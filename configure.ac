@@ -1,0 +1,33 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.61)
+AC_INIT(champlain, 0.1, pierre-luc@squidy.info)
+AC_CONFIG_SRCDIR([src/champlain.c])
+AC_CONFIG_HEADER([config.h])
+
+AM_INIT_AUTOMAKE   
+AC_LIBTOOL_DLOPEN
+AC_LIBLTDL_CONVENIENCE
+
+# Checks for programs.
+AC_PROG_CC
+
+# Checks for libraries.
+
+AC_SUBST(DEPS_CFLAGS)
+AC_SUBST(DEPS_LIBS)
+
+PKG_CHECK_MODULES(DEPS,
+	glib-2.0 >= 2.2
+)
+
+# Checks for header files.
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+# Checks for library functions.
+
+AC_CONFIG_FILES([Makefile
+                 src/Makefile])
+AC_OUTPUT
