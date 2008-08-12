@@ -29,15 +29,13 @@
 G_BEGIN_DECLS
 
 #define CHAMPLAIN_TYPE_WIDGET     (champlain_widget_get_type())
-#define CHAMPLAIN(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_WIDGET, ChamplainWidget))
+#define CHAMPLAIN_WIDGET(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_WIDGET, ChamplainWidget))
 #define CHAMPLAIN_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_WIDGET, ChamplainWidgetClass))
 #define CHAMPLAIN_IS_WIDGET(obj)  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_WIDGET))
 #define CHAMPLAIN_IS_WIDGET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass),  CHAMPLAIN_TYPE_WIDGET))
 #define CHAMPLAIN_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj),  CHAMPLAIN_TYPE_WIDGET, ChamplainWidgetClass))
 
 typedef struct _ChamplainWidgetPrivate ChamplainWidgetPrivate;
-typedef struct _ChamplainWidget ChamplainWidget;
-typedef struct _ChamplainWidgetClass ChamplainWidgetClass;
 
 struct _ChamplainWidget {
     GtkContainer parent_instance;
@@ -61,7 +59,7 @@ struct _ChamplainWidgetClass {
 CHAMPLAIN_API GType
 champlain_widget_get_type (void);
 
-CHAMPLAIN_API ChamplainWidget *
+CHAMPLAIN_API GtkWidget *
 champlain_widget_new (void);
 
 #endif

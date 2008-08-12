@@ -17,12 +17,61 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <stdio.h>
+#include <config.h>
 
-int main(int argc, char* argv[])
+#include <gtk/gtk.h>
+
+#include <champlain.h>
+
+/*
+ * Terminate the main loop.
+ */
+static void
+on_destroy (GtkWidget * widget, gpointer data)
 {
-   printf("Hello, world!\n");
+    gtk_main_quit ();
+}
 
-   return 0;
+int
+main (int argc, char *argv[])
+{
+    GtkWidget *window;
+    GtkWidget *widget;
+
+    gtk_init (&argc, &argv);
+
+    /* create the main, top level, window */
+    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+
+    /* give the window a 20px wide border */
+    gtk_container_set_border_width (GTK_CONTAINER (window), 10);
+
+    /* give it the title */
+    gtk_window_set_title (GTK_WINDOW (window), PACKAGE " " VERSION);
+
+    /* open it a bit wider so that both the label and title show up */
+    gtk_window_set_default_size (GTK_WINDOW (window), 200, 50);
+
+
+    /* Connect the destroy event of the window with our on_destroy function
+     * When the window is about to be destroyed we get a notificaiton and
+     * stop the main GTK loop
+     */
+    g_signal_connect (G_OBJECT (window), "destroy",
+                      G_CALLBACK (on_destroy), NULL);
+
+    /* Create the "Hello, World" label  */
+    widget = champlain_widget_new ();
+
+    /* and insert it into the main window  */
+    gtk_container_add (GTK_CONTAINER (window), widget);
+
+    /* make sure that everything, window and label, are visible */
+    gtk_widget_show_all (window);
+
+    /* start the main loop */
+    gtk_main ();
+
+    return 0;
 }
 

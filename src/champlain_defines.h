@@ -23,4 +23,7 @@
 #define CHAMPLAIN_API __attribute__((visibility("default")))
 #define CHAMPLAIN_OBSOLETE_API CHAMPLAIN_API __attribute__((deprecated))
 
+typedef struct _ChamplainWidget ChamplainWidget;
+typedef struct _ChamplainWidgetClass ChamplainWidgetClass;
+
 #endif
