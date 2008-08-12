@@ -17,10 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef CHAMPLAIN_H
-#define CHAMPLAIN_H
+#ifndef CHAMPLAIN_WIDGET_H
+#define CHAMPLAIN_WIDGET_H
 
-#include <gobjects.h>
+#include <champlain_defines.h>
+#include <glib.h>
+#include <glib-object.h>
+#include <gtk/gtk.h>
+
 
 G_BEGIN_DECLS
 
@@ -32,6 +36,8 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj),  CHAMPLAIN_TYPE_WIDGET, ChamplainWidgetClass))
 
 typedef struct _ChamplainWidgetPrivate ChamplainWidgetPrivate;
+typedef struct _ChamplainWidget ChamplainWidget;
+typedef struct _ChamplainWidgetClass ChamplainWidgetClass;
 
 struct _ChamplainWidget {
     GtkContainer parent_instance;
@@ -50,18 +56,12 @@ struct _ChamplainWidgetClass {
     void                       (* copy_clipboard)         (ChamplainWidget      *widget);
     void                       (* paste_clipboard)        (ChamplainWidget      *widget);
 
-    /*
-     * internal
-     */
-    void                       (* set_scroll_adjustments) (ChamplainWidget      *widget,
-                                                           GtkAdjustment        *hadjustment,
-                                                           GtkAdjustment        *vadjustment);
 };
 
 CHAMPLAIN_API GType
 champlain_widget_get_type (void);
 
-CHAMPLAIN_API GtkWidget *
+CHAMPLAIN_API ChamplainWidget *
 champlain_widget_new (void);
 
 #endif

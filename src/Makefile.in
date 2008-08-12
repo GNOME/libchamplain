@@ -47,9 +47,10 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_champlain_OBJECTS = champlain.$(OBJEXT)
+am_champlain_OBJECTS = champlain_widget.$(OBJEXT) launcher.$(OBJEXT)
 champlain_OBJECTS = $(am_champlain_OBJECTS)
-champlain_LDADD = $(LDADD)
+am__DEPENDENCIES_1 =
+champlain_DEPENDENCIES = $(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -140,8 +141,8 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-champlain_SOURCES = champlain.c
-sofa_LDADD = $(DEPS_LIBS) libsofa.la
+champlain_SOURCES = champlain_widget.c launcher.c
+champlain_LDADD = $(DEPS_LIBS)
 AM_CPPFLAGS = $(DEPS_CFLAGS)
 all: all-am
 
@@ -209,7 +210,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/champlain.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/champlain_widget.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/launcher.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

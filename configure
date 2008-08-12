@@ -578,7 +578,7 @@ PACKAGE_VERSION='0.1'
 PACKAGE_STRING='champlain 0.1'
 PACKAGE_BUGREPORT='pierre-luc@squidy.info'
 
-ac_unique_file="src/champlain.c"
+ac_unique_file="src/champlain_widget.h"
 ac_subst_vars='SHELL
 PATH_SEPARATOR
 PACKAGE_NAME
@@ -3403,14 +3403,20 @@ if test -n "$PKG_CONFIG"; then
         pkg_cv_DEPS_CFLAGS="$DEPS_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glib-2.0 >= 2.2
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \" glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.0,
+      gtk+-2.0 >= 2.2
 \"") >&5
-  ($PKG_CONFIG --exists --print-errors "glib-2.0 >= 2.2
+  ($PKG_CONFIG --exists --print-errors " glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.0,
+      gtk+-2.0 >= 2.2
 ") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_DEPS_CFLAGS=`$PKG_CONFIG --cflags "glib-2.0 >= 2.2
+  pkg_cv_DEPS_CFLAGS=`$PKG_CONFIG --cflags " glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.0,
+      gtk+-2.0 >= 2.2
 " 2>/dev/null`
 else
   pkg_failed=yes
@@ -3424,14 +3430,20 @@ if test -n "$PKG_CONFIG"; then
         pkg_cv_DEPS_LIBS="$DEPS_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glib-2.0 >= 2.2
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \" glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.0,
+      gtk+-2.0 >= 2.2
 \"") >&5
-  ($PKG_CONFIG --exists --print-errors "glib-2.0 >= 2.2
+  ($PKG_CONFIG --exists --print-errors " glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.0,
+      gtk+-2.0 >= 2.2
 ") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_DEPS_LIBS=`$PKG_CONFIG --libs "glib-2.0 >= 2.2
+  pkg_cv_DEPS_LIBS=`$PKG_CONFIG --libs " glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.0,
+      gtk+-2.0 >= 2.2
 " 2>/dev/null`
 else
   pkg_failed=yes
@@ -3451,16 +3463,22 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        DEPS_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "glib-2.0 >= 2.2
+	        DEPS_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors " glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.0,
+      gtk+-2.0 >= 2.2
 "`
         else
-	        DEPS_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "glib-2.0 >= 2.2
+	        DEPS_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors " glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.0,
+      gtk+-2.0 >= 2.2
 "`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$DEPS_PKG_ERRORS" >&5
 
-	{ { echo "$as_me:$LINENO: error: Package requirements (glib-2.0 >= 2.2
+	{ { echo "$as_me:$LINENO: error: Package requirements ( glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.0,
+      gtk+-2.0 >= 2.2
 ) were not met:
 
 $DEPS_PKG_ERRORS
@@ -3472,7 +3490,9 @@ Alternatively, you may set the environment variables DEPS_CFLAGS
 and DEPS_LIBS to avoid the need to call pkg-config.
 See the pkg-config man page for more details.
 " >&5
-echo "$as_me: error: Package requirements (glib-2.0 >= 2.2
+echo "$as_me: error: Package requirements ( glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.0,
+      gtk+-2.0 >= 2.2
 ) were not met:
 
 $DEPS_PKG_ERRORS

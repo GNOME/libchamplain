@@ -1,5 +1,5 @@
 bin_PROGRAMS = champlain
-champlain_SOURCES = champlain.c
+champlain_SOURCES = champlain_widget.c launcher.c
 
-sofa_LDADD = $(DEPS_LIBS) libsofa.la
+champlain_LDADD = $(DEPS_LIBS)
 AM_CPPFLAGS = $(DEPS_CFLAGS)

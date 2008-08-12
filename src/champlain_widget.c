@@ -19,17 +19,12 @@
 
 #include "config.h"
 
-#include "champlain.h"
+#include "champlain_defines.h"
 #include "champlain_widget.h"
 
 #include <stdio.h>
-
-int main(int argc, char* argv[])
-{
-   printf("Hello, world!\n");
-
-   return 0;
-}
+#include <glib.h>
+#include <glib-object.h>
 
 enum {
     /* normal signals */
@@ -47,3 +42,12 @@ static guint champlain_widget_signals[LAST_SIGNAL] = { 0, };
 
 G_DEFINE_TYPE(ChamplainWidget, champlain_widget, GTK_TYPE_CONTAINER)
 
+static void 
+champlain_widget_class_init(ChamplainWidgetClass* champlainWidgetClass)
+{
+}
+
+static void champlain_widget_init(ChamplainWidget* champlainWidget)
+{
+
+}
