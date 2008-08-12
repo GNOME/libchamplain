@@ -37,14 +37,15 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainWidgetPrivate ChamplainWidgetPrivate;
 
-struct _ChamplainWidget {
-    GtkContainer parent_instance;
+struct _ChamplainWidget {  
+	GtkAlignment bin;
 
     ChamplainWidgetPrivate *priv;
 };
 
-struct _ChamplainWidgetClass {
-    GtkContainerClass parent_class;
+struct _ChamplainWidgetClass {  
+	GtkBinClass parent_class;
+
 
     ChamplainWidget            * (* create_widget)        (ChamplainWidget* widget);
 

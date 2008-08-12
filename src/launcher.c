@@ -39,6 +39,7 @@ main (int argc, char *argv[])
     GtkWidget *widget;
 
     gtk_init (&argc, &argv);
+    clutter_init (&argc, &argv);
 
     /* create the main, top level, window */
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -50,7 +51,7 @@ main (int argc, char *argv[])
     gtk_window_set_title (GTK_WINDOW (window), PACKAGE " " VERSION);
 
     /* open it a bit wider so that both the label and title show up */
-    gtk_window_set_default_size (GTK_WINDOW (window), 200, 50);
+    gtk_window_set_default_size (GTK_WINDOW (window), 500, 500);
 
 
     /* Connect the destroy event of the window with our on_destroy function
