@@ -21,7 +21,10 @@ AC_SUBST(DEPS_LIBS)
 PKG_CHECK_MODULES(DEPS,
 	[ glib-2.0 >= 2.2,
       gobject-2.0 >= 2.0,
-      gtk+-2.0 >= 2.2 ]
+      gtk+-2.0 >= 2.2,
+      clutter-0.6 >= 0.6,
+      clutter-gtk-0.6 >= 0.6
+    ]
 )
 
 # Checks for header files.
