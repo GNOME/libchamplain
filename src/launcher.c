@@ -37,9 +37,9 @@ main (int argc, char *argv[])
 {
     GtkWidget *window;
     GtkWidget *widget;
+   	GtkWidget *scrolled;
 
-    gtk_init (&argc, &argv);
-    clutter_init (&argc, &argv);
+    gtk_clutter_init (&argc, &argv);
 
     /* create the main, top level, window */
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -60,12 +60,13 @@ main (int argc, char *argv[])
      */
     g_signal_connect (G_OBJECT (window), "destroy",
                       G_CALLBACK (on_destroy), NULL);
-
-    /* Create the "Hello, World" label  */
+                      
+	scrolled = gtk_scrolled_window_new (NULL, NULL);
     widget = champlain_widget_new ();
+	gtk_container_add (GTK_CONTAINER (scrolled), widget);
 
     /* and insert it into the main window  */
-    gtk_container_add (GTK_CONTAINER (window), widget);
+    gtk_container_add (GTK_CONTAINER (window), scrolled);
 
     /* make sure that everything, window and label, are visible */
     gtk_widget_show_all (window);

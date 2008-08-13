@@ -6893,50 +6893,51 @@ m4trace:configure.ac:14: -1- AM_CONDITIONAL([am__fastdepCC], [
   && test "$am_cv_CC_dependencies_compiler_type" = gcc3])
 m4trace:configure.ac:14: -1- m4_pattern_allow([^am__fastdepCC_TRUE$])
 m4trace:configure.ac:14: -1- m4_pattern_allow([^am__fastdepCC_FALSE$])
-m4trace:configure.ac:18: -1- m4_pattern_allow([^DEPS_CFLAGS$])
-m4trace:configure.ac:19: -1- m4_pattern_allow([^DEPS_LIBS$])
-m4trace:configure.ac:21: -1- PKG_CHECK_MODULES([DEPS], [ glib-2.0 >= 2.2,
-      gobject-2.0 >= 2.0,
+m4trace:configure.ac:15: -1- m4_pattern_allow([^GLIB_GENMARSHAL$])
+m4trace:configure.ac:19: -1- m4_pattern_allow([^DEPS_CFLAGS$])
+m4trace:configure.ac:20: -1- m4_pattern_allow([^DEPS_LIBS$])
+m4trace:configure.ac:22: -1- PKG_CHECK_MODULES([DEPS], [ glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
-      clutter-0.6 >= 0.6,
-      clutter-gtk-0.6 >= 0.6
+      clutter-0.8 >= 0.8,
+      clutter-gtk-0.8 >= 0.8
     
 ])
-m4trace:configure.ac:21: -1- PKG_PROG_PKG_CONFIG
-m4trace:configure.ac:21: -1- m4_pattern_forbid([^_?PKG_[A-Z_]+$])
-m4trace:configure.ac:21: -1- m4_pattern_allow([^PKG_CONFIG(_PATH)?$])
-m4trace:configure.ac:21: -1- m4_pattern_allow([^PKG_CONFIG$])
-m4trace:configure.ac:21: -1- m4_pattern_allow([^PKG_CONFIG$])
-m4trace:configure.ac:21: -1- m4_pattern_allow([^DEPS_CFLAGS$])
-m4trace:configure.ac:21: -1- m4_pattern_allow([^DEPS_LIBS$])
-m4trace:configure.ac:21: -1- PKG_CHECK_EXISTS([ glib-2.0 >= 2.2,
-      gobject-2.0 >= 2.0,
+m4trace:configure.ac:22: -1- PKG_PROG_PKG_CONFIG
+m4trace:configure.ac:22: -1- m4_pattern_forbid([^_?PKG_[A-Z_]+$])
+m4trace:configure.ac:22: -1- m4_pattern_allow([^PKG_CONFIG(_PATH)?$])
+m4trace:configure.ac:22: -1- m4_pattern_allow([^PKG_CONFIG$])
+m4trace:configure.ac:22: -1- m4_pattern_allow([^PKG_CONFIG$])
+m4trace:configure.ac:22: -1- m4_pattern_allow([^DEPS_CFLAGS$])
+m4trace:configure.ac:22: -1- m4_pattern_allow([^DEPS_LIBS$])
+m4trace:configure.ac:22: -1- PKG_CHECK_EXISTS([ glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
-      clutter-0.6 >= 0.6,
-      clutter-gtk-0.6 >= 0.6
+      clutter-0.8 >= 0.8,
+      clutter-gtk-0.8 >= 0.8
     
 ], [pkg_cv_[]DEPS_CFLAGS=`$PKG_CONFIG --[]cflags " glib-2.0 >= 2.2,
-      gobject-2.0 >= 2.0,
+      gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
-      clutter-0.6 >= 0.6,
-      clutter-gtk-0.6 >= 0.6
+      clutter-0.8 >= 0.8,
+      clutter-gtk-0.8 >= 0.8
     
 " 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.ac:21: -1- PKG_CHECK_EXISTS([ glib-2.0 >= 2.2,
-      gobject-2.0 >= 2.0,
+m4trace:configure.ac:22: -1- PKG_CHECK_EXISTS([ glib-2.0 >= 2.2,
+      gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
-      clutter-0.6 >= 0.6,
-      clutter-gtk-0.6 >= 0.6
+      clutter-0.8 >= 0.8,
+      clutter-gtk-0.8 >= 0.8
     
 ], [pkg_cv_[]DEPS_LIBS=`$PKG_CONFIG --[]libs " glib-2.0 >= 2.2,
-      gobject-2.0 >= 2.0,
+      gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
-      clutter-0.6 >= 0.6,
-      clutter-gtk-0.6 >= 0.6
+      clutter-0.8 >= 0.8,
+      clutter-gtk-0.8 >= 0.8
     
 " 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.ac:21: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.ac:38: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.ac:38: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.ac:38: -1- _AC_AM_CONFIG_HEADER_HOOK([$ac_file])
-m4trace:configure.ac:38: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
+m4trace:configure.ac:22: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.ac:39: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.ac:39: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.ac:39: -1- _AC_AM_CONFIG_HEADER_HOOK([$ac_file])
+m4trace:configure.ac:39: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS

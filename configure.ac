@@ -12,6 +12,7 @@ AC_LIBLTDL_CONVENIENCE
 
 # Checks for programs.
 AC_PROG_CC
+AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
 # Checks for libraries.
 
@@ -20,10 +21,10 @@ AC_SUBST(DEPS_LIBS)
 
 PKG_CHECK_MODULES(DEPS,
 	[ glib-2.0 >= 2.2,
-      gobject-2.0 >= 2.0,
+      gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
-      clutter-0.6 >= 0.6,
-      clutter-gtk-0.6 >= 0.6
+      clutter-0.8 >= 0.8,
+      clutter-gtk-0.8 >= 0.8
     ]
 )
 

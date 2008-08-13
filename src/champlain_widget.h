@@ -49,11 +49,9 @@ struct _ChamplainWidgetClass {
 
     ChamplainWidget            * (* create_widget)        (ChamplainWidget* widget);
 
-    
-    void                       (* select_all)             (ChamplainWidget      *widget);
-    void                       (* cut_clipboard)          (ChamplainWidget      *widget);
-    void                       (* copy_clipboard)         (ChamplainWidget      *widget);
-    void                       (* paste_clipboard)        (ChamplainWidget      *widget);
+    void                       (* set_scroll_adjustments) (ChamplainWidget      *widget,
+                                                           GtkAdjustment        *hadjustment,
+                                                           GtkAdjustment        *vadjustment);
 
 };
 
