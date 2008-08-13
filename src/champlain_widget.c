@@ -50,6 +50,7 @@ struct _ChamplainWidgetPrivate {
     GtkAdjustment* horizontalAdjustment;
     GtkAdjustment* verticalAdjustment;
     GdkPoint scrollOffset;    
+    ClutterActor* bg;
 };
 
 G_DEFINE_TYPE(ChamplainWidget, champlain_widget, GTK_TYPE_ALIGNMENT)
@@ -65,9 +66,10 @@ champlain_widget_adjustement_changed(GtkAdjustment* adjustment, gpointer champla
     else if (adjustment == priv->verticalAdjustment)
         priv->scrollOffset.y = (int)gtk_adjustment_get_value(adjustment);
 
+	g_print("value: (%d,%d) \n", priv->scrollOffset.x, priv->scrollOffset.y);
 	// Check if the offset is empty
 	
-	
+	clutter_actor_set_position(priv->bg, -priv->scrollOffset.x, -priv->scrollOffset.y);
 }            
 
 static void 
@@ -93,9 +95,7 @@ champlain_widget_set_scroll_adjustments(ChamplainWidget      *champlainWidget,
 		g_object_ref_sink(priv->verticalAdjustment);
 		
 		gdouble val = gtk_adjustment_get_value(hadjustment);
-		g_print("value: %f \n", val);
 		val = gtk_adjustment_get_value(vadjustment);
-		g_print("value: %f \n", val);
     	// Connect the signals
 	
 		g_object_set(G_OBJECT(priv->horizontalAdjustment), "lower", 0.0, NULL);
@@ -103,6 +103,16 @@ champlain_widget_set_scroll_adjustments(ChamplainWidget      *champlainWidget,
 		g_object_set(G_OBJECT(priv->horizontalAdjustment), "page-size", 20.0, NULL);
 		g_object_set(G_OBJECT(priv->horizontalAdjustment), "step-increment", 5.0, NULL);
 		g_object_set(G_OBJECT(priv->horizontalAdjustment), "page-increment", 15.0, NULL);
+		
+		g_object_set(G_OBJECT(priv->verticalAdjustment), "lower", 0.0, NULL);
+		g_object_set(G_OBJECT(priv->verticalAdjustment), "upper", 100.0, NULL);
+		g_object_set(G_OBJECT(priv->verticalAdjustment), "page-size", 20.0, NULL);
+		g_object_set(G_OBJECT(priv->verticalAdjustment), "step-increment", 5.0, NULL);
+		g_object_set(G_OBJECT(priv->verticalAdjustment), "page-increment", 15.0, NULL);
+		
+		
+		g_signal_connect(G_OBJECT(priv->horizontalAdjustment), "value-changed", (gpointer)champlain_widget_adjustement_changed, champlainWidget);
+		g_signal_connect(G_OBJECT(priv->verticalAdjustment), "value-changed", (gpointer)champlain_widget_adjustement_changed, champlainWidget);
 	}
 	
     
@@ -152,8 +162,8 @@ static void champlain_widget_init(ChamplainWidget* champlainWidget)
 {
 	ChamplainWidgetPrivate* priv = CHAMPLAIN_WIDGET_GET_PRIVATE(champlainWidget);
 
-    priv->horizontalAdjustment = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 100.0, 10.0, 50.0, 20.0));
-    priv->verticalAdjustment = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 100.0, 10.0, 50.0, 20.0));
+    priv->horizontalAdjustment = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+    priv->verticalAdjustment = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     
     g_object_ref_sink(priv->horizontalAdjustment);
     g_object_ref_sink(priv->verticalAdjustment);
@@ -169,30 +179,34 @@ static void champlain_widget_load_map(ChamplainWidget* champlainWidget)
 	clutter_color_parse("white", &white);
 	ClutterColor blue;
 	clutter_color_parse("blue", &blue);
+	ClutterActor* group = clutter_group_new();
 	
-	ClutterActor * rect = clutter_rectangle_new_with_color(&blue);
-	clutter_container_add(CLUTTER_CONTAINER(stage), rect, NULL);
+	ClutterActor* rect = clutter_rectangle_new_with_color(&blue);
   	clutter_actor_set_position (rect, 100, 100);
   	clutter_actor_set_size (rect, 100, 100);
 	clutter_actor_show(rect);
+	clutter_container_add(CLUTTER_CONTAINER(group), rect, NULL);
 	
 	rect = clutter_rectangle_new_with_color(&white);
-	clutter_container_add(CLUTTER_CONTAINER(stage), rect, NULL);
   	clutter_actor_set_position (rect, 100, 200);
   	clutter_actor_set_size (rect, 100, 100);
 	clutter_actor_show(rect);
+	clutter_container_add(CLUTTER_CONTAINER(group), rect, NULL);
 	
 	rect = clutter_rectangle_new_with_color(&blue);
-	clutter_container_add(CLUTTER_CONTAINER(stage), rect, NULL);
   	clutter_actor_set_position (rect, 200, 200);
   	clutter_actor_set_size (rect, 100, 100);
 	clutter_actor_show(rect);
+	clutter_container_add(CLUTTER_CONTAINER(group), rect, NULL);
 	
 	rect = clutter_rectangle_new_with_color(&white);
-	clutter_container_add(CLUTTER_CONTAINER(stage), rect, NULL);
   	clutter_actor_set_position (rect, 200, 100);
   	clutter_actor_set_size (rect, 100, 100);
 	clutter_actor_show(rect);
+	clutter_container_add(CLUTTER_CONTAINER(group), rect, NULL);
+	
+	priv->bg = group;
+	clutter_container_add(CLUTTER_CONTAINER(stage), group, NULL);
 	
 }
 
