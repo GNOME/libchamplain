@@ -80,12 +80,31 @@ champlain_widget_set_scroll_adjustments(ChamplainWidget      *champlainWidget,
     if (priv->horizontalAdjustment) {
 		g_signal_handlers_disconnect_by_func(G_OBJECT(priv->horizontalAdjustment), (gpointer)champlain_widget_adjustement_changed, champlainWidget);
 		g_signal_handlers_disconnect_by_func(G_OBJECT(priv->verticalAdjustment), (gpointer)champlain_widget_adjustement_changed, champlainWidget);
+		
 		g_object_unref(priv->horizontalAdjustment);
 		g_object_unref(priv->verticalAdjustment);
 	}
-
-    priv->horizontalAdjustment = hadjustment;
-    priv->verticalAdjustment = vadjustment;
+	
+	priv->horizontalAdjustment = hadjustment;
+	priv->verticalAdjustment = vadjustment;
+	
+	if (hadjustment) {
+		g_object_ref_sink(priv->horizontalAdjustment);
+		g_object_ref_sink(priv->verticalAdjustment);
+		
+		gdouble val = gtk_adjustment_get_value(hadjustment);
+		g_print("value: %f \n", val);
+		val = gtk_adjustment_get_value(vadjustment);
+		g_print("value: %f \n", val);
+    	// Connect the signals
+	
+		g_object_set(G_OBJECT(priv->horizontalAdjustment), "lower", 0.0, NULL);
+		g_object_set(G_OBJECT(priv->horizontalAdjustment), "upper", 100.0, NULL);
+		g_object_set(G_OBJECT(priv->horizontalAdjustment), "page-size", 20.0, NULL);
+		g_object_set(G_OBJECT(priv->horizontalAdjustment), "step-increment", 5.0, NULL);
+		g_object_set(G_OBJECT(priv->horizontalAdjustment), "page-increment", 15.0, NULL);
+	}
+	
     
 }   
 
@@ -94,16 +113,15 @@ static void champlain_widget_finalize(GObject* object)
     ChamplainWidget* widget = CHAMPLAIN_WIDGET(object);
 	ChamplainWidgetPrivate* priv = CHAMPLAIN_WIDGET_GET_PRIVATE(widget);
 
-
     if (priv->horizontalAdjustment) {
         g_object_unref(priv->horizontalAdjustment);
        	g_signal_handlers_disconnect_by_func(G_OBJECT(priv->horizontalAdjustment), (gpointer)champlain_widget_adjustement_changed, widget);
 	}
+	
     if (priv->verticalAdjustment) {
         g_object_unref(priv->verticalAdjustment);
         g_signal_handlers_disconnect_by_func(G_OBJECT(priv->verticalAdjustment), (gpointer)champlain_widget_adjustement_changed, widget);
     }
-    
 
     G_OBJECT_CLASS(champlain_widget_parent_class)->finalize(object);
 }
@@ -112,7 +130,6 @@ static void
 champlain_widget_class_init(ChamplainWidgetClass* champlainWidgetClass)
 {
 	g_type_class_add_private(champlainWidgetClass, sizeof(ChamplainWidgetPrivate));
-	
 	
     /*
      * make us scrollable (e.g. addable to a GtkScrolledWindow)
@@ -127,7 +144,6 @@ champlain_widget_class_init(ChamplainWidgetClass* champlainWidgetClass)
             G_TYPE_NONE, 2,
             GTK_TYPE_ADJUSTMENT, GTK_TYPE_ADJUSTMENT);
             
-            
     GObjectClass* objectClass = G_OBJECT_CLASS(champlainWidgetClass);
     objectClass->finalize = champlain_widget_finalize;
 }
@@ -136,8 +152,8 @@ static void champlain_widget_init(ChamplainWidget* champlainWidget)
 {
 	ChamplainWidgetPrivate* priv = CHAMPLAIN_WIDGET_GET_PRIVATE(champlainWidget);
 
-    priv->horizontalAdjustment = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    priv->verticalAdjustment = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+    priv->horizontalAdjustment = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 100.0, 10.0, 50.0, 20.0));
+    priv->verticalAdjustment = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 100.0, 10.0, 50.0, 20.0));
     
     g_object_ref_sink(priv->horizontalAdjustment);
     g_object_ref_sink(priv->verticalAdjustment);
