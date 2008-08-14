@@ -45,43 +45,51 @@ static guint champlain_widget_signals[LAST_SIGNAL] = { 0, };
 
 #define CHAMPLAIN_WIDGET_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_WIDGET, ChamplainWidgetPrivate))
 
+typedef struct {
+	/* Units to store the origin of a click when scrolling */
+	ClutterUnit x;
+	ClutterUnit y;
+} ScrollMotion;
+
 struct _ChamplainWidgetPrivate {
     GtkWidget* clutterEmbed;
     GtkAdjustment* horizontalAdjustment;
     GtkAdjustment* verticalAdjustment;
-    GdkPoint scrollOffset;    
-    ClutterActor* bg;
+    ClutterActor* viewport;
+    
+	// Scrolling  
+    ScrollMotion position;
+    ScrollMotion hitPoint;
 };
 
-G_DEFINE_TYPE(ChamplainWidget, champlain_widget, GTK_TYPE_ALIGNMENT)
 
-               
+G_DEFINE_TYPE(ChamplainWidget, champlain_widget, GTK_TYPE_ALIGNMENT)
+      
 static void
-champlain_widget_adjustement_changed(GtkAdjustment* adjustment, gpointer champlainWidget)
+adjustement_changed_cb (GtkAdjustment* adjustment, 
+						ChamplainWidgetPrivate* champlainWidget)
 {
 	ChamplainWidgetPrivate* priv = CHAMPLAIN_WIDGET_GET_PRIVATE(champlainWidget);
-	
+	/*
     if (adjustment == priv->horizontalAdjustment)
         priv->scrollOffset.x = (int)gtk_adjustment_get_value(adjustment);
     else if (adjustment == priv->verticalAdjustment)
         priv->scrollOffset.y = (int)gtk_adjustment_get_value(adjustment);
-
-	g_print("value: (%d,%d) \n", priv->scrollOffset.x, priv->scrollOffset.y);
+	*/
 	// Check if the offset is empty
 	
-	clutter_actor_set_position(priv->bg, -priv->scrollOffset.x, -priv->scrollOffset.y);
 }            
 
 static void 
-champlain_widget_set_scroll_adjustments(ChamplainWidget      *champlainWidget,
-                                        GtkAdjustment        *hadjustment,
-                                        GtkAdjustment        *vadjustment)
+champlain_widget_set_scroll_adjustments (ChamplainWidget      *champlainWidget,
+                                         GtkAdjustment        *hadjustment,
+                                         GtkAdjustment        *vadjustment)
 {
 	ChamplainWidgetPrivate* priv = CHAMPLAIN_WIDGET_GET_PRIVATE(champlainWidget);
 	
     if (priv->horizontalAdjustment) {
-		g_signal_handlers_disconnect_by_func(G_OBJECT(priv->horizontalAdjustment), (gpointer)champlain_widget_adjustement_changed, champlainWidget);
-		g_signal_handlers_disconnect_by_func(G_OBJECT(priv->verticalAdjustment), (gpointer)champlain_widget_adjustement_changed, champlainWidget);
+		g_signal_handlers_disconnect_by_func(G_OBJECT(priv->horizontalAdjustment), (gpointer) adjustement_changed_cb, champlainWidget);
+		g_signal_handlers_disconnect_by_func(G_OBJECT(priv->verticalAdjustment), (gpointer) adjustement_changed_cb, champlainWidget);
 		
 		g_object_unref(priv->horizontalAdjustment);
 		g_object_unref(priv->verticalAdjustment);
@@ -98,24 +106,21 @@ champlain_widget_set_scroll_adjustments(ChamplainWidget      *champlainWidget,
 		val = gtk_adjustment_get_value(vadjustment);
     	// Connect the signals
 	
-		g_object_set(G_OBJECT(priv->horizontalAdjustment), "lower", 0.0, NULL);
-		g_object_set(G_OBJECT(priv->horizontalAdjustment), "upper", 100.0, NULL);
+		g_object_set(G_OBJECT(priv->horizontalAdjustment), "lower", -180.0, NULL);
+		g_object_set(G_OBJECT(priv->horizontalAdjustment), "upper", 180.0, NULL);
 		g_object_set(G_OBJECT(priv->horizontalAdjustment), "page-size", 20.0, NULL);
 		g_object_set(G_OBJECT(priv->horizontalAdjustment), "step-increment", 5.0, NULL);
 		g_object_set(G_OBJECT(priv->horizontalAdjustment), "page-increment", 15.0, NULL);
 		
-		g_object_set(G_OBJECT(priv->verticalAdjustment), "lower", 0.0, NULL);
-		g_object_set(G_OBJECT(priv->verticalAdjustment), "upper", 100.0, NULL);
+		g_object_set(G_OBJECT(priv->verticalAdjustment), "lower", -90.0, NULL);
+		g_object_set(G_OBJECT(priv->verticalAdjustment), "upper", 90.0, NULL);
 		g_object_set(G_OBJECT(priv->verticalAdjustment), "page-size", 20.0, NULL);
 		g_object_set(G_OBJECT(priv->verticalAdjustment), "step-increment", 5.0, NULL);
 		g_object_set(G_OBJECT(priv->verticalAdjustment), "page-increment", 15.0, NULL);
 		
-		
-		g_signal_connect(G_OBJECT(priv->horizontalAdjustment), "value-changed", (gpointer)champlain_widget_adjustement_changed, champlainWidget);
-		g_signal_connect(G_OBJECT(priv->verticalAdjustment), "value-changed", (gpointer)champlain_widget_adjustement_changed, champlainWidget);
+		//g_signal_connect(G_OBJECT(priv->horizontalAdjustment), "value-changed", (gpointer)adjustement_changed_cb, champlainWidget);
+		//g_signal_connect(G_OBJECT(priv->verticalAdjustment), "value-changed", (gpointer)adjustement_changed_cb, champlainWidget);
 	}
-	
-    
 }   
 
 static void champlain_widget_finalize(GObject* object)
@@ -125,12 +130,12 @@ static void champlain_widget_finalize(GObject* object)
 
     if (priv->horizontalAdjustment) {
         g_object_unref(priv->horizontalAdjustment);
-       	g_signal_handlers_disconnect_by_func(G_OBJECT(priv->horizontalAdjustment), (gpointer)champlain_widget_adjustement_changed, widget);
+       	g_signal_handlers_disconnect_by_func(G_OBJECT(priv->horizontalAdjustment), (gpointer)adjustement_changed_cb, widget);
 	}
 	
     if (priv->verticalAdjustment) {
         g_object_unref(priv->verticalAdjustment);
-        g_signal_handlers_disconnect_by_func(G_OBJECT(priv->verticalAdjustment), (gpointer)champlain_widget_adjustement_changed, widget);
+        g_signal_handlers_disconnect_by_func(G_OBJECT(priv->verticalAdjustment), (gpointer)adjustement_changed_cb, widget);
     }
 
     G_OBJECT_CLASS(champlain_widget_parent_class)->finalize(object);
@@ -167,6 +172,138 @@ static void champlain_widget_init(ChamplainWidget* champlainWidget)
     
     g_object_ref_sink(priv->horizontalAdjustment);
     g_object_ref_sink(priv->verticalAdjustment);
+    
+      
+}
+
+static gboolean
+viewport_motion_event_cb (ClutterActor *actor,
+                 ClutterMotionEvent *event,
+                 ChamplainWidget* champlainWidget)
+{
+	ChamplainWidgetPrivate* priv = CHAMPLAIN_WIDGET_GET_PRIVATE(champlainWidget);
+	ClutterActor* stage = gtk_clutter_embed_get_stage(GTK_CLUTTER_EMBED(priv->clutterEmbed));
+	
+	ClutterUnit x, y;
+	if (clutter_actor_transform_stage_point (stage,
+                                           CLUTTER_UNITS_FROM_DEVICE(event->x),
+                                           CLUTTER_UNITS_FROM_DEVICE(event->y),
+                                           &x, &y))
+	{
+		ClutterUnit dx, dy;
+		
+		dx = x - priv->position.x ;
+		dy = y - priv->position.y;
+
+		g_print("Motion n: %d, %d\t c: %d, %d \t d: %d, %d\n", CLUTTER_UNITS_TO_INT(x), CLUTTER_UNITS_TO_INT(y), 
+			CLUTTER_UNITS_TO_INT(priv->position.x), CLUTTER_UNITS_TO_INT(priv->position.y), 
+			CLUTTER_UNITS_TO_INT(dx), CLUTTER_UNITS_TO_INT(dy));
+
+		priv->position.x += dx - priv->hitPoint.x;
+		priv->position.y += dy - priv->hitPoint.y;
+		
+		clutter_actor_set_positionu(priv->viewport, priv->position.x, priv->position.y );
+	}
+
+	return TRUE;
+}
+
+static gboolean
+viewport_button_release_event_cb (ClutterActor *actor,
+                         ClutterButtonEvent *event,
+                         ChamplainWidget* champlainWidget)
+{
+	ChamplainWidgetPrivate* priv = CHAMPLAIN_WIDGET_GET_PRIVATE(champlainWidget);
+	g_print("release\n");
+	
+  ClutterActor *viewport = priv->viewport;
+
+  if (event->button != 1)
+    return FALSE;
+  
+  g_signal_handlers_disconnect_by_func (viewport,
+                                        viewport_motion_event_cb,
+                                        champlainWidget);
+  g_signal_handlers_disconnect_by_func (viewport,
+                                        viewport_button_release_event_cb,
+                                        champlainWidget);
+  
+  clutter_ungrab_pointer ();
+  
+  /* Pass through events to children.
+   * FIXME: this probably breaks click-count.
+   */
+  clutter_event_put ((ClutterEvent *)event);
+  
+  return TRUE;
+}
+static gboolean
+after_event_cb (ChamplainWidget* champlainWidget)
+{
+  /* Check the pointer grab - if something else has grabbed it - for example,
+   * a scroll-bar or some such, don't do our funky stuff.
+   */
+	ChamplainWidgetPrivate* priv = CHAMPLAIN_WIDGET_GET_PRIVATE(champlainWidget);
+  if (clutter_get_pointer_grab () != CLUTTER_ACTOR (priv->viewport))
+    {
+      g_signal_handlers_disconnect_by_func (priv->viewport,
+                                            viewport_motion_event_cb,
+                                            champlainWidget);
+      g_signal_handlers_disconnect_by_func (priv->viewport,
+                                            viewport_button_release_event_cb,
+                                            champlainWidget);
+    }
+  
+  return FALSE;
+}
+
+static gboolean
+viewport_captured_event_cb (ClutterActor     *actor,
+					       ClutterEvent     *event,
+					       ChamplainWidget* champlainWidget)
+{
+  
+	ChamplainWidgetPrivate* priv = CHAMPLAIN_WIDGET_GET_PRIVATE(champlainWidget);
+	ClutterActor* stage = gtk_clutter_embed_get_stage(GTK_CLUTTER_EMBED(priv->clutterEmbed));
+
+	if (event->type == CLUTTER_BUTTON_PRESS)
+	{
+	  ClutterButtonEvent *bevent = (ClutterButtonEvent *)event;
+	  ClutterUnit x, y;
+	  if ((bevent->button == 1) &&
+		  (clutter_actor_transform_stage_point (stage,
+		                                   CLUTTER_UNITS_FROM_DEVICE(bevent->x),
+		                                   CLUTTER_UNITS_FROM_DEVICE(bevent->y),
+		                                   &x, &y)))
+		{
+
+		g_print("Hit h: %d, %d\t c: %d, %d \n", CLUTTER_UNITS_TO_INT(x), CLUTTER_UNITS_TO_INT(y), 
+			CLUTTER_UNITS_TO_INT(priv->position.x), CLUTTER_UNITS_TO_INT(priv->position.y));
+	  	  priv->hitPoint.x = x - priv->position.x;
+	  	  priv->hitPoint.y = y - priv->position.y;
+	  	  
+		  clutter_grab_pointer (actor);
+		  
+		  /* Add a high priority idle to check the grab after the event
+		   * emission is finished.
+		   */
+		  g_idle_add_full (G_PRIORITY_HIGH_IDLE,
+		                   (GSourceFunc)after_event_cb,
+		                   champlainWidget,
+		                   NULL);
+		 
+		  g_signal_connect (priv->viewport,
+		                    "motion-event",
+		                    G_CALLBACK (viewport_motion_event_cb),
+		                    champlainWidget);
+		  g_signal_connect (priv->viewport,
+		                    "button-release-event",
+		                    G_CALLBACK (viewport_button_release_event_cb),
+		                    champlainWidget);
+		}
+	}
+
+	return FALSE;
 }
 
 static void champlain_widget_load_map(ChamplainWidget* champlainWidget)
@@ -175,6 +312,13 @@ static void champlain_widget_load_map(ChamplainWidget* champlainWidget)
 	
 	ClutterActor* stage = gtk_clutter_embed_get_stage(GTK_CLUTTER_EMBED(priv->clutterEmbed));
 	
+	ClutterActor* viewport = clutter_group_new();
+	clutter_actor_set_reactive (CLUTTER_ACTOR (viewport), TRUE);
+	g_signal_connect (CLUTTER_ACTOR (viewport),
+					"captured-event",
+					G_CALLBACK (viewport_captured_event_cb),
+					champlainWidget);
+	
 	ClutterColor white;
 	clutter_color_parse("white", &white);
 	ClutterColor blue;
@@ -182,31 +326,33 @@ static void champlain_widget_load_map(ChamplainWidget* champlainWidget)
 	ClutterActor* group = clutter_group_new();
 	
 	ClutterActor* rect = clutter_rectangle_new_with_color(&blue);
+  	clutter_actor_set_position (rect, 0, 0);
+  	clutter_actor_set_size (rect, 100, 100);
+	clutter_actor_show(rect);
+	clutter_container_add(CLUTTER_CONTAINER(group), rect, NULL);
+	
+	rect = clutter_rectangle_new_with_color(&white);
+  	clutter_actor_set_position (rect, 0, 100);
+  	clutter_actor_set_size (rect, 100, 100);
+	clutter_actor_show(rect);
+	clutter_container_add(CLUTTER_CONTAINER(group), rect, NULL);
+	
+	rect = clutter_rectangle_new_with_color(&blue);
   	clutter_actor_set_position (rect, 100, 100);
   	clutter_actor_set_size (rect, 100, 100);
 	clutter_actor_show(rect);
 	clutter_container_add(CLUTTER_CONTAINER(group), rect, NULL);
 	
 	rect = clutter_rectangle_new_with_color(&white);
-  	clutter_actor_set_position (rect, 100, 200);
+  	clutter_actor_set_position (rect, 100, 0);
   	clutter_actor_set_size (rect, 100, 100);
 	clutter_actor_show(rect);
 	clutter_container_add(CLUTTER_CONTAINER(group), rect, NULL);
 	
-	rect = clutter_rectangle_new_with_color(&blue);
-  	clutter_actor_set_position (rect, 200, 200);
-  	clutter_actor_set_size (rect, 100, 100);
-	clutter_actor_show(rect);
-	clutter_container_add(CLUTTER_CONTAINER(group), rect, NULL);
+	priv->viewport = viewport;
+	clutter_container_add(CLUTTER_CONTAINER(viewport), group, NULL);
 	
-	rect = clutter_rectangle_new_with_color(&white);
-  	clutter_actor_set_position (rect, 200, 100);
-  	clutter_actor_set_size (rect, 100, 100);
-	clutter_actor_show(rect);
-	clutter_container_add(CLUTTER_CONTAINER(group), rect, NULL);
-	
-	priv->bg = group;
-	clutter_container_add(CLUTTER_CONTAINER(stage), group, NULL);
+	clutter_container_add_actor (CLUTTER_CONTAINER (stage), viewport);
 	
 }
 
