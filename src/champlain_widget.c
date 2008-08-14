@@ -140,15 +140,15 @@ champlain_widget_finalize (GObject * object)
   if (priv->horizontalAdjustment)
     {
       g_object_unref (priv->horizontalAdjustment);
-      g_signal_handlers_disconnect_by_func (G_OBJECT
-					    (priv->horizontalAdjustment), (gpointer) adjustement_changed_cb, widget);
+      //g_signal_handlers_disconnect_by_func (G_OBJECT
+			//		    (priv->horizontalAdjustment), (gpointer) adjustement_changed_cb, widget);
     }
 
   if (priv->verticalAdjustment)
     {
       g_object_unref (priv->verticalAdjustment);
-      g_signal_handlers_disconnect_by_func (G_OBJECT
-					    (priv->verticalAdjustment), (gpointer) adjustement_changed_cb, widget);
+      //g_signal_handlers_disconnect_by_func (G_OBJECT
+			//		    (priv->verticalAdjustment), (gpointer) adjustement_changed_cb, widget);
     }
 
   G_OBJECT_CLASS (champlain_widget_parent_class)->finalize (object);
@@ -205,10 +205,10 @@ viewport_motion_event_cb (ClutterActor * actor, ClutterMotionEvent * event, Cham
       dx = x - priv->position.x;
       dy = y - priv->position.y;
 
-      g_print ("Motion n: %d, %d\t c: %d, %d \t d: %d, %d\n",
-	       CLUTTER_UNITS_TO_INT (x), CLUTTER_UNITS_TO_INT (y),
-	       CLUTTER_UNITS_TO_INT (priv->position.x),
-	       CLUTTER_UNITS_TO_INT (priv->position.y), CLUTTER_UNITS_TO_INT (dx), CLUTTER_UNITS_TO_INT (dy));
+      //g_print ("Motion n: %d, %d\t c: %d, %d \t d: %d, %d\n",
+	    //   CLUTTER_UNITS_TO_INT (x), CLUTTER_UNITS_TO_INT (y),
+	    //   CLUTTER_UNITS_TO_INT (priv->position.x),
+	    //   CLUTTER_UNITS_TO_INT (priv->position.y), CLUTTER_UNITS_TO_INT (dx), CLUTTER_UNITS_TO_INT (dy));
 
       priv->position.x += dx - priv->hitPoint.x;
       priv->position.y += dy - priv->hitPoint.y;
@@ -223,8 +223,7 @@ static gboolean
 viewport_button_release_event_cb (ClutterActor * actor, ClutterButtonEvent * event, ChamplainWidget * champlainWidget)
 {
   ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (champlainWidget);
-  g_print ("release\n");
-
+  
   ClutterActor *viewport = priv->viewport;
 
   if (event->button != 1)
@@ -276,9 +275,9 @@ viewport_captured_event_cb (ClutterActor * actor, ClutterEvent * event, Champlai
 						(bevent->x), CLUTTER_UNITS_FROM_DEVICE (bevent->y), &x, &y)))
 			{
 
-				g_print ("Hit h: %d, %d\t c: %d, %d \n", CLUTTER_UNITS_TO_INT (x),
-					 CLUTTER_UNITS_TO_INT (y),
-					 CLUTTER_UNITS_TO_INT (priv->position.x), CLUTTER_UNITS_TO_INT (priv->position.y));
+				//g_print ("Hit h: %d, %d\t c: %d, %d \n", CLUTTER_UNITS_TO_INT (x),
+				//	 CLUTTER_UNITS_TO_INT (y),
+				//	 CLUTTER_UNITS_TO_INT (priv->position.x), CLUTTER_UNITS_TO_INT (priv->position.y));
 				priv->hitPoint.x = x - priv->position.x;
 				priv->hitPoint.y = y - priv->position.y;
 
