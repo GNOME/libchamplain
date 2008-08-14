@@ -29,49 +29,47 @@
 static void
 on_destroy (GtkWidget * widget, gpointer data)
 {
-    gtk_main_quit ();
+  gtk_main_quit ();
 }
 
 int
 main (int argc, char *argv[])
 {
-    GtkWidget *window;
-    GtkWidget *widget;
-   	GtkWidget *scrolled;
+  GtkWidget *window;
+  GtkWidget *widget;
+  GtkWidget *scrolled;
 
-    gtk_clutter_init (&argc, &argv);
+  gtk_clutter_init (&argc, &argv);
 
-    /* create the main, top level, window */
-    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  /* create the main, top level, window */
+  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
-    /* give the window a 20px wide border */
-    gtk_container_set_border_width (GTK_CONTAINER (window), 10);
+  /* give the window a 10px wide border */
+  gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
-    /* give it the title */
-    gtk_window_set_title (GTK_WINDOW (window), PACKAGE " " VERSION);
+  /* give it the title */
+  gtk_window_set_title (GTK_WINDOW (window), PACKAGE " " VERSION);
 
-    /* open it a bit wider so that both the label and title show up */
-    gtk_window_set_default_size (GTK_WINDOW (window), 500, 500);
+  /* open it a bit wider so that both the label and title show up */
+  gtk_window_set_default_size (GTK_WINDOW (window), 500, 500);
 
 
-    /* Connect the destroy event of the window with our on_destroy function
-     * When the window is about to be destroyed we get a notificaiton and
-     * stop the main GTK loop
-     */
-    g_signal_connect (G_OBJECT (window), "destroy",
-                      G_CALLBACK (on_destroy), NULL);
-                      
-    widget = champlain_widget_new ();
+  /* Connect the destroy event of the window with our on_destroy function
+   * When the window is about to be destroyed we get a notificaiton and
+   * stop the main GTK loop
+   */
+  g_signal_connect (G_OBJECT (window), "destroy", G_CALLBACK (on_destroy), NULL);
 
-    /* and insert it into the main window  */
-    gtk_container_add (GTK_CONTAINER (window), widget);
+  widget = champlain_widget_new ();
 
-    /* make sure that everything, window and label, are visible */
-    gtk_widget_show_all (window);
+  /* and insert it into the main window  */
+  gtk_container_add (GTK_CONTAINER (window), widget);
 
-    /* start the main loop */
-    gtk_main ();
+  /* make sure that everything, window and label, are visible */
+  gtk_widget_show_all (window);
 
-    return 0;
+  /* start the main loop */
+  gtk_main ();
+
+  return 0;
 }
-

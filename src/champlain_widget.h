@@ -27,39 +27,34 @@
 
 
 G_BEGIN_DECLS
-
 #define CHAMPLAIN_TYPE_WIDGET     (champlain_widget_get_type())
 #define CHAMPLAIN_WIDGET(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_WIDGET, ChamplainWidget))
 #define CHAMPLAIN_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_WIDGET, ChamplainWidgetClass))
 #define CHAMPLAIN_IS_WIDGET(obj)  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_WIDGET))
 #define CHAMPLAIN_IS_WIDGET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass),  CHAMPLAIN_TYPE_WIDGET))
 #define CHAMPLAIN_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj),  CHAMPLAIN_TYPE_WIDGET, ChamplainWidgetClass))
-
 typedef struct _ChamplainWidgetPrivate ChamplainWidgetPrivate;
 
-struct _ChamplainWidget {  
-	GtkAlignment bin;
+struct _ChamplainWidget
+{
+  GtkAlignment bin;
 
-    ChamplainWidgetPrivate *priv;
+  ChamplainWidgetPrivate *priv;
 };
 
-struct _ChamplainWidgetClass {  
-	GtkBinClass parent_class;
+struct _ChamplainWidgetClass
+{
+  GtkBinClass parent_class;
 
 
-    ChamplainWidget            * (* create_widget)        (ChamplainWidget* widget);
+  ChamplainWidget *(*create_widget) (ChamplainWidget * widget);
 
-    void                       (* set_scroll_adjustments) (ChamplainWidget      *widget,
-                                                           GtkAdjustment        *hadjustment,
-                                                           GtkAdjustment        *vadjustment);
+  void (*set_scroll_adjustments) (ChamplainWidget * widget, GtkAdjustment * hadjustment, GtkAdjustment * vadjustment);
 
 };
 
-CHAMPLAIN_API GType
-champlain_widget_get_type (void);
+CHAMPLAIN_API GType champlain_widget_get_type (void);
 
-CHAMPLAIN_API GtkWidget *
-champlain_widget_new (void);
+CHAMPLAIN_API GtkWidget *champlain_widget_new (void);
 
 #endif
-

@@ -23,4 +23,3 @@
 #include "champlain_widget.h"
 
 #endif
-

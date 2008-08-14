@@ -16,10 +16,10 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
- 
+
 #ifndef CHAMPLAIN_DEFINES_H
 #define CHAMPLAIN_DEFINES_H
- 
+
 #define CHAMPLAIN_API __attribute__((visibility("default")))
 #define CHAMPLAIN_OBSOLETE_API CHAMPLAIN_API __attribute__((deprecated))
 
