@@ -48,7 +48,7 @@ champlain_map_zoom_level_create(ChamplainMapZoomLevel* level, gint zoom_level)
 			clutter_color_parse ("blue", &blue);
 			
   		int i;
-			for (i = 0; i < 20; i++) 
+			for (i = 0; i < level->row_count * level->column_count; i++) 
 				{
 			 		int x = i % level->row_count;
 			 		int y = i / level->row_count;
