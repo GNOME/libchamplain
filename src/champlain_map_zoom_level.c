@@ -53,11 +53,9 @@ champlain_map_zoom_level_create(ChamplainMapZoomLevel* level, gint zoom_level)
 			 		int x = i % level->row_count;
 			 		int y = i / level->row_count;
 			 		
-			 		ChamplainMapTile* tile = champlain_map_tile_new(x, y);
-					clutter_actor_set_position (tile->actor, x * level->tile_size, y * level->tile_size);
-					clutter_actor_set_size (tile->actor, level->tile_size, level->tile_size);
+			 		ChamplainMapTile* tile = champlain_map_tile_new(x, y, level->tile_size);
 					
-					clutter_container_add (CLUTTER_CONTAINER (level->group), tile->actor, NULL);
+					//clutter_container_add (CLUTTER_CONTAINER (level->group), tile->actor, NULL);
 					g_ptr_array_add (level->tiles, tile);
 				}
 		}

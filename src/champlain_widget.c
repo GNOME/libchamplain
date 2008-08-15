@@ -54,7 +54,7 @@ typedef struct
   /* Units to store the origin of a click when scrolling */
   ClutterUnit x;
   ClutterUnit y;
-} ScrollMotion;
+} ChamplainPoint;
 
 struct _ChamplainWidgetPrivate
 {
@@ -64,8 +64,8 @@ struct _ChamplainWidgetPrivate
   ClutterActor *viewport;
 
   // Scrolling  
-  ScrollMotion position;
-  ScrollMotion hitPoint;
+  ChamplainPoint position;
+  ChamplainPoint hitPoint;
   
   ChamplainMap* map;
 };
@@ -193,38 +193,61 @@ champlain_widget_init (ChamplainWidget * champlainWidget)
 
 }
 
+static gboolean
+tile_is_visible(ClutterUnit viewport_w, ClutterUnit viewport_h, ChamplainPoint position, ChamplainMapTile* tile)
+{
+	ClutterUnit size = CLUTTER_UNITS_FROM_INT(tile->size);
+
+      
+	if( ((tile->x + 1)* size + position.x < 0 || tile->x* size + position.x > viewport_w) ||
+			((tile->y + 1)* size + position.y < 0 || tile->y* size + position.y > viewport_h))
+		{
+			g_print ("Tile I: %d, %d\t p: %d, %d \n",
+	       tile->x, tile->y,
+	       CLUTTER_UNITS_TO_INT (position.x),
+	       CLUTTER_UNITS_TO_INT (position.y));
+			return FALSE;
+		}
+	g_print ("Tile V: %d, %d\t p: %d, %d \n",
+	       tile->x, tile->y,
+	       CLUTTER_UNITS_TO_INT (position.x),
+	       CLUTTER_UNITS_TO_INT (position.y));
+	return TRUE;
+
+}
+
 static void
 champlain_widget_verify_tiles (ChamplainWidget * champlainWidget)
 {
   ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (champlainWidget);
   ClutterActor *stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutterEmbed));
-  
+  ClutterUnit stage_w, stage_h;
+  clutter_actor_get_sizeu(stage, &stage_w, &stage_h);
+  g_print("Stage: %d, %d\n", CLUTTER_UNITS_TO_INT(stage_w), CLUTTER_UNITS_TO_INT(stage_h));
   // Check for tiles that left the viewport
-  ClutterColor red;
-  clutter_color_parse ("red", &red);
-  ClutterColor white;
-  clutter_color_parse ("white", &white);
-  ClutterColor blue;
-  clutter_color_parse ("blue", &blue);
+  
   int i;
-  /*for (i = 0; i < priv->tiles->len; i++) 
+  int tile_count = priv->map->current_level->tiles->len;
+  for (i = 0; i < tile_count; i++) 
 		{
-	 		int x = i % ROW_SIZE;
-	 		int y = i / ROW_SIZE;
-  		ClutterActor * tile = CLUTTER_ACTOR(g_ptr_array_index (priv->tiles, i));
-  		ClutterUnit actor_x, actor_y, stage_w, stage_h;
-  		clutter_actor_get_sizeu(stage, &stage_w, &stage_h);
-  		clutter_actor_get_positionu(tile, &actor_x, &actor_y);
-  		if( (actor_x + CLUTTER_UNITS_FROM_INT(TILE_SIZE) + priv->position.x < 0 || actor_x + priv->position.x > stage_w) ||
-  				(actor_y + CLUTTER_UNITS_FROM_INT(TILE_SIZE) + priv->position.y < 0 || actor_y + priv->position.y > stage_h))
+  		ChamplainMapTile* tile = g_ptr_array_index (priv->map->current_level->tiles, i);
+  		if (tile_is_visible(stage_w, stage_h, priv->position, tile))
   			{
-  				//clutter_rectangle_set_color(CLUTTER_RECTANGLE(tile), &red);
-  			} 
-  		else
-  			{
-		  		clutter_rectangle_set_color(CLUTTER_RECTANGLE(tile), ( (y  + x) % 2 % 2 ? &blue : &white));
+  				if(!tile->visible) 
+  					{
+							tile->visible = TRUE;
+							clutter_container_add (CLUTTER_CONTAINER (priv->map->current_level->group), tile->actor, NULL);
+						}
   			}
-		}*/
+  			else 
+  			{
+  				if (tile->visible) 
+  					{
+							clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map->current_level->group), tile->actor);
+							tile->visible = FALSE;
+						}
+  			}
+		}
 		
 		
   // Check for missing tiles in the viewport
@@ -248,10 +271,13 @@ viewport_motion_event_cb (ClutterActor * actor, ClutterMotionEvent * event, Cham
   ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (champlainWidget);
   ClutterActor *stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutterEmbed));
 
+	//FIXME: doesn't work when the viewport's size is larger than the stage (?)
   ClutterUnit x, y;
   if (clutter_actor_transform_stage_point (stage,
-					   CLUTTER_UNITS_FROM_DEVICE (event->
-								      x), CLUTTER_UNITS_FROM_DEVICE (event->y), &x, &y))
+					   CLUTTER_UNITS_FROM_DEVICE (event->x), 
+					   CLUTTER_UNITS_FROM_DEVICE (event->y), 
+					   &x, 
+					   &y))
     {
       ClutterUnit dx, dy;
 
@@ -361,7 +387,7 @@ champlain_widget_load_map (ChamplainWidget * champlainWidget)
 	champlain_map_load(priv->map, 1);
 	
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
-
+	champlain_widget_verify_tiles (champlainWidget);
 }
 
 GtkWidget *
