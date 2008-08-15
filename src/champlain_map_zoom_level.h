@@ -26,11 +26,13 @@
 typedef struct
 {
 	int level;
-  ClutterActor* group;
   int row_count;
   int column_count;
   int tile_size;
+  
   GPtrArray  *tiles;
+  ClutterActor* group;
+  
 } ChamplainMapZoomLevel;
 
 #endif

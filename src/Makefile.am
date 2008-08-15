@@ -16,6 +16,8 @@ nodist_champlain_SOURCES = \
 champlain_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
 					champlain_widget.c \
 					champlain_map.c  \
+					champlain_map_zoom_level.c \
+					champlain_map_tile.c \
 					launcher.c
 					
 

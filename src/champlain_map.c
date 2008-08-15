@@ -29,37 +29,8 @@ champlain_map_new (ChamplainMapSource source)
 }
 
 void 
-champlain_map_create_tiles(ChamplainMap* map, gint zoom_level)
+champlain_map_load(ChamplainMap* map, gint zoom_level)
 {
-	if (zoom_level == 1) 
-		{
-			map->current_level = g_new0(ChamplainMapZoomLevel, 1);
-			map->current_level->level = zoom_level;
-			map->current_level->row_count = 5;
-			map->current_level->column_count = 4;
-			map->current_level->tile_size = 200;
-			map->current_level->tiles = g_ptr_array_sized_new (20);
-			map->current_level->group = clutter_group_new ();
-			
-			ClutterColor white;
-			clutter_color_parse ("white", &white);
-			ClutterColor blue;
-			clutter_color_parse ("blue", &blue);
-			
-  		int i;
-			for (i = 0; i < 20; i++) 
-				{
-			 		int x = i % map->current_level->row_count;
-			 		int y = i / map->current_level->row_count;
-			 		
-					ClutterColor * color = ( (y  + x) % 2 ? &blue : &white);
-					ClutterActor * tile = clutter_rectangle_new_with_color (color);
-					clutter_actor_set_position (tile, x * map->current_level->tile_size, y * map->current_level->tile_size);
-					clutter_actor_set_size (tile, map->current_level->tile_size, map->current_level->tile_size);
-					clutter_actor_show (tile);
-					
-					clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile, NULL);
-					g_ptr_array_add (map->current_level->tiles, tile);
-				}
-		}
+		map->current_level = champlain_map_zoom_level_new(zoom_level, 5, 4, 200);
+		champlain_map_zoom_level_create(map->current_level, zoom_level);
 }

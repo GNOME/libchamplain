@@ -358,7 +358,7 @@ champlain_widget_load_map (ChamplainWidget * champlainWidget)
 
 	priv->map = champlain_map_new(CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP);
 	
-	champlain_map_create_tiles(priv->map, 1);
+	champlain_map_load(priv->map, 1);
 	
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
 
