@@ -17,11 +17,18 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef CHAMPLAIN_H
-#define CHAMPLAIN_H
+#ifndef CHAMPLAIN_MAP_TILE_H
+#define CHAMPLAIN_MAP_TILE_H
 
-#include "champlain_defines.h"
-#include "champlain_widget.h"
-#include "champlain_map.h"
+#include <glib.h>
+#include <clutter/clutter.h>
+
+typedef struct
+{
+  ClutterActor* actor;
+  int x;
+  int y;
+  
+} ChamplainMapTile;
 
 #endif

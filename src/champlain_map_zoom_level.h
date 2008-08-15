@@ -17,11 +17,20 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef CHAMPLAIN_H
-#define CHAMPLAIN_H
+#ifndef CHAMPLAIN_MAP_ZOOM_LEVEL_H
+#define CHAMPLAIN_MAP_ZOOM_LEVEL_H
 
-#include "champlain_defines.h"
-#include "champlain_widget.h"
-#include "champlain_map.h"
+#include <glib.h>
+#include <clutter/clutter.h>
+
+typedef struct
+{
+	int level;
+  ClutterActor* group;
+  int row_count;
+  int column_count;
+  int tile_size;
+  GPtrArray  *tiles;
+} ChamplainMapZoomLevel;
 
 #endif

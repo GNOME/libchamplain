@@ -16,12 +16,11 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+ 
 
-#ifndef CHAMPLAIN_H
-#define CHAMPLAIN_H
+#ifndef CHAMPLAIN_PRIVATE_H
+#define CHAMPLAIN_PRIVATE_H
 
-#include "champlain_defines.h"
-#include "champlain_widget.h"
-#include "champlain_map.h"
+void champlain_map_create_tiles(gint zoom_level);
 
 #endif

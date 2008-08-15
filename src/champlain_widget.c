@@ -20,10 +20,12 @@
 #include "config.h"
 
 #include "champlain_defines.h"
+#include "champlain_map_tile.h"
+#include "champlain_map.h"
 #include "champlain_widget.h"
 #include "champlain-marshal.h"
 
-#include <stdio.h>
+#include <math.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <gtk-clutter-embed.h>
@@ -64,6 +66,8 @@ struct _ChamplainWidgetPrivate
   // Scrolling  
   ScrollMotion position;
   ScrollMotion hitPoint;
+  
+  ChamplainMap* map;
 };
 
 
@@ -189,6 +193,55 @@ champlain_widget_init (ChamplainWidget * champlainWidget)
 
 }
 
+static void
+champlain_widget_verify_tiles (ChamplainWidget * champlainWidget)
+{
+  ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (champlainWidget);
+  ClutterActor *stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutterEmbed));
+  
+  // Check for tiles that left the viewport
+  ClutterColor red;
+  clutter_color_parse ("red", &red);
+  ClutterColor white;
+  clutter_color_parse ("white", &white);
+  ClutterColor blue;
+  clutter_color_parse ("blue", &blue);
+  int i;
+  /*for (i = 0; i < priv->tiles->len; i++) 
+		{
+	 		int x = i % ROW_SIZE;
+	 		int y = i / ROW_SIZE;
+  		ClutterActor * tile = CLUTTER_ACTOR(g_ptr_array_index (priv->tiles, i));
+  		ClutterUnit actor_x, actor_y, stage_w, stage_h;
+  		clutter_actor_get_sizeu(stage, &stage_w, &stage_h);
+  		clutter_actor_get_positionu(tile, &actor_x, &actor_y);
+  		if( (actor_x + CLUTTER_UNITS_FROM_INT(TILE_SIZE) + priv->position.x < 0 || actor_x + priv->position.x > stage_w) ||
+  				(actor_y + CLUTTER_UNITS_FROM_INT(TILE_SIZE) + priv->position.y < 0 || actor_y + priv->position.y > stage_h))
+  			{
+  				//clutter_rectangle_set_color(CLUTTER_RECTANGLE(tile), &red);
+  			} 
+  		else
+  			{
+		  		clutter_rectangle_set_color(CLUTTER_RECTANGLE(tile), ( (y  + x) % 2 % 2 ? &blue : &white));
+  			}
+		}*/
+		
+		
+  // Check for missing tiles in the viewport
+  /*if ( priv->position.x > 0 )
+  	{
+  		gboolean exist = FALSE;
+			for (i = 0; i < 20; i++) 
+				{
+					ClutterActor * tile = CLUTTER_ACTOR(g_ptr_array_index (priv->tiles, i));
+					ClutterUnit actor_x, actor_y;
+  				clutter_actor_get_positionu(tile, &actor_x, &actor_y);
+					//if (actor_x < 0
+				}
+  
+  	}*/
+}
+
 static gboolean
 viewport_motion_event_cb (ClutterActor * actor, ClutterMotionEvent * event, ChamplainWidget * champlainWidget)
 {
@@ -214,6 +267,7 @@ viewport_motion_event_cb (ClutterActor * actor, ClutterMotionEvent * event, Cham
       priv->position.y += dy - priv->hitPoint.y;
 
       clutter_actor_set_positionu (priv->viewport, priv->position.x, priv->position.y);
+      champlain_widget_verify_tiles(champlainWidget);
     }
 
   return TRUE;
@@ -302,47 +356,11 @@ champlain_widget_load_map (ChamplainWidget * champlainWidget)
 {
   ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (champlainWidget);
 
-  ClutterActor *stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutterEmbed));
-
-  ClutterActor *viewport = clutter_group_new ();
-  clutter_actor_set_reactive (CLUTTER_ACTOR (viewport), TRUE);
-  g_signal_connect (CLUTTER_ACTOR (viewport),
-		    "captured-event", G_CALLBACK (viewport_captured_event_cb), champlainWidget);
-
-  ClutterColor white;
-  clutter_color_parse ("white", &white);
-  ClutterColor blue;
-  clutter_color_parse ("blue", &blue);
-  ClutterActor *group = clutter_group_new ();
-
-  ClutterActor *rect = clutter_rectangle_new_with_color (&blue);
-  clutter_actor_set_position (rect, 0, 0);
-  clutter_actor_set_size (rect, 100, 100);
-  clutter_actor_show (rect);
-  clutter_container_add (CLUTTER_CONTAINER (group), rect, NULL);
-
-  rect = clutter_rectangle_new_with_color (&white);
-  clutter_actor_set_position (rect, 0, 100);
-  clutter_actor_set_size (rect, 100, 100);
-  clutter_actor_show (rect);
-  clutter_container_add (CLUTTER_CONTAINER (group), rect, NULL);
-
-  rect = clutter_rectangle_new_with_color (&blue);
-  clutter_actor_set_position (rect, 100, 100);
-  clutter_actor_set_size (rect, 100, 100);
-  clutter_actor_show (rect);
-  clutter_container_add (CLUTTER_CONTAINER (group), rect, NULL);
-
-  rect = clutter_rectangle_new_with_color (&white);
-  clutter_actor_set_position (rect, 100, 0);
-  clutter_actor_set_size (rect, 100, 100);
-  clutter_actor_show (rect);
-  clutter_container_add (CLUTTER_CONTAINER (group), rect, NULL);
-
-  priv->viewport = viewport;
-  clutter_container_add (CLUTTER_CONTAINER (viewport), group, NULL);
-
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), viewport);
+	priv->map = champlain_map_new(CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP);
+	
+	champlain_map_create_tiles(priv->map, 1);
+	
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
 
 }
 
@@ -353,14 +371,22 @@ champlain_widget_new ()
   ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (widget);
 
   priv->clutterEmbed = gtk_clutter_embed_new ();
-  ClutterActor *stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutterEmbed));
 
+	/* Setup stage */
+  ClutterActor *stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutterEmbed));
   ClutterColor black;
   clutter_color_parse ("black", &black);
   clutter_stage_set_color (CLUTTER_STAGE (stage), &black);
   gtk_container_add (GTK_CONTAINER (widget), priv->clutterEmbed);
 
+	/* Setup viewport */
+	priv->viewport = clutter_group_new ();
+  clutter_actor_set_reactive (CLUTTER_ACTOR (priv->viewport), TRUE);
+  g_signal_connect (CLUTTER_ACTOR (priv->viewport),
+		    "captured-event", G_CALLBACK (viewport_captured_event_cb), widget);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), priv->viewport);
+  
   champlain_widget_load_map (widget);
-
+  
   return GTK_WIDGET (widget);
 }

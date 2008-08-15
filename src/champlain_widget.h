@@ -25,7 +25,6 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
-
 G_BEGIN_DECLS
 #define CHAMPLAIN_TYPE_WIDGET     (champlain_widget_get_type())
 #define CHAMPLAIN_WIDGET(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_WIDGET, ChamplainWidget))
@@ -46,7 +45,6 @@ struct _ChamplainWidgetClass
 {
   GtkBinClass parent_class;
 
-
   ChamplainWidget *(*create_widget) (ChamplainWidget * widget);
 
   void (*set_scroll_adjustments) (ChamplainWidget * widget, GtkAdjustment * hadjustment, GtkAdjustment * vadjustment);
@@ -56,5 +54,8 @@ struct _ChamplainWidgetClass
 CHAMPLAIN_API GType champlain_widget_get_type (void);
 
 CHAMPLAIN_API GtkWidget *champlain_widget_new (void);
+
+#define TILE_SIZE 100  
+#define ROW_SIZE 5 
 
 #endif

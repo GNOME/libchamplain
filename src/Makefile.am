@@ -1,7 +1,7 @@
 
 BUILT_SOURCES = \
 	champlain-marshal.h \
-	champlain-marshal.c
+	champlain-marshal.c 
 
 CLEANFILES = $(BUILT_SOURCES)
 
@@ -15,7 +15,9 @@ nodist_champlain_SOURCES = \
 
 champlain_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
 					champlain_widget.c \
-					launcher.c 
+					champlain_map.c  \
+					launcher.c
+					
 
 champlain_LDADD = $(DEPS_LIBS)
 AM_CPPFLAGS = $(DEPS_CFLAGS)

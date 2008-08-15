@@ -17,11 +17,30 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef CHAMPLAIN_H
-#define CHAMPLAIN_H
+#ifndef CHAMPLAIN_MAP_H
+#define CHAMPLAIN_MAP_H
 
 #include "champlain_defines.h"
-#include "champlain_widget.h"
-#include "champlain_map.h"
+#include "champlain_map_zoom_level.h"
+#include <glib.h>
+#include <clutter/clutter.h>
+
+typedef enum
+{
+  CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
+  CHAMPLAIN_MAP_SOURCE_GOOGLE
+} ChamplainMapSource;
+
+typedef struct
+{
+  int zoom_levels;
+  const gchar* name;
+  ChamplainMapZoomLevel* current_level;
+  
+} ChamplainMap;
+
+
+CHAMPLAIN_API ChamplainMap* champlain_map_new (ChamplainMapSource source);
+
 
 #endif
