@@ -32,4 +32,10 @@ ChamplainMapZoomLevel* champlain_map_zoom_level_new(gint zoom_level, gint row, g
 
 ChamplainMapTile* champlain_map_tile_new(gint x, gint y, gint tile_size);
 
+#define CHAMPLAIN_MIN_LAT -90
+#define CHAMPLAIN_MAX_LAT 90
+#define CHAMPLAIN_MIN_LONG -180
+#define CHAMPLAIN_MAX_LONG 180
+
+
 #endif

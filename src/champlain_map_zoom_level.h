@@ -35,4 +35,9 @@ typedef struct
   
 } ChamplainMapZoomLevel;
 
+guint champlain_map_zoom_level_get_width(ChamplainMapZoomLevel* level);
+
+guint champlain_map_zoom_level_get_height(ChamplainMapZoomLevel* level);
+
+
 #endif

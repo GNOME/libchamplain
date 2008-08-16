@@ -17,13 +17,13 @@
  * Boston, MA 02110-1301, USA.
  */
  
- #include <champlain_map.h>
+#include <champlain_map.h>
  
 ChamplainMap* 
 champlain_map_new (ChamplainMapSource source)
 {
 	ChamplainMap* map = g_new0(ChamplainMap, 1);
-	map->name = "OpenStreetMap";
+	map->name = "Debug";
 	map->zoom_levels = 1;
 	return map;
 }
@@ -31,6 +31,7 @@ champlain_map_new (ChamplainMapSource source)
 void 
 champlain_map_load(ChamplainMap* map, gint zoom_level)
 {
-		map->current_level = champlain_map_zoom_level_new(zoom_level, 5, 4, 200);
+		map->current_level = champlain_map_zoom_level_new(zoom_level, 15, 15, 100);
 		champlain_map_zoom_level_create(map->current_level, zoom_level);
 }
+
