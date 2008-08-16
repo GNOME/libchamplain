@@ -26,6 +26,9 @@
 #include "champlain-marshal.h"
 
 #include <tidy-finger-scroll.h>
+#include <tidy-scrollable.h>
+#include <tidy-viewport.h>
+#include <tidy-adjustment.h>
 #include <math.h>
 #include <glib.h>
 #include <glib-object.h>
@@ -236,6 +239,77 @@ champlain_widget_load_map (ChamplainWidget * champlainWidget)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
 	
 }
+static void
+add_rects (ClutterGroup* stage) 
+{
+	ClutterColor white;
+	clutter_color_parse("white", &white);
+	ClutterColor blue;
+	clutter_color_parse("blue", &blue);
+
+	ClutterActor * rect = clutter_rectangle_new_with_color(&blue);
+	clutter_container_add(CLUTTER_CONTAINER(stage), rect, NULL);
+	clutter_actor_set_position (rect, 100, 100);
+	clutter_actor_set_size (rect, 100, 100);
+	clutter_actor_show(rect);
+
+	rect = clutter_rectangle_new_with_color(&white);
+	clutter_container_add(CLUTTER_CONTAINER(stage), rect, NULL);
+	clutter_actor_set_position (rect, 100, 200);
+	clutter_actor_set_size (rect, 100, 100);
+	clutter_actor_show(rect);
+
+	rect = clutter_rectangle_new_with_color(&blue);
+	clutter_container_add(CLUTTER_CONTAINER(stage), rect, NULL);
+	clutter_actor_set_position (rect, 200, 200);
+	clutter_actor_set_size (rect, 100, 100);
+	clutter_actor_show(rect);
+
+	rect = clutter_rectangle_new_with_color(&white);
+	clutter_container_add(CLUTTER_CONTAINER(stage), rect, NULL);
+	clutter_actor_set_position (rect, 200, 100);
+	clutter_actor_set_size (rect, 100, 100);
+	clutter_actor_show(rect);
+
+}
+
+#define RECT_W 300
+#define RECT_H 300
+#define RECT_N 200
+#define RECT_GAP 50
+static void
+viewport_x_origin_notify_cb (TidyViewport *viewport,
+                             GParamSpec *args1,
+                             ClutterActor *group)
+{
+  GList *children, *c;
+  gint origin_x, width;
+  
+  tidy_viewport_get_origin (viewport, &origin_x, NULL, NULL);
+  width = clutter_actor_get_width (
+            clutter_actor_get_parent (CLUTTER_ACTOR (viewport)));
+  
+  children = clutter_container_get_children (CLUTTER_CONTAINER (group));
+  for (c = children; c; c = c->next)
+    {
+      gint x;
+      gdouble pos;
+      ClutterActor *actor;
+      
+      actor = (ClutterActor *)c->data;
+      
+      /* Get actor position with respect to viewport origin */
+      x = clutter_actor_get_x (actor) - origin_x;
+      pos = (((gdouble)x / (gdouble)(width-RECT_W)) - 0.5) * 2.0;
+      
+      /* Apply a function that transforms the actor depending on its 
+       * viewport position.
+       */
+      //pos = CLAMP(pos * 3.0, -0.5, 0.5);
+      clutter_actor_set_position (actor, pos, pos);
+    }
+  g_list_free (children);
+}
 
 GtkWidget *
 champlain_widget_new ()
@@ -253,8 +327,37 @@ champlain_widget_new ()
   clutter_stage_set_color (CLUTTER_STAGE (stage), &black);
   gtk_container_add (GTK_CONTAINER (widget), priv->clutterEmbed);
   
+  // Setup viewport
+  ClutterActor* viewport = tidy_viewport_new ();
+  clutter_actor_set_clip (viewport, 0, 0, 640, 480);
+  ClutterActor* group = clutter_group_new();
+  add_rects (group);
+	clutter_actor_show_all(group);
+  clutter_container_add_actor (CLUTTER_CONTAINER (viewport), group);
+  g_signal_connect (viewport, "notify::x-origin",
+                    G_CALLBACK (viewport_x_origin_notify_cb), group);
+  
+  gdouble lower, upper;
+  TidyAdjustment *hadjust, *vadjust;
+  g_object_set (G_OBJECT (viewport), "sync-adjustments", FALSE, NULL);
+  tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (viewport), &hadjust, &vadjust);
+  tidy_adjustment_get_values (hadjust, NULL, &lower, &upper, NULL, NULL, NULL);
+  lower -= RECT_W - RECT_GAP;
+  upper += RECT_W - RECT_GAP;
+  g_object_set (hadjust, "lower", lower, "upper", upper,
+                "step-increment", (gdouble)RECT_GAP, "elastic", TRUE, NULL);
+  tidy_adjustment_get_values (vadjust, NULL, &lower, &upper, NULL, NULL, NULL);
+  lower -= RECT_W - RECT_GAP;
+  upper += RECT_W - RECT_GAP;
+  g_object_set (vadjust, "lower", lower, "upper", upper,
+                "step-increment", (gdouble)RECT_GAP, "elastic", TRUE, NULL);
+                
+  // Setup fingerscroll
   ClutterActor* finger_scroll = tidy_finger_scroll_new(TIDY_FINGER_SCROLL_MODE_PUSH);
+  g_object_set (finger_scroll, "decel-rate", 1.03, NULL);
+  clutter_container_add_actor (CLUTTER_CONTAINER (finger_scroll), viewport);
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), finger_scroll);
+  clutter_actor_set_size (finger_scroll, 640, 480); // FIXME make as wide as the stage always
   
   return GTK_WIDGET (widget);
 }
