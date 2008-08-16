@@ -1,1 +1,1 @@
-SUBDIRS = src
+SUBDIRS = tidy src 

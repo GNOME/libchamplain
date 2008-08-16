@@ -21,8 +21,8 @@ champlain_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
 					launcher.c
 					
 
-champlain_LDADD = $(DEPS_LIBS)
-AM_CPPFLAGS = $(DEPS_CFLAGS)
+champlain_LDADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
+AM_CPPFLAGS = $(DEPS_CFLAGS) -I../tidy
 
 
 EXTRA_DIST = $(CHAMPLAIN_MARSHAL_LIST)

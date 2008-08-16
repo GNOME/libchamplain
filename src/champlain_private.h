@@ -21,9 +21,14 @@
 #ifndef CHAMPLAIN_PRIVATE_H
 #define CHAMPLAIN_PRIVATE_H
 
+#include <clutter/clutter.h>
+#include <clutter/clutter.h>
+
 void champlain_map_create_tiles(gint zoom_level);
 
 ChamplainMapZoomLevel* champlain_map_zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size);
+
+//gboolean tile_is_visible(ClutterUnit viewport_w, ClutterUnit viewport_h, ChamplainPoint position, ChamplainMapTile* tile);
 
 ChamplainMapTile* champlain_map_tile_new(gint x, gint y, gint tile_size);
 

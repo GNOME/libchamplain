@@ -9,6 +9,7 @@ AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
 AC_LIBTOOL_DLOPEN
 AC_LIBLTDL_CONVENIENCE
+AM_PROG_LIBTOOL
 
 # Checks for programs.
 AC_PROG_CC
@@ -20,7 +21,7 @@ AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 
 PKG_CHECK_MODULES(DEPS,
-	[ glib-2.0 >= 2.2,
+	[   glib-2.0 >= 2.2,
       gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
@@ -35,5 +36,6 @@ PKG_CHECK_MODULES(DEPS,
 # Checks for library functions.
 
 AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+                 src/Makefile
+                 tidy/Makefile])
 AC_OUTPUT
