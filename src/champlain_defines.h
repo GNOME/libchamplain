@@ -26,4 +26,13 @@
 typedef struct _ChamplainWidget ChamplainWidget;
 typedef struct _ChamplainWidgetClass ChamplainWidgetClass;
 
+typedef enum
+{
+  CHAMPLAIN_MAP_SOURCE_DEBUG,
+  CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
+  CHAMPLAIN_MAP_SOURCE_GOOGLE
+} ChamplainMapSourceId;
+
+typedef struct _ChamplainMap ChamplainMap;
+
 #endif

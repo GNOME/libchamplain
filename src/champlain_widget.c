@@ -22,6 +22,7 @@
 #include "champlain_defines.h"
 #include "champlain_map_tile.h"
 #include "champlain_map.h"
+#include "champlain_map_zoom_level.h"
 #include "champlain_widget.h"
 #include "champlain-marshal.h"
 
@@ -72,8 +73,6 @@ struct _ChamplainWidgetPrivate
 
 G_DEFINE_TYPE (ChamplainWidget, champlain_widget, GTK_TYPE_ALIGNMENT);
 
-
-
 static void
 champlain_widget_finalize (GObject * object)
 {
@@ -115,7 +114,7 @@ widget_size_allocated_cb (GtkWidget *widget, GtkAllocation *allocation, Champlai
   
   tidy_adjustment_get_values (hadjust, NULL, &lower, &upper, NULL, NULL, NULL);
   lower = 0;
-  upper = champlain_map_zoom_level_get_width(priv->map->current_level) - priv->viewportSize.x; // Map's width - Viewport width
+  upper = champlain_map_zoom_level_get_width(priv->map->current_level) - priv->viewportSize.x; 
   g_object_set (hadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
                 
@@ -130,7 +129,8 @@ GtkWidget *
 champlain_widget_new ()
 {
   ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
-  ChamplainWidget *widget, *stage; 
+  ChamplainWidget *widget;
+  ClutterActor *stage; 
   
   widget = CHAMPLAIN_WIDGET (g_object_new (CHAMPLAIN_TYPE_WIDGET, NULL));
   ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (widget);
@@ -160,10 +160,9 @@ champlain_widget_new ()
   g_object_set (priv->fingerScroll, "decel-rate", 1.25, NULL);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->fingerScroll), priv->viewport);
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), priv->fingerScroll);
-  
-  
-	priv->map = champlain_map_new(CHAMPLAIN_MAP_SOURCE_DEBUG);
-	champlain_map_load(priv->map, 1);
+    
+	priv->map = champlain_map_new(CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP);//OPENSTREETMAP
+	champlain_map_load(priv->map, 4);
   clutter_container_add_actor (CLUTTER_CONTAINER (group), priv->map->current_level->group);
   
   return GTK_WIDGET (widget);

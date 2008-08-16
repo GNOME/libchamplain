@@ -19,6 +19,7 @@
 
 #include <champlain_map_zoom_level.h>
 #include <champlain_map_tile.h>
+#include <champlain_map.h>
 #include <champlain_private.h>
 #include <clutter/clutter.h>
 
@@ -38,26 +39,18 @@ champlain_map_zoom_level_new(gint zoom_level, gint row, gint column, gint tile_s
 }
 
 void 
-champlain_map_zoom_level_create(ChamplainMapZoomLevel* level, gint zoom_level)
+champlain_map_zoom_level_create(ChamplainMap* map, gint zoom_level)
 {
-	if (zoom_level == 1) 
+	int i;
+	for (i = 0; i < map->current_level->row_count * map->current_level->column_count; i++) 
 		{
-			ClutterColor white;
-			clutter_color_parse ("white", &white);
-			ClutterColor blue;
-			clutter_color_parse ("blue", &blue);
+	 		int x = i % map->current_level->column_count;
+	 		int y = i / map->current_level->column_count;
+	 		
+	 		ChamplainMapTile* tile = map->get_tile(map, zoom_level, x, y);
 			
-  		int i;
-			for (i = 0; i < level->row_count * level->column_count; i++) 
-				{
-			 		int x = i % level->row_count;
-			 		int y = i / level->row_count;
-			 		
-			 		ChamplainMapTile* tile = champlain_map_tile_new(x, y, level->tile_size);
-					
-					clutter_container_add (CLUTTER_CONTAINER (level->group), tile->actor, NULL);
-					g_ptr_array_add (level->tiles, tile);
-				}
+			clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
+			g_ptr_array_add (map->current_level->tiles, tile);
 		}
 }
 
@@ -70,5 +63,5 @@ champlain_map_zoom_level_get_width(ChamplainMapZoomLevel* level)
 guint
 champlain_map_zoom_level_get_height(ChamplainMapZoomLevel* level)
 {
-		return (level->row_count + 1)  * level->tile_size;
+		return (level->row_count + 1) * level->tile_size;
 }

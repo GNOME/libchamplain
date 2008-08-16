@@ -17,28 +17,30 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef CHAMPLAIN_MAP_ZOOM_LEVEL_H
-#define CHAMPLAIN_MAP_ZOOM_LEVEL_H
 
-#include <glib.h>
-#include <clutter/clutter.h>
+#include "champlain_map_tile.h"
 
-typedef struct
+
+/*
+gboolean
+tile_is_visible(ClutterUnit viewport_w, ClutterUnit viewport_h, ChamplainPoint position, ChamplainMapTile* tile)
 {
-	int level;
-  int row_count;
-  int column_count;
-  int tile_size;
-  
-  GPtrArray  *tiles;
-  ClutterActor* group;
-  
-} ChamplainMapZoomLevel;
+	ClutterUnit size = CLUTTER_UNITS_FROM_INT(tile->size);
 
-guint champlain_map_zoom_level_get_width(ChamplainMapZoomLevel* level);
+      
+	if( ((tile->x + 1)* size + position.x < 0 || tile->x* size + position.x > viewport_w) ||
+			((tile->y + 1)* size + position.y < 0 || tile->y* size + position.y > viewport_h))
+		{
+			g_print ("Tile I: %d, %d\t p: %d, %d \n",
+	       tile->x, tile->y,
+	       CLUTTER_UNITS_TO_INT (position.x),
+	       CLUTTER_UNITS_TO_INT (position.y));
+			return FALSE;
+		}
+	//g_print ("Tile V: %d, %d\t p: %d, %d \n",
+	       //tile->x, tile->y,
+	       //CLUTTER_UNITS_TO_INT (position.x),
+	       //CLUTTER_UNITS_TO_INT (position.y));
+	return TRUE;
 
-guint champlain_map_zoom_level_get_height(ChamplainMapZoomLevel* level);
-
-ChamplainMapZoomLevel* champlain_map_zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size);
-
-#endif
+}*/

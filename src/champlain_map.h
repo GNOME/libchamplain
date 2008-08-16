@@ -22,26 +22,26 @@
 
 #include "champlain_defines.h"
 #include "champlain_map_zoom_level.h"
+#include "champlain_map_tile.h"
 #include <glib.h>
 #include <clutter/clutter.h>
 
-typedef enum
-{
-  CHAMPLAIN_MAP_SOURCE_DEBUG,
-  CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
-  CHAMPLAIN_MAP_SOURCE_GOOGLE
-} ChamplainMapSource;
 
-typedef struct
+struct _ChamplainMap
 {
   int zoom_levels;
   const gchar* name;
   ChamplainMapZoomLevel* current_level;
+  int tile_size;
   
-} ChamplainMap;
+  ChamplainMapTile* (* get_tile) (ChamplainMap* map, guint zoom_level, guint x, guint y);
+  guint (* get_row_count) (ChamplainMap* map, guint zoom_level);
+  guint (* get_column_count) (ChamplainMap* map, guint zoom_level);
+  
+} ;
 
 
-CHAMPLAIN_API ChamplainMap* champlain_map_new (ChamplainMapSource source);
+CHAMPLAIN_API ChamplainMap* champlain_map_new (ChamplainMapSourceId source);
 
 
 #endif

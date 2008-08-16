@@ -18,6 +18,8 @@ champlain_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
 					champlain_map.c  \
 					champlain_map_zoom_level.c \
 					champlain_map_tile.c \
+					map_source/openstreetmap.c \
+					map_source/debugmap.c \
 					launcher.c
 					
 

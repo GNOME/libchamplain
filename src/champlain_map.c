@@ -18,20 +18,34 @@
  */
  
 #include <champlain_map.h>
+#include <champlain_map_zoom_level.h>
  
+
 ChamplainMap* 
-champlain_map_new (ChamplainMapSource source)
+champlain_map_new (ChamplainMapSourceId source)
 {
 	ChamplainMap* map = g_new0(ChamplainMap, 1);
-	map->name = "Debug";
-	map->zoom_levels = 1;
+
+	switch(source) 
+		{
+			case CHAMPLAIN_MAP_SOURCE_DEBUG:
+				debugmap_init(map);
+				break;
+			case CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP:
+				osm_init(map);
+				break;
+		}
+		
 	return map;
 }
 
 void 
 champlain_map_load(ChamplainMap* map, gint zoom_level)
 {
-		map->current_level = champlain_map_zoom_level_new(zoom_level, 15, 15, 100);
-		champlain_map_zoom_level_create(map->current_level, zoom_level);
+		guint row_count = map->get_row_count(map, zoom_level);
+		guint column_count = map->get_column_count(map, zoom_level);
+		
+		map->current_level = champlain_map_zoom_level_new(zoom_level, row_count, column_count, map->tile_size);
+		champlain_map_zoom_level_create(map, zoom_level);
 }
 
