@@ -20,10 +20,10 @@
 #include "config.h"
 
 #include "champlain_defines.h"
-#include "champlain_view.h"
-#include "map_tile.h"
+#include "champlainview.h"
+#include "tile.h"
 #include "map.h"
-#include "map_zoom_level.h"
+#include "zoomlevel.h"
 #include "champlain-marshal.h"
 
 #include <tidy-finger-scroll.h>
@@ -114,13 +114,13 @@ view_size_allocated_cb (GtkWidget *view, GtkAllocation *allocation, ChamplainVie
   
   tidy_adjustment_get_values (hadjust, NULL, &lower, &upper, NULL, NULL, NULL);
   lower = 0;
-  upper = map_zoom_level_get_width(priv->map->current_level) - priv->viewportSize.x; 
+  upper = zoom_level_get_width(priv->map->current_level) - priv->viewportSize.x; 
   g_object_set (hadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
                 
   tidy_adjustment_get_values (vadjust, NULL, &lower, &upper, NULL, NULL, NULL);
   lower = 0;
-  upper = map_zoom_level_get_height(priv->map->current_level) - priv->viewportSize.y;
+  upper = zoom_level_get_height(priv->map->current_level) - priv->viewportSize.y;
   g_object_set (vadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
                 
@@ -138,14 +138,14 @@ champlain_view_new ()
   
   priv->viewportSize.x = 640;
   priv->viewportSize.y = 480;
-	
+  
   priv->clutterEmbed = gtk_clutter_embed_new ();
   g_signal_connect (priv->clutterEmbed,
                     "size-allocate",
                     G_CALLBACK (view_size_allocated_cb),
                     view);
 
-	// Setup stage
+  // Setup stage
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutterEmbed));
   
   clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
@@ -155,16 +155,29 @@ champlain_view_new ()
   priv->viewport = tidy_viewport_new ();
   ClutterActor* group = clutter_group_new();
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), group);
-                
+
   // Setup finger scroll
   priv->fingerScroll = tidy_finger_scroll_new(TIDY_FINGER_SCROLL_MODE_KINETIC);
   g_object_set (priv->fingerScroll, "decel-rate", 1.25, NULL);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->fingerScroll), priv->viewport);
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), priv->fingerScroll);
-    
-	priv->map = map_new(CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP);//OPENSTREETMAP
-	map_load(priv->map, 4);
+
+  priv->map = map_new(CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP);//OPENSTREETMAP
+  map_load(priv->map, 4);
   clutter_container_add_actor (CLUTTER_CONTAINER (group), priv->map->current_level->group);
   
   return GTK_WIDGET (view);
+}
+
+// FIXME: Animate this.  Can be done in Tidy-Adjustment (like for elastic effect)
+void
+champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdouble latitude)
+{
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
+
+  gdouble x, y;
+  x = priv->map->longitude_to_x(priv->map, longitude, priv->map->current_level->level);
+  y = priv->map->latitude_to_y(priv->map, latitude, priv->map->current_level->level);
+
+  tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - priv->viewportSize.x/2.0, y - priv->viewportSize.y/2.0, 0);
 }

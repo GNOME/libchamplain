@@ -23,16 +23,9 @@
 #define CHAMPLAIN_API __attribute__((visibility("default")))
 #define CHAMPLAIN_OBSOLETE_API CHAMPLAIN_API __attribute__((deprecated))
 
-typedef struct _ChamplainWidget ChamplainWidget;
-typedef struct _ChamplainWidgetClass ChamplainWidgetClass;
+typedef struct _ChamplainView ChamplainView;
+typedef struct _ChamplainViewClass ChamplainViewClass;
 
-typedef enum
-{
-  CHAMPLAIN_MAP_SOURCE_DEBUG,
-  CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
-  CHAMPLAIN_MAP_SOURCE_GOOGLE
-} ChamplainMapSourceId;
-
-typedef struct _ChamplainMap ChamplainMap;
+typedef struct _Map Map;
 
 #endif

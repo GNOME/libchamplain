@@ -32,11 +32,23 @@ on_destroy (GtkWidget * widget, gpointer data)
   gtk_main_quit ();
 }
 
+static void
+go_to_montreal (GtkWidget * widget, ChamplainView* view)
+{
+  champlain_view_center_on(view, -73.75, 45.466);
+}
+
+static void
+go_to_cambridge (GtkWidget * widget, ChamplainView* view)
+{
+  champlain_view_center_on(view, 0.1258, 52.2048);
+}
+
 int
 main (int argc, char *argv[])
 {
   GtkWidget *window;
-  GtkWidget *widget;
+  GtkWidget *widget, *vbox, *bbox, *button, *viewport;
   GtkWidget *scrolled;
 
   gtk_clutter_init (&argc, &argv);
@@ -51,8 +63,7 @@ main (int argc, char *argv[])
   gtk_window_set_title (GTK_WINDOW (window), PACKAGE " " VERSION);
 
   /* open it a bit wider so that both the label and title show up */
-  gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
-
+  //gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
 
   /* Connect the destroy event of the window with our on_destroy function
    * When the window is about to be destroyed we get a notificaiton and
@@ -60,14 +71,40 @@ main (int argc, char *argv[])
    */
   g_signal_connect (G_OBJECT (window), "destroy", G_CALLBACK (on_destroy), NULL);
 
+  vbox = gtk_vbox_new(FALSE, 10);
+  
   widget = champlain_view_new ();
+  gtk_widget_set_size_request(widget, 640, 480);
+  
+  bbox =  gtk_hbutton_box_new ();
+  gtk_button_box_set_layout (GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_START);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX(bbox), 10);
+  button = gtk_button_new_with_label ("Montréal");
+  g_signal_connect (button,
+                    "clicked",
+                    G_CALLBACK (go_to_montreal),
+                    widget);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+  button = gtk_button_new_with_label ("Cambridge");
+  g_signal_connect (button,
+                    "clicked",
+                    G_CALLBACK (go_to_cambridge),
+                    widget);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+  
+  viewport = gtk_viewport_new (NULL, NULL);
+  gtk_viewport_set_shadow_type (GTK_VIEWPORT(viewport), GTK_SHADOW_ETCHED_IN);
+  gtk_container_add (GTK_CONTAINER (viewport), widget);
+  
+  gtk_box_pack_start (GTK_BOX (vbox), bbox, FALSE, FALSE, 0);
+  gtk_container_add (GTK_CONTAINER (vbox), viewport);
 
   /* and insert it into the main window  */
-  gtk_container_add (GTK_CONTAINER (window), widget);
+  gtk_container_add (GTK_CONTAINER (window), vbox);
 
   /* make sure that everything, window and label, are visible */
   gtk_widget_show_all (window);
-
+  champlain_view_center_on(widget, 0.00, 0.0);
   /* start the main loop */
   gtk_main ();
 

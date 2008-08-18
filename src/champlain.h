@@ -20,8 +20,12 @@
 #ifndef CHAMPLAIN_H
 #define CHAMPLAIN_H
 
+#define CHAMPLAIN_MIN_LAT -90
+#define CHAMPLAIN_MAX_LAT 90
+#define CHAMPLAIN_MIN_LONG -180
+#define CHAMPLAIN_MAX_LONG 180
+
 #include "champlain_defines.h"
-#include "champlain_widget.h"
-#include "champlain_map.h"
+#include "champlainview.h"
 
 #endif

@@ -24,6 +24,11 @@ guint debugmap_row_count(Map* map, guint zoom_level);
 guint debugmap_column_count(Map* map, guint zoom_level);
 Tile* debugmap_get_tile (Map* map, guint zoom_level, guint x, guint y);
 
+gdouble debugmap_longitude_to_x (Map* map, gdouble longitude, guint zoom_level);
+gdouble debugmap_latitude_to_y (Map* map, gdouble latitude, guint zoom_level);
+gdouble debugmap_x_to_longitude (Map* map, gdouble x, guint zoom_level);
+gdouble debugmap_y_to_latitude (Map* map, gdouble y, guint zoom_level);
+
 void 
 debugmap_init(Map* map)
 {
@@ -34,6 +39,11 @@ debugmap_init(Map* map)
   map->get_row_count = debugmap_row_count;
   map->get_column_count = debugmap_column_count;
   map->get_tile = debugmap_get_tile;
+  
+  map->longitude_to_x = debugmap_longitude_to_x;
+  map->latitude_to_y = debugmap_latitude_to_y;
+  map->x_to_longitude = debugmap_x_to_longitude;
+  map->y_to_latitude = debugmap_y_to_latitude;
 }
 
 guint debugmap_row_count(Map* map, guint zoom_level)
@@ -79,11 +89,42 @@ Tile* debugmap_get_tile (Map* map, guint zoom_level, guint x, guint y)
   clutter_actor_show (actor);
   clutter_container_add_actor (CLUTTER_CONTAINER (tile->actor), actor);
   
-  actor = clutter_label_new_full ("Arial", g_strdup_printf("%d, %d", x, y), textColor);
-  clutter_actor_set_position (actor, x * map->tile_size + map->tile_size/2.25, y * map->tile_size + map->tile_size/2.25);
+  x *= map->tile_size;
+  y *= map->tile_size;
+  
+  gdouble lon, lat;
+  lon = debugmap_x_to_longitude(map, x, zoom_level);
+  lat = debugmap_y_to_latitude(map, x, zoom_level);
+  
+  actor = clutter_label_new_full ("Arial", g_strdup_printf("%.2f, %.2f", lon, lat), textColor);
+  clutter_actor_set_position (actor, x, y);
   clutter_container_add_actor (CLUTTER_CONTAINER (tile->actor), actor);
   
   g_object_ref(tile->actor); // to prevent actors to be destroyed when they are removed from groups
   
   return tile;
 }
+
+//FIXME: These functions need to be fixed
+gdouble debugmap_longitude_to_x (Map* map, gdouble longitude, guint zoom_level)
+{
+  return ((longitude + 180.0) / 360.0 * pow(2.0, zoom_level)) * map->tile_size; 
+}
+
+gdouble debugmap_latitude_to_y (Map* map, gdouble latitude, guint zoom_level)
+{
+  return ((latitude + 90.0) / 180.0 * pow(2.0, zoom_level)) * map->tile_size; 
+}
+
+gdouble debugmap_x_to_longitude (Map* map, gdouble x, guint zoom_level)
+{
+  x /= map->tile_size;
+  return x / map->tile_size * pow(2.0, zoom_level) * 360.0 - 180;
+}
+
+gdouble debugmap_y_to_latitude (Map* map, gdouble y, guint zoom_level)
+{
+  y /= map->tile_size;
+  return y / map->tile_size * pow(2.0, zoom_level) * 180.0 - 90;
+}
+

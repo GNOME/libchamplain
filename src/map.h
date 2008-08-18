@@ -40,6 +40,11 @@ struct _Map
   guint (* get_row_count) (Map* map, guint zoom_level);
   guint (* get_column_count) (Map* map, guint zoom_level);
   
+  gdouble (* longitude_to_x) (Map* map, gdouble longitude, guint zoom_level);
+  gdouble (* latitude_to_y) (Map* map, gdouble latitude, guint zoom_level);
+  gdouble (* x_to_longitude) (Map* map, gdouble x, guint zoom_level);
+  gdouble (* y_to_latitude) (Map* map, gdouble y, guint zoom_level);
+  
 };
 
 

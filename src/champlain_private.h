@@ -26,15 +26,6 @@
 
 void champlain_map_create_tiles(gint zoom_level);
 
-
 //gboolean tile_is_visible(ClutterUnit viewport_w, ClutterUnit viewport_h, ChamplainPoint position, ChamplainMapTile* tile);
-
-ChamplainMapTile* champlain_map_tile_new(gint x, gint y, gint tile_size);
-
-#define CHAMPLAIN_MIN_LAT -90
-#define CHAMPLAIN_MAX_LAT 90
-#define CHAMPLAIN_MIN_LONG -180
-#define CHAMPLAIN_MAX_LONG 180
-
 
 #endif

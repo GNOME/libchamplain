@@ -58,4 +58,6 @@ CHAMPLAIN_API GType champlain_view_get_type (void);
 
 CHAMPLAIN_API GtkWidget *champlain_view_new (void);
 
+CHAMPLAIN_API void champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitude);
+
 #endif
