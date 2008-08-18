@@ -17,11 +17,28 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef OPENSTREETMAP_H
-#define OPENSTREETMAP_H
+#ifndef CHAMPLAIN_MAP_ZOOM_LEVEL_H
+#define CHAMPLAIN_MAP_ZOOM_LEVEL_H
 
-#include <champlain_map.h>
+#include <glib.h>
+#include <clutter/clutter.h>
 
-void debugmap_init(ChamplainMap* map);
+typedef struct
+{
+	int level;
+  int row_count;
+  int column_count;
+  int tile_size;
+  
+  GPtrArray  *tiles;
+  ClutterActor* group;
+  
+} ZoomLevel;
+
+guint zoom_level_get_width(ZoomLevel* level);
+
+guint zoom_level_get_height(ZoomLevel* level);
+
+ZoomLevel* zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size);
 
 #endif

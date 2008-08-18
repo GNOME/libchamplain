@@ -16,36 +16,34 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
- 
-#include <champlain_map.h>
-#include <champlain_map_zoom_level.h>
- 
 
-ChamplainMap* 
-champlain_map_new (ChamplainMapSourceId source)
+#ifndef MAP_H
+#define MAP_H
+
+#include "champlainview.h"
+#include "champlain_defines.h"
+#include "zoomlevel.h"
+#include "tile.h"
+
+#include <glib.h>
+#include <clutter/clutter.h>
+
+
+struct _Map
 {
-	ChamplainMap* map = g_new0(ChamplainMap, 1);
+  int zoom_levels;
+  const gchar* name;
+  ZoomLevel* current_level;
+  int tile_size;
+  
+  Tile* (* get_tile) (Map* map, guint zoom_level, guint x, guint y);
+  guint (* get_row_count) (Map* map, guint zoom_level);
+  guint (* get_column_count) (Map* map, guint zoom_level);
+  
+};
 
-	switch(source) 
-		{
-			case CHAMPLAIN_MAP_SOURCE_DEBUG:
-				debugmap_init(map);
-				break;
-			case CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP:
-				osm_init(map);
-				break;
-		}
-		
-	return map;
-}
 
-void 
-champlain_map_load(ChamplainMap* map, gint zoom_level)
-{
-		guint row_count = map->get_row_count(map, zoom_level);
-		guint column_count = map->get_column_count(map, zoom_level);
-		
-		map->current_level = champlain_map_zoom_level_new(zoom_level, row_count, column_count, map->tile_size);
-		champlain_map_zoom_level_create(map, zoom_level);
-}
+CHAMPLAIN_API Map* champlain_map_new (ChamplainMapSource source);
 
+
+#endif

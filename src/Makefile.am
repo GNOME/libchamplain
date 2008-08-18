@@ -8,22 +8,26 @@ CLEANFILES = $(BUILT_SOURCES)
 CHAMPLAIN_MARSHAL = champlain-marshal
 CHAMPLAIN_MARSHAL_LIST = champlain-marshal.list 
 
-bin_PROGRAMS = champlain
+lib_LTLIBRARIES = libchamplain-1.0.la
 
-nodist_champlain_SOURCES = \
+bin_PROGRAMS = launcher
+
+nodist_libchamplain_1_0_la_SOURCES = \
         $(BUILT_SOURCES)
 
-champlain_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
-					champlain_widget.c \
-					champlain_map.c  \
-					champlain_map_zoom_level.c \
-					champlain_map_tile.c \
-					map_source/openstreetmap.c \
-					map_source/debugmap.c \
-					launcher.c
+launcher_SOURCES = launcher.c
+launcher_LDADD = $(DEPS_LIBS) libchamplain-1.0.la
+
+libchamplain_1_0_la_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
+					champlainview.c \
+					map.c  \
+					zoomlevel.c \
+					tile.c \
+					sources/openstreetmap.c \
+					sources/debugmap.c 
 					
 
-champlain_LDADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
+libchamplain_1_0_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
 AM_CPPFLAGS = $(DEPS_CFLAGS) -I../tidy
 
 

@@ -732,7 +732,7 @@ PACKAGE_VERSION='0.1'
 PACKAGE_STRING='champlain 0.1'
 PACKAGE_BUGREPORT='pierre-luc@squidy.info'
 
-ac_unique_file="src/champlain_widget.h"
+ac_unique_file="src/champlainview.h"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -20743,14 +20743,14 @@ if test -n "$PKG_CONFIG"; then
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    
+  
 \"") >&5
   ($PKG_CONFIG --exists --print-errors "   glib-2.0 >= 2.2,
       gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    
+  
 ") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
@@ -20760,7 +20760,7 @@ if test -n "$PKG_CONFIG"; then
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    
+  
 " 2>/dev/null`
 else
   pkg_failed=yes
@@ -20779,14 +20779,14 @@ if test -n "$PKG_CONFIG"; then
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    
+  
 \"") >&5
   ($PKG_CONFIG --exists --print-errors "   glib-2.0 >= 2.2,
       gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    
+  
 ") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
@@ -20796,7 +20796,7 @@ if test -n "$PKG_CONFIG"; then
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    
+  
 " 2>/dev/null`
 else
   pkg_failed=yes
@@ -20821,7 +20821,7 @@ fi
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    
+  
 "`
         else 
 	        DEPS_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "   glib-2.0 >= 2.2,
@@ -20829,7 +20829,7 @@ fi
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    
+  
 "`
         fi
 	# Put the nasty error message in config.log where it belongs
@@ -20840,7 +20840,7 @@ fi
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    
+  
 ) were not met:
 
 $DEPS_PKG_ERRORS
@@ -20857,7 +20857,7 @@ echo "$as_me: error: Package requirements (   glib-2.0 >= 2.2,
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    
+  
 ) were not met:
 
 $DEPS_PKG_ERRORS
@@ -20906,7 +20906,7 @@ fi
 
 # Checks for library functions.
 
-ac_config_files="$ac_config_files Makefile src/Makefile tidy/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile tidy/Makefile champlain.pc"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -21503,6 +21503,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "tidy/Makefile") CONFIG_FILES="$CONFIG_FILES tidy/Makefile" ;;
+    "champlain.pc") CONFIG_FILES="$CONFIG_FILES champlain.pc" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -22308,3 +22309,11 @@ if test "$no_create" != yes; then
   $ac_cs_success || { (exit 1); exit 1; }
 fi
 
+
+
+echo ""
+echo " Champlain $VERSION"
+echo ""
+echo "         Prefix: ${prefix}"
+echo " Compiler flags: ${CPPFLAGS}"
+echo ""

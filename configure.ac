@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(champlain, 0.1, pierre-luc@squidy.info)
-AC_CONFIG_SRCDIR([src/champlain_widget.h])
+AC_CONFIG_SRCDIR([src/champlainview.h])
 AC_CONFIG_HEADER([config.h])
 
 AM_INIT_AUTOMAKE
@@ -21,12 +21,12 @@ AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 
 PKG_CHECK_MODULES(DEPS,
-	[   glib-2.0 >= 2.2,
+  [   glib-2.0 >= 2.2,
       gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8
-    ]
+  ]
 )
 
 # Checks for header files.
@@ -37,5 +37,14 @@ PKG_CHECK_MODULES(DEPS,
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 tidy/Makefile])
+                 tidy/Makefile
+                 champlain.pc])
 AC_OUTPUT
+
+
+echo ""
+echo " Champlain $VERSION"
+echo ""
+echo "         Prefix: ${prefix}"
+echo " Compiler flags: ${CPPFLAGS}"
+echo ""

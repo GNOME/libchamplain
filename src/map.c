@@ -16,29 +16,36 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+ 
+#include <map.h>
+#include <zoomlevel.h>
+ 
 
-#ifndef CHAMPLAIN_MAP_ZOOM_LEVEL_H
-#define CHAMPLAIN_MAP_ZOOM_LEVEL_H
-
-#include <glib.h>
-#include <clutter/clutter.h>
-
-typedef struct
+Map* 
+map_new (ChamplainMapSource source)
 {
-	int level;
-  int row_count;
-  int column_count;
-  int tile_size;
-  
-  GPtrArray  *tiles;
-  ClutterActor* group;
-  
-} ChamplainMapZoomLevel;
+  Map* map = g_new0(Map, 1);
 
-guint champlain_map_zoom_level_get_width(ChamplainMapZoomLevel* level);
+  switch(source) 
+    {
+      case CHAMPLAIN_MAP_SOURCE_DEBUG:
+        debugmap_init(map);
+        break;
+      case CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP:
+        osm_init(map);
+        break;
+    }
+    
+  return map;
+}
 
-guint champlain_map_zoom_level_get_height(ChamplainMapZoomLevel* level);
+void 
+map_load(Map* map, gint zoom_level)
+{
+    guint row_count = map->get_row_count(map, zoom_level);
+    guint column_count = map->get_column_count(map, zoom_level);
+    
+    map->current_level = zoom_level_new(zoom_level, row_count, column_count, map->tile_size);
+    zoom_level_create(map, zoom_level);
+}
 
-ChamplainMapZoomLevel* champlain_map_zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size);
-
-#endif

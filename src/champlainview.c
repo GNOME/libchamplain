@@ -20,10 +20,10 @@
 #include "config.h"
 
 #include "champlain_defines.h"
-#include "champlain_map_tile.h"
-#include "champlain_map.h"
-#include "champlain_map_zoom_level.h"
-#include "champlain_widget.h"
+#include "champlain_view.h"
+#include "map_tile.h"
+#include "map.h"
+#include "map_zoom_level.h"
 #include "champlain-marshal.h"
 
 #include <tidy-finger-scroll.h>
@@ -49,9 +49,9 @@ enum
   PROP_TBD
 };
 
-static guint champlain_widget_signals[LAST_SIGNAL] = { 0, };
+static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
 
-#define CHAMPLAIN_WIDGET_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_WIDGET, ChamplainWidgetPrivate))
+#define CHAMPLAIN_VIEW_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
 
 typedef struct
 {
@@ -60,50 +60,50 @@ typedef struct
   ClutterUnit y;
 } ChamplainPoint;
 
-struct _ChamplainWidgetPrivate
+struct _ChamplainViewPrivate
 {
   GtkWidget *clutterEmbed;
   ClutterActor *viewport;
   ChamplainPoint viewportSize;
   ClutterActor *fingerScroll;
   
-  ChamplainMap *map;
+  Map *map;
 };
 
 
-G_DEFINE_TYPE (ChamplainWidget, champlain_widget, GTK_TYPE_ALIGNMENT);
+G_DEFINE_TYPE (ChamplainView, champlain_view, GTK_TYPE_ALIGNMENT);
 
 static void
-champlain_widget_finalize (GObject * object)
+champlain_view_finalize (GObject * object)
 {
-  ChamplainWidget *widget = CHAMPLAIN_WIDGET (object);
-  ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (widget);
+  ChamplainView *view = CHAMPLAIN_VIEW (object);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
-  G_OBJECT_CLASS (champlain_widget_parent_class)->finalize (object);
+  G_OBJECT_CLASS (champlain_view_parent_class)->finalize (object);
 }
 
 static void
-champlain_widget_class_init (ChamplainWidgetClass *champlainWidgetClass)
+champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 {
-  g_type_class_add_private (champlainWidgetClass, sizeof (ChamplainWidgetPrivate));
+  g_type_class_add_private (champlainViewClass, sizeof (ChamplainViewPrivate));
 
-  GObjectClass *objectClass = G_OBJECT_CLASS (champlainWidgetClass);
-  objectClass->finalize = champlain_widget_finalize;
+  GObjectClass *objectClass = G_OBJECT_CLASS (champlainViewClass);
+  objectClass->finalize = champlain_view_finalize;
 }
 
 static void
-champlain_widget_init (ChamplainWidget *champlainWidget)
+champlain_view_init (ChamplainView *champlainView)
 {
-  ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (champlainWidget);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
 }
 
 static void
-widget_size_allocated_cb (GtkWidget *widget, GtkAllocation *allocation, ChamplainWidget *champlainWidget) 
+view_size_allocated_cb (GtkWidget *view, GtkAllocation *allocation, ChamplainView *champlainView) 
 {                
   gdouble lower, upper;
   TidyAdjustment *hadjust, *vadjust;
   
-  ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (champlainWidget);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
   priv->viewportSize.x = allocation->width;
   priv->viewportSize.y = allocation->height;
   clutter_actor_set_size (priv->fingerScroll, priv->viewportSize.x, priv->viewportSize.y);
@@ -114,26 +114,27 @@ widget_size_allocated_cb (GtkWidget *widget, GtkAllocation *allocation, Champlai
   
   tidy_adjustment_get_values (hadjust, NULL, &lower, &upper, NULL, NULL, NULL);
   lower = 0;
-  upper = champlain_map_zoom_level_get_width(priv->map->current_level) - priv->viewportSize.x; 
+  upper = map_zoom_level_get_width(priv->map->current_level) - priv->viewportSize.x; 
   g_object_set (hadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
                 
   tidy_adjustment_get_values (vadjust, NULL, &lower, &upper, NULL, NULL, NULL);
   lower = 0;
-  upper = champlain_map_zoom_level_get_height(priv->map->current_level) - priv->viewportSize.y;
+  upper = map_zoom_level_get_height(priv->map->current_level) - priv->viewportSize.y;
   g_object_set (vadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
+                
 }
                           
 GtkWidget *
-champlain_widget_new ()
+champlain_view_new ()
 {
   ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
-  ChamplainWidget *widget;
+  ChamplainView *view;
   ClutterActor *stage; 
   
-  widget = CHAMPLAIN_WIDGET (g_object_new (CHAMPLAIN_TYPE_WIDGET, NULL));
-  ChamplainWidgetPrivate *priv = CHAMPLAIN_WIDGET_GET_PRIVATE (widget);
+  view = CHAMPLAIN_VIEW (g_object_new (CHAMPLAIN_TYPE_VIEW, NULL));
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
   
   priv->viewportSize.x = 640;
   priv->viewportSize.y = 480;
@@ -141,14 +142,14 @@ champlain_widget_new ()
   priv->clutterEmbed = gtk_clutter_embed_new ();
   g_signal_connect (priv->clutterEmbed,
                     "size-allocate",
-                    G_CALLBACK (widget_size_allocated_cb),
-                    widget);
+                    G_CALLBACK (view_size_allocated_cb),
+                    view);
 
 	// Setup stage
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutterEmbed));
   
   clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
-  gtk_container_add (GTK_CONTAINER (widget), priv->clutterEmbed);
+  gtk_container_add (GTK_CONTAINER (view), priv->clutterEmbed);
   
   // Setup viewport
   priv->viewport = tidy_viewport_new ();
@@ -161,9 +162,9 @@ champlain_widget_new ()
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->fingerScroll), priv->viewport);
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), priv->fingerScroll);
     
-	priv->map = champlain_map_new(CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP);//OPENSTREETMAP
-	champlain_map_load(priv->map, 4);
+	priv->map = map_new(CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP);//OPENSTREETMAP
+	map_load(priv->map, 4);
   clutter_container_add_actor (CLUTTER_CONTAINER (group), priv->map->current_level->group);
   
-  return GTK_WIDGET (widget);
+  return GTK_WIDGET (view);
 }

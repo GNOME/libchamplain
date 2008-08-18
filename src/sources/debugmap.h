@@ -20,8 +20,8 @@
 #ifndef OPENSTREETMAP_H
 #define OPENSTREETMAP_H
 
-#include <champlain_map.h>
+#include <map.h>
 
-void osm_init(ChamplainMap* map);
+void debugmap_init(Map* map);
 
 #endif

@@ -31,6 +31,6 @@ typedef struct
   int size;
   gboolean visible;		// Wether the tile is visible in the viewport
   
-} ChamplainMapTile;
+} Tile;
 
 #endif

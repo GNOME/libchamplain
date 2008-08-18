@@ -17,21 +17,21 @@
  * Boston, MA 02110-1301, USA.
  */
  
-#include "map_source/openstreetmap.h"
-#include <champlain_map.h>
+#include "sources/openstreetmap.h"
+#include <map.h>
 #include <math.h>
 
 //http://wiki.openstreetmap.org/index.php/Slippy_map_tilenames#C.2FC.2B.2B
 
-guint osm_row_count(ChamplainMap* map, guint zoom_level);
-guint osm_column_count(ChamplainMap* map, guint zoom_level);
-ChamplainMapTile* osm_get_tile (ChamplainMap* map, guint zoom_level, guint x, guint y);
+guint osm_row_count(Map* map, guint zoom_level);
+guint osm_column_count(Map* map, guint zoom_level);
+Tile* osm_get_tile (Map* map, guint zoom_level, guint x, guint y);
 
 void
-osm_init(ChamplainMap* map)
+osm_init(Map* map)
 {
-	map->name = "OpenStreetMap";
-	map->zoom_levels = 17;
+  map->name = "OpenStreetMap";
+  map->zoom_levels = 17;
   map->tile_size = 256;
   
   map->get_row_count = osm_row_count;
@@ -39,35 +39,35 @@ osm_init(ChamplainMap* map)
   map->get_tile = osm_get_tile;
 }
 
-guint osm_row_count(ChamplainMap* map, guint zoom_level)
+guint osm_row_count(Map* map, guint zoom_level)
 {
-	return pow (2, zoom_level);
+  return pow (2, zoom_level);
 }
 
-guint osm_column_count(ChamplainMap* map, guint zoom_level)
+guint osm_column_count(Map* map, guint zoom_level)
 {
-	return pow (2, zoom_level);
+  return pow (2, zoom_level);
 }
 
-ChamplainMapTile* osm_get_tile (ChamplainMap* map, guint zoom_level, guint x, guint y)
+Tile* osm_get_tile (Map* map, guint zoom_level, guint x, guint y)
 {
-	ChamplainMapTile* tile = g_new0(ChamplainMapTile, 1);
-	
-	tile->x = x;
-	tile->y = y;
-	tile->visible = FALSE;
+  Tile* tile = g_new0(Tile, 1);
+  
+  tile->x = x;
+  tile->y = y;
+  tile->visible = FALSE;
   // For no apparent reason, the group is necessary even if 
   // it contains only one actor... if missing, the viewport will break
-	tile->actor = clutter_group_new();
-																			
-	ClutterActor* actor = clutter_texture_new_from_file(g_strdup_printf("/home/plbeaudoin/champlain/tiles/%d/%d/%d.png", zoom_level, x, y), NULL);
-	clutter_actor_set_position (actor, x * map->tile_size, y * map->tile_size);
-	clutter_actor_set_size (actor, map->tile_size, map->tile_size);
-	clutter_actor_show (actor);
+  tile->actor = clutter_group_new();
+                                      
+  ClutterActor* actor = clutter_texture_new_from_file(g_strdup_printf("/home/plbeaudoin/champlain/tiles/%d/%d/%d.png", zoom_level, x, y), NULL);
+  clutter_actor_set_position (actor, x * map->tile_size, y * map->tile_size);
+  clutter_actor_set_size (actor, map->tile_size, map->tile_size);
+  clutter_actor_show (actor);
   clutter_container_add_actor (CLUTTER_CONTAINER (tile->actor), actor);
   
-	g_object_ref(tile->actor); // to prevent actors to be destroyed when they are removed from groups
-	
-	return tile;
-	
+  g_object_ref(tile->actor); // to prevent actors to be destroyed when they are removed from groups
+  
+  return tile;
+  
 }

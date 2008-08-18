@@ -60,7 +60,7 @@ main (int argc, char *argv[])
    */
   g_signal_connect (G_OBJECT (window), "destroy", G_CALLBACK (on_destroy), NULL);
 
-  widget = champlain_widget_new ();
+  widget = champlain_view_new ();
 
   /* and insert it into the main window  */
   gtk_container_add (GTK_CONTAINER (window), widget);

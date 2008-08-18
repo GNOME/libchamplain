@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${exec_prefix}/include
+
+Name: Champlain
+Description: Map View for Gtk+
+Version: 0.1
+Libs: -L${libdir} -lchamplain-1.0
+Cflags: -I${includedir}/champlain-1.0
+Requires: gobject-2.0 clutter-0.8 gtk+-2.10
