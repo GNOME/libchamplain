@@ -19,6 +19,7 @@
 
 #include "config.h"
 
+#include "champlain.h"
 #include "champlain_defines.h"
 #include "champlainview.h"
 #include "tile.h"
@@ -53,20 +54,12 @@ static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
 
 #define CHAMPLAIN_VIEW_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
 
-typedef struct
-{
-  /* Units to store the origin of a click when scrolling */
-  ClutterUnit x;
-  ClutterUnit y;
-} ChamplainPoint;
-
 struct _ChamplainViewPrivate
 {
   GtkWidget *clutterEmbed;
   ClutterActor *viewport;
-  ChamplainPoint viewportSize;
   ClutterActor *fingerScroll;
-  
+  ChamplainRect viewportSize;
   Map *map;
 };
 
@@ -97,16 +90,36 @@ champlain_view_init (ChamplainView *champlainView)
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
 }
 
+void viewport_x_changed_cb(GObject    *gobject,
+                           GParamSpec *arg1,
+                           ChamplainView *champlainView)
+{
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
+  
+  ChamplainRect rect;
+  tidy_viewport_get_origin(TIDY_VIEWPORT(priv->viewport), &rect.x, &rect.y, NULL);
+  if (rect.x < 0 || rect.y < 0)
+      return;
+  if (rect.x == priv->viewportSize.x &&
+      rect.y == priv->viewportSize.y &&
+      rect.width == priv->viewportSize.width &&
+      rect.height == priv->viewportSize.height)
+      return;
+  priv->viewportSize.x = rect.x;
+  priv->viewportSize.y = rect.y;
+  
+  map_load_visible_tiles (priv->map, priv->viewportSize);
+}
+
 static void
 view_size_allocated_cb (GtkWidget *view, GtkAllocation *allocation, ChamplainView *champlainView) 
-{                
+{
   gdouble lower, upper;
   TidyAdjustment *hadjust, *vadjust;
   
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
-  priv->viewportSize.x = allocation->width;
-  priv->viewportSize.y = allocation->height;
-  clutter_actor_set_size (priv->fingerScroll, priv->viewportSize.x, priv->viewportSize.y);
+  
+  clutter_actor_set_size (priv->fingerScroll, allocation->width, allocation->height);
   
   g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
   
@@ -114,16 +127,20 @@ view_size_allocated_cb (GtkWidget *view, GtkAllocation *allocation, ChamplainVie
   
   tidy_adjustment_get_values (hadjust, NULL, &lower, &upper, NULL, NULL, NULL);
   lower = 0;
-  upper = zoom_level_get_width(priv->map->current_level) - priv->viewportSize.x; 
+  upper = zoom_level_get_width(priv->map->current_level) - allocation->width; 
   g_object_set (hadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
                 
   tidy_adjustment_get_values (vadjust, NULL, &lower, &upper, NULL, NULL, NULL);
   lower = 0;
-  upper = zoom_level_get_height(priv->map->current_level) - priv->viewportSize.y;
+  upper = zoom_level_get_height(priv->map->current_level) - allocation->height;
   g_object_set (vadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
                 
+  priv->viewportSize.width = allocation->width;
+  priv->viewportSize.height = allocation->height;
+  
+  map_load_visible_tiles (priv->map, priv->viewportSize);
 }
                           
 GtkWidget *
@@ -135,9 +152,6 @@ champlain_view_new ()
   
   view = CHAMPLAIN_VIEW (g_object_new (CHAMPLAIN_TYPE_VIEW, NULL));
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
-  
-  priv->viewportSize.x = 640;
-  priv->viewportSize.y = 480;
   
   priv->clutterEmbed = gtk_clutter_embed_new ();
   g_signal_connect (priv->clutterEmbed,
@@ -154,7 +168,12 @@ champlain_view_new ()
   // Setup viewport
   priv->viewport = tidy_viewport_new ();
   ClutterActor* group = clutter_group_new();
+  
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), group);
+  g_signal_connect (priv->viewport,
+                    "notify::x-origin",
+                    G_CALLBACK (viewport_x_changed_cb),
+                    view);
 
   // Setup finger scroll
   priv->fingerScroll = tidy_finger_scroll_new(TIDY_FINGER_SCROLL_MODE_KINETIC);
@@ -165,7 +184,7 @@ champlain_view_new ()
   priv->map = map_new(CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP);//OPENSTREETMAP
   map_load(priv->map, 4);
   clutter_container_add_actor (CLUTTER_CONTAINER (group), priv->map->current_level->group);
-  
+  clutter_actor_show (group);
   return GTK_WIDGET (view);
 }
 
@@ -179,5 +198,8 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
   x = priv->map->longitude_to_x(priv->map, longitude, priv->map->current_level->level);
   y = priv->map->latitude_to_y(priv->map, latitude, priv->map->current_level->level);
 
-  tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - priv->viewportSize.x/2.0, y - priv->viewportSize.y/2.0, 0);
+  ChamplainRect rect;
+  clutter_actor_get_size(priv->viewport, &rect.width, &rect.height);
+  
+  tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - rect.width/2.0, y - rect.height/2.0, 0);
 }

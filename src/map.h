@@ -20,6 +20,7 @@
 #ifndef MAP_H
 #define MAP_H
 
+#include "champlain.h"
 #include "champlainview.h"
 #include "champlain_defines.h"
 #include "zoomlevel.h"
@@ -50,5 +51,6 @@ struct _Map
 
 CHAMPLAIN_API Map* champlain_map_new (ChamplainMapSource source);
 
+void map_load_visible_tiles (Map* map, ChamplainRect viewport);
 
 #endif

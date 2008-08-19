@@ -20,6 +20,7 @@
 #include "sources/openstreetmap.h"
 #include <map.h>
 #include <math.h>
+#include <clutter/clutter.h>
 
 //http://wiki.openstreetmap.org/index.php/Slippy_map_tilenames#C.2FC.2B.2B
 
@@ -54,12 +55,14 @@ guint osm_row_count(Map* map, guint zoom_level)
   return pow (2, zoom_level);
 }
 
-guint osm_column_count(Map* map, guint zoom_level)
+guint 
+osm_column_count(Map* map, guint zoom_level)
 {
   return pow (2, zoom_level);
 }
 
-Tile* osm_get_tile (Map* map, guint zoom_level, guint x, guint y)
+Tile* 
+osm_get_tile (Map* map, guint zoom_level, guint x, guint y)
 {
   Tile* tile = g_new0(Tile, 1);
   
@@ -82,23 +85,27 @@ Tile* osm_get_tile (Map* map, guint zoom_level, guint x, guint y)
   
 }
 
-gdouble osm_longitude_to_x (Map* map, gdouble longitude, guint zoom_level)
+gdouble 
+osm_longitude_to_x (Map* map, gdouble longitude, guint zoom_level)
 {
   return ((longitude + 180.0) / 360.0 * pow(2.0, zoom_level)) * map->tile_size; 
 }
 
-gdouble osm_latitude_to_y (Map* map, gdouble latitude, guint zoom_level)
+gdouble 
+osm_latitude_to_y (Map* map, gdouble latitude, guint zoom_level)
 {
   return ((1.0 - log( tan(latitude * M_PI/180.0) + 1.0 / cos(latitude * M_PI/180.0)) / M_PI) / 2.0 * pow(2.0, zoom_level)) * map->tile_size;
 }
 
-gdouble osm_x_to_longitude (Map* map, gdouble x, guint zoom_level)
+gdouble 
+osm_x_to_longitude (Map* map, gdouble x, guint zoom_level)
 {
   x /= map->tile_size;
   return x / map->tile_size * pow(2.0, zoom_level) * 360.0 - 180;
 }
 
-gdouble osm_y_to_latitude (Map* map, gdouble y, guint zoom_level)
+gdouble 
+osm_y_to_latitude (Map* map, gdouble y, guint zoom_level)
 {
   y /= map->tile_size;
   double n = M_PI - 2.0 * M_PI * y / pow(2.0, zoom_level);

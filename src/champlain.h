@@ -25,6 +25,15 @@
 #define CHAMPLAIN_MIN_LONG -180
 #define CHAMPLAIN_MAX_LONG 180
 
+#include <glib.h>
+
+typedef struct {
+  gint x;
+  gint y;
+  guint width;
+  guint height;
+} ChamplainRect;
+
 #include "champlain_defines.h"
 #include "champlainview.h"
 
