@@ -29,7 +29,6 @@ typedef struct
   int x;
   int y;
   int size;
-  gboolean visible;		// Wether the tile is visible in the viewport
   
 } Tile;
 

@@ -50,7 +50,8 @@ main (int argc, char *argv[])
   GtkWidget *window;
   GtkWidget *widget, *vbox, *bbox, *button, *viewport;
   GtkWidget *scrolled;
-
+  
+  g_thread_init (NULL);
   gtk_clutter_init (&argc, &argv);
 
   /* create the main, top level, window */

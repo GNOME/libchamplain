@@ -21,6 +21,14 @@
 #include <map.h>
 #include <math.h>
 #include <clutter/clutter.h>
+#include <libsoup/soup.h>
+
+
+typedef struct {
+  Map* map;
+  Tile* tile;
+} TwoPtr ;
+
 
 //http://wiki.openstreetmap.org/index.php/Slippy_map_tilenames#C.2FC.2B.2B
 
@@ -60,26 +68,92 @@ osm_column_count(Map* map, guint zoom_level)
 {
   return pow (2, zoom_level);
 }
+#define MAX_READ  100000
+
+static void
+file_loaded_cb (SoupSession *session,
+                 SoupMessage *msg,
+                 TwoPtr* ptr)
+{
+  GError *error = NULL;
+  GdkPixbufLoader* pixloader;
+  Tile* tile = ptr->tile;
+  Map* map = ptr->map;
+  
+  if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code)) 
+    {
+      g_warning ("Unable to download tile %d, %d", tile->x, tile->y);
+      return;
+    }
+
+  pixloader = gdk_pixbuf_loader_new();
+  if (!gdk_pixbuf_loader_write (pixloader,
+                          (const guchar *) msg->response_body->data,
+                          msg->response_body->length,
+                          NULL))
+    {
+      if (error)
+        {
+          g_warning ("Unable to load the pixbuf: %s", error->message);
+          g_error_free (error);
+        }
+ 
+      g_object_unref (pixloader);
+    }
+    
+  gdk_pixbuf_loader_close (pixloader, NULL);
+  if (error)
+    {
+      g_warning ("Unable to close the pixbuf loader: %s", error->message);
+      g_error_free (error);
+      g_object_unref (pixloader);
+    }
+  else
+    {
+      GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(pixloader);
+      
+      tile->actor = clutter_texture_new();
+      clutter_texture_set_from_rgb_data(tile->actor, 
+          gdk_pixbuf_get_pixels (pixbuf),
+          gdk_pixbuf_get_has_alpha (pixbuf),
+          gdk_pixbuf_get_width(pixbuf),
+          gdk_pixbuf_get_height(pixbuf),
+          gdk_pixbuf_get_rowstride (pixbuf),
+          3, 0, NULL);
+           
+      
+      clutter_actor_set_position (tile->actor, tile->x * map->tile_size, tile->y * map->tile_size);
+      clutter_actor_set_size (tile->actor, map->tile_size, map->tile_size);
+      clutter_actor_show (tile->actor);
+      //g_object_ref(tile->actor); // to prevent actors to be destroyed when they are removed from groups
+      
+      clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
+    }
+}
 
 Tile* 
 osm_get_tile (Map* map, guint zoom_level, guint x, guint y)
 {
+  static SoupSession * session;
+  
   Tile* tile = g_new0(Tile, 1);
   
   tile->x = x;
   tile->y = y;
-  tile->visible = FALSE;
-  // For no apparent reason, the group is necessary even if 
-  // it contains only one actor... if missing, the viewport will break
-  tile->actor = clutter_group_new();
-                                      
-  ClutterActor* actor = clutter_texture_new_from_file(g_strdup_printf("/home/plbeaudoin/champlain/tiles/%d/%d/%d.png", zoom_level, x, y), NULL);
-  clutter_actor_set_position (actor, x * map->tile_size, y * map->tile_size);
-  clutter_actor_set_size (actor, map->tile_size, map->tile_size);
-  clutter_actor_show (actor);
-  clutter_container_add_actor (CLUTTER_CONTAINER (tile->actor), actor);
   
-  g_object_ref(tile->actor); // to prevent actors to be destroyed when they are removed from groups
+  TwoPtr* ptr = g_new0(TwoPtr, 1);
+  ptr->map = map;
+  ptr->tile = tile;
+  
+  SoupMessage *msg;
+  if (!session)
+    session = soup_session_async_new ();
+
+  msg = soup_message_new (SOUP_METHOD_GET, g_strdup_printf("http://tile.openstreetmap.org/%d/%d/%d.png", zoom_level, x, y));
+
+  soup_session_queue_message (session, msg,
+                              file_loaded_cb,
+                              ptr);
   
   return tile;
   

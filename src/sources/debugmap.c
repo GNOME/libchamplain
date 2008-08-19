@@ -80,7 +80,6 @@ Tile* debugmap_get_tile (Map* map, guint zoom_level, guint x, guint y)
   
   tile->x = x;
   tile->y = y;
-  tile->visible = FALSE;
   tile->actor = clutter_group_new();
   
   ClutterActor* actor = clutter_rectangle_new_with_color (color);

@@ -21,11 +21,12 @@ AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 
 PKG_CHECK_MODULES(DEPS,
-  [   glib-2.0 >= 2.2,
+  [   glib-2.0 >= 2.16,
       gobject-2.0 >= 2.10,
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
-      clutter-gtk-0.8 >= 0.8
+      clutter-gtk-0.8 >= 0.8,
+      libsoup-2.4 >= 2.4.1
   ]
 )
 

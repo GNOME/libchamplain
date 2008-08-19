@@ -44,7 +44,7 @@ map_load(Map* map, gint zoom_level)
 {
     guint row_count = map->get_row_count(map, zoom_level);
     guint column_count = map->get_column_count(map, zoom_level);
-    
+
     map->current_level = zoom_level_new(zoom_level, row_count, column_count, map->tile_size);
 }
 
@@ -81,7 +81,6 @@ map_load_visible_tiles (Map* map, ChamplainRect viewport)
               Tile* tile = map->get_tile(map, map->current_level->level, i, j);
 
               g_ptr_array_add (map->current_level->tiles, tile);
-              clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
             }
         }
     }
