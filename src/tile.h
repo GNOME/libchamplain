@@ -29,6 +29,7 @@ typedef struct
   int x;
   int y;
   int size;
+  int level;
   
 } Tile;
 

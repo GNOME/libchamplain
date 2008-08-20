@@ -60,4 +60,6 @@ CHAMPLAIN_API GtkWidget *champlain_view_new (void);
 
 CHAMPLAIN_API void champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitude);
 
+CHAMPLAIN_API void champlain_view_zoom_in (ChamplainView *champlainView);
+
 #endif

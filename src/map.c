@@ -17,15 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
  
-#include <map.h>
-#include <zoomlevel.h>
- 
+#include "map.h"
+#include "zoomlevel.h"
+#include <math.h>
 
 Map* 
 map_new (ChamplainMapSource source)
 {
   Map* map = g_new0(Map, 1);
-
+  
   switch(source) 
     {
       case CHAMPLAIN_MAP_SOURCE_DEBUG:
@@ -35,20 +35,25 @@ map_new (ChamplainMapSource source)
         osm_init(map);
         break;
     }
-    
+  
+  map->levels = g_ptr_array_sized_new (map->zoom_levels);
+  map->current_level = NULL;
   return map;
 }
 
 void 
-map_load(Map* map, gint zoom_level)
+map_load_level(Map* map, gint zoom_level)
 {
-    guint row_count = map->get_row_count(map, zoom_level);
-    guint column_count = map->get_column_count(map, zoom_level);
+  //if(map->current_level)
+  
+  guint row_count = map->get_row_count(map, zoom_level);
+  guint column_count = map->get_column_count(map, zoom_level);
 
-    map->current_level = zoom_level_new(zoom_level, row_count, column_count, map->tile_size);
+  map->current_level = zoom_level_new(zoom_level, row_count, column_count, map->tile_size);
+  g_ptr_array_add(map->levels, map->current_level);
 }
 
-void 
+void
 map_load_visible_tiles (Map* map, ChamplainRect viewport)
 {
   gint x_count = ceil((float)viewport.width / map->tile_size) + 1;
@@ -78,10 +83,33 @@ map_load_visible_tiles (Map* map, ChamplainRect viewport)
 
           if(!exist)
             {
-              Tile* tile = map->get_tile(map, map->current_level->level, i, j);
-
+              Tile* tile = tile_load(map, map->current_level->level, i, j);
               g_ptr_array_add (map->current_level->tiles, tile);
             }
         }
     }
 }
+
+gboolean 
+map_zoom_in (Map* map)
+{
+  if(map->current_level->level + 1 <= map->zoom_levels)
+    {
+      map_load_level(map, map->current_level->level + 1);
+      return TRUE;
+    }
+  return FALSE;
+}
+
+gboolean 
+map_zoom_out (Map* map)
+{
+  if(map->current_level->level - 1 >= 0)
+    {
+      map_load_level(map, map->current_level->level - 1);
+      return TRUE;
+    }
+  return FALSE;
+}
+
+

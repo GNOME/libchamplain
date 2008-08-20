@@ -44,6 +44,18 @@ go_to_cambridge (GtkWidget * widget, ChamplainView* view)
   champlain_view_center_on(view, 0.1258, 52.2048);
 }
 
+static void
+zoom_in (GtkWidget * widget, ChamplainView* view)
+{
+  champlain_view_zoom_in(view);
+}
+
+static void
+zoom_out (GtkWidget * widget, ChamplainView* view)
+{
+  champlain_view_zoom_out(view);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -80,6 +92,18 @@ main (int argc, char *argv[])
   bbox =  gtk_hbutton_box_new ();
   gtk_button_box_set_layout (GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_START);
   gtk_button_box_set_spacing (GTK_BUTTON_BOX(bbox), 10);
+  button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_IN);
+  g_signal_connect (button,
+                    "clicked",
+                    G_CALLBACK (zoom_in),
+                    widget);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+  button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_OUT);
+  g_signal_connect (button,
+                    "clicked",
+                    G_CALLBACK (zoom_out),
+                    widget);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
   button = gtk_button_new_with_label ("Montréal");
   g_signal_connect (button,
                     "clicked",

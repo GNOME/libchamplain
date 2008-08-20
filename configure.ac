@@ -26,7 +26,8 @@ PKG_CHECK_MODULES(DEPS,
       gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8,
-      libsoup-2.4 >= 2.4.1
+      libsoup-2.4 >= 2.4.1,
+      gio-2.0 >= 2.16
   ]
 )
 
