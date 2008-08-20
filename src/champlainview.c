@@ -19,23 +19,23 @@
 
 #include "config.h"
 
-#include "champlain.h"
 #include "champlain_defines.h"
-#include "champlainview.h"
-#include "tile.h"
-#include "map.h"
-#include "zoomlevel.h"
+#include "champlain.h"
 #include "champlain-marshal.h"
+#include "champlainview.h"
+#include "map.h"
+#include "tile.h"
+#include "zoomlevel.h"
 
-#include <tidy-finger-scroll.h>
-#include <tidy-scrollable.h>
-#include <tidy-viewport.h>
-#include <tidy-adjustment.h>
-#include <math.h>
+#include <clutter/clutter.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <gtk-clutter-embed.h>
-#include <clutter/clutter.h>
+#include <math.h>
+#include <tidy-adjustment.h>
+#include <tidy-finger-scroll.h>
+#include <tidy-scrollable.h>
+#include <tidy-viewport.h>
 
 enum
 {
@@ -47,12 +47,22 @@ enum
 enum
 {
   PROP_0,
-  PROP_TBD
+  PROP_LONGITUDE,
+  PROP_LATITUDE,
+  PROP_ZOOM_LEVEL,
+  PROP_MAP_SOURCE
 };
 
 static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
 
 #define CHAMPLAIN_VIEW_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
+#define CHAMPLAIN_PARAM_READABLE     \
+        (G_PARAM_READABLE |     \
+         G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
+
+#define CHAMPLAIN_PARAM_READWRITE    \
+        (G_PARAM_READABLE | G_PARAM_WRITABLE | \
+         G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
 
 struct _ChamplainViewPrivate
 {
@@ -65,6 +75,76 @@ struct _ChamplainViewPrivate
 
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, GTK_TYPE_ALIGNMENT);
+
+static gdouble
+viewport_get_current_longitude(ChamplainViewPrivate *priv)
+{
+  return priv->map->x_to_longitude(priv->map, priv->viewportSize.x + priv->viewportSize.width/2.0, priv->map->current_level->level);
+}
+
+static gdouble
+viewport_get_current_latitude(ChamplainViewPrivate *priv)
+{
+  return priv->map->y_to_latitude(priv->map, priv->viewportSize.y + priv->viewportSize.height/2.0, priv->map->current_level->level);
+}
+
+static void 
+champlain_view_get_property(GObject* object, guint prop_id, GValue* value, GParamSpec* pspec)
+{
+    ChamplainView* view = CHAMPLAIN_VIEW(object);
+    ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+
+    switch(prop_id) 
+      {
+        case PROP_LONGITUDE:
+          g_value_set_double(value, viewport_get_current_longitude(priv));
+          break;
+        case PROP_LATITUDE:
+          g_value_set_double(value, viewport_get_current_latitude(priv));
+          break;
+        case PROP_ZOOM_LEVEL:
+          g_value_set_int(value, priv->map->current_level->level);
+          break;
+        case PROP_MAP_SOURCE:
+          //FIXME
+          break;
+        default:
+          G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+      }
+}
+
+static void 
+champlain_view_set_property(GObject* object, guint prop_id, const GValue* value, GParamSpec *pspec)
+{
+    ChamplainView* view = CHAMPLAIN_VIEW(object);
+    ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+
+    switch(prop_id) 
+    {
+      case PROP_LONGITUDE:
+        {
+          gdouble lon = g_value_get_double(value);
+          gdouble lat = viewport_get_current_latitude(priv);
+          champlain_view_center_on(view, lon, lat);
+          break;
+        }
+      case PROP_LATITUDE:
+        {
+          gdouble lon = viewport_get_current_longitude(priv);
+          gdouble lat = g_value_get_double(value);
+          champlain_view_center_on(view, lon, lat);
+          break;
+        }
+      case PROP_ZOOM_LEVEL:
+        //FIXME 
+        break;
+      case PROP_MAP_SOURCE:
+        //FIXME 
+        break;
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+    }
+}
 
 static void
 champlain_view_finalize (GObject * object)
@@ -82,6 +162,74 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
   GObjectClass *objectClass = G_OBJECT_CLASS (champlainViewClass);
   objectClass->finalize = champlain_view_finalize;
+  objectClass->get_property = champlain_view_get_property;
+  objectClass->set_property = champlain_view_set_property;
+  
+  
+  /**
+  * ChamplainView:longitude:
+  *
+  * The longitude coordonate of the map
+  *
+  * Since: 0.1
+  */
+  g_object_class_install_property(objectClass, PROP_ZOOM_LEVEL,
+                                  g_param_spec_float("longitude",
+                                                     "Longitude",
+                                                     "The longitude coordonate of the map",
+                                                     -180,
+                                                     180,
+                                                     1.0f,
+                                                     CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainView:latitude:
+  *
+  * The latitude coordonate of the map
+  *
+  * Since: 0.1
+  */
+  g_object_class_install_property(objectClass, PROP_ZOOM_LEVEL,
+                                  g_param_spec_float("latitude",
+                                                     "Latitude",
+                                                     "The latitude coordonate of the map",
+                                                     -90,
+                                                     90,
+                                                     1.0f,
+                                                     CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainView:zoom-level:
+  *
+  * The level of zoom of the content.
+  *
+  * Since: 0.1
+  */
+  g_object_class_install_property(objectClass, PROP_ZOOM_LEVEL,
+                                  g_param_spec_int("zoom-level",
+                                                     "Zoom level",
+                                                     "The level of zoom of the map",
+                                                     0,
+                                                     20,
+                                                     1.0f,
+                                                     CHAMPLAIN_PARAM_READABLE)); //FIXME change when can be written
+
+
+  /**
+  * ChamplainView:zoom-level:
+  *
+  * The level of zoom of the content.
+  *
+  * Since: 0.1
+  */
+  /* g_object_class_install_property(objectClass, PROP_ZOOM_LEVEL,
+                                  g_param_spec_int("map-source",
+                                                     "Map source",
+                                                     "The map source being displayed",
+                                                     0,
+                                                     10,
+                                                     1.0f,
+                                                     CHAMPLAIN_PARAM_READWRITE)); */
 }
 
 static void
@@ -151,7 +299,14 @@ view_size_allocated_cb (GtkWidget *view, GtkAllocation *allocation, ChamplainVie
   resize_viewport(champlainView);
   map_load_visible_tiles (priv->map, priv->viewportSize);
 }
-                          
+
+/**
+ * champlain_view_new:
+ *
+ * Returns a new #ChamplainWidget ready to be used as a #GtkWidget.
+ *
+ * Since: 0.1
+ */
 GtkWidget *
 champlain_view_new ()
 {
@@ -194,6 +349,16 @@ champlain_view_new ()
   return GTK_WIDGET (view);
 }
 
+/**
+ * champlain_view_center_on:
+ * @view: a #ChamplainView
+ * @longitude: the longitude to center the map at
+ * @latitude: the longitude to center the map at
+ *
+ * Centers the map on these coordinates.
+ *
+ * Since: 0.1
+ */
 // FIXME: Animate this.  Can be done in Tidy-Adjustment (like for elastic effect)
 void
 champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdouble latitude)
@@ -207,6 +372,14 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
   tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - priv->viewportSize.width/2.0, y - priv->viewportSize.height/2.0, 0);
 }
 
+/**
+ * champlain_view_zoom_in:
+ * @view: a #ChamplainView
+ *
+ * Zoom in the map by one level.
+ *
+ * Since: 0.1
+ */
 void
 champlain_view_zoom_in (ChamplainView *champlainView)
 {
@@ -216,8 +389,8 @@ champlain_view_zoom_in (ChamplainView *champlainView)
     {
       gint level = priv->map->current_level->level;
       g_print("Zoom: %d\n", level);
-      gdouble lon = priv->map->x_to_longitude(priv->map, priv->viewportSize.x + priv->viewportSize.width/2.0, level);
-      gdouble lat = priv->map->y_to_latitude(priv->map, priv->viewportSize.y + priv->viewportSize.height/2.0, level);
+      gdouble lon = viewport_get_current_longitude(priv);
+      gdouble lat = viewport_get_current_latitude(priv);
       level++;
       gdouble x = priv->map->longitude_to_x(priv->map, lon, level);
       gdouble y = priv->map->latitude_to_y(priv->map, lat, level);
@@ -230,6 +403,14 @@ champlain_view_zoom_in (ChamplainView *champlainView)
     }
 }
 
+/**
+ * champlain_view_zoom_out:
+ * @view: a #ChamplainView
+ *
+ * Zoom out the map by one level.
+ *
+ * Since: 0.1
+ */
 void
 champlain_view_zoom_out (ChamplainView *champlainView)
 {
@@ -239,8 +420,8 @@ champlain_view_zoom_out (ChamplainView *champlainView)
     {
       gint level = priv->map->current_level->level;
       g_print("Zoom: %d\n", level);
-      gdouble lon = priv->map->x_to_longitude(priv->map, priv->viewportSize.x + priv->viewportSize.width/2.0, level);
-      gdouble lat = priv->map->y_to_latitude(priv->map, priv->viewportSize.y + priv->viewportSize.height/2.0, level);
+      gdouble lon = viewport_get_current_longitude(priv);
+      gdouble lat = viewport_get_current_latitude(priv);
       level--;
       gdouble x = priv->map->longitude_to_x(priv->map, lon, level);
       gdouble y = priv->map->latitude_to_y(priv->map, lat, level);
