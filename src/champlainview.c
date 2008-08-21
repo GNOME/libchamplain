@@ -69,7 +69,7 @@ struct _ChamplainViewPrivate
   GtkWidget *clutterEmbed;
   ClutterActor *viewport;
   ClutterActor *fingerScroll;
-  ChamplainRect viewportSize;
+  GdkRectangle viewportSize;
   Map *map;
 };
 
@@ -244,7 +244,7 @@ void viewport_x_changed_cb(GObject    *gobject,
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
   
-  ChamplainRect rect;
+  GdkRectangle rect;
   tidy_viewport_get_origin(TIDY_VIEWPORT(priv->viewport), &rect.x, &rect.y, NULL);
   if (rect.x < 0 || rect.y < 0)
       return;

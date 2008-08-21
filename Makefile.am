@@ -1,4 +1,4 @@
-SUBDIRS = tidy src 
+SUBDIRS = tidy src docs/reference
 
 pcfiles = champlain-1.0.pc
 
@@ -7,3 +7,6 @@ champlain-1.0.pc: champlain.pc
 
 pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
+
+DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
+

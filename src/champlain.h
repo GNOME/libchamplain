@@ -27,13 +27,6 @@
 
 #include <glib.h>
 
-typedef struct {
-  gint x;
-  gint y;
-  guint width;
-  guint height;
-} ChamplainRect;
-
 #include "champlain_defines.h"
 #include "champlainview.h"
 

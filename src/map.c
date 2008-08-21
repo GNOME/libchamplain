@@ -54,7 +54,7 @@ map_load_level(Map* map, gint zoom_level)
 }
 
 void
-map_load_visible_tiles (Map* map, ChamplainRect viewport)
+map_load_visible_tiles (Map* map, GdkRectangle viewport)
 {
   gint x_count = ceil((float)viewport.width / map->tile_size) + 1;
   gint y_count = ceil((float)viewport.height / map->tile_size) + 1;

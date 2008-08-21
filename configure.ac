@@ -5,6 +5,8 @@ AC_PREREQ(2.61)
 AC_INIT(champlain, 0.1, pierre-luc@squidy.info)
 AC_CONFIG_SRCDIR([src/champlainview.h])
 AC_CONFIG_HEADER([config.h])
+AC_CONFIG_MACRO_DIR(m4)
+
 
 AM_INIT_AUTOMAKE
 AC_LIBTOOL_DLOPEN
@@ -30,19 +32,15 @@ PKG_CHECK_MODULES(DEPS,
       gio-2.0 >= 2.16
   ]
 )
-
-# Checks for header files.
-
-# Checks for typedefs, structures, and compiler characteristics.
-
-# Checks for library functions.
+# check for gtk-doc
+GTK_DOC_CHECK(1.9)
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  tidy/Makefile
+                 docs/reference/Makefile
                  champlain.pc])
 AC_OUTPUT
-
 
 echo ""
 echo " Champlain $VERSION"
