@@ -1,0 +1,3 @@
+#include <champlain.h>
+
+champlain_view_get_type

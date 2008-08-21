@@ -62,4 +62,6 @@ CHAMPLAIN_API void champlain_view_center_on (ChamplainView *view, gdouble longit
 
 CHAMPLAIN_API void champlain_view_zoom_in (ChamplainView *champlainView);
 
+CHAMPLAIN_API void champlain_view_zoom_out (ChamplainView *champlainView);
+
 #endif

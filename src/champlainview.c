@@ -40,7 +40,6 @@
 enum
 {
   /* normal signals */
-  TBD,
   LAST_SIGNAL
 };
 
@@ -165,7 +164,6 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   objectClass->get_property = champlain_view_get_property;
   objectClass->set_property = champlain_view_set_property;
   
-  
   /**
   * ChamplainView:longitude:
   *
@@ -238,7 +236,8 @@ champlain_view_init (ChamplainView *champlainView)
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
 }
 
-void viewport_x_changed_cb(GObject    *gobject,
+static void 
+viewport_x_changed_cb(GObject    *gobject,
                            GParamSpec *arg1,
                            ChamplainView *champlainView)
 {
@@ -257,6 +256,9 @@ void viewport_x_changed_cb(GObject    *gobject,
   priv->viewportSize.y = rect.y;
   
   map_load_visible_tiles (priv->map, priv->viewportSize);
+  
+  g_object_notify(G_OBJECT(champlainView), "longitude");
+  g_object_notify(G_OBJECT(champlainView), "latitude");
 }
 
 static void
@@ -370,6 +372,9 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
   y = priv->map->latitude_to_y(priv->map, latitude, priv->map->current_level->level);
 
   tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - priv->viewportSize.width/2.0, y - priv->viewportSize.height/2.0, 0);
+  
+  g_object_notify(G_OBJECT(champlainView), "longitude");
+  g_object_notify(G_OBJECT(champlainView), "latitude");
 }
 
 /**
@@ -400,6 +405,8 @@ champlain_view_zoom_in (ChamplainView *champlainView)
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
       
       tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - priv->viewportSize.width/2.0, y - priv->viewportSize.height/2.0, 0);
+      
+      g_object_notify(G_OBJECT(champlainView), "zoom-level");
     }
 }
 
@@ -431,5 +438,7 @@ champlain_view_zoom_out (ChamplainView *champlainView)
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
       
       tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - priv->viewportSize.width/2.0, y - priv->viewportSize.height/2.0, 0);
+      
+      g_object_notify(G_OBJECT(champlainView), "zoom-level");
     }
 }

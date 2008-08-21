@@ -83,8 +83,9 @@ tidy-enum-types.c: stamp-tidy-enum-types.h tidy-enum-types.c.in
 	  $(source_h) ) >> xgen-tetc && \
 	cp xgen-tetc tidy-enum-types.c && \
 	rm -f xgen-tetc
-
-lib_LTLIBRARIES = libtidy-1.0.la
+	
+noinst_libdir = $(top_srcdir)/tidy
+noinst_LTLIBRARIES = libtidy-1.0.la
 
 libtidy_1_0_la_LIBADD = $(DEPS_LIBS)
 libtidy_1_0_la_SOURCES = \
@@ -95,15 +96,7 @@ libtidy_1_0_la_SOURCES = \
 	$(NULL)
 libtidy_1_0_la_LDFLAGS = $(TIDY_LT_LDFLAGS)
 
-tidyincludedir = $(includedir)/tidy-1.0/tidy
-tidyinclude_DATA = \
-	$(source_h) \
-	$(top_srcdir)/tidy/tidy-enum-types.h \
-	$(NULL)
-
 CLEANFILES = $(STAMP_FILES) $(BUILT_SOURCES)
-
-DISTCLEANFILES = tidy-version.h
 
 EXTRA_DIST = \
 	tidy-enum-types.h.in \
