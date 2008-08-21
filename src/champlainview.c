@@ -175,9 +175,9 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
                                   g_param_spec_float("longitude",
                                                      "Longitude",
                                                      "The longitude coordonate of the map",
-                                                     -180,
-                                                     180,
-                                                     1.0f,
+                                                     -180.0f,
+                                                     180.0f,
+                                                     0.0f,
                                                      CHAMPLAIN_PARAM_READWRITE));
 
   /**
@@ -191,9 +191,9 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
                                   g_param_spec_float("latitude",
                                                      "Latitude",
                                                      "The latitude coordonate of the map",
-                                                     -90,
-                                                     90,
-                                                     1.0f,
+                                                     -90.0f,
+                                                     90.0f,
+                                                     0.0f,
                                                      CHAMPLAIN_PARAM_READWRITE));
 
   /**
