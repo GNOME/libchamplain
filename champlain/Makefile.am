@@ -32,8 +32,6 @@ champlain-marshal.c: $(CHAMPLAIN_MARSHAL_LIST)
 libchamplain_includedir=$(includedir)/libchamplain-1.0/champlain
 libchamplain_include_HEADERS = champlain.h champlainview.h champlain_defines.h
 
-LIBRARY_VERSION=0:1:0
-
 libchamplain_1_0_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
 noinst_PROGRAMS = launcher
