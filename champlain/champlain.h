@@ -27,7 +27,7 @@
 
 #include <glib.h>
 
-#include "champlain_defines.h"
-#include "champlainview.h"
+#include <champlain/champlain_defines.h>
+#include <champlain/champlainview.h>
 
 #endif

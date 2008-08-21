@@ -1,7 +1,7 @@
-prefix=/usr/local
+prefix=/home/pierlux/tmp
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
-includedir=${exec_prefix}/include
+includedir=${prefix}/include
 
 Name: Champlain
 Description: Map View for Gtk+

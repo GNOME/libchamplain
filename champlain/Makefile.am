@@ -30,19 +30,15 @@ champlain-marshal.c: $(CHAMPLAIN_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --body --prefix=champlain_marshal $< > $(CHAMPLAIN_MARSHAL).c
 
 libchamplain_includedir=$(includedir)/libchamplain-1.0/champlain
-libchamplain_include_HEADERS = champlain.h
+libchamplain_include_HEADERS = champlain.h champlainview.h champlain_defines.h
 
-libchamplain_configdir = $(libdir)/libchamplain-1.0/champlain
-libchamplain_config_DATA = ../config.h
-
-RELEASE=0:1:0
 LIBRARY_VERSION=0:1:0
 
-libchamplain_1_0_la_LDFLAGS= -version-info $(LIBRARY_VERSION) -release $(RELEASE)
+libchamplain_1_0_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
 noinst_PROGRAMS = launcher
 
 AM_CPPFLAGS = $(DEPS_CFLAGS) -I../tidy
-AM_LDFLAGS = $(DEPS_LIBS) -export-dynamic 
+AM_LDFLAGS = $(DEPS_LIBS) -export-dynamic -export-symbols-regex ^champlain_.*
 SOURCES = launcher.c
-LDADD = $(DEPS_LIBS) $(top_builddir)/src/libchamplain-1.0.la
+LDADD = $(DEPS_LIBS) $(top_builddir)/champlain/libchamplain-1.0.la

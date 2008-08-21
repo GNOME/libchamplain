@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(champlain, 0.1, pierre-luc@squidy.info)
-AC_CONFIG_SRCDIR([src/champlainview.h])
+AC_CONFIG_SRCDIR([champlain/champlainview.h])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR(m4)
 
@@ -18,7 +18,9 @@ AC_PROG_CC
 AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
 # Checks for libraries.
+LIBRARY_VERSION=0:1:0
 
+AC_SUBST(LIBRARY_VERSION)
 AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 
@@ -36,7 +38,7 @@ PKG_CHECK_MODULES(DEPS,
 GTK_DOC_CHECK(1.9)
 
 AC_CONFIG_FILES([Makefile
-                 src/Makefile
+                 champlain/Makefile
                  tidy/Makefile
                  docs/reference/Makefile
                  champlain.pc])
