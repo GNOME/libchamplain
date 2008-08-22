@@ -93,7 +93,8 @@ map_load_visible_tiles (Map* map, GdkRectangle viewport)
 gboolean 
 map_zoom_in (Map* map)
 {
-  if(map->current_level->level + 1 <= map->zoom_levels)
+  if(map->current_level->level + 1 <= map->zoom_levels &&
+     map->current_level->level + 1 <= 7) //FIXME Due to a ClutterUnit limitation (the x, y will have to be rethinked)
     {
       map_load_level(map, map->current_level->level + 1);
       return TRUE;
