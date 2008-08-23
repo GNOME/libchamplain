@@ -105,9 +105,26 @@ map_zoom_in (Map* map)
 gboolean 
 map_zoom_out (Map* map)
 {
-  if(map->current_level->level - 1 >= 0)
+  gint new_level = map->current_level->level - 1;
+  if(new_level >= 0)
     {
-      map_load_level(map, map->current_level->level - 1);
+      gboolean exist = FALSE;
+      int i;
+      for (i = 0; i < map->current_level->tiles->len && !exist; i++)
+        {
+          ZoomLevel* level = g_ptr_array_index(map->levels, i);
+          if ( level->level == new_level)
+            {
+              exist = TRUE;
+              map->current_level = level;
+              g_print("Found!");
+            }
+        }
+
+      if(!exist)
+        {
+          map_load_level(map, map->current_level->level - 1);
+        }
       return TRUE;
     }
   return FALSE;
