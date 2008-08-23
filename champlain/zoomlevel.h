@@ -41,4 +41,6 @@ guint zoom_level_get_height(ZoomLevel* level);
 
 ZoomLevel* zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size);
 
+void zoom_level_free(ZoomLevel* level);
+
 #endif

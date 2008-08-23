@@ -181,3 +181,9 @@ tile_load (Map* map, guint zoom_level, guint x, guint y)
   return tile;
   
 }
+
+void
+tile_free(Tile* tile)
+{
+  clutter_actor_destroy(tile->actor);
+}

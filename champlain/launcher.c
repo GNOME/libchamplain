@@ -39,9 +39,9 @@ go_to_montreal (GtkWidget * widget, ChamplainView* view)
 }
 
 static void
-go_to_cambridge (GtkWidget * widget, ChamplainView* view)
+switch_to_openstreetmap (GtkWidget * widget, ChamplainView* view)
 {
-  champlain_view_center_on(view, 0.1258, 52.2048);
+  g_object_set(G_OBJECT(view), "map-source", CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP, NULL);
 }
 
 static void
@@ -87,6 +87,8 @@ main (int argc, char *argv[])
   vbox = gtk_vbox_new(FALSE, 10);
   
   widget = champlain_view_new ();
+  g_object_set(G_OBJECT(widget), "map-source", CHAMPLAIN_MAP_SOURCE_OPENARIALMAP, NULL);
+  
   gtk_widget_set_size_request(widget, 640, 480);
   
   bbox =  gtk_hbutton_box_new ();
@@ -110,10 +112,10 @@ main (int argc, char *argv[])
                     G_CALLBACK (go_to_montreal),
                     widget);
   gtk_container_add (GTK_CONTAINER (bbox), button);
-  button = gtk_button_new_with_label ("Cambridge");
+  button = gtk_button_new_with_label ("Openstreetmap");
   g_signal_connect (button,
                     "clicked",
-                    G_CALLBACK (go_to_cambridge),
+                    G_CALLBACK (switch_to_openstreetmap),
                     widget);
   gtk_container_add (GTK_CONTAINER (bbox), button);
   

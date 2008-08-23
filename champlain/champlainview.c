@@ -66,6 +66,8 @@ static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
 struct _ChamplainViewPrivate
 {
   GtkWidget *clutterEmbed;
+  
+  ChamplainMapSource mapSource;
   ClutterActor *viewport;
   ClutterActor *fingerScroll;
   GdkRectangle viewportSize;
@@ -102,10 +104,10 @@ champlain_view_get_property(GObject* object, guint prop_id, GValue* value, GPara
           g_value_set_double(value, viewport_get_current_latitude(priv));
           break;
         case PROP_ZOOM_LEVEL:
-          g_value_set_int(value, priv->map->current_level->level);
+          //g_value_set_int(value, priv->map->current_level->level);
           break;
         case PROP_MAP_SOURCE:
-          //FIXME
+          g_value_set_int(value, priv->mapSource);
           break;
         default:
           G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -135,10 +137,28 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
           break;
         }
       case PROP_ZOOM_LEVEL:
-        //FIXME 
-        break;
+        {
+          //FIXME
+          break;
+        }
       case PROP_MAP_SOURCE:
-        //FIXME 
+        {
+          ChamplainMapSource source = g_value_get_int(value);
+          if (priv->mapSource != source)
+            {
+              priv->mapSource = source;
+              if (priv->map) {
+                gint currentLevel = priv->map->current_level->level;
+                map_free(priv->map);
+                priv->map = map_new(priv->mapSource);
+                map_load_level(priv->map, currentLevel);
+                map_load_visible_tiles (priv->map, priv->viewportSize);
+                clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
+              }
+              g_print("mapsource: %d", source);
+            }
+          break;
+        }
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -171,7 +191,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * Since: 0.1
   */
-  g_object_class_install_property(objectClass, PROP_ZOOM_LEVEL,
+  g_object_class_install_property(objectClass, PROP_LONGITUDE,
                                   g_param_spec_float("longitude",
                                                      "Longitude",
                                                      "The longitude coordonate of the map",
@@ -187,7 +207,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * Since: 0.1
   */
-  g_object_class_install_property(objectClass, PROP_ZOOM_LEVEL,
+  g_object_class_install_property(objectClass, PROP_LATITUDE,
                                   g_param_spec_float("latitude",
                                                      "Latitude",
                                                      "The latitude coordonate of the map",
@@ -220,20 +240,21 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * Since: 0.1
   */
-  /* g_object_class_install_property(objectClass, PROP_ZOOM_LEVEL,
+   g_object_class_install_property(objectClass, PROP_MAP_SOURCE,
                                   g_param_spec_int("map-source",
                                                      "Map source",
                                                      "The map source being displayed",
                                                      0,
-                                                     10,
-                                                     1.0f,
-                                                     CHAMPLAIN_PARAM_READWRITE)); */
+                                                     CHAMPLAIN_MAP_SOURCE_COUNT,
+                                                     CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
+                                                     CHAMPLAIN_PARAM_READWRITE)); 
 }
 
 static void
 champlain_view_init (ChamplainView *champlainView)
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
+  priv->mapSource = CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP;
 }
 
 static void 
@@ -269,6 +290,13 @@ resize_viewport(ChamplainView *champlainView)
   
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
   
+  if(priv->map == NULL)
+    {
+      priv->map = map_new(priv->mapSource);
+      map_load_level(priv->map, 0);
+      clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
+    }
+  
   clutter_actor_set_size (priv->fingerScroll, priv->viewportSize.width, priv->viewportSize.height);
   
   g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
@@ -287,7 +315,7 @@ resize_viewport(ChamplainView *champlainView)
   g_object_set (vadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
   
-  g_print("%d, %d, %d\n", zoom_level_get_width(priv->map->current_level), zoom_level_get_height(priv->map->current_level), sizeof(guint));
+  //g_print("%d, %d, %d\n", zoom_level_get_width(priv->map->current_level), zoom_level_get_height(priv->map->current_level), sizeof(guint));
 }
 
 static void
@@ -345,9 +373,7 @@ champlain_view_new ()
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->fingerScroll), priv->viewport);
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), priv->fingerScroll);
 
-  priv->map = map_new(CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP);//OPENSTREETMAP
-  map_load_level(priv->map, 2);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
+  
   return GTK_WIDGET (view);
 }
 
@@ -423,7 +449,7 @@ champlain_view_zoom_out (ChamplainView *champlainView)
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
   ClutterActor * group = priv->map->current_level->group;
-  if(map_zoom_out(priv->map)) 
+  if(map_zoom_out(priv->map))
     {
       gint level = priv->map->current_level->level;
       g_print("Zoom: %d\n", level);

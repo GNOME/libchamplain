@@ -33,4 +33,6 @@ typedef struct
   
 } Tile;
 
+void tile_free(Tile* tile);
+
 #endif

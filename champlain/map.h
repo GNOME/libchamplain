@@ -51,10 +51,11 @@ struct _Map
 };
 
 
-CHAMPLAIN_API Map* champlain_map_new (ChamplainMapSource source);
+
+Map* map_new (ChamplainMapSource source);
 
 void map_load_visible_tiles (Map* map, GdkRectangle viewport);
 
-gboolean map_zoom_in (Map* map);
+void map_free (Map* map);
 
 #endif

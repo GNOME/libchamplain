@@ -39,6 +39,17 @@ zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size)
   return level;
 }
 
+void
+zoom_level_free(ZoomLevel* level)
+{
+  int i;
+  for (i = 0; i < level->tiles->len; i++)
+    {
+      Tile* tile = g_ptr_array_index(level->tiles, i);
+      tile_free(tile);
+    }
+}
+
 guint
 zoom_level_get_width(ZoomLevel* level)
 {

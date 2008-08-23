@@ -55,8 +55,6 @@ map_new (ChamplainMapSource source)
 void 
 map_load_level(Map* map, gint zoom_level)
 {
-  //if(map->current_level)
-  
   guint row_count = map->get_row_count(map, zoom_level);
   guint column_count = map->get_column_count(map, zoom_level);
 
@@ -156,4 +154,12 @@ map_zoom_out (Map* map)
   return FALSE;
 }
 
-
+void map_free (Map* map)
+{
+  int i;
+  for (i = 0; i < map->levels->len; i++)
+    {
+      ZoomLevel* level = g_ptr_array_index(map->levels, i);
+      zoom_level_free(level);
+    }
+}
