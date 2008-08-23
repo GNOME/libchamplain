@@ -16,8 +16,13 @@ libchamplain_1_0_la_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
 					map.c  \
 					zoomlevel.c \
 					tile.c \
-					sources/openstreetmap.c \
-					sources/debugmap.c 
+					sources/oam.c \
+					sources/osm_mapnik.c \
+					sources/mff_relief.c \
+					sources/google_map.c \
+					sources/google_sat.c \
+					sources/google_terrain.c \
+					sources/debugmap.c
 
 libchamplain_1_0_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
 

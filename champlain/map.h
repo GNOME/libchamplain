@@ -46,8 +46,8 @@ struct _Map
   gdouble (* x_to_longitude) (Map* map, gint x, guint zoom_level);
   gdouble (* y_to_latitude) (Map* map, gint y, guint zoom_level);
   
-  gchar* (* get_tile_filename) (Tile* tile);
-  gchar* (* get_tile_uri) (Tile* tile);
+  gchar* (* get_tile_filename) (Map* map, Tile* tile);
+  gchar* (* get_tile_uri) (Map* map, Tile* tile);
 };
 
 

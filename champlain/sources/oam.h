@@ -17,11 +17,11 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef OPENSTREETMAP_H
-#define OPENSTREETMAP_H
+#ifndef OAM_H
+#define OAM_H
 
 #include <map.h>
 
-void osm_init(Map* map);
+void oam_init(Map* map);
 
 #endif

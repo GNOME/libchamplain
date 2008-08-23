@@ -19,6 +19,11 @@
  
 #include "map.h"
 #include "zoomlevel.h"
+#include "sources/osm_mapnik.h"
+#include "sources/mff_relief.h"
+#include "sources/google_sat.h"
+#include "sources/google_map.h"
+#include "sources/google_terrain.h"
 #include <math.h>
 
 Map* 
@@ -32,7 +37,13 @@ map_new (ChamplainMapSource source)
         debugmap_init(map);
         break;
       case CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP:
-        osm_init(map);
+        osm_mapnik_init(map);
+        break;
+      case CHAMPLAIN_MAP_SOURCE_OPENARIALMAP:
+        oam_init(map);
+        break;
+      case CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF:
+        mff_relief_init(map);
         break;
     }
   
@@ -93,10 +104,26 @@ map_load_visible_tiles (Map* map, GdkRectangle viewport)
 gboolean 
 map_zoom_in (Map* map)
 {
-  if(map->current_level->level + 1 <= map->zoom_levels &&
-     map->current_level->level + 1 <= 7) //FIXME Due to a ClutterUnit limitation (the x, y will have to be rethinked)
+  gint new_level = map->current_level->level + 1;
+  if(new_level + 1 <= map->zoom_levels &&
+     new_level + 1 <= 8) //FIXME Due to a ClutterUnit limitation (the x, y will have to be rethinked)
     {
-      map_load_level(map, map->current_level->level + 1);
+      gboolean exist = FALSE;
+      int i;
+      for (i = 0; i < map->levels->len && !exist; i++)
+        {
+          ZoomLevel* level = g_ptr_array_index(map->levels, i);
+          if (level && level->level == new_level)
+            {
+              exist = TRUE;
+              map->current_level = level;
+            }
+        }
+
+      if(!exist)
+        {
+          map_load_level(map, map->current_level->level + 1);
+        }
       return TRUE;
     }
   return FALSE;
@@ -110,14 +137,13 @@ map_zoom_out (Map* map)
     {
       gboolean exist = FALSE;
       int i;
-      for (i = 0; i < map->current_level->tiles->len && !exist; i++)
+      for (i = 0; i < map->levels->len && !exist; i++)
         {
           ZoomLevel* level = g_ptr_array_index(map->levels, i);
-          if ( level->level == new_level)
+          if (level && level->level == new_level)
             {
               exist = TRUE;
               map->current_level = level;
-              g_print("Found!");
             }
         }
 

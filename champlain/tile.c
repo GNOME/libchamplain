@@ -56,7 +56,7 @@ file_loaded_cb (SoupSession *session,
   
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code)) 
     {
-      g_warning ("Unable to download tile %d, %d", tile->x, tile->y);
+      g_warning ("Unable to download tile %d, %d: %s", tile->x, tile->y, soup_status_get_phrase(msg->status_code));
       return;
     }
 
@@ -99,7 +99,7 @@ file_loaded_cb (SoupSession *session,
             }
         }
       
-      map_filename = map->get_tile_filename(tile);
+      map_filename = map->get_tile_filename(map, tile);
       filename = g_build_filename (g_get_user_cache_dir (),
                                     CACHE_DIR,
                                     map->name,
@@ -148,7 +148,7 @@ tile_load (Map* map, guint zoom_level, guint x, guint y)
   ptr->tile = tile;
   
   // Try the cached version first
-  map_filename = map->get_tile_filename(tile);
+  map_filename = map->get_tile_filename(map, tile);
   filename = g_build_filename (g_get_user_cache_dir (),
                                 CACHE_DIR,
                                 map->name,
@@ -168,8 +168,8 @@ tile_load (Map* map, guint zoom_level, guint x, guint y)
       SoupMessage *msg;
       if (!session)
         session = soup_session_async_new ();
-
-      msg = soup_message_new (SOUP_METHOD_GET, g_strdup_printf("http://tile.openstreetmap.org/%d/%d/%d.png", zoom_level, x, y));
+        
+      msg = soup_message_new (SOUP_METHOD_GET, map->get_tile_uri(map, tile));
 
       soup_session_queue_message (session, msg,
                                   file_loaded_cb,
