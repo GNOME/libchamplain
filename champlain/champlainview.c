@@ -223,6 +223,10 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
                 gint currentLevel = priv->map->current_level->level;
                 map_free(priv->map);
                 priv->map = map_new(priv->mapSource);
+                
+                if (currentLevel > priv->map->zoom_levels)
+                  currentLevel = priv->map->zoom_levels;
+                  
                 map_load_level(priv->map, currentLevel);
                 map_load_visible_tiles (priv->map, priv->viewportSize);
                 clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
