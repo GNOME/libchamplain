@@ -154,7 +154,8 @@ map_zoom_out (Map* map)
   return FALSE;
 }
 
-void map_free (Map* map)
+void 
+map_free (Map* map)
 {
   int i;
   for (i = 0; i < map->levels->len; i++)
@@ -162,4 +163,32 @@ void map_free (Map* map)
       ZoomLevel* level = g_ptr_array_index(map->levels, i);
       zoom_level_free(level);
     }
+}
+
+gboolean 
+map_zoom_to (Map* map, guint zoomLevel)
+{
+  if(zoomLevel >= 0 && 
+     zoomLevel<= map->zoom_levels &&
+     zoomLevel <= 8) //FIXME Due to a ClutterUnit limitation (the x, y will have to be rethinked)
+    {
+      gboolean exist = FALSE;
+      int i;
+      for (i = 0; i < map->levels->len && !exist; i++)
+        {
+          ZoomLevel* level = g_ptr_array_index(map->levels, i);
+          if (level && level->level == zoomLevel)
+            {
+              exist = TRUE;
+              map->current_level = level;
+            }
+        }
+
+      if(!exist)
+        {
+          map_load_level(map, zoomLevel);
+        }
+      return TRUE;
+    }
+  return FALSE;
 }

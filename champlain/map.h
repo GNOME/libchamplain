@@ -58,4 +58,6 @@ void map_load_visible_tiles (Map* map, GdkRectangle viewport);
 
 void map_free (Map* map);
 
+gboolean map_zoom_to (Map* map, guint zoomLevel);
+
 #endif

@@ -41,7 +41,7 @@ go_to_montreal (GtkWidget * widget, ChamplainView* view)
 static void
 switch_to_openstreetmap (GtkWidget * widget, ChamplainView* view)
 {
-  g_object_set(G_OBJECT(view), "map-source", CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP, NULL);
+  g_object_set(G_OBJECT(view), "zoom-level", 5, NULL);
 }
 
 static void
@@ -88,6 +88,7 @@ main (int argc, char *argv[])
   
   widget = champlain_view_new ();
   g_object_set(G_OBJECT(widget), "map-source", CHAMPLAIN_MAP_SOURCE_OPENARIALMAP, NULL);
+  g_object_set(G_OBJECT(widget), "zoom-level", 5, NULL);
   
   gtk_widget_set_size_request(widget, 640, 480);
   
@@ -131,7 +132,7 @@ main (int argc, char *argv[])
 
   /* make sure that everything, window and label, are visible */
   gtk_widget_show_all (window);
-  champlain_view_center_on(widget, 0.00, 0.0);
+  champlain_view_center_on(widget, -73.75, 45.466);
   /* start the main loop */
   gtk_main ();
 
