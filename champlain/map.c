@@ -104,7 +104,7 @@ map_zoom_in (Map* map)
 {
   gint new_level = map->current_level->level + 1;
   if(new_level + 1 <= map->zoom_levels &&
-     new_level + 1 <= 8) //FIXME Due to a ClutterUnit limitation (the x, y will have to be rethinked)
+     new_level + 1 <= 7) //FIXME Due to a ClutterUnit limitation (the x, y will have to be rethinked)
     {
       gboolean exist = FALSE;
       int i;
@@ -170,7 +170,7 @@ map_zoom_to (Map* map, guint zoomLevel)
 {
   if(zoomLevel >= 0 && 
      zoomLevel<= map->zoom_levels &&
-     zoomLevel <= 8) //FIXME Due to a ClutterUnit limitation (the x, y will have to be rethinked)
+     zoomLevel <= 7) //FIXME Due to a ClutterUnit limitation (the x, y will have to be rethinked)
     {
       gboolean exist = FALSE;
       int i;

@@ -23,6 +23,10 @@
 
 #include <champlain.h>
 
+#define OSM_MAP "Open Street Map"
+#define OAM_MAP "Open Arial Map"
+#define MFF_MAP "Maps for free - Relief"
+
 /*
  * Terminate the main loop.
  */
@@ -39,9 +43,36 @@ go_to_montreal (GtkWidget * widget, ChamplainView* view)
 }
 
 static void
-switch_to_openstreetmap (GtkWidget * widget, ChamplainView* view)
+map_source_changed (GtkWidget * widget, ChamplainView* view)
 {
-  g_object_set(G_OBJECT(view), "zoom-level", 5, NULL);
+  gchar* selection = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
+  if (g_strcmp0(selection, OSM_MAP) == 0)
+    {
+      g_object_set(G_OBJECT(view), "map-source", CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP, NULL);
+    }
+  else if (g_strcmp0(selection, OAM_MAP) == 0)
+    {
+      g_object_set(G_OBJECT(view), "map-source", CHAMPLAIN_MAP_SOURCE_OPENARIALMAP, NULL);
+    }
+  else if (g_strcmp0(selection, MFF_MAP) == 0)
+    {
+      g_object_set(G_OBJECT(view), "map-source", CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF, NULL);
+    }
+}
+
+static void 
+zoom_changed (GtkSpinButton *spinbutton, ChamplainView* view)
+{
+  gint zoom = gtk_spin_button_get_value_as_int(spinbutton);
+  g_object_set(G_OBJECT(view), "zoom-level", zoom, NULL);
+}
+
+static void 
+map_zoom_changed (ChamplainView* view, GParamSpec *gobject, GtkSpinButton *spinbutton)
+{
+  gint zoom;
+  g_object_get(G_OBJECT(view), "zoom-level", &zoom, NULL);
+  gtk_spin_button_set_value(spinbutton, zoom);
 }
 
 static void
@@ -75,9 +106,6 @@ main (int argc, char *argv[])
   /* give it the title */
   gtk_window_set_title (GTK_WINDOW (window), PACKAGE " " VERSION);
 
-  /* open it a bit wider so that both the label and title show up */
-  //gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
-
   /* Connect the destroy event of the window with our on_destroy function
    * When the window is about to be destroyed we get a notificaiton and
    * stop the main GTK loop
@@ -87,14 +115,11 @@ main (int argc, char *argv[])
   vbox = gtk_vbox_new(FALSE, 10);
   
   widget = champlain_view_new ();
-  g_object_set(G_OBJECT(widget), "map-source", CHAMPLAIN_MAP_SOURCE_OPENARIALMAP, NULL);
   g_object_set(G_OBJECT(widget), "zoom-level", 5, NULL);
   
   gtk_widget_set_size_request(widget, 640, 480);
   
-  bbox =  gtk_hbutton_box_new ();
-  gtk_button_box_set_layout (GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_START);
-  gtk_button_box_set_spacing (GTK_BUTTON_BOX(bbox), 10);
+  bbox =  gtk_hbox_new (FALSE, 10);
   button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_IN);
   g_signal_connect (button,
                     "clicked",
@@ -113,11 +138,27 @@ main (int argc, char *argv[])
                     G_CALLBACK (go_to_montreal),
                     widget);
   gtk_container_add (GTK_CONTAINER (bbox), button);
-  button = gtk_button_new_with_label ("Openstreetmap");
+  
+  button = gtk_combo_box_new_text();
+  gtk_combo_box_append_text(GTK_COMBO_BOX(button), OSM_MAP);
+  gtk_combo_box_append_text(GTK_COMBO_BOX(button), OAM_MAP);
+  gtk_combo_box_append_text(GTK_COMBO_BOX(button), MFF_MAP);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(button), 0);
   g_signal_connect (button,
-                    "clicked",
-                    G_CALLBACK (switch_to_openstreetmap),
+                    "changed",
+                    G_CALLBACK (map_source_changed),
                     widget);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+  
+  button = gtk_spin_button_new_with_range(0, 20, 1);
+  g_signal_connect (button,
+                    "changed",
+                    G_CALLBACK (zoom_changed),
+                    widget);
+  g_signal_connect (widget,
+                    "notify::zoom-level",
+                    G_CALLBACK (map_zoom_changed),
+                    button);
   gtk_container_add (GTK_CONTAINER (bbox), button);
   
   viewport = gtk_viewport_new (NULL, NULL);
@@ -132,7 +173,7 @@ main (int argc, char *argv[])
 
   /* make sure that everything, window and label, are visible */
   gtk_widget_show_all (window);
-  champlain_view_center_on(widget, -73.75, 45.466);
+  champlain_view_center_on(CHAMPLAIN_VIEW(widget), -73.75, 45.466);
   /* start the main loop */
   gtk_main ();
 

@@ -104,6 +104,10 @@ resize_viewport(ChamplainView *champlainView)
       priv->map = map_new(priv->mapSource);
       map_load_level(priv->map, priv->zoomLevel);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
+      
+      
+      g_object_notify(G_OBJECT(champlainView), "zoom-level");
+      g_object_notify(G_OBJECT(champlainView), "map-source");
     }
   
   clutter_actor_set_size (priv->fingerScroll, priv->viewportSize.width, priv->viewportSize.height);
