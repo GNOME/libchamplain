@@ -41,6 +41,16 @@ tile_set(Tile* tile)
   clutter_actor_set_size (tile->actor, tile->size, tile->size);
   clutter_actor_show (tile->actor);
 }
+static void 
+create_error_tile(Map* map, Tile* tile)
+{
+  tile->actor = clutter_texture_new_from_file("error.svg", NULL);
+       
+  tile_set(tile);
+  
+  clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
+
+}
 
 static void
 file_loaded_cb (SoupSession *session,
@@ -57,6 +67,7 @@ file_loaded_cb (SoupSession *session,
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code)) 
     {
       g_warning ("Unable to download tile %d, %d: %s", tile->x, tile->y, soup_status_get_phrase(msg->status_code));
+      create_error_tile(map, tile);
       return;
     }
 
@@ -70,6 +81,8 @@ file_loaded_cb (SoupSession *session,
         {
           g_warning ("Unable to load the pixbuf: %s", error->message);
           g_error_free (error);
+          create_error_tile(map, tile);
+          return;
         }
  
       g_object_unref (loader);
@@ -81,6 +94,8 @@ file_loaded_cb (SoupSession *session,
       g_warning ("Unable to close the pixbuf loader: %s", error->message);
       g_error_free (error);
       g_object_unref (loader);
+      create_error_tile(map, tile);
+      return;
     }
   else
     {
@@ -158,7 +173,6 @@ tile_load (Map* map, guint zoom_level, guint x, guint y)
   if (g_file_test (filename, G_FILE_TEST_EXISTS)) 
     {
       tile->actor = clutter_texture_new_from_file(filename, NULL);
-      //g_object_ref(tile->actor); // to prevent actors to be destroyed when they are removed from groups
       tile_set(tile);
       
       clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
