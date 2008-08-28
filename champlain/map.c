@@ -63,7 +63,7 @@ map_load_level(Map* map, gint zoom_level)
 }
 
 void
-map_load_visible_tiles (Map* map, GdkRectangle viewport)
+map_load_visible_tiles (Map* map, GdkRectangle viewport, gboolean offline)
 {
   gint x_count = ceil((float)viewport.width / map->tile_size) + 1;
   gint y_count = ceil((float)viewport.height / map->tile_size) + 1;
@@ -92,7 +92,7 @@ map_load_visible_tiles (Map* map, GdkRectangle viewport)
 
           if(!exist)
             {
-              Tile* tile = tile_load(map, map->current_level->level, i, j);
+              Tile* tile = tile_load(map, map->current_level->level, i, j, offline);
               g_ptr_array_add (map->current_level->tiles, tile);
             }
         }

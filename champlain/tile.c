@@ -147,7 +147,7 @@ file_loaded_cb (SoupSession *session,
 }
 
 Tile* 
-tile_load (Map* map, guint zoom_level, guint x, guint y)
+tile_load (Map* map, guint zoom_level, guint x, guint y, gboolean offline)
 {
   static SoupSession * session;
   gchar* filename, *map_filename;
@@ -177,7 +177,7 @@ tile_load (Map* map, guint zoom_level, guint x, guint y)
       
       clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
     }
-  else 
+  else if (!offline)
     {
       SoupMessage *msg;
       if (!session)
@@ -188,7 +188,8 @@ tile_load (Map* map, guint zoom_level, guint x, guint y)
       soup_session_queue_message (session, msg,
                                   file_loaded_cb,
                                   ptr);
-    }
+    } 
+  // If a tile is neither in cache or can be fetched, do nothing, it'll show up as empty
     
   g_free (filename);
   g_free (map_filename);

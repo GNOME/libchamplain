@@ -49,12 +49,14 @@ enum
   PROP_LONGITUDE,
   PROP_LATITUDE,
   PROP_ZOOM_LEVEL,
-  PROP_MAP_SOURCE
+  PROP_MAP_SOURCE,
+  PROP_OFFLINE
 };
 
 static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
 
 #define CHAMPLAIN_VIEW_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
+
 #define CHAMPLAIN_PARAM_READABLE     \
         (G_PARAM_READABLE |     \
          G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
@@ -74,6 +76,8 @@ struct _ChamplainViewPrivate
   ClutterActor *fingerScroll;
   GdkRectangle viewportSize;
   Map *map;
+
+  gboolean offline;
 };
 
 
@@ -160,6 +164,9 @@ champlain_view_get_property(GObject* object, guint prop_id, GValue* value, GPara
         case PROP_MAP_SOURCE:
           g_value_set_int(value, priv->mapSource);
           break;
+        case PROP_OFFLINE:
+          g_value_set_boolean(value, priv->offline);
+          break;
         default:
           G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       }
@@ -232,12 +239,14 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
                   currentLevel = priv->map->zoom_levels;
                   
                 map_load_level(priv->map, currentLevel);
-                map_load_visible_tiles (priv->map, priv->viewportSize);
+                map_load_visible_tiles (priv->map, priv->viewportSize, priv->offline);
                 clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
               }
             }
           break;
         }
+      case PROP_OFFLINE:
+        priv->offline = g_value_get_boolean(value);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -304,12 +313,12 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   */
   g_object_class_install_property(objectClass, PROP_ZOOM_LEVEL,
                                   g_param_spec_int("zoom-level",
-                                                     "Zoom level",
-                                                     "The level of zoom of the map",
-                                                     0,
-                                                     20,
-                                                     1.0f,
-                                                     CHAMPLAIN_PARAM_READWRITE));
+                                                   "Zoom level",
+                                                   "The level of zoom of the map",
+                                                   0,
+                                                   20,
+                                                   1.0f,
+                                                   CHAMPLAIN_PARAM_READWRITE));
 
 
   /**
@@ -321,26 +330,40 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   */
    g_object_class_install_property(objectClass, PROP_MAP_SOURCE,
                                   g_param_spec_int("map-source",
-                                                     "Map source",
-                                                     "The map source being displayed",
-                                                     0,
-                                                     CHAMPLAIN_MAP_SOURCE_COUNT,
-                                                     CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
-                                                     CHAMPLAIN_PARAM_READWRITE)); 
+                                                   "Map source",
+                                                   "The map source being displayed",
+                                                   0,
+                                                   CHAMPLAIN_MAP_SOURCE_COUNT,
+                                                   CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
+                                                   CHAMPLAIN_PARAM_READWRITE)); 
+
+  /**
+  * ChamplainView:offline:
+  *
+  * If true, will fetch tiles from the Internet, otherwise, will only use cached content.
+  *
+  * Since: 0.2
+  */
+   g_object_class_install_property(objectClass, PROP_OFFLINE,
+                                  g_param_spec_boolean("offline",
+                                                       "Offline Mode",
+                                                       "If viewer is in offline mode.",
+                                                       FALSE,
+                                                       CHAMPLAIN_PARAM_READWRITE)); 
 }
 
 static void
 champlain_view_init (ChamplainView *champlainView)
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
+
   priv->mapSource = CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP;
   priv->zoomLevel = 0;
+  priv->offline = FALSE;
 }
 
 static void 
-viewport_x_changed_cb(GObject    *gobject,
-                           GParamSpec *arg1,
-                           ChamplainView *champlainView)
+viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *champlainView)
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
   
@@ -356,7 +379,7 @@ viewport_x_changed_cb(GObject    *gobject,
   priv->viewportSize.x = rect.x;
   priv->viewportSize.y = rect.y;
   
-  map_load_visible_tiles (priv->map, priv->viewportSize);
+  map_load_visible_tiles (priv->map, priv->viewportSize, priv->offline);
   
   g_object_notify(G_OBJECT(champlainView), "longitude");
   g_object_notify(G_OBJECT(champlainView), "latitude");
@@ -371,7 +394,7 @@ view_size_allocated_cb (GtkWidget *view, GtkAllocation *allocation, ChamplainVie
   priv->viewportSize.height = allocation->height;
   
   resize_viewport(champlainView);
-  map_load_visible_tiles (priv->map, priv->viewportSize);
+  map_load_visible_tiles (priv->map, priv->viewportSize, priv->offline);
 }
 
 /**
@@ -446,7 +469,7 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
   g_object_notify(G_OBJECT(champlainView), "longitude");
   g_object_notify(G_OBJECT(champlainView), "latitude");
   
-  map_load_visible_tiles (priv->map, priv->viewportSize);
+  map_load_visible_tiles (priv->map, priv->viewportSize, priv->offline);
 }
 
 /**

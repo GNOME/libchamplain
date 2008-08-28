@@ -54,7 +54,7 @@ struct _Map
 
 Map* map_new (ChamplainMapSource source);
 
-void map_load_visible_tiles (Map* map, GdkRectangle viewport);
+void map_load_visible_tiles (Map* map, GdkRectangle viewport, gboolean offline);
 
 void map_free (Map* map);
 
