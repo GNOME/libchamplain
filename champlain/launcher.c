@@ -114,8 +114,10 @@ main (int argc, char *argv[])
 
   vbox = gtk_vbox_new(FALSE, 10);
   
-  widget = champlain_view_new ();
+  widget = champlain_view_new (CHAMPLAIN_VIEW_MODE_KINETIC);
   g_object_set(G_OBJECT(widget), "zoom-level", 5, NULL);
+//  g_object_set(G_OBJECT(widget), "decel-rate", 1.1, NULL);
+//  g_object_set(G_OBJECT(widget), "offline", TRUE, NULL);
   
   gtk_widget_set_size_request(widget, 640, 480);
   

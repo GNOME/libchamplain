@@ -40,6 +40,7 @@
 enum
 {
   /* normal signals */
+  SIGNAL_TBD,
   LAST_SIGNAL
 };
 
@@ -50,7 +51,8 @@ enum
   PROP_LATITUDE,
   PROP_ZOOM_LEVEL,
   PROP_MAP_SOURCE,
-  PROP_OFFLINE
+  PROP_OFFLINE,
+  PROP_DECEL_RATE,
 };
 
 static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
@@ -167,6 +169,13 @@ champlain_view_get_property(GObject* object, guint prop_id, GValue* value, GPara
         case PROP_OFFLINE:
           g_value_set_boolean(value, priv->offline);
           break;
+        case PROP_DECEL_RATE:
+          {
+            gdouble decel;
+            g_object_get (priv->fingerScroll, "decel-rate", decel, NULL);
+            g_value_set_double(value, decel);
+            break;
+          }
         default:
           G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       }
@@ -248,6 +257,12 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
       case PROP_OFFLINE:
         priv->offline = g_value_get_boolean(value);
         break;
+      case PROP_DECEL_RATE:
+        {
+          gdouble decel = g_value_get_double(value);
+          g_object_set (priv->fingerScroll, "decel-rate", decel, NULL);
+          break;
+        }
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -267,10 +282,10 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 {
   g_type_class_add_private (champlainViewClass, sizeof (ChamplainViewPrivate));
 
-  GObjectClass *objectClass = G_OBJECT_CLASS (champlainViewClass);
-  objectClass->finalize = champlain_view_finalize;
-  objectClass->get_property = champlain_view_get_property;
-  objectClass->set_property = champlain_view_set_property;
+  GObjectClass *object_class = G_OBJECT_CLASS (champlainViewClass);
+  object_class->finalize = champlain_view_finalize;
+  object_class->get_property = champlain_view_get_property;
+  object_class->set_property = champlain_view_set_property;
   
   /**
   * ChamplainView:longitude:
@@ -279,7 +294,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * Since: 0.1
   */
-  g_object_class_install_property(objectClass, PROP_LONGITUDE,
+  g_object_class_install_property(object_class, PROP_LONGITUDE,
                                   g_param_spec_float("longitude",
                                                      "Longitude",
                                                      "The longitude coordonate of the map",
@@ -295,7 +310,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * Since: 0.1
   */
-  g_object_class_install_property(objectClass, PROP_LATITUDE,
+  g_object_class_install_property(object_class, PROP_LATITUDE,
                                   g_param_spec_float("latitude",
                                                      "Latitude",
                                                      "The latitude coordonate of the map",
@@ -311,7 +326,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * Since: 0.1
   */
-  g_object_class_install_property(objectClass, PROP_ZOOM_LEVEL,
+  g_object_class_install_property(object_class, PROP_ZOOM_LEVEL,
                                   g_param_spec_int("zoom-level",
                                                    "Zoom level",
                                                    "The level of zoom of the map",
@@ -328,7 +343,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * Since: 0.1
   */
-   g_object_class_install_property(objectClass, PROP_MAP_SOURCE,
+  g_object_class_install_property(object_class, PROP_MAP_SOURCE,
                                   g_param_spec_int("map-source",
                                                    "Map source",
                                                    "The map source being displayed",
@@ -344,12 +359,31 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * Since: 0.2
   */
-   g_object_class_install_property(objectClass, PROP_OFFLINE,
+  g_object_class_install_property(object_class, PROP_OFFLINE,
                                   g_param_spec_boolean("offline",
                                                        "Offline Mode",
                                                        "If viewer is in offline mode.",
                                                        FALSE,
                                                        CHAMPLAIN_PARAM_READWRITE)); 
+
+  /**
+  * ChamplainView:offline:
+  *
+  * If true, will fetch tiles from the Internet, otherwise, will only use cached content.
+  *
+  * Since: 0.2
+  */
+  g_object_class_install_property (object_class,
+                                   PROP_DECEL_RATE,
+                                   g_param_spec_double ("decel-rate",
+                                                        "Deceleration rate",
+                                                        "Rate at which the view "
+                                                        "will decelerate in "
+                                                        "kinetic mode.",
+                                                        CLUTTER_FIXED_TO_FLOAT (CFX_ONE + CFX_MIN),
+                                                        CLUTTER_FIXED_TO_FLOAT (CFX_MAX),
+                                                        1.1,
+                                                        G_PARAM_READWRITE));
 }
 
 static void
@@ -405,7 +439,7 @@ view_size_allocated_cb (GtkWidget *view, GtkAllocation *allocation, ChamplainVie
  * Since: 0.1
  */
 GtkWidget *
-champlain_view_new ()
+champlain_view_new (ChamplainViewMode mode)
 {
   ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
   ChamplainView *view;
@@ -435,8 +469,19 @@ champlain_view_new ()
                     view);
 
   // Setup finger scroll
-  priv->fingerScroll = tidy_finger_scroll_new(TIDY_FINGER_SCROLL_MODE_KINETIC);
-  g_object_set (priv->fingerScroll, "decel-rate", 1.25, NULL);
+  TidyFingerScrollMode tidy_mode;
+  switch(mode)
+    {
+      case CHAMPLAIN_VIEW_MODE_PUSH:
+        tidy_mode = TIDY_FINGER_SCROLL_MODE_PUSH;
+        break;
+      case CHAMPLAIN_VIEW_MODE_KINETIC:
+        tidy_mode = TIDY_FINGER_SCROLL_MODE_KINETIC;
+        break;
+    }
+
+  priv->fingerScroll = tidy_finger_scroll_new(mode);
+
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->fingerScroll), priv->viewport);
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), priv->fingerScroll);
 

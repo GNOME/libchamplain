@@ -41,6 +41,7 @@ tile_set(Tile* tile)
   clutter_actor_set_size (tile->actor, tile->size, tile->size);
   clutter_actor_show (tile->actor);
 }
+
 static void 
 create_error_tile(Map* map, Tile* tile)
 {

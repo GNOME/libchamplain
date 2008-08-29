@@ -46,6 +46,18 @@ typedef enum
 
 typedef struct _ChamplainViewPrivate ChamplainViewPrivate;
 
+/**
+ * ChamplainViewMode:
+ * @CHAMPLAIN_VIEW_MODE_PUSH: Non-kinetic scrolling
+ * @CHAMPLAIN_VIEW_MODE_KINETIC: Kinetic scrolling
+ *
+ * Type of scrolling.
+ */
+typedef enum {
+  CHAMPLAIN_VIEW_MODE_PUSH,
+  CHAMPLAIN_VIEW_MODE_KINETIC
+} ChamplainViewMode;
+
 struct _ChamplainView
 {
   GtkAlignment bin;
@@ -61,7 +73,7 @@ struct _ChamplainViewClass
 
 CHAMPLAIN_API GType champlain_view_get_type (void);
 
-CHAMPLAIN_API GtkWidget *champlain_view_new ();
+CHAMPLAIN_API GtkWidget *champlain_view_new (ChamplainViewMode mode);
 
 CHAMPLAIN_API void champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitude);
 
