@@ -36,10 +36,51 @@ on_destroy (GtkWidget * widget, gpointer data)
   gtk_main_quit ();
 }
 
-static void
-go_to_montreal (GtkWidget * widget, ChamplainView* view)
+
+static ClutterActor*
+create_marker (gchar* title, gdouble lon, gdouble lat)
 {
-  champlain_view_center_on(view, -73.75, 45.466);
+  ClutterActor* marker, *actor;
+  
+  marker = champlain_marker_new();
+  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), lon, lat);
+  champlain_marker_set_anchor(CHAMPLAIN_MARKER(marker), 0, 32);
+  
+  actor = clutter_texture_new_from_file("marker.svg", NULL);
+  clutter_container_add_actor(CLUTTER_CONTAINER(marker), actor);
+  
+  actor = clutter_label_new_with_text("Arial 14", title);
+  clutter_actor_set_position(actor, 30, 0);
+  clutter_container_add_actor(CLUTTER_CONTAINER(marker), actor);
+  
+  return marker;
+}
+
+static ClutterActor*
+create_marker_layer ()
+{
+  ClutterActor* layer, * marker;
+  
+  layer = clutter_group_new();
+  
+  marker = create_marker("Montréal", -73.563788, 45.528178);
+  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+  marker = create_marker("New York", -73.98, 40.77);
+  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+  marker = create_marker("Miami", -80.28, 25.82);
+  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+  
+  clutter_actor_hide(layer);
+  return layer;
+}
+
+static void
+toggle_layer (GtkToggleButton * widget, ClutterActor* layer)
+{
+  if(gtk_toggle_button_get_active(widget))
+    clutter_actor_show_all(layer);
+  else
+    clutter_actor_hide(layer);
 }
 
 static void
@@ -93,6 +134,7 @@ main (int argc, char *argv[])
   GtkWidget *window;
   GtkWidget *widget, *vbox, *bbox, *button, *viewport;
   GtkWidget *scrolled;
+  ClutterActor* layer;
   
   g_thread_init (NULL);
   gtk_clutter_init (&argc, &argv);
@@ -116,8 +158,8 @@ main (int argc, char *argv[])
   
   widget = champlain_view_new (CHAMPLAIN_VIEW_MODE_KINETIC);
   g_object_set(G_OBJECT(widget), "zoom-level", 5, NULL);
-//  g_object_set(G_OBJECT(widget), "decel-rate", 1.1, NULL);
-//  g_object_set(G_OBJECT(widget), "offline", TRUE, NULL);
+  layer = create_marker_layer();
+  champlain_view_add_layer(widget, layer);
   
   gtk_widget_set_size_request(widget, 640, 480);
   
@@ -134,11 +176,11 @@ main (int argc, char *argv[])
                     G_CALLBACK (zoom_out),
                     widget);
   gtk_container_add (GTK_CONTAINER (bbox), button);
-  button = gtk_button_new_with_label ("Montréal");
+  button = gtk_toggle_button_new_with_label  ("Markers");
   g_signal_connect (button,
-                    "clicked",
-                    G_CALLBACK (go_to_montreal),
-                    widget);
+                    "toggled",
+                    G_CALLBACK (toggle_layer),
+                    layer);
   gtk_container_add (GTK_CONTAINER (bbox), button);
   
   button = gtk_combo_box_new_text();
