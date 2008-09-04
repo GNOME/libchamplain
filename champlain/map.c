@@ -47,7 +47,7 @@ map_new (ChamplainMapSource source)
         break;
     }
   
-  map->levels = g_ptr_array_sized_new (map->zoom_levels);
+  map->previous_level = NULL;
   map->current_level = NULL;
 
   return map;
@@ -56,11 +56,14 @@ map_new (ChamplainMapSource source)
 void 
 map_load_level(Map* map, gint zoom_level)
 {
+  if (map->previous_level)
+    zoom_level_free(map->previous_level);
+  map->previous_level = map->current_level;
+
   guint row_count = map->get_row_count(map, zoom_level);
   guint column_count = map->get_column_count(map, zoom_level);
 
   map->current_level = zoom_level_new(zoom_level, row_count, column_count, map->tile_size);
-  g_ptr_array_add(map->levels, map->current_level);
 }
 
 void
@@ -74,16 +77,32 @@ map_load_visible_tiles (Map* map, GdkRectangle viewport, gboolean offline)
   
   x_count += x_first;
   y_count += y_first;
-  g_print("Tiles: %d, %d to %d, %d\n", x_first, y_first, x_count, y_count);
+
+  if(x_count > map->current_level->row_count)
+    x_count = map->current_level->row_count;
+  if(y_count > map->current_level->column_count)
+    y_count = map->current_level->column_count;
+
+  //g_print("Tiles: %d, %d to %d, %d\n", x_first, y_first, x_count, y_count);
   
   int i, j, k;
+
+  // Get rid of old tiles first
+  for (k = 0; k < map->current_level->tiles->len; k++)
+    {
+      Tile* tile = g_ptr_array_index(map->current_level->tiles, k);
+      if (tile->x < x_first || tile->x > x_count || tile->y < y_first || tile->y > y_count)
+        {
+          g_ptr_array_remove (map->current_level->tiles, tile);
+          tile_free(tile);
+        }
+    }
+  
+  //Load new tiles if needed
   for (i = x_first; i < x_count; i++)
     {
       for (j = y_first; j < y_count; j++)
         {
-          if(i >= map->current_level->row_count || j >= map->current_level->column_count)
-            continue;
-            
           gboolean exist = FALSE;
           for (k = 0; k < map->current_level->tiles->len && !exist; k++)
             {
@@ -107,22 +126,7 @@ map_zoom_in (Map* map)
   gint new_level = map->current_level->level + 1;
   if(new_level <= map->zoom_levels)
     {
-      gboolean exist = FALSE;
-      int i;
-      for (i = 0; i < map->levels->len && !exist; i++)
-        {
-          ZoomLevel* level = g_ptr_array_index(map->levels, i);
-          if (level && level->level == new_level)
-            {
-              exist = TRUE;
-              map->current_level = level;
-            }
-        }
-
-      if(!exist)
-        {
-          map_load_level(map, map->current_level->level + 1);
-        }
+      map_load_level(map, new_level);
       return TRUE;
     }
   return FALSE;
@@ -134,22 +138,7 @@ map_zoom_out (Map* map)
   gint new_level = map->current_level->level - 1;
   if(new_level >= 0)
     {
-      gboolean exist = FALSE;
-      int i;
-      for (i = 0; i < map->levels->len && !exist; i++)
-        {
-          ZoomLevel* level = g_ptr_array_index(map->levels, i);
-          if (level && level->level == new_level)
-            {
-              exist = TRUE;
-              map->current_level = level;
-            }
-        }
-
-      if(!exist)
-        {
-          map_load_level(map, map->current_level->level - 1);
-        }
+      map_load_level(map, new_level);
       return TRUE;
     }
   return FALSE;
@@ -158,12 +147,7 @@ map_zoom_out (Map* map)
 void 
 map_free (Map* map)
 {
-  int i;
-  for (i = 0; i < map->levels->len; i++)
-    {
-      ZoomLevel* level = g_ptr_array_index(map->levels, i);
-      zoom_level_free(level);
-    }
+  zoom_level_free(map->current_level);
 }
 
 gboolean 
@@ -172,22 +156,7 @@ map_zoom_to (Map* map, guint zoomLevel)
   if(zoomLevel >= 0 && 
      zoomLevel<= map->zoom_levels)
     {
-      gboolean exist = FALSE;
-      int i;
-      for (i = 0; i < map->levels->len && !exist; i++)
-        {
-          ZoomLevel* level = g_ptr_array_index(map->levels, i);
-          if (level && level->level == zoomLevel)
-            {
-              exist = TRUE;
-              map->current_level = level;
-            }
-        }
-
-      if(!exist)
-        {
-          map_load_level(map, zoomLevel);
-        }
+      map_load_level(map, zoomLevel);
       return TRUE;
     }
   return FALSE;

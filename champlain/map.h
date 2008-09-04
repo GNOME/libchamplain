@@ -37,7 +37,7 @@ struct _Map
   int tile_size;
 
   ZoomLevel* current_level;
-  GPtrArray  *levels;
+  ZoomLevel* previous_level;
   
   guint (* get_row_count) (Map* map, guint zoom_level);
   guint (* get_column_count) (Map* map, guint zoom_level);

@@ -42,7 +42,6 @@ tile_set(Map* map, Tile* tile)
     (tile->y * tile->size) - map->current_level->anchor.y);
   clutter_actor_set_size (tile->actor, tile->size, tile->size);
   clutter_actor_show (tile->actor);
-  g_print("Tile %d, %d\n", (tile->x * tile->size) - map->current_level->anchor.x, (tile->y * tile->size) - map->current_level->anchor.y);
 }
 
 static void 
@@ -206,4 +205,5 @@ tile_free(Tile* tile)
 {
   if(tile->actor)
     clutter_actor_destroy(tile->actor);
+  g_free(tile);
 }

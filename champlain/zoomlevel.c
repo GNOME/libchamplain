@@ -31,11 +31,9 @@ zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size)
   level->row_count = row;
   level->column_count = column;
   level->tile_size = tile_size;
-  gint count = row * column;
-  if (row * column > 256)
-    count = 256;
-    
-  level->tiles = g_ptr_array_sized_new (count);
+
+  //FIXME: this hard coded value means that there can't be more than 16x16 tiles displayed at once
+  level->tiles = g_ptr_array_sized_new (256);
   level->group = clutter_group_new ();
   
   g_object_ref(level->group); // so that the group isn't destroyed when removed from the viewport
