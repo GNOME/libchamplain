@@ -31,6 +31,9 @@ typedef struct
   int size;
   int level;
   
+  gboolean loading; // TRUE when a callback exist to load the tile, FALSE otherwise
+  gboolean to_destroy; // TRUE when a tile struct should be deleted when loading is done, FALSE otherwise
+  
 } Tile;
 
 void tile_free(Tile* tile);

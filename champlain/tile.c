@@ -33,7 +33,8 @@ typedef struct {
 } TwoPtr;
 
 #define CACHE_DIR "champlain"
-
+static SoupSession * soup_session;
+  
 void
 tile_set(Map* map, Tile* tile) 
 {
@@ -123,11 +124,22 @@ file_loaded_cb (SoupSession *session,
                                     map->name,
                                     map_filename,
                                     NULL);
-                                    
+      
+      g_print("Writing %s\n", map_filename);
       g_file_set_contents (filename,
                            msg->response_body->data,
                            msg->response_body->length,
                            NULL);
+      // If the tile has been marked to be deleted, don't go any further
+      if(tile->to_destroy)
+        {
+          g_object_unref (loader);
+          g_free (filename);
+          g_free (map_filename);
+          g_free (tile);
+          return;
+        }
+        
       GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
       
       tile->actor = clutter_texture_new();
@@ -143,6 +155,8 @@ file_loaded_cb (SoupSession *session,
       
       clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
       
+      tile->loading = FALSE;
+      
       g_object_unref (loader);
       g_free (filename);
       g_free (map_filename);
@@ -152,10 +166,10 @@ file_loaded_cb (SoupSession *session,
 Tile* 
 tile_load (Map* map, guint zoom_level, guint x, guint y, gboolean offline)
 {
-  static SoupSession * session;
   gchar* filename, *map_filename;
   Tile* tile = g_new0(Tile, 1);
-  
+  g_print ("Tile %d, %d\n", x, y);
+      
   tile->x = x;
   tile->y = y;
   tile->level = zoom_level;
@@ -183,14 +197,15 @@ tile_load (Map* map, guint zoom_level, guint x, guint y, gboolean offline)
   else if (!offline)
     {
       SoupMessage *msg;
-      if (!session)
-        session = soup_session_async_new ();
+      if (!soup_session)
+        soup_session = soup_session_async_new ();
         
       msg = soup_message_new (SOUP_METHOD_GET, map->get_tile_uri(map, tile));
 
-      soup_session_queue_message (session, msg,
+      soup_session_queue_message (soup_session, msg,
                                   file_loaded_cb,
                                   ptr);
+      tile->loading = TRUE;
     } 
   // If a tile is neither in cache or can be fetched, do nothing, it'll show up as empty
     
@@ -205,5 +220,8 @@ tile_free(Tile* tile)
 {
   if(tile->actor)
     clutter_actor_destroy(tile->actor);
-  g_free(tile);
+  if(tile->loading)
+    tile->to_destroy = TRUE;
+  else
+    g_free(tile);
 }

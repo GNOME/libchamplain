@@ -411,15 +411,13 @@ viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *champla
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
   
-  GdkRectangle rect;
+  GdkPoint rect;
   tidy_viewport_get_origin(TIDY_VIEWPORT(priv->viewport), &rect.x, &rect.y, NULL);
   if (rect.x < 0 || rect.y < 0)
       return;
-  /*if (rect.x == priv->viewportSize.x &&
-      rect.y == priv->viewportSize.y &&
-      rect.width == priv->viewportSize.width &&
-      rect.height == priv->viewportSize.height)
-      return;*/
+  if (rect.x == priv->viewportSize.x &&
+      rect.y == priv->viewportSize.y)
+      return;
 
   priv->viewportSize.x = rect.x;
   priv->viewportSize.y = rect.y;
