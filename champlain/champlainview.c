@@ -37,6 +37,8 @@
 #include <tidy-scrollable.h>
 #include <tidy-viewport.h>
 
+
+
 enum
 {
   /* normal signals */
@@ -88,13 +90,17 @@ G_DEFINE_TYPE (ChamplainView, champlain_view, GTK_TYPE_ALIGNMENT);
 static gdouble
 viewport_get_current_longitude(ChamplainViewPrivate *priv)
 {
-  return priv->map->x_to_longitude(priv->map, priv->viewportSize.x + priv->viewportSize.width/2.0, priv->map->current_level->level);
+  return priv->map->x_to_longitude(priv->map, 
+    priv->map->current_level->anchor.x + priv->viewportSize.x + priv->viewportSize.width / 2.0, 
+    priv->map->current_level->level);
 }
 
 static gdouble
 viewport_get_current_latitude(ChamplainViewPrivate *priv)
 {
-  return priv->map->y_to_latitude(priv->map, priv->viewportSize.y + priv->viewportSize.height/2.0, priv->map->current_level->level);
+  return priv->map->y_to_latitude(priv->map, 
+    priv->map->current_level->anchor.y + priv->viewportSize.y + priv->viewportSize.height / 2.0, 
+    priv->map->current_level->level);
 }
 
 static void
@@ -111,30 +117,35 @@ resize_viewport(ChamplainView *champlainView)
       map_load_level(priv->map, priv->zoomLevel);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
       
-      
       g_object_notify(G_OBJECT(champlainView), "zoom-level");
       g_object_notify(G_OBJECT(champlainView), "map-source");
     }
   
   clutter_actor_set_size (priv->fingerScroll, priv->viewportSize.width, priv->viewportSize.height);
   
-  g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
   
   tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->viewport), &hadjust, &vadjust);
   
-  tidy_adjustment_get_values (hadjust, NULL, &lower, &upper, NULL, NULL, NULL);
+  //tidy_adjustment_get_values (hadjust, NULL, &lower, &upper, NULL, NULL, NULL);
   lower = 0;
-  upper = zoom_level_get_width(priv->map->current_level) - priv->viewportSize.width; 
+  if (priv->map->current_level->level < 8)
+    upper = zoom_level_get_width(priv->map->current_level) - priv->viewportSize.width; 
+  else
+    upper = G_MAXINT16;
   g_object_set (hadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
                 
-  tidy_adjustment_get_values (vadjust, NULL, &lower, &upper, NULL, NULL, NULL);
+  //tidy_adjustment_get_values (vadjust, NULL, &lower, &upper, NULL, NULL, NULL);
   lower = 0;
-  upper = zoom_level_get_height(priv->map->current_level) - priv->viewportSize.height;
+  if (priv->map->current_level->level < 8)
+    upper = zoom_level_get_height(priv->map->current_level) - priv->viewportSize.height; 
+  else
+    upper = G_MAXINT16;
   g_object_set (vadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
   
-  //g_print("%d, %d, %d\n", zoom_level_get_width(priv->map->current_level), zoom_level_get_height(priv->map->current_level), sizeof(guint));
+  g_print("Level: %d\n", priv->map->current_level->level);
+  g_print("Upper: %f\n", upper);
 }
 
 static void 
@@ -215,15 +226,10 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
                   gdouble lat = viewport_get_current_latitude(priv);
                   if (map_zoom_to(priv->map, level)) 
                     {
-                      gint old_level = priv->map->current_level->level;
-                      gdouble x = priv->map->longitude_to_x(priv->map, lon, level);
-                      gdouble y = priv->map->latitude_to_y(priv->map, lat, level);
-
                       resize_viewport(view);
                       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->viewport), group);
                       clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
-
-                      tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - priv->viewportSize.width/2.0, y - priv->viewportSize.height/2.0, 0);
+                      champlain_view_center_on(view, lon, lat);
                     }
                 }
             }
@@ -241,13 +247,17 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
               priv->mapSource = source;
               if (priv->map) {
                 gint currentLevel = priv->map->current_level->level;
+                GdkPoint anchor = priv->map->current_level->anchor;
                 map_free(priv->map);
                 priv->map = map_new(priv->mapSource);
                 
+                // Keep same zoom level
                 if (currentLevel > priv->map->zoom_levels)
                   currentLevel = priv->map->zoom_levels;
                   
                 map_load_level(priv->map, currentLevel);
+                priv->map->current_level->anchor = anchor;
+
                 map_load_visible_tiles (priv->map, priv->viewportSize, priv->offline);
                 clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
               }
@@ -405,11 +415,12 @@ viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *champla
   tidy_viewport_get_origin(TIDY_VIEWPORT(priv->viewport), &rect.x, &rect.y, NULL);
   if (rect.x < 0 || rect.y < 0)
       return;
-  if (rect.x == priv->viewportSize.x &&
+  /*if (rect.x == priv->viewportSize.x &&
       rect.y == priv->viewportSize.y &&
       rect.width == priv->viewportSize.width &&
       rect.height == priv->viewportSize.height)
-      return;
+      return;*/
+
   priv->viewportSize.x = rect.x;
   priv->viewportSize.y = rect.y;
   
@@ -462,6 +473,7 @@ champlain_view_new (ChamplainViewMode mode)
   
   // Setup viewport
   priv->viewport = tidy_viewport_new ();
+  g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
   
   g_signal_connect (priv->viewport,
                     "notify::x-origin",
@@ -508,8 +520,41 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
   gdouble x, y;
   x = priv->map->longitude_to_x(priv->map, longitude, priv->map->current_level->level);
   y = priv->map->latitude_to_y(priv->map, latitude, priv->map->current_level->level);
+  GdkPoint* anchor = &priv->map->current_level->anchor;
 
-  tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - priv->viewportSize.width/2.0, y - priv->viewportSize.height/2.0, 0);
+  if (priv->map->current_level->level >= 8) {
+    anchor->x = x - G_MAXINT16 / 2;
+    anchor->y = y - G_MAXINT16 / 2;
+
+    if ( anchor->x < 0 )
+      anchor->x = 0;
+    if ( anchor->y < 0 )
+      anchor->y = 0;
+
+    gdouble max = priv->map->longitude_to_x(priv->map, 180, priv->map->current_level->level)
+       - (G_MAXINT16 / 2);
+    if (anchor->x > max)
+      anchor->x = max;
+    if (anchor->y > max)
+      anchor->y = max;
+    
+    x -= anchor->x;
+    y -= anchor->y;
+  } else {
+    anchor->x = 0;
+    anchor->y = 0;
+  }
+
+  //FIXME: Inform tiles that there is a new anchor
+
+  g_print("Anchor: %d, %d\n", anchor->x, anchor->y);
+  g_print("Center: %f, %f\n", x, y);
+
+
+  tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport),
+    x - priv->viewportSize.width / 2.0,
+    y - priv->viewportSize.height / 2.0,
+    0);
   
   g_object_notify(G_OBJECT(champlainView), "longitude");
   g_object_notify(G_OBJECT(champlainView), "latitude");
@@ -534,15 +579,10 @@ champlain_view_zoom_in (ChamplainView *champlainView)
   gdouble lat = viewport_get_current_latitude(priv);
   if(map_zoom_in(priv->map)) 
     {
-      gint level = priv->map->current_level->level;
-      gdouble x = priv->map->longitude_to_x(priv->map, lon, level);
-      gdouble y = priv->map->latitude_to_y(priv->map, lat, level);
-      
       resize_viewport(champlainView);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->viewport), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
-      
-      tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - priv->viewportSize.width/2.0, y - priv->viewportSize.height/2.0, 0);
+      champlain_view_center_on(champlainView, lon, lat);
       
       g_object_notify(G_OBJECT(champlainView), "zoom-level");
     }
@@ -565,15 +605,10 @@ champlain_view_zoom_out (ChamplainView *champlainView)
   gdouble lat = viewport_get_current_latitude(priv);
   if(map_zoom_out(priv->map))
     {
-      gint level = priv->map->current_level->level;
-      gdouble x = priv->map->longitude_to_x(priv->map, lon, level);
-      gdouble y = priv->map->latitude_to_y(priv->map, lat, level);
-      
       resize_viewport(champlainView);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->viewport), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
-      
-      tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport), x - priv->viewportSize.width/2.0, y - priv->viewportSize.height/2.0, 0);
+      champlain_view_center_on(champlainView, lon, lat);
       
       g_object_notify(G_OBJECT(champlainView), "zoom-level");
     }

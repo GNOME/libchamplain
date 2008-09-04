@@ -49,6 +49,7 @@ map_new (ChamplainMapSource source)
   
   map->levels = g_ptr_array_sized_new (map->zoom_levels);
   map->current_level = NULL;
+
   return map;
 }
 
@@ -68,11 +69,12 @@ map_load_visible_tiles (Map* map, GdkRectangle viewport, gboolean offline)
   gint x_count = ceil((float)viewport.width / map->tile_size) + 1;
   gint y_count = ceil((float)viewport.height / map->tile_size) + 1;
   
-  gint x_first = viewport.x / map->tile_size;
-  gint y_first = viewport.y / map->tile_size;
+  gint x_first = (map->current_level->anchor.x + viewport.x) / map->tile_size;
+  gint y_first = (map->current_level->anchor.y + viewport.y) / map->tile_size;
   
   x_count += x_first;
   y_count += y_first;
+  g_print("Tiles: %d, %d to %d, %d\n", x_first, y_first, x_count, y_count);
   
   int i, j, k;
   for (i = x_first; i < x_count; i++)
@@ -103,8 +105,7 @@ gboolean
 map_zoom_in (Map* map)
 {
   gint new_level = map->current_level->level + 1;
-  if(new_level + 1 <= map->zoom_levels &&
-     new_level + 1 <= 7) //FIXME Due to a ClutterUnit limitation (the x, y will have to be rethinked)
+  if(new_level <= map->zoom_levels)
     {
       gboolean exist = FALSE;
       int i;
@@ -169,8 +170,7 @@ gboolean
 map_zoom_to (Map* map, guint zoomLevel)
 {
   if(zoomLevel >= 0 && 
-     zoomLevel<= map->zoom_levels &&
-     zoomLevel <= 7) //FIXME Due to a ClutterUnit limitation (the x, y will have to be rethinked)
+     zoomLevel<= map->zoom_levels)
     {
       gboolean exist = FALSE;
       int i;

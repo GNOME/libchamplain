@@ -31,11 +31,18 @@ zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size)
   level->row_count = row;
   level->column_count = column;
   level->tile_size = tile_size;
-  level->tiles = g_ptr_array_sized_new (row * column);
+  gint count = row * column;
+  if (row * column > 256)
+    count = 256;
+    
+  level->tiles = g_ptr_array_sized_new (count);
   level->group = clutter_group_new ();
   
   g_object_ref(level->group); // so that the group isn't destroyed when removed from the viewport
   
+  level->anchor.x = 0;
+  level->anchor.y = 0;
+
   return level;
 }
 

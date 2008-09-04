@@ -35,6 +35,7 @@ struct _Map
   int zoom_levels;
   const gchar* name;
   int tile_size;
+
   ZoomLevel* current_level;
   GPtrArray  *levels;
   

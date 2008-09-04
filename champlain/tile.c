@@ -35,11 +35,14 @@ typedef struct {
 #define CACHE_DIR "champlain"
 
 void
-tile_set(Tile* tile) 
+tile_set(Map* map, Tile* tile) 
 {
-  clutter_actor_set_position (tile->actor, tile->x * tile->size, tile->y * tile->size);
+  clutter_actor_set_position (tile->actor, 
+    (tile->x * tile->size) - map->current_level->anchor.x, 
+    (tile->y * tile->size) - map->current_level->anchor.y);
   clutter_actor_set_size (tile->actor, tile->size, tile->size);
   clutter_actor_show (tile->actor);
+  g_print("Tile %d, %d\n", (tile->x * tile->size) - map->current_level->anchor.x, (tile->y * tile->size) - map->current_level->anchor.y);
 }
 
 static void 
@@ -47,7 +50,7 @@ create_error_tile(Map* map, Tile* tile)
 {
   tile->actor = clutter_texture_new_from_file("error.svg", NULL);
        
-  tile_set(tile);
+  tile_set(map, tile);
   
   clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
 
@@ -137,7 +140,7 @@ file_loaded_cb (SoupSession *session,
           gdk_pixbuf_get_rowstride (pixbuf),
           3, 0, NULL);
            
-      tile_set(tile);
+      tile_set(map, tile);
       
       clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
       
@@ -174,7 +177,7 @@ tile_load (Map* map, guint zoom_level, guint x, guint y, gboolean offline)
   if (g_file_test (filename, G_FILE_TEST_EXISTS)) 
     {
       tile->actor = clutter_texture_new_from_file(filename, NULL);
-      tile_set(tile);
+      tile_set(map, tile);
       
       clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
     }

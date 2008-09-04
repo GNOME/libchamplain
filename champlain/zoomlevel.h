@@ -22,6 +22,7 @@
 
 #include <glib.h>
 #include <clutter/clutter.h>
+#include <gdk/gdk.h>
 
 typedef struct
 {
@@ -32,7 +33,8 @@ typedef struct
   
   GPtrArray  *tiles;
   ClutterActor* group;
-  
+
+  GdkPoint anchor;  
 } ZoomLevel;
 
 guint zoom_level_get_width(ZoomLevel* level);
