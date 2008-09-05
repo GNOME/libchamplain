@@ -45,6 +45,14 @@ tile_set(Map* map, Tile* tile)
   clutter_actor_show (tile->actor);
 }
 
+void
+tile_setup_animation(Tile* tile) 
+{
+  ClutterEffectTemplate *etemplate = clutter_effect_template_new_for_duration (250, CLUTTER_ALPHA_SINE_INC);
+  clutter_actor_set_opacity(tile->actor, 0);
+  clutter_effect_fade (etemplate, tile->actor, 255, NULL, NULL);
+}
+
 static void 
 create_error_tile(Map* map, Tile* tile)
 {
@@ -53,6 +61,7 @@ create_error_tile(Map* map, Tile* tile)
   tile_set(map, tile);
   
   clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
+  tile_setup_animation(tile);
 
 }
 
@@ -125,7 +134,6 @@ file_loaded_cb (SoupSession *session,
                                     map_filename,
                                     NULL);
       
-      g_print("Writing %s\n", map_filename);
       g_file_set_contents (filename,
                            msg->response_body->data,
                            msg->response_body->length,
@@ -154,6 +162,7 @@ file_loaded_cb (SoupSession *session,
       tile_set(map, tile);
       
       clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
+      tile_setup_animation(tile);
       
       tile->loading = FALSE;
       
@@ -168,7 +177,6 @@ tile_load (Map* map, guint zoom_level, guint x, guint y, gboolean offline)
 {
   gchar* filename, *map_filename;
   Tile* tile = g_new0(Tile, 1);
-  g_print ("Tile %d, %d\n", x, y);
       
   tile->x = x;
   tile->y = y;
@@ -193,6 +201,7 @@ tile_load (Map* map, guint zoom_level, guint x, guint y, gboolean offline)
       tile_set(map, tile);
       
       clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
+      // Do not animate since it is local and fast
     }
   else if (!offline)
     {
