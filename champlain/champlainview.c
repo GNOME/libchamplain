@@ -529,8 +529,7 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
     if ( anchor->y < 0 )
       anchor->y = 0;
 
-    gdouble max = priv->map->longitude_to_x(priv->map, 180, priv->map->current_level->level)
-       - (G_MAXINT16 / 2);
+    gdouble max = zoom_level_get_width(priv->map->current_level) - (G_MAXINT16 / 2);
     if (anchor->x > max)
       anchor->x = max;
     if (anchor->y > max)
