@@ -17,18 +17,20 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef CHAMPLAIN_H
-#define CHAMPLAIN_H
-
-#define CHAMPLAIN_MIN_LAT -90
-#define CHAMPLAIN_MAX_LAT 90
-#define CHAMPLAIN_MIN_LONG -180
-#define CHAMPLAIN_MAX_LONG 180
+#ifndef CHAMPLAIN_PRIVATE_H
+#define CHAMPLAIN_PRIVATE_H
 
 #include <glib.h>
+#include <gdk/gdk.h>
 
-#include <champlain/champlain_defines.h>
-#include <champlain/champlainview.h>
-#include <champlain/champlainmarker.h>
+#define CHAMPLAIN_MARKER_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
+
+struct _ChamplainMarkerPrivate
+{
+  gdouble lon;
+  gdouble lat;
+  
+  GdkPoint anchor;
+};
 
 #endif

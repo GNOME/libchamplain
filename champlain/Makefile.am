@@ -13,6 +13,7 @@ lib_LTLIBRARIES = libchamplain-1.0.la
 libchamplain_1_0_la_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
 					$(BUILT_SOURCES) \
 					champlainview.c \
+					champlainmarker.c \
 					map.c  \
 					zoomlevel.c \
 					tile.c \
@@ -35,7 +36,7 @@ champlain-marshal.c: $(CHAMPLAIN_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --body --prefix=champlain_marshal $< > $(CHAMPLAIN_MARSHAL).c
 
 libchamplain_includedir=$(includedir)/libchamplain-1.0/champlain
-libchamplain_include_HEADERS = champlain.h champlainview.h champlain_defines.h
+libchamplain_include_HEADERS = champlain.h champlainview.h champlain_defines.h champlainmarker.h
 
 libchamplain_1_0_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 

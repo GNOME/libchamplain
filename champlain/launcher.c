@@ -31,19 +31,47 @@
  * Terminate the main loop.
  */
 static void
-on_destroy (GtkWidget * widget, gpointer data)
+on_destroy (GtkWidget *widget, gpointer data)
 {
   gtk_main_quit ();
 }
 
-static void
-go_to_montreal (GtkWidget * widget, ChamplainView* view)
+static ClutterActor*
+create_marker_layer ()
 {
-  champlain_view_center_on(view, -73.75, 45.466);
+  ClutterActor *layer, *marker;
+  
+  layer = clutter_group_new();
+  
+  ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
+  ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
+  marker = champlain_marker_new_with_label("Montréal", "Airmole 14", NULL, NULL);
+  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), -73.563788, 45.528178);
+  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+  
+  marker = champlain_marker_new_with_label("New York", "Sans 25", &white, NULL);
+  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), -73.98, 40.77);
+  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+  
+  marker = champlain_marker_new_with_label("Saint-Tite-des-Caps", "Serif 12", NULL, &orange);
+  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), -70.764141, 47.130885);
+  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+  
+  clutter_actor_hide(layer);
+  return layer;
 }
 
 static void
-map_source_changed (GtkWidget * widget, ChamplainView* view)
+toggle_layer (GtkToggleButton *widget, ClutterActor *layer)
+{
+  if(gtk_toggle_button_get_active(widget))
+    clutter_actor_show_all(layer);
+  else
+    clutter_actor_hide(layer);
+}
+
+static void
+map_source_changed (GtkWidget *widget, ChamplainView *view)
 {
   gchar* selection = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
   if (g_strcmp0(selection, OSM_MAP) == 0)
@@ -61,14 +89,14 @@ map_source_changed (GtkWidget * widget, ChamplainView* view)
 }
 
 static void 
-zoom_changed (GtkSpinButton *spinbutton, ChamplainView* view)
+zoom_changed (GtkSpinButton *spinbutton, ChamplainView *view)
 {
   gint zoom = gtk_spin_button_get_value_as_int(spinbutton);
   g_object_set(G_OBJECT(view), "zoom-level", zoom, NULL);
 }
 
 static void 
-map_zoom_changed (ChamplainView* view, GParamSpec *gobject, GtkSpinButton *spinbutton)
+map_zoom_changed (ChamplainView *view, GParamSpec *gobject, GtkSpinButton *spinbutton)
 {
   gint zoom;
   g_object_get(G_OBJECT(view), "zoom-level", &zoom, NULL);
@@ -76,13 +104,13 @@ map_zoom_changed (ChamplainView* view, GParamSpec *gobject, GtkSpinButton *spinb
 }
 
 static void
-zoom_in (GtkWidget * widget, ChamplainView* view)
+zoom_in (GtkWidget *widget, ChamplainView *view)
 {
   champlain_view_zoom_in(view);
 }
 
 static void
-zoom_out (GtkWidget * widget, ChamplainView* view)
+zoom_out (GtkWidget *widget, ChamplainView *view)
 {
   champlain_view_zoom_out(view);
 }
@@ -93,6 +121,7 @@ main (int argc, char *argv[])
   GtkWidget *window;
   GtkWidget *widget, *vbox, *bbox, *button, *viewport;
   GtkWidget *scrolled;
+  ClutterActor* layer;
   
   g_thread_init (NULL);
   gtk_clutter_init (&argc, &argv);
@@ -116,8 +145,8 @@ main (int argc, char *argv[])
   
   widget = champlain_view_new (CHAMPLAIN_VIEW_MODE_KINETIC);
   g_object_set(G_OBJECT(widget), "zoom-level", 5, NULL);
-//  g_object_set(G_OBJECT(widget), "decel-rate", 1.1, NULL);
-//  g_object_set(G_OBJECT(widget), "offline", TRUE, NULL);
+  layer = create_marker_layer();
+  champlain_view_add_layer(widget, layer);
   
   gtk_widget_set_size_request(widget, 640, 480);
   
@@ -134,11 +163,11 @@ main (int argc, char *argv[])
                     G_CALLBACK (zoom_out),
                     widget);
   gtk_container_add (GTK_CONTAINER (bbox), button);
-  button = gtk_button_new_with_label ("Montréal");
+  button = gtk_toggle_button_new_with_label  ("Markers");
   g_signal_connect (button,
-                    "clicked",
-                    G_CALLBACK (go_to_montreal),
-                    widget);
+                    "toggled",
+                    G_CALLBACK (toggle_layer),
+                    layer);
   gtk_container_add (GTK_CONTAINER (bbox), button);
   
   button = gtk_combo_box_new_text();
