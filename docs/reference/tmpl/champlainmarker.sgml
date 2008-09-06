@@ -1,0 +1,77 @@
+<!-- ##### SECTION Title ##### -->
+ChamplainMarker
+
+<!-- ##### SECTION Short_Description ##### -->
+A marker to identify points of interest on a map
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>Markers reprensent points of interest on a map. Markers need to be placed on a layer (a #ClutterGroup).  Layers have to be added to a #ChamplainView for the markers to show on the map.</para>
+
+<para>A marker is nothing more than a regular #ClutterActor.  You can draw on it what ever you want.  Don't forget to set the anchor position in the marker using #champlain_marker_set_anchor.  Set the markers position on the map using #champlain_marker_set_position.</para>
+
+<para>Champlain has a default type of markers with text. To create one, use #champlain_marker_new_with_label.</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT ChamplainMarker ##### -->
+<para>
+
+</para>
+
+@group: 
+@priv: 
+
+<!-- ##### FUNCTION champlain_marker_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION champlain_marker_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION champlain_marker_new_with_label ##### -->
+<para>
+
+</para>
+
+@label: 
+@font: 
+@text_color: 
+@marker_color: 
+@Returns: 
+
+
+<!-- ##### FUNCTION champlain_marker_set_anchor ##### -->
+<para>
+
+</para>
+
+@marker: 
+@x: 
+@y: 
+
+
+<!-- ##### FUNCTION champlain_marker_set_position ##### -->
+<para>
+
+</para>
+
+@marker: 
+@longitude: 
+@latitude: 
+
+

@@ -14,5 +14,6 @@
   <chapter>
     <title>I. API Reference</title>
     <xi:include href="xml/champlainview.xml"/>
+    <xi:include href="xml/champlainmarker.xml"/>
   </chapter>
 </book>

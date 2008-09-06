@@ -1,0 +1,131 @@
+<!-- ##### SECTION Title ##### -->
+ChamplainView
+
+<!-- ##### SECTION Short_Description ##### -->
+A widget to display maps
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The #ChamplainView widget is a Clutter based widget to display maps.  It supports two modes of scrolling:
+<itemizedlist>
+  <listitem><para>Push: the normal behavior where the maps doesn't move after the user stopped scrolling;</para></listitem>
+  <listitem><para>Kinetic: the iPhone-like behavior where the maps decelerate after the user stopped scrolling.</para></listitem>
+</itemizedlist>
+</para>
+<para>
+You can use the same #ChamplainView to display many types of maps.  In Champlain they are called map sources.  You can change the #map-source property at anytime to replace the current displayed map.
+</para>
+<para>
+The maps are downloaded from Internet from open maps sources (like <ulink role="online-location" url="http://www.openstreetmap.org">OpenStreetMap</ulink>).  Maps are divided in tiles for each zoom level.  When a tile is requested, #ChamplainView will first check if it is in cache (in
+the user's cache dir under champlain). If an error occurs during download, an error tile will be displayed (if not in offline mode).
+</para>
+
+<para>
+
+</para>
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### ENUM ChamplainMapSource ##### -->
+<para>
+
+</para>
+
+@CHAMPLAIN_MAP_SOURCE_DEBUG: 
+@CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP: 
+@CHAMPLAIN_MAP_SOURCE_OPENARIALMAP: 
+@CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF: 
+@CHAMPLAIN_MAP_SOURCE_COUNT: 
+
+<!-- ##### ENUM ChamplainViewMode ##### -->
+<para>
+
+</para>
+
+@CHAMPLAIN_VIEW_MODE_PUSH: 
+@CHAMPLAIN_VIEW_MODE_KINETIC: 
+
+<!-- ##### STRUCT ChamplainView ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG ChamplainView:decel-rate ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG ChamplainView:latitude ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG ChamplainView:longitude ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG ChamplainView:map-source ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG ChamplainView:offline ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG ChamplainView:zoom-level ##### -->
+<para>
+
+</para>
+
+<!-- ##### FUNCTION champlain_view_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION champlain_view_new ##### -->
+<para>
+
+</para>
+
+@mode: 
+@Returns: 
+
+
+<!-- ##### FUNCTION champlain_view_center_on ##### -->
+<para>
+
+</para>
+
+@view: 
+@longitude: 
+@latitude: 
+
+
+<!-- ##### FUNCTION champlain_view_zoom_in ##### -->
+<para>
+
+</para>
+
+@champlainView: 
+
+
+<!-- ##### FUNCTION champlain_view_zoom_out ##### -->
+<para>
+
+</para>
+
+@champlainView: 
+
+

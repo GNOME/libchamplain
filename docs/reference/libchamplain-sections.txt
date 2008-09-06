@@ -4,9 +4,6 @@
 <INCLUDE>champlain/champlainview.h</INCLUDE>
 ChamplainMapSource
 ChamplainViewMode
-CHAMPLAIN_CLASS
-CHAMPLAIN_GET_CLASS
-ChamplainViewPrivate
 ChamplainView
 champlain_view_get_type
 champlain_view_new
@@ -18,6 +15,17 @@ CHAMPLAIN_VIEW
 CHAMPLAIN_IS_VIEW
 CHAMPLAIN_TYPE_VIEW
 CHAMPLAIN_IS_VIEW_CLASS
+</SECTION>
+<SECTION>
+<FILE>champlainmarker</FILE>
+<TITLE>ChamplainMarker</TITLE>
+<INCLUDE>champlain/champlainmarker.h</INCLUDE>
+ChamplainMarker
+champlain_marker_get_type
+champlain_marker_new
+champlain_marker_new_with_label
+champlain_marker_set_anchor
+champlain_marker_set_position
 </SECTION>
 
 <SECTION>

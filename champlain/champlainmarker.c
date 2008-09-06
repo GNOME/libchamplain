@@ -163,7 +163,7 @@ champlain_marker_init (ChamplainMarker *champlainMarker)
 /**
  * champlain_marker_new:
  *
- * Returns a new #ChamplainWidget ready to be used as a #ClutterActor.
+ * Returns a new #ChamplainMarker ready to be used as a #ClutterActor.
  *
  * Since: 0.2
  */
@@ -229,7 +229,7 @@ champlain_marker_set_anchor (ChamplainMarker *champlainMarker, gint x, gint y)
  * @text_color: a #ClutterColor, the color of the text, can be NULL
  * @marker_color: a #ClutterColor, the color of the marker, can be NULL
  *
- * Returns a new #ChamplainWidget with a drawn marker containing the given text. 
+ * Returns a new #ChamplainMarker with a drawn marker containing the given text. 
  *
  * Since: 0.2
  */
