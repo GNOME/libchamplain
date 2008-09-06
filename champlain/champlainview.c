@@ -88,7 +88,7 @@ static gdouble
 viewport_get_current_longitude(ChamplainViewPrivate *priv)
 {
   return priv->map->x_to_longitude(priv->map, 
-    priv->map->current_level->anchor.x + priv->viewportSize.x + priv->viewportSize.width / 2.0, 
+    priv->map->current_level->anchor.x + priv->viewport_size.x + priv->viewport_size.width / 2.0, 
     priv->map->current_level->level);
 }
 
@@ -96,7 +96,7 @@ static gdouble
 viewport_get_current_latitude(ChamplainViewPrivate *priv)
 {
   return priv->map->y_to_latitude(priv->map, 
-    priv->map->current_level->anchor.y + priv->viewportSize.y + priv->viewportSize.height / 2.0, 
+    priv->map->current_level->anchor.y + priv->viewport_size.y + priv->viewport_size.height / 2.0, 
     priv->map->current_level->level);
 }
 
@@ -155,8 +155,8 @@ resize_viewport(ChamplainView *champlainView)
   //tidy_adjustment_get_values (hadjust, NULL, &lower, &upper, NULL, NULL, NULL);
   if (priv->map->current_level->level < 8)
     {
-      lower = -priv->viewportSize.width / 2;
-      upper = zoom_level_get_width(priv->map->current_level) - priv->viewportSize.width / 2;
+      lower = -priv->viewport_size.width / 2;
+      upper = zoom_level_get_width(priv->map->current_level) - priv->viewport_size.width / 2;
     }
   else
     {
@@ -170,8 +170,8 @@ resize_viewport(ChamplainView *champlainView)
   
   if (priv->map->current_level->level < 8)
     {
-      lower = -priv->viewportSize.height / 2; 
-      upper = zoom_level_get_height(priv->map->current_level) - priv->viewportSize.height / 2;
+      lower = -priv->viewport_size.height / 2; 
+      upper = zoom_level_get_height(priv->map->current_level) - priv->viewport_size.height / 2;
     }
   else
     {
@@ -217,7 +217,7 @@ champlain_view_get_property(GObject* object, guint prop_id, GValue* value, GPara
         case PROP_DECEL_RATE:
           {
             gdouble decel;
-            g_object_get (priv->fingerScroll, "decel-rate", decel, NULL);
+            g_object_get (priv->finger_scroll, "decel-rate", decel, NULL);
             g_value_set_double(value, decel);
             break;
           }
@@ -293,7 +293,7 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
                 map_load_level(priv->map, currentLevel);
                 priv->map->current_level->anchor = anchor;
 
-                map_load_visible_tiles (priv->map, priv->viewportSize, priv->offline);
+                map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
                 clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
               }
             }
@@ -305,7 +305,7 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
       case PROP_DECEL_RATE:
         {
           gdouble decel = g_value_get_double(value);
-          g_object_set (priv->fingerScroll, "decel-rate", decel, NULL);
+          g_object_set (priv->finger_scroll, "decel-rate", decel, NULL);
           break;
         }
       default:
@@ -449,8 +449,8 @@ viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *champla
   GdkPoint rect;
   tidy_viewport_get_origin(TIDY_VIEWPORT(priv->viewport), &rect.x, &rect.y, NULL);
   
-  if (rect.x == priv->viewportSize.x &&
-      rect.y == priv->viewportSize.y)
+  if (rect.x == priv->viewport_size.x &&
+      rect.y == priv->viewport_size.y)
       return;
 
   priv->viewport_size.x = rect.x;
@@ -524,10 +524,10 @@ champlain_view_new (ChamplainViewMode mode)
         break;
     }
 
-  priv->fingerScroll = tidy_finger_scroll_new(mode);
+  priv->finger_scroll = tidy_finger_scroll_new(mode);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->fingerScroll), priv->viewport);
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), priv->fingerScroll);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->finger_scroll), priv->viewport);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), priv->finger_scroll);
 
   // Map Layer
   priv->map_layer = clutter_group_new();
@@ -586,7 +586,6 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
     anchor->y = 0;
   }
 
-  //FIXME: Inform tiles that there is a new anchor
   int i;
   for (i = 0; i < priv->map->current_level->tiles->len; i++)
     {
@@ -596,8 +595,8 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
     }
 
   tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport),
-    x - priv->viewportSize.width / 2.0,
-    y - priv->viewportSize.height / 2.0,
+    x - priv->viewport_size.width / 2.0,
+    y - priv->viewport_size.height / 2.0,
     0);
   
   g_object_notify(G_OBJECT(champlainView), "longitude");
