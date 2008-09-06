@@ -16,16 +16,17 @@ CHAMPLAIN_IS_VIEW
 CHAMPLAIN_TYPE_VIEW
 CHAMPLAIN_IS_VIEW_CLASS
 </SECTION>
+
 <SECTION>
 <FILE>champlainmarker</FILE>
 <TITLE>ChamplainMarker</TITLE>
 <INCLUDE>champlain/champlainmarker.h</INCLUDE>
 ChamplainMarker
-champlain_marker_get_type
 champlain_marker_new
 champlain_marker_new_with_label
 champlain_marker_set_anchor
 champlain_marker_set_position
+<SUBSECTION Standard>
 </SECTION>
 
 <SECTION>
