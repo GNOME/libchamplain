@@ -56,7 +56,7 @@ tile_setup_animation(Tile* tile)
 static void 
 create_error_tile(Map* map, Tile* tile)
 {
-  tile->actor = clutter_texture_new_from_file("error.svg", NULL);
+  tile->actor = clutter_texture_new_from_file(DATADIR "/champlain/error.svg", NULL);
        
   tile_set_position(map, tile);
   

@@ -27,8 +27,6 @@ libchamplain_1_0_la_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
 
 libchamplain_1_0_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
 
-EXTRA_DIST = $(CHAMPLAIN_MARSHAL_LIST)
-        
 champlain-marshal.h: $(CHAMPLAIN_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --header --prefix=champlain_marshal $< > $(CHAMPLAIN_MARSHAL).h 
 
@@ -42,7 +40,12 @@ libchamplain_1_0_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
 noinst_PROGRAMS = launcher
 
-AM_CPPFLAGS = $(DEPS_CFLAGS) -I../tidy
+AM_CPPFLAGS = $(DEPS_CFLAGS) -DDATADIR=\""$(datadir)"\" -I../tidy 
 AM_LDFLAGS = $(DEPS_LIBS) -export-dynamic -export-symbols-regex ^champlain_.*
 SOURCES = launcher.c
 LDADD = $(DEPS_LIBS) $(top_builddir)/champlain/libchamplain-1.0.la
+
+svgdir = $(datadir)/champlain
+svg_DATA = error.svg
+
+EXTRA_DIST = $(svg_DATA) $(CHAMPLAIN_MARSHAL_LIST)
