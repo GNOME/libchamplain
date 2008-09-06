@@ -5,7 +5,6 @@
 ChamplainMapSource
 ChamplainViewMode
 ChamplainView
-champlain_view_get_type
 champlain_view_new
 champlain_view_center_on
 champlain_view_zoom_in
