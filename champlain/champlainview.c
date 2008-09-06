@@ -131,6 +131,20 @@ marker_reposition (ChamplainView *view)
 }
 
 static void
+create_initial_map(ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  priv->map = map_new(priv->map_source);
+  map_load_level(priv->map, priv->zoom_level);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
+
+  marker_reposition(view);
+
+  g_object_notify(G_OBJECT(view), "zoom-level");
+  g_object_notify(G_OBJECT(view), "map-source");
+}
+
+static void
 resize_viewport(ChamplainView *view)
 {
   gdouble lower, upper;
@@ -140,14 +154,7 @@ resize_viewport(ChamplainView *view)
 
   if(!priv->map)
     {
-      priv->map = map_new(priv->map_source);
-      map_load_level(priv->map, priv->zoom_level);
-      clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-
-      marker_reposition(view);
-
-      g_object_notify(G_OBJECT(view), "zoom-level");
-      g_object_notify(G_OBJECT(view), "map-source");
+      create_initial_map(view);
     }
 
   clutter_actor_set_size (priv->finger_scroll, priv->viewport_size.width, priv->viewport_size.height);
@@ -560,6 +567,11 @@ void
 champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitude)
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+
+  if(!priv->map)
+    {
+      create_initial_map(view);
+    }
 
   gdouble x, y;
   x = priv->map->longitude_to_x(priv->map, longitude, priv->map->current_level->level);
