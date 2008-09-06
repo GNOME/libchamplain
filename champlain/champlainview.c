@@ -101,32 +101,35 @@ viewport_get_current_latitude(ChamplainViewPrivate *priv)
 }
 
 static void 
-for_each_marker (ChamplainMarker *marker, ChamplainView* champlainView)
+marker_reposition_cb (ChamplainMarker *marker, ChamplainView* champlainView)
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
   ChamplainMarkerPrivate *marker_priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
-  
+
   gint x, y;
-  
-  x = priv->map->longitude_to_x(priv->map, marker_priv->lon, priv->map->current_level->level);
-  y = priv->map->latitude_to_y(priv->map, marker_priv->lat, priv->map->current_level->level);
-  
-  clutter_actor_set_position(CLUTTER_ACTOR(marker), 
-    x - marker_priv->anchor.x - priv->map->current_level->anchor.x, 
-    y - marker_priv->anchor.y - priv->map->current_level->anchor.y);
+
+  if(priv->map)
+    {
+      x = priv->map->longitude_to_x(priv->map, marker_priv->lon, priv->map->current_level->level);
+      y = priv->map->latitude_to_y(priv->map, marker_priv->lat, priv->map->current_level->level);
+
+      clutter_actor_set_position(CLUTTER_ACTOR(marker),
+        x - marker_priv->anchor.x - priv->map->current_level->anchor.x,
+        y - marker_priv->anchor.y - priv->map->current_level->anchor.y);
+    }
 }
 
 static void 
-for_each_layer (ClutterActor *layer, ChamplainView* champlainView)
+layer_reposition_cb (ClutterActor *layer, ChamplainView* champlainView)
 {
-  clutter_container_foreach(CLUTTER_CONTAINER(layer), CLUTTER_CALLBACK(for_each_marker), champlainView);
+  clutter_container_foreach(CLUTTER_CONTAINER(layer), CLUTTER_CALLBACK(marker_reposition_cb), champlainView);
 }
-                                                         
+
 static void
 marker_reposition (ChamplainView* champlainView) 
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
-  clutter_container_foreach(CLUTTER_CONTAINER(priv->user_layers), CLUTTER_CALLBACK(for_each_layer), champlainView);
+  clutter_container_foreach(CLUTTER_CONTAINER(priv->user_layers), CLUTTER_CALLBACK(layer_reposition_cb), champlainView);
 }
 
 static void
@@ -632,6 +635,7 @@ champlain_view_zoom_in (ChamplainView *champlainView)
       g_object_notify(G_OBJECT(champlainView), "zoom-level");
     }
 }
+
 /**
  * champlain_view_zoom_out:
  * @view: a #ChamplainView
@@ -659,6 +663,39 @@ champlain_view_zoom_out (ChamplainView *champlainView)
     }
 }
 
+static void
+notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg1, ChamplainView *champlainView)
+{
+  marker_reposition_cb(marker, champlainView);
+}
+
+static void
+layer_add_marker (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *champlainView)
+{
+  g_signal_connect (marker,
+                    "notify::longitude",
+                    G_CALLBACK (notify_marker_reposition_cb),
+                    champlainView);
+}
+
+static void 
+connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView* champlainView)
+{
+  g_signal_connect (marker,
+                    "notify::longitude",
+                    G_CALLBACK (notify_marker_reposition_cb),
+                    champlainView);
+}
+
+/**
+ * champlain_view_add_layer:
+ * @champlainView: a #ChamplainView
+ * @layer: a #ClutterActor
+ *
+ * Adds a new layer to the view
+ *
+ * Since: 0.2
+ */
 void 
 champlain_view_add_layer (ChamplainView *champlainView, ClutterActor *layer)
 {
@@ -668,4 +705,11 @@ champlain_view_add_layer (ChamplainView *champlainView, ClutterActor *layer)
   
   if(priv->map)
     marker_reposition(champlainView);
+  
+  g_signal_connect (layer,
+                    "add",
+                    G_CALLBACK (layer_add_marker),
+                    champlainView);
+
+  clutter_container_foreach(CLUTTER_CONTAINER(layer), CLUTTER_CALLBACK(connect_marker_notify_cb), champlainView);
 }

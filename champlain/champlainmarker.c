@@ -121,7 +121,7 @@ champlain_marker_class_init (ChamplainMarkerClass *champlainMarkerClass)
   *
   * The longitude coordonate of the map
   *
-  * Since: 0.3
+  * Since: 0.2
   */
   g_object_class_install_property(objectClass, PROP_LONGITUDE,
                                   g_param_spec_double("longitude",
@@ -137,7 +137,7 @@ champlain_marker_class_init (ChamplainMarkerClass *champlainMarkerClass)
   *
   * The latitude coordonate of the map
   *
-  * Since: 0.3
+  * Since: 0.2
   */
   g_object_class_install_property(objectClass, PROP_LATITUDE,
                                   g_param_spec_double("latitude",
@@ -164,7 +164,7 @@ champlain_marker_init (ChamplainMarker *champlainMarker)
  *
  * Returns a new #ChamplainWidget ready to be used as a #ClutterActor.
  *
- * Since: 0.3
+ * Since: 0.2
  */
 ClutterActor *
 champlain_marker_new ()
@@ -185,7 +185,7 @@ champlain_marker_new ()
  *
  * Positions the marker on the map at the coordinates
  *
- * Since: 0.3
+ * Since: 0.2
  */
 void
 champlain_marker_set_position (ChamplainMarker *champlainMarker, gdouble longitude, gdouble latitude)
@@ -208,7 +208,7 @@ champlain_marker_set_position (ChamplainMarker *champlainMarker, gdouble longitu
  *
  * Marks the point (x, y) as the place where the #ChamplainMarker position is at (longitude, latitude).
  *
- * Since: 0.3
+ * Since: 0.2
  */
 void 
 champlain_marker_set_anchor (ChamplainMarker *champlainMarker, gint x, gint y)
