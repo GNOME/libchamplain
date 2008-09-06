@@ -54,13 +54,13 @@ static guint champlain_marker_signals[LAST_SIGNAL] = { 0, };
 
 G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_GROUP);
 
-static void 
-champlain_marker_get_property(GObject* object, guint prop_id, GValue* value, GParamSpec* pspec)
+static void
+champlain_marker_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec)
 {
-    ChamplainMarker* marker = CHAMPLAIN_MARKER(object);
+    ChamplainMarker *marker = CHAMPLAIN_MARKER(object);
     ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
 
-    switch(prop_id) 
+    switch(prop_id)
       {
         case PROP_LONGITUDE:
           g_value_set_double(value, priv->lon);
@@ -73,13 +73,13 @@ champlain_marker_get_property(GObject* object, guint prop_id, GValue* value, GPa
       }
 }
 
-static void 
-champlain_marker_set_property(GObject* object, guint prop_id, const GValue* value, GParamSpec *pspec)
+static void
+champlain_marker_set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec)
 {
-    ChamplainMarker* marker = CHAMPLAIN_MARKER(object);
+    ChamplainMarker *marker = CHAMPLAIN_MARKER(object);
     ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
 
-    switch(prop_id) 
+    switch(prop_id)
     {
       case PROP_LONGITUDE:
         {
@@ -99,7 +99,7 @@ champlain_marker_set_property(GObject* object, guint prop_id, const GValue* valu
 }
 
 static void
-champlain_marker_finalize (GObject * object)
+champlain_marker_finalize (GObject *object)
 {
   ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
   ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
@@ -112,11 +112,11 @@ champlain_marker_class_init (ChamplainMarkerClass *champlainMarkerClass)
 {
   g_type_class_add_private (champlainMarkerClass, sizeof (ChamplainMarkerPrivate));
 
-  GObjectClass *objectClass = G_OBJECT_CLASS (champlainMarkerClass);
-  objectClass->finalize = champlain_marker_finalize;
-  objectClass->get_property = champlain_marker_get_property;
-  objectClass->set_property = champlain_marker_set_property;
-  
+  GObjectClass *object_class = G_OBJECT_CLASS (champlainMarkerClass);
+  object_class->finalize = champlain_marker_finalize;
+  object_class->get_property = champlain_marker_get_property;
+  object_class->set_property = champlain_marker_set_property;
+
   /**
   * ChamplainMarker:longitude:
   *
@@ -124,14 +124,14 @@ champlain_marker_class_init (ChamplainMarkerClass *champlainMarkerClass)
   *
   * Since: 0.2
   */
-  g_object_class_install_property(objectClass, PROP_LONGITUDE,
+  g_object_class_install_property(object_class, PROP_LONGITUDE,
                                   g_param_spec_double("longitude",
-                                                     "Longitude",
-                                                     "The longitude coordonate of the marker",
-                                                     -180.0f,
-                                                     180.0f,
-                                                     0.0f,
-                                                     CHAMPLAIN_PARAM_READWRITE));
+                                                      "Longitude",
+                                                      "The longitude coordonate of the marker",
+                                                      -180.0f,
+                                                      180.0f,
+                                                      0.0f,
+                                                      CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainMarker:latitude:
@@ -140,14 +140,14 @@ champlain_marker_class_init (ChamplainMarkerClass *champlainMarkerClass)
   *
   * Since: 0.2
   */
-  g_object_class_install_property(objectClass, PROP_LATITUDE,
+  g_object_class_install_property(object_class, PROP_LATITUDE,
                                   g_param_spec_double("latitude",
-                                                     "Latitude",
-                                                     "The latitude coordonate of the marker",
-                                                     -90.0f,
-                                                     90.0f,
-                                                     0.0f,
-                                                     CHAMPLAIN_PARAM_READWRITE));
+                                                      "Latitude",
+                                                      "The latitude coordonate of the marker",
+                                                      -90.0f,
+                                                      90.0f,
+                                                      0.0f,
+                                                      CHAMPLAIN_PARAM_READWRITE));
 
 }
 
@@ -171,10 +171,10 @@ ClutterActor *
 champlain_marker_new ()
 {
   ChamplainMarker *marker;
-  
+
   marker = CHAMPLAIN_MARKER (g_object_new (CHAMPLAIN_TYPE_MARKER, NULL));
   ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
-  
+
   return CLUTTER_ACTOR (marker);
 }
 
@@ -195,11 +195,10 @@ champlain_marker_set_position (ChamplainMarker *champlainMarker, gdouble longitu
 
   priv->lon = longitude;
   priv->lat = latitude;
-  
+
   g_object_notify(G_OBJECT(champlainMarker), "longitude");
   g_object_notify(G_OBJECT(champlainMarker), "latitude");
 }
-
 
 /**
  * champlain_marker_set_anchor:
@@ -211,14 +210,14 @@ champlain_marker_set_position (ChamplainMarker *champlainMarker, gdouble longitu
  *
  * Since: 0.2
  */
-void 
+void
 champlain_marker_set_anchor (ChamplainMarker *champlainMarker, gint x, gint y)
 {
   ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
-  
+
   priv->anchor.x = x;
   priv->anchor.y = y;
-  
+
   clutter_actor_set_position(CLUTTER_ACTOR(champlainMarker), -x, -y);
 }
 
@@ -229,14 +228,14 @@ champlain_marker_set_anchor (ChamplainMarker *champlainMarker, gint x, gint y)
  * @text_color: a #ClutterColor, the color of the text, can be NULL
  * @marker_color: a #ClutterColor, the color of the marker, can be NULL
  *
- * Returns a new #ChamplainMarker with a drawn marker containing the given text. 
+ * Returns a new #ChamplainMarker with a drawn marker containing the given text.
  *
  * Since: 0.2
  */
-ClutterActor * 
-champlain_marker_new_with_label (const gchar *label, 
-                                 const gchar *font, 
-                                 ClutterColor *text_color, 
+ClutterActor *
+champlain_marker_new_with_label (const gchar *label,
+                                 const gchar *font,
+                                 ClutterColor *text_color,
                                  ClutterColor *marker_color)
 {
   ChamplainMarker *champlainMarker = CHAMPLAIN_MARKER(champlain_marker_new ());
@@ -276,7 +275,7 @@ champlain_marker_new_with_label (const gchar *label,
   cairo_line_to (cr, 0, text_height + point);
   cairo_close_path (cr);
 
-  cairo_set_source_rgba (cr, 
+  cairo_set_source_rgba (cr,
                         marker_color->red / 255.0,
                         marker_color->green / 255.0,
                         marker_color->blue / 255.0,
@@ -291,7 +290,7 @@ champlain_marker_new_with_label (const gchar *label,
   cairo_line_to (cr, point, text_height);
   cairo_line_to (cr, 0, text_height + point);
   cairo_close_path (cr);
-  cairo_set_source_rgba (cr, 
+  cairo_set_source_rgba (cr,
                         darker_color.red / 255.0,
                         darker_color.green / 255.0,
                         darker_color.blue / 255.0,

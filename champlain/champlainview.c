@@ -38,8 +38,6 @@
 #include <tidy-scrollable.h>
 #include <tidy-viewport.h>
 
-
-
 enum
 {
   /* normal signals */
@@ -65,17 +63,17 @@ static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
 struct _ChamplainViewPrivate
 {
   GtkWidget *clutter_embed;
-  
+
   ChamplainMapSource map_source;
   gint zoom_level; // only used when the zoom-level property is set before map is created
-  
+
   ClutterActor *map_layer;
   ClutterActor *viewport;
   ClutterActor *finger_scroll;
   GdkRectangle viewport_size;
-  
+
   ClutterActor *user_layers;
-  
+
   Map *map;
 
   gboolean offline;
@@ -87,23 +85,23 @@ G_DEFINE_TYPE (ChamplainView, champlain_view, GTK_TYPE_ALIGNMENT);
 static gdouble
 viewport_get_current_longitude(ChamplainViewPrivate *priv)
 {
-  return priv->map->x_to_longitude(priv->map, 
-    priv->map->current_level->anchor.x + priv->viewport_size.x + priv->viewport_size.width / 2.0, 
+  return priv->map->x_to_longitude(priv->map,
+    priv->map->current_level->anchor.x + priv->viewport_size.x + priv->viewport_size.width / 2.0,
     priv->map->current_level->level);
 }
 
 static gdouble
 viewport_get_current_latitude(ChamplainViewPrivate *priv)
 {
-  return priv->map->y_to_latitude(priv->map, 
-    priv->map->current_level->anchor.y + priv->viewport_size.y + priv->viewport_size.height / 2.0, 
+  return priv->map->y_to_latitude(priv->map,
+    priv->map->current_level->anchor.y + priv->viewport_size.y + priv->viewport_size.height / 2.0,
     priv->map->current_level->level);
 }
 
-static void 
-marker_reposition_cb (ChamplainMarker *marker, ChamplainView* champlainView)
+static void
+marker_reposition_cb (ChamplainMarker *marker, ChamplainView *view)
 {
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
   ChamplainMarkerPrivate *marker_priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
 
   gint x, y;
@@ -119,42 +117,42 @@ marker_reposition_cb (ChamplainMarker *marker, ChamplainView* champlainView)
     }
 }
 
-static void 
-layer_reposition_cb (ClutterActor *layer, ChamplainView* champlainView)
+static void
+layer_reposition_cb (ClutterActor *layer, ChamplainView *view)
 {
-  clutter_container_foreach(CLUTTER_CONTAINER(layer), CLUTTER_CALLBACK(marker_reposition_cb), champlainView);
+  clutter_container_foreach(CLUTTER_CONTAINER(layer), CLUTTER_CALLBACK(marker_reposition_cb), view);
 }
 
 static void
-marker_reposition (ChamplainView* champlainView) 
+marker_reposition (ChamplainView *view)
 {
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
-  clutter_container_foreach(CLUTTER_CONTAINER(priv->user_layers), CLUTTER_CALLBACK(layer_reposition_cb), champlainView);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  clutter_container_foreach(CLUTTER_CONTAINER(priv->user_layers), CLUTTER_CALLBACK(layer_reposition_cb), view);
 }
 
 static void
-resize_viewport(ChamplainView *champlainView)
+resize_viewport(ChamplainView *view)
 {
   gdouble lower, upper;
   TidyAdjustment *hadjust, *vadjust;
-  
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
-  
+
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+
   if(!priv->map)
     {
       priv->map = map_new(priv->map_source);
       map_load_level(priv->map, priv->zoom_level);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-      
-      marker_reposition(champlainView);
-      
-      g_object_notify(G_OBJECT(champlainView), "zoom-level");
-      g_object_notify(G_OBJECT(champlainView), "map-source");
+
+      marker_reposition(view);
+
+      g_object_notify(G_OBJECT(view), "zoom-level");
+      g_object_notify(G_OBJECT(view), "map-source");
     }
-  
+
   clutter_actor_set_size (priv->finger_scroll, priv->viewport_size.width, priv->viewport_size.height);
-  
-  
+
+
   tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->viewport), &hadjust, &vadjust);
 
   if (priv->map->current_level->level < 8)
@@ -172,7 +170,7 @@ resize_viewport(ChamplainView *champlainView)
 
   if (priv->map->current_level->level < 8)
     {
-      lower = -priv->viewport_size.height / 2; 
+      lower = -priv->viewport_size.height / 2;
       upper = zoom_level_get_height(priv->map->current_level) - priv->viewport_size.height / 2;
     }
   else
@@ -184,132 +182,43 @@ resize_viewport(ChamplainView *champlainView)
                 "step-increment", 1.0, "elastic", TRUE, NULL);
 }
 
-static void 
-champlain_view_get_property(GObject* object, guint prop_id, GValue* value, GParamSpec* pspec)
+static void
+champlain_view_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec)
 {
-    ChamplainView* view = CHAMPLAIN_VIEW(object);
-    ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  ChamplainView *view = CHAMPLAIN_VIEW(object);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
-    switch(prop_id) 
-      {
-        case PROP_LONGITUDE:
-          g_value_set_double(value, viewport_get_current_longitude(priv));
-          break;
-        case PROP_LATITUDE:
-          g_value_set_double(value, viewport_get_current_latitude(priv));
-          break;
-        case PROP_ZOOM_LEVEL:
-          {
-            if (priv->map) 
-              {
-                g_value_set_int(value, priv->map->current_level->level);
-              }
-            else
-              {
-                g_value_set_int(value, 0);
-              }
-            break;
-          }
-        case PROP_MAP_SOURCE:
-          g_value_set_int(value, priv->map_source);
-          break;
-        case PROP_OFFLINE:
-          g_value_set_boolean(value, priv->offline);
-          break;
-        case PROP_DECEL_RATE:
-          {
-            gdouble decel;
-            g_object_get (priv->finger_scroll, "decel-rate", decel, NULL);
-            g_value_set_double(value, decel);
-            break;
-          }
-        default:
-          G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
-      }
-}
-
-static void 
-champlain_view_set_property(GObject* object, guint prop_id, const GValue* value, GParamSpec *pspec)
-{
-    ChamplainView* view = CHAMPLAIN_VIEW(object);
-    ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
-
-    switch(prop_id) 
+  switch(prop_id)
     {
       case PROP_LONGITUDE:
-        {
-          gdouble lon = g_value_get_double(value);
-          gdouble lat = viewport_get_current_latitude(priv);
-          champlain_view_center_on(view, lon, lat);
-          break;
-        }
+        g_value_set_double(value, viewport_get_current_longitude(priv));
+        break;
       case PROP_LATITUDE:
-        {
-          gdouble lon = viewport_get_current_longitude(priv);
-          gdouble lat = g_value_get_double(value);
-          champlain_view_center_on(view, lon, lat);
-          break;
-        }
+        g_value_set_double(value, viewport_get_current_latitude(priv));
+        break;
       case PROP_ZOOM_LEVEL:
         {
-          gint level = g_value_get_int(value);
-          if (priv->map) 
+          if (priv->map)
             {
-              if (level != priv->map->current_level->level) 
-                {
-                  ClutterActor * group = priv->map->current_level->group;
-                  gdouble lon = viewport_get_current_longitude(priv);
-                  gdouble lat = viewport_get_current_latitude(priv);
-                  if (map_zoom_to(priv->map, level)) 
-                    {
-                      resize_viewport(view);
-                      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
-                      clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-                      champlain_view_center_on(view, lon, lat);
-                      marker_reposition(view);
-                    }
-                }
+              g_value_set_int(value, priv->map->current_level->level);
             }
-          else 
+          else
             {
-              priv->zoom_level = level;
+              g_value_set_int(value, 0);
             }
           break;
         }
       case PROP_MAP_SOURCE:
-        {
-          ChamplainMapSource source = g_value_get_int(value);
-          if (priv->map_source != source)
-            {
-              priv->map_source = source;
-              if (priv->map) {
-                gint currentLevel = priv->map->current_level->level;
-                GdkPoint anchor = priv->map->current_level->anchor;
-                map_free(priv->map);
-                priv->map = map_new(priv->map_source);
-                
-                // Keep same zoom level
-                if (currentLevel > priv->map->zoom_levels)
-                  currentLevel = priv->map->zoom_levels;
-                  
-                map_load_level(priv->map, currentLevel);
-                priv->map->current_level->anchor = anchor;
-
-                map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
-                clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-
-                marker_reposition(view);
-              }
-            }
-          break;
-        }
+        g_value_set_int(value, priv->map_source);
+        break;
       case PROP_OFFLINE:
-        priv->offline = g_value_get_boolean(value);
+        g_value_set_boolean(value, priv->offline);
         break;
       case PROP_DECEL_RATE:
         {
-          gdouble decel = g_value_get_double(value);
-          g_object_set (priv->finger_scroll, "decel-rate", decel, NULL);
+          gdouble decel;
+          g_object_get (priv->finger_scroll, "decel-rate", decel, NULL);
+          g_value_set_double(value, decel);
           break;
         }
       default:
@@ -318,7 +227,96 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
 }
 
 static void
-champlain_view_finalize (GObject * object)
+champlain_view_set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec)
+{
+  ChamplainView *view = CHAMPLAIN_VIEW(object);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+
+  switch(prop_id)
+  {
+    case PROP_LONGITUDE:
+      {
+        gdouble lon = g_value_get_double(value);
+        gdouble lat = viewport_get_current_latitude(priv);
+        champlain_view_center_on(view, lon, lat);
+        break;
+      }
+    case PROP_LATITUDE:
+      {
+        gdouble lon = viewport_get_current_longitude(priv);
+        gdouble lat = g_value_get_double(value);
+        champlain_view_center_on(view, lon, lat);
+        break;
+      }
+    case PROP_ZOOM_LEVEL:
+      {
+        gint level = g_value_get_int(value);
+        if (priv->map)
+          {
+            if (level != priv->map->current_level->level)
+              {
+                ClutterActor *group = priv->map->current_level->group;
+                gdouble lon = viewport_get_current_longitude(priv);
+                gdouble lat = viewport_get_current_latitude(priv);
+                if (map_zoom_to(priv->map, level))
+                  {
+                    resize_viewport(view);
+                    clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+                    clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
+                    champlain_view_center_on(view, lon, lat);
+                    marker_reposition(view);
+                  }
+              }
+          }
+        else
+          {
+            priv->zoom_level = level;
+          }
+        break;
+      }
+    case PROP_MAP_SOURCE:
+      {
+        ChamplainMapSource source = g_value_get_int(value);
+        if (priv->map_source != source)
+          {
+            priv->map_source = source;
+            if (priv->map) {
+              gint currentLevel = priv->map->current_level->level;
+              GdkPoint anchor = priv->map->current_level->anchor;
+              map_free(priv->map);
+              priv->map = map_new(priv->map_source);
+
+              // Keep same zoom level
+              if (currentLevel > priv->map->zoom_levels)
+                currentLevel = priv->map->zoom_levels;
+
+              map_load_level(priv->map, currentLevel);
+              priv->map->current_level->anchor = anchor;
+
+              map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
+              clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
+
+              marker_reposition(view);
+            }
+          }
+        break;
+      }
+    case PROP_OFFLINE:
+      priv->offline = g_value_get_boolean(value);
+      break;
+    case PROP_DECEL_RATE:
+      {
+        gdouble decel = g_value_get_double(value);
+        g_object_set (priv->finger_scroll, "decel-rate", decel, NULL);
+        break;
+      }
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+  }
+}
+
+static void
+champlain_view_finalize (GObject *object)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
@@ -335,7 +333,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   object_class->finalize = champlain_view_finalize;
   object_class->get_property = champlain_view_get_property;
   object_class->set_property = champlain_view_set_property;
-  
+
   /**
   * ChamplainView:longitude:
   *
@@ -399,7 +397,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
                                                    0,
                                                    CHAMPLAIN_MAP_SOURCE_COUNT,
                                                    CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
-                                                   CHAMPLAIN_PARAM_READWRITE)); 
+                                                   CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainView:offline:
@@ -413,7 +411,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
                                                        "Offline Mode",
                                                        "If viewer is in offline mode.",
                                                        FALSE,
-                                                       CHAMPLAIN_PARAM_READWRITE)); 
+                                                       CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainView:decel-rate:
@@ -436,45 +434,45 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 }
 
 static void
-champlain_view_init (ChamplainView *champlainView)
+champlain_view_init (ChamplainView *view)
 {
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
   priv->map_source = CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP;
   priv->zoom_level = 3;
   priv->offline = FALSE;
 }
 
-static void 
-viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *champlainView)
+static void
+viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *view)
 {
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
-  
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+
   GdkPoint rect;
   tidy_viewport_get_origin(TIDY_VIEWPORT(priv->viewport), &rect.x, &rect.y, NULL);
-  
+
   if (rect.x == priv->viewport_size.x &&
       rect.y == priv->viewport_size.y)
       return;
 
   priv->viewport_size.x = rect.x;
   priv->viewport_size.y = rect.y;
-  
+
   map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
-  
-  g_object_notify(G_OBJECT(champlainView), "longitude");
-  g_object_notify(G_OBJECT(champlainView), "latitude");
+
+  g_object_notify(G_OBJECT(view), "longitude");
+  g_object_notify(G_OBJECT(view), "latitude");
 }
 
 static void
-view_size_allocated_cb (GtkWidget *view, GtkAllocation *allocation, ChamplainView *champlainView) 
+view_size_allocated_cb (GtkWidget *widget, GtkAllocation *allocation, ChamplainView *view)
 {
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
-  
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+
   priv->viewport_size.width = allocation->width;
   priv->viewport_size.height = allocation->height;
-  
-  resize_viewport(champlainView);
+
+  resize_viewport(view);
   map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
 }
 
@@ -490,11 +488,11 @@ champlain_view_new (ChamplainViewMode mode)
 {
   ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
   ChamplainView *view;
-  ClutterActor *stage; 
-  
+  ClutterActor *stage;
+
   view = CHAMPLAIN_VIEW (g_object_new (CHAMPLAIN_TYPE_VIEW, NULL));
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
-  
+
   priv->clutter_embed = gtk_clutter_embed_new ();
   g_signal_connect (priv->clutter_embed,
                     "size-allocate",
@@ -503,14 +501,14 @@ champlain_view_new (ChamplainViewMode mode)
 
   // Setup stage
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
-  
+
   clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
   gtk_container_add (GTK_CONTAINER (view), priv->clutter_embed);
-  
+
   // Setup viewport
   priv->viewport = tidy_viewport_new ();
   g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
-  
+
   g_signal_connect (priv->viewport,
                     "notify::x-origin",
                     G_CALLBACK (viewport_x_changed_cb),
@@ -537,13 +535,13 @@ champlain_view_new (ChamplainViewMode mode)
   priv->map_layer = clutter_group_new();
   clutter_actor_show(priv->map_layer);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map_layer);
-  
+
   // Setup user_layers
   priv->user_layers = clutter_group_new();
   clutter_actor_show(priv->user_layers);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->user_layers);
   clutter_actor_raise(priv->user_layers, priv->map_layer);
-  
+
   return GTK_WIDGET (view);
 }
 
@@ -559,9 +557,9 @@ champlain_view_new (ChamplainViewMode mode)
  */
 // FIXME: Animate this.  Can be done in Tidy-Adjustment (like for elastic effect)
 void
-champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdouble latitude)
+champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitude)
 {
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
   gdouble x, y;
   x = priv->map->longitude_to_x(priv->map, longitude, priv->map->current_level->level);
@@ -582,7 +580,7 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
       anchor->x = max;
     if (anchor->y > max)
       anchor->y = max;
-    
+
     x -= anchor->x;
     y -= anchor->y;
   } else {
@@ -593,7 +591,7 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
   int i;
   for (i = 0; i < priv->map->current_level->tiles->len; i++)
     {
-      Tile* tile = g_ptr_array_index(priv->map->current_level->tiles, i);
+      Tile *tile = g_ptr_array_index(priv->map->current_level->tiles, i);
       if (!tile->loading)
         tile_set_position(priv->map, tile);
     }
@@ -602,114 +600,116 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
     x - priv->viewport_size.width / 2.0,
     y - priv->viewport_size.height / 2.0,
     0);
-  
-  g_object_notify(G_OBJECT(champlainView), "longitude");
-  g_object_notify(G_OBJECT(champlainView), "latitude");
-  
+
+  g_object_notify(G_OBJECT(view), "longitude");
+  g_object_notify(G_OBJECT(view), "latitude");
+
   map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
 }
 
 /**
  * champlain_view_zoom_in:
- * @champlainView: a #ChamplainView
+ * @view: a #ChamplainView
  *
  * Zoom in the map by one level.
  *
  * Since: 0.1
  */
 void
-champlain_view_zoom_in (ChamplainView *champlainView)
+champlain_view_zoom_in (ChamplainView *view)
 {
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
-  ClutterActor * group = priv->map->current_level->group;
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  ClutterActor *group = priv->map->current_level->group;
   gdouble lon = viewport_get_current_longitude(priv);
   gdouble lat = viewport_get_current_latitude(priv);
-  if(map_zoom_in(priv->map)) 
+
+  if(map_zoom_in(priv->map))
     {
-      resize_viewport(champlainView);
+      resize_viewport(view);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-      champlain_view_center_on(champlainView, lon, lat);
-      marker_reposition(champlainView);
-      
-      g_object_notify(G_OBJECT(champlainView), "zoom-level");
+      champlain_view_center_on(view, lon, lat);
+      marker_reposition(view);
+
+      g_object_notify(G_OBJECT(view), "zoom-level");
     }
 }
 
 /**
  * champlain_view_zoom_out:
- * @champlainView: a #ChamplainView
+ * @view: a #ChamplainView
  *
  * Zoom out the map by one level.
  *
  * Since: 0.1
  */
 void
-champlain_view_zoom_out (ChamplainView *champlainView)
+champlain_view_zoom_out (ChamplainView *view)
 {
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
-  ClutterActor * group = priv->map->current_level->group;
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  ClutterActor *group = priv->map->current_level->group;
   gdouble lon = viewport_get_current_longitude(priv);
   gdouble lat = viewport_get_current_latitude(priv);
+
   if(map_zoom_out(priv->map))
     {
-      resize_viewport(champlainView);
+      resize_viewport(view);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-      champlain_view_center_on(champlainView, lon, lat);
-      marker_reposition(champlainView);
-      
-      g_object_notify(G_OBJECT(champlainView), "zoom-level");
+      champlain_view_center_on(view, lon, lat);
+      marker_reposition(view);
+
+      g_object_notify(G_OBJECT(view), "zoom-level");
     }
 }
 
 static void
-notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg1, ChamplainView *champlainView)
+notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg1, ChamplainView *view)
 {
-  marker_reposition_cb(marker, champlainView);
+  marker_reposition_cb(marker, view);
 }
 
 static void
-layer_add_marker (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *champlainView)
+layer_add_marker (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *view)
 {
   g_signal_connect (marker,
                     "notify::longitude",
                     G_CALLBACK (notify_marker_reposition_cb),
-                    champlainView);
+                    view);
 }
 
-static void 
-connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView* champlainView)
+static void
+connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView *view)
 {
   g_signal_connect (marker,
                     "notify::longitude",
                     G_CALLBACK (notify_marker_reposition_cb),
-                    champlainView);
+                    view);
 }
 
 /**
  * champlain_view_add_layer:
- * @champlainView: a #ChamplainView
+ * @view: a #ChamplainView
  * @layer: a #ClutterActor
  *
  * Adds a new layer to the view
  *
  * Since: 0.2
  */
-void 
-champlain_view_add_layer (ChamplainView *champlainView, ClutterActor *layer)
+void
+champlain_view_add_layer (ChamplainView *view, ClutterActor *layer)
 {
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
   clutter_container_add(CLUTTER_CONTAINER(priv->user_layers), layer, NULL);
   clutter_actor_raise_top(layer);
-  
+
   if(priv->map)
-    marker_reposition(champlainView);
-  
+    marker_reposition(view);
+
   g_signal_connect (layer,
                     "add",
                     G_CALLBACK (layer_add_marker),
-                    champlainView);
+                    view);
 
-  clutter_container_foreach(CLUTTER_CONTAINER(layer), CLUTTER_CALLBACK(connect_marker_notify_cb), champlainView);
+  clutter_container_foreach(CLUTTER_CONTAINER(layer), CLUTTER_CALLBACK(connect_marker_notify_cb), view);
 }

@@ -30,19 +30,19 @@ typedef struct
   int row_count;
   int column_count;
   int tile_size;
-  
+
   GPtrArray  *tiles;
   ClutterActor* group;
 
-  GdkPoint anchor;  
+  GdkPoint anchor;
 } ZoomLevel;
 
-guint zoom_level_get_width(ZoomLevel* level);
+guint zoom_level_get_width(ZoomLevel *level);
 
-guint zoom_level_get_height(ZoomLevel* level);
+guint zoom_level_get_height(ZoomLevel *level);
 
 ZoomLevel* zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size);
 
-void zoom_level_free(ZoomLevel* level);
+void zoom_level_free(ZoomLevel *level);
 
 #endif

@@ -22,11 +22,11 @@
 #include "map.h"
 #include <clutter/clutter.h>
 
-ZoomLevel* 
+ZoomLevel*
 zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size)
 {
-  ZoomLevel* level = g_new0(ZoomLevel, 1);
-  
+  ZoomLevel *level = g_new0(ZoomLevel, 1);
+
   level->level = zoom_level;
   level->row_count = row;
   level->column_count = column;
@@ -35,9 +35,9 @@ zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size)
   //FIXME: this hard coded value means that there can't be more than 16x16 tiles displayed at once
   level->tiles = g_ptr_array_sized_new (256);
   level->group = clutter_group_new ();
-  
+
   g_object_ref(level->group); // so that the group isn't destroyed when removed from the viewport
-  
+
   level->anchor.x = 0;
   level->anchor.y = 0;
 
@@ -45,24 +45,24 @@ zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size)
 }
 
 void
-zoom_level_free(ZoomLevel* level)
+zoom_level_free(ZoomLevel *level)
 {
   int i;
   for (i = 0; i < level->tiles->len; i++)
     {
-      Tile* tile = g_ptr_array_index(level->tiles, i);
+      Tile *tile = g_ptr_array_index(level->tiles, i);
       tile_free(tile);
     }
 }
 
 guint
-zoom_level_get_width(ZoomLevel* level)
+zoom_level_get_width(ZoomLevel *level)
 {
   return (level->column_count) * level->tile_size;
 }
 
 guint
-zoom_level_get_height(ZoomLevel* level)
+zoom_level_get_height(ZoomLevel *level)
 {
   return (level->row_count) * level->tile_size;
 }

@@ -33,32 +33,32 @@
 struct _Map
 {
   int zoom_levels;
-  const gchar* name;
+  const gchar *name;
   int tile_size;
 
-  ZoomLevel* current_level;
-  ZoomLevel* previous_level;
-  
-  guint (* get_row_count) (Map* map, guint zoom_level);
-  guint (* get_column_count) (Map* map, guint zoom_level);
-  
-  gint (* longitude_to_x) (Map* map, gdouble longitude, guint zoom_level);
-  gint (* latitude_to_y) (Map* map, gdouble latitude, guint zoom_level);
-  gdouble (* x_to_longitude) (Map* map, gint x, guint zoom_level);
-  gdouble (* y_to_latitude) (Map* map, gint y, guint zoom_level);
-  
-  gchar* (* get_tile_filename) (Map* map, Tile* tile);
-  gchar* (* get_tile_uri) (Map* map, Tile* tile);
+  ZoomLevel *current_level;
+  ZoomLevel *previous_level;
+
+  guint (* get_row_count) (Map *map, guint zoom_level);
+  guint (* get_column_count) (Map *map, guint zoom_level);
+
+  gint (* longitude_to_x) (Map *map, gdouble longitude, guint zoom_level);
+  gint (* latitude_to_y) (Map *map, gdouble latitude, guint zoom_level);
+  gdouble (* x_to_longitude) (Map *map, gint x, guint zoom_level);
+  gdouble (* y_to_latitude) (Map *map, gint y, guint zoom_level);
+
+  gchar *(* get_tile_filename) (Map *map, Tile *tile);
+  gchar *(* get_tile_uri) (Map *map, Tile *tile);
 };
 
 
 
-Map* map_new (ChamplainMapSource source);
+Map *map_new (ChamplainMapSource source);
 
-void map_load_visible_tiles (Map* map, GdkRectangle viewport, gboolean offline);
+void map_load_visible_tiles (Map *map, GdkRectangle viewport, gboolean offline);
 
-void map_free (Map* map);
+void map_free (Map *map);
 
-gboolean map_zoom_to (Map* map, guint zoomLevel);
+gboolean map_zoom_to (Map *map, guint zoomLevel);
 
 #endif
