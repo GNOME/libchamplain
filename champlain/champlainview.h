@@ -25,14 +25,20 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
+/**
+ * ChamplainMapSource:
+ * @CHAMPLAIN_MAP_SOURCE_DEBUG: Debug map, untested as of 0.2
+ * @CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP: Open Street Map - Mapnick tiles
+ * @CHAMPLAIN_MAP_SOURCE_OPENARIALMAP: Open Arial Map
+ * @CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF: Maps for free - Relief tiles
+ *
+ * Type of scrolling.
+ */
 typedef enum
 {
   CHAMPLAIN_MAP_SOURCE_DEBUG,
   CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
   CHAMPLAIN_MAP_SOURCE_OPENARIALMAP,
-  //CHAMPLAIN_MAP_SOURCE_GOOGLE_MAP,
-  //CHAMPLAIN_MAP_SOURCE_GOOGLE_TERRAIN,
-  //CHAMPLAIN_MAP_SOURCE_GOOGLE_SATELITE
   CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF,
   CHAMPLAIN_MAP_SOURCE_COUNT
 } ChamplainMapSource;
@@ -71,14 +77,14 @@ struct _ChamplainViewClass
 
 };
 
-CHAMPLAIN_API GType champlain_view_get_type (void);
+GType champlain_view_get_type (void);
 
-CHAMPLAIN_API GtkWidget *champlain_view_new (ChamplainViewMode mode);
+GtkWidget *champlain_view_new (ChamplainViewMode mode);
 
-CHAMPLAIN_API void champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitude);
+void champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitude);
 
-CHAMPLAIN_API void champlain_view_zoom_in (ChamplainView *champlainView);
+void champlain_view_zoom_in (ChamplainView *champlainView);
 
-CHAMPLAIN_API void champlain_view_zoom_out (ChamplainView *champlainView);
+void champlain_view_zoom_out (ChamplainView *champlainView);
 
 #endif

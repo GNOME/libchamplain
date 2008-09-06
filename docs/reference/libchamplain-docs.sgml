@@ -5,9 +5,9 @@
   <bookinfo>
     <title>libchamplain Reference Manual</title>
     <releaseinfo>
-      for libchamplain [VERSION]
+      for libchamplain 0.2
       The latest version of this documentation can be found on-line at
-      <ulink role="online-location" url="http://[SERVER]/libchamplain/index.html">http://[SERVER]/libchamplain/</ulink>.
+      <ulink role="online-location" url="http://blog.squidy.info/projects/libchamplain/">http://blog.squidy.info/projects/libchamplain/</ulink>.
     </releaseinfo>
   </bookinfo>
 

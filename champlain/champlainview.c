@@ -350,16 +350,16 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
                                                    "The level of zoom of the map",
                                                    0,
                                                    20,
-                                                   1.0f,
+                                                   3,
                                                    CHAMPLAIN_PARAM_READWRITE));
 
 
   /**
-  * ChamplainView:zoom-level:
+  * ChamplainView:map-source:
   *
-  * The level of zoom of the content.
+  * The #ChamplainMapSource being displayed
   *
-  * Since: 0.1
+  * Since: 0.2
   */
   g_object_class_install_property(object_class, PROP_MAP_SOURCE,
                                   g_param_spec_int("map-source",
@@ -385,9 +385,9 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
                                                        CHAMPLAIN_PARAM_READWRITE)); 
 
   /**
-  * ChamplainView:offline:
+  * ChamplainView:decel-rate:
   *
-  * If true, will fetch tiles from the Internet, otherwise, will only use cached content.
+  * The deceleration rate for the kinetic mode.
   *
   * Since: 0.2
   */
@@ -398,8 +398,8 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
                                                         "Rate at which the view "
                                                         "will decelerate in "
                                                         "kinetic mode.",
-                                                        CLUTTER_FIXED_TO_FLOAT (CFX_ONE + CFX_MIN),
-                                                        CLUTTER_FIXED_TO_FLOAT (CFX_MAX),
+                                                        1.0,
+                                                        2.0,
                                                         1.1,
                                                         G_PARAM_READWRITE));
 }
@@ -410,7 +410,7 @@ champlain_view_init (ChamplainView *champlainView)
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (champlainView);
 
   priv->mapSource = CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP;
-  priv->zoomLevel = 0;
+  priv->zoomLevel = 3;
   priv->offline = FALSE;
 }
 
@@ -449,7 +449,7 @@ view_size_allocated_cb (GtkWidget *view, GtkAllocation *allocation, ChamplainVie
 
 /**
  * champlain_view_new:
- *
+ * @mode: a #ChamplainViewMode, the scrolling mode
  * Returns a new #ChamplainWidget ready to be used as a #GtkWidget.
  *
  * Since: 0.1
@@ -549,7 +549,6 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
     anchor->y = 0;
   }
 
-  //FIXME: Inform tiles that there is a new anchor
   int i;
   for (i = 0; i < priv->map->current_level->tiles->len; i++)
     {
@@ -571,7 +570,7 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
 
 /**
  * champlain_view_zoom_in:
- * @view: a #ChamplainView
+ * @champlainView: a #ChamplainView
  *
  * Zoom in the map by one level.
  *
@@ -597,7 +596,7 @@ champlain_view_zoom_in (ChamplainView *champlainView)
 
 /**
  * champlain_view_zoom_out:
- * @view: a #ChamplainView
+ * @champlainView: a #ChamplainView
  *
  * Zoom out the map by one level.
  *
