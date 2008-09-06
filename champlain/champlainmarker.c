@@ -32,6 +32,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <gtk-clutter-embed.h>
+#include <cairo.h>
 #include <math.h>
 
 enum
@@ -219,5 +220,90 @@ champlain_marker_set_anchor (ChamplainMarker *champlainMarker, gint x, gint y)
   priv->anchor.y = y;
   
   clutter_actor_set_position(CLUTTER_ACTOR(champlainMarker), -x, -y);
+}
+
+/**
+ * champlain_marker_new_with_label:
+ * @label: the text of the label
+ * @font: the font to use to draw the text, for example "Courrier Bold 11", can be NULL
+ * @text_color: a #ClutterColor, the color of the text, can be NULL
+ * @marker_color: a #ClutterColor, the color of the marker, can be NULL
+ *
+ * Returns a new #ChamplainWidget with a drawn marker containing the given text. 
+ *
+ * Since: 0.2
+ */
+ClutterActor * 
+champlain_marker_new_with_label (const gchar *label, 
+                                 const gchar *font, 
+                                 ClutterColor *text_color, 
+                                 ClutterColor *marker_color)
+{
+  ChamplainMarker *champlainMarker = CHAMPLAIN_MARKER(champlain_marker_new ());
+  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
+  ClutterColor default_text_color = { 0x22, 022, 0x22, 0xFF },
+               default_marker_color = { 0x2A, 0xB1, 0x26, 0xEE },
+               darker_color;
+  ClutterActor *actor, *bg;
+  cairo_t *cr;
+  guint text_width, text_height, point;
+  const gint padding = 5;
+
+  if (!font)
+    font = "Sans 11";
+  if (!text_color)
+    text_color = &default_text_color;
+  if (!marker_color)
+    marker_color = &default_marker_color;
+
+  actor = clutter_label_new_with_text(font, label);
+  clutter_actor_set_position(actor, padding, padding / 2.0);
+  text_width = clutter_actor_get_width(actor) + 2 * padding;
+  text_height = clutter_actor_get_height(actor)+ padding;
+  clutter_label_set_color(CLUTTER_LABEL(actor), text_color);
+  clutter_container_add_actor(CLUTTER_CONTAINER(champlainMarker), actor);
+
+  point = (text_height + 2 * padding) / 4.0;
+
+  bg = clutter_cairo_new (text_width, text_height + point);
+  cr = clutter_cairo_create (bg);
+
+  cairo_set_source_rgb (cr, 0, 0, 0);
+  cairo_move_to (cr, 0, 0);
+  cairo_line_to (cr, text_width, 0);
+  cairo_line_to (cr, text_width, text_height);
+  cairo_line_to (cr, point, text_height);
+  cairo_line_to (cr, 0, text_height + point);
+  cairo_close_path (cr);
+
+  cairo_set_source_rgba (cr, 
+                        marker_color->red / 255.0,
+                        marker_color->green / 255.0,
+                        marker_color->blue / 255.0,
+                        marker_color->alpha / 255.0);
+  cairo_fill (cr);
+
+  cairo_set_line_width (cr, 1.0);
+  clutter_color_darken(marker_color, &darker_color);
+  cairo_move_to (cr, 0, 0);
+  cairo_line_to (cr, text_width, 0);
+  cairo_line_to (cr, text_width, text_height);
+  cairo_line_to (cr, point, text_height);
+  cairo_line_to (cr, 0, text_height + point);
+  cairo_close_path (cr);
+  cairo_set_source_rgba (cr, 
+                        darker_color.red / 255.0,
+                        darker_color.green / 255.0,
+                        darker_color.blue / 255.0,
+                        darker_color.alpha / 255.0);
+  cairo_stroke (cr);
+
+  cairo_destroy(cr);
+  clutter_container_add_actor(CLUTTER_CONTAINER(champlainMarker), bg);
+  clutter_actor_raise(actor, bg);
+
+  champlain_marker_set_anchor(CHAMPLAIN_MARKER(champlainMarker), 0, text_height + point);
+
+  return champlainMarker;
 }
 

@@ -54,4 +54,8 @@ CHAMPLAIN_API void champlain_marker_set_position (ChamplainMarker *marker, gdoub
 
 CHAMPLAIN_API void champlain_marker_set_anchor (ChamplainMarker *marker, gint x, gint y);
 
+CHAMPLAIN_API ClutterActor *champlain_marker_new_with_label (const gchar *label, 
+                                 const gchar *font, 
+                                 ClutterColor *text_color, 
+                                 ClutterColor *marker_color);
 #endif

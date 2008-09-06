@@ -31,43 +31,30 @@
  * Terminate the main loop.
  */
 static void
-on_destroy (GtkWidget * widget, gpointer data)
+on_destroy (GtkWidget *widget, gpointer data)
 {
   gtk_main_quit ();
-}
-
-
-static ClutterActor*
-create_marker (gchar* title, gdouble lon, gdouble lat)
-{
-  ClutterActor* marker, *actor;
-  
-  marker = champlain_marker_new();
-  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), lon, lat);
-  champlain_marker_set_anchor(CHAMPLAIN_MARKER(marker), 0, 32);
-  
-  actor = clutter_texture_new_from_file("marker.svg", NULL);
-  clutter_container_add_actor(CLUTTER_CONTAINER(marker), actor);
-  
-  actor = clutter_label_new_with_text("Arial 14", title);
-  clutter_actor_set_position(actor, 30, 0);
-  clutter_container_add_actor(CLUTTER_CONTAINER(marker), actor);
-  
-  return marker;
 }
 
 static ClutterActor*
 create_marker_layer ()
 {
-  ClutterActor* layer, * marker;
+  ClutterActor *layer, *marker;
   
   layer = clutter_group_new();
   
-  marker = create_marker("Montréal", -73.563788, 45.528178);
+  ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
+  ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
+  marker = champlain_marker_new_with_label("Montréal", "Airmole 14", NULL, NULL);
+  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), -73.563788, 45.528178);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
-  marker = create_marker("New York", -73.98, 40.77);
+  
+  marker = champlain_marker_new_with_label("New York", "Sans 25", &white, NULL);
+  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), -73.98, 40.77);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
-  marker = create_marker("Miami", -80.28, 25.82);
+  
+  marker = champlain_marker_new_with_label("Saint-Tite-des-Caps", "Serif 12", NULL, &orange);
+  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), -70.764141, 47.130885);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
   
   clutter_actor_hide(layer);
@@ -75,7 +62,7 @@ create_marker_layer ()
 }
 
 static void
-toggle_layer (GtkToggleButton * widget, ClutterActor* layer)
+toggle_layer (GtkToggleButton *widget, ClutterActor *layer)
 {
   if(gtk_toggle_button_get_active(widget))
     clutter_actor_show_all(layer);
@@ -84,7 +71,7 @@ toggle_layer (GtkToggleButton * widget, ClutterActor* layer)
 }
 
 static void
-map_source_changed (GtkWidget * widget, ChamplainView* view)
+map_source_changed (GtkWidget *widget, ChamplainView *view)
 {
   gchar* selection = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
   if (g_strcmp0(selection, OSM_MAP) == 0)
@@ -102,14 +89,14 @@ map_source_changed (GtkWidget * widget, ChamplainView* view)
 }
 
 static void 
-zoom_changed (GtkSpinButton *spinbutton, ChamplainView* view)
+zoom_changed (GtkSpinButton *spinbutton, ChamplainView *view)
 {
   gint zoom = gtk_spin_button_get_value_as_int(spinbutton);
   g_object_set(G_OBJECT(view), "zoom-level", zoom, NULL);
 }
 
 static void 
-map_zoom_changed (ChamplainView* view, GParamSpec *gobject, GtkSpinButton *spinbutton)
+map_zoom_changed (ChamplainView *view, GParamSpec *gobject, GtkSpinButton *spinbutton)
 {
   gint zoom;
   g_object_get(G_OBJECT(view), "zoom-level", &zoom, NULL);
@@ -117,13 +104,13 @@ map_zoom_changed (ChamplainView* view, GParamSpec *gobject, GtkSpinButton *spinb
 }
 
 static void
-zoom_in (GtkWidget * widget, ChamplainView* view)
+zoom_in (GtkWidget *widget, ChamplainView *view)
 {
   champlain_view_zoom_in(view);
 }
 
 static void
-zoom_out (GtkWidget * widget, ChamplainView* view)
+zoom_out (GtkWidget *widget, ChamplainView *view)
 {
   champlain_view_zoom_out(view);
 }
