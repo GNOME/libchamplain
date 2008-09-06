@@ -111,7 +111,9 @@ for_each_marker (ChamplainMarker *marker, ChamplainView* champlainView)
   x = priv->map->longitude_to_x(priv->map, marker_priv->lon, priv->map->current_level->level);
   y = priv->map->latitude_to_y(priv->map, marker_priv->lat, priv->map->current_level->level);
   
-  clutter_actor_set_position(CLUTTER_ACTOR(marker), x - marker_priv->anchor.x, y - marker_priv->anchor.y);
+  clutter_actor_set_position(CLUTTER_ACTOR(marker), 
+    x - marker_priv->anchor.x - priv->map->current_level->anchor.x, 
+    y - marker_priv->anchor.y - priv->map->current_level->anchor.y);
 }
 
 static void 
@@ -151,8 +153,7 @@ resize_viewport(ChamplainView *champlainView)
   
   
   tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->viewport), &hadjust, &vadjust);
-  
-  //tidy_adjustment_get_values (hadjust, NULL, &lower, &upper, NULL, NULL, NULL);
+
   if (priv->map->current_level->level < 8)
     {
       lower = -priv->viewport_size.width / 2;
@@ -166,8 +167,6 @@ resize_viewport(ChamplainView *champlainView)
   g_object_set (hadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
 
-  //tidy_adjustment_get_values (vadjust, NULL, &lower, &upper, NULL, NULL, NULL);
-  
   if (priv->map->current_level->level < 8)
     {
       lower = -priv->viewport_size.height / 2; 
@@ -261,8 +260,8 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
                   if (map_zoom_to(priv->map, level)) 
                     {
                       resize_viewport(view);
-                      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->viewport), group);
-                      clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
+                      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+                      clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
                       champlain_view_center_on(view, lon, lat);
                       marker_reposition(view);
                     }
@@ -294,7 +293,9 @@ champlain_view_set_property(GObject* object, guint prop_id, const GValue* value,
                 priv->map->current_level->anchor = anchor;
 
                 map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
-                clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
+                clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
+
+                marker_reposition(view);
               }
             }
           break;
@@ -623,8 +624,8 @@ champlain_view_zoom_in (ChamplainView *champlainView)
   if(map_zoom_in(priv->map)) 
     {
       resize_viewport(champlainView);
-      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->viewport), group);
-      clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
+      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+      clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
       champlain_view_center_on(champlainView, lon, lat);
       marker_reposition(champlainView);
       
@@ -649,8 +650,8 @@ champlain_view_zoom_out (ChamplainView *champlainView)
   if(map_zoom_out(priv->map))
     {
       resize_viewport(champlainView);
-      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->viewport), group);
-      clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map->current_level->group);
+      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+      clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
       champlain_view_center_on(champlainView, lon, lat);
       marker_reposition(champlainView);
       
