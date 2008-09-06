@@ -127,25 +127,33 @@ resize_viewport(ChamplainView *champlainView)
   tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->viewport), &hadjust, &vadjust);
   
   //tidy_adjustment_get_values (hadjust, NULL, &lower, &upper, NULL, NULL, NULL);
-  lower = 0;
   if (priv->map->current_level->level < 8)
-    upper = zoom_level_get_width(priv->map->current_level) - priv->viewportSize.width; 
+    {
+      lower = -priv->viewportSize.width / 2;
+      upper = zoom_level_get_width(priv->map->current_level) - priv->viewportSize.width / 2;
+    }
   else
-    upper = G_MAXINT16;
+    {
+      lower = 0;
+      upper = G_MAXINT16;
+    }
   g_object_set (hadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
                 
   //tidy_adjustment_get_values (vadjust, NULL, &lower, &upper, NULL, NULL, NULL);
-  lower = 0;
+  
   if (priv->map->current_level->level < 8)
-    upper = zoom_level_get_height(priv->map->current_level) - priv->viewportSize.height; 
+    {
+      lower = -priv->viewportSize.height / 2; 
+      upper = zoom_level_get_height(priv->map->current_level) - priv->viewportSize.height / 2;
+    }
   else
-    upper = G_MAXINT16;
+    {
+      lower = 0;
+      upper = G_MAXINT16;
+    }
   g_object_set (vadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
-  
-  g_print("Level: %d\n", priv->map->current_level->level);
-  g_print("Upper: %f\n", upper);
 }
 
 static void 
@@ -413,8 +421,7 @@ viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *champla
   
   GdkPoint rect;
   tidy_viewport_get_origin(TIDY_VIEWPORT(priv->viewport), &rect.x, &rect.y, NULL);
-  if (rect.x < 0 || rect.y < 0)
-      return;
+  
   if (rect.x == priv->viewportSize.x &&
       rect.y == priv->viewportSize.y)
       return;
@@ -543,10 +550,13 @@ champlain_view_center_on (ChamplainView *champlainView, gdouble longitude, gdoub
   }
 
   //FIXME: Inform tiles that there is a new anchor
-
-  g_print("Anchor: %d, %d\n", anchor->x, anchor->y);
-  g_print("Center: %f, %f\n", x, y);
-
+  int i;
+  for (i = 0; i < priv->map->current_level->tiles->len; i++)
+    {
+      Tile* tile = g_ptr_array_index(priv->map->current_level->tiles, i);
+      if (!tile->loading)
+        tile_set_position(priv->map, tile);
+    }
 
   tidy_viewport_set_origin(TIDY_VIEWPORT(priv->viewport),
     x - priv->viewportSize.width / 2.0,

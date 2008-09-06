@@ -69,6 +69,11 @@ map_load_level(Map* map, gint zoom_level)
 void
 map_load_visible_tiles (Map* map, GdkRectangle viewport, gboolean offline)
 {
+  if (viewport.x < 0)
+    viewport.x = 0;
+  if (viewport.y < 0)
+    viewport.y = 0;
+
   gint x_count = ceil((float)viewport.width / map->tile_size) + 1;
   gint y_count = ceil((float)viewport.height / map->tile_size) + 1;
   

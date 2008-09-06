@@ -34,9 +34,9 @@ typedef struct {
 
 #define CACHE_DIR "champlain"
 static SoupSession * soup_session;
-  
+
 void
-tile_set(Map* map, Tile* tile) 
+tile_set_position(Map* map, Tile* tile) 
 {
   clutter_actor_set_position (tile->actor, 
     (tile->x * tile->size) - map->current_level->anchor.x, 
@@ -58,7 +58,7 @@ create_error_tile(Map* map, Tile* tile)
 {
   tile->actor = clutter_texture_new_from_file("error.svg", NULL);
        
-  tile_set(map, tile);
+  tile_set_position(map, tile);
   
   clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
   tile_setup_animation(tile);
@@ -159,7 +159,7 @@ file_loaded_cb (SoupSession *session,
           gdk_pixbuf_get_rowstride (pixbuf),
           3, 0, NULL);
            
-      tile_set(map, tile);
+      tile_set_position(map, tile);
       
       clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
       tile_setup_animation(tile);
@@ -198,7 +198,7 @@ tile_load (Map* map, guint zoom_level, guint x, guint y, gboolean offline)
   if (g_file_test (filename, G_FILE_TEST_EXISTS)) 
     {
       tile->actor = clutter_texture_new_from_file(filename, NULL);
-      tile_set(map, tile);
+      tile_set_position(map, tile);
       
       clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), tile->actor, NULL);
       // Do not animate since it is local and fast
