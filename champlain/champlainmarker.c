@@ -201,27 +201,6 @@ champlain_marker_set_position (ChamplainMarker *champlainMarker, gdouble longitu
 }
 
 /**
- * champlain_marker_set_anchor:
- * @marker: a #ChamplainMarker
- * @x: the position in the actor that represents the longitude
- * @y: the position in the actor that represents the latitude
- *
- * Marks the point (x, y) as the place where the #ChamplainMarker position is at (longitude, latitude).
- *
- * Since: 0.2
- */
-void
-champlain_marker_set_anchor (ChamplainMarker *champlainMarker, gint x, gint y)
-{
-  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
-
-  priv->anchor.x = x;
-  priv->anchor.y = y;
-
-  clutter_actor_set_position(CLUTTER_ACTOR(champlainMarker), -x, -y);
-}
-
-/**
  * champlain_marker_new_with_label:
  * @label: the text of the label
  * @font: the font to use to draw the text, for example "Courrier Bold 11", can be NULL
@@ -301,7 +280,7 @@ champlain_marker_new_with_label (const gchar *label,
   clutter_container_add_actor(CLUTTER_CONTAINER(champlainMarker), bg);
   clutter_actor_raise(actor, bg);
 
-  champlain_marker_set_anchor(CHAMPLAIN_MARKER(champlainMarker), 0, text_height + point);
+  clutter_actor_set_anchor_point(CLUTTER_ACTOR(champlainMarker), 0, text_height + point);
 
   return champlainMarker;
 }
