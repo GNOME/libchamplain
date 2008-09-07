@@ -628,14 +628,8 @@ champlain_view_new (ChamplainViewMode mode)
                     G_CALLBACK (mouse_button_cb),
                     view);
   // Setup cursors
-  priv->cursor_hand_open = gdk_cursor_new_from_pixbuf(gdk_display_get_default(), 
-    gdk_pixbuf_new_from_file(DATADIR "/champlain/hand_open.svg", NULL),
-    20, 
-    20);
-  priv->cursor_hand_closed = gdk_cursor_new_from_pixbuf(gdk_display_get_default(), 
-    gdk_pixbuf_new_from_file(DATADIR "/champlain/hand_closed.svg", NULL),
-    20, 
-    20);
+  priv->cursor_hand_open = gdk_cursor_new(GDK_HAND1);
+  priv->cursor_hand_closed = gdk_cursor_new(GDK_FLEUR);
   
   // Setup stage
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
