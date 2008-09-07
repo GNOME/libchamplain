@@ -79,23 +79,95 @@ struct _ChamplainViewPrivate
   gboolean offline;
 };
 
-
 G_DEFINE_TYPE (ChamplainView, champlain_view, GTK_TYPE_ALIGNMENT);
+
+static gdouble viewport_get_current_longitude(ChamplainViewPrivate *priv);
+static gdouble viewport_get_current_latitude(ChamplainViewPrivate *priv);
+static gdouble viewport_get_longitude_at(ChamplainViewPrivate *priv, gint x);
+static gdouble viewport_get_latitude_at(ChamplainViewPrivate *priv, gint y);
+static gboolean scroll_event (ClutterActor *actor, ClutterScrollEvent *event, ChamplainView *view);
+static void marker_reposition_cb (ChamplainMarker *marker, ChamplainView *view);
+static void layer_reposition_cb (ClutterActor *layer, ChamplainView *view);
+static void marker_reposition (ChamplainView *view);
+static void create_initial_map(ChamplainView *view);
+static void resize_viewport(ChamplainView *view);
+static void champlain_view_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec);
+static void champlain_view_set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec);
+static void champlain_view_finalize (GObject *object);
+static void champlain_view_class_init (ChamplainViewClass *champlainViewClass);
+static void champlain_view_init (ChamplainView *view);
+static void viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *view);
+static void view_size_allocated_cb (GtkWidget *widget, GtkAllocation *allocation, ChamplainView *view);
+static void notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg1, ChamplainView *view);
+static void layer_add_marker_cb (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *view);
+static void connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView *view);
+
+static gdouble
+viewport_get_longitude_at(ChamplainViewPrivate *priv, gint x)
+{
+  return priv->map->x_to_longitude(priv->map, x, priv->map->current_level->level);
+}
 
 static gdouble
 viewport_get_current_longitude(ChamplainViewPrivate *priv)
 {
-  return priv->map->x_to_longitude(priv->map,
-    priv->map->current_level->anchor.x + priv->viewport_size.x + priv->viewport_size.width / 2.0,
-    priv->map->current_level->level);
+  return viewport_get_longitude_at(priv,
+    priv->map->current_level->anchor.x + priv->viewport_size.x + priv->viewport_size.width / 2.0);
+}
+
+static gdouble
+viewport_get_latitude_at(ChamplainViewPrivate *priv, gint y)
+{
+  return priv->map->y_to_latitude(priv->map, y, priv->map->current_level->level);
 }
 
 static gdouble
 viewport_get_current_latitude(ChamplainViewPrivate *priv)
 {
-  return priv->map->y_to_latitude(priv->map,
-    priv->map->current_level->anchor.y + priv->viewport_size.y + priv->viewport_size.height / 2.0,
-    priv->map->current_level->level);
+  return viewport_get_latitude_at(priv,
+    priv->map->current_level->anchor.y + priv->viewport_size.y + priv->viewport_size.height / 2.0);
+}
+
+static gboolean
+scroll_event (ClutterActor *actor, ClutterScrollEvent *event, ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  ClutterActor *group = priv->map->current_level->group;
+  gboolean success = FALSE;
+
+  // Keep the lon, lat where the mouse is
+  gdouble lon = viewport_get_longitude_at(priv,
+    priv->viewport_size.x + event->x + priv->map->current_level->anchor.x);
+  gdouble lat = viewport_get_latitude_at(priv, 
+    priv->viewport_size.y + event->y + priv->map->current_level->anchor.y);
+
+  // How far was it from the center of the viewport (in px)
+  gint x_diff = priv->viewport_size.width / 2 - event->x;
+  gint y_diff = priv->viewport_size.height / 2 - event->y;
+
+  if (event->direction == CLUTTER_SCROLL_UP)
+    success = map_zoom_in(priv->map);
+  else if (event->direction == CLUTTER_SCROLL_DOWN) 
+    success = map_zoom_out(priv->map);
+
+  if (success)
+    {
+      // Get the new x,y in the new zoom level
+      gint x2 = priv->map->longitude_to_x(priv->map, lon, priv->map->current_level->level);
+      gint y2 = priv->map->latitude_to_y(priv->map, lat, priv->map->current_level->level);
+      // Get the new lon,lat of these new x,y minus the distance from the viewport center
+      gdouble lon2 = priv->map->x_to_longitude(priv->map, x2 + x_diff, priv->map->current_level->level);
+      gdouble lat2 = priv->map->y_to_latitude(priv->map, y2 + y_diff, priv->map->current_level->level);
+
+      resize_viewport(view);
+      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+      clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
+      champlain_view_center_on(view, lon2, lat2);
+      marker_reposition(view);
+
+      g_object_notify(G_OBJECT(view), "zoom-level");
+    }
+
 }
 
 static void
@@ -115,6 +187,30 @@ marker_reposition_cb (ChamplainMarker *marker, ChamplainView *view)
         x - marker_priv->anchor.x - priv->map->current_level->anchor.x,
         y - marker_priv->anchor.y - priv->map->current_level->anchor.y);
     }
+}
+
+static void
+notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg1, ChamplainView *view)
+{
+  marker_reposition_cb(marker, view);
+}
+
+static void
+layer_add_marker_cb (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *view)
+{
+  g_signal_connect (marker,
+                    "notify::longitude",
+                    G_CALLBACK (notify_marker_reposition_cb),
+                    view);
+}
+
+static void
+connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView *view)
+{
+  g_signal_connect (marker,
+                    "notify::longitude",
+                    G_CALLBACK (notify_marker_reposition_cb),
+                    view);
 }
 
 static void
@@ -511,6 +607,10 @@ champlain_view_new (ChamplainViewMode mode)
 
   clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
   gtk_container_add (GTK_CONTAINER (view), priv->clutter_embed);
+  g_signal_connect (stage,
+                    "scroll-event",
+                    G_CALLBACK (scroll_event),
+                    view);
 
   // Setup viewport
   priv->viewport = tidy_viewport_new ();
@@ -675,30 +775,6 @@ champlain_view_zoom_out (ChamplainView *view)
     }
 }
 
-static void
-notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg1, ChamplainView *view)
-{
-  marker_reposition_cb(marker, view);
-}
-
-static void
-layer_add_marker (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *view)
-{
-  g_signal_connect (marker,
-                    "notify::longitude",
-                    G_CALLBACK (notify_marker_reposition_cb),
-                    view);
-}
-
-static void
-connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView *view)
-{
-  g_signal_connect (marker,
-                    "notify::longitude",
-                    G_CALLBACK (notify_marker_reposition_cb),
-                    view);
-}
-
 /**
  * champlain_view_add_layer:
  * @view: a #ChamplainView
@@ -720,7 +796,7 @@ champlain_view_add_layer (ChamplainView *view, ClutterActor *layer)
 
   g_signal_connect (layer,
                     "add",
-                    G_CALLBACK (layer_add_marker),
+                    G_CALLBACK (layer_add_marker_cb),
                     view);
 
   clutter_container_foreach(CLUTTER_CONTAINER(layer), CLUTTER_CALLBACK(connect_marker_notify_cb), view);
