@@ -20,7 +20,7 @@
 #ifndef CHAMPLAIN_VIEW_H
 #define CHAMPLAIN_VIEW_H
 
-#include <champlain_defines.h>
+#include <champlain/champlain_defines.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>

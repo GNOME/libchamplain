@@ -7,5 +7,5 @@ Name: Champlain
 Description: Map View for Gtk+
 Version: @VERSION@
 Libs: -L${libdir} -lchamplain-1.0
-Cflags: -I${includedir}/champlain-1.0
-Requires: gobject-2.0 clutter-0.8 gtk+-2.10
+Cflags: -I${includedir}/libchamplain-1.0
+Requires: gobject-2.0 clutter-0.8 gtk+-2.0
