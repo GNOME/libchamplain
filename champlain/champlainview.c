@@ -66,6 +66,8 @@ struct _ChamplainViewPrivate
 
   ChamplainMapSource map_source;
   gint zoom_level; // only used when the zoom-level property is set before map is created
+  gdouble longitude; // only used when the center_on is called before map is created
+  gdouble latitude;  // only used when the center_on is called before map is created
 
   ClutterActor *map_layer;
   ClutterActor *viewport;
@@ -247,6 +249,7 @@ static void
 resize_viewport(ChamplainView *view)
 {
   gdouble lower, upper;
+  gboolean center = FALSE;
   TidyAdjustment *hadjust, *vadjust;
 
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
@@ -254,6 +257,7 @@ resize_viewport(ChamplainView *view)
   if(!priv->map)
     {
       create_initial_map(view);
+      center = TRUE;
     }
 
   clutter_actor_set_size (priv->finger_scroll, priv->viewport_size.width, priv->viewport_size.height);
@@ -286,6 +290,12 @@ resize_viewport(ChamplainView *view)
     }
   g_object_set (vadjust, "lower", lower, "upper", upper,
                 "step-increment", 1.0, "elastic", TRUE, NULL);
+
+  if (center)
+    {
+      champlain_view_center_on(view, priv->longitude, priv->latitude);
+      marker_reposition(view);
+    }
 }
 
 static void
@@ -699,7 +709,10 @@ champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitu
 
   if(!priv->map)
     {
-      create_initial_map(view);
+      // keep until the viewport is created
+      priv->longitude = longitude;
+      priv->latitude = latitude;
+      return;
     }
 
   gdouble x, y;
