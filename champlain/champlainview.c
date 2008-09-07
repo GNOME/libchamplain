@@ -76,6 +76,9 @@ struct _ChamplainViewPrivate
 
   Map *map;
 
+  GdkCursor *cursor_hand_open;
+  GdkCursor *cursor_hand_closed;
+
   gboolean offline;
 };
 
@@ -577,6 +580,21 @@ view_size_allocated_cb (GtkWidget *widget, GtkAllocation *allocation, ChamplainV
 
   resize_viewport(view);
   map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
+  
+  // Setup mouse cursor to a hand
+  gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_open);
+}
+static gboolean 
+mouse_button_cb (GtkWidget *widget, GdkEventButton *event, ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  
+  if (event->type == GDK_BUTTON_PRESS)
+    gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_closed);
+  else
+    gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_open);
+
+  return FALSE;
 }
 
 /**
@@ -601,7 +619,24 @@ champlain_view_new (ChamplainViewMode mode)
                     "size-allocate",
                     G_CALLBACK (view_size_allocated_cb),
                     view);
-
+  g_signal_connect (priv->clutter_embed,
+                    "button-press-event",
+                    G_CALLBACK (mouse_button_cb),
+                    view);
+  g_signal_connect (priv->clutter_embed,
+                    "button-release-event",
+                    G_CALLBACK (mouse_button_cb),
+                    view);
+  // Setup cursors
+  priv->cursor_hand_open = gdk_cursor_new_from_pixbuf(gdk_display_get_default(), 
+    gdk_pixbuf_new_from_file(DATADIR "/champlain/hand_open.svg", NULL),
+    20, 
+    20);
+  priv->cursor_hand_closed = gdk_cursor_new_from_pixbuf(gdk_display_get_default(), 
+    gdk_pixbuf_new_from_file(DATADIR "/champlain/hand_closed.svg", NULL),
+    20, 
+    20);
+  
   // Setup stage
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
 

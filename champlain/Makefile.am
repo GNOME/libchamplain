@@ -46,6 +46,6 @@ SOURCES = launcher.c
 LDADD = $(DEPS_LIBS) $(top_builddir)/champlain/libchamplain-1.0.la
 
 svgdir = $(datadir)/champlain
-svg_DATA = error.svg
+svg_DATA = error.svg hand_open.svg hand_closed.svg
 
 EXTRA_DIST = $(svg_DATA) $(CHAMPLAIN_MARSHAL_LIST)
