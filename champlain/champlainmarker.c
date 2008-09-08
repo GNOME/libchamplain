@@ -234,12 +234,12 @@ champlain_marker_new_with_label (const gchar *label,
   if (!marker_color)
     marker_color = &default_marker_color;
 
-  actor = clutter_label_new_with_text(font, label);
-  clutter_actor_set_position(actor, padding, padding / 2.0);
-  text_width = clutter_actor_get_width(actor) + 2 * padding;
-  text_height = clutter_actor_get_height(actor)+ padding;
-  clutter_label_set_color(CLUTTER_LABEL(actor), text_color);
-  clutter_container_add_actor(CLUTTER_CONTAINER(champlainMarker), actor);
+  actor = clutter_label_new_with_text (font, label);
+  clutter_actor_set_position (actor, padding, padding / 2.0);
+  text_width = clutter_actor_get_width (actor) + 2 * padding;
+  text_height = clutter_actor_get_height (actor)+ padding;
+  clutter_label_set_color (CLUTTER_LABEL(actor), text_color);
+  clutter_container_add_actor (CLUTTER_CONTAINER(champlainMarker), actor);
 
   point = (text_height + 2 * padding) / 4.0;
 
@@ -254,21 +254,14 @@ champlain_marker_new_with_label (const gchar *label,
   cairo_line_to (cr, 0, text_height + point);
   cairo_close_path (cr);
 
+  cairo_set_line_width (cr, 1.0);
   cairo_set_source_rgba (cr,
                         marker_color->red / 255.0,
                         marker_color->green / 255.0,
                         marker_color->blue / 255.0,
                         marker_color->alpha / 255.0);
-  cairo_fill (cr);
-
-  cairo_set_line_width (cr, 1.0);
-  clutter_color_darken(marker_color, &darker_color);
-  cairo_move_to (cr, 0, 0);
-  cairo_line_to (cr, text_width, 0);
-  cairo_line_to (cr, text_width, text_height);
-  cairo_line_to (cr, point, text_height);
-  cairo_line_to (cr, 0, text_height + point);
-  cairo_close_path (cr);
+  cairo_fill_preserve (cr);
+  clutter_color_darken (marker_color, &darker_color);
   cairo_set_source_rgba (cr,
                         darker_color.red / 255.0,
                         darker_color.green / 255.0,
@@ -276,11 +269,12 @@ champlain_marker_new_with_label (const gchar *label,
                         darker_color.alpha / 255.0);
   cairo_stroke (cr);
 
-  cairo_destroy(cr);
-  clutter_container_add_actor(CLUTTER_CONTAINER(champlainMarker), bg);
-  clutter_actor_raise(actor, bg);
 
-  clutter_actor_set_anchor_point(CLUTTER_ACTOR(champlainMarker), 0, text_height + point);
+  cairo_destroy (cr);
+  clutter_container_add_actor (CLUTTER_CONTAINER(champlainMarker), bg);
+  clutter_actor_raise (actor, bg);
+
+  clutter_actor_set_anchor_point (CLUTTER_ACTOR(champlainMarker), 0, text_height + point);
 
   return champlainMarker;
 }
