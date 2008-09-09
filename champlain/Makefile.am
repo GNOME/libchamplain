@@ -25,6 +25,20 @@ libchamplain_1_0_la_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
 					sources/google_terrain.c \
 					sources/debugmap.c
 
+noinst_HEADERS = champlainview.h \
+					champlainmarker.h \
+					champlain_private.h \
+					map.h  \
+					zoomlevel.h \
+					tile.h \
+					sources/oam.h \
+					sources/osm_mapnik.h \
+					sources/mff_relief.h \
+					sources/google_map.h \
+					sources/google_sat.h \
+					sources/google_terrain.h \
+					sources/debugmap.h
+
 libchamplain_1_0_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
 
 champlain-marshal.h: $(CHAMPLAIN_MARSHAL_LIST)

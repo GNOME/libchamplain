@@ -30,6 +30,7 @@ source_h = \
 	$(top_srcdir)/tidy/tidy-scrollable.h		\
 	$(top_srcdir)/tidy/tidy-scroll-view.h		\
 	$(top_srcdir)/tidy/tidy-viewport.h		\
+	$(top_srcdir)/tidy/tidy-private.h		\
 	$(NULL)
 
 source_h_private = \
