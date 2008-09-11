@@ -54,10 +54,10 @@ libchamplain_1_0_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
 noinst_PROGRAMS = launcher
 
-AM_CPPFLAGS = $(DEPS_CFLAGS) -DDATADIR=\""$(datadir)"\" -I../tidy 
+AM_CPPFLAGS = $(DEPS_CFLAGS) -DDATADIR=\""$(datadir)"\" -I$(top_srcdir)/tidy -I$(top_srcdir)
 AM_LDFLAGS = $(DEPS_LIBS) -export-dynamic -export-symbols-regex ^champlain_.*
-SOURCES = launcher.c
-LDADD = $(DEPS_LIBS) $(top_builddir)/champlain/libchamplain-1.0.la
+launcher_SOURCES = launcher.c
+launcher_LDADD = $(DEPS_LIBS) libchamplain-1.0.la
 
 svgdir = $(datadir)/champlain
 svg_DATA = error.svg
