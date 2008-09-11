@@ -168,7 +168,6 @@ scroll_event (ClutterActor *actor, ClutterScrollEvent *event, ChamplainView *vie
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
       champlain_view_center_on(view, lon2, lat2);
-      marker_reposition(view);
 
       g_object_notify(G_OBJECT(view), "zoom-level");
     }
@@ -207,6 +206,7 @@ layer_add_marker_cb (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView
                     "notify::longitude",
                     G_CALLBACK (notify_marker_reposition_cb),
                     view);
+  marker_reposition(view);
 }
 
 static void
@@ -294,7 +294,6 @@ resize_viewport(ChamplainView *view)
   if (center)
     {
       champlain_view_center_on(view, priv->longitude, priv->latitude);
-      marker_reposition(view);
     }
 }
 
@@ -380,7 +379,6 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
                     clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
                     clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
                     champlain_view_center_on(view, lon, lat);
-                    marker_reposition(view);
                   }
               }
           }
@@ -594,6 +592,7 @@ view_size_allocated_cb (GtkWidget *widget, GtkAllocation *allocation, ChamplainV
   // Setup mouse cursor to a hand
   gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_open);
 }
+
 static gboolean 
 mouse_button_cb (GtkWidget *widget, GdkEventButton *event, ChamplainView *view)
 {
@@ -759,6 +758,7 @@ champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitu
   g_object_notify(G_OBJECT(view), "latitude");
 
   map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
+  marker_reposition(view);
 }
 
 /**
@@ -783,7 +783,6 @@ champlain_view_zoom_in (ChamplainView *view)
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
       champlain_view_center_on(view, lon, lat);
-      marker_reposition(view);
 
       g_object_notify(G_OBJECT(view), "zoom-level");
     }
@@ -811,7 +810,6 @@ champlain_view_zoom_out (ChamplainView *view)
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
       champlain_view_center_on(view, lon, lat);
-      marker_reposition(view);
 
       g_object_notify(G_OBJECT(view), "zoom-level");
     }
