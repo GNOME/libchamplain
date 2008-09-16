@@ -31,15 +31,15 @@ create_marker_layer ()
   ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
   ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
   marker = champlain_marker_new_with_label("Montréal", "Airmole 14", NULL, NULL);
-  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), -73.563788, 45.528178);
+  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 45.528178, -73.563788);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
   
   marker = champlain_marker_new_with_label("New York", "Sans 25", &white, NULL);
-  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), -73.98, 40.77);
+  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 40.77, -73.98);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
   
   marker = champlain_marker_new_with_label("Saint-Tite-des-Caps", "Serif 12", NULL, &orange);
-  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), -70.764141, 47.130885);
+  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 47.130885, -70.764141);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
   
   clutter_actor_hide(layer);
@@ -66,7 +66,7 @@ main (int argc, char *argv[])
   champlain_view_add_layer(actor, layer);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
-  champlain_view_center_on(CHAMPLAIN_VIEW(actor), -73.75, 45.466);
+  champlain_view_center_on(CHAMPLAIN_VIEW(actor), 45.466, -73.75);
   
   clutter_actor_show (stage);
   clutter_main ();

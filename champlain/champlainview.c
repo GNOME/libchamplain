@@ -162,7 +162,7 @@ scroll_event (ClutterActor *actor, ClutterScrollEvent *event, ChamplainView *vie
       resize_viewport(view);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-      champlain_view_center_on(view, lon2, lat2);
+      champlain_view_center_on(view, lat2, lon2);
 
       g_object_notify(G_OBJECT(view), "zoom-level");
     }
@@ -288,7 +288,7 @@ resize_viewport(ChamplainView *view)
 
   if (center)
     {
-      champlain_view_center_on(view, priv->longitude, priv->latitude);
+      champlain_view_center_on(view, priv->latitude, priv->longitude);
     }
 }
 
@@ -348,14 +348,14 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
       {
         gdouble lon = g_value_get_double(value);
         gdouble lat = viewport_get_current_latitude(priv);
-        champlain_view_center_on(view, lon, lat);
+        champlain_view_center_on(view, lat, lon);
         break;
       }
     case PROP_LATITUDE:
       {
         gdouble lon = viewport_get_current_longitude(priv);
         gdouble lat = g_value_get_double(value);
-        champlain_view_center_on(view, lon, lat);
+        champlain_view_center_on(view, lat, lon);
         break;
       }
     case PROP_ZOOM_LEVEL:
@@ -366,14 +366,14 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
             if (level != priv->map->current_level->level)
               {
                 ClutterActor *group = priv->map->current_level->group;
-                gdouble lon = viewport_get_current_longitude(priv);
                 gdouble lat = viewport_get_current_latitude(priv);
+                gdouble lon = viewport_get_current_longitude(priv);
                 if (map_zoom_to(priv->map, level))
                   {
                     resize_viewport(view);
                     clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
                     clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-                    champlain_view_center_on(view, lon, lat);
+                    champlain_view_center_on(view, lat, lon);
                   }
               }
           }
@@ -654,8 +654,8 @@ champlain_view_new (ChamplainViewMode mode)
 /**
  * champlain_view_center_on:
  * @view: a #ChamplainView
- * @longitude: the longitude to center the map at
  * @latitude: the longitude to center the map at
+ * @longitude: the longitude to center the map at
  *
  * Centers the map on these coordinates.
  *
@@ -663,7 +663,7 @@ champlain_view_new (ChamplainViewMode mode)
  */
 // FIXME: Animate this.  Can be done in Tidy-Adjustment (like for elastic effect)
 void
-champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitude)
+champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitude)
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
@@ -743,7 +743,7 @@ champlain_view_zoom_in (ChamplainView *view)
       resize_viewport(view);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-      champlain_view_center_on(view, lon, lat);
+      champlain_view_center_on(view, lat, lon);
 
       g_object_notify(G_OBJECT(view), "zoom-level");
     }
@@ -770,7 +770,7 @@ champlain_view_zoom_out (ChamplainView *view)
       resize_viewport(view);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-      champlain_view_center_on(view, lon, lat);
+      champlain_view_center_on(view, lat, lon);
 
       g_object_notify(G_OBJECT(view), "zoom-level");
     }
@@ -795,7 +795,7 @@ champlain_view_add_layer (ChamplainView *view, ClutterActor *layer)
   if(priv->map)
     marker_reposition(view);
 
-  g_signal_connect (layer,
+  g_signal_connect_after (layer,
                     "add",
                     G_CALLBACK (layer_add_marker_cb),
                     view);

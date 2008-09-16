@@ -81,7 +81,7 @@ GType champlain_view_get_type (void);
 
 ClutterActor *champlain_view_new (ChamplainViewMode mode);
 
-void champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitude);
+void champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitude);
 
 void champlain_view_zoom_in (ChamplainView *champlainView);
 
