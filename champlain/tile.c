@@ -20,6 +20,7 @@
 
 #include "tile.h"
 #include "map.h"
+#include "champlain_private.h"
 
 #include <math.h>
 #include <errno.h>

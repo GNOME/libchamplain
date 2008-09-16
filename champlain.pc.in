@@ -3,9 +3,9 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: Champlain
-Description: Map View for Gtk+
+Name: libchamplain
+Description: Map View for Clutter
 Version: @VERSION@
 Libs: -L${libdir} -lchamplain-1.0
 Cflags: -I${includedir}/libchamplain-1.0
-Requires: gobject-2.0 clutter-0.8 gtk+-2.0
+Requires: gobject-2.0 clutter-0.8

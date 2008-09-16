@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(champlain, 0.2, pierre-luc@squidy.info)
+AC_INIT(libchamplain, 0.2, pierre-luc@squidy.info)
 AC_CONFIG_SRCDIR([champlain/champlainview.h])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR(m4)
@@ -27,9 +27,8 @@ AC_SUBST(DEPS_LIBS)
 PKG_CHECK_MODULES(DEPS,
   [   glib-2.0 >= 2.16,
       gobject-2.0 >= 2.10,
-      gtk+-2.0 >= 2.2,
+      gdk-2.0 >= 2.10,
       clutter-0.8 >= 0.8,
-      clutter-gtk-0.8 >= 0.8,
       clutter-cairo-0.8 >= 0.8,
       cairo >= 1.6,
       libsoup-2.4 >= 2.4.1,
@@ -47,7 +46,7 @@ AC_CONFIG_FILES([Makefile
 AC_OUTPUT
 
 echo ""
-echo " Champlain $VERSION"
+echo " libchamplain $VERSION"
 echo ""
 echo "         Prefix: ${prefix}"
 echo " Compiler flags: ${CPPFLAGS}"

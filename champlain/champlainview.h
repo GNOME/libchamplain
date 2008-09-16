@@ -23,7 +23,6 @@
 #include <champlain/champlain_defines.h>
 #include <glib.h>
 #include <glib-object.h>
-#include <gtk/gtk.h>
 #include <clutter/clutter.h>
 
 /**
@@ -67,20 +66,20 @@ typedef enum {
 
 struct _ChamplainView
 {
-  GtkAlignment bin;
+  ClutterGroup group;
 
   ChamplainViewPrivate *priv;
 };
 
 struct _ChamplainViewClass
 {
-  GtkBinClass parent_class;
+  ClutterGroupClass parent_class;
 
 };
 
 GType champlain_view_get_type (void);
 
-GtkWidget *champlain_view_new (ChamplainViewMode mode);
+ClutterActor *champlain_view_new (ChamplainViewMode mode);
 
 void champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitude);
 
@@ -89,5 +88,7 @@ void champlain_view_zoom_in (ChamplainView *champlainView);
 void champlain_view_zoom_out (ChamplainView *champlainView);
 
 void champlain_view_add_layer (ChamplainView *champlainView, ClutterActor *layer);
+
+void champlain_view_set_size (ChamplainView *view, gint width, gint height);
 
 #endif

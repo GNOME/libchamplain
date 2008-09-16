@@ -67,7 +67,7 @@ map_load_level(Map *map, gint zoom_level)
 }
 
 void
-map_load_visible_tiles (Map *map, GdkRectangle viewport, gboolean offline)
+map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
 {
   if (viewport.x < 0)
     viewport.x = 0;

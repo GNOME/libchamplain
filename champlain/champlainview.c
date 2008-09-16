@@ -31,7 +31,6 @@
 #include <clutter/clutter.h>
 #include <glib.h>
 #include <glib-object.h>
-#include <gtk-clutter-embed.h>
 #include <math.h>
 #include <tidy-adjustment.h>
 #include <tidy-finger-scroll.h>
@@ -62,7 +61,7 @@ static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
 
 struct _ChamplainViewPrivate
 {
-  GtkWidget *clutter_embed;
+  ClutterActor *stage;
 
   ChamplainMapSource map_source;
   gint zoom_level; // only used when the zoom-level property is set before map is created
@@ -72,19 +71,16 @@ struct _ChamplainViewPrivate
   ClutterActor *map_layer;
   ClutterActor *viewport;
   ClutterActor *finger_scroll;
-  GdkRectangle viewport_size;
+  ChamplainRectangle viewport_size;
 
   ClutterActor *user_layers;
 
   Map *map;
 
-  GdkCursor *cursor_hand_open;
-  GdkCursor *cursor_hand_closed;
-
   gboolean offline;
 };
 
-G_DEFINE_TYPE (ChamplainView, champlain_view, GTK_TYPE_ALIGNMENT);
+G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
 
 static gdouble viewport_get_current_longitude(ChamplainViewPrivate *priv);
 static gdouble viewport_get_current_latitude(ChamplainViewPrivate *priv);
@@ -102,7 +98,6 @@ static void champlain_view_finalize (GObject *object);
 static void champlain_view_class_init (ChamplainViewClass *champlainViewClass);
 static void champlain_view_init (ChamplainView *view);
 static void viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *view);
-static void view_size_allocated_cb (GtkWidget *widget, GtkAllocation *allocation, ChamplainView *view);
 static void notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg1, ChamplainView *view);
 static void layer_add_marker_cb (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *view);
 static void connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView *view);
@@ -396,7 +391,7 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
             priv->map_source = source;
             if (priv->map) {
               gint currentLevel = priv->map->current_level->level;
-              GdkPoint anchor = priv->map->current_level->anchor;
+              ChamplainPoint anchor = priv->map->current_level->anchor;
               map_free(priv->map);
               priv->map = map_new(priv->map_source);
 
@@ -562,7 +557,7 @@ viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *view)
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
-  GdkPoint rect;
+  ChamplainPoint rect;
   tidy_viewport_get_origin(TIDY_VIEWPORT(priv->viewport), &rect.x, &rect.y, NULL);
 
   if (rect.x == priv->viewport_size.x &&
@@ -578,42 +573,26 @@ viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *view)
   g_object_notify(G_OBJECT(view), "latitude");
 }
 
-static void
-view_size_allocated_cb (GtkWidget *widget, GtkAllocation *allocation, ChamplainView *view)
+void
+champlain_view_set_size (ChamplainView *view, gint width, gint height)
 {
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
-  priv->viewport_size.width = allocation->width;
-  priv->viewport_size.height = allocation->height;
+  priv->viewport_size.width = width;
+  priv->viewport_size.height = height;
 
   resize_viewport(view);
   map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
-  
-  // Setup mouse cursor to a hand
-  gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_open);
-}
-
-static gboolean 
-mouse_button_cb (GtkWidget *widget, GdkEventButton *event, ChamplainView *view)
-{
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
-  
-  if (event->type == GDK_BUTTON_PRESS)
-    gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_closed);
-  else
-    gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_open);
-
-  return FALSE;
 }
 
 /**
  * champlain_view_new:
  * @mode: a #ChamplainViewMode, the scrolling mode
- * Returns a new #ChamplainWidget ready to be used as a #GtkWidget.
+ * Returns a new #ChamplainView ready to be used as a #ClutterActor.
  *
  * Since: 0.1
  */
-GtkWidget *
+ClutterActor *
 champlain_view_new (ChamplainViewMode mode)
 {
   ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
@@ -623,32 +602,8 @@ champlain_view_new (ChamplainViewMode mode)
   view = CHAMPLAIN_VIEW (g_object_new (CHAMPLAIN_TYPE_VIEW, NULL));
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
-  priv->clutter_embed = gtk_clutter_embed_new ();
-  g_signal_connect (priv->clutter_embed,
-                    "size-allocate",
-                    G_CALLBACK (view_size_allocated_cb),
-                    view);
-  g_signal_connect (priv->clutter_embed,
-                    "button-press-event",
-                    G_CALLBACK (mouse_button_cb),
-                    view);
-  g_signal_connect (priv->clutter_embed,
-                    "button-release-event",
-                    G_CALLBACK (mouse_button_cb),
-                    view);
-  // Setup cursors
-  priv->cursor_hand_open = gdk_cursor_new(GDK_HAND1);
-  priv->cursor_hand_closed = gdk_cursor_new(GDK_FLEUR);
+  priv->stage = clutter_group_new ();
   
-  // Setup stage
-  stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
-
-  clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
-  gtk_container_add (GTK_CONTAINER (view), priv->clutter_embed);
-  g_signal_connect (stage,
-                    "scroll-event",
-                    G_CALLBACK (scroll_event),
-                    view);
 
   // Setup viewport
   priv->viewport = tidy_viewport_new ();
@@ -673,8 +628,14 @@ champlain_view_new (ChamplainViewMode mode)
 
   priv->finger_scroll = tidy_finger_scroll_new(mode);
 
+  g_signal_connect (priv->finger_scroll,
+                    "scroll-event",
+                    G_CALLBACK (scroll_event),
+                    view);
+                    
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->finger_scroll), priv->viewport);
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), priv->finger_scroll);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->finger_scroll);
+  clutter_container_add_actor (CLUTTER_CONTAINER (view), priv->stage);
 
   // Map Layer
   priv->map_layer = clutter_group_new();
@@ -687,7 +648,7 @@ champlain_view_new (ChamplainViewMode mode)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->user_layers);
   clutter_actor_raise(priv->user_layers, priv->map_layer);
 
-  return GTK_WIDGET (view);
+  return CLUTTER_ACTOR (view);
 }
 
 /**
@@ -717,7 +678,7 @@ champlain_view_center_on (ChamplainView *view, gdouble longitude, gdouble latitu
   gdouble x, y;
   x = priv->map->longitude_to_x(priv->map, longitude, priv->map->current_level->level);
   y = priv->map->latitude_to_y(priv->map, latitude, priv->map->current_level->level);
-  GdkPoint* anchor = &priv->map->current_level->anchor;
+  ChamplainPoint* anchor = &priv->map->current_level->anchor;
 
   if (priv->map->current_level->level >= 8) {
     anchor->x = x - G_MAXINT16 / 2;

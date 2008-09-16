@@ -21,16 +21,31 @@
 #define CHAMPLAIN_PRIVATE_H
 
 #include <glib.h>
-#include <gdk/gdk.h>
 
 #define CHAMPLAIN_MARKER_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
+
+typedef struct 
+{
+  gint x;
+  gint y;
+  gint z;
+} ChamplainPoint;
 
 struct _ChamplainMarkerPrivate
 {
   gdouble lon;
   gdouble lat;
   
-  GdkPoint anchor;
+  ChamplainPoint anchor;
 };
+
+typedef struct 
+{
+  gint x;
+  gint y;
+  gint width;
+  gint height;
+} ChamplainRectangle;
+
 
 #endif

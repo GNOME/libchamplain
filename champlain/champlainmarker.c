@@ -31,7 +31,6 @@
 #include <clutter/clutter.h>
 #include <glib.h>
 #include <glib-object.h>
-#include <gtk-clutter-embed.h>
 #include <cairo.h>
 #include <math.h>
 
