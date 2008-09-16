@@ -184,5 +184,6 @@ champlain_view_embed_new (ChamplainView *view)
 ChamplainView *
 champlain_view_embed_get_view (ChamplainViewEmbed* embed)
 {
+  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (embed);
   return priv->view;
 }
