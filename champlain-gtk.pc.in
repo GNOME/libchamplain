@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libchamplain-gtk
+Description: Gtk+ Widget wrapper for libchamplain
+Version: @VERSION@
+Libs: -L${libdir} -lchamplain-gtk-1.0
+Cflags: -I${includedir}/libchamplain-1.0
+Requires: gobject-2.0 clutter-0.8 clutter-gtk-0.8 gtk+-2.0

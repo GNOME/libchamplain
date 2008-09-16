@@ -1,0 +1,21 @@
+<SECTION>
+<FILE>champlainviewembed</FILE>
+ChamplainViewEmbedPrivate
+<TITLE>ChamplainViewEmbed</TITLE>
+ChamplainViewEmbed
+champlain_view_embed_new
+champlain_view_embed_get_view
+<SUBSECTION Standard>
+CHAMPLAIN_VIEW_EMBED
+CHAMPLAIN_IS_VIEW_EMBED
+CHAMPLAIN_TYPE_VIEW_EMBED
+champlain_view_embed_get_type
+CHAMPLAIN_VIEW_EMBED_CLASS
+CHAMPLAIN_IS_VIEW_EMBED_CLASS
+CHAMPLAIN_VIEW_EMBED_GET_CLASS
+</SECTION>
+
+<SECTION>
+<FILE>champlain-gtk-marshal</FILE>
+</SECTION>
+
