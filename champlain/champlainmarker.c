@@ -188,15 +188,15 @@ champlain_marker_new ()
  * Since: 0.2
  */
 void
-champlain_marker_set_position (ChamplainMarker *champlainMarker, gdouble longitude, gdouble latitude)
+champlain_marker_set_position (ChamplainMarker *champlainMarker, gdouble latitude, gdouble longitude)
 {
   ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
 
   priv->lon = longitude;
   priv->lat = latitude;
 
-  g_object_notify(G_OBJECT(champlainMarker), "longitude");
   g_object_notify(G_OBJECT(champlainMarker), "latitude");
+  g_object_notify(G_OBJECT(champlainMarker), "longitude");
 }
 
 /**
