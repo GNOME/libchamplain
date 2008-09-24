@@ -26,7 +26,7 @@ create_marker_layer ()
 {
   ClutterActor *layer, *marker;
   
-  layer = clutter_group_new();
+  layer = champlain_layer_new();
   
   ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
   ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
