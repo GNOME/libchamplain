@@ -27,14 +27,6 @@ A marker to identify points of interest on a map
 @group: 
 @priv: 
 
-<!-- ##### FUNCTION champlain_marker_get_type ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-
 <!-- ##### FUNCTION champlain_marker_new ##### -->
 <para>
 
@@ -53,16 +45,6 @@ A marker to identify points of interest on a map
 @text_color: 
 @marker_color: 
 @Returns: 
-
-
-<!-- ##### FUNCTION champlain_marker_set_anchor ##### -->
-<para>
-
-</para>
-
-@marker: 
-@x: 
-@y: 
 
 
 <!-- ##### FUNCTION champlain_marker_set_position ##### -->

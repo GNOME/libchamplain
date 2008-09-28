@@ -19,6 +19,7 @@
 
 #include "config.h"
 
+#include "champlainlayer.h"
 #include "champlain_defines.h"
 
 #include <clutter/clutter.h>
@@ -67,11 +68,11 @@ layer_add_cb (ClutterGroup *layer, ClutterActor *marker, gpointer data)
 /**
  * champlain_layer_new:
  *
- * Returns a new #ClutterActor ready to be used as a #ClutterContainer for the markers.
+ * Returns a new #ChamplainLayer ready to be used as a #ClutterContainer for the markers.
  *
  * Since: 0.2.2
  */
-ClutterActor *
+ChamplainLayer *
 champlain_layer_new ()
 {
   ClutterGroup *layer;

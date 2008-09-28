@@ -2,11 +2,11 @@
 ChamplainView
 
 <!-- ##### SECTION Short_Description ##### -->
-A widget to display maps
+A #ClutterActor to display maps
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-The #ChamplainView widget is a Clutter based widget to display maps.  It supports two modes of scrolling:
+The #ChamplainView is a ClutterActor to display maps.  It supports two modes of scrolling:
 <itemizedlist>
   <listitem><para>Push: the normal behavior where the maps doesn't move after the user stopped scrolling;</para></listitem>
   <listitem><para>Kinetic: the iPhone-like behavior where the maps decelerate after the user stopped scrolling.</para></listitem>
@@ -23,6 +23,7 @@ the user's cache dir under champlain). If an error occurs during download, an er
 <para>
 
 </para>
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
@@ -86,14 +87,6 @@ the user's cache dir under champlain). If an error occurs during download, an er
 
 </para>
 
-<!-- ##### FUNCTION champlain_view_get_type ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-
 <!-- ##### FUNCTION champlain_view_new ##### -->
 <para>
 
@@ -109,8 +102,8 @@ the user's cache dir under champlain). If an error occurs during download, an er
 </para>
 
 @view: 
-@longitude: 
 @latitude: 
+@longitude: 
 
 
 <!-- ##### FUNCTION champlain_view_zoom_in ##### -->

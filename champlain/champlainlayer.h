@@ -24,6 +24,8 @@
 #include <glib-object.h>
 #include <clutter/clutter.h>
 
-ClutterActor *champlain_layer_new ();
+typedef ClutterActor ChamplainLayer;
+
+ChamplainLayer *champlain_layer_new ();
 
 #endif

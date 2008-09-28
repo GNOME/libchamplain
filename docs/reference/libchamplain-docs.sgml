@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY version SYSTEM "version.xml">
+]>
 <book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
   <bookinfo>
     <title>libchamplain Reference Manual</title>
     <releaseinfo>
-      for libchamplain 0.2
+      for libchamplain &version;
       The latest version of this documentation can be found on-line at
       <ulink role="online-location" url="http://blog.squidy.info/projects/libchamplain/">http://blog.squidy.info/projects/libchamplain/</ulink>.
     </releaseinfo>
@@ -14,6 +16,7 @@
   <chapter>
     <title>I. API Reference</title>
     <xi:include href="xml/champlainview.xml"/>
+    <xi:include href="xml/champlainlayer.xml"/>
     <xi:include href="xml/champlainmarker.xml"/>
   </chapter>
 </book>

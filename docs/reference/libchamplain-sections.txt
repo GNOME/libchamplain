@@ -29,6 +29,14 @@ champlain_marker_set_position
 </SECTION>
 
 <SECTION>
+<FILE>champlainlayer</FILE>
+<TITLE>ChamplainLayer</TITLE>
+<INCLUDE>champlain/champlainlayer.h</INCLUDE>
+champlain_layer_new
+<SUBSECTION Standard>
+</SECTION>
+
+<SECTION>
 <FILE>champlain</FILE>
 CHAMPLAIN_MIN_LAT
 CHAMPLAIN_MAX_LAT
