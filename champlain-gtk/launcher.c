@@ -41,7 +41,7 @@ create_marker_layer ()
 {
   ClutterActor *layer, *marker;
   
-  layer = clutter_group_new();
+  layer = champlain_layer_new();
   
   ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
   ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
@@ -57,7 +57,7 @@ create_marker_layer ()
   champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 47.130885, -70.764141);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
   
-  clutter_actor_hide(layer);
+  clutter_actor_show(layer);
   return layer;
 }
 
