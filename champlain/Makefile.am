@@ -43,10 +43,10 @@ noinst_HEADERS = champlainview.h \
 libchamplain_1_0_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
 
 champlain-marshal.h: $(CHAMPLAIN_MARSHAL_LIST)
-	@GLIB_GENMARSHAL@ --header --prefix=champlain_marshal $< > $(CHAMPLAIN_MARSHAL).h 
+	@GLIB_GENMARSHAL@ --header --prefix=cpl_marshal $< > $(CHAMPLAIN_MARSHAL).h 
 
 champlain-marshal.c: $(CHAMPLAIN_MARSHAL_LIST)
-	@GLIB_GENMARSHAL@ --body --prefix=champlain_marshal $< > $(CHAMPLAIN_MARSHAL).c
+	@GLIB_GENMARSHAL@ --body --prefix=cpl_marshal $< > $(CHAMPLAIN_MARSHAL).c
 
 libchamplain_includedir=$(includedir)/libchamplain-1.0/champlain
 libchamplain_include_HEADERS = champlain.h champlainview.h champlain_defines.h champlainlayer.h champlainmarker.h
