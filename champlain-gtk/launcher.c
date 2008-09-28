@@ -57,7 +57,7 @@ create_marker_layer ()
   champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 47.130885, -70.764141);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
   
-  clutter_actor_show(layer);
+  clutter_actor_hide(layer);
   return layer;
 }
 

@@ -1,8 +1,6 @@
 <SECTION>
 <FILE>champlainviewembed</FILE>
-ChamplainViewEmbedPrivate
 <TITLE>ChamplainViewEmbed</TITLE>
-ChamplainViewEmbed
 champlain_view_embed_new
 champlain_view_embed_get_view
 <SUBSECTION Standard>

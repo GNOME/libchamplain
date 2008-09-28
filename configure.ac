@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(libchamplain-gtk, 0.2.1, pierre-luc@squidy.info)
+AC_INIT(libchamplain-gtk, 0.2.2, pierre-luc@squidy.info)
 AC_CONFIG_SRCDIR([champlain-gtk/champlainviewembed.h])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR(m4)
@@ -37,6 +37,7 @@ GTK_DOC_CHECK(1.9)
 AC_CONFIG_FILES([Makefile
                  champlain-gtk/Makefile
                  docs/reference/Makefile
+                 docs/reference/version.xml
                  champlain-gtk.pc])
 AC_OUTPUT
 
