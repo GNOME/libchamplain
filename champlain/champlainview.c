@@ -578,8 +578,10 @@ viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainView *view)
 }
 
 void
-champlain_view_set_size (ChamplainView *view, gint width, gint height)
+champlain_view_set_size (ChamplainView *view, guint width, guint height)
 {
+  g_return_if_fail(CHAMPLAIN_IS_VIEW(view));
+
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
   priv->viewport_size.width = width;
@@ -669,6 +671,8 @@ champlain_view_new (ChamplainViewMode mode)
 void
 champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitude)
 {
+  g_return_if_fail(CHAMPLAIN_IS_VIEW(view));
+
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
   if(!priv->map)
@@ -737,6 +741,8 @@ champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitu
 void
 champlain_view_zoom_in (ChamplainView *view)
 {
+  g_return_if_fail(CHAMPLAIN_IS_VIEW(view));
+
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
   ClutterActor *group = priv->map->current_level->group;
   gdouble lon = viewport_get_current_longitude(priv);
@@ -764,6 +770,8 @@ champlain_view_zoom_in (ChamplainView *view)
 void
 champlain_view_zoom_out (ChamplainView *view)
 {
+  g_return_if_fail(CHAMPLAIN_IS_VIEW(view));
+
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
   ClutterActor *group = priv->map->current_level->group;
   gdouble lon = viewport_get_current_longitude(priv);
@@ -792,6 +800,9 @@ champlain_view_zoom_out (ChamplainView *view)
 void
 champlain_view_add_layer (ChamplainView *view, ClutterActor *layer)
 {
+  g_return_if_fail(CHAMPLAIN_IS_VIEW(view));
+  g_return_if_fail(CLUTTER_IS_ACTOR(layer));
+
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
   clutter_container_add(CLUTTER_CONTAINER(priv->user_layers), layer, NULL);
   clutter_actor_raise_top(layer);

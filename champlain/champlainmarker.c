@@ -190,6 +190,8 @@ champlain_marker_new ()
 void
 champlain_marker_set_position (ChamplainMarker *champlainMarker, gdouble latitude, gdouble longitude)
 {
+  g_return_if_fail(CHAMPLAIN_IS_MARKER(champlainMarker));
+
   ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
 
   priv->lon = longitude;
