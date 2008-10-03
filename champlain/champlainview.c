@@ -389,23 +389,27 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
         if (priv->map_source != source)
           {
             priv->map_source = source;
+            gdouble lat = viewport_get_current_latitude(priv);
+            gdouble lon = viewport_get_current_longitude(priv);
             if (priv->map) {
               gint currentLevel = priv->map->current_level->level;
-              ChamplainPoint anchor = priv->map->current_level->anchor;
               map_free(priv->map);
               priv->map = map_new(priv->map_source);
 
-              // Keep same zoom level
+              // Keep same zoom level if the new map supports it
               if (currentLevel > priv->map->zoom_levels)
-                currentLevel = priv->map->zoom_levels;
+                {
+                  currentLevel = priv->map->zoom_levels;
+                  g_object_notify(G_OBJECT(view), "zoom-level");
+                }
 
               map_load_level(priv->map, currentLevel);
-              priv->map->current_level->anchor = anchor;
 
               map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
               clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
 
               marker_reposition(view);
+              champlain_view_center_on(view, lat, lon);
             }
           }
         break;
