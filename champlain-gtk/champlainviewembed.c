@@ -146,6 +146,8 @@ mouse_button_cb (GtkWidget *widget, GdkEventButton *event, ChamplainViewEmbed *v
 GtkWidget *
 champlain_view_embed_new (ChamplainView *view)
 {
+  g_return_val_if_fail(CLUTTER_IS_ACTOR(view), NULL);  //FIXME should be CHAMPLAIN_IS_VIEW but doesn't compile
+
   ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
   ChamplainViewEmbed *embed;
   ClutterActor *stage;
@@ -184,6 +186,8 @@ champlain_view_embed_new (ChamplainView *view)
 ChamplainView *
 champlain_view_embed_get_view (ChamplainViewEmbed* embed)
 {
+  g_return_val_if_fail(CHAMPLAIN_IS_VIEW_EMBED(embed), NULL);
+
   ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (embed);
   return priv->view;
 }
