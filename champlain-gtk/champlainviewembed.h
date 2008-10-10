@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef CHAMPLAIN_VIEW_H
-#define CHAMPLAIN_VIEW_H
+#ifndef CHAMPLAIN_VIEW_EMBED_H
+#define CHAMPLAIN_VIEW_EMBED_H
 
 #include <gtk/gtk.h>
 #include <champlain/champlain.h>
