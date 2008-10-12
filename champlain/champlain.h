@@ -30,5 +30,6 @@
 #include <champlain/champlain_defines.h>
 #include <champlain/champlainview.h>
 #include <champlain/champlainmarker.h>
+#include <champlain/champlainlayer.h>
 
 #endif
