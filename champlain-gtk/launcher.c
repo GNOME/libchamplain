@@ -21,6 +21,8 @@
 #include <gtk/gtk.h>
 
 #include <champlain/champlain.h>
+#include <champlain-gtk/champlainviewembed.h>
+#include <clutter-gtk/gtk-clutter-embed.h>
 
 #define OSM_MAP "Open Street Map"
 #define OAM_MAP "Open Arial Map"
@@ -143,10 +145,10 @@ main (int argc, char *argv[])
   vbox = gtk_vbox_new(FALSE, 10);
   
   view = champlain_view_new (CHAMPLAIN_VIEW_MODE_KINETIC);
-  widget = champlain_view_embed_new(view);
+  widget = champlain_view_embed_new(CHAMPLAIN_VIEW (view));
   g_object_set(G_OBJECT(view), "zoom-level", 5, NULL);
   layer = create_marker_layer();
-  champlain_view_add_layer(view, layer);
+  champlain_view_add_layer(CHAMPLAIN_VIEW (view), layer);
   
   gtk_widget_set_size_request(widget, 640, 480);
   
