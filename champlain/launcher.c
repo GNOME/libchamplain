@@ -20,6 +20,14 @@
 
 #include <champlain.h>
 
+static gboolean
+montreal_click (ClutterActor *actor,
+                ClutterEvent *event,
+                gpointer      user_data)
+{	g_print("Montreal was clicked!\n");
+	return TRUE;
+}
+
 static ClutterActor*
 create_marker_layer ()
 {
@@ -32,6 +40,11 @@ create_marker_layer ()
   marker = champlain_marker_new_with_label("Montréal", "Airmole 14", NULL, NULL);
   champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 45.528178, -73.563788);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+  clutter_actor_set_reactive(marker, TRUE);
+  g_signal_connect_after (marker,
+                    "button-release-event",
+                    G_CALLBACK (montreal_click),
+                    NULL);
   
   marker = champlain_marker_new_with_label("New York", "Sans 25", &white, NULL);
   champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 40.77, -73.98);
@@ -58,11 +71,11 @@ main (int argc, char *argv[])
   
   actor = champlain_view_new (CHAMPLAIN_VIEW_MODE_KINETIC);
   
-  champlain_view_set_size (actor, 800, 600);
+  champlain_view_set_size (CHAMPLAIN_VIEW (actor), 800, 600);
   
   g_object_set(G_OBJECT(actor), "zoom-level", 5, NULL);
   layer = create_marker_layer();
-  champlain_view_add_layer(actor, layer);
+  champlain_view_add_layer(CHAMPLAIN_VIEW (actor), layer);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
   champlain_view_center_on(CHAMPLAIN_VIEW(actor), 45.466, -73.75);
