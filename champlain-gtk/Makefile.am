@@ -29,11 +29,7 @@ libchamplain_include_HEADERS = champlainviewembed.h
 
 libchamplain_gtk_1_0_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
-noinst_PROGRAMS = launcher
-
 AM_CPPFLAGS = $(DEPS_CFLAGS) -I$(top_srcdir)
 AM_LDFLAGS = $(DEPS_LIBS) -export-dynamic -export-symbols-regex ^champlain_.*
-launcher_SOURCES = launcher.c
-launcher_LDADD = $(DEPS_LIBS) libchamplain-gtk-1.0.la
 
 EXTRA_DIST = $(CHAMPLAIN_GTK_MARSHAL_LIST)

@@ -1,4 +1,4 @@
-SUBDIRS = champlain-gtk docs/reference
+SUBDIRS = champlain-gtk demos docs/reference
 
 pcfiles = champlain-gtk-1.0.pc
 

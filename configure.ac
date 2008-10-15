@@ -25,7 +25,7 @@ AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 
 PKG_CHECK_MODULES(DEPS,
-  [    gtk+-2.0 >= 2.2,
+  [   gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8,
       champlain-1.0 >= 0.2
@@ -36,6 +36,7 @@ GTK_DOC_CHECK(1.9)
 
 AC_CONFIG_FILES([Makefile
                  champlain-gtk/Makefile
+                 demos/Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
                  champlain-gtk.pc])
