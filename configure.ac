@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(libchamplain, 0.2.2, pierre-luc@pierlux.com)
+AC_INIT(libchamplain, 0.2.3, pierre-luc@pierlux.com)
 AC_CONFIG_SRCDIR([champlain/champlainview.h])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR(m4)
@@ -30,7 +30,7 @@ PKG_CHECK_MODULES(DEPS,
       gdk-2.0 >= 2.10,
       clutter-0.8 >= 0.8,
       clutter-cairo-0.8 >= 0.8,
-      cairo >= 1.6,
+      cairo >= 1.4,
       libsoup-2.4 >= 2.4.1,
       gio-2.0 >= 2.16
   ]
