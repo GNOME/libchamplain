@@ -103,5 +103,5 @@ gchar *google_map_get_tile_filename(Map *map, Tile *tile)
 
 gchar *google_map_get_tile_uri(Map *map, Tile *tile)
 {
-  return g_strdup_printf("http://mt.google.com/mt?n=404&v=w2.99&x=%d&y=%d&zoom=%d", tile->x, tile->y, map->zoom_levels + 1 - tile->level, NULL);
+  return g_strdup_printf("http://mt.google.com/mt?n=404&v=w2.99&x=%d&y=%d&zoom=%d", tile->x, tile->y, map->zoom_levels + 1 - tile->level);
 }

@@ -28,6 +28,7 @@
 #include "zoomlevel.h"
 
 #include <clutter/clutter.h>
+#include <clutter-cairo/clutter-cairo.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <cairo.h>
@@ -48,7 +49,7 @@ enum
   PROP_ANCHOR_Y,
 };
 
-static guint champlain_marker_signals[LAST_SIGNAL] = { 0, };
+//static guint champlain_marker_signals[LAST_SIGNAL] = { 0, };
 
 G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_GROUP);
 
@@ -99,8 +100,8 @@ champlain_marker_set_property(GObject *object, guint prop_id, const GValue *valu
 static void
 champlain_marker_finalize (GObject *object)
 {
-  ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
-  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
+  //ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
+  //ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
 
   G_OBJECT_CLASS (champlain_marker_parent_class)->finalize (object);
 }
@@ -171,7 +172,7 @@ champlain_marker_new ()
   ChamplainMarker *marker;
 
   marker = CHAMPLAIN_MARKER (g_object_new (CHAMPLAIN_TYPE_MARKER, NULL));
-  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
+  //ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
 
   return CLUTTER_ACTOR (marker);
 }
@@ -218,7 +219,6 @@ champlain_marker_new_with_label (const gchar *label,
                                  ClutterColor *marker_color)
 {
   ChamplainMarker *champlainMarker = CHAMPLAIN_MARKER(champlain_marker_new ());
-  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
   ClutterColor default_text_color = { 0x22, 022, 0x22, 0xFF },
                default_marker_color = { 0x2A, 0xB1, 0x26, 0xEE },
                darker_color;
@@ -244,7 +244,7 @@ champlain_marker_new_with_label (const gchar *label,
   point = (text_height + 2 * padding) / 4.0;
 
   bg = clutter_cairo_new (text_width, text_height + point);
-  cr = clutter_cairo_create (bg);
+  cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
 
   cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_move_to (cr, 0, 0);
@@ -276,6 +276,6 @@ champlain_marker_new_with_label (const gchar *label,
 
   clutter_actor_set_anchor_point (CLUTTER_ACTOR(champlainMarker), 0, text_height + point);
 
-  return champlainMarker;
+  return CLUTTER_ACTOR (champlainMarker);
 }
 

@@ -23,6 +23,9 @@
 
 #define CHAMPLAIN_MARKER_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
 
+typedef struct _Map Map;
+typedef struct _Tile Tile;
+
 typedef struct 
 {
   gint x;

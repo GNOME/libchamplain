@@ -21,17 +21,16 @@
 
 #include "champlain.h"
 #include "champlainview.h"
-#include "champlain_defines.h"
+#include "champlain_private.h"
 #include "zoomlevel.h"
 #include "tile.h"
 
 #include <glib.h>
 #include <clutter/clutter.h>
 
-
 struct _Map
 {
-  int zoom_levels;
+  guint zoom_levels;
   const gchar *name;
   int tile_size;
 
@@ -58,6 +57,12 @@ void map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean off
 
 void map_free (Map *map);
 
+gboolean map_zoom_in (Map *map);
+
+gboolean map_zoom_out (Map *map);
+
 gboolean map_zoom_to (Map *map, guint zoomLevel);
+
+void map_load_level(Map *map, gint zoom_level);
 
 #endif

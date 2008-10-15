@@ -101,5 +101,5 @@ gchar *mff_relief_get_tile_filename(Map *map, Tile *tile)
 
 gchar *mff_relief_get_tile_uri(Map *map, Tile *tile)
 {
-  return g_strdup_printf("http://maps-for-free.com/layer/relief/z%d/row%d/%d_%d-%d.jpg", tile->level, tile->y, tile->level, tile->x, tile->y, NULL);
+  return g_strdup_printf("http://maps-for-free.com/layer/relief/z%d/row%d/%d_%d-%d.jpg", tile->level, tile->y, tile->level, tile->x, tile->y);
 }

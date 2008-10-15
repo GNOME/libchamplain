@@ -21,8 +21,9 @@
 
 #include <glib.h>
 #include <clutter/clutter.h>
+#include <champlain/champlain_private.h>
 
-typedef struct
+struct _Tile
 {
   ClutterActor* actor;
   int x;
@@ -32,8 +33,12 @@ typedef struct
 
   gboolean loading; // TRUE when a callback exist to load the tile, FALSE otherwise
   gboolean to_destroy; // TRUE when a tile struct should be deleted when loading is done, FALSE otherwise
-} Tile;
+};
 
 void tile_free(Tile* tile);
+
+void tile_set_position(Map* map, Tile* tile);
+
+Tile* tile_load (Map* map, guint zoom_level, guint x, guint y, gboolean offline);
 
 #endif

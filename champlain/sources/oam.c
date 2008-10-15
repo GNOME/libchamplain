@@ -98,5 +98,5 @@ gchar *oam_get_tile_filename(Map *map, Tile *tile)
 
 gchar *oam_get_tile_uri(Map *map, Tile *tile)
 {
-  return g_strdup_printf("http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/%d/%d/%d.jpg", tile->level, tile->x, tile->y, NULL);
+  return g_strdup_printf("http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/%d/%d/%d.jpg", tile->level, tile->x, tile->y);
 }

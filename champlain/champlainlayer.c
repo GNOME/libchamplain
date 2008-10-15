@@ -49,7 +49,7 @@ layer_add_cb (ClutterGroup *layer, ClutterActor *marker, gpointer data)
       g_object_get(G_OBJECT(prev_marker), "latitude", &tmp_y, NULL);
       tmp_y = 90 - tmp_y;
 
-      if (prev_marker == marker)
+      if (prev_marker == (ChamplainMarker*) marker)
         continue;
 
       if (y < tmp_y && tmp_y < low_y)
@@ -74,7 +74,7 @@ layer_add_cb (ClutterGroup *layer, ClutterActor *marker, gpointer data)
 ChamplainLayer *
 champlain_layer_new ()
 {
-  ClutterGroup *layer;
+  ClutterActor *layer;
 
   layer = clutter_group_new();
   g_signal_connect_after(G_OBJECT(layer), "actor-added", G_CALLBACK(layer_add_cb), NULL);

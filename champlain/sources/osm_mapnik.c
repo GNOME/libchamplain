@@ -101,5 +101,5 @@ gchar *osm_mapnik_get_tile_filename(Map *map, Tile *tile)
 
 gchar *osm_mapnik_get_tile_uri(Map *map, Tile *tile)
 {
-  return g_strdup_printf("http://tile.openstreetmap.org/%d/%d/%d.png", tile->level, tile->x, tile->y, NULL);
+  return g_strdup_printf("http://tile.openstreetmap.org/%d/%d/%d.png", tile->level, tile->x, tile->y);
 }

@@ -54,7 +54,7 @@ enum
   PROP_DECEL_RATE,
 };
 
-static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
+// static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
 
 #define CHAMPLAIN_VIEW_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
 
@@ -165,7 +165,8 @@ scroll_event (ClutterActor *actor, ClutterScrollEvent *event, ChamplainView *vie
 
       g_object_notify(G_OBJECT(view), "zoom-level");
     }
-
+  
+  return success;
 }
 
 static void
@@ -391,7 +392,7 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
             gdouble lat = viewport_get_current_latitude(priv);
             gdouble lon = viewport_get_current_longitude(priv);
             if (priv->map) {
-              gint currentLevel = priv->map->current_level->level;
+              guint currentLevel = priv->map->current_level->level;
               map_free(priv->map);
               priv->map = map_new(priv->map_source);
 
@@ -430,8 +431,8 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
 static void
 champlain_view_finalize (GObject *object)
 {
-  ChamplainView *view = CHAMPLAIN_VIEW (object);
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  //ChamplainView *view = CHAMPLAIN_VIEW (object);
+  //ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
   G_OBJECT_CLASS (champlain_view_parent_class)->finalize (object);
 }
@@ -600,9 +601,7 @@ champlain_view_set_size (ChamplainView *view, guint width, guint height)
 ClutterActor *
 champlain_view_new (ChamplainViewMode mode)
 {
-  ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
   ChamplainView *view;
-  ClutterActor *stage;
 
   view = CHAMPLAIN_VIEW (g_object_new (CHAMPLAIN_TYPE_VIEW, NULL));
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
@@ -709,7 +708,7 @@ champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitu
     anchor->y = 0;
   }
 
-  int i;
+  guint i;
   for (i = 0; i < priv->map->current_level->tiles->len; i++)
     {
       Tile *tile = g_ptr_array_index(priv->map->current_level->tiles, i);
