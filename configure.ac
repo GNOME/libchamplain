@@ -40,6 +40,7 @@ GTK_DOC_CHECK(1.9)
 
 AC_CONFIG_FILES([Makefile
                  champlain/Makefile
+		 demos/Makefile
                  tidy/Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml

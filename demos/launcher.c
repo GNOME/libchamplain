@@ -18,7 +18,7 @@
 
 #include <config.h>
 
-#include <champlain.h>
+#include <champlain/champlain.h>
 
 static gboolean
 montreal_click (ClutterActor *actor,

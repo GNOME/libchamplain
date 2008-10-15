@@ -1,4 +1,4 @@
-SUBDIRS = tidy champlain docs/reference
+SUBDIRS = tidy champlain demos docs/reference
 
 pcfiles = champlain-1.0.pc
 
