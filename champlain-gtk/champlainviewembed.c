@@ -33,7 +33,7 @@ enum
 };
 
 
-static guint champlain_view_embed_embed_signals[LAST_SIGNAL] = { 0, };
+//static guint champlain_view_embed_embed_signals[LAST_SIGNAL] = { 0, };
 
 #define CHAMPLAIN_VIEW_EMBED_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW_EMBED, ChamplainViewEmbedPrivate))
 
@@ -59,8 +59,8 @@ G_DEFINE_TYPE (ChamplainViewEmbed, champlain_view_embed, GTK_TYPE_ALIGNMENT);
 static void
 champlain_view_embed_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec)
 {
-  ChamplainViewEmbed *view = CHAMPLAIN_VIEW_EMBED(object);
-  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (view);
+  //ChamplainViewEmbed *view = CHAMPLAIN_VIEW_EMBED(object);
+  //ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (view);
 
   switch(prop_id)
     {
@@ -72,8 +72,8 @@ champlain_view_embed_get_property(GObject *object, guint prop_id, GValue *value,
 static void
 champlain_view_embed_set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec)
 {
-  ChamplainViewEmbed *view = CHAMPLAIN_VIEW_EMBED(object);
-  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (view);
+  //ChamplainViewEmbed *view = CHAMPLAIN_VIEW_EMBED(object);
+  //ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (view);
 
   switch(prop_id)
   {
@@ -85,8 +85,8 @@ champlain_view_embed_set_property(GObject *object, guint prop_id, const GValue *
 static void
 champlain_view_embed_finalize (GObject *object)
 {
-  ChamplainViewEmbed *view = CHAMPLAIN_VIEW_EMBED (object);
-  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (view);
+  //ChamplainViewEmbed *view = CHAMPLAIN_VIEW_EMBED (object);
+  //ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (view);
 
   G_OBJECT_CLASS (champlain_view_embed_parent_class)->finalize (object);
 }
@@ -175,7 +175,7 @@ champlain_view_embed_new (ChamplainView *view)
   // Setup stage
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
   clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), view);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR(view));
   
   gtk_container_add (GTK_CONTAINER (embed), priv->clutter_embed);
 

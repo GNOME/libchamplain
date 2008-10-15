@@ -121,7 +121,6 @@ main (int argc, char *argv[])
 {
   GtkWidget *window;
   GtkWidget *widget, *vbox, *bbox, *button, *viewport;
-  GtkWidget *scrolled;
   ClutterActor *layer, *view;
   
   g_thread_init (NULL);
