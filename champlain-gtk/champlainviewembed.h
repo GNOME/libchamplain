@@ -15,6 +15,10 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+ 
+#if !defined (__CHAMPLAIN_GTK_CHAMPLAIN_GTK_H_INSIDE__) && !defined (CHAMPLAIN_GTK_COMPILATION)
+#error "Only <champlain/champlain.h> can be included directly."
+#endif
 
 #ifndef CHAMPLAIN_VIEW_EMBED_H
 #define CHAMPLAIN_VIEW_EMBED_H

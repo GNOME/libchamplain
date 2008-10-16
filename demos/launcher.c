@@ -21,7 +21,7 @@
 #include <gtk/gtk.h>
 
 #include <champlain/champlain.h>
-#include <champlain-gtk/champlainviewembed.h>
+#include <champlain-gtk/champlain-gtk.h>
 #include <clutter-gtk/gtk-clutter-embed.h>
 
 #define OSM_MAP "Open Street Map"
