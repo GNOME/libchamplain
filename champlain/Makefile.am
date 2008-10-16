@@ -8,9 +8,9 @@ CLEANFILES = $(BUILT_SOURCES)
 CHAMPLAIN_MARSHAL = champlain-marshal
 CHAMPLAIN_MARSHAL_LIST = champlain-marshal.list 
 
-lib_LTLIBRARIES = libchamplain-1.0.la
+lib_LTLIBRARIES = libchamplain-0.2.la
 
-libchamplain_1_0_la_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
+libchamplain_0_2_la_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
 					$(BUILT_SOURCES) \
 					champlainview.c \
 					champlainlayer.c \
@@ -40,7 +40,7 @@ noinst_HEADERS = champlainview.h \
 					sources/google_terrain.h \
 					sources/debugmap.h
 
-libchamplain_1_0_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
+libchamplain_0_2_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
 
 champlain-marshal.h: $(CHAMPLAIN_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --header --prefix=cpl_marshal $< > $(CHAMPLAIN_MARSHAL).h 
@@ -48,10 +48,10 @@ champlain-marshal.h: $(CHAMPLAIN_MARSHAL_LIST)
 champlain-marshal.c: $(CHAMPLAIN_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --body --prefix=cpl_marshal $< > $(CHAMPLAIN_MARSHAL).c
 
-libchamplain_includedir=$(includedir)/libchamplain-1.0/champlain
+libchamplain_includedir=$(includedir)/libchamplain-0.2/champlain
 libchamplain_include_HEADERS = champlain.h champlainview.h champlain_defines.h champlainlayer.h champlainmarker.h
 
-libchamplain_1_0_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
+libchamplain_0_2_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
 AM_CPPFLAGS = $(DEPS_CFLAGS) -DDATADIR=\""$(datadir)"\" -I$(top_srcdir)/tidy -I$(top_srcdir)
 AM_LDFLAGS = $(DEPS_LIBS) -export-dynamic -export-symbols-regex ^champlain_.*
