@@ -21,7 +21,7 @@
 
 #include <glib.h>
 #include <clutter/clutter.h>
-#include "champlain_private.h"
+#include "champlainprivate.h"
 
 typedef struct
 {

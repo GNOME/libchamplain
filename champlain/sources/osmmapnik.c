@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "sources/osm_mapnik.h"
+#include "sources/osmmapnik.h"
 #include "map.h"
 #include <math.h>
 #include <clutter/clutter.h>

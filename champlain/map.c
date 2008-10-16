@@ -18,8 +18,8 @@
 
 #include "map.h"
 #include "zoomlevel.h"
-#include "sources/osm_mapnik.h"
-#include "sources/mff_relief.h"
+#include "sources/osmmapnik.h"
+#include "sources/mffrelief.h"
 #include "sources/oam.h"
 #include "sources/debugmap.h"
 #include <math.h>

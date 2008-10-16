@@ -21,7 +21,7 @@
 
 #include <glib.h>
 #include <clutter/clutter.h>
-#include <champlain/champlain_private.h>
+#include <champlain/champlainprivate.h>
 
 struct _Tile
 {

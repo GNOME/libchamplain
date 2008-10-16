@@ -18,9 +18,9 @@
 
 #include "config.h"
 
-#include "champlain_defines.h"
+#include "champlaindefines.h"
 #include "champlainmarker.h"
-#include "champlain_private.h"
+#include "champlainprivate.h"
 #include "champlain.h"
 #include "champlain-marshal.h"
 #include "map.h"

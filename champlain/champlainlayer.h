@@ -19,7 +19,7 @@
 #ifndef CHAMPLAIN_LAYER_H
 #define CHAMPLAIN_LAYER_H
 
-#include <champlain/champlain_defines.h>
+#include <champlain/champlaindefines.h>
 #include <glib-object.h>
 #include <clutter/clutter.h>
 

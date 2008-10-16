@@ -22,7 +22,7 @@
  * The current code isn't working because the web server is returning Forbiden error message.
  */
 
-#include "sources/google_terrain.h"
+#include "sources/googleterrain.h"
 #include "map.h"
 #include <math.h>
 #include <clutter/clutter.h>

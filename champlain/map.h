@@ -21,7 +21,7 @@
 
 #include "champlain.h"
 #include "champlainview.h"
-#include "champlain_private.h"
+#include "champlainprivate.h"
 #include "zoomlevel.h"
 #include "tile.h"
 

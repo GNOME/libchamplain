@@ -18,8 +18,8 @@
 
 #include "config.h"
 
-#include "champlain_defines.h"
-#include "champlain_private.h"
+#include "champlaindefines.h"
+#include "champlainprivate.h"
 #include "champlain.h"
 #include "champlain-marshal.h"
 #include "champlainview.h"

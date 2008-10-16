@@ -19,7 +19,7 @@
 #include "config.h"
 
 #include "champlainlayer.h"
-#include "champlain_defines.h"
+#include "champlaindefines.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>

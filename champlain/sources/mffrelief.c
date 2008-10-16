@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "sources/mff_relief.h"
+#include "sources/mffrelief.h"
 #include "map.h"
 #include <math.h>
 #include <clutter/clutter.h>

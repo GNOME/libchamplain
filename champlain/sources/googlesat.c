@@ -22,86 +22,86 @@
  * The current code isn't working because the web server is returning Forbiden error message.
  */
 
-#include "sources/google_map.h"
+#include "sources/googlesat.h"
 #include "map.h"
 #include <math.h>
 #include <clutter/clutter.h>
 
-guint google_map_row_count(Map *map, guint zoom_level);
-guint google_map_column_count(Map *map, guint zoom_level);
-Tile *google_map_get_tile (Map *map, guint zoom_level, guint x, guint y);
+guint google_sat_row_count(Map *map, guint zoom_level);
+guint google_sat_column_count(Map *map, guint zoom_level);
+Tile *google_sat_get_tile (Map *map, guint zoom_level, guint x, guint y);
 
-gint google_map_longitude_to_x (Map *map, gdouble longitude, guint zoom_level);
-gint google_map_latitude_to_y (Map *map, gdouble latitude, guint zoom_level);
-gdouble google_map_x_to_longitude (Map *map, gint x, guint zoom_level);
-gdouble google_map_y_to_latitude (Map *map, gint y, guint zoom_level);
+gint google_sat_longitude_to_x (Map *map, gdouble longitude, guint zoom_level);
+gint google_sat_latitude_to_y (Map *map, gdouble latitude, guint zoom_level);
+gdouble google_sat_x_to_longitude (Map *map, gint x, guint zoom_level);
+gdouble google_sat_y_to_latitude (Map *map, gint y, guint zoom_level);
 
-gchar *google_map_get_tile_filename(Map *map, Tile *tile);
-gchar *google_map_get_tile_uri(Map *map, Tile *tile);
+gchar *google_sat_get_tile_filename(Map *map, Tile *tile);
+gchar *google_sat_get_tile_uri(Map *map, Tile *tile);
 
 void
-google_map_init(Map *map)
+google_sat_init(Map *map)
 {
-  map->name = "Google Map";
-  map->zoom_levels = 15;
+  map->name = "OpenStreetMap";
+  map->zoom_levels = 17;
   map->tile_size = 256;
 
-  map->get_row_count = google_map_row_count;
-  map->get_column_count = google_map_column_count;
+  map->get_row_count = google_sat_row_count;
+  map->get_column_count = google_sat_column_count;
 
-  map->longitude_to_x = google_map_longitude_to_x;
-  map->latitude_to_y = google_map_latitude_to_y;
-  map->x_to_longitude = google_map_x_to_longitude;
-  map->y_to_latitude = google_map_y_to_latitude;
+  map->longitude_to_x = google_sat_longitude_to_x;
+  map->latitude_to_y = google_sat_latitude_to_y;
+  map->x_to_longitude = google_sat_x_to_longitude;
+  map->y_to_latitude = google_sat_y_to_latitude;
 
-  map->get_tile_filename = google_map_get_tile_filename;
-  map->get_tile_uri = google_map_get_tile_uri;
+  map->get_tile_filename = google_sat_get_tile_filename;
+  map->get_tile_uri = google_sat_get_tile_uri;
 }
 
-guint google_map_row_count(Map *map, guint zoom_level)
+guint google_sat_row_count(Map *map, guint zoom_level)
 {
   return pow (2, zoom_level);
 }
 
 guint
-google_map_column_count(Map *map, guint zoom_level)
+google_sat_column_count(Map *map, guint zoom_level)
 {
   return pow (2, zoom_level);
 }
 
 gint
-google_map_longitude_to_x (Map *map, gdouble longitude, guint zoom_level)
+google_sat_longitude_to_x (Map *map, gdouble longitude, guint zoom_level)
 {
   return ((longitude + 180.0) / 360.0 * pow(2.0, zoom_level)) * map->tile_size;
 }
 
 gint
-google_map_latitude_to_y (Map *map, gdouble latitude, guint zoom_level)
+google_sat_latitude_to_y (Map *map, gdouble latitude, guint zoom_level)
 {
   return ((1.0 - log( tan(latitude * M_PI/180.0) + 1.0 / cos(latitude * M_PI/180.0)) / M_PI) / 2.0 * pow(2.0, zoom_level)) * map->tile_size;
 }
 
 gdouble
-google_map_x_to_longitude (Map *map, gint x, guint zoom_level)
+google_sat_x_to_longitude (Map *map, gint x, guint zoom_level)
 {
   gdouble dx = (float)x / map->tile_size;
   return dx / pow(2.0, zoom_level) * 360.0 - 180;
 }
 
 gdouble
-google_map_y_to_latitude (Map *map, gint y, guint zoom_level)
+google_sat_y_to_latitude (Map *map, gint y, guint zoom_level)
 {
   gdouble dy = (float)y / map->tile_size;
   double n = M_PI - 2.0 * M_PI * dy / pow(2.0, zoom_level);
 	return 180.0 / M_PI * atan(0.5 * (exp(n) - exp(-n)));
 }
 
-gchar *google_map_get_tile_filename(Map *map, Tile *tile)
+gchar *google_sat_get_tile_filename(Map *map, Tile *tile)
 {
   return g_build_filename (g_strdup_printf("%d_%d_%d.png", map->zoom_levels + 1 - tile->level, tile->y, tile->x), NULL);
 }
 
-gchar *google_map_get_tile_uri(Map *map, Tile *tile)
+gchar *google_sat_get_tile_uri(Map *map, Tile *tile)
 {
   return g_strdup_printf("http://mt.google.com/mt?n=404&v=w2.99&x=%d&y=%d&zoom=%d", tile->x, tile->y, map->zoom_levels + 1 - tile->level);
 }

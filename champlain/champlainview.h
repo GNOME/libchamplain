@@ -19,7 +19,7 @@
 #ifndef CHAMPLAIN_VIEW_H
 #define CHAMPLAIN_VIEW_H
 
-#include <champlain/champlain_defines.h>
+#include <champlain/champlaindefines.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <clutter/clutter.h>

@@ -19,25 +19,25 @@ libchamplain_0_2_la_SOURCES = $(CHAMPLAIN_MARSHAL_LIST) \
 					zoomlevel.c \
 					tile.c \
 					sources/oam.c \
-					sources/osm_mapnik.c \
-					sources/mff_relief.c \
-					sources/google_map.c \
-					sources/google_sat.c \
-					sources/google_terrain.c \
+					sources/osmmapnik.c \
+					sources/mffrelief.c \
+					sources/googlemap.c \
+					sources/googlesat.c \
+					sources/googleterrain.c \
 					sources/debugmap.c
 
 noinst_HEADERS = champlainview.h \
 					champlainmarker.c \
-					champlain_private.h \
+					champlainprivate.h \
 					map.h  \
 					zoomlevel.h \
 					tile.h \
 					sources/oam.h \
-					sources/osm_mapnik.h \
-					sources/mff_relief.h \
-					sources/google_map.h \
-					sources/google_sat.h \
-					sources/google_terrain.h \
+					sources/osmmapnik.h \
+					sources/mffrelief.h \
+					sources/googlemap.h \
+					sources/googlesat.h \
+					sources/googleterrain.h \
 					sources/debugmap.h
 
 libchamplain_0_2_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
@@ -49,7 +49,7 @@ champlain-marshal.c: $(CHAMPLAIN_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --body --prefix=cpl_marshal $< > $(CHAMPLAIN_MARSHAL).c
 
 libchamplain_includedir=$(includedir)/libchamplain-0.2/champlain
-libchamplain_include_HEADERS = champlain.h champlainview.h champlain_defines.h champlainlayer.h champlainmarker.h
+libchamplain_include_HEADERS = champlain.h champlainview.h champlaindefines.h champlainlayer.h champlainmarker.h
 
 libchamplain_0_2_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
