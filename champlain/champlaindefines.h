@@ -16,6 +16,10 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#if !defined (__CHAMPLAIN_CHAMPLAIN_H_INSIDE__) && !defined (CHAMPLAIN_COMPILATION)
+#error "Only <champlain/champlain.h> can be included directly."
+#endif
+
 #ifndef CHAMPLAIN_DEFINES_H
 #define CHAMPLAIN_DEFINES_H
 

@@ -53,7 +53,7 @@ libchamplain_include_HEADERS = champlain.h champlainview.h champlaindefines.h ch
 
 libchamplain_0_2_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
-AM_CPPFLAGS = $(DEPS_CFLAGS) -DDATADIR=\""$(datadir)"\" -I$(top_srcdir)/tidy -I$(top_srcdir)
+AM_CPPFLAGS = $(DEPS_CFLAGS) -DDATADIR=\""$(datadir)"\" -I$(top_srcdir)/tidy -I$(top_srcdir) -DCHAMPLAIN_COMPILATION
 AM_LDFLAGS = $(DEPS_LIBS) -export-dynamic -export-symbols-regex ^champlain_.*
 
 svgdir = $(datadir)/champlain

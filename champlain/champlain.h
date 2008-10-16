@@ -19,6 +19,8 @@
 #ifndef CHAMPLAIN_H
 #define CHAMPLAIN_H
 
+#define __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
+
 #define CHAMPLAIN_MIN_LAT -90
 #define CHAMPLAIN_MAX_LAT 90
 #define CHAMPLAIN_MIN_LONG -180
@@ -30,5 +32,7 @@
 #include <champlain/champlainview.h>
 #include <champlain/champlainmarker.h>
 #include <champlain/champlainlayer.h>
+
+#undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 
 #endif
