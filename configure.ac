@@ -28,7 +28,7 @@ PKG_CHECK_MODULES(DEPS,
   [   gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
       clutter-gtk-0.8 >= 0.8,
-      champlain-1.0 >= 0.2
+      champlain-0.2 >= 0.2
   ]
 )
 # check for gtk-doc
