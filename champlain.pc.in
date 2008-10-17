@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libchamplain
 Description: Map View for Clutter
 Version: @VERSION@
-Libs: -L${libdir} -lchamplain-1.0
-Cflags: -I${includedir}/libchamplain-1.0
+Libs: -L${libdir} -lchamplain-0.2
+Cflags: -I${includedir}/libchamplain-0.2
 Requires: gobject-2.0 clutter-0.8
