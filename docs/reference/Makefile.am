@@ -61,7 +61,7 @@ expand_content_files=
 # signals and properties.
 # e.g. INCLUDES=-I$(top_srcdir) -I$(top_builddir) $(GTK_DEBUG_FLAGS)
 # e.g. GTKDOC_LIBS=$(top_builddir)/gtk/$(gtktargetlib)
-INCLUDES=-I$(top_builddir)/champlain -I$(top_builddir) $(DEPS_CFLAGS)
+INCLUDES=-I$(top_srcdir)/champlain -I$(top_srcdir) -I$(top_builddir) $(DEPS_CFLAGS)
 GTKDOC_LIBS=$(DEPS_LIBS) $(top_builddir)/champlain-gtk/libchamplain-gtk-1.0.la
 
 # This includes the standard gtk-doc make rules, copied by gtkdocize.

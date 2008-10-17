@@ -25,7 +25,7 @@ champlain-gtk-marshal.c: $(CHAMPLAIN_GTK_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --body --prefix=champlain_gtk_marshal $< > $(CHAMPLAIN_GTK_MARSHAL).c
 
 libchamplain_includedir=$(includedir)/libchamplain-gtk-1.0/champlain-gtk
-libchamplain_include_HEADERS = champlainviewembed.h
+libchamplain_include_HEADERS = champlain-gtk.h champlainviewembed.h
 
 libchamplain_gtk_0_2_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
