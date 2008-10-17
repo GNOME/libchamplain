@@ -30,3 +30,4 @@ tidy/tidy-enum-types.c
 tidy/tidy-enum-types.h
 tidy/tidy-marshal.c
 tidy/tidy-marshal.h
+*~
