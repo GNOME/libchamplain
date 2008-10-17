@@ -2,11 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(libchamplain, 0.2.4, pierre-luc@pierlux.com)
+AC_INIT(libchamplain, 0.2.5, pierre-luc@pierlux.com)
 AC_CONFIG_SRCDIR([champlain/champlainview.h])
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_MACRO_DIR(m4)
-
 
 AM_INIT_AUTOMAKE
 AC_LIBTOOL_DLOPEN
