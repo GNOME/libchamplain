@@ -17,8 +17,11 @@ AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
 # Checks for libraries.
 LIBRARY_VERSION=0:1:0
+# API_VERSION is used to generate the pc file only
+API_VERSION=0.2
 
 AC_SUBST(LIBRARY_VERSION)
+AC_SUBST(API_VERSION)
 AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 

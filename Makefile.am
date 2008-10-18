@@ -1,8 +1,8 @@
 SUBDIRS = champlain-gtk demos docs/reference
 
-pcfiles = champlain-gtk-0.2.pc
+pcfiles = champlain-gtk-@API_VERSION@.pc
 
-champlain-gtk-0.2.pc: champlain-gtk.pc
+champlain-gtk-@API_VERSION@.pc: champlain-gtk.pc
 	@cp -f $< $@
 
 pkgconfig_DATA = $(pcfiles)
