@@ -1,8 +1,8 @@
 SUBDIRS = tidy champlain demos docs/reference
 
-pcfiles = champlain-0.2.pc
+pcfiles = champlain-@API_VERSION@.pc
 
-champlain-0.2.pc: champlain.pc
+champlain-@API_VERSION@.pc: champlain.pc
 	@cp -f $< $@
 
 pkgconfig_DATA = $(pcfiles)
