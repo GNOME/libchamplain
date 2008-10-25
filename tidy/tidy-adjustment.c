@@ -54,7 +54,6 @@ struct _TidyAdjustmentPrivate
   
   /* For elasticity */
   gboolean      elastic;
-  guint         bounce_source;
   ClutterAlpha *bounce_alpha;
 };
 
@@ -184,7 +183,6 @@ static void
 stop_interpolation (TidyAdjustment *adjustment)
 {
   TidyAdjustmentPrivate *priv = adjustment->priv;
-
   if (priv->interpolation)
     {
       clutter_timeline_stop (priv->interpolation);
@@ -196,12 +194,6 @@ stop_interpolation (TidyAdjustment *adjustment)
           g_object_unref (priv->bounce_alpha);
           priv->bounce_alpha = NULL;
         }
-    }
-  
-  if (priv->bounce_source)
-    {
-      g_source_remove (priv->bounce_source);
-      priv->bounce_source = 0;
     }
 }
 
@@ -703,7 +695,7 @@ interpolation_new_frame_cb (ClutterTimeline *timeline,
   TidyAdjustmentPrivate *priv = adjustment->priv;
 
   priv->interpolation = NULL;
-  if (priv->elastic)
+  if (priv->elastic && priv->bounce_alpha)
     {
       gdouble progress = clutter_alpha_get_alpha (priv->bounce_alpha) /
         (gdouble)CLUTTER_ALPHA_MAX_ALPHA;

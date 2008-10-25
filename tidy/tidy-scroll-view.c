@@ -38,9 +38,6 @@ G_DEFINE_TYPE_WITH_CODE (TidyScrollView, tidy_scroll_view, CLUTTER_TYPE_ACTOR,
 struct _TidyScrollViewPrivate
 {
   ClutterActor   *child;
-  
-  TidyAdjustment *hadjustment;
-  TidyAdjustment *vadjustment;
 };
 
 enum {
@@ -247,7 +244,7 @@ tidy_scroll_view_add_actor (ClutterContainer *container,
           /* Notify that child has been set */
           g_signal_emit_by_name (container, "actor-added", priv->child);
           g_object_notify (G_OBJECT (container), "child");
-          
+ 		
           clutter_actor_queue_relayout (CLUTTER_ACTOR (container));
         }
       else
