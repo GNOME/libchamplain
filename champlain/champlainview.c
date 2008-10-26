@@ -52,6 +52,7 @@ enum
   PROP_MAP_SOURCE,
   PROP_OFFLINE,
   PROP_DECEL_RATE,
+  PROP_KEEP_CENTER_ON_RESIZE
 };
 
 // static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
@@ -77,6 +78,7 @@ struct _ChamplainViewPrivate
   Map *map;
 
   gboolean offline;
+  gboolean keep_center_on_resize;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -105,12 +107,18 @@ static gboolean finger_scroll_clicked (ClutterActor *actor, ClutterButtonEvent *
 static gdouble
 viewport_get_longitude_at(ChamplainViewPrivate *priv, gint x)
 {
+  if (!priv->map)
+    return 0.0;
+
   return priv->map->x_to_longitude(priv->map, x, priv->map->current_level->level);
 }
 
 static gdouble
 viewport_get_current_longitude(ChamplainViewPrivate *priv)
 {
+  if (!priv->map)
+    return 0.0;
+
   return viewport_get_longitude_at(priv,
     priv->map->current_level->anchor.x + priv->viewport_size.x + priv->viewport_size.width / 2.0);
 }
@@ -118,12 +126,18 @@ viewport_get_current_longitude(ChamplainViewPrivate *priv)
 static gdouble
 viewport_get_latitude_at(ChamplainViewPrivate *priv, gint y)
 {
+  if (!priv->map)
+    return 0.0;
+
   return priv->map->y_to_latitude(priv->map, y, priv->map->current_level->level);
 }
 
 static gdouble
 viewport_get_current_latitude(ChamplainViewPrivate *priv)
 {
+  if (!priv->map)
+    return 0.0;
+
   return viewport_get_latitude_at(priv,
     priv->map->current_level->anchor.y + priv->viewport_size.y + priv->viewport_size.height / 2.0);
 }
@@ -332,6 +346,9 @@ champlain_view_get_property(GObject *object, guint prop_id, GValue *value, GPara
           g_value_set_double(value, decel);
           break;
         }
+      case PROP_KEEP_CENTER_ON_RESIZE:
+        g_value_set_boolean(value, priv->keep_center_on_resize);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -424,6 +441,9 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
         g_object_set (priv->finger_scroll, "decel-rate", decel, NULL);
         break;
       }
+    case PROP_KEEP_CENTER_ON_RESIZE:
+      priv->keep_center_on_resize = g_value_get_boolean(value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
   }
@@ -544,7 +564,22 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
                                                         1.0,
                                                         2.0,
                                                         1.1,
-                                                        G_PARAM_READWRITE));
+                                                        CHAMPLAIN_PARAM_READWRITE));
+  /**
+  * ChamplainView:keep-center-on-resize:
+  *
+  * Keep the current centered position when resizing the view.
+  *
+  * Since: 0.2.7
+  */
+  g_object_class_install_property (object_class,
+                                   PROP_KEEP_CENTER_ON_RESIZE,
+                                   g_param_spec_boolean ("keep-center-on-resize",
+                                                         "Keep center on resize",
+                                                         "Keep the current centered position "
+                                                         "upon resizing",
+                                                         TRUE,
+                                                         CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
@@ -555,6 +590,7 @@ champlain_view_init (ChamplainView *view)
   priv->map_source = CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP;
   priv->zoom_level = 3;
   priv->offline = FALSE;
+  priv->keep_center_on_resize = TRUE;
 }
 
 static void
@@ -584,12 +620,18 @@ champlain_view_set_size (ChamplainView *view, guint width, guint height)
   g_return_if_fail(CHAMPLAIN_IS_VIEW(view));
 
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  
+  gdouble lon = viewport_get_current_longitude(priv);
+  gdouble lat = viewport_get_current_latitude(priv);
 
   priv->viewport_size.width = width;
   priv->viewport_size.height = height;
 
   resize_viewport(view);
-  map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
+  if (priv->keep_center_on_resize)
+    champlain_view_center_on(view, lat, lon);
+  else
+    map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
 }
 
 static gboolean

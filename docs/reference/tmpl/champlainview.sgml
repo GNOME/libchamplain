@@ -62,6 +62,11 @@ the user's cache dir under champlain). If an error occurs during download, an er
 
 </para>
 
+<!-- ##### ARG ChamplainView:keep-center-on-resize ##### -->
+<para>
+
+</para>
+
 <!-- ##### ARG ChamplainView:latitude ##### -->
 <para>
 
