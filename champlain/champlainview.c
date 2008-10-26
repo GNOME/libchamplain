@@ -100,6 +100,7 @@ static void viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainV
 static void notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg1, ChamplainView *view);
 static void layer_add_marker_cb (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *view);
 static void connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView *view);
+static gboolean finger_scroll_clicked (ClutterActor *actor, ClutterButtonEvent *event, ChamplainView *view);
 
 static gdouble
 viewport_get_longitude_at(ChamplainViewPrivate *priv, gint x)
@@ -591,6 +592,48 @@ champlain_view_set_size (ChamplainView *view, guint width, guint height)
   map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
 }
 
+static gboolean
+finger_scroll_clicked (ClutterActor *actor,
+                  ClutterButtonEvent *event,
+                  ChamplainView *view)
+{	
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+
+  if (event->button == 1 && event->click_count == 2)
+    {
+      ClutterActor *group = priv->map->current_level->group;
+      // Keep the lon, lat where the mouse is
+      gdouble lon = viewport_get_longitude_at(priv,
+        priv->viewport_size.x + event->x + priv->map->current_level->anchor.x);
+      gdouble lat = viewport_get_latitude_at(priv, 
+        priv->viewport_size.y + event->y + priv->map->current_level->anchor.y);
+      
+      // How far was it from the center of the viewport (in px)
+      gint x_diff = priv->viewport_size.width / 2 - event->x;
+      gint y_diff = priv->viewport_size.height / 2 - event->y;
+
+      if (map_zoom_in (priv->map))
+        {
+          // Get the new x,y in the new zoom level
+          gint x2 = priv->map->longitude_to_x(priv->map, lon, priv->map->current_level->level);
+          gint y2 = priv->map->latitude_to_y(priv->map, lat, priv->map->current_level->level);
+          // Get the new lon,lat of these new x,y minus the distance from the viewport center
+          gdouble lon2 = priv->map->x_to_longitude(priv->map, x2 + x_diff, priv->map->current_level->level);
+          gdouble lat2 = priv->map->y_to_latitude(priv->map, y2 + y_diff, priv->map->current_level->level);
+
+          resize_viewport(view);
+          clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+          clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
+          champlain_view_center_on(view, lat2, lon2);
+
+          g_object_notify(G_OBJECT(view), "zoom-level");
+        }
+      champlain_view_center_on (view, lat, lon);
+      return TRUE;
+    }
+  return FALSE; // Propagate the event
+}
+
 /**
  * champlain_view_new:
  * @mode: a #ChamplainViewMode, the scrolling mode
@@ -645,6 +688,11 @@ champlain_view_new (ChamplainViewMode mode)
   priv->map_layer = clutter_group_new();
   clutter_actor_show(priv->map_layer);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->map_layer);
+
+  g_signal_connect (priv->finger_scroll,
+                    "button-press-event",
+                    G_CALLBACK (finger_scroll_clicked),
+                    view);
 
   // Setup user_layers
   priv->user_layers = clutter_group_new();
