@@ -37,8 +37,6 @@ struct _ChamplainMarkerPrivate
 {
   gdouble lon;
   gdouble lat;
-  
-  ChamplainPoint anchor;
 };
 
 typedef struct 

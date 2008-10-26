@@ -198,8 +198,8 @@ marker_reposition_cb (ChamplainMarker *marker, ChamplainView *view)
       y = priv->map->latitude_to_y(priv->map, marker_priv->lat, priv->map->current_level->level);
 
       clutter_actor_set_position(CLUTTER_ACTOR(marker),
-        x - marker_priv->anchor.x - priv->map->current_level->anchor.x,
-        y - marker_priv->anchor.y - priv->map->current_level->anchor.y);
+        x - priv->map->current_level->anchor.x,
+        y - priv->map->current_level->anchor.y);
     }
 }
 

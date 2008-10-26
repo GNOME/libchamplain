@@ -154,8 +154,6 @@ static void
 champlain_marker_init (ChamplainMarker *champlainMarker)
 {
   ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
-  priv->anchor.x = 0;
-  priv->anchor.y = 0;
 }
 
 
