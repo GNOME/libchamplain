@@ -168,6 +168,7 @@ file_loaded_cb (SoupSession *session,
       g_free (filename);
       g_free (map_filename);
     }
+  g_free (ptr);
 }
 
 Tile*

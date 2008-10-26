@@ -25,7 +25,7 @@
 
 typedef struct
 {
-	int level;
+  int level;
   int row_count;
   int column_count;
   int tile_size;
