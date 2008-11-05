@@ -41,7 +41,7 @@ void
 osm_mapnik_init(Map *map)
 {
   map->name = "OpenStreetMap";
-  map->zoom_levels = 17;
+  map->zoom_levels = 18;
   map->tile_size = 256;
 
   map->get_row_count = osm_mapnik_row_count;
