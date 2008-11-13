@@ -32,6 +32,8 @@ struct _Map
 {
   guint zoom_levels;
   const gchar *name;
+  const gchar *license;
+  const gchar *license_uri;
   int tile_size;
 
   ZoomLevel *current_level;
@@ -48,8 +50,6 @@ struct _Map
   gchar *(* get_tile_filename) (Map *map, Tile *tile);
   gchar *(* get_tile_uri) (Map *map, Tile *tile);
 };
-
-
 
 Map *map_new (ChamplainMapSource source);
 

@@ -41,6 +41,8 @@ void
 osm_mapnik_init(Map *map)
 {
   map->name = "OpenStreetMap";
+  map->license = "Map data is CC BY-SA 2.0 by OpenStreetMap Contributors";
+  map->license_uri = "http://creativecommons.org/licenses/by-sa/2.0/";
   map->zoom_levels = 18;
   map->tile_size = 256;
 

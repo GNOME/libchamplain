@@ -52,7 +52,8 @@ enum
   PROP_MAP_SOURCE,
   PROP_OFFLINE,
   PROP_DECEL_RATE,
-  PROP_KEEP_CENTER_ON_RESIZE
+  PROP_KEEP_CENTER_ON_RESIZE,
+  PROP_SHOW_LICENSE
 };
 
 // static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
@@ -74,6 +75,7 @@ struct _ChamplainViewPrivate
   ClutterActor *viewport;
   ClutterActor *finger_scroll;
   ChamplainRectangle viewport_size;
+  ClutterActor *license_actor;
 
   ClutterActor *user_layers;
 
@@ -81,6 +83,7 @@ struct _ChamplainViewPrivate
 
   gboolean offline;
   gboolean keep_center_on_resize;
+  gboolean show_license;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -351,6 +354,9 @@ champlain_view_get_property(GObject *object, guint prop_id, GValue *value, GPara
       case PROP_KEEP_CENTER_ON_RESIZE:
         g_value_set_boolean(value, priv->keep_center_on_resize);
         break;
+      case PROP_SHOW_LICENSE:
+        g_value_set_boolean(value, priv->show_license);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -387,7 +393,7 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
                     resize_viewport(view);
                     clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
                     clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-                    champlain_view_center_on(view, priv->latitude, priv->longtitude);
+                    champlain_view_center_on(view, priv->latitude, priv->longitude);
                   }
               }
           }
@@ -437,6 +443,9 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
       }
     case PROP_KEEP_CENTER_ON_RESIZE:
       priv->keep_center_on_resize = g_value_get_boolean(value);
+      break;
+    case PROP_SHOW_LICENSE:
+      priv->show_license = g_value_get_boolean(value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -572,6 +581,21 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
                                                          "Keep center on resize",
                                                          "Keep the current centered position "
                                                          "upon resizing",
+                                                         TRUE,
+                                                         CHAMPLAIN_PARAM_READWRITE));
+  /**
+  * ChamplainView:show-license:
+  *
+  * Show the license on the map view.  The license information should always be available 
+  * in a way or another in your application.  You can have it in About, or on the map. 
+  *
+  * Since: 0.2.8
+  */
+  g_object_class_install_property (object_class,
+                                   PROP_SHOW_LICENSE,
+                                   g_param_spec_boolean ("show-license",
+                                                         "Show the map data license",
+                                                         "Show the map data license on the map view",
                                                          TRUE,
                                                          CHAMPLAIN_PARAM_READWRITE));
 }
@@ -726,6 +750,12 @@ champlain_view_new (ChamplainViewMode mode)
                     "button-press-event",
                     G_CALLBACK (finger_scroll_clicked),
                     view);
+ 
+  // License layer 
+  priv->license_actor = clutter_group_new();
+  clutter_actor_show(priv->license_actor);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
+  clutter_actor_raise_top (priv->license_actor);
 
   // Setup user_layers
   priv->user_layers = clutter_group_new();

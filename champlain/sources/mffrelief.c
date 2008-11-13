@@ -41,6 +41,8 @@ void
 mff_relief_init(Map *map)
 {
   map->name = "Maps For Free Relief";
+  map->license = "Map data available under GNU Free Documentation license, Version 1.2 or later";
+  map->license_uri = "http://www.gnu.org/copyleft/fdl.html";
   map->zoom_levels = 11;
   map->tile_size = 256;
 
