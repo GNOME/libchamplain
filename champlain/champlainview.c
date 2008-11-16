@@ -56,6 +56,7 @@ enum
   PROP_SHOW_LICENSE
 };
 
+#define PADDING 10
 // static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
 
 #define CHAMPLAIN_VIEW_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
@@ -108,6 +109,8 @@ static void notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg
 static void layer_add_marker_cb (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *view);
 static void connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView *view);
 static gboolean finger_scroll_clicked (ClutterActor *actor, ClutterButtonEvent *event, ChamplainView *view);
+static void update_license (ChamplainView *view);
+static void license_set_position (ChamplainView *view);
 
 static gdouble
 viewport_get_longitude_at(ChamplainViewPrivate *priv, gint x)
@@ -255,11 +258,25 @@ create_initial_map(ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
 
   marker_reposition(view);
+  update_license (view);
 
   g_object_notify(G_OBJECT(view), "zoom-level");
   g_object_notify(G_OBJECT(view), "map-source");
 }
 
+static void
+license_set_position (ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  guint width, height;
+
+  if (!priv->license_actor)
+    return;
+
+  clutter_actor_get_size (priv->license_actor, &width, &height);
+  clutter_actor_set_position (priv->license_actor, priv->viewport_size.width - PADDING - width, priv->viewport_size.height - PADDING - height);
+}
+	
 static void
 resize_viewport(ChamplainView *view)
 {
@@ -426,7 +443,8 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
               map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
               clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
 
-              marker_reposition(view);
+              update_license (view);
+              marker_reposition (view);
               champlain_view_center_on(view, priv->latitude, priv->longitude);
             }
           }
@@ -609,6 +627,8 @@ champlain_view_init (ChamplainView *view)
   priv->zoom_level = 3;
   priv->offline = FALSE;
   priv->keep_center_on_resize = TRUE;
+  priv->show_license = TRUE;
+  priv->license_actor = NULL;
 }
 
 static void
@@ -642,11 +662,29 @@ champlain_view_set_size (ChamplainView *view, guint width, guint height)
   priv->viewport_size.width = width;
   priv->viewport_size.height = height;
 
-  resize_viewport(view);
+  license_set_position (view);
+  resize_viewport (view);
+
   if (priv->keep_center_on_resize)
     champlain_view_center_on(view, priv->latitude, priv->longitude);
   else
     map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
+}
+static void
+update_license (ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  
+  if (priv->license_actor)
+    clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
+
+  priv->license_actor = clutter_label_new_with_text ( "sans 8", priv->map->license);
+  clutter_actor_set_opacity (priv->license_actor, 128);
+  clutter_actor_show (priv->license_actor);
+
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
+  clutter_actor_raise_top (priv->license_actor);
+  license_set_position (view);
 }
 
 static gboolean
@@ -751,12 +789,6 @@ champlain_view_new (ChamplainViewMode mode)
                     G_CALLBACK (finger_scroll_clicked),
                     view);
  
-  // License layer 
-  priv->license_actor = clutter_group_new();
-  clutter_actor_show(priv->license_actor);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
-  clutter_actor_raise_top (priv->license_actor);
-
   // Setup user_layers
   priv->user_layers = clutter_group_new();
   clutter_actor_show(priv->user_layers);
