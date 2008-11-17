@@ -1,0 +1,17 @@
+libchamplain 0.2.7 (2008-11-16)
+===============================
+
+Enhancements:
+
+* Double clicking on the map will now zoom and recenter. 
+* When resizing a ChamplainView, the centered content will still be
+  centered after the resizing.  Can be disabled.
+* The Map's license is displayed by default on the lower right corner. 
+
+Fixes:
+
+* Fix a memory leak
+* Some code clean-up
+* Fix Bug 558026 – zoom in + center_on != center_on + zoom in
+* Fix missing zoom level in OpenStreetMap Mapnik
+
