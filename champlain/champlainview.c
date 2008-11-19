@@ -52,9 +52,11 @@ enum
   PROP_MAP_SOURCE,
   PROP_OFFLINE,
   PROP_DECEL_RATE,
-  PROP_KEEP_CENTER_ON_RESIZE
+  PROP_KEEP_CENTER_ON_RESIZE,
+  PROP_SHOW_LICENSE
 };
 
+#define PADDING 10
 // static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
 
 #define CHAMPLAIN_VIEW_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
@@ -65,13 +67,16 @@ struct _ChamplainViewPrivate
 
   ChamplainMapSource map_source;
   gint zoom_level; // only used when the zoom-level property is set before map is created
-  gdouble longitude; // only used when the center_on is called before map is created
-  gdouble latitude;  // only used when the center_on is called before map is created
+
+  // Represents the (lat, lon) at the center of the viewport
+  gdouble longitude;
+  gdouble latitude;
 
   ClutterActor *map_layer;
   ClutterActor *viewport;
   ClutterActor *finger_scroll;
   ChamplainRectangle viewport_size;
+  ClutterActor *license_actor;
 
   ClutterActor *user_layers;
 
@@ -79,6 +84,7 @@ struct _ChamplainViewPrivate
 
   gboolean offline;
   gboolean keep_center_on_resize;
+  gboolean show_license;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -103,6 +109,8 @@ static void notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg
 static void layer_add_marker_cb (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *view);
 static void connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView *view);
 static gboolean finger_scroll_clicked (ClutterActor *actor, ClutterButtonEvent *event, ChamplainView *view);
+static void update_license (ChamplainView *view);
+static void license_set_position (ChamplainView *view);
 
 static gdouble
 viewport_get_longitude_at(ChamplainViewPrivate *priv, gint x)
@@ -250,11 +258,25 @@ create_initial_map(ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
 
   marker_reposition(view);
+  update_license (view);
 
   g_object_notify(G_OBJECT(view), "zoom-level");
   g_object_notify(G_OBJECT(view), "map-source");
 }
 
+static void
+license_set_position (ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  guint width, height;
+
+  if (!priv->license_actor)
+    return;
+
+  clutter_actor_get_size (priv->license_actor, &width, &height);
+  clutter_actor_set_position (priv->license_actor, priv->viewport_size.width - PADDING - width, priv->viewport_size.height - PADDING - height);
+}
+	
 static void
 resize_viewport(ChamplainView *view)
 {
@@ -349,6 +371,9 @@ champlain_view_get_property(GObject *object, guint prop_id, GValue *value, GPara
       case PROP_KEEP_CENTER_ON_RESIZE:
         g_value_set_boolean(value, priv->keep_center_on_resize);
         break;
+      case PROP_SHOW_LICENSE:
+        g_value_set_boolean(value, priv->show_license);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -364,16 +389,12 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
   {
     case PROP_LONGITUDE:
       {
-        gdouble lon = g_value_get_double(value);
-        gdouble lat = viewport_get_current_latitude(priv);
-        champlain_view_center_on(view, lat, lon);
+        champlain_view_center_on (view, priv->latitude, g_value_get_double (value));
         break;
       }
     case PROP_LATITUDE:
       {
-        gdouble lon = viewport_get_current_longitude(priv);
-        gdouble lat = g_value_get_double(value);
-        champlain_view_center_on(view, lat, lon);
+        champlain_view_center_on (view, g_value_get_double (value), priv->longitude);
         break;
       }
     case PROP_ZOOM_LEVEL:
@@ -384,14 +405,12 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
             if (level != priv->map->current_level->level)
               {
                 ClutterActor *group = priv->map->current_level->group;
-                gdouble lat = viewport_get_current_latitude(priv);
-                gdouble lon = viewport_get_current_longitude(priv);
                 if (map_zoom_to(priv->map, level))
                   {
                     resize_viewport(view);
                     clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
                     clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-                    champlain_view_center_on(view, lat, lon);
+                    champlain_view_center_on(view, priv->latitude, priv->longitude);
                   }
               }
           }
@@ -407,8 +426,6 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
         if (priv->map_source != source)
           {
             priv->map_source = source;
-            gdouble lat = viewport_get_current_latitude(priv);
-            gdouble lon = viewport_get_current_longitude(priv);
             if (priv->map) {
               guint currentLevel = priv->map->current_level->level;
               map_free(priv->map);
@@ -426,8 +443,9 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
               map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
               clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
 
-              marker_reposition(view);
-              champlain_view_center_on(view, lat, lon);
+              update_license (view);
+              marker_reposition (view);
+              champlain_view_center_on(view, priv->latitude, priv->longitude);
             }
           }
         break;
@@ -443,6 +461,9 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
       }
     case PROP_KEEP_CENTER_ON_RESIZE:
       priv->keep_center_on_resize = g_value_get_boolean(value);
+      break;
+    case PROP_SHOW_LICENSE:
+      priv->show_license = g_value_get_boolean(value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -580,6 +601,21 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
                                                          "upon resizing",
                                                          TRUE,
                                                          CHAMPLAIN_PARAM_READWRITE));
+  /**
+  * ChamplainView:show-license:
+  *
+  * Show the license on the map view.  The license information should always be available 
+  * in a way or another in your application.  You can have it in About, or on the map. 
+  *
+  * Since: 0.2.8
+  */
+  g_object_class_install_property (object_class,
+                                   PROP_SHOW_LICENSE,
+                                   g_param_spec_boolean ("show-license",
+                                                         "Show the map data license",
+                                                         "Show the map data license on the map view",
+                                                         TRUE,
+                                                         CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
@@ -591,6 +627,8 @@ champlain_view_init (ChamplainView *view)
   priv->zoom_level = 3;
   priv->offline = FALSE;
   priv->keep_center_on_resize = TRUE;
+  priv->show_license = TRUE;
+  priv->license_actor = NULL;
 }
 
 static void
@@ -621,17 +659,32 @@ champlain_view_set_size (ChamplainView *view, guint width, guint height)
 
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
   
-  gdouble lon = viewport_get_current_longitude(priv);
-  gdouble lat = viewport_get_current_latitude(priv);
-
   priv->viewport_size.width = width;
   priv->viewport_size.height = height;
 
-  resize_viewport(view);
+  license_set_position (view);
+  resize_viewport (view);
+
   if (priv->keep_center_on_resize)
-    champlain_view_center_on(view, lat, lon);
+    champlain_view_center_on(view, priv->latitude, priv->longitude);
   else
     map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
+}
+static void
+update_license (ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  
+  if (priv->license_actor)
+    clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
+
+  priv->license_actor = clutter_label_new_with_text ( "sans 8", priv->map->license);
+  clutter_actor_set_opacity (priv->license_actor, 128);
+  clutter_actor_show (priv->license_actor);
+
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
+  clutter_actor_raise_top (priv->license_actor);
+  license_set_position (view);
 }
 
 static gboolean
@@ -735,7 +788,7 @@ champlain_view_new (ChamplainViewMode mode)
                     "button-press-event",
                     G_CALLBACK (finger_scroll_clicked),
                     view);
-
+ 
   // Setup user_layers
   priv->user_layers = clutter_group_new();
   clutter_actor_show(priv->user_layers);
@@ -763,13 +816,11 @@ champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitu
 
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
+  priv->longitude = longitude;
+  priv->latitude = latitude;
+
   if(!priv->map)
-    {
-      // keep until the viewport is created
-      priv->longitude = longitude;
-      priv->latitude = latitude;
-      return;
-    }
+    return;
 
   gint x, y;
   x = priv->map->longitude_to_x(priv->map, longitude, priv->map->current_level->level);
@@ -815,7 +866,7 @@ champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitu
   g_object_notify(G_OBJECT(view), "latitude");
 
   map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
-  marker_reposition(view);
+  marker_reposition (view);
 }
 
 /**
@@ -833,15 +884,13 @@ champlain_view_zoom_in (ChamplainView *view)
 
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
   ClutterActor *group = priv->map->current_level->group;
-  gdouble lon = viewport_get_current_longitude(priv);
-  gdouble lat = viewport_get_current_latitude(priv);
 
   if(map_zoom_in(priv->map))
     {
       resize_viewport(view);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-      champlain_view_center_on(view, lat, lon);
+      champlain_view_center_on(view, priv->latitude, priv->longitude);
 
       g_object_notify(G_OBJECT(view), "zoom-level");
     }
@@ -862,15 +911,13 @@ champlain_view_zoom_out (ChamplainView *view)
 
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
   ClutterActor *group = priv->map->current_level->group;
-  gdouble lon = viewport_get_current_longitude(priv);
-  gdouble lat = viewport_get_current_latitude(priv);
 
   if(map_zoom_out(priv->map))
     {
       resize_viewport(view);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), priv->map->current_level->group);
-      champlain_view_center_on(view, lat, lon);
+      champlain_view_center_on(view, priv->latitude, priv->longitude);
 
       g_object_notify(G_OBJECT(view), "zoom-level");
     }

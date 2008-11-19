@@ -38,6 +38,8 @@ void
 oam_init(Map *map)
 {
   map->name = "OpenArialMap";
+  map->license = "Map data is CC BY 3.0 by OpenArialMap Contributors";
+  map->license_uri = "http://creativecommons.org/licenses/by/3.0/";
   map->zoom_levels = 17;
   map->tile_size = 256;
 

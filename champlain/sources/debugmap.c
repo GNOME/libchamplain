@@ -34,6 +34,8 @@ debugmap_init(Map *map)
 {
   map->name = "Debug";
   map->zoom_levels = 1;
+  map->license = "Map data available under GNU Free Documentation license, Version 1.2 or later";
+  map->license_uri = "http://www.gnu.org/copyleft/fdl.html";
   map->tile_size = 256;
 
   map->get_row_count = debugmap_row_count;

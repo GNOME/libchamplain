@@ -87,6 +87,11 @@ the user's cache dir under champlain). If an error occurs during download, an er
 
 </para>
 
+<!-- ##### ARG ChamplainView:show-license ##### -->
+<para>
+
+</para>
+
 <!-- ##### ARG ChamplainView:zoom-level ##### -->
 <para>
 

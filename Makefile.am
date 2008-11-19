@@ -1,5 +1,7 @@
 SUBDIRS = tidy champlain demos docs/reference
 
+ACLOCAL_AMFLAGS = -I m4
+
 pcfiles = champlain-@API_VERSION@.pc
 
 champlain-@API_VERSION@.pc: champlain.pc
