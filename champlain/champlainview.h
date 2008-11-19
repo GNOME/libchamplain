@@ -94,4 +94,6 @@ void champlain_view_add_layer (ChamplainView *champlainView, ClutterActor *layer
 
 void champlain_view_set_size (ChamplainView *view, guint width, guint height);
 
+gboolean champlain_view_get_coords_from_event (ChamplainView *view, ClutterEvent *event, gdouble *lat, gdouble *lon);
+
 #endif

@@ -771,7 +771,7 @@ champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitu
       return;
     }
 
-  gdouble x, y;
+  gint x, y;
   x = priv->map->longitude_to_x(priv->map, longitude, priv->map->current_level->level);
   y = priv->map->latitude_to_y(priv->map, latitude, priv->map->current_level->level);
   ChamplainPoint* anchor = &priv->map->current_level->anchor;
@@ -904,4 +904,55 @@ champlain_view_add_layer (ChamplainView *view, ClutterActor *layer)
                     view);
 
   clutter_container_foreach(CLUTTER_CONTAINER(layer), CLUTTER_CALLBACK(connect_marker_notify_cb), view);
+}
+
+gboolean 
+champlain_view_get_coords_from_event (ChamplainView *view, ClutterEvent *event, gdouble *lat, gdouble *lon)
+{
+  g_return_val_if_fail(CHAMPLAIN_IS_VIEW(view), FALSE);
+  g_return_val_if_fail(event, FALSE); // Apparently there isn't a more precise test
+
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
+  guint x, y;
+
+  switch (clutter_event_type (event))
+    {
+      case CLUTTER_BUTTON_PRESS:
+      case CLUTTER_BUTTON_RELEASE:
+        {
+          ClutterButtonEvent *e = (ClutterButtonEvent*) event;
+          x = e->x;
+	  y = e->y;
+        }
+        break;
+      case CLUTTER_SCROLL:
+        {
+          ClutterScrollEvent *e = (ClutterScrollEvent*) event;
+          x = e->x;
+	  y = e->y;
+        }
+        break;
+      case CLUTTER_MOTION:
+        {
+          ClutterMotionEvent *e = (ClutterMotionEvent*) event;
+          x = e->x;
+	  y = e->y;
+        }
+        break;
+      case CLUTTER_ENTER:
+      case CLUTTER_LEAVE:
+        {
+          ClutterCrossingEvent *e = (ClutterCrossingEvent*) event;
+          x = e->x;
+	  y = e->y;
+        }
+        break;
+      default:
+	return FALSE;
+    }
+  if (lat)
+    *lat = viewport_get_latitude_at(priv, priv->viewport_size.y + y + priv->map->current_level->anchor.y);
+  if (lon)
+    *lon = viewport_get_longitude_at(priv, priv->viewport_size.x + x + priv->map->current_level->anchor.x);
+  return TRUE;
 }
