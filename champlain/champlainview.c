@@ -658,7 +658,11 @@ champlain_view_set_size (ChamplainView *view, guint width, guint height)
   g_return_if_fail(CHAMPLAIN_IS_VIEW(view));
 
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
-  
+ 
+  gdouble lat, lon;
+  lat = viewport_get_current_latitude (priv);
+  lon = viewport_get_current_longitude (priv);
+
   priv->viewport_size.width = width;
   priv->viewport_size.height = height;
 
@@ -666,7 +670,7 @@ champlain_view_set_size (ChamplainView *view, guint width, guint height)
   resize_viewport (view);
 
   if (priv->keep_center_on_resize)
-    champlain_view_center_on(view, priv->latitude, priv->longitude);
+    champlain_view_center_on(view, lat, lon); 
   else
     map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
 }
