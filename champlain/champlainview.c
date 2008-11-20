@@ -299,8 +299,8 @@ resize_viewport(ChamplainView *view)
 
   if (priv->map->current_level->level < 8)
     {
-      lower = -priv->viewport_size.width / 2;
-      upper = zoom_level_get_width(priv->map->current_level) - priv->viewport_size.width / 2;
+      lower = -priv->viewport_size.width / 2.0;
+      upper = zoom_level_get_width(priv->map->current_level) - priv->viewport_size.width / 2.0;
     }
   else
     {
@@ -312,8 +312,8 @@ resize_viewport(ChamplainView *view)
 
   if (priv->map->current_level->level < 8)
     {
-      lower = -priv->viewport_size.height / 2;
-      upper = zoom_level_get_height(priv->map->current_level) - priv->viewport_size.height / 2;
+      lower = -priv->viewport_size.height / 2.0;
+      upper = zoom_level_get_height(priv->map->current_level) - priv->viewport_size.height / 2.0;
     }
   else
     {
@@ -464,6 +464,7 @@ champlain_view_set_property(GObject *object, guint prop_id, const GValue *value,
       break;
     case PROP_SHOW_LICENSE:
       priv->show_license = g_value_get_boolean(value);
+      update_license (view);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -682,13 +683,16 @@ update_license (ChamplainView *view)
   if (priv->license_actor)
     clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
 
-  priv->license_actor = clutter_label_new_with_text ( "sans 8", priv->map->license);
-  clutter_actor_set_opacity (priv->license_actor, 128);
-  clutter_actor_show (priv->license_actor);
+  if (priv->show_license) 
+    {
+      priv->license_actor = clutter_label_new_with_text ( "sans 8", priv->map->license);
+      clutter_actor_set_opacity (priv->license_actor, 128);
+      clutter_actor_show (priv->license_actor);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
-  clutter_actor_raise_top (priv->license_actor);
-  license_set_position (view);
+      clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
+      clutter_actor_raise_top (priv->license_actor);
+      license_set_position (view);
+    }
 }
 
 static gboolean
