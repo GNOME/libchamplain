@@ -661,8 +661,8 @@ champlain_view_set_size (ChamplainView *view, guint width, guint height)
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
  
   gdouble lat, lon;
-  lat = viewport_get_current_latitude (priv);
-  lon = viewport_get_current_longitude (priv);
+  lat = priv->latitude;
+  lon = priv->longitude;
 
   priv->viewport_size.width = width;
   priv->viewport_size.height = height;
@@ -675,6 +675,7 @@ champlain_view_set_size (ChamplainView *view, guint width, guint height)
   else
     map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
 }
+
 static void
 update_license (ChamplainView *view)
 {
