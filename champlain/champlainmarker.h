@@ -59,4 +59,14 @@ ClutterActor *champlain_marker_new_with_label (const gchar *label,
                                  const gchar *font,
                                  ClutterColor *text_color,
                                  ClutterColor *marker_color);
+
+ClutterActor *champlain_marker_new_with_image(const gchar *filename, 
+				GError **error);
+
+ClutterActor *champlain_marker_new_with_image_full(const gchar *filename,
+				gint width,
+				gint height,
+				gint anchor_x,
+				gint anchor_y,
+				GError **error);
 #endif

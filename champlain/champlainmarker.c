@@ -277,3 +277,64 @@ champlain_marker_new_with_label (const gchar *label,
   return CLUTTER_ACTOR (champlainMarker);
 }
 
+/**
+ * champlain_marker_new_with_image:
+ * @filename: The filename of the image.
+ * @error: Return location for an error.
+ * 
+ * Returns a new #ChamplainMarker with a drawn marker containing the given image.
+ *
+ */
+ClutterActor *
+champlain_marker_new_with_image(const gchar *filename, GError **error)
+{
+	if (filename == NULL)
+		return NULL;
+
+	ChamplainMarker *champlainMarker = CHAMPLAIN_MARKER(champlain_marker_new ());
+	ClutterActor *actor = clutter_texture_new_from_file(filename, error);
+
+	if (actor == NULL){
+		g_object_unref(G_OBJECT(champlainMarker));
+		return NULL;
+	}
+
+	clutter_container_add_actor (CLUTTER_CONTAINER(champlainMarker), actor);
+	
+	return CLUTTER_ACTOR (champlainMarker);
+}
+
+/**
+ * champlain_marker_new_with_image_full:
+ * @filename: The name of an image file to load.
+ * @width: Width of the image in pixel or -1.
+ * @height: Height of the image in pixel or -1.
+ * @anchor_x: X coordinate of the anchor point.
+ * @anchor_y: Y coordinate of the anchor point.
+ * @error: Return location for an error.
+ *
+ * Returns a new #ChamplainMarker with a drawn marker containing the given image.
+ *
+ */
+ClutterActor *
+champlain_marker_new_with_image_full(const gchar *filename, gint width, gint height, gint anchor_x, gint anchor_y, GError **error)
+{
+	if(filename == NULL)
+		return NULL;
+
+	ChamplainMarker *champlainMarker = CHAMPLAIN_MARKER(champlain_marker_new());
+	ClutterActor *actor = clutter_texture_new_from_file(filename, error);
+
+	if(actor == NULL){
+		g_object_unref(G_OBJECT(champlainMarker));
+		return NULL;
+	}
+
+	clutter_actor_set_size(actor, width, height);
+
+	clutter_container_add_actor(CLUTTER_CONTAINER(champlainMarker), actor);
+	clutter_actor_set_anchor_point(CLUTTER_ACTOR(champlainMarker), anchor_x, anchor_y);
+
+	return CLUTTER_ACTOR(champlainMarker);
+}
+

@@ -23,6 +23,8 @@ CHAMPLAIN_IS_VIEW_CLASS
 ChamplainMarker
 champlain_marker_new
 champlain_marker_new_with_label
+champlain_marker_new_with_image
+champlain_marker_new_with_image_full
 champlain_marker_set_anchor
 champlain_marker_set_position
 <SUBSECTION Standard>

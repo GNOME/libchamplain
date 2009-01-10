@@ -47,6 +47,30 @@ A marker to identify points of interest on a map
 @Returns: 
 
 
+<!-- ##### FUNCTION champlain_marker_new_with_image ##### -->
+<para>
+
+</para>
+
+@filename: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION champlain_marker_new_with_image_full ##### -->
+<para>
+
+</para>
+
+@filename: 
+@width: 
+@height: 
+@anchor_x: 
+@anchor_y: 
+@error: 
+@Returns: 
+
+
 <!-- ##### FUNCTION champlain_marker_set_position ##### -->
 <para>
 
