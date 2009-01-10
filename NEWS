@@ -1,3 +1,16 @@
+libchamplain 0.2.8 (2009-01-10)
+===============================
+
+Enhancements:
+
+* Add a new constructor for ChamplainMarkers made of an image. (Lorenzo Masini)
+
+Fixes:
+
+* Fix map recenter
+* Fix licence hiding
+* Fix map centering on startup
+
 libchamplain 0.2.7 (2008-11-16)
 ===============================
 
