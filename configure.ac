@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(libchamplain-gtk, 0.2.6, pierre-luc@pierlux.com)
+AC_INIT(libchamplain-gtk, 0.2.8, pierre-luc@pierlux.com)
 AC_CONFIG_SRCDIR([champlain-gtk/champlainviewembed.h])
 AC_CONFIG_HEADER([config.h])
 
@@ -28,10 +28,16 @@ AC_SUBST(DEPS_LIBS)
 PKG_CHECK_MODULES(DEPS,
   [   gtk+-2.0 >= 2.2,
       clutter-0.8 >= 0.8,
-      clutter-gtk-0.8 >= 0.8,
-      champlain-0.2 >= 0.2
+      clutter-gtk-0.8 >= 0.8
   ]
 )
+
+
+AC_SUBST(CPLAIN_DEPS_CFLAGS)
+AC_SUBST(CPLAIN_DEPS_LIBS)
+
+PKG_CHECK_MODULES(CPLAIN_DEPS,[champlain-0.2 >= 0.2])
+
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
 
