@@ -73,7 +73,7 @@ libchamplain_includedir = $(includedir)/libchamplain-0.3/champlain
 libchamplain_0_3_la_LDFLAGS = -version-info $(LIBRARY_VERSION)
 
 AM_CPPFLAGS = $(DEPS_CFLAGS) -DDATADIR=\""$(datadir)"\" -I$(top_srcdir)/tidy -I$(top_srcdir) -DCHAMPLAIN_COMPILATION
-AM_LDFLAGS = $(DEPS_LIBS) -export-dynamic -export-symbols-regex ^champlain_.*
+AM_LDFLAGS = $(DEPS_LIBS) -export-symbols-regex ^champlain_.*
 
 svgdir = $(datadir)/champlain
 svg_DATA = error.svg
