@@ -359,6 +359,7 @@ button_release_event_cb (ClutterActor *actor,
   TidyFingerScrollPrivate *priv = scroll->priv;
   ClutterActor *child = tidy_scroll_view_get_child (TIDY_SCROLL_VIEW(scroll));
   gboolean decelerating = FALSE;
+  gboolean moved = TRUE;
 
   if (event->button != 1)
     return FALSE;
@@ -536,6 +537,8 @@ button_release_event_cb (ClutterActor *actor,
     }
 
   /* Reset motion event buffer */
+  if (priv->last_motion <= 1)
+      moved = FALSE;
   priv->last_motion = 0;
   
   if (!decelerating)
@@ -546,7 +549,8 @@ button_release_event_cb (ClutterActor *actor,
   /* Pass through events to children.
    * FIXME: this probably breaks click-count.
    */
-  clutter_event_put ((ClutterEvent *)event);
+  if (moved == FALSE)
+    clutter_event_put ((ClutterEvent *)event);
   
   return TRUE;
 }

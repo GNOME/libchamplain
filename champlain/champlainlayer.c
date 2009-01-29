@@ -16,6 +16,17 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlainlayer
+ * @short_description: A container for #ChamplainMarker
+ *
+ * A ChamplainLayer is little more than a #ClutterContainer. It keeps the
+ * markers ordered so that they display correctly.
+ *
+ * Use #clutter_container_add to add markers to the layer and
+ * #clutter_container_remove to remove them.
+ */
+
 #include "config.h"
 
 #include "champlainlayer.h"

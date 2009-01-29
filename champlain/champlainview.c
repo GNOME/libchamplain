@@ -16,6 +16,36 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlainview
+ * @short_description: A #ClutterActor to display maps
+ *
+ * The #ChamplainView is a ClutterActor to display maps.  It supports two modes
+ * of scrolling:
+ * <itemizedlist>
+ *   <listitem><para>Push: the normal behavior where the maps doesn't move
+ *   after the user stopped scrolling;</para></listitem>
+ *   <listitem><para>Kinetic: the iPhone-like behavior where the maps
+ *   decelerate after the user stopped scrolling.</para></listitem>
+ * </itemizedlist>
+ *
+ * You can use the same #ChamplainView to display many types of maps.  In
+ * Champlain they are called map sources.  You can change the #map-source
+ * property at anytime to replace the current displayed map.
+ *
+ * The maps are downloaded from Internet from open maps sources (like
+ * <ulink role="online-location"
+ * url="http://www.openstreetmap.org">OpenStreetMap</ulink>).  Maps are divided
+ * in tiles for each zoom level.  When a tile is requested, #ChamplainView will
+ * first check if it is in cache (in the user's cache dir under champlain). If
+ * an error occurs during download, an error tile will be displayed (if not in
+ * offline mode).
+ *
+ * The button-press-event and button-release-event signals are emitted each
+ * time a mouse button is pressed on the @view.  Coordinates can be converted with
+ * #champlain_view_get_coords_from_event.
+ */
+
 #include "config.h"
 
 #include "champlaindefines.h"
@@ -39,7 +69,6 @@
 enum
 {
   /* normal signals */
-  SIGNAL_TBD,
   LAST_SIGNAL
 };
 
@@ -57,10 +86,9 @@ enum
 };
 
 #define PADDING 10
-// static guint champlain_view_signals[LAST_SIGNAL] = { 0, };
+//static guint signals[LAST_SIGNAL] = { 0, };
 
-#define CHAMPLAIN_VIEW_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
-
+#define CHAMPLAIN_VIEW_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate)) 
 struct _ChamplainViewPrivate
 {
   ClutterActor *stage;
@@ -108,7 +136,8 @@ static void viewport_x_changed_cb(GObject *gobject, GParamSpec *arg1, ChamplainV
 static void notify_marker_reposition_cb(ChamplainMarker *marker, GParamSpec *arg1, ChamplainView *view);
 static void layer_add_marker_cb (ClutterGroup *layer, ChamplainMarker *marker, ChamplainView *view);
 static void connect_marker_notify_cb (ChamplainMarker *marker, ChamplainView *view);
-static gboolean finger_scroll_clicked (ClutterActor *actor, ClutterButtonEvent *event, ChamplainView *view);
+static gboolean finger_scroll_button_press_cb (ClutterActor *actor,
+    ClutterButtonEvent *event, ChamplainView *view);
 static void update_license (ChamplainView *view);
 static void license_set_position (ChamplainView *view);
 
@@ -697,9 +726,9 @@ update_license (ChamplainView *view)
 }
 
 static gboolean
-finger_scroll_clicked (ClutterActor *actor,
-                  ClutterButtonEvent *event,
-                  ChamplainView *view)
+finger_scroll_button_press_cb (ClutterActor *actor,
+                               ClutterButtonEvent *event,
+                               ChamplainView *view)
 {	
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
@@ -795,9 +824,9 @@ champlain_view_new (ChamplainViewMode mode)
 
   g_signal_connect (priv->finger_scroll,
                     "button-press-event",
-                    G_CALLBACK (finger_scroll_clicked),
+                    G_CALLBACK (finger_scroll_button_press_cb),
                     view);
- 
+
   // Setup user_layers
   priv->user_layers = clutter_group_new();
   clutter_actor_show(priv->user_layers);
@@ -962,8 +991,22 @@ champlain_view_add_layer (ChamplainView *view, ClutterActor *layer)
   clutter_container_foreach(CLUTTER_CONTAINER(layer), CLUTTER_CALLBACK(connect_marker_notify_cb), view);
 }
 
-gboolean 
-champlain_view_get_coords_from_event (ChamplainView *view, ClutterEvent *event, gdouble *lat, gdouble *lon)
+/**
+ * champlain_view_get_coords_from_event:
+ * @view: a #ChamplainView
+ * @event: a #ClutterEvent
+ * @latitude: a variable where to put the latitude of the event
+ * @longitude: a variable where to put the longitude of the event
+ *
+ * Returns a new #ChamplainView ready to be used as a #ClutterActor.
+ *
+ * Since: 0.2.8
+ */
+gboolean
+champlain_view_get_coords_from_event (ChamplainView *view,
+                                      ClutterEvent *event,
+                                      gdouble *latitude,
+                                      gdouble *longitude)
 {
   g_return_val_if_fail(CHAMPLAIN_IS_VIEW(view), FALSE);
   g_return_val_if_fail(event, FALSE); // Apparently there isn't a more precise test
@@ -978,21 +1021,21 @@ champlain_view_get_coords_from_event (ChamplainView *view, ClutterEvent *event, 
         {
           ClutterButtonEvent *e = (ClutterButtonEvent*) event;
           x = e->x;
-	  y = e->y;
+          y = e->y;
         }
         break;
       case CLUTTER_SCROLL:
         {
           ClutterScrollEvent *e = (ClutterScrollEvent*) event;
           x = e->x;
-	  y = e->y;
+          y = e->y;
         }
         break;
       case CLUTTER_MOTION:
         {
           ClutterMotionEvent *e = (ClutterMotionEvent*) event;
           x = e->x;
-	  y = e->y;
+          y = e->y;
         }
         break;
       case CLUTTER_ENTER:
@@ -1000,15 +1043,19 @@ champlain_view_get_coords_from_event (ChamplainView *view, ClutterEvent *event, 
         {
           ClutterCrossingEvent *e = (ClutterCrossingEvent*) event;
           x = e->x;
-	  y = e->y;
+          y = e->y;
         }
         break;
       default:
-	return FALSE;
+        return FALSE;
     }
-  if (lat)
-    *lat = viewport_get_latitude_at(priv, priv->viewport_size.y + y + priv->map->current_level->anchor.y);
-  if (lon)
-    *lon = viewport_get_longitude_at(priv, priv->viewport_size.x + x + priv->map->current_level->anchor.x);
+
+  if (latitude)
+    *latitude = viewport_get_latitude_at (priv,
+        priv->viewport_size.y + y + priv->map->current_level->anchor.y);
+  if (longitude)
+    *longitude = viewport_get_longitude_at (priv,
+        priv->viewport_size.x + x + priv->map->current_level->anchor.x);
+
   return TRUE;
 }

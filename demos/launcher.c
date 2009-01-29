@@ -19,15 +19,31 @@
 #include <champlain/champlain.h>
 
 static gboolean
+map_view_button_release_cb (ClutterActor *actor,
+                            ClutterButtonEvent *event,
+                            ChamplainView * view)
+{
+  gdouble lat, lon;
+
+  if (event->button != 1 || event->click_count > 1)
+    return;
+
+  g_print("Map was clicked at ");
+  if (champlain_view_get_coords_from_event (view, event, &lat, &lon))
+    g_print("%f, %f \n", lat, lon);
+
+  return TRUE;
+}
+
+static gboolean
 montreal_click (ClutterActor *actor,
                 ClutterButtonEvent *event,
                 ChamplainView * view)
 {
-  gdouble lat, lon;
+  if (event->button != 1 || event->click_count > 1)
+    return;
 
-  g_print("Montreal was clicked!\n");
-  if (champlain_view_get_coords_from_event (view, event, &lat, &lon))
-    g_print("%f, %f \n", lat, lon);
+  g_print("Montreal was clicked\n");
 
   return TRUE;
 }
@@ -79,6 +95,9 @@ main (int argc,
   clutter_actor_set_size (stage, 800, 600);
 
   actor = champlain_view_new (CHAMPLAIN_VIEW_MODE_KINETIC);
+  clutter_actor_set_reactive (actor, TRUE);
+  g_signal_connect_after (actor, "button-release-event",
+      G_CALLBACK (map_view_button_release_cb), actor);
 
   champlain_view_set_size (CHAMPLAIN_VIEW (actor), 800, 600);
 

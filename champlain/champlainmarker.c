@@ -16,6 +16,23 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlainmarker
+ * @short_description: A marker to identify points of interest on a map
+ *
+ * Markers reprensent points of interest on a map. Markers need to be placed on
+ * a layer (a #ClutterGroup).  Layers have to be added to a #ChamplainView for
+ * the markers to show on the map.
+ *
+ * A marker is nothing more than a regular #ClutterActor.  You can draw on it
+ * what ever you want.  Don't forget to set the anchor position in the marker
+ * using #champlain_marker_set_anchor.  Set the markers position on the map
+ * using #champlain_marker_set_position.
+ *
+ * Champlain has a default type of markers with text. To create one,
+ * use #champlain_marker_new_with_label.
+ */
+
 #include "config.h"
 
 #include "champlaindefines.h"

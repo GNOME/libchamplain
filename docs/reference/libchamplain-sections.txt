@@ -9,6 +9,7 @@ champlain_view_new
 champlain_view_center_on
 champlain_view_zoom_in
 champlain_view_zoom_out
+champlain_view_get_coords_from_event
 <SUBSECTION Standard>
 CHAMPLAIN_VIEW
 CHAMPLAIN_IS_VIEW
