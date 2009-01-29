@@ -29,16 +29,16 @@ map_view_button_release_cb (ClutterActor *actor,
     return;
 
   g_print("Map was clicked at ");
-  if (champlain_view_get_coords_from_event (view, event, &lat, &lon))
+  if (champlain_view_get_coords_from_event (view, (ClutterEvent*)event, &lat, &lon))
     g_print("%f, %f \n", lat, lon);
 
   return TRUE;
 }
 
 static gboolean
-montreal_click (ClutterActor *actor,
-                ClutterButtonEvent *event,
-                ChamplainView * view)
+marker_button_release_cb (ClutterActor *actor,
+                          ClutterButtonEvent *event,
+                          ChamplainView * view)
 {
   if (event->button != 1 || event->click_count > 1)
     return;
@@ -52,32 +52,32 @@ static ClutterActor*
 create_marker_layer (ChamplainView *view)
 {
   ClutterActor *layer, *marker;
-
-  layer = champlain_layer_new();
-
   ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
   ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
-  marker = champlain_marker_new_with_label("Montréal", "Airmole 14", NULL,
+
+  layer = champlain_layer_new ();
+
+  marker = champlain_marker_new_with_label ("Montréal", "Airmole 14", NULL,
       NULL);
-  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 45.528178,
-      -73.563788);
-  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
-  clutter_actor_set_reactive(marker, TRUE);
+  champlain_marker_set_position (CHAMPLAIN_MARKER (marker),
+      45.528178, -73.563788);
+  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
+  clutter_actor_set_reactive (marker, TRUE);
   g_signal_connect_after (marker, "button-release-event",
-      G_CALLBACK (montreal_click), view);
+      G_CALLBACK (marker_button_release_cb), view);
 
-  marker = champlain_marker_new_with_label("New York", "Sans 25", &white,
+  marker = champlain_marker_new_with_label ("New York", "Sans 25", &white,
       NULL);
-  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 40.77, -73.98);
-  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+  champlain_marker_set_position (CHAMPLAIN_MARKER (marker), 40.77, -73.98);
+  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  marker = champlain_marker_new_with_label("Saint-Tite-des-Caps", "Serif 12",
+  marker = champlain_marker_new_with_label ("Saint-Tite-des-Caps", "Serif 12",
       NULL, &orange);
-  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 47.130885,
+  champlain_marker_set_position (CHAMPLAIN_MARKER (marker), 47.130885,
       -70.764141);
-  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  clutter_actor_show(layer);
+  clutter_actor_show (layer);
 
   return layer;
 }
@@ -101,12 +101,12 @@ main (int argc,
 
   champlain_view_set_size (CHAMPLAIN_VIEW (actor), 800, 600);
 
-  layer = create_marker_layer(actor);
+  layer = create_marker_layer (actor);
   champlain_view_add_layer(CHAMPLAIN_VIEW (actor), layer);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
   g_object_set (G_OBJECT (actor), "zoom-level", 12, NULL);
-  champlain_view_center_on(CHAMPLAIN_VIEW(actor), 45.466, -73.75);
+  champlain_view_center_on (CHAMPLAIN_VIEW(actor), 45.466, -73.75);
 
   clutter_actor_show (stage);
   clutter_main ();

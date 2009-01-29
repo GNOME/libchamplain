@@ -53,20 +53,16 @@ GType champlain_marker_get_type (void);
 
 ClutterActor *champlain_marker_new ();
 
-void champlain_marker_set_position (ChamplainMarker *marker, gdouble longitude, gdouble latitude);
+void champlain_marker_set_position (ChamplainMarker *marker,
+    gdouble longitude, gdouble latitude);
 
 ClutterActor *champlain_marker_new_with_label (const gchar *label,
-                                 const gchar *font,
-                                 ClutterColor *text_color,
-                                 ClutterColor *marker_color);
+    const gchar *font, ClutterColor *text_color, ClutterColor *marker_color);
 
-ClutterActor *champlain_marker_new_with_image(const gchar *filename, 
-				GError **error);
+ClutterActor *champlain_marker_new_with_image(const gchar *filename,
+    GError **error);
 
 ClutterActor *champlain_marker_new_with_image_full(const gchar *filename,
-				gint width,
-				gint height,
-				gint anchor_x,
-				gint anchor_y,
-				GError **error);
+    gint width, gint height, gint anchor_x, gint anchor_y, GError **error);
+
 #endif
