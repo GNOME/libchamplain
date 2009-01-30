@@ -19,9 +19,10 @@
 #ifndef CHAMPLAIN_MAP_ZOOM_LEVEL_H
 #define CHAMPLAIN_MAP_ZOOM_LEVEL_H
 
+#include "champlain-private.h"
+
 #include <glib.h>
 #include <clutter/clutter.h>
-#include "champlainprivate.h"
 
 typedef struct
 {

@@ -35,14 +35,15 @@
 
 #include "config.h"
 
-#include "champlaindefines.h"
-#include "champlainmarker.h"
-#include "champlainprivate.h"
+#include "champlain-marker.h"
+
 #include "champlain.h"
+#include "champlain-defines.h"
 #include "champlain-marshal.h"
-#include "map.h"
-#include "tile.h"
-#include "zoomlevel.h"
+#include "champlain-private.h"
+#include "champlain-map.h"
+#include "champlain-tile.h"
+#include "champlain-zoom-level.h"
 
 #include <clutter/clutter.h>
 #include <clutter-cairo/clutter-cairo.h>

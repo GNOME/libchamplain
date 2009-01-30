@@ -16,29 +16,20 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef CHAMPLAIN_MAP_TILE_H
-#define CHAMPLAIN_MAP_TILE_H
+#if !defined (__CHAMPLAIN_CHAMPLAIN_H_INSIDE__) && !defined (CHAMPLAIN_COMPILATION)
+#error "Only <champlain/champlain.h> can be included directly."
+#endif
 
-#include <glib.h>
+#ifndef CHAMPLAIN_LAYER_H
+#define CHAMPLAIN_LAYER_H
+
+#include <champlain/champlain-defines.h>
+
+#include <glib-object.h>
 #include <clutter/clutter.h>
-#include <champlain/champlainprivate.h>
 
-struct _Tile
-{
-  ClutterActor* actor;
-  int x;
-  int y;
-  int size;
-  int level;
+typedef ClutterActor ChamplainLayer;
 
-  gboolean loading; // TRUE when a callback exist to load the tile, FALSE otherwise
-  gboolean to_destroy; // TRUE when a tile struct should be deleted when loading is done, FALSE otherwise
-};
-
-void tile_free(Tile* tile);
-
-void tile_set_position(Map* map, Tile* tile);
-
-Tile* tile_load (Map* map, guint zoom_level, guint x, guint y, gboolean offline);
+ChamplainLayer *champlain_layer_new ();
 
 #endif

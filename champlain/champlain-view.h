@@ -18,12 +18,13 @@
 
 #if !defined (__CHAMPLAIN_CHAMPLAIN_H_INSIDE__) && !defined (CHAMPLAIN_COMPILATION)
 #error "Only <champlain/champlain.h> can be included directly."
-#endif 
+#endif
 
 #ifndef CHAMPLAIN_VIEW_H
 #define CHAMPLAIN_VIEW_H
 
-#include <champlain/champlaindefines.h>
+#include <champlain/champlain-defines.h>
+
 #include <glib.h>
 #include <glib-object.h>
 #include <clutter/clutter.h>

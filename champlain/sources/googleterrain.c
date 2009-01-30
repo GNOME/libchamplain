@@ -23,9 +23,11 @@
  */
 
 #include "sources/googleterrain.h"
-#include "map.h"
-#include <math.h>
+
+#include "champlain-map.h"
+
 #include <clutter/clutter.h>
+#include <math.h>
 
 guint google_terrain_row_count(Map *map, guint zoom_level);
 guint google_terrain_column_count(Map *map, guint zoom_level);

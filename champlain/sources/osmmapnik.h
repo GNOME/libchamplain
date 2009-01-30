@@ -20,7 +20,7 @@
 #ifndef OSM_MAPNIK_H
 #define OSM_MAPNIK_H
 
-#include <map.h>
+#include "champlain-map.h"
 
 void osm_mapnik_init(Map* map);
 

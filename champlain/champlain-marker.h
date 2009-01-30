@@ -23,7 +23,8 @@
 #ifndef CHAMPLAIN_MARKER_H
 #define CHAMPLAIN_MARKER_H
 
-#include <champlain/champlaindefines.h>
+#include <champlain/champlain-defines.h>
+
 #include <glib-object.h>
 #include <clutter/clutter.h>
 

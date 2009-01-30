@@ -20,7 +20,7 @@
 #ifndef OAM_H
 #define OAM_H
 
-#include <map.h>
+#include "champlain-map.h"
 
 void oam_init(Map* map);
 

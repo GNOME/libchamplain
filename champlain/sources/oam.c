@@ -18,9 +18,11 @@
  */
 
 #include "sources/oam.h"
-#include "map.h"
-#include <math.h>
+
+#include "champlain-map.h"
+
 #include <clutter/clutter.h>
+#include <math.h>
 
 guint oam_row_count(Map *map, guint zoom_level);
 guint oam_column_count(Map *map, guint zoom_level);

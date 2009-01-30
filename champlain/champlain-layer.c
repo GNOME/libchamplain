@@ -29,8 +29,9 @@
 
 #include "config.h"
 
-#include "champlainlayer.h"
-#include "champlaindefines.h"
+#include "champlain-layer.h"
+
+#include "champlain-defines.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>

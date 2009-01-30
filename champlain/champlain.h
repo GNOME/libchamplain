@@ -28,10 +28,10 @@
 
 #include <glib.h>
 
-#include <champlain/champlaindefines.h>
-#include <champlain/champlainview.h>
-#include <champlain/champlainmarker.h>
-#include <champlain/champlainlayer.h>
+#include "champlain/champlain-defines.h"
+#include "champlain/champlain-layer.h"
+#include "champlain/champlain-marker.h"
+#include "champlain/champlain-view.h"
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 

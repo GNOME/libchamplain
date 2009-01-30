@@ -48,14 +48,15 @@
 
 #include "config.h"
 
-#include "champlaindefines.h"
-#include "champlainprivate.h"
+#include "champlain-view.h"
+
 #include "champlain.h"
+#include "champlain-defines.h"
+#include "champlain-map.h"
 #include "champlain-marshal.h"
-#include "champlainview.h"
-#include "map.h"
-#include "tile.h"
-#include "zoomlevel.h"
+#include "champlain-private.h"
+#include "champlain-tile.h"
+#include "champlain-zoom-level.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>

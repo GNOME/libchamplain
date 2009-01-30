@@ -23,7 +23,9 @@
  */
 
 #include "sources/googlemap.h"
-#include "map.h"
+
+#include "champlain-map.h"
+
 #include <math.h>
 #include <clutter/clutter.h>
 

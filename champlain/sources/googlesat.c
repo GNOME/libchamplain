@@ -23,9 +23,11 @@
  */
 
 #include "sources/googlesat.h"
-#include "map.h"
-#include <math.h>
+
+#include "champlain-map.h"
+
 #include <clutter/clutter.h>
+#include <math.h>
 
 guint google_sat_row_count(Map *map, guint zoom_level);
 guint google_sat_column_count(Map *map, guint zoom_level);

@@ -20,10 +20,10 @@
 #define MAP_H
 
 #include "champlain.h"
-#include "champlainview.h"
-#include "champlainprivate.h"
-#include "zoomlevel.h"
-#include "tile.h"
+#include "champlain-private.h"
+#include "champlain-tile.h"
+#include "champlain-view.h"
+#include "champlain-zoom-level.h"
 
 #include <glib.h>
 #include <clutter/clutter.h>

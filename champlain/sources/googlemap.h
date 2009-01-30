@@ -20,7 +20,7 @@
 #ifndef GOOGLE_MAP_H
 #define GOOGLE_MAP_H
 
-#include <map.h>
+#include "champlain-map.h"
 
 void google_map_init(Map* map);
 

@@ -16,9 +16,10 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "tile.h"
-#include "map.h"
-#include "champlainprivate.h"
+#include "champlain-tile.h"
+
+#include "champlain-map.h"
+#include "champlain-private.h"
 
 #include <math.h>
 #include <errno.h>

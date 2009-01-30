@@ -20,7 +20,7 @@
 #ifndef GOOGLE_TERRAIN_H
 #define GOOGLE_TERRAIN_H
 
-#include <map.h>
+#include "champlain-map.h"
 
 void google_terrain_init(Map* map);
 

@@ -20,7 +20,7 @@
 #ifndef MFF_RELIEF_H
 #define MFF_RELIEF_H
 
-#include <map.h>
+#include "champlain-map.h"
 
 void mff_relief_init(Map* map);
 
