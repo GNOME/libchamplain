@@ -39,9 +39,22 @@ PKG_CHECK_MODULES(DEPS,
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
 
+# -----------------------------------------------------------
+# Enable debug
+# -----------------------------------------------------------
+
+AC_ARG_ENABLE(debug,
+  AC_HELP_STRING([--disable-debug],[compile without debug code]),
+    enable_debug=$enableval, enable_debug=yes )
+
+if test x$enable_debug = xyes; then
+  AC_DEFINE(ENABLE_DEBUG, [], [Enable debug code])
+fi
+# -----------------------------------------------------------
+
 AC_CONFIG_FILES([Makefile
                  champlain/Makefile
-		 demos/Makefile
+                 demos/Makefile
                  tidy/Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
@@ -53,4 +66,5 @@ echo " libchamplain $VERSION"
 echo ""
 echo "         Prefix: ${prefix}"
 echo " Compiler flags: ${CPPFLAGS}"
+echo "          Debug: ${enable_debug}"
 echo ""

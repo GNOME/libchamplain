@@ -13,6 +13,7 @@ lib_LTLIBRARIES = libchamplain-0.2.la
 libchamplain_0_2_la_SOURCES = \
 	$(CHAMPLAIN_MARSHAL_LIST) 	\
 	$(BUILT_SOURCES) 		\
+	champlain-debug.c 		\
 	champlain-view.c 		\
 	champlain-layer.c 		\
 	champlain-marker.c 		\
@@ -28,6 +29,7 @@ libchamplain_0_2_la_SOURCES = \
 	sources/debugmap.c
 
 noinst_HEADERS = \
+	champlain-debug.h  		\
 	champlain-view.h 		\
 	champlain-marker.c 		\
 	champlain-private.h 		\
