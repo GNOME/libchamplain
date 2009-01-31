@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(libchamplain-gtk, 0.2.8, pierre-luc@pierlux.com)
+AC_INIT(libchamplain-gtk, 0.3, pierre-luc@pierlux.com)
 AC_CONFIG_SRCDIR([champlain-gtk/champlain-view-embed.h])
 AC_CONFIG_HEADER([config.h])
 
@@ -18,7 +18,7 @@ AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 # Checks for libraries.
 LIBRARY_VERSION=0:1:0
 # API_VERSION is used to generate the pc file only
-API_VERSION=0.2
+API_VERSION=0.3
 
 AC_SUBST(LIBRARY_VERSION)
 AC_SUBST(API_VERSION)
@@ -36,7 +36,9 @@ PKG_CHECK_MODULES(DEPS,
 AC_SUBST(CPLAIN_DEPS_CFLAGS)
 AC_SUBST(CPLAIN_DEPS_LIBS)
 
-PKG_CHECK_MODULES(CPLAIN_DEPS,[champlain-0.2 >= 0.2])
+PKG_CHECK_MODULES(CPLAIN_DEPS,
+	[champlain-0.3 >= 0.3]
+	)
 
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
