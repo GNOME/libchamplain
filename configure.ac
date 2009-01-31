@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(libchamplain, 0.2.8, pierre-luc@pierlux.com)
+AC_INIT(libchamplain, 0.3, pierre-luc@pierlux.com)
 AC_CONFIG_SRCDIR([champlain/champlain.h])
 AC_CONFIG_HEADER([config.h])
 
@@ -18,7 +18,7 @@ AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 # Checks for libraries.
 LIBRARY_VERSION=1:3:0
 # API_VERSION is used to generate pc file only
-API_VERSION=0.2
+API_VERSION=0.3
 
 AC_SUBST(LIBRARY_VERSION)
 AC_SUBST(API_VERSION)
