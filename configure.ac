@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(libchamplain-gtk, 0.2.8, pierre-luc@pierlux.com)
-AC_CONFIG_SRCDIR([champlain-gtk/champlainviewembed.h])
+AC_CONFIG_SRCDIR([champlain-gtk/champlain-view-embed.h])
 AC_CONFIG_HEADER([config.h])
 
 AM_INIT_AUTOMAKE

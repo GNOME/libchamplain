@@ -18,7 +18,7 @@
 
 #include "config.h"
 
-#include <champlainviewembed.h>
+#include <champlain-view-embed.h>
 #include <champlain/champlain.h>
 
 #include <gtk/gtk.h>
