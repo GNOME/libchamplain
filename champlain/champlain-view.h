@@ -64,9 +64,9 @@ typedef struct _ChamplainViewPrivate ChamplainViewPrivate;
  * Type of scrolling.
  */
 typedef enum {
-  CHAMPLAIN_VIEW_MODE_PUSH,
-  CHAMPLAIN_VIEW_MODE_KINETIC
-} ChamplainViewMode;
+  CHAMPLAIN_SCROLL_MODE_PUSH,
+  CHAMPLAIN_SCROLL_MODE_KINETIC
+} ChamplainScrollMode;
 
 struct _ChamplainView
 {
@@ -83,7 +83,7 @@ struct _ChamplainViewClass
 
 GType champlain_view_get_type (void);
 
-ClutterActor *champlain_view_new (ChamplainViewMode mode);
+ClutterActor *champlain_view_new ();
 
 void champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitude);
 

@@ -94,7 +94,9 @@ main (int argc,
   stage = clutter_stage_get_default ();
   clutter_actor_set_size (stage, 800, 600);
 
-  actor = champlain_view_new (CHAMPLAIN_VIEW_MODE_KINETIC);
+  actor = champlain_view_new ();
+  g_object_set (G_OBJECT (actor), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
+      "zoom-level", 12, NULL);
   clutter_actor_set_reactive (actor, TRUE);
   g_signal_connect_after (actor, "button-release-event",
       G_CALLBACK (map_view_button_release_cb), actor);
@@ -105,7 +107,6 @@ main (int argc,
   champlain_view_add_layer(CHAMPLAIN_VIEW (actor), layer);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
-  g_object_set (G_OBJECT (actor), "zoom-level", 12, NULL);
   champlain_view_center_on (CHAMPLAIN_VIEW(actor), 45.466, -73.75);
 
   clutter_actor_show (stage);

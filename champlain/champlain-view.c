@@ -52,6 +52,7 @@
 
 #include "champlain.h"
 #include "champlain-defines.h"
+#include "champlain-enum-types.h"
 #include "champlain-map.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
@@ -82,6 +83,7 @@ enum
   PROP_MAP_SOURCE,
   PROP_OFFLINE,
   PROP_DECEL_RATE,
+  PROP_SCROLL_MODE,
   PROP_KEEP_CENTER_ON_RESIZE,
   PROP_SHOW_LICENSE
 };
@@ -96,6 +98,7 @@ struct _ChamplainViewPrivate
   ClutterActor *stage;
 
   ChamplainMapSource map_source;
+  ChamplainScrollMode scroll_mode;
   gint zoom_level; /* Only used when the zoom-level property is set before map
                     * is created */
 
@@ -431,6 +434,9 @@ champlain_view_get_property (GObject *object,
       case PROP_MAP_SOURCE:
         g_value_set_int (value, priv->map_source);
         break;
+      case PROP_SCROLL_MODE:
+        g_value_set_enum (value, priv->scroll_mode);
+        break;
       case PROP_OFFLINE:
         g_value_set_boolean (value, priv->offline);
         break;
@@ -534,6 +540,11 @@ champlain_view_set_property (GObject *object,
           }
         break;
       }
+    case PROP_SCROLL_MODE:
+      priv->scroll_mode = g_value_get_enum (value);
+      g_object_set (G_OBJECT (priv->finger_scroll), "mode",
+          priv->scroll_mode, NULL);
+      break;
     case PROP_OFFLINE:
       priv->offline = g_value_get_boolean (value);
       break;
@@ -650,6 +661,22 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
+  * ChamplainView:scroll-mode:
+  *
+  * Determines the way the view reacts to scroll events.
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+      PROP_SCROLL_MODE,
+      g_param_spec_enum ("scroll-mode",
+           "Scroll Mode",
+           "Determines the way the view reacts to scroll events.",
+           CHAMPLAIN_TYPE_SCROLL_MODE,
+           CHAMPLAIN_SCROLL_MODE_KINETIC,
+           CHAMPLAIN_PARAM_READWRITE));
+
+  /**
   * ChamplainView:decel-rate:
   *
   * The deceleration rate for the kinetic mode.
@@ -704,6 +731,49 @@ champlain_view_init (ChamplainView *view)
   priv->keep_center_on_resize = TRUE;
   priv->show_license = TRUE;
   priv->license_actor = NULL;
+  priv->stage = clutter_group_new ();
+  priv->scroll_mode = CHAMPLAIN_SCROLL_MODE_PUSH;
+
+  /* Setup viewport */
+  priv->viewport = tidy_viewport_new ();
+  g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
+
+  g_signal_connect (priv->viewport,
+                    "notify::x-origin",
+                    G_CALLBACK (viewport_x_changed_cb),
+                    view);
+
+  /* Setup finger scroll */
+  priv->finger_scroll = tidy_finger_scroll_new (priv->scroll_mode);
+
+  g_signal_connect (priv->finger_scroll,
+                    "scroll-event",
+                    G_CALLBACK (scroll_event),
+                    view);
+
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->finger_scroll),
+      priv->viewport);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage),
+      priv->finger_scroll);
+  clutter_container_add_actor (CLUTTER_CONTAINER (view), priv->stage);
+
+  /* Map Layer */
+  priv->map_layer = clutter_group_new ();
+  clutter_actor_show (priv->map_layer);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
+      priv->map_layer);
+
+  g_signal_connect (priv->finger_scroll,
+                    "button-press-event",
+                    G_CALLBACK (finger_scroll_button_press_cb),
+                    view);
+
+  /* Setup user_layers */
+  priv->user_layers = clutter_group_new ();
+  clutter_actor_show (priv->user_layers);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
+      priv->user_layers);
+  clutter_actor_raise (priv->user_layers, priv->map_layer);
 }
 
 static void
@@ -830,75 +900,14 @@ finger_scroll_button_press_cb (ClutterActor *actor,
 
 /**
  * champlain_view_new:
- * @mode: a #ChamplainViewMode, the scrolling mode
  * Returns a new #ChamplainView ready to be used as a #ClutterActor.
  *
- * Since: 0.1
+ * Since: 0.4
  */
 ClutterActor *
-champlain_view_new (ChamplainViewMode mode)
+champlain_view_new ()
 {
-  ChamplainView *view;
-
-  view = CHAMPLAIN_VIEW (g_object_new (CHAMPLAIN_TYPE_VIEW, NULL));
-  ChamplainViewPrivate *priv = GET_PRIVATE (view);
-
-  priv->stage = clutter_group_new ();
-
-
-  /* Setup viewport */
-  priv->viewport = tidy_viewport_new ();
-  g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
-
-  g_signal_connect (priv->viewport,
-                    "notify::x-origin",
-                    G_CALLBACK (viewport_x_changed_cb),
-                    view);
-
-  /* Setup finger scroll */
-  TidyFingerScrollMode tidy_mode;
-  switch (mode)
-    {
-      case CHAMPLAIN_VIEW_MODE_PUSH:
-        tidy_mode = TIDY_FINGER_SCROLL_MODE_PUSH;
-        break;
-      case CHAMPLAIN_VIEW_MODE_KINETIC:
-        tidy_mode = TIDY_FINGER_SCROLL_MODE_KINETIC;
-        break;
-    }
-
-  priv->finger_scroll = tidy_finger_scroll_new (mode);
-
-  g_signal_connect (priv->finger_scroll,
-                    "scroll-event",
-                    G_CALLBACK (scroll_event),
-                    view);
-
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->finger_scroll),
-      priv->viewport);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage),
-      priv->finger_scroll);
-  clutter_container_add_actor (CLUTTER_CONTAINER (view), priv->stage);
-
-  /* Map Layer */
-  priv->map_layer = clutter_group_new ();
-  clutter_actor_show (priv->map_layer);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
-      priv->map_layer);
-
-  g_signal_connect (priv->finger_scroll,
-                    "button-press-event",
-                    G_CALLBACK (finger_scroll_button_press_cb),
-                    view);
-
-  /* Setup user_layers */
-  priv->user_layers = clutter_group_new ();
-  clutter_actor_show (priv->user_layers);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
-      priv->user_layers);
-  clutter_actor_raise (priv->user_layers, priv->map_layer);
-
-  return CLUTTER_ACTOR (view);
+  return g_object_new (CHAMPLAIN_TYPE_VIEW, NULL);
 }
 
 /**
