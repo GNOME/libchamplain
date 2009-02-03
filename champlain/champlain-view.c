@@ -205,16 +205,22 @@ scroll_event (ClutterActor *actor,
   gboolean success = FALSE;
   gdouble lon, lat;
   gint x_diff, y_diff;
+  gint actor_x, actor_y;
+  gint rel_x, rel_y;
+
+  clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
+  rel_x = event->x - actor_x;
+  rel_y = event->y - actor_y;
 
   /* Keep the lon, lat where the mouse is */
   lon = viewport_get_longitude_at (priv,
-    priv->viewport_size.x + event->x + priv->map->current_level->anchor.x);
+    priv->viewport_size.x + rel_x + priv->map->current_level->anchor.x);
   lat = viewport_get_latitude_at (priv,
-    priv->viewport_size.y + event->y + priv->map->current_level->anchor.y);
+    priv->viewport_size.y + rel_y + priv->map->current_level->anchor.y);
 
   /* How far was it from the center of the viewport (in px) */
-  x_diff = priv->viewport_size.width / 2 - event->x;
-  y_diff = priv->viewport_size.height / 2 - event->y;
+  x_diff = priv->viewport_size.width / 2 - rel_x;
+  y_diff = priv->viewport_size.height / 2 - rel_y;
 
   if (event->direction == CLUTTER_SCROLL_UP)
     success = map_zoom_in (priv->map);
@@ -858,16 +864,23 @@ finger_scroll_button_press_cb (ClutterActor *actor,
 
   if (event->button == 1 && event->click_count == 2)
     {
+      gint actor_x, actor_y;
+      gint rel_x, rel_y;
+
+      clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
+      rel_x = event->x - actor_x;
+      rel_y = event->y - actor_y;
+
       ClutterActor *group = priv->map->current_level->group;
       /* Keep the lon, lat where the mouse is */
       gdouble lon = viewport_get_longitude_at (priv,
-        priv->viewport_size.x + event->x + priv->map->current_level->anchor.x);
+        priv->viewport_size.x + rel_x + priv->map->current_level->anchor.x);
       gdouble lat = viewport_get_latitude_at (priv, 
-        priv->viewport_size.y + event->y + priv->map->current_level->anchor.y);
+        priv->viewport_size.y + rel_y + priv->map->current_level->anchor.y);
 
       /* How far was it from the center of the viewport (in px) */
-      gint x_diff = priv->viewport_size.width / 2 - event->x;
-      gint y_diff = priv->viewport_size.height / 2 - event->y;
+      gint x_diff = priv->viewport_size.width / 2 - rel_x;
+      gint y_diff = priv->viewport_size.height / 2 - rel_y;
 
       if (map_zoom_in (priv->map))
         {
@@ -1102,6 +1115,10 @@ champlain_view_get_coords_from_event (ChamplainView *view,
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   guint x, y;
+  gint actor_x, actor_y;
+  gint rel_x, rel_y;
+
+  clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
 
   switch (clutter_event_type (event))
     {
@@ -1139,12 +1156,15 @@ champlain_view_get_coords_from_event (ChamplainView *view,
         return FALSE;
     }
 
+  rel_x = x - actor_x;
+  rel_y = y - actor_y;
+
   if (latitude)
     *latitude = viewport_get_latitude_at (priv,
-        priv->viewport_size.y + y + priv->map->current_level->anchor.y);
+        priv->viewport_size.y + rel_y + priv->map->current_level->anchor.y);
   if (longitude)
     *longitude = viewport_get_longitude_at (priv,
-        priv->viewport_size.x + x + priv->map->current_level->anchor.x);
+        priv->viewport_size.x + rel_x + priv->map->current_level->anchor.x);
 
   return TRUE;
 }

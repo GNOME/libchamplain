@@ -101,7 +101,8 @@ main (int argc,
   g_signal_connect_after (actor, "button-release-event",
       G_CALLBACK (map_view_button_release_cb), actor);
 
-  champlain_view_set_size (CHAMPLAIN_VIEW (actor), 800, 600);
+  champlain_view_set_size (CHAMPLAIN_VIEW (actor), 700, 500);
+  clutter_actor_set_position (actor, 50, 50);
 
   layer = create_marker_layer (actor);
   champlain_view_add_layer(CHAMPLAIN_VIEW (actor), layer);
