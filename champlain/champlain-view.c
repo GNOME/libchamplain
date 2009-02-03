@@ -295,7 +295,7 @@ layer_add_marker_cb (ClutterGroup *layer,
   g_signal_connect (marker, "notify::longitude",
       G_CALLBACK (notify_marker_reposition_cb), view);
 
-  marker_reposition (view);
+  g_idle_add (marker_reposition, view);
 }
 
 static void
@@ -331,7 +331,7 @@ create_initial_map (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
       priv->map->current_level->group);
 
-  marker_reposition (view);
+  g_idle_add (marker_reposition, view);
   update_license (view);
 
   g_object_notify (G_OBJECT (view), "zoom-level");
@@ -540,7 +540,7 @@ champlain_view_set_property (GObject *object,
                   priv->map->current_level->group);
 
               update_license (view);
-              marker_reposition (view);
+              g_idle_add (marker_reposition, view);
               champlain_view_center_on (view, priv->latitude, priv->longitude);
             }
           }
@@ -1000,7 +1000,7 @@ champlain_view_center_on (ChamplainView *view,
   g_object_notify (G_OBJECT (view), "latitude");
 
   map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
-  marker_reposition (view);
+  g_idle_add (marker_reposition, view);
 }
 
 /**
@@ -1081,10 +1081,10 @@ champlain_view_add_layer (ChamplainView *view, ClutterActor *layer)
   clutter_actor_raise_top (layer);
 
   if (priv->map)
-    marker_reposition (view);
+    g_idle_add (marker_reposition, view);
 
   g_signal_connect_after (layer,
-                    "add",
+                    "actor-added",
                     G_CALLBACK (layer_add_marker_cb),
                     view);
 
