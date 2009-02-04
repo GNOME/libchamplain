@@ -308,7 +308,7 @@ resize_viewport(ChamplainView *view)
       upper = G_MAXINT16;
     }
   g_object_set (hadjust, "lower", lower, "upper", upper,
-                "step-increment", 1.0, "elastic", TRUE, NULL);
+                "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
 
   if (priv->map->current_level->level < 8)
     {
@@ -321,7 +321,7 @@ resize_viewport(ChamplainView *view)
       upper = G_MAXINT16;
     }
   g_object_set (vadjust, "lower", lower, "upper", upper,
-                "step-increment", 1.0, "elastic", TRUE, NULL);
+                "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
 
   if (center)
     {
@@ -700,7 +700,7 @@ static gboolean
 finger_scroll_clicked (ClutterActor *actor,
                   ClutterButtonEvent *event,
                   ChamplainView *view)
-{	
+{
   ChamplainViewPrivate *priv = CHAMPLAIN_VIEW_GET_PRIVATE (view);
 
   if (event->button == 1 && event->click_count == 2)
@@ -711,7 +711,7 @@ finger_scroll_clicked (ClutterActor *actor,
         priv->viewport_size.x + event->x + priv->map->current_level->anchor.x);
       gdouble lat = viewport_get_latitude_at(priv, 
         priv->viewport_size.y + event->y + priv->map->current_level->anchor.y);
-      
+
       // How far was it from the center of the viewport (in px)
       gint x_diff = priv->viewport_size.width / 2 - event->x;
       gint y_diff = priv->viewport_size.height / 2 - event->y;
