@@ -388,7 +388,7 @@ resize_viewport (ChamplainView *view)
       upper = G_MAXINT16;
     }
   g_object_set (hadjust, "lower", lower, "upper", upper,
-      "step-increment", 1.0, "elastic", TRUE, NULL);
+      "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
 
   if (priv->map->current_level->level < 8)
     {
@@ -402,7 +402,7 @@ resize_viewport (ChamplainView *view)
       upper = G_MAXINT16;
     }
   g_object_set (vadjust, "lower", lower, "upper", upper,
-                "step-increment", 1.0, "elastic", TRUE, NULL);
+                "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
 
   if (center)
     {
