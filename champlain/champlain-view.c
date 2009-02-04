@@ -131,7 +131,7 @@ static gboolean scroll_event (ClutterActor *actor, ClutterScrollEvent *event,
     ChamplainView *view);
 static void marker_reposition_cb (ChamplainMarker *marker, ChamplainView *view);
 static void layer_reposition_cb (ClutterActor *layer, ChamplainView *view);
-static void marker_reposition (ChamplainView *view);
+static gboolean marker_reposition (gpointer data);
 static void create_initial_map (ChamplainView *view);
 static void resize_viewport (ChamplainView *view);
 static void champlain_view_get_property (GObject *object, guint prop_id,
@@ -314,12 +314,14 @@ layer_reposition_cb (ClutterActor *layer,
       CLUTTER_CALLBACK (marker_reposition_cb), view);
 }
 
-static void
-marker_reposition (ChamplainView *view)
+static gboolean
+marker_reposition (gpointer data)
 {
+  ChamplainView *view = CHAMPLAIN_VIEW (data);
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   clutter_container_foreach (CLUTTER_CONTAINER (priv->user_layers),
       CLUTTER_CALLBACK (layer_reposition_cb), view);
+  return FALSE;
 }
 
 static void
