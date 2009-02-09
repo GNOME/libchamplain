@@ -217,7 +217,7 @@ champlain_marker_new_with_label (const gchar *label,
                                  ClutterColor *marker_color)
 {
   ChamplainMarker *champlainMarker = CHAMPLAIN_MARKER(champlain_marker_new ());
-  ClutterColor default_text_color = { 0x22, 022, 0x22, 0xFF },
+  ClutterColor default_text_color = { 0x22, 0x22, 0x22, 0xFF },
                default_marker_color = { 0x2A, 0xB1, 0x26, 0xEE },
                darker_color;
   ClutterActor *actor, *bg;
