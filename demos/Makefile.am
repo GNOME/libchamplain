@@ -1,10 +1,13 @@
 
-noinst_PROGRAMS = launcher
+noinst_PROGRAMS = launcher animated-marker
 
 INCLUDES = -I$(top_srcdir)
 
-AM_CPPFLAGS = $(DEPS_CFLAGS) 
+AM_CPPFLAGS = $(DEPS_CFLAGS)
 AM_LDFLAGS = $(DEPS_LIBS)
 
 launcher_SOURCES = launcher.c
 launcher_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.2.la
+
+animated_marker_SOURCES = animated-marker.c
+animated_marker_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.2.la

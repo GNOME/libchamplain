@@ -24,21 +24,21 @@ static gboolean
 montreal_click (ClutterActor *actor,
                 ClutterButtonEvent *event,
                 ChamplainView * view)
-{	
-	g_print("Montreal was clicked!\n");
-	gdouble lat, lon;
-	if (champlain_view_get_coords_from_event (view, event, &lat, &lon))
-	  g_print("%f, %f \n", lat, lon);
-	return TRUE;
+{
+  g_print("Montreal was clicked!\n");
+  gdouble lat, lon;
+  if (champlain_view_get_coords_from_event (view, (ClutterEvent*)(event), &lat, &lon))
+    g_print("%f, %f \n", lat, lon);
+  return TRUE;
 }
 
 static ClutterActor*
 create_marker_layer (ChamplainView *view)
 {
   ClutterActor *layer, *marker;
-  
+
   layer = champlain_layer_new();
-  
+
   ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
   ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
   marker = champlain_marker_new_with_label("Montréal", "Airmole 14", NULL, NULL);
@@ -49,15 +49,15 @@ create_marker_layer (ChamplainView *view)
                     "button-release-event",
                     G_CALLBACK (montreal_click),
                     view);
-  
+
   marker = champlain_marker_new_with_label("New York", "Sans 25", &white, NULL);
   champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 40.77, -73.98);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
-  
+
   marker = champlain_marker_new_with_label("Saint-Tite-des-Caps", "Serif 12", NULL, &orange);
   champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 47.130885, -70.764141);
   clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
-  
+
   clutter_actor_show(layer);
   return layer;
 }
@@ -66,24 +66,26 @@ int
 main (int argc, char *argv[])
 {
   ClutterActor* actor, *layer, *stage;
-  
+
   g_thread_init (NULL);
   clutter_init (&argc, &argv);
-  
+
   stage = clutter_stage_get_default ();
   clutter_actor_set_size (stage, 800, 600);
-  
-  actor = champlain_view_new (CHAMPLAIN_VIEW_MODE_KINETIC);
-  
-  champlain_view_set_size (CHAMPLAIN_VIEW (actor), 800, 600);
-  
-  layer = create_marker_layer(actor);
-  champlain_view_add_layer(CHAMPLAIN_VIEW (actor), layer);
 
+  /* Create the map view */
+  actor = champlain_view_new (CHAMPLAIN_VIEW_MODE_KINETIC);
+  champlain_view_set_size (CHAMPLAIN_VIEW (actor), 800, 600);
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
-  g_object_set (G_OBJECT (actor), "zoom-level", 12, NULL);  
+
+  /* Create the markers and marker layer */
+  layer = create_marker_layer (CHAMPLAIN_VIEW (actor));
+  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
+
+  /* Finish initialising the map view */
+  g_object_set (G_OBJECT (actor), "zoom-level", 12, NULL);
   champlain_view_center_on(CHAMPLAIN_VIEW(actor), 45.466, -73.75);
-  
+
   clutter_actor_show (stage);
   clutter_main ();
 
