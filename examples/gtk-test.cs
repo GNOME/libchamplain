@@ -5,8 +5,8 @@
  public class ChamplainHelloWorld {
   
    public static void Main() {
-     Clutter.ClutterRun.Init();
      Application.Init();
+     Clutter.ClutterRun.Init();
  
      Window mainWin = new Window("Hello World!");
      mainWin.Resize(200,200);
@@ -17,6 +17,6 @@
      mainWin.Add(mapWidget);
      mainWin.ShowAll();
      
-     Application.Run();   
+     Application.Run();
    }
  }
