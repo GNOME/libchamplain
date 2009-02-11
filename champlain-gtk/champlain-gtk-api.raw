@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<api>
+  <!--
+
+        This file was automatically generated.
+        Please DO NOT MODIFY THIS FILE, modify .metadata files instead.
+
+-->
+  <namespace name="Champlain" library="champlain-gtk">
+    <object name="ViewEmbed" cname="ChamplainViewEmbed" parent="GtkAlignment">
+      <field name="Priv" cname="priv" type="ChamplainViewEmbedPrivate*" />
+      <property name="ChamplainView" cname="champlain-view" type="ChamplainView" readable="true" writeable="true" construct="true" />
+      <method name="GetType" cname="champlain_view_embed_get_type" shared="true">
+        <return-type type="GType" />
+      </method>
+      <method name="GetView" cname="champlain_view_embed_get_view">
+        <return-type type="ChamplainView*" />
+      </method>
+      <constructor cname="champlain_view_embed_new">
+        <parameters>
+          <parameter type="ChamplainView*" name="view" />
+        </parameters>
+      </constructor>
+    </object>
+  </namespace>
+</api>
