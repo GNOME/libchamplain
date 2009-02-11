@@ -2,7 +2,7 @@
 	<api filename="champlain-gtk-api.raw">
 		<library name="champlain-gtk">
 			<namespace name="Champlain">
-				<dir>../champlain-gtk</dir>
+				<dir>../../../champlain-gtk</dir>
 			</namespace>
 		</library>
 	</api>
