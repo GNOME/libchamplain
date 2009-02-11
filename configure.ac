@@ -80,14 +80,14 @@ AC_SUBST(CHAMPLAIN_APIVERSION)
 
 AC_OUTPUT([
 	Makefile
-	champlain/champlain-sharp.pc
-	champlain/Makefile
-	champlain/AssemblyInfo.cs
-	champlain/champlain-sharp.dll.config
-	champlain-gtk/champlain-gtk-sharp.pc
-	champlain-gtk/Makefile
-	champlain-gtk/AssemblyInfo.cs
-	champlain-gtk/champlain-gtk-sharp.dll.config
+	champlain-cil/champlain-sharp.pc
+	champlain-cil/Makefile
+	champlain-cil/AssemblyInfo.cs
+	champlain-cil/champlain-sharp.dll.config
+	champlain-gtk-cil/champlain-gtk-sharp.pc
+	champlain-gtk-cil/Makefile
+	champlain-gtk-cil/AssemblyInfo.cs
+	champlain-gtk-cil/champlain-gtk-sharp.dll.config
 	examples/Makefile
 ])
 

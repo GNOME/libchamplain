@@ -17,11 +17,11 @@ noinst_SCRIPTS=$(SAMPLES:.cs=.exe)
 %.exe: %.cs $(assemblies)
 	$(MCS) $(MCSFLAGS) $(GTKSHARP_LIBS) -out:$@ $<
 
-champlain-sharp.dll: $(top_builddir)/champlain/champlain-sharp.dll
-	cp $(top_builddir)/champlain/champlain-sharp.dll* .
+champlain-sharp.dll: $(top_builddir)/champlain-cil/champlain-sharp.dll
+	cp $(top_builddir)/champlain-cil/champlain-sharp.dll* .
 
-champlain-gtk-sharp.dll: $(top_builddir)/champlain-gtk/champlain-gtk-sharp.dll
-	cp $(top_builddir)/champlain-gtk/champlain-gtk-sharp.dll* .
+champlain-gtk-sharp.dll: $(top_builddir)/champlain-gtk-cil/champlain-gtk-sharp.dll
+	cp $(top_builddir)/champlain-gtk-cil/champlain-gtk-sharp.dll* .
 
 EXTRA_DIST=$(SAMPLES)
 CLEANFILES= *.exe *.mdb *.pdb *.dll *.config
