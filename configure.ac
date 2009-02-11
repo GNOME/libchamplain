@@ -69,7 +69,8 @@ AC_SUBST(CLUTTER_GTK_SHARP_LIBS)
 
 PKG_CHECK_MODULES(CHAMPLAIN, champlain-0.3 >= 0.3)
 
-CHAMPLAIN_APIVERSION=$(pkg-config --variable apiversion champlain-0.3)
+dnl CHAMPLAIN_APIVERSION=$(pkg-config --variable apiversion champlain-0.3)
+CHAMPLAIN_APIVERSION=0.3
 
 CHAMPLAIN_GTK_REQUIRED_VERSION=0.3
 PKG_CHECK_MODULES(CHAMPLAIN_GTK, champlain-gtk-0.3 >= $CHAMPLAIN_GTK_REQUIRED_VERSION, enable_gtk=yes, enable_gtk=no)
