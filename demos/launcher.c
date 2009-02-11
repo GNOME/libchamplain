@@ -29,7 +29,8 @@ map_view_button_release_cb (ClutterActor *actor,
     return;
 
   g_print("Map was clicked at ");
-  if (champlain_view_get_coords_from_event (view, (ClutterEvent*)event, &lat, &lon))
+  if (champlain_view_get_coords_from_event (view, (ClutterEvent*)event, &lat,
+         &lon))
     g_print("%f, %f \n", lat, lon);
 
   return TRUE;
@@ -78,7 +79,6 @@ create_marker_layer (ChamplainView *view)
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
   clutter_actor_show (layer);
-
   return layer;
 }
 
@@ -94,21 +94,19 @@ main (int argc,
   stage = clutter_stage_get_default ();
   clutter_actor_set_size (stage, 800, 600);
 
+  /* Create the map view */
   actor = champlain_view_new ();
-  g_object_set (G_OBJECT (actor), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
-      "zoom-level", 12, NULL);
-  clutter_actor_set_reactive (actor, TRUE);
-  g_signal_connect_after (actor, "button-release-event",
-      G_CALLBACK (map_view_button_release_cb), actor);
-
-  champlain_view_set_size (CHAMPLAIN_VIEW (actor), 700, 500);
-  clutter_actor_set_position (actor, 50, 50);
-
-  layer = create_marker_layer (actor);
-  champlain_view_add_layer(CHAMPLAIN_VIEW (actor), layer);
-
+  champlain_view_set_size (CHAMPLAIN_VIEW (actor), 800, 600);
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
-  champlain_view_center_on (CHAMPLAIN_VIEW(actor), 45.466, -73.75);
+
+  /* Create the markers and marker layer */
+  layer = create_marker_layer (CHAMPLAIN_VIEW (actor));
+  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
+
+  /* Finish initialising the map view */
+  g_object_set (G_OBJECT (actor), "zoom-level", 12,
+      "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC, NULL);
+  champlain_view_center_on(CHAMPLAIN_VIEW(actor), 45.466, -73.75);
 
   clutter_actor_show (stage);
   clutter_main ();
