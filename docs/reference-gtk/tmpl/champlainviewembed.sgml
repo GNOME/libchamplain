@@ -1,0 +1,37 @@
+<!-- ##### SECTION Title ##### -->
+ChamplainViewEmbed
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION champlain_view_embed_new ##### -->
+<para>
+
+</para>
+
+@view: 
+@Returns: 
+
+
+<!-- ##### FUNCTION champlain_view_embed_get_view ##### -->
+<para>
+
+</para>
+
+@embed: 
+@Returns: 
+
+
