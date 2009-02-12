@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<api>
+  <!--
+
+        This file was automatically generated.
+        Please DO NOT MODIFY THIS FILE, modify .metadata files instead.
+
+-->
+  <namespace name="Champlain" library="champlain">
+    <enum name="MapSource" cname="ChamplainMapSource" gtype="champlain_map_source_get_type" type="enum">
+      <member cname="CHAMPLAIN_MAP_SOURCE_DEBUG" name="Debug" />
+      <member cname="CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP" name="Openstreetmap" />
+      <member cname="CHAMPLAIN_MAP_SOURCE_OPENARIALMAP" name="Openarialmap" />
+      <member cname="CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF" name="MapsforfreeRelief" />
+      <member cname="CHAMPLAIN_MAP_SOURCE_COUNT" name="Count" />
+    </enum>
+    <enum name="ScrollMode" cname="ChamplainScrollMode" gtype="champlain_scroll_mode_get_type" type="enum">
+      <member cname="CHAMPLAIN_SCROLL_MODE_PUSH" name="Push" />
+      <member cname="CHAMPLAIN_SCROLL_MODE_KINETIC" name="Kinetic" />
+    </enum>
+    <object name="Marker" cname="ChamplainMarker" parent="ClutterGroup">
+      <field name="Priv" cname="priv" type="ChamplainMarkerPrivate*" />
+      <property name="Longitude" cname="longitude" type="gdouble" readable="true" writeable="true" />
+      <property name="Latitude" cname="latitude" type="gdouble" readable="true" writeable="true" />
+      <method name="GetType" cname="champlain_marker_get_type" shared="true">
+        <return-type type="GType" />
+      </method>
+      <constructor cname="champlain_marker_new" />
+      <constructor cname="champlain_marker_new_with_image">
+        <parameters>
+          <parameter type="const-gchar*" name="filename" />
+          <parameter type="GError**" name="error" />
+        </parameters>
+      </constructor>
+      <constructor cname="champlain_marker_new_with_image_full">
+        <parameters>
+          <parameter type="const-gchar*" name="filename" />
+          <parameter type="gint" name="width" />
+          <parameter type="gint" name="height" />
+          <parameter type="gint" name="anchor_x" />
+          <parameter type="gint" name="anchor_y" />
+          <parameter type="GError**" name="error" />
+        </parameters>
+      </constructor>
+      <constructor cname="champlain_marker_new_with_label">
+        <parameters>
+          <parameter type="const-gchar*" name="label" />
+          <parameter type="const-gchar*" name="font" />
+          <parameter type="ClutterColor*" name="text_color" />
+          <parameter type="ClutterColor*" name="marker_color" />
+        </parameters>
+      </constructor>
+      <method name="SetPosition" cname="champlain_marker_set_position">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="gdouble" name="longitude" />
+          <parameter type="gdouble" name="latitude" />
+        </parameters>
+      </method>
+    </object>
+    <object name="View" cname="ChamplainView" parent="ClutterGroup">
+      <field name="Priv" cname="priv" type="ChamplainViewPrivate*" />
+      <property name="Longitude" cname="longitude" type="gfloat" readable="true" writeable="true" />
+      <property name="Latitude" cname="latitude" type="gfloat" readable="true" writeable="true" />
+      <property name="ZoomLevel" cname="zoom-level" type="gint" readable="true" writeable="true" />
+      <property name="MapSource" cname="map-source" type="gint" readable="true" writeable="true" />
+      <property name="Offline" cname="offline" type="gboolean" readable="true" writeable="true" />
+      <property name="ScrollMode" cname="scroll-mode" type="ChamplainScrollMode" readable="true" writeable="true" />
+      <property name="DecelRate" cname="decel-rate" type="gdouble" readable="true" writeable="true" />
+      <property name="KeepCenterOnResize" cname="keep-center-on-resize" type="gboolean" readable="true" writeable="true" />
+      <property name="ShowLicense" cname="show-license" type="gboolean" readable="true" writeable="true" />
+      <method name="AddLayer" cname="champlain_view_add_layer">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ClutterActor*" name="layer" />
+        </parameters>
+      </method>
+      <method name="CenterOn" cname="champlain_view_center_on">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="gdouble" name="latitude" />
+          <parameter type="gdouble" name="longitude" />
+        </parameters>
+      </method>
+      <method name="GetCoordsFromEvent" cname="champlain_view_get_coords_from_event">
+        <return-type type="gboolean" />
+        <parameters>
+          <parameter type="ClutterEvent*" name="event" />
+          <parameter type="gdouble*" name="lat" />
+          <parameter type="gdouble*" name="lon" />
+        </parameters>
+      </method>
+      <method name="GetType" cname="champlain_view_get_type" shared="true">
+        <return-type type="GType" />
+      </method>
+      <constructor cname="champlain_view_new" />
+      <method name="SetSize" cname="champlain_view_set_size">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="guint" name="width" />
+          <parameter type="guint" name="height" />
+        </parameters>
+      </method>
+      <method name="ZoomIn" cname="champlain_view_zoom_in">
+        <return-type type="void" />
+      </method>
+      <method name="ZoomOut" cname="champlain_view_zoom_out">
+        <return-type type="void" />
+      </method>
+    </object>
+    <alias name="Layer" cname="ChamplainLayer" type="ClutterActor" />
+    <class name="Global" cname="ChamplainGlobal">
+      <method name="LayerNew" cname="champlain_layer_new" shared="true">
+        <return-type type="ChamplainLayer*" />
+      </method>
+    </class>
+  </namespace>
+</api>

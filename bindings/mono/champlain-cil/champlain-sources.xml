@@ -1,0 +1,33 @@
+<gapi-parser-input>
+	<api filename="champlain-api.raw">
+		<library name="champlain">
+			<namespace name="Champlain">
+				<file>../../../champlain/champlain.h</file>
+				<file>../../../champlain/champlain-view.h</file>
+				<file>../../../champlain/champlain-defines.h</file>
+				<file>../../../champlain/champlain-layer.h</file>
+				<file>../../../champlain/champlain-marker.h</file>
+				<file>../../../champlain/champlain-debug.c</file>
+				<file>../../../champlain/champlain-view.c</file>
+				<file>../../../champlain/champlain-layer.c</file>
+				<file>../../../champlain/champlain-marker.c</file>
+				<file>../../../champlain/champlain-map.c</file>
+				<file>../../../champlain/champlain-zoom-level.c</file>
+				<file>../../../champlain/champlain-tile.c</file>
+				<file>../../../champlain/sources/oam.c</file>
+				<file>../../../champlain/sources/osmmapnik.c</file>
+				<file>../../../champlain/sources/mffrelief.c</file>
+				<file>../../../champlain/sources/googlemap.c</file>
+				<file>../../../champlain/sources/googlesat.c</file>
+				<file>../../../champlain/sources/googleterrain.c</file>
+				<file>../../../champlain/sources/debugmap.c</file>
+				<file>../../../champlain/champlain-marshal.h</file>
+				<file>../../../champlain/champlain-marshal.c</file>
+				<file>../../../champlain/champlain-enum-types.h</file>
+				<file>../../../champlain/champlain-enum-types.c</file>
+				<file>../../../champlain/stamp-enum-types</file>
+			</namespace>
+		</library>
+	</api>
+</gapi-parser-input>
+

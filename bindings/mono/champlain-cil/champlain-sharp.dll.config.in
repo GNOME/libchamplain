@@ -1,0 +1,5 @@
+<configuration>
+	<dllmap dll="champlain" target="libchamplain-@CHAMPLAIN_APIVERSION@.so" />
+	<dllmap dll="glib" target="libglib-2.0.so" />
+</configuration>
+

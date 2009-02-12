@@ -1,0 +1,42 @@
+GAPI_PARSER = gapi2-parser
+GAPI_CODEGEN = gapi2-codegen
+GAPI_FIXUP = gapi2-fixup
+
+gapidir = $(datadir)/gapi-2.0
+gapi_DATA = $(CHAMPLAIN_FIXED_API)
+
+assemblydir = $(libdir)/champlain-sharp
+assembly_DATA = $(TARGET)
+CLEANFILES = $(ASSEMBLY) $(ASSEMBLY).mdb generated-stamp generated/*.cs $(API) $(CHAMPLAIN_FIXED_API) champlain-sharp.snk
+DISTCLEANFILES = $(ASSEMBLY).config Makefile.in
+EXTRA_DIST = $(RAW_API) $(METADATA) $(customs) $(sources) $(SOURCES_XML) $(CHAMPLAIN_METADATA) $(custom_extradist)
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = $(ASSEMBLY_NAME).pc
+
+api_includes = $(GTKSHARP_CFLAGS) $(CLUTTERSHARP_CFLAGS) $(CLUTTER_GTK_CFLAGS) $(custom_api_includes)
+
+references = $(GTKSHARP_LIBS) $(CLUTTER_SHARP_LIBS) $(CLUTTER_GTK_SHARP_LIBS) $(custom_references)
+
+$(CHAMPLAIN_FIXED_API): 
+	@if ! [ -e '$(CHAMPLAIN_RAW_API)' ]; then 		\
+		$(GAPI_PARSER) $(SOURCES_XML);		\
+	fi
+	cp $(CHAMPLAIN_RAW_API) $(CHAMPLAIN_FIXED_API)
+	$(GAPI_FIXUP) --api=$(CHAMPLAIN_FIXED_API) --metadata=$(CHAMPLAIN_METADATA)
+	$(GAPI_CODEGEN) --outdir=./generated --customdir=. $(api_includes) --generate $(CHAMPLAIN_FIXED_API)
+
+champlain-sharp.snk:
+	cp $(top_builddir)/champlain-sharp.snk .
+
+$(ASSEMBLY): $(CHAMPLAIN_FIXED_API) $(sources) champlain-sharp.snk
+	@rm -f $(ASSEMBLY).mdb
+	$(MCS) $(CSFLAGS) -out:$@ -pkg:clutter-sharp -pkg:clutter-gtk-sharp -target:library -nowarn:0169 -unsafe $(references) generated/*.cs AssemblyInfo.cs $(sources)
+
+install-data-local:
+	echo "$(GACUTIL) /i $(ASSEMBLY) /f /package $(ASSEMBLY_NAME) /gacdir $(DESTDIR)$(libdir)"
+	$(GACUTIL) /i $(ASSEMBLY) /f /package champlain-sharp /gacdir $(DESTDIR)$(libdir)
+
+uninstall-local:
+	echo "$(GACUTIL) /u $(ASSEMBLY_NAME) /package $(ASSEMBLY_NAME) /gacdir $(DESTDIR)$(libdir)"
+	$(GACUTIL) /u $(ASSEMBLY_NAME) /package champlain-sharp /gacdir $(DESTDIR)$(libdir)

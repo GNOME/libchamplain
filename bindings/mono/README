@@ -1,0 +1,10 @@
+champlain-mono offers C#/Mono bindings to champlain
+
+About re-parsing the API
+ To build these bindings from scratch (re-parsing the C-files), you should
+ have the champlain source in location ../champlain/ and champlain-gtk in
+ location ../champlain-gtk/
+
+	libchamplain: http://blog.pierlux.com/projects/libchamplain/en/
+	clutter: http://www.clutter-project.com
+	Mono: http://www.mono-project.com
