@@ -17,7 +17,7 @@ libchamplain_gtk_0_3_la_SOURCES = \
 
 noinst_HEADERS = champlain-view-embed.h
 
-libchamplain_gtk_0_3_la_LIBADD = $(DEPS_LIBS) $(CPLAIN_DEPS_LIBS)
+libchamplain_gtk_0_3_la_LIBADD = $(GTK_DEPS_LIBS)
 
 champlain-gtk-marshal.h: $(CHAMPLAIN_GTK_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --header --prefix=champlain_gtk_marshal $< > $(CHAMPLAIN_GTK_MARSHAL).h 
@@ -30,7 +30,7 @@ libchamplain_include_HEADERS = champlain-gtk.h champlain-view-embed.h
 
 libchamplain_gtk_0_3_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
-AM_CPPFLAGS = $(DEPS_CFLAGS) $(CPLAIN_DEPS_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_GTK_COMPILATION
-AM_LDFLAGS = $(DEPS_LIBS) $(CPLAIN_DEPS_LIBS) -export-symbols-regex ^champlain_.*
+AM_CPPFLAGS = $(GTK_DEPS_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_GTK_COMPILATION
+AM_LDFLAGS = $(GTK_DEPS_LIBS) -export-symbols-regex ^champlain_.*
 
 EXTRA_DIST = $(CHAMPLAIN_GTK_MARSHAL_LIST)

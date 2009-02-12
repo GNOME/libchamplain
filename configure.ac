@@ -31,11 +31,9 @@ PKG_CHECK_MODULES(DEPS,
       gdk-2.0 >= 2.10,
       clutter-0.8 >= 0.8,
       clutter-cairo-0.8 >= 0.8,
-      clutter-gtk-0.8 >= 0.8,
       cairo >= 1.4,
       libsoup-2.4 >= 2.4.1,
       gio-2.0 >= 2.16
-      gtk+-2.0 >= 2.2
   ]
 )
 # check for gtk-doc
@@ -52,17 +50,40 @@ AC_ARG_ENABLE(debug,
 if test x$enable_debug = xyes; then
   AC_DEFINE(ENABLE_DEBUG, [], [Enable debug code])
 fi
+
+# -----------------------------------------------------------
+# Enable debug
+# -----------------------------------------------------------
+
+AC_ARG_ENABLE(gtk,
+  AC_HELP_STRING([--disable-gtk],[Don't compile Gtk+ embedded view]),
+    enable_gtk=$enableval, enable_gtk=yes )
+
+if test x$enable_gtk = xyes; then
+  AC_SUBST(GTK_DEPS_CFLAGS)
+  AC_SUBST(GTK_DEPS_LIBS)
+  PKG_CHECK_MODULES(GTK_DEPS,
+    [   gtk+-2.0 >= 2.2
+        clutter-gtk-0.8 >= 0.8
+    ]
+  )
+
+  AC_CONFIG_FILES([champlain-gtk/Makefile
+                   champlain-gtk.pc])
+
+  AC_DEFINE(ENABLE_GTK, [], [Enable Gtk+ view code])
+fi
+
+AM_CONDITIONAL(ENABLE_GTK, test "x$enable_gtk" = "xyes")
 # -----------------------------------------------------------
 
 AC_CONFIG_FILES([Makefile
                  champlain/Makefile
-                 champlain-gtk/Makefile
                  demos/Makefile
                  tidy/Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
-                 champlain.pc
-                 champlain-gtk.pc])
+                 champlain.pc])
 AC_OUTPUT
 
 echo ""
@@ -71,4 +92,5 @@ echo ""
 echo "         Prefix: ${prefix}"
 echo " Compiler flags: ${CPPFLAGS}"
 echo "          Debug: ${enable_debug}"
+echo "      Gtk+ View: ${enable_gtk}"
 
