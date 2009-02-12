@@ -31,9 +31,11 @@ PKG_CHECK_MODULES(DEPS,
       gdk-2.0 >= 2.10,
       clutter-0.8 >= 0.8,
       clutter-cairo-0.8 >= 0.8,
+      clutter-gtk-0.8 >= 0.8,
       cairo >= 1.4,
       libsoup-2.4 >= 2.4.1,
       gio-2.0 >= 2.16
+      gtk+-2.0 >= 2.2
   ]
 )
 # check for gtk-doc
@@ -54,11 +56,13 @@ fi
 
 AC_CONFIG_FILES([Makefile
                  champlain/Makefile
+                 champlain-gtk/Makefile
                  demos/Makefile
                  tidy/Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
-                 champlain.pc])
+                 champlain.pc
+                 champlain-gtk.pc])
 AC_OUTPUT
 
 echo ""
@@ -67,4 +71,4 @@ echo ""
 echo "         Prefix: ${prefix}"
 echo " Compiler flags: ${CPPFLAGS}"
 echo "          Debug: ${enable_debug}"
-echo ""
+

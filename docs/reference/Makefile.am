@@ -12,7 +12,7 @@ DOC_MAIN_SGML_FILE=$(DOC_MODULE)-docs.sgml
 # gtk-doc will search all .c & .h files beneath here for inline comments
 # documenting the functions and macros.
 # e.g. DOC_SOURCE_DIR=../../../gtk
-DOC_SOURCE_DIR=../../champlain
+DOC_SOURCE_DIR=../../champlain ../../champlain-gtk
 
 # Extra options to pass to gtkdoc-scangobj. Not normally needed.
 SCANGOBJ_OPTIONS=
@@ -36,12 +36,11 @@ FIXXREF_OPTIONS= \
 	--extra-dir=$(PREFIX)/share/gtk-doc/html/glib \
 	--extra-dir=$(PREFIX)/share/gtk-doc/html/clutter
 
-
 # Used for dependencies. The docs will be rebuilt if any of these change.
 # e.g. HFILE_GLOB=$(top_srcdir)/gtk/*.h
 # e.g. CFILE_GLOB=$(top_srcdir)/gtk/*.c
-HFILE_GLOB=$(top_srcdir)/champlain/*.h
-CFILE_GLOB=$(top_srcdir)/champlain/*.c
+HFILE_GLOB=$(top_srcdir)/champlain/*.h $(top_srcdir)/champlain-gtk/*.h
+CFILE_GLOB=$(top_srcdir)/champlain/*.c $(top_srcdir)/champlain-gtk/*.c
 
 # Header files to ignore when scanning.
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
@@ -66,7 +65,7 @@ expand_content_files=
 # e.g. INCLUDES=-I$(top_srcdir) -I$(top_builddir) $(GTK_DEBUG_FLAGS)
 # e.g. GTKDOC_LIBS=$(top_builddir)/gtk/$(gtktargetlib)
 INCLUDES=-I$(top_srcdir)/champlain -I$(top_srcdir) -I$(top_builddir) $(DEPS_CFLAGS)
-GTKDOC_LIBS=$(DEPS_LIBS) $(top_builddir)/champlain/libchamplain-0.2.la
+GTKDOC_LIBS=$(DEPS_LIBS) $(top_builddir)/champlain/libchamplain-0.3.la $(top_builddir)/champlain-gtk/libchamplain-gtk-0.3.la
 
 # This includes the standard gtk-doc make rules, copied by gtkdocize.
 include $(top_srcdir)/gtk-doc.make
