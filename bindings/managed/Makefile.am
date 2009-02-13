@@ -1,6 +1,6 @@
 SUBDIRS = \
-	champlain-cil	 \
-	champlain-gtk-cil    \
-	examples
+	champlain	 \
+	champlain-gtk    \
+	samples
 
-DIST_SUBDIRS = champlain-cil champlain-gtk-cil examples
+DIST_SUBDIRS = champlain champlain-gtk samples

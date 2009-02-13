@@ -52,7 +52,7 @@ if test x$enable_debug = xyes; then
 fi
 
 # -----------------------------------------------------------
-# Enable debug
+# Enable gtk
 # -----------------------------------------------------------
 
 AC_ARG_ENABLE(gtk,
@@ -77,6 +77,60 @@ if test x$enable_gtk = xyes; then
 fi
 
 AM_CONDITIONAL(ENABLE_GTK, test "x$enable_gtk" = "xyes")
+
+# -----------------------------------------------------------
+# Enable managed (default to "no")
+# -----------------------------------------------------------
+AC_ARG_ENABLE(managed,
+  AC_HELP_STRING([--enable-managed],[Build champlain-sharp (and champlain-gtk-sharp)]),
+    enable_managed=$enableval, enable_managed=no )
+
+if test x$enable_managed = xyes; then
+  AC_PATH_PROG(MCS, gmcs)
+  AC_SUBST(MCS)
+
+  AC_PATH_PROG(GACUTIL, gacutil)
+  AC_SUBST(GACUTIL)
+
+  PKG_CHECK_MODULES(GAPI, gapi-2.0 >= 2.12.1)
+  AC_PATH_PROG(GAPI_PARSER, gapi2-parser)
+  AC_SUBST(GAPI_PARSER)
+
+  AC_PATH_PROG(GAPI_CODEGEN, gapi2-codegen)
+  AC_SUBST(GAPI_CODEGEN)
+
+  AC_PATH_PROG(GAPI_FIXUP, gapi2-fixup)
+  AC_SUBST(GAPI_FIXUP)
+  
+  PKG_CHECK_MODULES(GTKSHARP, gtk-sharp-2.0 > 2.3.92)
+  AC_SUBST(GTKSHARP_LIBS)
+  
+  PKG_CHECK_MODULES(CLUTTERSHARP, clutter-sharp >= 0.8.0)
+  AC_SUBST(CLUTTER_SHARP_LIBS)
+  
+  PKG_CHECK_MODULES(CLUTTER_GTK_SHARP, clutter-gtk-sharp >= 0.8.0)
+  AC_SUBST(CLUTTER_GTK_SHARP_LIBS)
+
+  CHAMPLAIN_APIVERSION=0.3
+  CHAMPLAIN_GTK_APIVERSION=0.2
+  AC_SUBST(CHAMPLAIN_APIVERSION)
+  AC_SUBST(CHAMPLAIN_GTK_APIVERSION)
+
+AC_CONFIG_FILES([
+	bindings/managed/Makefile
+	bindings/managed/champlain/Makefile
+	bindings/managed/champlain-gtk/Makefile
+])
+
+
+  if test x$enable_gtk = xyes; then
+    enable_gtk_managed = yes
+  fi
+fi
+
+AM_CONDITIONAL(ENABLE_MANAGED, test "x$enable_managed" = "xyes")
+AM_CONDITIONAL(ENABLE_GTK_MANAGED, test "x$enable_managed" = "xyes" && test "x$enable_gtk" = "xyes")
+
 # -----------------------------------------------------------
 
 AC_CONFIG_FILES([Makefile
@@ -91,8 +145,12 @@ AC_OUTPUT
 echo ""
 echo " libchamplain $VERSION"
 echo ""
-echo "         Prefix: ${prefix}"
-echo " Compiler flags: ${CPPFLAGS}"
-echo "          Debug: ${enable_debug}"
-echo "      Gtk+ View: ${enable_gtk}"
+echo "          Prefix: ${prefix}"
+echo "  Compiler flags: ${CPPFLAGS}"
+echo "           Debug: ${enable_debug}"
+echo "       Gtk+ View: ${enable_gtk}"
+echo ""
+echo "Bindings:"
+echo " champlain-sharp: ${enable_managed}"
+echo ""
 
