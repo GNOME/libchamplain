@@ -146,7 +146,8 @@ AC_CONFIG_FILES([Makefile
                  tidy/Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
-                 champlain.pc])
+                 champlain.pc
+		 bindings/Makefile])
 AC_OUTPUT
 
 echo ""
