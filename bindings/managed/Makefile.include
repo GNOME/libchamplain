@@ -27,7 +27,7 @@ $(CHAMPLAIN_FIXED_API):
 	$(GAPI_CODEGEN) --outdir=./generated --customdir=. $(api_includes) --generate $(CHAMPLAIN_FIXED_API)
 
 champlain-sharp.snk:
-	cp $(top_builddir)/champlain-sharp.snk .
+	cp $(top_builddir)/bindings/managed/champlain-sharp.snk .
 
 $(ASSEMBLY): $(CHAMPLAIN_FIXED_API) $(sources) champlain-sharp.snk
 	@rm -f $(ASSEMBLY).mdb

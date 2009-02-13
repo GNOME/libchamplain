@@ -119,7 +119,14 @@ if test x$enable_managed = xyes; then
 AC_CONFIG_FILES([
 	bindings/managed/Makefile
 	bindings/managed/champlain/Makefile
+	bindings/managed/champlain/AssemblyInfo.cs
+	bindings/managed/champlain/champlain-sharp.pc
+	bindings/managed/champlain/champlain-sharp.dll.config
 	bindings/managed/champlain-gtk/Makefile
+	bindings/managed/champlain-gtk/AssemblyInfo.cs
+	bindings/managed/champlain-gtk/champlain-gtk-sharp.pc
+	bindings/managed/champlain-gtk/champlain-gtk-sharp.dll.config
+	bindings/managed/samples/Makefile
 ])
 
 
