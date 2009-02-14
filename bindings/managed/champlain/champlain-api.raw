@@ -7,6 +7,12 @@
 
 -->
   <namespace name="Champlain" library="champlain">
+    <enum name="DebugFlags" cname="ChamplainDebugFlags" type="flags">
+      <member cname="CHAMPLAIN_DEBUG_LOADING" name="Loading" value="1 &lt;&lt; 1" />
+      <member cname="CHAMPLAIN_DEBUG_ENGINE" name="Engine" value="1 &lt;&lt; 2" />
+      <member cname="CHAMPLAIN_DEBUG_VIEW" name="View" value="1 &lt;&lt; 3" />
+      <member cname="CHAMPLAIN_DEBUG_OTHER" name="Other" value="1 &lt;&lt; 4" />
+    </enum>
     <enum name="MapSource" cname="ChamplainMapSource" gtype="champlain_map_source_get_type" type="enum">
       <member cname="CHAMPLAIN_MAP_SOURCE_DEBUG" name="Debug" />
       <member cname="CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP" name="Openstreetmap" />
@@ -109,6 +115,46 @@
       </method>
     </object>
     <alias name="Layer" cname="ChamplainLayer" type="ClutterActor" />
+    <struct name="ZoomLevel" cname="ZoomLevel" opaque="true">
+      <field name="Level" cname="level" type="int" access="public" writeable="true" />
+      <field name="RowCount" cname="row_count" type="int" access="public" writeable="true" />
+      <field name="ColumnCount" cname="column_count" type="int" access="public" writeable="true" />
+      <field name="TileSize" cname="tile_size" type="int" access="public" writeable="true" />
+      <field name="Tiles" cname="tiles" type="GPtrArray*" access="public" writeable="true" />
+      <field name="Group" cname="group" type="ClutterActor*" access="public" writeable="true" />
+      <field name="Anchor" cname="anchor" type="ChamplainPoint" access="public" writeable="true" />
+      <method name="Free" cname="zoom_level_free">
+        <return-type type="void" />
+      </method>
+      <method name="GetHeight" cname="zoom_level_get_height">
+        <return-type type="guint" />
+      </method>
+      <method name="GetWidth" cname="zoom_level_get_width">
+        <return-type type="guint" />
+      </method>
+      <constructor cname="zoom_level_new">
+        <parameters>
+          <parameter type="gint" name="zoom_level" />
+          <parameter type="gint" name="row" />
+          <parameter type="gint" name="column" />
+          <parameter type="gint" name="tile_size" />
+        </parameters>
+      </constructor>
+    </struct>
+    <class name="Debug" cname="ChamplainDebug_">
+      <method name="FlagIsSet" cname="champlain_debug_flag_is_set" shared="true">
+        <return-type type="gboolean" />
+        <parameters>
+          <parameter type="ChamplainDebugFlags" name="flag" />
+        </parameters>
+      </method>
+      <method name="SetFlags" cname="champlain_debug_set_flags" shared="true">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="const-gchar*" name="flags_string" />
+        </parameters>
+      </method>
+    </class>
     <class name="Global" cname="ChamplainGlobal">
       <method name="LayerNew" cname="champlain_layer_new" shared="true">
         <return-type type="ChamplainLayer*" />
