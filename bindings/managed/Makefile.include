@@ -18,10 +18,10 @@ api_includes = $(GTKSHARP_CFLAGS) $(CLUTTERSHARP_CFLAGS) $(CLUTTER_GTK_CFLAGS) $
 
 references = $(GTKSHARP_LIBS) $(CLUTTER_SHARP_LIBS) $(CLUTTER_GTK_SHARP_LIBS) $(custom_references)
 
+api:
+	$(GAPI_PARSER) $(SOURCES_XML)
+
 $(CHAMPLAIN_FIXED_API): 
-	@if ! [ -e '$(CHAMPLAIN_RAW_API)' ]; then 		\
-		$(GAPI_PARSER) $(SOURCES_XML);		\
-	fi
 	cp $(CHAMPLAIN_RAW_API) $(CHAMPLAIN_FIXED_API)
 	$(GAPI_FIXUP) --api=$(CHAMPLAIN_FIXED_API) --metadata=$(CHAMPLAIN_METADATA)
 	$(GAPI_CODEGEN) --outdir=./generated --customdir=. $(api_includes) --generate $(CHAMPLAIN_FIXED_API)
