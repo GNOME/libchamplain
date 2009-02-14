@@ -8,4 +8,5 @@ Name: champlain-gtk-sharp
 Description: champlain-sharp - champlain Mono Bindings
 Version: @VERSION@
 Libs: -r:${libdir}/mono/champlain-sharp/champlain-sharp.dll
-Cflags: -I:${includedir}/mono/champlain-sharp/champlain-api.xml
+Cflags: -I:${gapidir}/champlain-api.xml
+Requires: clutter-sharp
