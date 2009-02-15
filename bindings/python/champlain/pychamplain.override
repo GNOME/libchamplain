@@ -1,0 +1,13 @@
+%%
+headers
+#include <Python.h>
+#include <pygobject.h>
+#include <champlain/champlain.h>
+#include <clutter/clutter.h>
+
+%%
+modulename champlain
+%%
+import clutter.Actor as PyClutterActor_Type
+import clutter.Group as PyClutterGroup_Type
+%%

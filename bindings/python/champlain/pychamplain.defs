@@ -1,0 +1,208 @@
+;; -*- scheme -*-
+; object definitions ...
+(define-object Marker
+  (in-module "Champlain")
+  (parent "ClutterGroup")
+  (c-name "ChamplainMarker")
+  (gtype-id "CHAMPLAIN_TYPE_MARKER")
+)
+
+(define-object View
+  (in-module "Champlain")
+  (parent "ClutterGroup")
+  (c-name "ChamplainView")
+  (gtype-id "CHAMPLAIN_TYPE_VIEW")
+)
+
+;; Enumerations and flags ...
+
+(define-enum MapSource
+  (in-module "Champlain")
+  (c-name "ChamplainMapSource")
+  (gtype-id "CHAMPLAIN_TYPE_MAP_SOURCE")
+  (values
+    '("debug" "CHAMPLAIN_MAP_SOURCE_DEBUG")
+    '("openstreetmap" "CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP")
+    '("openarialmap" "CHAMPLAIN_MAP_SOURCE_OPENARIALMAP")
+    '("mapsforfree-relief" "CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF")
+    '("count" "CHAMPLAIN_MAP_SOURCE_COUNT")
+  )
+)
+
+(define-enum ScrollMode
+  (in-module "Champlain")
+  (c-name "ChamplainScrollMode")
+  (gtype-id "CHAMPLAIN_TYPE_SCROLL_MODE")
+  (values
+    '("push" "CHAMPLAIN_SCROLL_MODE_PUSH")
+    '("kinetic" "CHAMPLAIN_SCROLL_MODE_KINETIC")
+  )
+)
+
+
+;; From champlain.h
+
+
+
+;; From champlain-view.h
+
+(define-function view_get_type
+  (c-name "champlain_view_get_type")
+  (return-type "GType")
+)
+
+(define-function view_new
+  (c-name "champlain_view_new")
+  (is-constructor-of "ChamplainView")
+  (return-type "ClutterActor*")
+  (parameters
+  )
+)
+
+(define-method center_on
+  (of-object "ChamplainView")
+  (c-name "champlain_view_center_on")
+  (return-type "none")
+  (parameters
+    '("gdouble" "latitude")
+    '("gdouble" "longitude")
+  )
+)
+
+(define-method zoom_in
+  (of-object "ChamplainView")
+  (c-name "champlain_view_zoom_in")
+  (return-type "none")
+)
+
+(define-method zoom_out
+  (of-object "ChamplainView")
+  (c-name "champlain_view_zoom_out")
+  (return-type "none")
+)
+
+(define-method add_layer
+  (of-object "ChamplainView")
+  (c-name "champlain_view_add_layer")
+  (return-type "none")
+  (parameters
+    '("ClutterActor*" "layer")
+  )
+)
+
+(define-method set_size
+  (of-object "ChamplainView")
+  (c-name "champlain_view_set_size")
+  (return-type "none")
+  (parameters
+    '("guint" "width")
+    '("guint" "height")
+  )
+)
+
+(define-method get_coords_from_event
+  (of-object "ChamplainView")
+  (c-name "champlain_view_get_coords_from_event")
+  (return-type "gboolean")
+  (parameters
+    '("ClutterEvent*" "event")
+    '("gdouble*" "lat")
+    '("gdouble*" "lon")
+  )
+)
+
+
+
+;; From champlain-defines.h
+
+
+
+;; From champlain-layer.h
+
+(define-function layer_new
+  (c-name "champlain_layer_new")
+  (is-constructor-of "ChamplainLayer")
+  (return-type "ChamplainLayer*")
+  (parameters
+  )
+)
+
+
+
+;; From champlain-marker.h
+
+(define-function marker_get_type
+  (c-name "champlain_marker_get_type")
+  (return-type "GType")
+)
+
+(define-function marker_new
+  (c-name "champlain_marker_new")
+  (is-constructor-of "ChamplainMarker")
+  (return-type "ClutterActor*")
+  (parameters
+  )
+)
+
+(define-method set_position
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_position")
+  (return-type "none")
+  (parameters
+    '("gdouble" "longitude")
+    '("gdouble" "latitude")
+  )
+)
+
+(define-function marker_new_with_label
+  (c-name "champlain_marker_new_with_label")
+  (return-type "ClutterActor*")
+  (parameters
+    '("const-gchar*" "label")
+    '("const-gchar*" "font")
+    '("ClutterColor*" "text_color")
+    '("ClutterColor*" "marker_color")
+  )
+)
+
+(define-function marker_new_with_image
+  (c-name "champlain_marker_new_with_image")
+  (return-type "ClutterActor*")
+  (parameters
+    '("const-gchar*" "filename")
+    '("GError**" "error")
+  )
+)
+
+(define-function marker_new_with_image_full
+  (c-name "champlain_marker_new_with_image_full")
+  (return-type "ClutterActor*")
+  (parameters
+    '("const-gchar*" "filename")
+    '("gint" "width")
+    '("gint" "height")
+    '("gint" "anchor_x")
+    '("gint" "anchor_y")
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From champlain-marshal.h
+
+
+
+;; From champlain-enum-types.h
+
+(define-function map_source_get_type
+  (c-name "champlain_map_source_get_type")
+  (return-type "GType")
+)
+
+(define-function scroll_mode_get_type
+  (c-name "champlain_scroll_mode_get_type")
+  (return-type "GType")
+)
+
+

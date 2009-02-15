@@ -5,6 +5,7 @@ AC_PREREQ(2.61)
 AC_INIT(libchamplain, 0.3, pierre-luc@pierlux.com)
 AC_CONFIG_SRCDIR([champlain/champlain.h])
 AC_CONFIG_HEADER([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE
 AC_LIBTOOL_DLOPEN
@@ -138,6 +139,43 @@ AM_CONDITIONAL(ENABLE_MANAGED, test "x$enable_managed" = "xyes")
 AM_CONDITIONAL(ENABLE_GTK_MANAGED, test "x$enable_managed" = "xyes" && test "x$enable_gtk" = "xyes")
 
 # -----------------------------------------------------------
+# Enable Python bindings
+# -----------------------------------------------------------
+
+AC_ARG_ENABLE(python,
+  AC_HELP_STRING([--enable-python],[Build python bindings]),
+    enable_python=$enableval, enable_python=no )
+
+if test x$enable_python = xyes; then
+  PKG_CHECK_MODULES(PYTHON_BINDING,
+   [
+      pygtk-2.0,
+      glib-2.0,
+      gobject-2.0,
+      clutter-0.8,
+      gconf-2.0,
+      gtk+-2.0
+   ], have_python="yes", have_python="no")
+
+  AC_CONFIG_FILES([
+   bindings/python/Makefile
+   bindings/python/champlain/Makefile
+   bindings/python/champlain-gtk/Makefile
+  ])
+
+  if test "x$have_python" = "xyes" ; then
+    AC_CHECK_PROGS([PYGOBJECTCODEGEN], [pygobject-codegen-2.0 pygtk-codegen-2.0])
+    AM_CHECK_PYTHON_HEADERS(,have_python="no")
+  fi
+fi
+
+if test "x$enable_python" = "xyes" -a "x$have_python" != "xyes"; then
+   AC_MSG_ERROR([Couldn't find python.])
+fi
+
+AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
+
+# -----------------------------------------------------------
 
 AC_CONFIG_FILES([Makefile
                  champlain/Makefile
@@ -159,5 +197,5 @@ echo "       Gtk+ View: ${enable_gtk}"
 echo ""
 echo "Bindings:"
 echo " champlain-sharp: ${enable_managed}"
-echo ""
+echo " Python bindings: ${enable_python}"
 
