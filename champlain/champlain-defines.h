@@ -40,4 +40,12 @@ typedef struct _ChamplainMarkerClass ChamplainMarkerClass;
         (G_PARAM_READABLE | G_PARAM_WRITABLE | \
          G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
 
+typedef enum
+{
+  CHAMPLAIN_STATE_NONE,
+  CHAMPLAIN_STATE_INIT,
+  CHAMPLAIN_STATE_LOADING,
+  CHAMPLAIN_STATE_DONE
+} ChamplainStateEnum;
+
 #endif
