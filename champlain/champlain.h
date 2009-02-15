@@ -32,6 +32,7 @@
 #include "champlain/champlain-layer.h"
 #include "champlain/champlain-marker.h"
 #include "champlain/champlain-view.h"
+#include "champlain/champlain-enum-types.h"
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 
