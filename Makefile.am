@@ -22,4 +22,4 @@ DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
 CLEANFILES = $(pcfiles)
 
 # Have the demos build at the end as they depend on optional parts
-SUBDIRS += demos
+SUBDIRS += demos bindings
