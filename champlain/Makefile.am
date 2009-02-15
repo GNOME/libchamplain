@@ -36,11 +36,7 @@ libchamplain_0_3_la_SOURCES = \
 	champlain-tile.c 		\
 	sources/oam.c 			\
 	sources/osmmapnik.c 		\
-	sources/mffrelief.c 		\
-	sources/googlemap.c 		\
-	sources/googlesat.c 		\
-	sources/googleterrain.c 	\
-	sources/debugmap.c
+	sources/mffrelief.c
 
 noinst_HEADERS = \
 	champlain-debug.h  		\
@@ -53,10 +49,6 @@ noinst_HEADERS = \
 	sources/oam.h 			\
 	sources/osmmapnik.h 		\
 	sources/mffrelief.h 		\
-	sources/googlemap.h 		\
-	sources/googlesat.h 		\
-	sources/googleterrain.h 	\
-	sources/debugmap.h		\
 	champlain-enum-types.h
 
 libchamplain_include_HEADERS = \

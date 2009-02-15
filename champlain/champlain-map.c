@@ -22,7 +22,6 @@
 #include "sources/osmmapnik.h"
 #include "sources/mffrelief.h"
 #include "sources/oam.h"
-#include "sources/debugmap.h"
 
 #include <math.h>
 
@@ -33,9 +32,6 @@ map_new (ChamplainMapSource source)
 
   switch(source)
     {
-      case CHAMPLAIN_MAP_SOURCE_DEBUG:
-        debugmap_init(map);
-        break;
       case CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP:
         osm_mapnik_init(map);
         break;
