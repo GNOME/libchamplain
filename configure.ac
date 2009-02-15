@@ -101,13 +101,13 @@ if test x$enable_managed = xyes; then
 
   AC_PATH_PROG(GAPI_FIXUP, gapi2-fixup)
   AC_SUBST(GAPI_FIXUP)
-  
+
   PKG_CHECK_MODULES(GTKSHARP, gtk-sharp-2.0 > 2.3.92)
   AC_SUBST(GTKSHARP_LIBS)
-  
+
   PKG_CHECK_MODULES(CLUTTERSHARP, clutter-sharp >= 0.8.0)
   AC_SUBST(CLUTTER_SHARP_LIBS)
-  
+
   PKG_CHECK_MODULES(CLUTTER_GTK_SHARP, clutter-gtk-sharp >= 0.8.0)
   AC_SUBST(CLUTTER_GTK_SHARP_LIBS)
 
@@ -116,19 +116,18 @@ if test x$enable_managed = xyes; then
   AC_SUBST(CHAMPLAIN_APIVERSION)
   AC_SUBST(CHAMPLAIN_GTK_APIVERSION)
 
-AC_CONFIG_FILES([
-	bindings/managed/Makefile
-	bindings/managed/champlain/Makefile
-	bindings/managed/champlain/AssemblyInfo.cs
-	bindings/managed/champlain/champlain-sharp.pc
-	bindings/managed/champlain/champlain-sharp.dll.config
-	bindings/managed/champlain-gtk/Makefile
-	bindings/managed/champlain-gtk/AssemblyInfo.cs
-	bindings/managed/champlain-gtk/champlain-gtk-sharp.pc
-	bindings/managed/champlain-gtk/champlain-gtk-sharp.dll.config
-	bindings/managed/samples/Makefile
-])
-
+  AC_CONFIG_FILES([
+    bindings/managed/Makefile
+    bindings/managed/champlain/Makefile
+    bindings/managed/champlain/AssemblyInfo.cs
+    bindings/managed/champlain/champlain-sharp.pc
+    bindings/managed/champlain/champlain-sharp.dll.config
+    bindings/managed/champlain-gtk/Makefile
+    bindings/managed/champlain-gtk/AssemblyInfo.cs
+    bindings/managed/champlain-gtk/champlain-gtk-sharp.pc
+    bindings/managed/champlain-gtk/champlain-gtk-sharp.dll.config
+    bindings/managed/samples/Makefile
+  ])
 
   if test x$enable_gtk = xyes; then
     enable_gtk_managed = yes
@@ -147,7 +146,7 @@ AC_CONFIG_FILES([Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
                  champlain.pc
-		 bindings/Makefile])
+                 bindings/Makefile])
 AC_OUTPUT
 
 echo ""
