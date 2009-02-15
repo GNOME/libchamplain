@@ -18,6 +18,8 @@
 
 #include "champlain-map.h"
 
+#define DEBUG_FLAG CHAMPLAIN_DEBUG_LOADING
+#include "champlain-debug.h"
 #include "champlain-zoom-level.h"
 #include "sources/osmmapnik.h"
 #include "sources/mffrelief.h"
@@ -88,7 +90,7 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
   if(y_count > map->current_level->column_count)
     y_count = map->current_level->column_count;
 
-  //g_print("Tiles: %d, %d to %d, %d\n", x_first, y_first, x_count, y_count);
+  DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_count, y_count);
 
   int i, j;
   guint k;
@@ -96,11 +98,14 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
   // Get rid of old tiles first
   for (k = 0; k < map->current_level->tiles->len; k++)
     {
-      Tile *tile = g_ptr_array_index(map->current_level->tiles, k);
-      if (tile->x < x_first || tile->x > x_count || tile->y < y_first || tile->y > y_count)
+      ChamplainTile *tile = g_ptr_array_index(map->current_level->tiles, k);
+      gint tile_x = champlain_tile_get_x (tile);
+      gint tile_y = champlain_tile_get_y (tile);
+      if (tile_x < x_first || tile_x > x_count ||
+          tile_y < y_first || tile_y > y_count)
         {
           g_ptr_array_remove (map->current_level->tiles, tile);
-          tile_free(tile);
+          g_object_unref (tile);
         }
     }
 
@@ -112,14 +117,18 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
           gboolean exist = FALSE;
           for (k = 0; k < map->current_level->tiles->len && !exist; k++)
             {
-              Tile *tile = g_ptr_array_index(map->current_level->tiles, k);
-              if ( tile->x == i && tile->y == j)
+              ChamplainTile *tile = g_ptr_array_index(map->current_level->tiles, k);
+              gint tile_x = champlain_tile_get_x (tile);
+              gint tile_y = champlain_tile_get_y (tile);
+
+              if ( tile_x == i && tile_y == j)
                 exist = TRUE;
             }
 
           if(!exist)
             {
-              Tile *tile = tile_load(map, map->current_level->level, i, j, offline);
+              DEBUG ("Loading tile %d, %d, %d", map->current_level->level, i, j);
+              ChamplainTile *tile = tile_load (map, map->current_level->level, i, j, offline);
               g_ptr_array_add (map->current_level->tiles, tile);
             }
         }

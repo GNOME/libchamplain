@@ -51,8 +51,8 @@ zoom_level_free(ZoomLevel *level)
   guint i;
   for (i = 0; i < level->tiles->len; i++)
     {
-      Tile *tile = g_ptr_array_index(level->tiles, i);
-      tile_free(tile);
+      ChamplainTile *tile = g_ptr_array_index(level->tiles, i);
+      g_object_unref (tile);
     }
 }
 

@@ -29,15 +29,15 @@
 
 guint osm_mapnik_row_count(Map *map, guint zoom_level);
 guint osm_mapnik_column_count(Map *map, guint zoom_level);
-Tile *osm_mapnik_get_tile (Map *map, guint zoom_level, guint x, guint y);
+ChamplainTile *osm_mapnik_get_tile (Map *map, guint zoom_level, guint x, guint y);
 
 gint osm_mapnik_longitude_to_x (Map *map, gdouble longitude, guint zoom_level);
 gint osm_mapnik_latitude_to_y (Map *map, gdouble latitude, guint zoom_level);
 gdouble osm_mapnik_x_to_longitude (Map *map, gint x, guint zoom_level);
 gdouble osm_mapnik_y_to_latitude (Map *map, gint y, guint zoom_level);
 
-gchar *osm_mapnik_get_tile_filename(Map *map, Tile *tile);
-gchar *osm_mapnik_get_tile_uri(Map *map, Tile *tile);
+gchar *osm_mapnik_get_tile_filename(Map *map, ChamplainTile *tile);
+gchar *osm_mapnik_get_tile_uri(Map *map, ChamplainTile *tile);
 
 void
 osm_mapnik_init(Map *map)
@@ -98,12 +98,16 @@ osm_mapnik_y_to_latitude (Map *map, gint y, guint zoom_level)
 	return 180.0 / M_PI * atan(0.5 * (exp(n) - exp(-n)));
 }
 
-gchar *osm_mapnik_get_tile_filename(Map *map, Tile *tile)
+gchar *osm_mapnik_get_tile_filename(Map *map, ChamplainTile *tile)
 {
-  return g_build_filename (g_strdup_printf("%d_%d_%d.png", tile->level, tile->y, tile->x), NULL);
+  gint x, y, level;
+  g_object_get (G_OBJECT (tile), "x", &x, "y", &y, "zoom-level", &level, NULL);
+  return g_build_filename (g_strdup_printf("%d_%d_%d.png", level, y, x), NULL);
 }
 
-gchar *osm_mapnik_get_tile_uri(Map *map, Tile *tile)
+gchar *osm_mapnik_get_tile_uri(Map *map, ChamplainTile *tile)
 {
-  return g_strdup_printf("http://tile.openstreetmap.org/%d/%d/%d.png", tile->level, tile->x, tile->y);
+  gint x, y, level;
+  g_object_get (G_OBJECT (tile), "x", &x, "y", &y, "zoom-level", &level, NULL);
+  return g_strdup_printf("http://tile.openstreetmap.org/%d/%d/%d.png", level, x, y);
 }

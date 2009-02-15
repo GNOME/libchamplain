@@ -733,8 +733,10 @@ champlain_view_init (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
+  champlain_debug_set_flags (g_getenv ("CHAMPLAIN_DEBUG"));
+
   priv->map_source = CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP;
-  priv->zoom_level = 3;
+  priv->zoom_level = 0;
   priv->offline = FALSE;
   priv->keep_center_on_resize = TRUE;
   priv->show_license = TRUE;
@@ -988,8 +990,8 @@ champlain_view_center_on (ChamplainView *view,
 
   for (i = 0; i < priv->map->current_level->tiles->len; i++)
     {
-      Tile *tile = g_ptr_array_index (priv->map->current_level->tiles, i);
-      if (!tile->loading)
+      ChamplainTile *tile = g_ptr_array_index (priv->map->current_level->tiles, i);
+      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
         tile_set_position (priv->map, tile);
     }
 

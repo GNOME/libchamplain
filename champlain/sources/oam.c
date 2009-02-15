@@ -26,15 +26,15 @@
 
 guint oam_row_count(Map *map, guint zoom_level);
 guint oam_column_count(Map *map, guint zoom_level);
-Tile *oam_get_tile (Map *map, guint zoom_level, guint x, guint y);
+ChamplainTile *oam_get_tile (Map *map, guint zoom_level, guint x, guint y);
 
 gint oam_longitude_to_x (Map *map, gdouble longitude, guint zoom_level);
 gint oam_latitude_to_y (Map *map, gdouble latitude, guint zoom_level);
 gdouble oam_x_to_longitude (Map *map, gint x, guint zoom_level);
 gdouble oam_y_to_latitude (Map *map, gint y, guint zoom_level);
 
-gchar *oam_get_tile_filename(Map *map, Tile *tile);
-gchar *oam_get_tile_uri(Map *map, Tile *tile);
+gchar *oam_get_tile_filename(Map *map, ChamplainTile *tile);
+gchar *oam_get_tile_uri(Map *map, ChamplainTile *tile);
 
 void
 oam_init(Map *map)
@@ -95,12 +95,16 @@ oam_y_to_latitude (Map *map, gint y, guint zoom_level)
 	return 180.0 / M_PI * atan(0.5 * (exp(n) - exp(-n)));
 }
 
-gchar *oam_get_tile_filename(Map *map, Tile *tile)
+gchar *oam_get_tile_filename(Map *map, ChamplainTile *tile)
 {
-  return g_build_filename (g_strdup_printf("%d_%d_%d.png", tile->level, tile->y, tile->x), NULL);
+  gint x, y, level;
+  g_object_get (G_OBJECT (tile), "x", &x, "y", &y, "zoom-level", &level, NULL);
+  return g_build_filename (g_strdup_printf("%d_%d_%d.png", level, y, x), NULL);
 }
 
-gchar *oam_get_tile_uri(Map *map, Tile *tile)
+gchar *oam_get_tile_uri(Map *map, ChamplainTile *tile)
 {
-  return g_strdup_printf("http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/%d/%d/%d.jpg", tile->level, tile->x, tile->y);
+  gint x, y, level;
+  g_object_get (G_OBJECT (tile), "x", &x, "y", &y, "zoom-level", &level, NULL);
+  return g_strdup_printf("http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/%d/%d/%d.jpg", level, x, y);
 }

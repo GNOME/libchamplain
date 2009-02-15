@@ -19,27 +19,64 @@
 #ifndef CHAMPLAIN_MAP_TILE_H
 #define CHAMPLAIN_MAP_TILE_H
 
+#include <champlain/champlain-defines.h>
 #include <champlain/champlain-private.h>
 
 #include <glib.h>
 #include <clutter/clutter.h>
 
-struct _Tile
-{
-  ClutterActor* actor;
-  int x;
-  int y;
-  int size;
-  int level;
+G_BEGIN_DECLS
 
-  gboolean loading; // TRUE when a callback exist to load the tile, FALSE otherwise
-  gboolean to_destroy; // TRUE when a tile struct should be deleted when loading is done, FALSE otherwise
-};
+#define CHAMPLAIN_TYPE_TILE champlain_tile_get_type()
 
-void tile_free(Tile* tile);
+#define CHAMPLAIN_TILE(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_TILE, ChamplainTile))
 
-void tile_set_position(Map* map, Tile* tile);
+#define CHAMPLAIN_TILE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_TILE, ChamplainTileClass))
 
-Tile* tile_load (Map* map, guint zoom_level, guint x, guint y, gboolean offline);
+#define CHAMPLAIN_IS_TILE(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_TILE))
 
-#endif
+#define CHAMPLAIN_IS_TILE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_TILE))
+
+#define CHAMPLAIN_TILE_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_TILE, ChamplainTileClass))
+
+typedef struct {
+  GObject parent;
+} ChamplainTile;
+
+typedef struct {
+  GObjectClass parent_class;
+} ChamplainTileClass;
+
+GType champlain_tile_get_type (void);
+
+ChamplainTile* champlain_tile_new (void);
+ChamplainTile* champlain_tile_new_full (gint x, gint y, guint size, gint zoom_level);
+
+gint champlain_tile_get_x (ChamplainTile *self);
+gint champlain_tile_get_y (ChamplainTile *self);
+gint champlain_tile_get_zoom_level (ChamplainTile *self);
+guint champlain_tile_get_size (ChamplainTile *self);
+ChamplainStateEnum champlain_tile_get_state (ChamplainTile *self);
+gchar * champlain_tile_get_uri (ChamplainTile *self);
+gchar * champlain_tile_get_filename (ChamplainTile *self);
+ClutterActor * champlain_tile_get_actor (ChamplainTile *self);
+
+void champlain_tile_set_x (ChamplainTile *self, gint x);
+void champlain_tile_set_y (ChamplainTile *self, gint y);
+void champlain_tile_set_zoom_level (ChamplainTile *self, gint zoom_level);
+void champlain_tile_set_size (ChamplainTile *self, guint size);
+void champlain_tile_set_state (ChamplainTile *self, ChamplainStateEnum state);
+void champlain_tile_set_uri (ChamplainTile *self, gchar* uri);
+void champlain_tile_set_filename (ChamplainTile *self, gchar* filename);
+void champlain_tile_set_actor (ChamplainTile *self, ClutterActor* actor);
+
+ChamplainTile* tile_load (Map* map, gint zoom_level, gint x, gint y, gboolean offline);
+G_END_DECLS
+
+#endif /* CHAMPLAIN_MAP_TILE_H */
+

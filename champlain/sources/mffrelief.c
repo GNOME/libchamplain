@@ -29,15 +29,15 @@
 
 guint mff_relief_row_count(Map *map, guint zoom_level);
 guint mff_relief_column_count(Map *map, guint zoom_level);
-Tile *mff_relief_get_tile (Map *map, guint zoom_level, guint x, guint y);
+ChamplainTile *mff_relief_get_tile (Map *map, guint zoom_level, guint x, guint y);
 
 gint mff_relief_longitude_to_x (Map *map, gdouble longitude, guint zoom_level);
 gint mff_relief_latitude_to_y (Map *map, gdouble latitude, guint zoom_level);
 gdouble mff_relief_x_to_longitude (Map *map, gint x, guint zoom_level);
 gdouble mff_relief_y_to_latitude (Map *map, gint y, guint zoom_level);
 
-gchar *mff_relief_get_tile_filename(Map *map, Tile *tile);
-gchar *mff_relief_get_tile_uri(Map *map, Tile *tile);
+gchar *mff_relief_get_tile_filename(Map *map, ChamplainTile *tile);
+gchar *mff_relief_get_tile_uri(Map *map, ChamplainTile *tile);
 
 void
 mff_relief_init(Map *map)
@@ -98,12 +98,16 @@ mff_relief_y_to_latitude (Map *map, gint y, guint zoom_level)
 	return 180.0 / M_PI * atan(0.5 * (exp(n) - exp(-n)));
 }
 
-gchar *mff_relief_get_tile_filename(Map *map, Tile *tile)
+gchar *mff_relief_get_tile_filename(Map *map, ChamplainTile *tile)
 {
-  return g_build_filename (g_strdup_printf("%d_%d_%d.png", tile->level, tile->y, tile->x), NULL);
+  gint x, y, level;
+  g_object_get (G_OBJECT (tile), "x", &x, "y", &y, "zoom-level", &level, NULL);
+  return g_build_filename (g_strdup_printf("%d_%d_%d.png", level, y, x), NULL);
 }
 
-gchar *mff_relief_get_tile_uri(Map *map, Tile *tile)
+gchar *mff_relief_get_tile_uri(Map *map, ChamplainTile *tile)
 {
-  return g_strdup_printf("http://maps-for-free.com/layer/relief/z%d/row%d/%d_%d-%d.jpg", tile->level, tile->y, tile->level, tile->x, tile->y);
+  gint x, y, level;
+  g_object_get (G_OBJECT (tile), "x", &x, "y", &y, "zoom-level", &level, NULL);
+  return g_strdup_printf("http://maps-for-free.com/layer/relief/z%d/row%d/%d_%d-%d.jpg", level, y, level, x, y);
 }
