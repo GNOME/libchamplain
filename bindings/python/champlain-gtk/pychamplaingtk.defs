@@ -1,0 +1,33 @@
+;; -*- scheme -*-
+; object definitions ...
+;; Enumerations and flags ...
+
+
+;; From champlain-gtk.h
+
+
+
+;; From champlain-view-embed.h
+
+(define-function view_embed_get_type
+  (c-name "champlain_view_embed_get_type")
+  (return-type "GType")
+)
+
+(define-method embed_new
+  (of-object "ChamplainView")
+  (c-name "champlain_view_embed_new")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_view
+  (of-object "ChamplainViewEmbed")
+  (c-name "champlain_view_embed_get_view")
+  (return-type "ChamplainView*")
+)
+
+
+
+;; From champlain-gtk-marshal.h
+
+
