@@ -544,59 +544,57 @@ file_loaded_cb (SoupSession *session,
       g_object_unref (tile);
       return;
     }
-  else
+
+  path = g_build_filename (g_get_user_cache_dir (),
+                                CACHE_DIR,
+                                map->name,
+                                NULL);
+
+  if (g_mkdir_with_parents (path, 0700) == -1)
     {
-      path = g_build_filename (g_get_user_cache_dir (),
-                                    CACHE_DIR,
-                                    map->name,
-                                    NULL);
-
-      if (g_mkdir_with_parents (path, 0700) == -1)
+      if (errno != EEXIST)
         {
-          if (errno != EEXIST)
-            {
-              g_warning ("Unable to create the image cache: %s",
-                         g_strerror (errno));
-              g_object_unref (loader);
-            }
+          g_warning ("Unable to create the image cache: %s",
+                     g_strerror (errno));
+          g_object_unref (loader);
         }
-
-      map_filename = map->get_tile_filename(map, tile);
-      filename = g_build_filename (g_get_user_cache_dir (),
-                                    CACHE_DIR,
-                                    map->name,
-                                    map_filename,
-                                    NULL);
-
-      g_file_set_contents (filename,
-                           msg->response_body->data,
-                           msg->response_body->length,
-                           NULL);
-
-      GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
-
-      ClutterActor *actor = clutter_texture_new();
-      clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
-          gdk_pixbuf_get_pixels (pixbuf),
-          gdk_pixbuf_get_has_alpha (pixbuf),
-          gdk_pixbuf_get_width (pixbuf),
-          gdk_pixbuf_get_height (pixbuf),
-          gdk_pixbuf_get_rowstride (pixbuf),
-          3, 0, NULL);
-      champlain_tile_set_actor (tile, actor);
-
-      tile_set_position (map, tile);
-
-      clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), actor, NULL);
-      tile_setup_animation (tile);
-
-      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-      g_object_unref (tile);
-
-      g_object_unref (loader);
-      g_free (filename);
-      g_free (map_filename);
     }
+
+  map_filename = map->get_tile_filename(map, tile);
+  filename = g_build_filename (g_get_user_cache_dir (),
+                                CACHE_DIR,
+                                map->name,
+                                map_filename,
+                                NULL);
+
+  g_file_set_contents (filename,
+                       msg->response_body->data,
+                       msg->response_body->length,
+                       NULL);
+
+  GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+
+  ClutterActor *actor = clutter_texture_new();
+  clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
+      gdk_pixbuf_get_pixels (pixbuf),
+      gdk_pixbuf_get_has_alpha (pixbuf),
+      gdk_pixbuf_get_width (pixbuf),
+      gdk_pixbuf_get_height (pixbuf),
+      gdk_pixbuf_get_rowstride (pixbuf),
+      3, 0, NULL);
+  champlain_tile_set_actor (tile, actor);
+
+  tile_set_position (map, tile);
+
+  clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), actor, NULL);
+  tile_setup_animation (tile);
+
+  champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+
+  g_object_unref (tile);
+  g_object_unref (loader); /* also frees the pixbuf */
+  g_free (filename);
+  g_free (map_filename);
   g_free (ptr);
 }
 
@@ -622,7 +620,7 @@ tile_load (Map* map, gint zoom_level, gint x, gint y, gboolean offline)
 
   if (g_file_test (filename, G_FILE_TEST_EXISTS))
     {
-      ClutterActor *actor = clutter_texture_new_from_file(filename, NULL);
+      ClutterActor *actor = clutter_texture_new_from_file (filename, NULL);
       champlain_tile_set_actor (tile, actor);
       tile_set_position (map, tile);
 
