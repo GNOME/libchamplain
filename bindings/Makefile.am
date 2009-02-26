@@ -4,4 +4,9 @@ if ENABLE_MANAGED
   SUBDIRS+=managed
 endif
 
-DIST_SUBDIRS= managed
+if ENABLE_PYTHON
+  SUBDIRS+=python
+endif
+
+DIST_SUBDIRS= managed python
+
