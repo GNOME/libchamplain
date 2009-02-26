@@ -1,3 +1,17 @@
+libchamplain 0.2.9 (2009-02-26)
+===============================
+
+Enhancements:
+
+* Add a new animated marker demo
+
+Fixes:
+
+* Fix symbols' export
+* Fix bug 567594 (config.h.in in DVCS)
+* Fix a strange bug where the elastic effect is wrong
+* Don't generate a million criticals if the error tile image is not found
+
 libchamplain 0.2.8 (2009-01-10)
 ===============================
 
