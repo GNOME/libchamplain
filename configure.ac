@@ -150,6 +150,7 @@ if test x$enable_python = xyes; then
   PKG_CHECK_MODULES(PYTHON_BINDING,
    [
       pygtk-2.0,
+      pygobject-2.0,
       glib-2.0,
       gobject-2.0,
       clutter-0.8,

@@ -14,17 +14,18 @@ BUILT_SOURCES = 					\
 	pychamplaingtk.c					
 
 pychamplaingtkdir = $(pyexecdir)
-pychamplaingtk_LTLIBRARIES = champlain-gtk.la
+pychamplaingtk_LTLIBRARIES = champlaingtk.la
 
-champlain_gtk_la_SOURCES =					\
+champlaingtk_la_SOURCES =			\
+	pychamplaingtkmodule.c			\
 	pychamplaingtk.c
 
-champlain_gtk_la_LIBADD =					\
+champlaingtk_la_LIBADD =					\
 	$(PYTHON_BINDING_LIBS)				\
 	$(top_builddir)/champlain/libchamplain-0.3.la	\
 	$(top_builddir)/champlain-gtk/libchamplain-gtk-0.3.la
 
-champlain_gtk_la_LDFLAGS =					\
+champlaingtk_la_LDFLAGS =					\
 	-module -avoid-version
 
 pychamplaingtk.c: pychamplaingtk.override pychamplaingtk.defs
