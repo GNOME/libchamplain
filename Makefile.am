@@ -14,3 +14,7 @@ DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
 
 CLEANFILES = $(pcfiles)
 
+ChangeLog: Makefile.am
+	git-log --pretty=short > ChangeLog
+	
+
