@@ -24,6 +24,18 @@
       <member cname="CHAMPLAIN_SCROLL_MODE_PUSH" name="Push" />
       <member cname="CHAMPLAIN_SCROLL_MODE_KINETIC" name="Kinetic" />
     </enum>
+    <enum name="StateEnum" cname="ChamplainStateEnum" type="enum">
+      <member cname="CHAMPLAIN_STATE_NONE" name="None" />
+      <member cname="CHAMPLAIN_STATE_INIT" name="Init" />
+      <member cname="CHAMPLAIN_STATE_LOADING" name="Loading" />
+      <member cname="CHAMPLAIN_STATE_DONE" name="Done" />
+    </enum>
+    <object name="Layer" cname="ChamplainLayer" parent="ClutterGroup">
+      <method name="GetType" cname="champlain_layer_get_type" shared="true">
+        <return-type type="GType" />
+      </method>
+      <constructor cname="champlain_layer_new" />
+    </object>
     <object name="Marker" cname="ChamplainMarker" parent="ClutterGroup">
       <field name="Priv" cname="priv" type="ChamplainMarkerPrivate*" />
       <property name="Longitude" cname="longitude" type="gdouble" readable="true" writeable="true" />
@@ -61,6 +73,100 @@
         <parameters>
           <parameter type="gdouble" name="longitude" />
           <parameter type="gdouble" name="latitude" />
+        </parameters>
+      </method>
+    </object>
+    <object name="Tile" cname="ChamplainTile" parent="GObject">
+      <property name="X" cname="x" type="gint" readable="true" writeable="true" />
+      <property name="Y" cname="y" type="gint" readable="true" writeable="true" />
+      <property name="ZoomLevel" cname="zoom-level" type="gint" readable="true" writeable="true" />
+      <property name="Size" cname="size" type="guint" readable="true" writeable="true" />
+      <property name="State" cname="state" type="ChamplainStateEnum" readable="true" writeable="true" />
+      <property name="Uri" cname="uri" type="gchar*" readable="true" writeable="true" />
+      <property name="Filename" cname="filename" type="gchar*" readable="true" writeable="true" />
+      <property name="Actor" cname="actor" type="ClutterActor" readable="true" writeable="true" />
+      <method name="GetActor" cname="champlain_tile_get_actor">
+        <return-type type="ClutterActor*" />
+      </method>
+      <method name="GetFilename" cname="champlain_tile_get_filename">
+        <return-type type="gchar*" />
+      </method>
+      <method name="GetSize" cname="champlain_tile_get_size">
+        <return-type type="guint" />
+      </method>
+      <method name="GetState" cname="champlain_tile_get_state">
+        <return-type type="ChamplainStateEnum" />
+      </method>
+      <method name="GetType" cname="champlain_tile_get_type" shared="true">
+        <return-type type="GType" />
+      </method>
+      <method name="GetUri" cname="champlain_tile_get_uri">
+        <return-type type="gchar*" />
+      </method>
+      <method name="GetX" cname="champlain_tile_get_x">
+        <return-type type="gint" />
+      </method>
+      <method name="GetY" cname="champlain_tile_get_y">
+        <return-type type="gint" />
+      </method>
+      <method name="GetZoomLevel" cname="champlain_tile_get_zoom_level">
+        <return-type type="gint" />
+      </method>
+      <constructor cname="champlain_tile_new" />
+      <constructor cname="champlain_tile_new_full">
+        <parameters>
+          <parameter type="gint" name="x" />
+          <parameter type="gint" name="y" />
+          <parameter type="guint" name="size" />
+          <parameter type="gint" name="zoom_level" />
+        </parameters>
+      </constructor>
+      <method name="SetActor" cname="champlain_tile_set_actor">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ClutterActor*" name="actor" />
+        </parameters>
+      </method>
+      <method name="SetFilename" cname="champlain_tile_set_filename">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="gchar*" name="filename" />
+        </parameters>
+      </method>
+      <method name="SetSize" cname="champlain_tile_set_size">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="guint" name="size" />
+        </parameters>
+      </method>
+      <method name="SetState" cname="champlain_tile_set_state">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ChamplainStateEnum" name="state" />
+        </parameters>
+      </method>
+      <method name="SetUri" cname="champlain_tile_set_uri">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="gchar*" name="uri" />
+        </parameters>
+      </method>
+      <method name="SetX" cname="champlain_tile_set_x">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="gint" name="x" />
+        </parameters>
+      </method>
+      <method name="SetY" cname="champlain_tile_set_y">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="gint" name="y" />
+        </parameters>
+      </method>
+      <method name="SetZoomLevel" cname="champlain_tile_set_zoom_level">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="gint" name="zoom_level" />
         </parameters>
       </method>
     </object>
@@ -114,7 +220,6 @@
         <return-type type="void" />
       </method>
     </object>
-    <alias name="Layer" cname="ChamplainLayer" type="ClutterActor" />
     <struct name="ZoomLevel" cname="ZoomLevel" opaque="true">
       <field name="Level" cname="level" type="int" access="public" writeable="true" />
       <field name="RowCount" cname="row_count" type="int" access="public" writeable="true" />
@@ -153,11 +258,6 @@
         <parameters>
           <parameter type="const-gchar*" name="flags_string" />
         </parameters>
-      </method>
-    </class>
-    <class name="Global" cname="ChamplainGlobal">
-      <method name="LayerNew" cname="champlain_layer_new" shared="true">
-        <return-type type="ChamplainLayer*" />
       </method>
     </class>
   </namespace>
