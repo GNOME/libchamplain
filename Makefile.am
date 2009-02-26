@@ -23,3 +23,6 @@ CLEANFILES = $(pcfiles)
 
 # Have the demos build at the end as they depend on optional parts
 SUBDIRS += demos bindings
+
+ChangeLog: Makefile.am
+	git-log --pretty=short > ChangeLog
