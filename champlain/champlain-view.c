@@ -1004,7 +1004,7 @@ champlain_view_center_on (ChamplainView *view,
   g_object_notify (G_OBJECT (view), "latitude");
 
   map_load_visible_tiles (priv->map, priv->viewport_size, priv->offline);
-  g_idle_add (marker_reposition, view);
+  marker_reposition (view);
 }
 
 /**
