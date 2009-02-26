@@ -28,8 +28,37 @@
 #include <glib-object.h>
 #include <clutter/clutter.h>
 
-typedef ClutterActor ChamplainLayer;
+G_BEGIN_DECLS
 
-ChamplainLayer *champlain_layer_new ();
+#define CHAMPLAIN_TYPE_LAYER champlain_layer_get_type()
+
+#define CHAMPLAIN_LAYER(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_LAYER, ChamplainLayer))
+
+#define CHAMPLAIN_LAYER_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_LAYER, ChamplainLayerClass))
+
+#define CHAMPLAIN_IS_LAYER(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_LAYER))
+
+#define CHAMPLAIN_IS_LAYER_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_LAYER))
+
+#define CHAMPLAIN_LAYER_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_LAYER, ChamplainLayerClass))
+
+typedef struct {
+  ClutterGroup parent;
+} ChamplainLayer;
+
+typedef struct {
+  ClutterGroupClass parent_class;
+} ChamplainLayerClass;
+
+GType champlain_layer_get_type (void);
+
+ChamplainLayer* champlain_layer_new (void);
+
+G_END_DECLS
 
 #endif

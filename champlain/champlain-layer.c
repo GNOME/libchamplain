@@ -36,6 +36,86 @@
 #include <clutter/clutter.h>
 #include <glib.h>
 
+G_DEFINE_TYPE (ChamplainLayer, champlain_layer, CLUTTER_TYPE_GROUP)
+
+#define GET_PRIVATE(o) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_LAYER, ChamplainLayerPrivate))
+
+enum
+{
+  PROP_0
+};
+
+typedef struct _ChamplainLayerPrivate ChamplainLayerPrivate;
+
+struct _ChamplainLayerPrivate {
+  gpointer spacer;
+};
+
+static void layer_add_cb (ClutterGroup *layer, ClutterActor *marker,
+    gpointer data);
+
+static void
+champlain_layer_get_property (GObject *object,
+                             guint property_id,
+                             GValue *value,
+                             GParamSpec *pspec)
+{
+  ChamplainLayer *self = CHAMPLAIN_LAYER (object);
+  switch (property_id)
+    {
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    }
+}
+
+static void
+champlain_layer_set_property (GObject *object,
+                             guint property_id,
+                             const GValue *value,
+                             GParamSpec *pspec)
+{
+  ChamplainLayer *self = CHAMPLAIN_LAYER (object);
+  switch (property_id)
+    {
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    }
+}
+
+static void
+champlain_layer_dispose (GObject *object)
+{
+  ChamplainLayerPrivate *priv = GET_PRIVATE (object);
+
+  G_OBJECT_CLASS (champlain_layer_parent_class)->dispose (object);
+}
+
+static void
+champlain_layer_finalize (GObject *object)
+{
+  G_OBJECT_CLASS (champlain_layer_parent_class)->finalize (object);
+}
+
+static void
+champlain_layer_class_init (ChamplainLayerClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  g_type_class_add_private (klass, sizeof (ChamplainLayerPrivate));
+
+  object_class->get_property = champlain_layer_get_property;
+  object_class->set_property = champlain_layer_set_property;
+  object_class->dispose = champlain_layer_dispose;
+  object_class->finalize = champlain_layer_finalize;
+}
+
+static void
+champlain_layer_init (ChamplainLayer *self)
+{
+  g_signal_connect_after(G_OBJECT(self), "actor-added", G_CALLBACK(layer_add_cb), NULL);
+}
+
 /* This callback serves to keep the markers ordered by their latitude.
  * Markers that are up north on the map should be lowered in the list so that
  * they are drawn the first. This is to make the illusion of a semi-3d plane
@@ -86,10 +166,5 @@ layer_add_cb (ClutterGroup *layer, ClutterActor *marker, gpointer data)
 ChamplainLayer *
 champlain_layer_new ()
 {
-  ClutterActor *layer;
-
-  layer = clutter_group_new();
-  g_signal_connect_after(G_OBJECT(layer), "actor-added", G_CALLBACK(layer_add_cb), NULL);
-
-  return layer;
+  return g_object_new (CHAMPLAIN_TYPE_LAYER, NULL);
 }
