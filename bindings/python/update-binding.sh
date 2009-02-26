@@ -29,10 +29,10 @@ cp champlain/pychamplain.defs /tmp
 cp champlain-gtk/pychamplaingtk.defs /tmp
 
 # Apply patches
-#patch -p0 < pyempathy.patch
-#patch -p0 < pyempathygtk.patch
+#patch -p0 < pychamplain.patch
+#patch -p0 < pychamplaingtk.patch
 
 # Make modification then run that:
-#diff -up /tmp/pyempathy.defs pyempathy/pyempathy.defs > pyempathy.patch
-#diff -up /tmp/pyempathygtk.defs pyempathygtk/pyempathygtk.defs > pyempathygtk.patch
+#diff -up /tmp/pychamplain.defs champlain/pychamplain.defs > pychamplain.patch
+#diff -up /tmp/pychamplaingtk.defs champlain-gtk/pychamplaingtk.defs > pychamplaingtk.patch
 
