@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <metadata>
 	<attr path="/api/namespace/struct[@cname='ZoomLevel']" name="hidden">1</attr>
+	<attr path="/api/namespace/object[@cname='ChamplainTile']" name="hidden">1</attr>
 </metadata>
 
