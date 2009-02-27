@@ -11,3 +11,6 @@ modulename champlain
 import clutter.Actor as PyClutterActor_Type
 import clutter.Group as PyClutterGroup_Type
 %%
+ignore-glob
+        *_get_type
+%%
