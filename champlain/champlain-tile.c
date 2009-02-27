@@ -460,9 +460,12 @@ tile_set_position(Map* map, ChamplainTile* tile)
   g_object_get (G_OBJECT (tile), "actor", &actor,
       "x", &x, "y", &y,
       "size", &size, NULL);
+  ChamplainPoint anchor; //XXX
+  anchor.x = 0;
+  anchor.y = 0;
   clutter_actor_set_position (actor,
-    (x * size) - map->current_level->anchor.x,
-    (y * size) - map->current_level->anchor.y);
+    (x * size) - anchor.x,
+    (y * size) - anchor.y);
   clutter_actor_set_size (actor, size, size); //XXX Move elsewhere
   clutter_actor_show (actor);
 }
@@ -487,7 +490,7 @@ create_error_tile(Map* map, ChamplainTile* tile)
   champlain_tile_set_actor (tile, actor);
   tile_set_position (map, tile);
 
-  clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), actor, NULL);
+  clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (map->current_level)), actor, NULL);
   tile_setup_animation (tile);
 
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
@@ -586,7 +589,7 @@ file_loaded_cb (SoupSession *session,
 
   tile_set_position (map, tile);
 
-  clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), actor, NULL);
+  clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (map->current_level)), actor, NULL);
   tile_setup_animation (tile);
 
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
@@ -624,7 +627,7 @@ tile_load (Map* map, gint zoom_level, gint x, gint y, gboolean offline)
       champlain_tile_set_actor (tile, actor);
       tile_set_position (map, tile);
 
-      clutter_container_add (CLUTTER_CONTAINER (map->current_level->group), actor, NULL);
+      clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (map->current_level)), actor, NULL);
       // Do not animate since it is local and fast
     }
   else if (!offline)

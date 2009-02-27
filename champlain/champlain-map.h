@@ -36,8 +36,8 @@ struct _Map
   const gchar *license_uri;
   int tile_size;
 
-  ZoomLevel *current_level;
-  ZoomLevel *previous_level;
+  ChamplainZoomLevel *current_level;
+  ChamplainZoomLevel *previous_level;
 
   guint (* get_row_count) (Map *map, guint zoom_level);
   guint (* get_column_count) (Map *map, guint zoom_level);

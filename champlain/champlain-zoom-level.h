@@ -16,33 +16,66 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef CHAMPLAIN_MAP_ZOOM_LEVEL_H
-#define CHAMPLAIN_MAP_ZOOM_LEVEL_H
+#ifndef CHAMPLAIN_ZOOM_LEVEL_H
+#define CHAMPLAIN_ZOOM_LEVEL_H
 
 #include "champlain-private.h"
+#include "champlain-tile.h"
 
 #include <glib.h>
 #include <clutter/clutter.h>
 
-typedef struct
-{
-  int level;
-  int row_count;
-  int column_count;
-  int tile_size;
+G_BEGIN_DECLS
 
-  GPtrArray  *tiles;
-  ClutterActor* group;
+#define CHAMPLAIN_TYPE_ZOOM_LEVEL champlain_zoom_level_get_type()
 
-  ChamplainPoint anchor;
-} ZoomLevel;
+#define CHAMPLAIN_ZOOM_LEVEL(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_ZOOM_LEVEL, ChamplainZoomLevel))
 
-guint zoom_level_get_width(ZoomLevel *level);
+#define CHAMPLAIN_ZOOM_LEVEL_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_ZOOM_LEVEL, ChamplainZoomLevelClass))
 
-guint zoom_level_get_height(ZoomLevel *level);
+#define CHAMPLAIN_IS_ZOOM_LEVEL(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_ZOOM_LEVEL))
 
-ZoomLevel* zoom_level_new(gint zoom_level, gint row, gint column, gint tile_size);
+#define CHAMPLAIN_IS_ZOOM_LEVEL_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_ZOOM_LEVEL))
 
-void zoom_level_free(ZoomLevel *level);
+#define CHAMPLAIN_ZOOM_LEVEL_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_ZOOM_LEVEL, ChamplainZoomLevelClass))
+
+typedef struct {
+  GObject parent;
+} ChamplainZoomLevel;
+
+typedef struct {
+  GObjectClass parent_class;
+} ChamplainZoomLevelClass;
+
+GType champlain_zoom_level_get_type (void);
+
+ChamplainZoomLevel* champlain_zoom_level_new (void);
+
+gint champlain_zoom_level_get_width (ChamplainZoomLevel *self);
+gint champlain_zoom_level_get_height (ChamplainZoomLevel *self);
+gint champlain_zoom_level_get_zoom_level (ChamplainZoomLevel *self);
+ClutterActor* champlain_zoom_level_get_actor (ChamplainZoomLevel *self);
+
+void champlain_zoom_level_set_width (ChamplainZoomLevel *self, guint width);
+void champlain_zoom_level_set_height (ChamplainZoomLevel *self, guint height);
+void champlain_zoom_level_set_zoom_level (ChamplainZoomLevel *self,
+    gint zoom_level);
+void champlain_zoom_level_set_actor (ChamplainZoomLevel *self,
+    ClutterActor *actor);
+
+void champlain_zoom_level_add_tile (ChamplainZoomLevel *self,
+    ChamplainTile *tile);
+void champlain_zoom_level_remove_tile (ChamplainZoomLevel *self,
+    ChamplainTile *tile);
+guint champlain_zoom_level_tile_count (ChamplainZoomLevel *self);
+ChamplainTile* champlain_zoom_level_get_nth_tile (ChamplainZoomLevel *self,
+    guint index);
+
+G_END_DECLS
 
 #endif

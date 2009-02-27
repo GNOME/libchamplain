@@ -59,13 +59,18 @@ void
 map_load_level(Map *map, gint zoom_level)
 {
   if (map->previous_level)
-    zoom_level_free(map->previous_level);
+    g_object_unref (map->previous_level);
   map->previous_level = map->current_level;
 
   guint row_count = map->get_row_count(map, zoom_level);
   guint column_count = map->get_column_count(map, zoom_level);
 
-  map->current_level = zoom_level_new(zoom_level, row_count, column_count, map->tile_size);
+  map->current_level = champlain_zoom_level_new ();
+  g_object_set (G_OBJECT (map->current_level),
+      "zoom-level", zoom_level,
+      "width", row_count,
+      "height", column_count,
+      NULL);
 }
 
 void
@@ -79,16 +84,19 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
   gint x_count = ceil((float)viewport.width / map->tile_size) + 1;
   gint y_count = ceil((float)viewport.height / map->tile_size) + 1;
 
-  gint x_first = (map->current_level->anchor.x + viewport.x) / map->tile_size;
-  gint y_first = (map->current_level->anchor.y + viewport.y) / map->tile_size;
+  ChamplainPoint anchor; //XXX
+  anchor.x = 0;
+  anchor.y = 0;
+  gint x_first = (anchor.x + viewport.x) / map->tile_size;
+  gint y_first = (anchor.y + viewport.y) / map->tile_size;
 
   x_count += x_first;
   y_count += y_first;
 
-  if(x_count > map->current_level->row_count)
-    x_count = map->current_level->row_count;
-  if(y_count > map->current_level->column_count)
-    y_count = map->current_level->column_count;
+  if(x_count > champlain_zoom_level_get_width (map->current_level))
+    x_count = champlain_zoom_level_get_width (map->current_level);
+  if(y_count > champlain_zoom_level_get_height (map->current_level))
+    y_count = champlain_zoom_level_get_height (map->current_level);
 
   DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_count, y_count);
 
@@ -96,17 +104,14 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
   guint k;
 
   // Get rid of old tiles first
-  for (k = 0; k < map->current_level->tiles->len; k++)
+  for (k = 0; k < champlain_zoom_level_tile_count (map->current_level); k++)
     {
-      ChamplainTile *tile = g_ptr_array_index(map->current_level->tiles, k);
+      ChamplainTile *tile = champlain_zoom_level_get_nth_tile (map->current_level, k);
       gint tile_x = champlain_tile_get_x (tile);
       gint tile_y = champlain_tile_get_y (tile);
       if (tile_x < x_first || tile_x > x_count ||
           tile_y < y_first || tile_y > y_count)
-        {
-          g_ptr_array_remove (map->current_level->tiles, tile);
-          g_object_unref (tile);
-        }
+        champlain_zoom_level_remove_tile (map->current_level, tile);
     }
 
   //Load new tiles if needed
@@ -115,9 +120,9 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
       for (j = y_first; j < y_count; j++)
         {
           gboolean exist = FALSE;
-          for (k = 0; k < map->current_level->tiles->len && !exist; k++)
+          for (k = 0; k < champlain_zoom_level_tile_count (map->current_level) && !exist; k++)
             {
-              ChamplainTile *tile = g_ptr_array_index(map->current_level->tiles, k);
+              ChamplainTile *tile = champlain_zoom_level_get_nth_tile (map->current_level, k);
               gint tile_x = champlain_tile_get_x (tile);
               gint tile_y = champlain_tile_get_y (tile);
 
@@ -127,9 +132,9 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
 
           if(!exist)
             {
-              DEBUG ("Loading tile %d, %d, %d", map->current_level->level, i, j);
-              ChamplainTile *tile = tile_load (map, map->current_level->level, i, j, offline);
-              g_ptr_array_add (map->current_level->tiles, tile);
+              DEBUG ("Loading tile %d, %d, %d", champlain_zoom_level_get_zoom_level (map->current_level), i, j);
+              ChamplainTile *tile = tile_load (map, champlain_zoom_level_get_zoom_level (map->current_level), i, j, offline);
+              champlain_zoom_level_add_tile (map->current_level, tile);
             }
         }
     }
@@ -138,7 +143,7 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
 gboolean
 map_zoom_in (Map *map)
 {
-  guint new_level = map->current_level->level + 1;
+  guint new_level = champlain_zoom_level_get_zoom_level (map->current_level) + 1;
   if(new_level <= map->zoom_levels)
     {
       map_load_level(map, new_level);
@@ -150,7 +155,7 @@ map_zoom_in (Map *map)
 gboolean
 map_zoom_out (Map *map)
 {
-  gint new_level = map->current_level->level - 1;
+  guint new_level = champlain_zoom_level_get_zoom_level (map->current_level) - 1;
   if(new_level >= 0)
     {
       map_load_level(map, new_level);
@@ -162,7 +167,7 @@ map_zoom_out (Map *map)
 void
 map_free (Map *map)
 {
-  zoom_level_free(map->current_level);
+  g_object_unref (map->current_level);
 }
 
 gboolean
