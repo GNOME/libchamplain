@@ -10,8 +10,6 @@ python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	champlain-defines.h			\
 	champlain-layer.h			\
 	champlain-marker.h			\
-	champlain-marshal.h			\
-	champlain-enum-types.h			\
  > ../bindings/python/champlain/pychamplain.defs
 
 # Update the list of headers from Makefile.am
@@ -20,7 +18,6 @@ python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	-m champlain				\
 	champlain-gtk.h				\
 	champlain-view-embed.h			\
-	champlain-gtk-marshal.h			\
  > ../bindings/python/champlain-gtk/pychamplaingtk.defs
 
 # Keep original version

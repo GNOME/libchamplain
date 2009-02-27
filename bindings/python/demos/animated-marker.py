@@ -14,8 +14,6 @@ def create_marker():
 	orange = clutter.Color(0xf3, 0x94, 0x07, 0xbb)
   	white = clutter.Color(0xff, 0xff, 0xff, 0xff)
 	timeline = clutter.Timeline()
-	#behaviour = clutter.Behaviour()
-	alpha = clutter.Alpha()
 	
 	marker = champlain.Marker()
 	bg = cluttercairo.CairoTexture(MARKER_SIZE, MARKER_SIZE)
@@ -54,14 +52,20 @@ def create_marker():
 
 	timeline.set_duration(1000)
 	timeline.set_loop(True)
+
+	alpha = clutter.Alpha()
+	alpha.set_timeline(timeline)
+	alpha.set_func(clutter.sine_inc_func)
+
+	behaviour = clutter.BehaviourScale(0.5, 0.5, 2.0, 2.0)
   	
 	#alpha = clutter_alpha_new_full (timeline, CLUTTER_ALPHA_SINE_INC, NULL, g_object_unref);
+	behaviour.set_alpha(alpha)
+	behaviour.apply(bg)
 
-#behaviour = clutter_behaviour_scale_new (alpha, 0.5, 0.5, 2.0, 2.0);
- # clutter_behaviour_apply (behaviour, bg);
-
-  #behaviour = clutter_behaviour_opacity_new (alpha, 255, 0);
-  #clutter_behaviour_apply (behaviour, bg);
+	behaviour = clutter.BehaviourOpacity(255, 0)
+	behaviour.set_alpha(alpha)
+	behaviour.apply(bg)
 
 	timeline.start()
 
@@ -83,12 +87,12 @@ def main():
 	actor.set_size(800, 600)
 	stage.add(actor)
 
-	#layer = champlain.Layer()
-	#layer.show()
-	#actor.add_layer(layer)
+	layer = champlain.Layer()
+	layer.show()
+	actor.add_layer(layer)
 
 	marker = create_marker()
-	actor.add(marker)
+	layer.add(marker)
 
 	# Finish initialising the map view
 	actor.set_property("zoom-level", 5)

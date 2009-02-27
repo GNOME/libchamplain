@@ -1,5 +1,12 @@
 ;; -*- scheme -*-
 ; object definitions ...
+(define-object Layer
+  (in-module "Champlain")
+  (parent "ClutterGroup")
+  (c-name "ChamplainLayer")
+  (gtype-id "CHAMPLAIN_TYPE_LAYER")
+)
+
 (define-object Marker
   (in-module "Champlain")
   (parent "ClutterGroup")
@@ -36,6 +43,18 @@
   (values
     '("push" "CHAMPLAIN_SCROLL_MODE_PUSH")
     '("kinetic" "CHAMPLAIN_SCROLL_MODE_KINETIC")
+  )
+)
+
+(define-enum StateEnum
+  (in-module "Champlain")
+  (c-name "ChamplainStateEnum")
+  (gtype-id "CHAMPLAIN_TYPE_STATE_ENUM")
+  (values
+    '("none" "CHAMPLAIN_STATE_NONE")
+    '("init" "CHAMPLAIN_STATE_INIT")
+    '("loading" "CHAMPLAIN_STATE_LOADING")
+    '("done" "CHAMPLAIN_STATE_DONE")
   )
 )
 
@@ -119,12 +138,15 @@
 
 ;; From champlain-layer.h
 
+(define-function layer_get_type
+  (c-name "champlain_layer_get_type")
+  (return-type "GType")
+)
+
 (define-function layer_new
   (c-name "champlain_layer_new")
   (is-constructor-of "ChamplainLayer")
   (return-type "ChamplainLayer*")
-  (parameters
-  )
 )
 
 
@@ -185,24 +207,6 @@
     '("gint" "anchor_y")
     '("GError**" "error")
   )
-)
-
-
-
-;; From champlain-marshal.h
-
-
-
-;; From champlain-enum-types.h
-
-(define-function map_source_get_type
-  (c-name "champlain_map_source_get_type")
-  (return-type "GType")
-)
-
-(define-function scroll_mode_get_type
-  (c-name "champlain_scroll_mode_get_type")
-  (return-type "GType")
 )
 
 
