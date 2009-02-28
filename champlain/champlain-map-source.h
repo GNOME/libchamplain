@@ -85,6 +85,8 @@ void champlain_map_source_set_tile_uri (ChamplainMapSource *map_source,
     ChamplainMapSourceParameter second, ChamplainMapSourceParameter third);
 
 ChamplainMapSource * champlain_map_source_new_osm_mapnik ();
+ChamplainMapSource * champlain_map_source_new_oam ();
+ChamplainMapSource * champlain_map_source_new_mff_relief ();
 
 guint champlain_map_source_get_x (ChamplainMapSource *map_source,
     gint zoom_level, gdouble longitude);

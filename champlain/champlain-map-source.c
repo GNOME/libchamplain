@@ -389,9 +389,37 @@ ChamplainMapSource *
 champlain_map_source_new_osm_mapnik ()
 {
   champlain_map_source_new_network ("OpenStreetMap Mapnik",
-      "(CC) by contributors", "", 0, 18, 256,
+      "(CC) BY 2.0 OpenStreetMap contributors",
+      "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
       "http://tile.openstreetmap.org/%d/%d/%d.png",
+      CHAMPLAIN_MAP_SOURCE_PARAMETER_Z,
+      CHAMPLAIN_MAP_SOURCE_PARAMETER_X,
+      CHAMPLAIN_MAP_SOURCE_PARAMETER_Y);
+}
+
+ChamplainMapSource *
+champlain_map_source_new_oam ()
+{
+  champlain_map_source_new_network ("OpenArialMap",
+      "(CC) BY 3.0 OpenArialMap contributors",
+      "http://creativecommons.org/licenses/by/3.0/", 0, 17, 256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/%d/%d/%d.jpg",
+      CHAMPLAIN_MAP_SOURCE_PARAMETER_Z,
+      CHAMPLAIN_MAP_SOURCE_PARAMETER_X,
+      CHAMPLAIN_MAP_SOURCE_PARAMETER_Y);
+}
+
+//FIXME: the API isn't enough flexible for mff's url!
+ChamplainMapSource *
+champlain_map_source_new_mff_relief ()
+{
+  champlain_map_source_new_network ("MapsForFree Relief",
+      "Map data available under GNU Free Documentation license, Version 1.2 or later",
+      "http://www.gnu.org/copyleft/fdl.html", 0, 11, 256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://maps-for-free.com/layer/relief/z%d/row%d/%d_%d-%d.jpg",
       CHAMPLAIN_MAP_SOURCE_PARAMETER_Z,
       CHAMPLAIN_MAP_SOURCE_PARAMETER_X,
       CHAMPLAIN_MAP_SOURCE_PARAMETER_Y);
