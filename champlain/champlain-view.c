@@ -55,6 +55,7 @@
 #include "champlain-enum-types.h"
 #include "champlain-map.h"
 #include "champlain-marshal.h"
+#include "champlain-map-source.h"
 #include "champlain-private.h"
 #include "champlain-tile.h"
 #include "champlain-zoom-level.h"
@@ -97,7 +98,7 @@ struct _ChamplainViewPrivate
 {
   ClutterActor *stage;
 
-  ChamplainMapSource map_source;
+  ChamplainMapSource *map_source;
   ChamplainScrollMode scroll_mode;
   gint zoom_level; /* Holds the current zoom level number */
 
@@ -164,10 +165,11 @@ viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
 {
   gint level;
 
-  if (!priv->map)
+  if (!priv->map_source)
     return 0.0;
 
-  return priv->map->x_to_longitude (priv->map, x, priv->zoom_level);
+  return champlain_map_source_get_longitude (priv->map_source,
+      priv->zoom_level, x);
 }
 
 static gdouble
@@ -185,10 +187,11 @@ viewport_get_latitude_at (ChamplainViewPrivate *priv, gint y)
 {
   gint level;
 
-  if (!priv->map)
+  if (!priv->map_source)
     return 0.0;
 
-  return priv->map->y_to_latitude (priv->map, y, priv->zoom_level);
+  return champlain_map_source_get_latitude (priv->map_source,
+      priv->zoom_level, y);
 }
 
 static gdouble
@@ -232,9 +235,9 @@ scroll_event (ClutterActor *actor,
   y_diff = priv->viewport_size.height / 2 - rel_y;
 
   if (event->direction == CLUTTER_SCROLL_UP)
-    success = map_zoom_in (priv->map);
+    success = map_zoom_in (priv->map, priv->map_source);
   else if (event->direction == CLUTTER_SCROLL_DOWN)
-    success = map_zoom_out (priv->map);
+    success = map_zoom_out (priv->map, priv->map_source);
 
   if (success)
     {
@@ -245,12 +248,14 @@ scroll_event (ClutterActor *actor,
       new_group = champlain_zoom_level_get_actor (priv->map->current_level);
 
       /* Get the new x,y in the new zoom level */
-      x2 = priv->map->longitude_to_x (priv->map, lon, priv->zoom_level);
-      y2 = priv->map->latitude_to_y (priv->map, lat, priv->zoom_level);
+      x2 = champlain_map_source_get_x (priv->map_source, priv->zoom_level, lon);
+      y2 = champlain_map_source_get_y (priv->map_source, priv->zoom_level, lat);
       /* Get the new lon,lat of these new x,y minus the distance from the
        * viewport center */
-      lon2 = priv->map->x_to_longitude (priv->map, x2 + x_diff, priv->zoom_level);
-      lat2 = priv->map->y_to_latitude (priv->map, y2 + y_diff, priv->zoom_level);
+      lon2 = champlain_map_source_get_longitude (priv->map_source,
+          priv->zoom_level, x2 + x_diff);
+      lat2 = champlain_map_source_get_latitude (priv->map_source,
+          priv->zoom_level, y2 + y_diff);
 
       resize_viewport (view);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
@@ -277,8 +282,8 @@ marker_reposition_cb (ChamplainMarker *marker,
 
   if (priv->map)
     {
-      x = priv->map->longitude_to_x (priv->map, marker_priv->lon, priv->zoom_level);
-      y = priv->map->latitude_to_y (priv->map, marker_priv->lat, priv->zoom_level);
+      x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, marker_priv->lon);
+      y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, marker_priv->lat);
 
       clutter_actor_set_position (CLUTTER_ACTOR (marker),
         x - priv->anchor.x,
@@ -337,8 +342,8 @@ create_initial_map (ChamplainView *view)
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   ClutterActor *group;
 
-  priv->map = map_new (priv->map_source);
-  map_load_level (priv->map, priv->zoom_level);
+  priv->map = map_new ();
+  map_load_level (priv->map, priv->map_source, priv->zoom_level);
   group = champlain_zoom_level_get_actor (priv->map->current_level);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), group);
 
@@ -441,7 +446,7 @@ champlain_view_get_property (GObject *object,
         g_value_set_int (value, priv->zoom_level);
         break;
       case PROP_MAP_SOURCE:
-        g_value_set_int (value, priv->map_source);
+        g_value_set_object (value, priv->map_source);
         break;
       case PROP_SCROLL_MODE:
         g_value_set_enum (value, priv->scroll_mode);
@@ -497,10 +502,10 @@ champlain_view_set_property (GObject *object,
           {
             if (level != priv->zoom_level)
               {
-                priv->zoom_level = level;
                 ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
-                if (map_zoom_to (priv->map, level))
+                if (map_zoom_to (priv->map, priv->map_source, level))
                   {
+                    priv->zoom_level = level;
                     ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
                     resize_viewport (view);
                     clutter_container_remove_actor (
@@ -516,24 +521,26 @@ champlain_view_set_property (GObject *object,
       }
     case PROP_MAP_SOURCE:
       {
-        ChamplainMapSource source = g_value_get_int (value);
+        ChamplainMapSource *source = g_value_get_object (value);
+
         if (priv->map_source != source)
           {
-            priv->map_source = source;
+            g_object_unref (priv->map_source);
+            priv->map_source = g_object_ref (source);
             if (priv->map)
               {
                 ClutterActor *group;
                 map_free (priv->map);
-                priv->map = map_new (priv->map_source);
+                priv->map = map_new ();
 
                 /* Keep same zoom level if the new map supports it */
-                if (priv->zoom_level > priv->map->zoom_levels)
+                if (priv->zoom_level > champlain_map_source_get_max_zoom_level (priv->map_source))
                   {
-                    priv->zoom_level = priv->map->zoom_levels;
+                    priv->zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
                     g_object_notify (G_OBJECT (view), "zoom-level");
                   }
 
-                map_load_level (priv->map, priv->zoom_level);
+                map_load_level (priv->map, priv->map_source, priv->zoom_level);
                 group = champlain_zoom_level_get_actor (priv->map->current_level);
 
                 view_load_visible_tiles (view);
@@ -647,10 +654,10 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   */
   g_object_class_install_property (object_class,
       PROP_MAP_SOURCE,
-      g_param_spec_int ("map-source",
+      g_param_spec_object ("map-source",
            "Map source",
            "The map source being displayed",
-           0, CHAMPLAIN_MAP_SOURCE_COUNT, CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
+           CHAMPLAIN_TYPE_MAP_SOURCE,
            CHAMPLAIN_PARAM_READWRITE));
 
   /**
@@ -735,7 +742,7 @@ champlain_view_init (ChamplainView *view)
 
   champlain_debug_set_flags (g_getenv ("CHAMPLAIN_DEBUG"));
 
-  priv->map_source = CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP;
+  priv->map_source = champlain_map_source_new_osm_mapnik ();
   priv->zoom_level = 0;
   priv->offline = FALSE;
   priv->keep_center_on_resize = TRUE;
@@ -852,7 +859,7 @@ update_license (ChamplainView *view)
   if (priv->show_license)
     {
       priv->license_actor = clutter_label_new_with_text ( "sans 8",
-          priv->map->license);
+          ""); //XXX: champlain_map_source_get_license (priv->map_source));
       clutter_actor_set_opacity (priv->license_actor, 128);
       clutter_actor_show (priv->license_actor);
 
@@ -890,21 +897,23 @@ finger_scroll_button_press_cb (ClutterActor *actor,
       gint x_diff = priv->viewport_size.width / 2 - rel_x;
       gint y_diff = priv->viewport_size.height / 2 - rel_y;
 
-      if (map_zoom_in (priv->map))
+      if (map_zoom_in (priv->map, priv->map_source))
         {
+          gint x2, y2;
+          gdouble lat2, lon2;
+
           priv->zoom_level++;
           ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
+
           /* Get the new x,y in the new zoom level */
-          gint x2 = priv->map->longitude_to_x (priv->map, lon,
-              priv->zoom_level);
-          gint y2 = priv->map->latitude_to_y (priv->map, lat,
-              priv->zoom_level);
+          x2 = champlain_map_source_get_x (priv->map_source, priv->zoom_level, lon);
+          y2 = champlain_map_source_get_y (priv->map_source, priv->zoom_level, lat);
           /* Get the new lon,lat of these new x,y minus the distance from the
            * viewport center */
-          gdouble lon2 = priv->map->x_to_longitude (priv->map, x2 + x_diff,
-              priv->zoom_level);
-          gdouble lat2 = priv->map->y_to_latitude (priv->map, y2 + y_diff,
-              priv->zoom_level);
+          lon2 = champlain_map_source_get_longitude (priv->map_source,
+              priv->zoom_level, x2 + x_diff);
+          lat2 = champlain_map_source_get_latitude (priv->map_source,
+              priv->zoom_level, y2 + y_diff);
 
           resize_viewport (view);
           clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
@@ -960,8 +969,8 @@ champlain_view_center_on (ChamplainView *view,
   if (!priv->map)
     return;
 
-  x = priv->map->longitude_to_x (priv->map, longitude, priv->zoom_level);
-  y = priv->map->latitude_to_y (priv->map, latitude, priv->zoom_level);
+  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
+  y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
 
   if (priv->zoom_level >= 8)
     {
@@ -1020,7 +1029,7 @@ champlain_view_zoom_in (ChamplainView *view)
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
 
-  if (map_zoom_in (priv->map))
+  if (map_zoom_in (priv->map, priv->map_source))
     {
       priv->zoom_level++;
       resize_viewport (view);
@@ -1050,7 +1059,7 @@ champlain_view_zoom_out (ChamplainView *view)
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
 
-  if (map_zoom_out (priv->map))
+  if (map_zoom_out (priv->map, priv->map_source))
     {
       priv->zoom_level--;
       resize_viewport (view);
@@ -1181,7 +1190,7 @@ view_load_visible_tiles (ChamplainView *view)
   viewport.x += priv->anchor.x;
   viewport.y += priv->anchor.y;
 
-  map_load_visible_tiles (priv->map, viewport, priv->offline);
+  map_load_visible_tiles (priv->map, view, priv->map_source, viewport, priv->offline);
 }
 
 static void
@@ -1197,12 +1206,12 @@ view_position_tile (ChamplainView* view, ChamplainTile* tile)
   g_object_get (G_OBJECT (tile), "actor", &actor,
       "x", &x, "y", &y,
       "size", &size, NULL);
+
   clutter_actor_set_position (actor,
     (x * size) - priv->anchor.x,
     (y * size) - priv->anchor.y);
 }
 
-//FIXME: This isn't called  when tiles are done loading
 static void
 view_tiles_reposition (ChamplainView* view)
 {
@@ -1215,4 +1224,26 @@ view_tiles_reposition (ChamplainView* view)
       if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
         view_position_tile (view, tile);
     }
+}
+
+void
+champlain_view_tile_ready (ChamplainView *view,
+                           ChamplainZoomLevel *level,
+                           ChamplainTile *tile,
+                           gboolean animate)
+{
+  ClutterActor *actor;
+  ClutterEffectTemplate *etemplate;
+
+  actor = champlain_tile_get_actor (tile);
+  clutter_actor_show (actor);
+  if (animate)
+    {
+      etemplate = clutter_effect_template_new_for_duration (750, CLUTTER_ALPHA_SINE_INC);
+      clutter_actor_set_opacity(actor, 0);
+      clutter_effect_fade (etemplate, actor, 255, NULL, NULL);
+    }
+
+  clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)), actor, NULL);
+  view_position_tile (view, tile);
 }

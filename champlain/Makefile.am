@@ -22,7 +22,8 @@ libchamplain_headers = \
 	champlain-map.h			\
 	champlain-zoom-level.h		\
 	champlain-enum-types.h		\
-	champlain-tile.h
+	champlain-tile.h		\
+	champlain-map-source.h
 
 
 libchamplain_0_3_la_SOURCES = \
@@ -34,10 +35,8 @@ libchamplain_0_3_la_SOURCES = \
 	champlain-marker.c 		\
 	champlain-map.c  		\
 	champlain-zoom-level.c 		\
-	champlain-tile.c 		\
-	sources/oam.c 			\
-	sources/osmmapnik.c 		\
-	sources/mffrelief.c
+	champlain-tile.c		\
+	champlain-map-source.c
 
 noinst_HEADERS = \
 	champlain-debug.h  		\
@@ -47,10 +46,8 @@ noinst_HEADERS = \
 	champlain-map.h  		\
 	champlain-zoom-level.h 		\
 	champlain-tile.h 		\
-	sources/oam.h 			\
-	sources/osmmapnik.h 		\
-	sources/mffrelief.h 		\
-	champlain-enum-types.h
+	champlain-enum-types.h		\
+	champlain-map-source.h
 
 libchamplain_include_HEADERS = \
 	champlain.h 			\

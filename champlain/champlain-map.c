@@ -21,33 +21,13 @@
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_LOADING
 #include "champlain-debug.h"
 #include "champlain-zoom-level.h"
-#include "sources/osmmapnik.h"
-#include "sources/mffrelief.h"
-#include "sources/oam.h"
 
 #include <math.h>
 
 Map*
-map_new (ChamplainMapSource source)
+map_new ()
 {
   Map *map = g_new0(Map, 1);
-
-  switch(source)
-    {
-      case CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP:
-        osm_mapnik_init(map);
-        break;
-      case CHAMPLAIN_MAP_SOURCE_OPENARIALMAP:
-        oam_init(map);
-        break;
-      case CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF:
-        mff_relief_init(map);
-        break;
-      case CHAMPLAIN_MAP_SOURCE_COUNT:
-      default:
-        g_warning("Unsupported map source");
-        break;
-    }
 
   map->previous_level = NULL;
   map->current_level = NULL;
@@ -56,14 +36,14 @@ map_new (ChamplainMapSource source)
 }
 
 void
-map_load_level(Map *map, gint zoom_level)
+map_load_level(Map *map, ChamplainMapSource *map_source, gint zoom_level)
 {
   if (map->previous_level)
     g_object_unref (map->previous_level);
   map->previous_level = map->current_level;
 
-  guint row_count = map->get_row_count(map, zoom_level);
-  guint column_count = map->get_column_count(map, zoom_level);
+  guint row_count = champlain_map_source_get_row_count (map_source, zoom_level);
+  guint column_count = champlain_map_source_get_column_count (map_source, zoom_level);
 
   map->current_level = champlain_zoom_level_new ();
   g_object_set (G_OBJECT (map->current_level),
@@ -74,18 +54,22 @@ map_load_level(Map *map, gint zoom_level)
 }
 
 void
-map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
+map_load_visible_tiles (Map *map, ChamplainView *view, ChamplainMapSource *source, ChamplainRectangle viewport, gboolean offline)
 {
+  gint size;
+
+  size = champlain_map_source_get_tile_size (source);
+
   if (viewport.x < 0)
     viewport.x = 0;
   if (viewport.y < 0)
     viewport.y = 0;
 
-  gint x_count = ceil((float)viewport.width / map->tile_size) + 1;
-  gint y_count = ceil((float)viewport.height / map->tile_size) + 1;
+  gint x_count = ceil((float)viewport.width / size) + 1;
+  gint y_count = ceil((float)viewport.height / size) + 1;
 
-  gint x_first = viewport.x / map->tile_size;
-  gint y_first = viewport.y / map->tile_size;
+  gint x_first = viewport.x / size;
+  gint y_first = viewport.y / size;
 
   x_count += x_first;
   y_count += y_first;
@@ -130,7 +114,9 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
           if(!exist)
             {
               DEBUG ("Loading tile %d, %d, %d", champlain_zoom_level_get_zoom_level (map->current_level), i, j);
-              ChamplainTile *tile = tile_load (map, champlain_zoom_level_get_zoom_level (map->current_level), i, j, offline);
+              ChamplainTile *tile = champlain_tile_new ();
+              g_object_set (G_OBJECT (tile), "x", i, "y", j, NULL);
+              champlain_map_source_get_tile (source, view, map->current_level, tile);
               champlain_zoom_level_add_tile (map->current_level, tile);
             }
         }
@@ -138,24 +124,24 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
 }
 
 gboolean
-map_zoom_in (Map *map)
+map_zoom_in (Map *map, ChamplainMapSource *source)
 {
   guint new_level = champlain_zoom_level_get_zoom_level (map->current_level) + 1;
-  if(new_level <= map->zoom_levels)
+  if(new_level <= champlain_map_source_get_max_zoom_level (source))
     {
-      map_load_level(map, new_level);
+      map_load_level(map, source, new_level);
       return TRUE;
     }
   return FALSE;
 }
 
 gboolean
-map_zoom_out (Map *map)
+map_zoom_out (Map *map, ChamplainMapSource *source)
 {
   guint new_level = champlain_zoom_level_get_zoom_level (map->current_level) - 1;
-  if(new_level >= 0)
+  if(new_level >= champlain_map_source_get_min_zoom_level (source))
     {
-      map_load_level(map, new_level);
+      map_load_level(map, source, new_level);
       return TRUE;
     }
   return FALSE;
@@ -168,11 +154,11 @@ map_free (Map *map)
 }
 
 gboolean
-map_zoom_to (Map *map, guint zoomLevel)
+map_zoom_to (Map *map, ChamplainMapSource *source, guint zoomLevel)
 {
-  if (zoomLevel<= map->zoom_levels)
+  if (zoomLevel<= champlain_map_source_get_max_zoom_level (source))
     {
-      map_load_level(map, zoomLevel);
+      map_load_level(map, source, zoomLevel);
       return TRUE;
     }
   return FALSE;

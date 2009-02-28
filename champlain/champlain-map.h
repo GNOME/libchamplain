@@ -22,6 +22,7 @@
 #include "champlain.h"
 #include "champlain-private.h"
 #include "champlain-tile.h"
+#include "champlain-map-source.h"
 #include "champlain-view.h"
 #include "champlain-zoom-level.h"
 
@@ -30,39 +31,22 @@
 
 struct _Map
 {
-  guint zoom_levels;
-  const gchar *name;
-  const gchar *license;
-  const gchar *license_uri;
-  int tile_size;
-
   ChamplainZoomLevel *current_level;
   ChamplainZoomLevel *previous_level;
-
-  guint (* get_row_count) (Map *map, guint zoom_level);
-  guint (* get_column_count) (Map *map, guint zoom_level);
-
-  gint (* longitude_to_x) (Map *map, gdouble longitude, guint zoom_level);
-  gint (* latitude_to_y) (Map *map, gdouble latitude, guint zoom_level);
-  gdouble (* x_to_longitude) (Map *map, gint x, guint zoom_level);
-  gdouble (* y_to_latitude) (Map *map, gint y, guint zoom_level);
-
-  gchar *(* get_tile_filename) (Map *map, ChamplainTile *tile);
-  gchar *(* get_tile_uri) (Map *map, ChamplainTile *tile);
 };
 
-Map *map_new (ChamplainMapSource source);
+Map *map_new ();
 
-void map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline);
+void map_load_visible_tiles (Map *map, ChamplainView * view, ChamplainMapSource *source, ChamplainRectangle viewport, gboolean offline);
 
 void map_free (Map *map);
 
-gboolean map_zoom_in (Map *map);
+gboolean map_zoom_in (Map *map, ChamplainMapSource *map_source);
 
-gboolean map_zoom_out (Map *map);
+gboolean map_zoom_out (Map *map, ChamplainMapSource *map_source);
 
-gboolean map_zoom_to (Map *map, guint zoomLevel);
+gboolean map_zoom_to (Map *map, ChamplainMapSource *map_source, guint zoomLevel);
 
-void map_load_level(Map *map, gint zoom_level);
+void map_load_level(Map *map, ChamplainMapSource *map_source, gint zoom_level);
 
 #endif

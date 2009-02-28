@@ -24,28 +24,11 @@
 #define CHAMPLAIN_VIEW_H
 
 #include <champlain/champlain-defines.h>
+#include <champlain/champlain-zoom-level.h>
 
 #include <glib.h>
 #include <glib-object.h>
 #include <clutter/clutter.h>
-
-/**
- * ChamplainMapSource:
- * @CHAMPLAIN_MAP_SOURCE_DEBUG: Debug map, untested as of 0.2
- * @CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP: Open Street Map - Mapnick tiles
- * @CHAMPLAIN_MAP_SOURCE_OPENARIALMAP: Open Arial Map
- * @CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF: Maps for free - Relief tiles
- *
- * Type of scrolling.
- */
-typedef enum
-{
-  CHAMPLAIN_MAP_SOURCE_DEBUG,
-  CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP,
-  CHAMPLAIN_MAP_SOURCE_OPENARIALMAP,
-  CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF,
-  CHAMPLAIN_MAP_SOURCE_COUNT
-} ChamplainMapSource;
 
 #define CHAMPLAIN_TYPE_VIEW     (champlain_view_get_type())
 #define CHAMPLAIN_VIEW(obj)     (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_VIEW, ChamplainView))
@@ -96,5 +79,7 @@ void champlain_view_add_layer (ChamplainView *champlainView, ClutterActor *layer
 void champlain_view_set_size (ChamplainView *view, guint width, guint height);
 
 gboolean champlain_view_get_coords_from_event (ChamplainView *view, ClutterEvent *event, gdouble *lat, gdouble *lon);
+
+void champlain_view_tile_ready (ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile, gboolean animate);
 
 #endif
