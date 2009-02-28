@@ -530,6 +530,11 @@ champlain_view_set_property (GObject *object,
             if (priv->map)
               {
                 ClutterActor *group;
+
+                group = champlain_zoom_level_get_actor (priv->map->current_level);
+                clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
+                    group);
+
                 map_free (priv->map);
                 priv->map = map_new ();
 
