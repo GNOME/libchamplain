@@ -389,7 +389,7 @@ ChamplainMapSource *
 champlain_map_source_new_osm_mapnik ()
 {
   champlain_map_source_new_network ("OpenStreetMap Mapnik",
-      "(CC) by contributors", "", 0, 20, 256,
+      "(CC) by contributors", "", 0, 18, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
       "http://tile.openstreetmap.org/%d/%d/%d.png",
       CHAMPLAIN_MAP_SOURCE_PARAMETER_Z,
