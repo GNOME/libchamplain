@@ -84,11 +84,8 @@ map_load_visible_tiles (Map *map, ChamplainRectangle viewport, gboolean offline)
   gint x_count = ceil((float)viewport.width / map->tile_size) + 1;
   gint y_count = ceil((float)viewport.height / map->tile_size) + 1;
 
-  ChamplainPoint anchor; //XXX
-  anchor.x = 0;
-  anchor.y = 0;
-  gint x_first = (anchor.x + viewport.x) / map->tile_size;
-  gint y_first = (anchor.y + viewport.y) / map->tile_size;
+  gint x_first = viewport.x / map->tile_size;
+  gint y_first = viewport.y / map->tile_size;
 
   x_count += x_first;
   y_count += y_first;

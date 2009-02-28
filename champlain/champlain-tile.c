@@ -451,26 +451,6 @@ typedef struct {
 static SoupSession * soup_session;
 
 void
-tile_set_position(Map* map, ChamplainTile* tile)
-{
-  ClutterActor *actor;
-  gint x;
-  gint y;
-  guint size;
-  g_object_get (G_OBJECT (tile), "actor", &actor,
-      "x", &x, "y", &y,
-      "size", &size, NULL);
-  ChamplainPoint anchor; //XXX
-  anchor.x = 0;
-  anchor.y = 0;
-  clutter_actor_set_position (actor,
-    (x * size) - anchor.x,
-    (y * size) - anchor.y);
-  clutter_actor_set_size (actor, size, size); //XXX Move elsewhere
-  clutter_actor_show (actor);
-}
-
-void
 tile_setup_animation (ChamplainTile* tile)
 {
   ClutterActor *actor = champlain_tile_get_actor (tile);
@@ -488,9 +468,10 @@ create_error_tile(Map* map, ChamplainTile* tile)
     return;
 
   champlain_tile_set_actor (tile, actor);
-  tile_set_position (map, tile);
+  clutter_actor_show (actor);
 
   clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (map->current_level)), actor, NULL);
+  clutter_actor_show (actor);
   tile_setup_animation (tile);
 
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
@@ -587,7 +568,8 @@ file_loaded_cb (SoupSession *session,
       3, 0, NULL);
   champlain_tile_set_actor (tile, actor);
 
-  tile_set_position (map, tile);
+  clutter_actor_set_size (actor, champlain_tile_get_size (tile), champlain_tile_get_size (tile));
+  clutter_actor_show (actor);
 
   clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (map->current_level)), actor, NULL);
   tile_setup_animation (tile);
@@ -625,9 +607,10 @@ tile_load (Map* map, gint zoom_level, gint x, gint y, gboolean offline)
     {
       ClutterActor *actor = clutter_texture_new_from_file (filename, NULL);
       champlain_tile_set_actor (tile, actor);
-      tile_set_position (map, tile);
+      clutter_actor_show (actor);
 
       clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (map->current_level)), actor, NULL);
+      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
       // Do not animate since it is local and fast
     }
   else if (!offline)
