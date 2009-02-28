@@ -23,11 +23,11 @@ def zoom_changed(spinbutton, view):
 def map_source_changed(widget, view):
     selection = widget.get_active_text()
     if selection == "Open Street Map":
-        view.set_property("map-source", "openstreetmap")  # champlain.MAP_SOURCE_OPENSTREETMAP)
+        view.set_property("map-source", champlain.MAP_SOURCE_OPENSTREETMAP)
     elif selection == "Open Arial Map":
-        view.set_property("map-source", "openarialmap")  # champlain.MAP_SOURCE_OPENARIALMAP)
+        view.set_property("map-source", champlain.MAP_SOURCE_OPENARIALMAP)
     elif selection == "Maps for free - Relief":
-        view.set_property("map-source", "mapsforfree-relief")  # champlain.MAP_SOURCE_MAPSFORFREE_RELIEF)
+        view.set_property("map-source", champlain.MAP_SOURCE_MAPSFORFREE_RELIEF)
     else:
         raise RuntimeException("Illegal state: active text of combobox invalid")
 
@@ -56,7 +56,7 @@ window.connect("destroy", lambda w: gtk.main_quit)
 vbox = gtk.VBox(False, 12)
 
 view = champlain.View()
-view.set_property("scroll-mode", "kinetic")  # champlain.SCROLL_MODE_KINETIC)
+view.set_property("scroll-mode", champlain.SCROLL_MODE_KINETIC)
 view.set_property("zoom-level", 5)
 
 #layer = create_marker_layer()
@@ -78,12 +78,13 @@ bbox.add(button)
 #button.connect("toggled", toggle_layer, layer)
 #bbox.add(button)
 
-button = gtk.combo_box_new_text()
-button.append_text("Open Street Map")
-button.append_text("Open Arial Map")
-button.append_text("Maps for free - Relief")
-button.connect("changed", map_source_changed, view)
-bbox.add(button)
+combo = gtk.combo_box_new_text()
+combo.append_text("Open Street Map")
+combo.append_text("Open Arial Map")
+combo.append_text("Maps for free - Relief")
+combo.set_active(0)
+combo.connect("changed", map_source_changed, view)
+bbox.add(combo)
 
 button = gtk.SpinButton(gtk.Adjustment(lower=0, upper=20, value=1))
 button.connect("changed", zoom_changed, view)

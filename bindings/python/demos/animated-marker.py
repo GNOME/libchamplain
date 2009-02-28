@@ -59,7 +59,6 @@ def create_marker():
 
 	behaviour = clutter.BehaviourScale(0.5, 0.5, 2.0, 2.0)
   	
-	#alpha = clutter_alpha_new_full (timeline, CLUTTER_ALPHA_SINE_INC, NULL, g_object_unref);
 	behaviour.set_alpha(alpha)
 	behaviour.apply(bg)
 
@@ -96,7 +95,7 @@ def main():
 
 	# Finish initialising the map view
 	actor.set_property("zoom-level", 5)
-	#actor.set_property("scroll-mode", champlain.SCROLL_MODE_KINETIC)
+	actor.set_property("scroll-mode", champlain.SCROLL_MODE_KINETIC)
   
   	actor.center_on(45.466, -73.75)
 	stage.show()

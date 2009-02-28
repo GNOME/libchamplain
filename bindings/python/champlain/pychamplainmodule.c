@@ -3,6 +3,7 @@
 #include <pygobject.h>
 
 void champlain_register_classes (PyObject *d);
+void champlain_add_constants(PyObject *module, const gchar *strip_prefix);
 DL_EXPORT(void) initchamplain(void);
 extern PyMethodDef champlain_functions[];
 
@@ -17,6 +18,7 @@ initchamplain(void)
 	d = PyModule_GetDict (m);
 	
 	champlain_register_classes (d);
+	champlain_add_constants(m, "CHAMPLAIN_");
 	
 	if (PyErr_Occurred ()) {
 		PyErr_Print();
