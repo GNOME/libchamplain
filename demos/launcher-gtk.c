@@ -79,11 +79,11 @@ map_source_changed (GtkWidget *widget,
   gchar* selection = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
   if (g_strcmp0(selection, OSM_MAP) == 0)
     {
-      //g_object_set(G_OBJECT(view), "map-source", CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP, NULL);
+      g_object_set(G_OBJECT(view), "map-source", champlain_map_source_new_osm_mapnik (), NULL);
     }
   else if (g_strcmp0(selection, OAM_MAP) == 0)
     {
-      //g_object_set(G_OBJECT(view), "map-source", CHAMPLAIN_MAP_SOURCE_OPENARIALMAP, NULL);
+      g_object_set(G_OBJECT(view), "map-source", champlain_map_source_new_oam (), NULL);
     }
   else if (g_strcmp0(selection, MFF_MAP) == 0)
     {
