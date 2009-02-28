@@ -54,6 +54,7 @@ libchamplain_include_HEADERS = \
 	champlain-view.h 		\
 	champlain-defines.h 		\
 	champlain-layer.h 		\
+	champlain-map-source.h		\
 	champlain-marker.h
 
 libchamplain_0_3_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
