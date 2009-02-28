@@ -20,7 +20,6 @@
 #define CHAMPLAIN_MAP_TILE_H
 
 #include <champlain/champlain-defines.h>
-#include <champlain/champlain-private.h>
 
 #include <glib.h>
 #include <clutter/clutter.h>
@@ -75,7 +74,6 @@ void champlain_tile_set_uri (ChamplainTile *self, gchar* uri);
 void champlain_tile_set_filename (ChamplainTile *self, gchar* filename);
 void champlain_tile_set_actor (ChamplainTile *self, ClutterActor* actor);
 
-ChamplainTile* tile_load (Map* map, gint zoom_level, gint x, gint y, gboolean offline);
 G_END_DECLS
 
 #endif /* CHAMPLAIN_MAP_TILE_H */

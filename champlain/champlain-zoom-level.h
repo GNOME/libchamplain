@@ -19,7 +19,6 @@
 #ifndef CHAMPLAIN_ZOOM_LEVEL_H
 #define CHAMPLAIN_ZOOM_LEVEL_H
 
-#include "champlain-private.h"
 #include "champlain-tile.h"
 
 #include <glib.h>
