@@ -37,7 +37,7 @@ struct _Map
 
 Map *map_new ();
 
-void map_load_visible_tiles (Map *map, ChamplainView * view, ChamplainMapSource *source, ChamplainRectangle viewport, gboolean offline);
+void map_load_visible_tiles (Map *map, ChamplainView * view, ChamplainMapSource *source, ChamplainRectangle viewport);
 
 void map_free (Map *map);
 

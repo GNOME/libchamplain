@@ -119,7 +119,6 @@ struct _ChamplainViewPrivate
 
   Map *map;
 
-  gboolean offline;
   gboolean keep_center_on_resize;
   gboolean show_license;
 };
@@ -452,7 +451,7 @@ champlain_view_get_property (GObject *object,
         g_value_set_enum (value, priv->scroll_mode);
         break;
       case PROP_OFFLINE:
-        g_value_set_boolean (value, priv->offline);
+        g_value_set_boolean (value, !champlain_settings_is_online ());
         break;
       case PROP_DECEL_RATE:
         {
@@ -566,7 +565,7 @@ champlain_view_set_property (GObject *object,
           priv->scroll_mode, NULL);
       break;
     case PROP_OFFLINE:
-      priv->offline = g_value_get_boolean (value);
+      champlain_settings_set_online (!g_value_get_boolean (value));
       break;
     case PROP_DECEL_RATE:
       {
@@ -749,7 +748,6 @@ champlain_view_init (ChamplainView *view)
 
   priv->map_source = champlain_map_source_new_osm_mapnik ();
   priv->zoom_level = 0;
-  priv->offline = FALSE;
   priv->keep_center_on_resize = TRUE;
   priv->show_license = TRUE;
   priv->license_actor = NULL;
@@ -1195,7 +1193,7 @@ view_load_visible_tiles (ChamplainView *view)
   viewport.x += priv->anchor.x;
   viewport.y += priv->anchor.y;
 
-  map_load_visible_tiles (priv->map, view, priv->map_source, viewport, priv->offline);
+  map_load_visible_tiles (priv->map, view, priv->map_source, viewport);
 }
 
 static void

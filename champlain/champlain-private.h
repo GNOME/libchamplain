@@ -25,7 +25,7 @@
 
 typedef struct _Map Map;
 
-typedef struct 
+typedef struct
 {
   gint x;
   gint y;
@@ -38,13 +38,12 @@ struct _ChamplainMarkerPrivate
   gdouble lat;
 };
 
-typedef struct 
+typedef struct
 {
   gint x;
   gint y;
   gint width;
   gint height;
 } ChamplainRectangle;
-
 
 #endif

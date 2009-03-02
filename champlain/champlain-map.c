@@ -54,7 +54,7 @@ map_load_level(Map *map, ChamplainMapSource *map_source, gint zoom_level)
 }
 
 void
-map_load_visible_tiles (Map *map, ChamplainView *view, ChamplainMapSource *source, ChamplainRectangle viewport, gboolean offline)
+map_load_visible_tiles (Map *map, ChamplainView *view, ChamplainMapSource *source, ChamplainRectangle viewport)
 {
   gint size;
 

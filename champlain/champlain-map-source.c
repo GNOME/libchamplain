@@ -27,6 +27,7 @@
 #include "champlain-map-source.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
+#include "champlain-settings.h"
 #include "champlain-zoom-level.h"
 
 #include <errno.h>
@@ -642,7 +643,7 @@ champlain_map_source_get_tile (ChamplainMapSource *map_source,
       g_object_unref (tile);
       g_object_unref (zoom_level);
     }
-  else /* if (!offline) */
+  else if (champlain_settings_is_online ())
     {
       SoupMessage *msg;
       gchar *uri;
