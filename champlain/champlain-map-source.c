@@ -36,6 +36,7 @@
 #include <glib-object.h>
 #include <libsoup/soup.h>
 #include <math.h>
+#include <string.h>
 
 enum
 {
@@ -52,7 +53,8 @@ enum
   PROP_MAX_ZOOM_LEVEL,
   PROP_MIN_ZOOM_LEVEL,
   PROP_TILE_SIZE,
-  PROP_MAP_PROJECTION
+  PROP_MAP_PROJECTION,
+  PROP_URI_FORMAT
 };
 
 /* static guint champlain_map_source_signals[LAST_SIGNAL] = { 0, }; */
@@ -73,10 +75,7 @@ struct _ChamplainMapSourcePrivate
   guint min_zoom_level;
   guint tile_size;
   ChamplainMapProjection map_projection;
-  gchar *tile_uri_format;
-  ChamplainMapSourceParameter first_param;
-  ChamplainMapSourceParameter second_param;
-  ChamplainMapSourceParameter third_param;
+  gchar *uri_format;
 };
 
 static void
@@ -110,6 +109,9 @@ champlain_map_source_get_property (GObject *object,
         break;
       case PROP_MAP_PROJECTION:
         g_value_set_enum (value, priv->map_projection);
+        break;
+      case PROP_URI_FORMAT:
+        g_value_set_string (value, priv->uri_format);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -147,6 +149,9 @@ champlain_map_source_set_property (GObject *object,
         break;
       case PROP_MAP_PROJECTION:
         priv->map_projection = g_value_get_enum (value);
+        break;
+      case PROP_URI_FORMAT:
+        priv->uri_format = g_value_dup_string (value);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -280,6 +285,20 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
                              (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_MAP_PROJECTION, pspec);
 
+  /**
+  * ChamplainMapSource:uri-format
+  *
+  * The uri format for the map source
+  *
+  * Since: 0.4
+  */
+  pspec = g_param_spec_string ("uri-format",
+                               "URI Format",
+                               "The URI format",
+                               "",
+                               (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+  g_object_class_install_property (object_class, PROP_URI_FORMAT, pspec);
+
 }
 
 static void
@@ -317,72 +336,71 @@ champlain_map_source_new_network (gchar *name,
                                   guint max_zoom,
                                   guint tile_size,
                                   ChamplainMapProjection projection,
-                                  gchar *uri_format,
-                                  ChamplainMapSourceParameter first,
-                                  ChamplainMapSourceParameter second,
-                                  ChamplainMapSourceParameter third)
+                                  gchar *uri_format)
 {
 
   ChamplainMapSource * map_source;
   map_source = g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE, "name", name,
       "license", license, "license-uri", license_uri,
       "min-zoom-level", min_zoom, "max-zoom-level", max_zoom,
-      "tile-size", tile_size, "map-projection", projection, NULL);
-//FIXME no function call in a _new ()
-  champlain_map_source_set_tile_uri (map_source, uri_format, first, second,
-      third);
+      "tile-size", tile_size, "map-projection", projection,
+      "uri-format", uri_format, NULL);
   return map_source;
-}
-
-static
-get_value (guint x, guint y, guint z, ChamplainMapSourceParameter param)
-{
-  switch (param)
-    {
-      case CHAMPLAIN_MAP_SOURCE_PARAMETER_X:
-        return x;
-      case CHAMPLAIN_MAP_SOURCE_PARAMETER_Y:
-        return y;
-      case CHAMPLAIN_MAP_SOURCE_PARAMETER_Z:
-        return z;
-    }
 }
 
 gchar *
 champlain_map_source_get_tile_uri (ChamplainMapSource *map_source,
-                                   guint x,
-                                   guint y,
+                                   gint x,
+                                   gint y,
                                    gint z)
 {
   ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
 
-  guint first;
-  guint second;
-  guint third;
+  gchar **tokens;
+  gchar *token;
+  GString *ret;
+  gint i = 0;
 
-  first = get_value (x, y, z, priv->first_param);
-  second = get_value (x, y, z, priv->second_param);
-  third = get_value (x, y, z, priv->third_param);
+  tokens = g_strsplit (priv->uri_format, "#", 20);
+  token = tokens[i];
+  ret = g_string_sized_new (strlen (priv->uri_format));
 
-  return g_strdup_printf (priv->tile_uri_format, first, second, third);
+  while (token != NULL)
+    {
+      gint number = G_MAXINT;
+      gchar value[3];
 
+      if (strcmp (token, "X") == 0)
+        number = x;
+      if (strcmp (token, "Y") == 0)
+        number = y;
+      if (strcmp (token, "Z") == 0)
+        number = z;
+
+      if (number != G_MAXINT)
+        {
+          g_sprintf (value, "%d", number);
+          g_string_append (ret, value);
+        }
+      else
+        g_string_append (ret, token);
+
+      token = tokens[++i];
+    }
+  token = ret->str;
+  g_string_free (ret, FALSE);
+  g_strfreev (tokens);
+
+  return token;
 }
 
 void
 champlain_map_source_set_tile_uri (ChamplainMapSource *map_source,
-                                   const gchar *uri_format,
-                                   ChamplainMapSourceParameter first,
-                                   ChamplainMapSourceParameter second,
-                                   ChamplainMapSourceParameter third)
+                                   const gchar *uri_format)
 {
   ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
 
-  priv->first_param = first;
-  priv->second_param = second;
-  priv->third_param = third;
-
-  priv->tile_uri_format = g_strdup (uri_format);
-
+  priv->uri_format = g_strdup (uri_format);
 }
 
 ChamplainMapSource *
@@ -392,10 +410,7 @@ champlain_map_source_new_osm_mapnik ()
       "(CC) BY 2.0 OpenStreetMap contributors",
       "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://tile.openstreetmap.org/%d/%d/%d.png",
-      CHAMPLAIN_MAP_SOURCE_PARAMETER_Z,
-      CHAMPLAIN_MAP_SOURCE_PARAMETER_X,
-      CHAMPLAIN_MAP_SOURCE_PARAMETER_Y);
+      "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png");
 }
 
 ChamplainMapSource *
@@ -405,10 +420,7 @@ champlain_map_source_new_oam ()
       "(CC) BY 3.0 OpenArialMap contributors",
       "http://creativecommons.org/licenses/by/3.0/", 0, 17, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/%d/%d/%d.jpg",
-      CHAMPLAIN_MAP_SOURCE_PARAMETER_Z,
-      CHAMPLAIN_MAP_SOURCE_PARAMETER_X,
-      CHAMPLAIN_MAP_SOURCE_PARAMETER_Y);
+      "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg");
 }
 
 //FIXME: the API isn't enough flexible for mff's url!
@@ -419,10 +431,7 @@ champlain_map_source_new_mff_relief ()
       "Map data available under GNU Free Documentation license, Version 1.2 or later",
       "http://www.gnu.org/copyleft/fdl.html", 0, 11, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://maps-for-free.com/layer/relief/z%d/row%d/%d_%d-%d.jpg",
-      CHAMPLAIN_MAP_SOURCE_PARAMETER_Z,
-      CHAMPLAIN_MAP_SOURCE_PARAMETER_X,
-      CHAMPLAIN_MAP_SOURCE_PARAMETER_Y);
+      "http://maps-for-free.com/layer/relief/z#Z#/row#Y#/#Z#_#X#-#Y#.jpg");
 }
 
 guint
@@ -636,7 +645,7 @@ champlain_map_source_get_tile (ChamplainMapSource *map_source,
   else /* if (!offline) */
     {
       SoupMessage *msg;
-      const gchar *uri;
+      gchar *uri;
       FileLoadedCallbackContext *ctx = g_new0 (FileLoadedCallbackContext, 1);
       ctx->view = view;
       ctx->zoom_level = zoom_level;

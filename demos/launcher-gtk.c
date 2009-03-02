@@ -87,7 +87,7 @@ map_source_changed (GtkWidget *widget,
     }
   else if (g_strcmp0(selection, MFF_MAP) == 0)
     {
-      //g_object_set(G_OBJECT(view), "map-source", CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF, NULL);
+      g_object_set(G_OBJECT(view), "map-source", champlain_map_source_new_mff_relief (), NULL);
     }
 }
 

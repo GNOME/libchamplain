@@ -67,9 +67,7 @@ GType champlain_map_source_get_type (void);
 
 ChamplainMapSource* champlain_map_source_new_network (gchar *name,
     gchar *license, gchar *license_uri, guint min_zoom, guint map_zoom,
-    guint tile_size, ChamplainMapProjection projection, gchar *uri_format,
-    ChamplainMapSourceParameter first, ChamplainMapSourceParameter second,
-    ChamplainMapSourceParameter third);
+    guint tile_size, ChamplainMapProjection projection, gchar *uri_format);
 
 gint champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source);
 
@@ -78,11 +76,10 @@ gint champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source);
 guint champlain_map_source_get_tile_size (ChamplainMapSource *map_source);
 
 gchar * champlain_map_source_get_tile_uri (ChamplainMapSource *source,
-    guint x, guint y, gint z);
+    gint x, gint y, gint z);
 
 void champlain_map_source_set_tile_uri (ChamplainMapSource *map_source,
-    const gchar *uri_format, ChamplainMapSourceParameter first,
-    ChamplainMapSourceParameter second, ChamplainMapSourceParameter third);
+    const gchar *uri_format);
 
 ChamplainMapSource * champlain_map_source_new_osm_mapnik ();
 ChamplainMapSource * champlain_map_source_new_oam ();
