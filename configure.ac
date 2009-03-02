@@ -129,14 +129,9 @@ if test x$enable_managed = xyes; then
     bindings/managed/champlain-gtk/champlain-gtk-sharp.dll.config
     bindings/managed/samples/Makefile
   ])
-
-  if test x$enable_gtk = xyes; then
-    enable_gtk_managed = yes
-  fi
 fi
 
 AM_CONDITIONAL(ENABLE_MANAGED, test "x$enable_managed" = "xyes")
-AM_CONDITIONAL(ENABLE_GTK_MANAGED, test "x$enable_managed" = "xyes" && test "x$enable_gtk" = "xyes")
 
 # -----------------------------------------------------------
 # Enable Python bindings
