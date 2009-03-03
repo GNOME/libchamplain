@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import clutter
 import cluttergtk
 import gtk
@@ -37,9 +38,19 @@ def map_zoom_changed(view, obj, spinbutton):
 def create_marker_layer():
     layer = champlain.Layer()
 
-    marker = champlain.Marker()
+    orange = clutter.Color(0xf3, 0x94, 0x07, 0xbb)
+    white = clutter.Color(0xff, 0xff, 0xff, 0xff)
+    marker = champlain.Marker("Montréal", "Airmole 14")
     marker.set_position(45.528178, -73.563788)
     layer.add(marker)
+
+#  marker = champlain_marker_new_with_label("New York", "Sans 25", &white, NULL);
+#  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 40.77, -73.98);
+#  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+
+#  marker = champlain_marker_new_with_label("Saint-Tite-des-Caps", "Serif 12", NULL, &orange);
+#  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 47.130885, -70.764141);
+#  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
 
     layer.hide()
 
@@ -59,8 +70,8 @@ view = champlain.View()
 view.set_property("scroll-mode", champlain.SCROLL_MODE_KINETIC)
 view.set_property("zoom-level", 5)
 
-#layer = create_marker_layer()
-#view.add_layer(layer)
+layer = create_marker_layer()
+view.add_layer(layer)
 
 embed = cluttergtk.Embed()
 embed.set_size_request(640, 480)
@@ -74,9 +85,9 @@ button = gtk.Button(stock=gtk.STOCK_ZOOM_OUT)
 button.connect("clicked", zoom_out, view)
 bbox.add(button)
 
-#button = gtk.Button(label="Markers")
-#button.connect("toggled", toggle_layer, layer)
-#bbox.add(button)
+button = gtk.ToggleButton(label="Markers")
+button.connect("toggled", toggle_layer, layer)
+bbox.add(button)
 
 combo = gtk.combo_box_new_text()
 combo.append_text("Open Street Map")
