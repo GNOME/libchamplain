@@ -98,7 +98,7 @@ struct _ChamplainViewPrivate
 {
   ClutterActor *stage;
 
-  ChamplainMapSource *map_source;
+  ChamplainMapSource *map_source; /* Current map tile source */
   ChamplainScrollMode scroll_mode;
   gint zoom_level; /* Holds the current zoom level number */
 
@@ -109,18 +109,19 @@ struct _ChamplainViewPrivate
   /* Hack to get smaller x,y coordinates as the clutter limit is G_MAXINT16 */
   ChamplainPoint anchor;
 
-  ClutterActor *map_layer;
-  ClutterActor *viewport;
-  ClutterActor *finger_scroll;
+  Map *map; /* Contains the current map model */
+
+  ClutterActor *finger_scroll; /* Contains the viewport */
+  ClutterActor *viewport;  /* Contains the map_layer, licence and markers */
+  ClutterActor *map_layer; /* Contains tiles actors (grouped by zoom level) */
   ChamplainRectangle viewport_size;
-  ClutterActor *license_actor;
 
-  ClutterActor *user_layers;
-
-  Map *map;
+  ClutterActor *user_layers; /* Contains the markers */
 
   gboolean keep_center_on_resize;
+
   gboolean show_license;
+  ClutterActor *license_actor; /* Contains the licence info */
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -742,23 +743,18 @@ champlain_view_init (ChamplainView *view)
   priv->anchor.x = 0;
   priv->anchor.y = 0;
 
-
   /* Setup viewport */
   priv->viewport = tidy_viewport_new ();
   g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
 
-  g_signal_connect (priv->viewport,
-                    "notify::x-origin",
-                    G_CALLBACK (viewport_x_changed_cb),
-                    view);
+  g_signal_connect (priv->viewport, "notify::x-origin",
+      G_CALLBACK (viewport_x_changed_cb), view);
 
   /* Setup finger scroll */
   priv->finger_scroll = tidy_finger_scroll_new (priv->scroll_mode);
 
-  g_signal_connect (priv->finger_scroll,
-                    "scroll-event",
-                    G_CALLBACK (scroll_event),
-                    view);
+  g_signal_connect (priv->finger_scroll, "scroll-event",
+      G_CALLBACK (scroll_event), view);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->finger_scroll),
       priv->viewport);
@@ -772,10 +768,8 @@ champlain_view_init (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->map_layer);
 
-  g_signal_connect (priv->finger_scroll,
-                    "button-press-event",
-                    G_CALLBACK (finger_scroll_button_press_cb),
-                    view);
+  g_signal_connect (priv->finger_scroll, "button-press-event",
+      G_CALLBACK (finger_scroll_button_press_cb), view);
 
   /* Setup user_layers */
   priv->user_layers = clutter_group_new ();
