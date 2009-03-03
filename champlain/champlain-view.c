@@ -973,18 +973,18 @@ champlain_view_zoom_in (ChamplainView *view)
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
 
-  if (map_zoom_in (priv->map, priv->map_source))
-    {
-      priv->zoom_level++;
-      resize_viewport (view);
-      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
-          group);
-      clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
-          champlain_zoom_level_get_actor (priv->map->current_level));
-      champlain_view_center_on (view, priv->latitude, priv->longitude);
+  if (!map_zoom_in (priv->map, priv->map_source))
+    return;
 
-      g_object_notify (G_OBJECT (view), "zoom-level");
-    }
+  priv->zoom_level++;
+  resize_viewport (view);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
+      group);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
+      champlain_zoom_level_get_actor (priv->map->current_level));
+  champlain_view_center_on (view, priv->latitude, priv->longitude);
+
+  g_object_notify (G_OBJECT (view), "zoom-level");
 }
 
 /**
@@ -1003,18 +1003,18 @@ champlain_view_zoom_out (ChamplainView *view)
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
 
-  if (map_zoom_out (priv->map, priv->map_source))
-    {
-      priv->zoom_level--;
-      resize_viewport (view);
-      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
-          group);
-      clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
-          champlain_zoom_level_get_actor (priv->map->current_level));
-      champlain_view_center_on (view, priv->latitude, priv->longitude);
+  if (!map_zoom_out (priv->map, priv->map_source))
+    return;
 
-      g_object_notify (G_OBJECT (view), "zoom-level");
-    }
+  priv->zoom_level--;
+  resize_viewport (view);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
+      group);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
+      champlain_zoom_level_get_actor (priv->map->current_level));
+  champlain_view_center_on (view, priv->latitude, priv->longitude);
+
+  g_object_notify (G_OBJECT (view), "zoom-level");
 }
 
 /**
@@ -1033,23 +1033,22 @@ champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
-  if (priv->map && zoom_level != priv->zoom_level)
-    {
-      ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
-      if (map_zoom_to (priv->map, priv->map_source, zoom_level))
-        {
-          priv->zoom_level = zoom_level;
-          ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
-          resize_viewport (view);
-          clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
-              group);
-          clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
-              new_group);
-          champlain_view_center_on (view, priv->latitude, priv->longitude);
+  if (priv->map == NULL || zoom_level == priv->zoom_level)
+    return;
 
-          g_object_notify (G_OBJECT (view), "zoom-level");
-        }
-    }
+  ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
+
+  if (!map_zoom_to (priv->map, priv->map_source, zoom_level))
+    return;
+
+  priv->zoom_level = zoom_level;
+  ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
+  resize_viewport (view);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), new_group);
+  champlain_view_center_on (view, priv->latitude, priv->longitude);
+
+  g_object_notify (G_OBJECT (view), "zoom-level");
 }
 
 /**
@@ -1074,10 +1073,8 @@ champlain_view_add_layer (ChamplainView *view, ClutterActor *layer)
   if (priv->map)
     g_idle_add (marker_reposition, view);
 
-  g_signal_connect_after (layer,
-                    "actor-added",
-                    G_CALLBACK (layer_add_marker_cb),
-                    view);
+  g_signal_connect_after (layer, "actor-added",
+      G_CALLBACK (layer_add_marker_cb), view);
 
   clutter_container_foreach (CLUTTER_CONTAINER (layer),
       CLUTTER_CALLBACK (connect_marker_notify_cb), view);
