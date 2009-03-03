@@ -497,25 +497,7 @@ champlain_view_set_property (GObject *object,
     case PROP_ZOOM_LEVEL:
       {
         gint level = g_value_get_int (value);
-        if (priv->map)
-          {
-            if (level != priv->zoom_level)
-              {
-                ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
-                if (map_zoom_to (priv->map, priv->map_source, level))
-                  {
-                    priv->zoom_level = level;
-                    ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
-                    resize_viewport (view);
-                    clutter_container_remove_actor (
-                        CLUTTER_CONTAINER (priv->map_layer), group);
-                    clutter_container_add_actor (
-                        CLUTTER_CONTAINER (priv->map_layer), new_group);
-                    champlain_view_center_on (view, priv->latitude,
-                        priv->longitude);
-                  }
-              }
-          }
+        champlain_view_set_zoom_level (view, level);
         break;
       }
     case PROP_MAP_SOURCE:
@@ -1073,6 +1055,41 @@ champlain_view_zoom_out (ChamplainView *view)
       champlain_view_center_on (view, priv->latitude, priv->longitude);
 
       g_object_notify (G_OBJECT (view), "zoom-level");
+    }
+}
+
+/**
+ * champlain_view_set_zoom_level:
+ * @view: a #ChamplainView
+ * @zoom_level: a gint
+ *
+ * Changes the current zoom level
+ *
+ * Since: 0.4
+ */
+void
+champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  if (priv->map && zoom_level != priv->zoom_level)
+    {
+      ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
+      if (map_zoom_to (priv->map, priv->map_source, zoom_level))
+        {
+          priv->zoom_level = zoom_level;
+          ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
+          resize_viewport (view);
+          clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
+              group);
+          clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
+              new_group);
+          champlain_view_center_on (view, priv->latitude, priv->longitude);
+
+          g_object_notify (G_OBJECT (view), "zoom-level");
+        }
     }
 }
 

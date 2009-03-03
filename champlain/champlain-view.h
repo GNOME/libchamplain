@@ -74,6 +74,8 @@ void champlain_view_zoom_in (ChamplainView *champlainView);
 
 void champlain_view_zoom_out (ChamplainView *champlainView);
 
+void champlain_view_set_zoom_level (ChamplainView *champlainView, gint zoom_level);
+
 void champlain_view_add_layer (ChamplainView *champlainView, ClutterActor *layer);
 
 void champlain_view_set_size (ChamplainView *view, guint width, guint height);
