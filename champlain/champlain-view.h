@@ -25,6 +25,7 @@
 
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-zoom-level.h>
+#include <champlain/champlain-map-source.h>
 
 #include <glib.h>
 #include <glib-object.h>
@@ -75,6 +76,8 @@ void champlain_view_zoom_in (ChamplainView *champlainView);
 void champlain_view_zoom_out (ChamplainView *champlainView);
 
 void champlain_view_set_zoom_level (ChamplainView *champlainView, gint zoom_level);
+
+void champlain_view_set_map_source (ChamplainView *champlainView, ChamplainMapSource *map_source);
 
 void champlain_view_add_layer (ChamplainView *champlainView, ClutterActor *layer);
 

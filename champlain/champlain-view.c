@@ -504,42 +504,7 @@ champlain_view_set_property (GObject *object,
     case PROP_MAP_SOURCE:
       {
         ChamplainMapSource *source = g_value_get_object (value);
-
-        if (priv->map_source != source)
-          {
-            g_object_unref (priv->map_source);
-            priv->map_source = g_object_ref (source);
-            if (priv->map)
-              {
-                ClutterActor *group;
-
-                group = champlain_zoom_level_get_actor (priv->map->current_level);
-                clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
-                    group);
-
-                map_free (priv->map);
-                priv->map = map_new ();
-
-                /* Keep same zoom level if the new map supports it */
-                if (priv->zoom_level > champlain_map_source_get_max_zoom_level (priv->map_source))
-                  {
-                    priv->zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
-                    g_object_notify (G_OBJECT (view), "zoom-level");
-                  }
-
-                map_load_level (priv->map, priv->map_source, priv->zoom_level);
-                group = champlain_zoom_level_get_actor (priv->map->current_level);
-
-                view_load_visible_tiles (view);
-                clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
-                    group);
-
-                update_license (view);
-                g_idle_add (marker_reposition, view);
-                view_tiles_reposition (view);
-                champlain_view_center_on (view, priv->latitude, priv->longitude);
-              }
-          }
+        champlain_view_set_map_source (view, source);
         break;
       }
     case PROP_SCROLL_MODE:
@@ -1260,4 +1225,59 @@ champlain_view_tile_ready (ChamplainView *view,
 
   clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)), actor, NULL);
   view_position_tile (view, tile);
+}
+
+/**
+ * champlain_view_set_map_source:
+ * @view: a #ChamplainView
+ * @source: a #ChamplainMapSource
+ *
+ * Changes the currently used map source.  #g_object_unref will be called on
+ * the previous one.
+ *
+ * Since: 0.4
+ */
+void
+champlain_view_set_map_source (ChamplainView *view,
+                               ChamplainMapSource *source)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view) ||
+      CHAMPLAIN_IS_MAP_SOURCE (source));
+
+  ClutterActor *group;
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  if (priv->map_source == source)
+    return;
+
+  g_object_unref (priv->map_source);
+  priv->map_source = g_object_ref (source);
+
+  if (priv->map == NULL)
+    return;
+
+  group = champlain_zoom_level_get_actor (priv->map->current_level);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+
+  map_free (priv->map);
+  priv->map = map_new ();
+
+  /* Keep same zoom level if the new map supports it */
+  if (priv->zoom_level > champlain_map_source_get_max_zoom_level (priv->map_source))
+    {
+      priv->zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
+      g_object_notify (G_OBJECT (view), "zoom-level");
+    }
+
+  map_load_level (priv->map, priv->map_source, priv->zoom_level);
+  group = champlain_zoom_level_get_actor (priv->map->current_level);
+
+  view_load_visible_tiles (view);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+
+  update_license (view);
+  g_idle_add (marker_reposition, view);
+  view_tiles_reposition (view);
+  champlain_view_center_on (view, priv->latitude, priv->longitude);
 }
