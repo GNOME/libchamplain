@@ -21,6 +21,7 @@ libchamplain_headers = \
 	champlain-marker.h		\
 	champlain-map.h			\
 	champlain-zoom-level.h		\
+	champlain-enum-types.h		\
 	champlain-tile.h
 
 
