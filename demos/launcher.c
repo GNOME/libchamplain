@@ -26,7 +26,7 @@ map_view_button_release_cb (ClutterActor *actor,
   gdouble lat, lon;
 
   if (event->button != 1 || event->click_count > 1)
-    return;
+    return FALSE;
 
   g_print("Map was clicked at ");
   if (champlain_view_get_coords_from_event (view, (ClutterEvent*)event, &lat,
@@ -42,7 +42,7 @@ marker_button_release_cb (ClutterActor *actor,
                           ChamplainView * view)
 {
   if (event->button != 1 || event->click_count > 1)
-    return;
+    return FALSE;
 
   g_print("Montreal was clicked\n");
 
