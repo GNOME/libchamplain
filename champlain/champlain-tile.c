@@ -56,7 +56,7 @@ struct _ChamplainTilePrivate {
 
   gchar * uri;
   gpointer data;
-  ChamplainStateEnum state;
+  ChamplainState state;
   gchar *filename;
   ClutterActor *actor;
 };
@@ -212,7 +212,7 @@ champlain_tile_class_init (ChamplainTileClass *klass)
       g_param_spec_enum ("state",
         "State",
         "The state of the tile",
-        CHAMPLAIN_TYPE_STATE_ENUM,
+        CHAMPLAIN_TYPE_STATE,
         CHAMPLAIN_STATE_NONE,
         G_PARAM_READWRITE));
 
@@ -299,7 +299,7 @@ champlain_tile_get_size (ChamplainTile *self)
   return priv->size;
 }
 
-ChamplainStateEnum
+ChamplainState
 champlain_tile_get_state (ChamplainTile *self)
 {
   g_return_val_if_fail(CHAMPLAIN_TILE(self), CHAMPLAIN_STATE_NONE);
@@ -384,7 +384,7 @@ champlain_tile_set_size (ChamplainTile *self, guint size)
 }
 
 void
-champlain_tile_set_state (ChamplainTile *self, ChamplainStateEnum state)
+champlain_tile_set_state (ChamplainTile *self, ChamplainState state)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
 

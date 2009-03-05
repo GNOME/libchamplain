@@ -46,6 +46,6 @@ typedef enum
   CHAMPLAIN_STATE_INIT,
   CHAMPLAIN_STATE_LOADING,
   CHAMPLAIN_STATE_DONE
-} ChamplainStateEnum;
+} ChamplainState;
 
 #endif
