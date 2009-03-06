@@ -27,7 +27,6 @@
 #include "champlain-map-source.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
-#include "champlain-settings.h"
 #include "champlain-zoom-level.h"
 
 #include <glib.h>

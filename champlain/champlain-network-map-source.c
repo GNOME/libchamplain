@@ -29,7 +29,6 @@
 #include "champlain-map-source.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
-#include "champlain-settings.h"
 #include "champlain-zoom-level.h"
 
 #include <errno.h>
@@ -50,7 +49,8 @@ enum
 enum
 {
   PROP_0,
-  PROP_URI_FORMAT
+  PROP_URI_FORMAT,
+  PROP_OFFLINE
 };
 
 /* static guint champlain_network_map_source_signals[LAST_SIGNAL] = { 0, }; */
@@ -64,6 +64,7 @@ static SoupSession * soup_session;
 
 struct _ChamplainNetworkMapSourcePrivate
 {
+  gboolean offline;
   gchar *uri_format;
 };
 
@@ -80,6 +81,9 @@ champlain_network_map_source_get_property (GObject *object,
     {
       case PROP_URI_FORMAT:
         g_value_set_string (value, priv->uri_format);
+        break;
+      case PROP_OFFLINE:
+        g_value_set_boolean (value, priv->offline);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -99,6 +103,9 @@ champlain_network_map_source_set_property (GObject *object,
     {
       case PROP_URI_FORMAT:
         priv->uri_format = g_value_dup_string (value);
+        break;
+      case PROP_OFFLINE:
+        priv->offline = g_value_get_boolean (value);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -144,6 +151,19 @@ champlain_network_map_source_class_init (ChamplainNetworkMapSourceClass *klass)
                                (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_URI_FORMAT, pspec);
 
+  /**
+  * ChamplainNetworkMapSource:offline
+  *
+  * If the network map source can access network
+  *
+  * Since: 0.4
+  */
+  pspec = g_param_spec_boolean ("offline",
+                                "Offline",
+                                "Offline",
+                                FALSE,
+                                (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+  g_object_class_install_property (object_class, PROP_OFFLINE, pspec);
 }
 
 static void
@@ -425,7 +445,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       g_object_unref (tile);
       g_object_unref (zoom_level);
     }
-  else if (champlain_settings_is_online ())
+  else if (!priv->offline)
     {
       SoupMessage *msg;
       gchar *uri;

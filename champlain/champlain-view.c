@@ -38,8 +38,7 @@
  * url="http://www.openstreetmap.org">OpenStreetMap</ulink>).  Maps are divided
  * in tiles for each zoom level.  When a tile is requested, #ChamplainView will
  * first check if it is in cache (in the user's cache dir under champlain). If
- * an error occurs during download, an error tile will be displayed (if not in
- * offline mode).
+ * an error occurs during download, an error tile will be displayed.
  *
  * The button-press-event and button-release-event signals are emitted each
  * time a mouse button is pressed on the @view.  Coordinates can be converted
@@ -82,7 +81,6 @@ enum
   PROP_LATITUDE,
   PROP_ZOOM_LEVEL,
   PROP_MAP_SOURCE,
-  PROP_OFFLINE,
   PROP_DECEL_RATE,
   PROP_SCROLL_MODE,
   PROP_KEEP_CENTER_ON_RESIZE,
@@ -451,9 +449,6 @@ champlain_view_get_property (GObject *object,
       case PROP_SCROLL_MODE:
         g_value_set_enum (value, priv->scroll_mode);
         break;
-      case PROP_OFFLINE:
-        g_value_set_boolean (value, !champlain_settings_is_online ());
-        break;
       case PROP_DECEL_RATE:
         {
           gdouble decel;
@@ -511,9 +506,6 @@ champlain_view_set_property (GObject *object,
       priv->scroll_mode = g_value_get_enum (value);
       g_object_set (G_OBJECT (priv->finger_scroll), "mode",
           priv->scroll_mode, NULL);
-      break;
-    case PROP_OFFLINE:
-      champlain_settings_set_online (!g_value_get_boolean (value));
       break;
     case PROP_DECEL_RATE:
       {
@@ -611,21 +603,6 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            "The map source being displayed",
            CHAMPLAIN_TYPE_MAP_SOURCE,
            CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-  * ChamplainView:offline:
-  *
-  * If true, will fetch tiles from the Internet, otherwise, will only use
-  * cached content.
-  *
-  * Since: 0.2
-  */
-  g_object_class_install_property (object_class,
-      PROP_OFFLINE,
-      g_param_spec_boolean ("offline",
-           "Offline Mode",
-           "If viewer is in offline mode.",
-           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainView:scroll-mode:

@@ -35,7 +35,6 @@
 #include "champlain/champlain-enum-types.h"
 #include "champlain/champlain-map-source.h"
 #include "champlain/champlain-network-map-source.h"
-#include "champlain/champlain-settings.h"
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 
