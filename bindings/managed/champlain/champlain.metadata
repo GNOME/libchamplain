@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
 <metadata>
+	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/property[@type='class']" name="hidden">1</attr>
+	<attr path="/api/namespace/object[@cname='ChamplainNetworkMapSource']/property[@type='class']" name="hidden">1</attr>
 </metadata>
 
