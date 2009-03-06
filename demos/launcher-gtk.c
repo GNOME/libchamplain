@@ -77,17 +77,17 @@ map_source_changed (GtkWidget *widget,
                     ChamplainView *view)
 {
   gchar* selection = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
-  if (g_strcmp0(selection, OSM_MAP) == 0)
+  if (g_strcmp0 (selection, OSM_MAP) == 0)
     {
-      g_object_set(G_OBJECT(view), "map-source", champlain_map_source_new_osm_mapnik (), NULL);
+      g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_osm_mapnik (), NULL);
     }
-  else if (g_strcmp0(selection, OAM_MAP) == 0)
+  else if (g_strcmp0 (selection, OAM_MAP) == 0)
     {
-      g_object_set(G_OBJECT(view), "map-source", champlain_map_source_new_oam (), NULL);
+      g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_oam (), NULL);
     }
-  else if (g_strcmp0(selection, MFF_MAP) == 0)
+  else if (g_strcmp0 (selection, MFF_MAP) == 0)
     {
-      g_object_set(G_OBJECT(view), "map-source", champlain_map_source_new_mff_relief (), NULL);
+      g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_mff_relief (), NULL);
     }
 }
 

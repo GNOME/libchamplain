@@ -30,12 +30,8 @@
 #include "champlain-settings.h"
 #include "champlain-zoom-level.h"
 
-#include <errno.h>
-#include <gdk/gdk.h>
-#include <gio/gio.h>
 #include <glib.h>
 #include <glib-object.h>
-#include <libsoup/soup.h>
 #include <math.h>
 #include <string.h>
 
@@ -55,7 +51,6 @@ enum
   PROP_MIN_ZOOM_LEVEL,
   PROP_TILE_SIZE,
   PROP_MAP_PROJECTION,
-  PROP_URI_FORMAT
 };
 
 /* static guint champlain_map_source_signals[LAST_SIGNAL] = { 0, }; */
@@ -63,9 +58,6 @@ enum
 G_DEFINE_TYPE (ChamplainMapSource, champlain_map_source, G_TYPE_OBJECT);
 
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourcePrivate))
-
-#define CACHE_SUBDIR "champlain"
-static SoupSession * soup_session;
 
 struct _ChamplainMapSourcePrivate
 {
@@ -76,7 +68,6 @@ struct _ChamplainMapSourcePrivate
   guint min_zoom_level;
   guint tile_size;
   ChamplainMapProjection map_projection;
-  gchar *uri_format;
 };
 
 static void
@@ -111,9 +102,6 @@ champlain_map_source_get_property (GObject *object,
       case PROP_MAP_PROJECTION:
         g_value_set_enum (value, priv->map_projection);
         break;
-      case PROP_URI_FORMAT:
-        g_value_set_string (value, priv->uri_format);
-        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -131,7 +119,8 @@ champlain_map_source_set_property (GObject *object,
   switch(prop_id)
     {
       case PROP_NAME:
-        priv->name = g_value_dup_string (value);
+        champlain_map_source_set_name (map_source,
+            g_value_get_string (value));
         break;
       case PROP_LICENSE:
         priv->license = g_value_dup_string (value);
@@ -151,9 +140,6 @@ champlain_map_source_set_property (GObject *object,
       case PROP_MAP_PROJECTION:
         priv->map_projection = g_value_get_enum (value);
         break;
-      case PROP_URI_FORMAT:
-        priv->uri_format = g_value_dup_string (value);
-        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -162,10 +148,12 @@ champlain_map_source_set_property (GObject *object,
 static void
 champlain_map_source_finalize (GObject *object)
 {
-  /* ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE (object);
-   * ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
-   */
+  ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE (object);
+  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
 
+  g_free (priv->name);
+  g_free (priv->license);
+  g_free (priv->license_uri);
   G_OBJECT_CLASS (champlain_map_source_parent_class)->finalize (object);
 }
 
@@ -180,6 +168,8 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
   object_class->finalize = champlain_map_source_finalize;
   object_class->get_property = champlain_map_source_get_property;
   object_class->set_property = champlain_map_source_set_property;
+
+  klass->get_tile = champlain_map_source_get_tile;
 
   /**
   * ChamplainMapSource:name:
@@ -285,21 +275,6 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
                              CHAMPLAIN_MAP_PROJECTION_MERCATOR,
                              (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_MAP_PROJECTION, pspec);
-
-  /**
-  * ChamplainMapSource:uri-format
-  *
-  * The uri format for the map source
-  *
-  * Since: 0.4
-  */
-  pspec = g_param_spec_string ("uri-format",
-                               "URI Format",
-                               "The URI format",
-                               "",
-                               (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
-  g_object_class_install_property (object_class, PROP_URI_FORMAT, pspec);
-
 }
 
 static void
@@ -327,112 +302,6 @@ champlain_map_source_get_tile_size (ChamplainMapSource *map_source)
 {
   ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
   return priv->tile_size;
-}
-
-ChamplainMapSource*
-champlain_map_source_new_network (gchar *name,
-                                  gchar *license,
-                                  gchar *license_uri,
-                                  guint min_zoom,
-                                  guint max_zoom,
-                                  guint tile_size,
-                                  ChamplainMapProjection projection,
-                                  gchar *uri_format)
-{
-
-  ChamplainMapSource * map_source;
-  map_source = g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE, "name", name,
-      "license", license, "license-uri", license_uri,
-      "min-zoom-level", min_zoom, "max-zoom-level", max_zoom,
-      "tile-size", tile_size, "map-projection", projection,
-      "uri-format", uri_format, NULL);
-  return map_source;
-}
-
-gchar *
-champlain_map_source_get_tile_uri (ChamplainMapSource *map_source,
-                                   gint x,
-                                   gint y,
-                                   gint z)
-{
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
-
-  gchar **tokens;
-  gchar *token;
-  GString *ret;
-  gint i = 0;
-
-  tokens = g_strsplit (priv->uri_format, "#", 20);
-  token = tokens[i];
-  ret = g_string_sized_new (strlen (priv->uri_format));
-
-  while (token != NULL)
-    {
-      gint number = G_MAXINT;
-      gchar value[3];
-
-      if (strcmp (token, "X") == 0)
-        number = x;
-      if (strcmp (token, "Y") == 0)
-        number = y;
-      if (strcmp (token, "Z") == 0)
-        number = z;
-
-      if (number != G_MAXINT)
-        {
-          g_sprintf (value, "%d", number);
-          g_string_append (ret, value);
-        }
-      else
-        g_string_append (ret, token);
-
-      token = tokens[++i];
-    }
-  token = ret->str;
-  g_string_free (ret, FALSE);
-  g_strfreev (tokens);
-
-  return token;
-}
-
-void
-champlain_map_source_set_tile_uri (ChamplainMapSource *map_source,
-                                   const gchar *uri_format)
-{
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
-
-  priv->uri_format = g_strdup (uri_format);
-}
-
-ChamplainMapSource *
-champlain_map_source_new_osm_mapnik ()
-{
-  champlain_map_source_new_network ("OpenStreetMap Mapnik",
-      "(CC) BY 2.0 OpenStreetMap contributors",
-      "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
-      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png");
-}
-
-ChamplainMapSource *
-champlain_map_source_new_oam ()
-{
-  champlain_map_source_new_network ("OpenArialMap",
-      "(CC) BY 3.0 OpenArialMap contributors",
-      "http://creativecommons.org/licenses/by/3.0/", 0, 17, 256,
-      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg");
-}
-
-//FIXME: the API isn't enough flexible for mff's url!
-ChamplainMapSource *
-champlain_map_source_new_mff_relief ()
-{
-  champlain_map_source_new_network ("MapsForFree Relief",
-      "Map data available under GNU Free Documentation license, Version 1.2 or later",
-      "http://www.gnu.org/copyleft/fdl.html", 0, 11, 256,
-      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://maps-for-free.com/layer/relief/z#Z#/row#Y#/#Z#_#X#-#Y#.jpg");
 }
 
 guint
@@ -475,200 +344,13 @@ champlain_map_source_get_column_count (ChamplainMapSource *map_source,
   return pow (2, zoom_level);
 }
 
-static gchar *
-get_filename (ChamplainMapSource *map_source,
-              ChamplainZoomLevel *level,
-              ChamplainTile *tile)
-{
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
-  return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
-             "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
-             "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
-             CACHE_SUBDIR, priv->name,
-             champlain_zoom_level_get_zoom_level (level),
-             champlain_tile_get_x (tile), champlain_tile_get_y (tile),
-             NULL);
-}
-
-typedef struct {
-  ChamplainView *view;
-  ChamplainZoomLevel *zoom_level;
-  ChamplainTile *tile;
-} FileLoadedCallbackContext;
-
-static void
-create_error_tile (ChamplainTile* tile)
-{
-  ClutterActor *actor;
-  actor = clutter_texture_new_from_file (DATADIR "/champlain/error.svg", NULL);
-  if (!actor)
-    return;
-
-  champlain_tile_set_actor (tile, actor);
-  clutter_actor_show (actor);
-
-  champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-}
-
-static void
-file_loaded_cb (SoupSession *session,
-                SoupMessage *msg,
-                gpointer user_data)
-{
-  FileLoadedCallbackContext *ctx = (FileLoadedCallbackContext*) user_data;
-  GdkPixbufLoader* loader;
-  GError *error = NULL;
-  gchar* path, *filename;
-
-  if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
-    {
-      g_warning ("Unable to download tile %d, %d: %s",
-          champlain_tile_get_x (ctx->tile),
-          champlain_tile_get_y (ctx->tile),
-          soup_status_get_phrase(msg->status_code));
-      g_object_unref (ctx->tile);
-      create_error_tile (ctx->tile);
-      return;
-    }
-
-  loader = gdk_pixbuf_loader_new();
-  if (!gdk_pixbuf_loader_write (loader,
-                          (const guchar *) msg->response_body->data,
-                          msg->response_body->length,
-                          &error))
-    {
-      if (error)
-        {
-          g_warning ("Unable to load the pixbuf: %s", error->message);
-          g_error_free (error);
-          create_error_tile (ctx->tile);
-          goto finish;
-        }
-
-      g_object_unref (loader);
-    }
-
-  gdk_pixbuf_loader_close (loader, &error);
-  if (error)
-    {
-      g_warning ("Unable to close the pixbuf loader: %s", error->message);
-      g_error_free (error);
-      create_error_tile (ctx->tile);
-      goto finish;
-    }
-
-  filename = champlain_tile_get_filename (ctx->tile);
-  path = g_path_get_dirname (filename);
-
-  if (g_mkdir_with_parents (path, 0700) == -1)
-    {
-      if (errno != EEXIST)
-        {
-          g_warning ("Unable to create the image cache: %s",
-                     g_strerror (errno));
-          g_object_unref (loader);
-        }
-    }
-
-  g_file_set_contents (filename, msg->response_body->data,
-      msg->response_body->length, NULL);
-
-  /* If the tile has been marked to be deleted, don't go any further */
-  /*if (tile->to_destroy)
-    {
-      g_object_unref (loader);
-      g_free (filename);
-      g_free (map_filename);
-      g_free (tile);
-      return;
-    }
-*/
-  GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
-  ClutterActor *actor = clutter_texture_new();
-  clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
-      gdk_pixbuf_get_pixels (pixbuf),
-      gdk_pixbuf_get_has_alpha (pixbuf),
-      gdk_pixbuf_get_width (pixbuf),
-      gdk_pixbuf_get_height (pixbuf),
-      gdk_pixbuf_get_rowstride (pixbuf),
-      3, 0, NULL);
-  champlain_tile_set_actor (ctx->tile, actor);
-  DEBUG ("Tile loaded from network");
-
-finish:
-  champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
-
-  g_object_unref (loader);
-  g_free (path);
-
-  champlain_view_tile_ready (ctx->view, ctx->zoom_level, ctx->tile, TRUE);
-  g_object_unref (ctx->tile);
-  g_object_unref (ctx->zoom_level);
-  g_free (ctx);
-}
-
 void
 champlain_map_source_get_tile (ChamplainMapSource *map_source,
                                ChamplainView *view,
                                ChamplainZoomLevel *zoom_level,
                                ChamplainTile *tile)
 {
-  gchar* filename;
-
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
-
-  /* Ref the tile as it may be freeing during the loading
-   * Unref when the loading is done.
-   */
-  g_object_ref (tile);
-  g_object_ref (zoom_level);
-
-  /* Try the cached version first */
-  filename = get_filename (map_source, zoom_level, tile);
-  champlain_tile_set_filename (tile, filename);
-  champlain_tile_set_size (tile, champlain_map_source_get_tile_size (map_source));
-
-  if (g_file_test (filename, G_FILE_TEST_EXISTS))
-    {
-      GError *error = NULL;
-      ClutterActor *actor;
-
-      actor = clutter_texture_new_from_file (filename, &error);
-      champlain_tile_set_actor (tile, actor);
-      clutter_actor_show (actor);
-
-      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-      DEBUG ("Tile loaded from cache");
-      champlain_view_tile_ready (view, zoom_level, tile, FALSE);
-      g_object_unref (tile);
-      g_object_unref (zoom_level);
-    }
-  else if (champlain_settings_is_online ())
-    {
-      SoupMessage *msg;
-      gchar *uri;
-      FileLoadedCallbackContext *ctx = g_new0 (FileLoadedCallbackContext, 1);
-      ctx->view = view;
-      ctx->zoom_level = zoom_level;
-      ctx->tile = tile;
-
-      if (!soup_session)
-        soup_session = soup_session_async_new ();
-
-      uri = champlain_map_source_get_tile_uri (map_source,
-               champlain_tile_get_x (tile), champlain_tile_get_y (tile),
-               champlain_zoom_level_get_zoom_level (zoom_level));
-      champlain_tile_set_uri (tile, uri);
-      champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
-      msg = soup_message_new (SOUP_METHOD_GET, uri);
-
-      soup_session_queue_message (soup_session, msg,
-                                  file_loaded_cb,
-                                  ctx);
-    }
-  /* If a tile is neither in cache or can be fetched, do nothing, it'll show up
-   * as empty
-   */
+  CHAMPLAIN_MAP_SOURCE_GET_CLASS (map_source)->get_tile (map_source, view, zoom_level, tile);
 }
 
 gdouble
@@ -692,5 +374,21 @@ champlain_map_source_get_latitude (ChamplainMapSource *map_source,
   gdouble dy = (float)y / champlain_map_source_get_tile_size (map_source);
   double n = M_PI - 2.0 * M_PI * dy / pow (2.0, zoom_level);
   return 180.0 / M_PI * atan (0.5 * (exp (n) - exp (-n)));
+}
+
+const gchar *
+champlain_map_source_get_name (ChamplainMapSource *map_source)
+{
+  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
+  return priv->name;
+}
+
+void
+champlain_map_source_set_name (ChamplainMapSource *map_source,
+                               char *name)
+{
+  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
+
+  priv->name = g_strdup (name);
 }
 

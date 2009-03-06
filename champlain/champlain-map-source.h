@@ -45,13 +45,6 @@ typedef enum
   CHAMPLAIN_MAP_PROJECTION_MERCATOR
 } ChamplainMapProjection;
 
-typedef enum
-{
-  CHAMPLAIN_MAP_SOURCE_PARAMETER_X,
-  CHAMPLAIN_MAP_SOURCE_PARAMETER_Y,
-  CHAMPLAIN_MAP_SOURCE_PARAMETER_Z,
-} ChamplainMapSourceParameter;
-
 struct _ChamplainMapSource
 {
   GObject parent;
@@ -61,29 +54,22 @@ struct _ChamplainMapSource
 struct _ChamplainMapSourceClass
 {
   GObjectClass parent_class;
+
+  void (*get_tile) (ChamplainMapSource *map_source,
+                    ChamplainView *view,
+                    ChamplainZoomLevel *zoom_level,
+                    ChamplainTile *tile);
 };
 
 GType champlain_map_source_get_type (void);
 
-ChamplainMapSource* champlain_map_source_new_network (gchar *name,
-    gchar *license, gchar *license_uri, guint min_zoom, guint map_zoom,
-    guint tile_size, ChamplainMapProjection projection, gchar *uri_format);
+const gchar * champlain_map_source_get_name (ChamplainMapSource *map_source);
 
 gint champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source);
 
 gint champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source);
 
 guint champlain_map_source_get_tile_size (ChamplainMapSource *map_source);
-
-gchar * champlain_map_source_get_tile_uri (ChamplainMapSource *source,
-    gint x, gint y, gint z);
-
-void champlain_map_source_set_tile_uri (ChamplainMapSource *map_source,
-    const gchar *uri_format);
-
-ChamplainMapSource * champlain_map_source_new_osm_mapnik ();
-ChamplainMapSource * champlain_map_source_new_oam ();
-ChamplainMapSource * champlain_map_source_new_mff_relief ();
 
 guint champlain_map_source_get_x (ChamplainMapSource *map_source,
     gint zoom_level, gdouble longitude);
@@ -102,8 +88,8 @@ guint champlain_map_source_get_row_count (ChamplainMapSource *map_source,
 
 guint champlain_map_source_get_column_count (ChamplainMapSource *map_source,
     gint zoom_level);
-/*
+
 void champlain_map_source_get_tile (ChamplainMapSource *map_source,
-    ChamplainEngine *engine, ChamplainZoomLevel *level, ChamplainTile *tile);
-*/
+    ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile);
+
 #endif
