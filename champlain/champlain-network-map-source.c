@@ -192,6 +192,8 @@ static void
 champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource)
 {
   ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (champlainMapSource);
+
+  priv->proxy_uri = NULL;
 }
 
 ChamplainNetworkMapSource*
