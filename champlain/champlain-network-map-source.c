@@ -479,7 +479,8 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       ctx->tile = tile;
 
       if (!soup_session)
-        soup_session = soup_session_async_new_with_options ("proxy-uri", soup_uri_new (priv->proxy_uri));
+        soup_session = soup_session_async_new_with_options ("proxy-uri",
+            soup_uri_new (priv->proxy_uri), NULL);
 
       uri = champlain_network_map_source_get_tile_uri (network_map_source,
                champlain_tile_get_x (tile), champlain_tile_get_y (tile),
