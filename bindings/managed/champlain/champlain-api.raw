@@ -13,18 +13,14 @@
       <member cname="CHAMPLAIN_DEBUG_VIEW" name="View" value="1 &lt;&lt; 3" />
       <member cname="CHAMPLAIN_DEBUG_OTHER" name="Other" value="1 &lt;&lt; 4" />
     </enum>
-    <enum name="MapSource" cname="ChamplainMapSource" gtype="champlain_map_source_get_type" type="enum">
-      <member cname="CHAMPLAIN_MAP_SOURCE_DEBUG" name="Debug" />
-      <member cname="CHAMPLAIN_MAP_SOURCE_OPENSTREETMAP" name="Openstreetmap" />
-      <member cname="CHAMPLAIN_MAP_SOURCE_OPENARIALMAP" name="Openarialmap" />
-      <member cname="CHAMPLAIN_MAP_SOURCE_MAPSFORFREE_RELIEF" name="MapsforfreeRelief" />
-      <member cname="CHAMPLAIN_MAP_SOURCE_COUNT" name="Count" />
+    <enum name="MapProjection" cname="ChamplainMapProjection" type="enum">
+      <member cname="CHAMPLAIN_MAP_PROJECTION_MERCATOR" name="Mercator" />
     </enum>
-    <enum name="ScrollMode" cname="ChamplainScrollMode" gtype="champlain_scroll_mode_get_type" type="enum">
+    <enum name="ScrollMode" cname="ChamplainScrollMode" type="enum">
       <member cname="CHAMPLAIN_SCROLL_MODE_PUSH" name="Push" />
       <member cname="CHAMPLAIN_SCROLL_MODE_KINETIC" name="Kinetic" />
     </enum>
-    <enum name="StateEnum" cname="ChamplainStateEnum" type="enum">
+    <enum name="State" cname="ChamplainState" type="enum">
       <member cname="CHAMPLAIN_STATE_NONE" name="None" />
       <member cname="CHAMPLAIN_STATE_INIT" name="Init" />
       <member cname="CHAMPLAIN_STATE_LOADING" name="Loading" />
@@ -35,6 +31,91 @@
         <return-type type="GType" />
       </method>
       <constructor cname="champlain_layer_new" />
+    </object>
+    <object name="MapSource" cname="ChamplainMapSource" parent="GObject">
+      <field name="Priv" cname="priv" type="ChamplainMapSourcePrivate*" />
+      <property name="" cname="" type="class" />
+      <property name="" cname="" type="class" />
+      <property name="" cname="" type="class" />
+      <property name="" cname="" type="class" />
+      <property name="" cname="" type="class" />
+      <property name="" cname="" type="class" />
+      <property name="" cname="" type="class" />
+      <virtual_method name="GetTile" cname="get_tile">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ChamplainMapSource*" name="map_source" />
+          <parameter type="ChamplainView*" name="view" />
+          <parameter type="ChamplainZoomLevel*" name="zoom_level" />
+          <parameter type="ChamplainTile*" name="tile" />
+        </parameters>
+      </virtual_method>
+      <method name="GetColumnCount" cname="champlain_map_source_get_column_count">
+        <return-type type="guint" />
+        <parameters>
+          <parameter type="gint" name="zoom_level" />
+        </parameters>
+      </method>
+      <method name="GetLatitude" cname="champlain_map_source_get_latitude">
+        <return-type type="gdouble" />
+        <parameters>
+          <parameter type="gint" name="zoom_level" />
+          <parameter type="guint" name="y" />
+        </parameters>
+      </method>
+      <method name="GetLongitude" cname="champlain_map_source_get_longitude">
+        <return-type type="gdouble" />
+        <parameters>
+          <parameter type="gint" name="zoom_level" />
+          <parameter type="guint" name="x" />
+        </parameters>
+      </method>
+      <method name="GetMaxZoomLevel" cname="champlain_map_source_get_max_zoom_level">
+        <return-type type="gint" />
+      </method>
+      <method name="GetMinZoomLevel" cname="champlain_map_source_get_min_zoom_level">
+        <return-type type="gint" />
+      </method>
+      <method name="GetName" cname="champlain_map_source_get_name">
+        <return-type type="const-gchar*" />
+      </method>
+      <method name="GetRowCount" cname="champlain_map_source_get_row_count">
+        <return-type type="guint" />
+        <parameters>
+          <parameter type="gint" name="zoom_level" />
+        </parameters>
+      </method>
+      <method name="GetTile" cname="champlain_map_source_get_tile">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ChamplainView*" name="view" />
+          <parameter type="ChamplainZoomLevel*" name="level" />
+          <parameter type="ChamplainTile*" name="tile" />
+        </parameters>
+      </method>
+      <method name="GetTileSize" cname="champlain_map_source_get_tile_size">
+        <return-type type="guint" />
+      </method>
+      <method name="GetType" cname="champlain_map_source_get_type" shared="true">
+        <return-type type="GType" />
+      </method>
+      <method name="GetX" cname="champlain_map_source_get_x">
+        <return-type type="guint" />
+        <parameters>
+          <parameter type="gint" name="zoom_level" />
+          <parameter type="gdouble" name="longitude" />
+        </parameters>
+      </method>
+      <method name="GetY" cname="champlain_map_source_get_y">
+        <return-type type="guint" />
+        <parameters>
+          <parameter type="gint" name="zoom_level" />
+          <parameter type="gdouble" name="latitude" />
+        </parameters>
+      </method>
+      <constructor cname="champlain_map_source_new_mff_relief" />
+      <constructor cname="champlain_map_source_new_oam" />
+      <constructor cname="champlain_map_source_new_osm_mapnik" />
     </object>
     <object name="Marker" cname="ChamplainMarker" parent="ClutterGroup">
       <field name="Priv" cname="priv" type="ChamplainMarkerPrivate*" />
@@ -76,12 +157,56 @@
         </parameters>
       </method>
     </object>
+    <object name="NetworkMapSource" cname="ChamplainNetworkMapSource" parent="ChamplainMapSource">
+      <field name="Priv" cname="priv" type="ChamplainNetworkMapSourcePrivate*" />
+      <property name="" cname="" type="class" />
+      <property name="" cname="" type="class" />
+      <property name="" cname="" type="class" />
+      <method name="GetTile" cname="champlain_network_map_source_get_tile" shared="true">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ChamplainMapSource*" name="map_source" />
+          <parameter type="ChamplainView*" name="view" />
+          <parameter type="ChamplainZoomLevel*" name="level" />
+          <parameter type="ChamplainTile*" name="tile" />
+        </parameters>
+      </method>
+      <method name="GetTileUri" cname="champlain_network_map_source_get_tile_uri">
+        <return-type type="gchar*" />
+        <parameters>
+          <parameter type="gint" name="x" />
+          <parameter type="gint" name="y" />
+          <parameter type="gint" name="z" />
+        </parameters>
+      </method>
+      <method name="GetType" cname="champlain_network_map_source_get_type" shared="true">
+        <return-type type="GType" />
+      </method>
+      <constructor cname="champlain_network_map_source_new_full">
+        <parameters>
+          <parameter type="gchar*" name="name" />
+          <parameter type="gchar*" name="license" />
+          <parameter type="gchar*" name="license_uri" />
+          <parameter type="guint" name="min_zoom" />
+          <parameter type="guint" name="map_zoom" />
+          <parameter type="guint" name="tile_size" />
+          <parameter type="ChamplainMapProjection" name="projection" />
+          <parameter type="gchar*" name="uri_format" />
+        </parameters>
+      </constructor>
+      <method name="SetTileUri" cname="champlain_network_map_source_set_tile_uri">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="const-gchar*" name="uri_format" />
+        </parameters>
+      </method>
+    </object>
     <object name="Tile" cname="ChamplainTile" parent="GObject">
       <property name="X" cname="x" type="gint" readable="true" writeable="true" />
       <property name="Y" cname="y" type="gint" readable="true" writeable="true" />
       <property name="ZoomLevel" cname="zoom-level" type="gint" readable="true" writeable="true" />
       <property name="Size" cname="size" type="guint" readable="true" writeable="true" />
-      <property name="State" cname="state" type="ChamplainStateEnum" readable="true" writeable="true" />
+      <property name="State" cname="state" type="ChamplainState" readable="true" writeable="true" />
       <property name="Uri" cname="uri" type="gchar*" readable="true" writeable="true" />
       <property name="Filename" cname="filename" type="gchar*" readable="true" writeable="true" />
       <property name="Actor" cname="actor" type="ClutterActor" readable="true" writeable="true" />
@@ -95,7 +220,7 @@
         <return-type type="guint" />
       </method>
       <method name="GetState" cname="champlain_tile_get_state">
-        <return-type type="ChamplainStateEnum" />
+        <return-type type="ChamplainState" />
       </method>
       <method name="GetType" cname="champlain_tile_get_type" shared="true">
         <return-type type="GType" />
@@ -142,7 +267,7 @@
       <method name="SetState" cname="champlain_tile_set_state">
         <return-type type="void" />
         <parameters>
-          <parameter type="ChamplainStateEnum" name="state" />
+          <parameter type="ChamplainState" name="state" />
         </parameters>
       </method>
       <method name="SetUri" cname="champlain_tile_set_uri">
@@ -175,8 +300,7 @@
       <property name="Longitude" cname="longitude" type="gfloat" readable="true" writeable="true" />
       <property name="Latitude" cname="latitude" type="gfloat" readable="true" writeable="true" />
       <property name="ZoomLevel" cname="zoom-level" type="gint" readable="true" writeable="true" />
-      <property name="MapSource" cname="map-source" type="gint" readable="true" writeable="true" />
-      <property name="Offline" cname="offline" type="gboolean" readable="true" writeable="true" />
+      <property name="MapSource" cname="map-source" type="ChamplainMapSource" readable="true" writeable="true" />
       <property name="ScrollMode" cname="scroll-mode" type="ChamplainScrollMode" readable="true" writeable="true" />
       <property name="DecelRate" cname="decel-rate" type="gdouble" readable="true" writeable="true" />
       <property name="KeepCenterOnResize" cname="keep-center-on-resize" type="gboolean" readable="true" writeable="true" />
@@ -206,11 +330,31 @@
         <return-type type="GType" />
       </method>
       <constructor cname="champlain_view_new" />
+      <method name="SetMapSource" cname="champlain_view_set_map_source">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ChamplainMapSource*" name="map_source" />
+        </parameters>
+      </method>
       <method name="SetSize" cname="champlain_view_set_size">
         <return-type type="void" />
         <parameters>
           <parameter type="guint" name="width" />
           <parameter type="guint" name="height" />
+        </parameters>
+      </method>
+      <method name="SetZoomLevel" cname="champlain_view_set_zoom_level">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="gint" name="zoom_level" />
+        </parameters>
+      </method>
+      <method name="TileReady" cname="champlain_view_tile_ready">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ChamplainZoomLevel*" name="level" />
+          <parameter type="ChamplainTile*" name="tile" />
+          <parameter type="gboolean" name="animate" />
         </parameters>
       </method>
       <method name="ZoomIn" cname="champlain_view_zoom_in">
@@ -220,32 +364,87 @@
         <return-type type="void" />
       </method>
     </object>
-    <struct name="ZoomLevel" cname="ZoomLevel" opaque="true">
-      <field name="Level" cname="level" type="int" access="public" writeable="true" />
-      <field name="RowCount" cname="row_count" type="int" access="public" writeable="true" />
-      <field name="ColumnCount" cname="column_count" type="int" access="public" writeable="true" />
-      <field name="TileSize" cname="tile_size" type="int" access="public" writeable="true" />
-      <field name="Tiles" cname="tiles" type="GPtrArray*" access="public" writeable="true" />
-      <field name="Group" cname="group" type="ClutterActor*" access="public" writeable="true" />
-      <field name="Anchor" cname="anchor" type="ChamplainPoint" access="public" writeable="true" />
-      <method name="Free" cname="zoom_level_free">
+    <object name="ZoomLevel" cname="ChamplainZoomLevel" parent="GObject">
+      <signal name="TileAdded" cname="tile-added" when="LAST">
         <return-type type="void" />
+        <parameters>
+          <parameter name="inst" type="ChamplainZoomLevel*" />
+          <parameter name="p0" type="ChamplainTile" />
+        </parameters>
+      </signal>
+      <signal name="TileRemoved" cname="tile-removed" when="LAST">
+        <return-type type="void" />
+        <parameters>
+          <parameter name="inst" type="ChamplainZoomLevel*" />
+          <parameter name="p0" type="ChamplainTile" />
+        </parameters>
+      </signal>
+      <property name="Width" cname="width" type="guint" readable="true" writeable="true" />
+      <property name="Height" cname="height" type="guint" readable="true" writeable="true" />
+      <property name="ZoomLevel" cname="zoom-level" type="gint" readable="true" writeable="true" />
+      <property name="Actor" cname="actor" type="ClutterActor" readable="true" />
+      <method name="AddTile" cname="champlain_zoom_level_add_tile">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ChamplainTile*" name="tile" />
+        </parameters>
       </method>
-      <method name="GetHeight" cname="zoom_level_get_height">
-        <return-type type="guint" />
+      <method name="GetActor" cname="champlain_zoom_level_get_actor">
+        <return-type type="ClutterActor*" />
       </method>
-      <method name="GetWidth" cname="zoom_level_get_width">
-        <return-type type="guint" />
+      <method name="GetHeight" cname="champlain_zoom_level_get_height">
+        <return-type type="gint" />
       </method>
-      <constructor cname="zoom_level_new">
+      <method name="GetNthTile" cname="champlain_zoom_level_get_nth_tile">
+        <return-type type="ChamplainTile*" />
+        <parameters>
+          <parameter type="guint" name="index" />
+        </parameters>
+      </method>
+      <method name="GetType" cname="champlain_zoom_level_get_type" shared="true">
+        <return-type type="GType" />
+      </method>
+      <method name="GetWidth" cname="champlain_zoom_level_get_width">
+        <return-type type="gint" />
+      </method>
+      <method name="GetZoomLevel" cname="champlain_zoom_level_get_zoom_level">
+        <return-type type="gint" />
+      </method>
+      <constructor cname="champlain_zoom_level_new" />
+      <method name="RemoveTile" cname="champlain_zoom_level_remove_tile">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ChamplainTile*" name="tile" />
+        </parameters>
+      </method>
+      <method name="SetActor" cname="champlain_zoom_level_set_actor">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="ClutterActor*" name="actor" />
+        </parameters>
+      </method>
+      <method name="SetHeight" cname="champlain_zoom_level_set_height">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="guint" name="height" />
+        </parameters>
+      </method>
+      <method name="SetWidth" cname="champlain_zoom_level_set_width">
+        <return-type type="void" />
+        <parameters>
+          <parameter type="guint" name="width" />
+        </parameters>
+      </method>
+      <method name="SetZoomLevel" cname="champlain_zoom_level_set_zoom_level">
+        <return-type type="void" />
         <parameters>
           <parameter type="gint" name="zoom_level" />
-          <parameter type="gint" name="row" />
-          <parameter type="gint" name="column" />
-          <parameter type="gint" name="tile_size" />
         </parameters>
-      </constructor>
-    </struct>
+      </method>
+      <method name="TileCount" cname="champlain_zoom_level_tile_count">
+        <return-type type="guint" />
+      </method>
+    </object>
     <class name="Debug" cname="ChamplainDebug_">
       <method name="FlagIsSet" cname="champlain_debug_flag_is_set" shared="true">
         <return-type type="gboolean" />
