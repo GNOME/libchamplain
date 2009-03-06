@@ -56,6 +56,7 @@ libchamplain_include_HEADERS = \
 	champlain.h 			\
 	champlain-view.h 		\
 	champlain-defines.h 		\
+	champlain-enum-types.h		\
 	champlain-layer.h 		\
 	champlain-map-source.h		\
 	champlain-network-map-source.h	\
