@@ -50,7 +50,8 @@ enum
 {
   PROP_0,
   PROP_URI_FORMAT,
-  PROP_OFFLINE
+  PROP_OFFLINE,
+  PROP_PROXY_URI
 };
 
 /* static guint champlain_network_map_source_signals[LAST_SIGNAL] = { 0, }; */
@@ -66,6 +67,7 @@ struct _ChamplainNetworkMapSourcePrivate
 {
   gboolean offline;
   gchar *uri_format;
+  gchar *proxy_uri;
 };
 
 static void
@@ -84,6 +86,9 @@ champlain_network_map_source_get_property (GObject *object,
         break;
       case PROP_OFFLINE:
         g_value_set_boolean (value, priv->offline);
+        break;
+      case PROP_PROXY_URI:
+        g_value_set_string (value, priv->proxy_uri);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -106,6 +111,9 @@ champlain_network_map_source_set_property (GObject *object,
         break;
       case PROP_OFFLINE:
         priv->offline = g_value_get_boolean (value);
+        break;
+      case PROP_PROXY_URI:
+        priv->proxy_uri = g_value_dup_string (value);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -164,6 +172,20 @@ champlain_network_map_source_class_init (ChamplainNetworkMapSourceClass *klass)
                                 FALSE,
                                 (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_OFFLINE, pspec);
+
+  /**
+  * ChamplainNetworkMapSource:proxy-uri
+  *
+  * The proxy uri to use to access network
+  *
+  * Since: 0.4
+  */
+  pspec = g_param_spec_string ("proxy-uri",
+                               "Proxy URI",
+                               "The proxy URI to use to access network",
+                               "",
+                               (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+  g_object_class_install_property (object_class, PROP_PROXY_URI, pspec);
 }
 
 static void
@@ -455,7 +477,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       ctx->tile = tile;
 
       if (!soup_session)
-        soup_session = soup_session_async_new ();
+        soup_session = soup_session_async_new_with_options ("proxy-uri", soup_uri_new (priv->proxy_uri));
 
       uri = champlain_network_map_source_get_tile_uri (network_map_source,
                champlain_tile_get_x (tile), champlain_tile_get_y (tile),
