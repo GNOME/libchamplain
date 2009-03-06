@@ -1,16 +1,5 @@
 <?xml version="1.0"?>
 <metadata>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/property[@type='class']" name="hidden">1</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainNetworkMapSource']/property[@type='class']" name="hidden">1</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/constructor[@cname='champlain_map_source_new_mff_relief']" name="shared">true</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/constructor[@cname='champlain_map_source_new_mff_relief']" name="name">CreateMffRelief</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/constructor[@cname='champlain_map_source_new_oam']" name="shared">true</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/constructor[@cname='champlain_map_source_new_oam']" name="name">CreateOam</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/constructor[@cname='champlain_map_source_new_osm_cyclemap']" name="shared">true</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/constructor[@cname='champlain_map_source_new_osm_cyclemap']" name="name">CreateOsmCyclemap</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/constructor[@cname='champlain_map_source_new_osm_mapnik']" name="shared">true</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/constructor[@cname='champlain_map_source_new_osm_mapnik']" name="name">CreateOsmMapnik</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/constructor[@cname='champlain_map_source_new_osm_osmarender']" name="shared">true</attr>
-	<attr path="/api/namespace/object[@cname='ChamplainMapSource']/constructor[@cname='champlain_map_source_new_osm_osmarender']" name="name">CreateOsmOsmaRender</attr>
+	<attr path="/api/namespace/object[@cname='ChamplainTile']" name="hidden">1</attr>
 </metadata>
 
