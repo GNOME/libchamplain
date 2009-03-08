@@ -61,7 +61,7 @@ champlain_layer_get_property (GObject *object,
                              GValue *value,
                              GParamSpec *pspec)
 {
-  ChamplainLayer *self = CHAMPLAIN_LAYER (object);
+  //ChamplainLayer *self = CHAMPLAIN_LAYER (object);
   switch (property_id)
     {
       default:
@@ -75,7 +75,7 @@ champlain_layer_set_property (GObject *object,
                              const GValue *value,
                              GParamSpec *pspec)
 {
-  ChamplainLayer *self = CHAMPLAIN_LAYER (object);
+  //ChamplainLayer *self = CHAMPLAIN_LAYER (object);
   switch (property_id)
     {
       default:
@@ -86,7 +86,7 @@ champlain_layer_set_property (GObject *object,
 static void
 champlain_layer_dispose (GObject *object)
 {
-  ChamplainLayerPrivate *priv = GET_PRIVATE (object);
+  //ChamplainLayerPrivate *priv = GET_PRIVATE (object);
 
   G_OBJECT_CLASS (champlain_layer_parent_class)->dispose (object);
 }

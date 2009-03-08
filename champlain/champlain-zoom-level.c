@@ -317,7 +317,7 @@ champlain_zoom_level_set_zoom_level (ChamplainZoomLevel *self,
 ClutterActor *
 champlain_zoom_level_get_actor (ChamplainZoomLevel *self)
 {
-  g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
+  g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), NULL);
 
   ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
 

@@ -35,7 +35,7 @@ struct _Map
   ChamplainZoomLevel *previous_level;
 };
 
-Map *map_new ();
+Map *map_new (void);
 
 void map_load_visible_tiles (Map *map, ChamplainView * view, ChamplainMapSource *source, ChamplainRectangle viewport);
 

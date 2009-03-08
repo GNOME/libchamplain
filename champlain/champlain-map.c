@@ -25,7 +25,7 @@
 #include <math.h>
 
 Map*
-map_new ()
+map_new (void)
 {
   Map *map = g_new0(Map, 1);
 
