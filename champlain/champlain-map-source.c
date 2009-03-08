@@ -279,7 +279,7 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
 static void
 champlain_map_source_init (ChamplainMapSource *champlainMapSource)
 {
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE (champlainMapSource);
+  //ChamplainMapSourcePrivate *priv = GET_PRIVATE (champlainMapSource);
 }
 
 gint
@@ -329,7 +329,7 @@ guint
 champlain_map_source_get_row_count (ChamplainMapSource *map_source,
                                     gint zoom_level)
 {
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
+  //ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
   // FIXME: support other projections
   return pow (2, zoom_level);
 }
@@ -338,7 +338,7 @@ guint
 champlain_map_source_get_column_count (ChamplainMapSource *map_source,
                                        gint zoom_level)
 {
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
+  //ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
   // FIXME: support other projections
   return pow (2, zoom_level);
 }
@@ -357,7 +357,7 @@ champlain_map_source_get_longitude (ChamplainMapSource *map_source,
                                     gint zoom_level,
                                     guint x)
 {
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
+  //ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
   // FIXME: support other projections
   gdouble dx = (float)x / champlain_map_source_get_tile_size (map_source);
   return dx / pow (2.0, zoom_level) * 360.0 - 180;
@@ -368,7 +368,7 @@ champlain_map_source_get_latitude (ChamplainMapSource *map_source,
                                    gint zoom_level,
                                    guint y)
 {
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
+  //ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
   // FIXME: support other projections
   gdouble dy = (float)y / champlain_map_source_get_tile_size (map_source);
   double n = M_PI - 2.0 * M_PI * dy / pow (2.0, zoom_level);
@@ -384,7 +384,7 @@ champlain_map_source_get_name (ChamplainMapSource *map_source)
 
 void
 champlain_map_source_set_name (ChamplainMapSource *map_source,
-                               char *name)
+                               const char *name)
 {
   ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
 

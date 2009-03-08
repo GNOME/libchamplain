@@ -35,6 +35,7 @@
 #include <gdk/gdk.h>
 #include <gio/gio.h>
 #include <glib.h>
+#include <glib/gprintf.h>
 #include <glib-object.h>
 #include <libsoup/soup.h>
 #include <math.h>
@@ -271,7 +272,7 @@ champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *network_ma
 }
 
 ChamplainMapSource *
-champlain_map_source_new_osm_mapnik ()
+champlain_map_source_new_osm_mapnik (void)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenStreetMap Mapnik",
       "(CC) BY 2.0 OpenStreetMap contributors",
@@ -281,7 +282,7 @@ champlain_map_source_new_osm_mapnik ()
 }
 
 ChamplainMapSource *
-champlain_map_source_new_oam ()
+champlain_map_source_new_oam (void)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenArialMap",
       "(CC) BY 3.0 OpenArialMap contributors",
@@ -291,7 +292,7 @@ champlain_map_source_new_oam ()
 }
 
 ChamplainMapSource *
-champlain_map_source_new_mff_relief ()
+champlain_map_source_new_mff_relief (void)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("MapsForFree Relief",
       "Map data available under GNU Free Documentation license, Version 1.2 or later",
@@ -305,14 +306,13 @@ get_filename (ChamplainNetworkMapSource *network_map_source,
               ChamplainZoomLevel *level,
               ChamplainTile *tile)
 {
-  ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
+  //ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
   return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
              "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
              "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
              CACHE_SUBDIR, champlain_map_source_get_name (CHAMPLAIN_MAP_SOURCE (network_map_source)),
              champlain_zoom_level_get_zoom_level (level),
-             champlain_tile_get_x (tile), champlain_tile_get_y (tile),
-             NULL);
+             champlain_tile_get_x (tile), champlain_tile_get_y (tile));
 }
 
 typedef struct {
@@ -343,7 +343,7 @@ file_loaded_cb (SoupSession *session,
   FileLoadedCallbackContext *ctx = (FileLoadedCallbackContext*) user_data;
   GdkPixbufLoader* loader;
   GError *error = NULL;
-  gchar* path, *filename;
+  gchar* path = NULL, *filename = NULL;
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
