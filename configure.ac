@@ -14,6 +14,7 @@ AM_PROG_LIBTOOL
 
 # Checks for programs.
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
 # Checks for libraries.
@@ -39,6 +40,7 @@ PKG_CHECK_MODULES(DEPS,
 )
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
+IDT_COMPILE_WARNINGS
 
 # -----------------------------------------------------------
 # Enable debug
