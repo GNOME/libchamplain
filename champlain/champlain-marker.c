@@ -177,7 +177,7 @@ champlain_marker_class_init (ChamplainMarkerClass *champlainMarkerClass)
 static void
 champlain_marker_init (ChamplainMarker *champlainMarker)
 {
-  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
+  //ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
 }
 
 
@@ -189,7 +189,7 @@ champlain_marker_init (ChamplainMarker *champlainMarker)
  * Since: 0.2
  */
 ClutterActor *
-champlain_marker_new ()
+champlain_marker_new (void)
 {
   ChamplainMarker *marker;
 

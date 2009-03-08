@@ -49,6 +49,9 @@
 
 #include "champlain-view.h"
 
+#define DEBUG_FLAG CHAMPLAIN_DEBUG_VIEW
+#include "champlain-debug.h"
+
 #include "champlain.h"
 #include "champlain-defines.h"
 #include "champlain-enum-types.h"
@@ -161,8 +164,6 @@ static void view_tiles_reposition (ChamplainView* view);
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
 {
-  gint level;
-
   if (!priv->map_source)
     return 0.0;
 
@@ -183,8 +184,6 @@ viewport_get_current_longitude (ChamplainViewPrivate *priv)
 static gdouble
 viewport_get_latitude_at (ChamplainViewPrivate *priv, gint y)
 {
-  gint level;
-
   if (!priv->map_source)
     return 0.0;
 
@@ -275,7 +274,6 @@ marker_reposition_cb (ChamplainMarker *marker,
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   ChamplainMarkerPrivate *marker_priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
 
-  gint level;
   gint x, y;
 
   if (priv->map)
@@ -373,7 +371,6 @@ resize_viewport (ChamplainView *view)
   gdouble lower, upper;
   gboolean center = FALSE;
   TidyAdjustment *hadjust, *vadjust;
-  gint level;
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
@@ -451,7 +448,7 @@ champlain_view_get_property (GObject *object,
         break;
       case PROP_DECEL_RATE:
         {
-          gdouble decel;
+          gdouble decel = 0.0;
           g_object_get (priv->finger_scroll, "decel-rate", decel, NULL);
           g_value_set_double (value, decel);
           break;
@@ -858,7 +855,7 @@ finger_scroll_button_press_cb (ClutterActor *actor,
  * Since: 0.4
  */
 ClutterActor *
-champlain_view_new ()
+champlain_view_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_VIEW, NULL);
 }
@@ -881,7 +878,6 @@ champlain_view_center_on (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   gint x, y;
-  guint i;
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
   priv->longitude = longitude;
