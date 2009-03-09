@@ -49,10 +49,11 @@ marker_button_release_cb (ClutterActor *actor,
   return TRUE;
 }
 
-static ClutterActor*
+static ChamplainLayer *
 create_marker_layer (ChamplainView *view)
 {
-  ClutterActor *layer, *marker;
+  ClutterActor *marker;
+  ChamplainLayer *layer;
   ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
   ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
 
@@ -78,7 +79,7 @@ create_marker_layer (ChamplainView *view)
       -70.764141);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  clutter_actor_show (layer);
+  clutter_actor_show (CLUTTER_ACTOR (layer));
   return layer;
 }
 
@@ -86,7 +87,8 @@ int
 main (int argc,
       char *argv[])
 {
-  ClutterActor* actor, *layer, *stage;
+  ClutterActor* actor, *stage;
+  ChamplainLayer *layer;
 
   g_thread_init (NULL);
   clutter_init (&argc, &argv);
@@ -102,6 +104,11 @@ main (int argc,
   /* Create the markers and marker layer */
   layer = create_marker_layer (CHAMPLAIN_VIEW (actor));
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
+
+  /* Connect to the click event */
+  g_signal_connect (actor, "button-release-event",
+      G_CALLBACK (map_view_button_release_cb),
+      actor);
 
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (actor), "zoom-level", 12,

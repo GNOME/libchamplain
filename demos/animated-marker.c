@@ -31,9 +31,7 @@ static ClutterActor*
 create_marker ()
 {
   ClutterActor *marker;
-  ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
-  ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
-  ClutterActor *actor, *bg;
+  ClutterActor *bg;
   ClutterTimeline *timeline;
   ClutterBehaviour *behaviour;
   ClutterAlpha *alpha;
@@ -107,7 +105,8 @@ create_marker ()
 int
 main (int argc, char *argv[])
 {
-  ClutterActor* actor, *layer, *marker, *stage;
+  ClutterActor* actor, *marker, *stage;
+  ChamplainLayer *layer;
 
   g_thread_init (NULL);
   clutter_init (&argc, &argv);
@@ -122,7 +121,7 @@ main (int argc, char *argv[])
 
   /* Create the marker layer */
   layer = champlain_layer_new ();
-  clutter_actor_show (layer);
+  clutter_actor_show (CLUTTER_ACTOR (layer));
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
 
   /* Create a marker */

@@ -2,7 +2,7 @@ noinst_PROGRAMS = launcher animated-marker
 
 INCLUDES = -I$(top_srcdir)
 
-AM_CPPFLAGS = $(DEPS_CFLAGS)
+AM_CPPFLAGS = $(DEPS_CFLAGS) $(WARN_CFLAGS)
 AM_LDFLAGS = $(DEPS_LIBS)
 
 launcher_SOURCES = launcher.c
