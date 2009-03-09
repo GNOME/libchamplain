@@ -106,6 +106,7 @@ main (int argc,
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
 
   /* Connect to the click event */
+  clutter_actor_set_reactive (actor, TRUE);
   g_signal_connect (actor, "button-release-event",
       G_CALLBACK (map_view_button_release_cb),
       actor);
