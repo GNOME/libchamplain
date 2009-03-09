@@ -87,7 +87,8 @@ enum
   PROP_DECEL_RATE,
   PROP_SCROLL_MODE,
   PROP_KEEP_CENTER_ON_RESIZE,
-  PROP_SHOW_LICENSE
+  PROP_SHOW_LICENSE,
+  PROP_ZOOM_ON_DOUBLE_CLICK
 };
 
 #define PADDING 10
@@ -120,6 +121,8 @@ struct _ChamplainViewPrivate
   ClutterActor *user_layers; /* Contains the markers */
 
   gboolean keep_center_on_resize;
+
+  gboolean zoom_on_double_click;
 
   gboolean show_license;
   ClutterActor *license_actor; /* Contains the licence info */
@@ -459,6 +462,9 @@ champlain_view_get_property (GObject *object,
       case PROP_SHOW_LICENSE:
         g_value_set_boolean (value, priv->show_license);
         break;
+      case PROP_ZOOM_ON_DOUBLE_CLICK:
+        g_value_set_boolean (value, priv->zoom_on_double_click);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -500,6 +506,9 @@ champlain_view_set_property (GObject *object,
       break;
     case PROP_SHOW_LICENSE:
       champlain_view_set_show_license (view, g_value_get_boolean (value));
+      break;
+    case PROP_ZOOM_ON_DOUBLE_CLICK:
+      champlain_view_set_zoom_on_double_click (view, g_value_get_boolean (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -645,6 +654,20 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            "Show the map data license",
            "Show the map data license on the map view",
            TRUE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainView:zoom-on-double-click:
+  *
+  * Should the view zoom in and recenter when the user double click on the map.
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+       PROP_ZOOM_ON_DOUBLE_CLICK,
+       g_param_spec_boolean ("zoom-on-double-click",
+           "Zoom in on double click",
+           "Zoom in and recenter on double click on the map",
+           TRUE, CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
@@ -657,6 +680,7 @@ champlain_view_init (ChamplainView *view)
   priv->map_source = champlain_map_source_new_osm_mapnik ();
   priv->zoom_level = 0;
   priv->keep_center_on_resize = TRUE;
+  priv->zoom_on_double_click = TRUE;
   priv->show_license = TRUE;
   priv->license_actor = NULL;
   priv->stage = clutter_group_new ();
@@ -781,7 +805,7 @@ finger_scroll_button_press_cb (ClutterActor *actor,
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
-  if (event->button == 1 && event->click_count == 2)
+  if (priv->zoom_on_double_click && event->button == 1 && event->click_count == 2)
     {
       gint actor_x, actor_y;
       gint rel_x, rel_y;
@@ -1325,4 +1349,24 @@ champlain_view_set_show_license (ChamplainView *view,
 
   priv->show_license = value;
   update_license (view);
+}
+
+/**
+* champlain_view_set_zoom_on_double_click:
+* @view: a #ChamplainView
+* @value: a #gboolean
+*
+* Should the view zoom in and recenter when the user double click on the map.
+*
+* Since: 0.4
+*/
+void
+champlain_view_set_zoom_on_double_click (ChamplainView *view,
+                                         gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  priv->zoom_on_double_click = value;
 }

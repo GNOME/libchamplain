@@ -87,6 +87,8 @@ void champlain_view_set_scroll_mode (ChamplainView *view,
 void champlain_view_set_keep_center_on_resize (ChamplainView *view,
     gboolean value);
 void champlain_view_set_show_license (ChamplainView *view, gboolean value);
+void champlain_view_set_zoom_on_double_click (ChamplainView *view,
+    gboolean value);
 
 void champlain_view_add_layer (ChamplainView *champlainView, ChamplainLayer *layer);
 
