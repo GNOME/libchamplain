@@ -62,7 +62,7 @@ G_DEFINE_TYPE (ChamplainNetworkMapSource, champlain_network_map_source, CHAMPLAI
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE, ChamplainNetworkMapSourcePrivate))
 
 #define CACHE_SUBDIR "champlain"
-static SoupSession * soup_session;
+static SoupSession * soup_session = NULL;
 
 struct _ChamplainNetworkMapSourcePrivate
 {
@@ -114,7 +114,13 @@ champlain_network_map_source_set_property (GObject *object,
         priv->offline = g_value_get_boolean (value);
         break;
       case PROP_PROXY_URI:
+        if (priv->proxy_uri)
+          g_free (priv->proxy_uri);
+
         priv->proxy_uri = g_value_dup_string (value);
+        if (soup_session)
+          g_object_set (G_OBJECT (soup_session), "proxy-uri",
+              soup_uri_new (priv->proxy_uri), NULL);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -171,7 +177,7 @@ champlain_network_map_source_class_init (ChamplainNetworkMapSourceClass *klass)
                                 "Offline",
                                 "Offline",
                                 FALSE,
-                                (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+                                G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_OFFLINE, pspec);
 
   /**
@@ -185,7 +191,7 @@ champlain_network_map_source_class_init (ChamplainNetworkMapSourceClass *klass)
                                "Proxy URI",
                                "The proxy URI to use to access network",
                                "",
-                               (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+                               G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_PROXY_URI, pspec);
 }
 
@@ -194,7 +200,7 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
 {
   ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (champlainMapSource);
 
-  priv->proxy_uri = NULL;
+  priv->proxy_uri = "";
 }
 
 ChamplainNetworkMapSource*
