@@ -1027,21 +1027,22 @@ champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
 /**
  * champlain_view_add_layer:
  * @view: a #ChamplainView
- * @layer: a #ClutterActor
+ * @layer: a #ChamplainLayer
  *
  * Adds a new layer to the view
  *
  * Since: 0.2
  */
 void
-champlain_view_add_layer (ChamplainView *view, ClutterActor *layer)
+champlain_view_add_layer (ChamplainView *view, ChamplainLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   g_return_if_fail (CLUTTER_IS_ACTOR (layer));
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
-  clutter_container_add (CLUTTER_CONTAINER (priv->user_layers), layer, NULL);
-  clutter_actor_raise_top (layer);
+  clutter_container_add (CLUTTER_CONTAINER (priv->user_layers),
+      CLUTTER_ACTOR (layer), NULL);
+  clutter_actor_raise_top (CLUTTER_ACTOR (layer));
 
   if (priv->map)
     g_idle_add (marker_reposition, view);
