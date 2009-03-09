@@ -476,46 +476,30 @@ champlain_view_set_property (GObject *object,
   switch (prop_id)
   {
     case PROP_LONGITUDE:
-      {
-        champlain_view_center_on (view, priv->latitude,
-            g_value_get_double (value));
-        break;
-      }
+      champlain_view_center_on (view, priv->latitude,
+          g_value_get_double (value));
+      break;
     case PROP_LATITUDE:
-      {
-        champlain_view_center_on (view, g_value_get_double (value),
-            priv->longitude);
-        break;
-      }
+      champlain_view_center_on (view, g_value_get_double (value),
+          priv->longitude);
+      break;
     case PROP_ZOOM_LEVEL:
-      {
-        gint level = g_value_get_int (value);
-        champlain_view_set_zoom_level (view, level);
-        break;
-      }
+      champlain_view_set_zoom_level (view, g_value_get_int (value));
+      break;
     case PROP_MAP_SOURCE:
-      {
-        ChamplainMapSource *source = g_value_get_object (value);
-        champlain_view_set_map_source (view, source);
-        break;
-      }
+      champlain_view_set_map_source (view, g_value_get_object (value));
+      break;
     case PROP_SCROLL_MODE:
-      priv->scroll_mode = g_value_get_enum (value);
-      g_object_set (G_OBJECT (priv->finger_scroll), "mode",
-          priv->scroll_mode, NULL);
+      champlain_view_set_scroll_mode (view, g_value_get_enum (value));
       break;
     case PROP_DECEL_RATE:
-      {
-        gdouble decel = g_value_get_double (value);
-        g_object_set (priv->finger_scroll, "decel-rate", decel, NULL);
-        break;
-      }
+      champlain_view_set_decel_rate (view, g_value_get_double (value));
+      break;
     case PROP_KEEP_CENTER_ON_RESIZE:
-      priv->keep_center_on_resize = g_value_get_boolean (value);
+      champlain_view_set_keep_center_on_resize (view, g_value_get_boolean (value));
       break;
     case PROP_SHOW_LICENSE:
-      priv->show_license = g_value_get_boolean (value);
-      update_license (view);
+      champlain_view_set_show_license (view, g_value_get_boolean (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -620,7 +604,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   /**
   * ChamplainView:decel-rate:
   *
-  * The deceleration rate for the kinetic mode.
+  * The deceleration rate for the kinetic mode. The default value is 1.1.
   *
   * Since: 0.2
   */
@@ -630,6 +614,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
             "Deceleration rate",
             "Rate at which the view will decelerate in kinetic mode.",
             1.0, 2.0, 1.1, CHAMPLAIN_PARAM_READWRITE));
+
   /**
   * ChamplainView:keep-center-on-resize:
   *
@@ -644,6 +629,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            "Keep the current centered position "
            "upon resizing",
            TRUE, CHAMPLAIN_PARAM_READWRITE));
+
   /**
   * ChamplainView:show-license:
   *
@@ -1251,4 +1237,92 @@ champlain_view_set_map_source (ChamplainView *view,
   g_idle_add (marker_reposition, view);
   view_tiles_reposition (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
+}
+
+/**
+* champlain_view_set_decel_rate:
+* @view: a #ChamplainView
+* @rate: a #gdouble between 0.0 and 2.0
+*
+* The deceleration rate for the kinetic mode.
+*
+* Since: 0.4
+*/
+void
+champlain_view_set_decel_rate (ChamplainView *view,
+                               gdouble rate)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view) ||
+      rate > 2.0 ||
+      rate < 0);
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  g_object_set (priv->finger_scroll, "decel-rate", rate, NULL);
+}
+
+/**
+* champlain_view_set_scroll_mode:
+* @view: a #ChamplainView
+* @mode: a #ChamplainScrollMode value
+*
+* Determines the way the view reacts to scroll events.
+*
+* Since: 0.4
+*/
+void
+champlain_view_set_scroll_mode (ChamplainView *view,
+                                ChamplainScrollMode mode)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  priv->scroll_mode = mode;
+
+  g_object_set (G_OBJECT (priv->finger_scroll), "mode",
+      priv->scroll_mode, NULL);
+}
+
+/**
+* champlain_view_set_keep_center_on_resize:
+* @view: a #ChamplainView
+* @value: a #gboolean
+*
+* Keep the current centered position when resizing the view.
+*
+* Since: 0.4
+*/
+void
+champlain_view_set_keep_center_on_resize (ChamplainView *view,
+                                          gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  priv->keep_center_on_resize = value;
+}
+
+/**
+* champlain_view_set_show_license:
+* @view: a #ChamplainView
+* @value: a #gboolean
+*
+* Show the license on the map view.  The license information should always be
+* available in a way or another in your application.  You can have it in
+* About, or on the map.
+*
+* Since: 0.4
+*/
+void
+champlain_view_set_show_license (ChamplainView *view,
+                                 gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  priv->show_license = value;
+  update_license (view);
 }

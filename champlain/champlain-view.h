@@ -76,13 +76,19 @@ void champlain_view_zoom_in (ChamplainView *champlainView);
 
 void champlain_view_zoom_out (ChamplainView *champlainView);
 
-void champlain_view_set_zoom_level (ChamplainView *champlainView, gint zoom_level);
-
-void champlain_view_set_map_source (ChamplainView *champlainView, ChamplainMapSource *map_source);
+void champlain_view_set_zoom_level (ChamplainView *champlainView,
+    gint zoom_level);
+void champlain_view_set_map_source (ChamplainView *champlainView,
+    ChamplainMapSource *map_source);
+void champlain_view_set_size (ChamplainView *view, guint width, guint height);
+void champlain_view_set_decel_rate (ChamplainView *view, gdouble rate);
+void champlain_view_set_scroll_mode (ChamplainView *view,
+    ChamplainScrollMode mode);
+void champlain_view_set_keep_center_on_resize (ChamplainView *view,
+    gboolean value);
+void champlain_view_set_show_license (ChamplainView *view, gboolean value);
 
 void champlain_view_add_layer (ChamplainView *champlainView, ChamplainLayer *layer);
-
-void champlain_view_set_size (ChamplainView *view, guint width, guint height);
 
 gboolean champlain_view_get_coords_from_event (ChamplainView *view, ClutterEvent *event, gdouble *lat, gdouble *lon);
 
