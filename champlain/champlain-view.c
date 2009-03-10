@@ -396,7 +396,8 @@ resize_viewport (ChamplainView *view)
   if (priv->zoom_level < 8)
     {
       lower = -priv->viewport_size.width / 2.0;
-      upper = champlain_zoom_level_get_width (priv->map->current_level)*256 - //XXX
+      upper = champlain_zoom_level_get_width (priv->map->current_level) *
+          champlain_map_source_get_tile_size (priv->map_source) -
           priv->viewport_size.width / 2.0;
     }
   else
@@ -410,7 +411,8 @@ resize_viewport (ChamplainView *view)
   if (priv->zoom_level < 8)
     {
       lower = -priv->viewport_size.height / 2.0;
-      upper = champlain_zoom_level_get_height (priv->map->current_level)*256 - //XXX
+      upper = champlain_zoom_level_get_height (priv->map->current_level) *
+          champlain_map_source_get_tile_size (priv->map_source) -
           priv->viewport_size.height / 2.0;
     }
   else
@@ -942,7 +944,8 @@ champlain_view_center_on (ChamplainView *view,
       if ( priv->anchor.y < 0 )
         priv->anchor.y = 0;
 
-      max = champlain_zoom_level_get_width (priv->map->current_level)*256 - //XXX
+      max = champlain_zoom_level_get_width (priv->map->current_level) *
+          champlain_map_source_get_tile_size (priv->map_source) -
           (G_MAXINT16 / 2);
       if (priv->anchor.x > max)
         priv->anchor.x = max;
