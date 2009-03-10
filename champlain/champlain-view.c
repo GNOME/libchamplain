@@ -746,6 +746,9 @@ viewport_x_changed_cb (GObject *gobject,
   priv->viewport_size.x = rect.x;
   priv->viewport_size.y = rect.y;
 
+  priv->longitude = viewport_get_current_longitude (priv);
+  priv->latitude = viewport_get_current_latitude (priv);
+
   view_load_visible_tiles (view);
   view_tiles_reposition (view);
 
