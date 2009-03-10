@@ -353,13 +353,12 @@ file_loaded_cb (SoupSession *session,
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
-      g_warning ("Unable to download tile %d, %d: %s",
+      DEBUG ("Unable to download tile %d, %d: %s",
           champlain_tile_get_x (ctx->tile),
           champlain_tile_get_y (ctx->tile),
           soup_status_get_phrase(msg->status_code));
-      g_object_unref (ctx->tile);
       create_error_tile (ctx->tile);
-      return;
+      goto finish;
     }
 
   loader = gdk_pixbuf_loader_new();
@@ -373,7 +372,7 @@ file_loaded_cb (SoupSession *session,
           g_warning ("Unable to load the pixbuf: %s", error->message);
           g_error_free (error);
           create_error_tile (ctx->tile);
-          goto finish;
+          goto cleanup;
         }
 
       g_object_unref (loader);
@@ -385,7 +384,7 @@ file_loaded_cb (SoupSession *session,
       g_warning ("Unable to close the pixbuf loader: %s", error->message);
       g_error_free (error);
       create_error_tile (ctx->tile);
-      goto finish;
+      goto cleanup;
     }
 
   filename = champlain_tile_get_filename (ctx->tile);
@@ -426,12 +425,11 @@ file_loaded_cb (SoupSession *session,
   champlain_tile_set_actor (ctx->tile, actor);
   DEBUG ("Tile loaded from network");
 
-finish:
-  champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
-
+cleanup:
   g_object_unref (loader);
   g_free (path);
-
+finish:
+  champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
   champlain_view_tile_ready (ctx->view, ctx->zoom_level, ctx->tile, TRUE);
   g_object_unref (ctx->tile);
   g_object_unref (ctx->zoom_level);
