@@ -88,7 +88,8 @@ enum
   PROP_SCROLL_MODE,
   PROP_KEEP_CENTER_ON_RESIZE,
   PROP_SHOW_LICENSE,
-  PROP_ZOOM_ON_DOUBLE_CLICK
+  PROP_ZOOM_ON_DOUBLE_CLICK,
+  PROP_STATE
 };
 
 #define PADDING 10
@@ -126,6 +127,8 @@ struct _ChamplainViewPrivate
 
   gboolean show_license;
   ClutterActor *license_actor; /* Contains the licence info */
+
+  ChamplainState state; /* View's global state */
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -163,6 +166,7 @@ static void license_set_position (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
 static void view_position_tile (ChamplainView* view, ChamplainTile* tile);
 static void view_tiles_reposition (ChamplainView* view);
+static void view_update_state (ChamplainView *view);
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -465,6 +469,9 @@ champlain_view_get_property (GObject *object,
       case PROP_ZOOM_ON_DOUBLE_CLICK:
         g_value_set_boolean (value, priv->zoom_on_double_click);
         break;
+      case PROP_STATE:
+        g_value_set_enum (value, priv->state);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -668,6 +675,23 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            "Zoom in on double click",
            "Zoom in and recenter on double click on the map",
            TRUE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainView:state
+  *
+  * The view's global state. Useful to inform using if the view is busy loading
+  * tiles or not.
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+       PROP_STATE,
+       g_param_spec_enum ("state",
+           "View's state",
+           "View's global state",
+           CHAMPLAIN_TYPE_STATE,
+           CHAMPLAIN_STATE_INIT,
+           G_PARAM_READABLE));
 }
 
 static void
@@ -691,6 +715,7 @@ champlain_view_init (ChamplainView *view)
   priv->viewport_size.height = 0;
   priv->anchor.x = 0;
   priv->anchor.y = 0;
+  priv->state = CHAMPLAIN_STATE_INIT;
 
   /* Setup viewport */
   priv->viewport = tidy_viewport_new ();
@@ -726,6 +751,9 @@ champlain_view_init (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->user_layers);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
+
+  priv->state = CHAMPLAIN_STATE_DONE;
+  g_object_notify (G_OBJECT (view), "state");
 }
 
 static void
@@ -1154,6 +1182,7 @@ view_load_visible_tiles (ChamplainView *view)
   viewport.y += priv->anchor.y;
 
   map_load_visible_tiles (priv->map, view, priv->map_source, viewport);
+  view_update_state (view);
 }
 
 static void
@@ -1209,6 +1238,28 @@ champlain_view_tile_ready (ChamplainView *view,
 
   clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)), actor, NULL);
   view_position_tile (view, tile);
+  view_update_state (view);
+}
+
+static void
+view_update_state (ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  ChamplainState new_state = CHAMPLAIN_STATE_DONE;
+  gint i;
+
+  for (i = 0; i < champlain_zoom_level_tile_count (priv->map->current_level); i++)
+    {
+      ChamplainTile *tile = champlain_zoom_level_get_nth_tile (priv->map->current_level, i);
+      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING)
+        new_state = CHAMPLAIN_STATE_LOADING;
+    }
+
+  if (priv->state != new_state)
+    {
+      priv->state = new_state;
+      g_object_notify (G_OBJECT (view), "state");
+    }
 }
 
 /**

@@ -111,6 +111,26 @@ map_zoom_changed (ChamplainView *view,
 }
 
 static void
+view_state_changed (ChamplainView *view,
+                    GParamSpec *gobject,
+                    GtkImage *image)
+{
+  ChamplainState state;
+
+  g_object_get (G_OBJECT (view), "state", &state, NULL);
+  if (state == CHAMPLAIN_STATE_LOADING)
+    {
+      gtk_image_set_from_stock (image, GTK_STOCK_NETWORK, GTK_ICON_SIZE_BUTTON);
+      g_print("STATE: loading\n");
+    }
+  else
+    {
+      gtk_image_clear (image);
+      g_print("STATE: done\n");
+    }
+}
+
+static void
 zoom_in (GtkWidget *widget,
          ChamplainView *view)
 {
@@ -189,6 +209,11 @@ main (int argc,
   g_signal_connect (view, "notify::zoom-level", G_CALLBACK (map_zoom_changed),
       button);
   gtk_container_add (GTK_CONTAINER (bbox), button);
+
+  button = gtk_image_new ();
+  g_signal_connect (view, "notify::state", G_CALLBACK (view_state_changed),
+      button);
+  gtk_box_pack_end (GTK_HBOX (bbox), button, FALSE, FALSE, 0);
 
   viewport = gtk_viewport_new (NULL, NULL);
   gtk_viewport_set_shadow_type (GTK_VIEWPORT(viewport), GTK_SHADOW_ETCHED_IN);
