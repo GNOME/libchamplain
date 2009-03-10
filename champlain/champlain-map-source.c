@@ -391,3 +391,19 @@ champlain_map_source_set_name (ChamplainMapSource *map_source,
   priv->name = g_strdup (name);
 }
 
+const gchar *
+champlain_map_source_get_license (ChamplainMapSource *map_source)
+{
+  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
+  return priv->license;
+}
+
+void
+champlain_map_source_set_license (ChamplainMapSource *map_source,
+                                  const char *license)
+{
+  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
+
+  priv->license = g_strdup (license);
+}
+

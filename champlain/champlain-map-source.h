@@ -63,8 +63,6 @@ struct _ChamplainMapSourceClass
 
 GType champlain_map_source_get_type (void);
 
-const gchar * champlain_map_source_get_name (ChamplainMapSource *map_source);
-
 gint champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source);
 
 gint champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source);
@@ -94,5 +92,11 @@ void champlain_map_source_get_tile (ChamplainMapSource *map_source,
 
 void champlain_map_source_set_name (ChamplainMapSource *map_source,
     const char *name);
+const gchar * champlain_map_source_get_name (ChamplainMapSource *map_source);
+
+void champlain_map_source_set_license (ChamplainMapSource *map_source,
+    const char *license);
+const gchar * champlain_map_source_get_license (ChamplainMapSource *map_source);
+
 
 #endif

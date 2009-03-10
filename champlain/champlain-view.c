@@ -790,7 +790,7 @@ update_license (ChamplainView *view)
   if (priv->show_license)
     {
       priv->license_actor = clutter_label_new_with_text ( "sans 8",
-          ""); //XXX: champlain_map_source_get_license (priv->map_source));
+          champlain_map_source_get_license (priv->map_source));
       clutter_actor_set_opacity (priv->license_actor, 128);
       clutter_actor_show (priv->license_actor);
 
