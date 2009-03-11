@@ -27,6 +27,8 @@
 #define OSM_MAP "Open Street Map"
 #define OAM_MAP "Open Arial Map"
 #define MFF_MAP "Maps for free - Relief"
+#define OSM_CYCLE "OSM Cycle Map"
+#define OSM_OSMA "OSM Osmarender"
 
 /*
  * Terminate the main loop.
@@ -89,6 +91,14 @@ map_source_changed (GtkWidget *widget,
   else if (g_strcmp0 (selection, MFF_MAP) == 0)
     {
       g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_mff_relief (), NULL);
+    }
+  else if (g_strcmp0 (selection, OSM_CYCLE) == 0)
+    {
+      g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_osm_cyclemap (), NULL);
+    }
+  else if (g_strcmp0 (selection, OSM_OSMA) == 0)
+    {
+      g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_osm_osmarender (), NULL);
     }
 }
 
@@ -200,6 +210,8 @@ main (int argc,
   gtk_combo_box_append_text(GTK_COMBO_BOX(button), OSM_MAP);
   gtk_combo_box_append_text(GTK_COMBO_BOX(button), OAM_MAP);
   gtk_combo_box_append_text(GTK_COMBO_BOX(button), MFF_MAP);
+  gtk_combo_box_append_text(GTK_COMBO_BOX(button), OSM_CYCLE);
+  gtk_combo_box_append_text(GTK_COMBO_BOX(button), OSM_OSMA);
   gtk_combo_box_set_active(GTK_COMBO_BOX(button), 0);
   g_signal_connect (button, "changed", G_CALLBACK (map_source_changed), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);

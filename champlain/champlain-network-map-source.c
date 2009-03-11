@@ -278,6 +278,26 @@ champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *network_ma
 }
 
 ChamplainMapSource *
+champlain_map_source_new_osm_cyclemap (void)
+{
+  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenStreetMap Cycle Map",
+      "(CC) BY 2.0 OpenStreetMap contributors",
+      "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://andy.sandbox.cloudmade.com/tiles/cycle/#Z#/#X#/#Y#.png"));
+}
+
+ChamplainMapSource *
+champlain_map_source_new_osm_osmarender (void)
+{
+  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenStreetMap Osmarender",
+      "(CC) BY 2.0 OpenStreetMap contributors",
+      "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png"));
+}
+
+ChamplainMapSource *
 champlain_map_source_new_osm_mapnik (void)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenStreetMap Mapnik",
@@ -415,15 +435,29 @@ file_loaded_cb (SoupSession *session,
 */
   GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
   ClutterActor *actor = clutter_texture_new();
-  clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
+  gboolean ret = FALSE;
+  if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
       gdk_pixbuf_get_pixels (pixbuf),
       gdk_pixbuf_get_has_alpha (pixbuf),
       gdk_pixbuf_get_width (pixbuf),
       gdk_pixbuf_get_height (pixbuf),
       gdk_pixbuf_get_rowstride (pixbuf),
-      3, 0, NULL);
+      gdk_pixbuf_get_bits_per_sample (pixbuf) *
+      gdk_pixbuf_get_n_channels (pixbuf) / 8,
+      0, &error))
+    {
+      g_print("BPP: %d", gdk_pixbuf_get_bits_per_sample (pixbuf));
+      if (error)
+        {
+          g_warning ("Unable to transfer to clutter: %s", error->message);
+          g_error_free (error);
+          create_error_tile (ctx->tile);
+          goto cleanup;
+        }
+    }
+
   champlain_tile_set_actor (ctx->tile, actor);
-  DEBUG ("Tile loaded from network");
+  DEBUG ("Tile loaded from network %d", ret);
 
 cleanup:
   g_object_unref (loader);
