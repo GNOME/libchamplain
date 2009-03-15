@@ -16,9 +16,6 @@ xs/ChamplainNetworkMapSource.xs
 xs/ChamplainTile.xs
 xs/ChamplainView.xs
 xs/Gtk2ChamplainViewEmbed.xs
-t/00-load.t
-t/boilerplate.t
-t/pod-coverage.t
-t/pod.t
+t/Champlain.t
 examples/launcher.pl
 examples/gtk2.pl
