@@ -1,0 +1,4 @@
+^build/
+\.svn
+^Makefile$
+^Makefile[.]old$
