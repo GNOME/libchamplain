@@ -99,6 +99,11 @@ sub main {
 		},
 
 		$DEPENDS->get_makefile_vars(),
+		
+		# Remove the build folder when doing "make clean"
+		clean => {
+			FILES => 'build',
+		},
 	);
 	
 	return 0;
