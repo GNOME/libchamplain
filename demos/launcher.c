@@ -18,6 +18,8 @@
 
 #include <champlain/champlain.h>
 
+#define PADDING 10
+
 static gboolean
 map_view_button_release_cb (ClutterActor *actor,
                             ClutterButtonEvent *event,
@@ -46,6 +48,24 @@ marker_button_release_cb (ClutterActor *actor,
 
   g_print("Montreal was clicked\n");
 
+  return TRUE;
+}
+
+static gboolean
+zoom_in (ClutterActor *actor,
+         ClutterButtonEvent *event,
+         ChamplainView * view)
+{
+  champlain_view_zoom_in (view);
+  return TRUE;
+}
+
+static gboolean
+zoom_out (ClutterActor *actor,
+          ClutterButtonEvent *event,
+          ChamplainView * view)
+{
+  champlain_view_zoom_out (view);
   return TRUE;
 }
 
@@ -83,12 +103,38 @@ create_marker_layer (ChamplainView *view)
   return layer;
 }
 
+static ClutterActor *
+make_button (char *text)
+{
+  ClutterActor *button, *button_bg, *button_text;
+  ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
+  ClutterColor black = { 0x00, 0x00, 0x00, 0xff };
+  guint width, height;
+
+  button = clutter_group_new ();
+
+  button_bg = clutter_rectangle_new_with_color (&white);
+  clutter_container_add_actor (CLUTTER_CONTAINER (button), button_bg);
+  clutter_actor_set_opacity (button_bg, 0xcc);
+
+  button_text = clutter_label_new_full ("Sans 10", text, &black);
+  clutter_container_add_actor (CLUTTER_CONTAINER (button), button_text);
+  clutter_actor_get_size (button_text, &width, &height);
+
+  clutter_actor_set_size (button_bg, width + PADDING * 2, height + PADDING * 2);
+  clutter_actor_set_position (button_bg, 0, 0);
+  clutter_actor_set_position (button_text, PADDING, PADDING);
+
+  return button;
+}
+
 int
 main (int argc,
       char *argv[])
 {
-  ClutterActor* actor, *stage;
+  ClutterActor* actor, *stage, *buttons, *button;
   ChamplainLayer *layer;
+  guint width;
 
   g_thread_init (NULL);
   clutter_init (&argc, &argv);
@@ -100,6 +146,28 @@ main (int argc,
   actor = champlain_view_new ();
   champlain_view_set_size (CHAMPLAIN_VIEW (actor), 800, 600);
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
+
+  /* Create the buttons */
+  buttons = clutter_group_new ();
+  clutter_actor_set_position (buttons, PADDING, PADDING);
+
+  button = make_button ("Zoom in");
+  clutter_container_add_actor (CLUTTER_CONTAINER (buttons), button);
+  clutter_actor_set_reactive (button, TRUE);
+  clutter_actor_get_size (button, &width, NULL);
+  g_signal_connect (button, "button-release-event",
+      G_CALLBACK (zoom_in),
+      actor);
+
+  button = make_button ("Zoom out");
+  clutter_container_add_actor (CLUTTER_CONTAINER (buttons), button);
+  clutter_actor_set_reactive (button, TRUE);
+  clutter_actor_set_position (button, width + PADDING, 0);
+  g_signal_connect (button, "button-release-event",
+      G_CALLBACK (zoom_out),
+      actor);
+
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), buttons);
 
   /* Create the markers and marker layer */
   layer = create_marker_layer (CHAMPLAIN_VIEW (actor));
