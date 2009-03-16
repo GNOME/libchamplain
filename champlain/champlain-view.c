@@ -1050,7 +1050,12 @@ champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
-  if (priv->map == NULL || zoom_level == priv->zoom_level)
+  if (zoom_level == priv->zoom_level)
+    return;
+
+  priv->zoom_level = zoom_level;
+
+  if (priv->map == NULL)
     return;
 
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
@@ -1058,7 +1063,6 @@ champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
   if (!map_zoom_to (priv->map, priv->map_source, zoom_level))
     return;
 
-  priv->zoom_level = zoom_level;
   ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
   resize_viewport (view);
   clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
