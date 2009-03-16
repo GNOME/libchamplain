@@ -138,7 +138,7 @@ map_zoom_in (Map *map, ChamplainMapSource *source)
 gboolean
 map_zoom_out (Map *map, ChamplainMapSource *source)
 {
-  guint new_level = champlain_zoom_level_get_zoom_level (map->current_level) - 1;
+  gint new_level = champlain_zoom_level_get_zoom_level (map->current_level) - 1;
   if(new_level >= champlain_map_source_get_min_zoom_level (source))
     {
       map_load_level(map, source, new_level);
