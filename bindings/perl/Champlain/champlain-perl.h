@@ -10,7 +10,6 @@
 #endif
 
 
-#include "ppport.h"
 #include "champlain-autogen.h"
 
 #endif /* _CHAMPLAIN_PERL_H_ */

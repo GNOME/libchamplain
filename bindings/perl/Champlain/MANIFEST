@@ -7,7 +7,6 @@ lib/Champlain.pm
 maps
 maps-gtk
 champlain-perl.h
-ppport.h
 xs/Champlain.xs
 xs/ChamplainLayer.xs
 xs/ChamplainMapSource.xs
