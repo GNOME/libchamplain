@@ -45,7 +45,7 @@ struct _ChamplainViewEmbed
 
 struct _ChamplainViewEmbedClass
 {
-  GtkBinClass parent_class;
+  GtkAlignmentClass parent_class;
 
 };
 
