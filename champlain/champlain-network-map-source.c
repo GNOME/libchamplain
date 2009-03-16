@@ -351,9 +351,16 @@ static void
 create_error_tile (ChamplainTile* tile)
 {
   ClutterActor *actor;
+  ClutterColor red = { 0xff, 0x00, 0x00, 0xff };
+
   actor = clutter_texture_new_from_file (DATADIR "/champlain/error.svg", NULL);
   if (!actor)
-    return;
+  {
+    /* Just in case the image is not found, put some red.  This should not
+     * happen if libchamplain is installed correctly. */
+    actor = clutter_rectangle_new_with_color (&red);
+    clutter_actor_set_size (actor , 256, 256);
+  }
 
   champlain_tile_set_actor (tile, actor);
   clutter_actor_show (actor);
