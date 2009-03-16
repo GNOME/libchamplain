@@ -167,6 +167,7 @@ static void view_load_visible_tiles (ChamplainView *view);
 static void view_position_tile (ChamplainView* view, ChamplainTile* tile);
 static void view_tiles_reposition (ChamplainView* view);
 static void view_update_state (ChamplainView *view);
+static void view_update_anchor (ChamplainView *view, gint x, gint y);
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -781,6 +782,11 @@ viewport_x_changed_cb (GObject *gobject,
   priv->longitude = viewport_get_current_longitude (priv);
   priv->latitude = viewport_get_current_latitude (priv);
 
+  /*view_update_anchor (view,
+      rect.x + priv->anchor.x + priv->viewport_size.width / 2.0,
+      rect.y + priv->anchor.y + priv->viewport_size.height / 2.0);
+  */
+
   view_load_visible_tiles (view);
   view_tiles_reposition (view);
 
@@ -905,6 +911,39 @@ champlain_view_new (void)
   return g_object_new (CHAMPLAIN_TYPE_VIEW, NULL);
 }
 
+static void
+view_update_anchor (ChamplainView *view, gint x, gint y)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  if (priv->zoom_level >= 8)
+    {
+      gdouble max;
+
+      priv->anchor.x = x - G_MAXINT16 / 2;
+      priv->anchor.y = y - G_MAXINT16 / 2;
+
+      if ( priv->anchor.x < 0 )
+        priv->anchor.x = 0;
+      if ( priv->anchor.y < 0 )
+        priv->anchor.y = 0;
+
+      max = champlain_zoom_level_get_width (priv->map->current_level) *
+          champlain_map_source_get_tile_size (priv->map_source) -
+          (G_MAXINT16 / 2);
+      if (priv->anchor.x > max)
+        priv->anchor.x = max;
+      if (priv->anchor.y > max)
+        priv->anchor.y = max;
+    }
+  else
+    {
+      priv->anchor.x = 0;
+      priv->anchor.y = 0;
+    }
+  DEBUG ("New Anchor (%d, %d) for (%d, %d)", priv->anchor.x, priv->anchor.y, x, y);
+}
+
 /**
  * champlain_view_center_on:
  * @view: a #ChamplainView
@@ -934,34 +973,10 @@ champlain_view_center_on (ChamplainView *view,
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
 
-  if (priv->zoom_level >= 8)
-    {
-      gdouble max;
+  view_update_anchor (view, x, y);
 
-      priv->anchor.x = x - G_MAXINT16 / 2;
-      priv->anchor.y = y - G_MAXINT16 / 2;
-
-      if ( priv->anchor.x < 0 )
-        priv->anchor.x = 0;
-      if ( priv->anchor.y < 0 )
-        priv->anchor.y = 0;
-
-      max = champlain_zoom_level_get_width (priv->map->current_level) *
-          champlain_map_source_get_tile_size (priv->map_source) -
-          (G_MAXINT16 / 2);
-      if (priv->anchor.x > max)
-        priv->anchor.x = max;
-      if (priv->anchor.y > max)
-        priv->anchor.y = max;
-
-      x -= priv->anchor.x;
-      y -= priv->anchor.y;
-    }
-  else
-    {
-      priv->anchor.x = 0;
-      priv->anchor.y = 0;
-    }
+  x -= priv->anchor.x;
+  y -= priv->anchor.y;
 
   tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
     x - priv->viewport_size.width / 2.0,
