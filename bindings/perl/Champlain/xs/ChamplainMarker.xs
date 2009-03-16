@@ -27,7 +27,7 @@ champlain_marker_new_with_image (class, gchar *filename)
 	CODE:
 		RETVAL = champlain_marker_new_with_image(filename, &error);
 		if (error) {
-			gperl_croak_gerror(filename, error);
+			gperl_croak_gerror(NULL, error);
 		}
 	OUTPUT:
 		RETVAL
@@ -40,7 +40,7 @@ champlain_marker_new_with_image_full(class, const gchar *filename, gint width, g
 	CODE:
 		RETVAL = champlain_marker_new_with_image_full(filename, width, height, anchor_x, anchor_y, &error);
 		if (error) {
-			gperl_croak_gerror(filename, error);
+			gperl_croak_gerror(NULL, error);
 		}
 	OUTPUT:
 		RETVAL
