@@ -6,10 +6,10 @@ MODULE = Gtk2::Champlain::ViewEmbed  PACKAGE = Gtk2::Champlain::ViewEmbed  PREFI
 PROTOTYPES: DISABLE
 
 
-GtkWidget *
+GtkWidget*
 champlain_view_embed_new (class, ChamplainView *view)
 	C_ARGS: view
 
 
-ChamplainView *
+ChamplainView*
 champlain_view_embed_get_view (ChamplainViewEmbed *embed)
