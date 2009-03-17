@@ -33,7 +33,6 @@ enum
 
 enum
 {
-  /* normal signals */
   PROP_0,
   PROP_VIEW
 };
