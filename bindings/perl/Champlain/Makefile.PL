@@ -26,15 +26,15 @@ sub main {
 	
 	# Find libchamplain
 	my @typemaps = ();
-    my @deps = qw/ Glib /;
+	my @deps = ('Glib');
 	my %pkgconfig;
 
 	eval {
 		%pkgconfig = ExtUtils::PkgConfig->find("champlain-$champlain_version");
-	    # All XS files that start with Champlain are for libchamplain
-        push @XS_FILES, <xs/Champlain*.xs>;
-        push @typemaps, 'maps';
-        push @deps, 'Clutter';
+		# All XS files that start with Champlain are for libchamplain
+		push @XS_FILES, <xs/Champlain*.xs>;
+		push @typemaps, 'maps';
+		push @deps, 'Clutter';
 	};
 	if (my $error = $@) {
 		warn "FAIL: ", $error;
@@ -50,7 +50,7 @@ sub main {
 		# All XS files that start with Gtk2Champlain are for libchamplain-gtk
 		push @XS_FILES, <xs/Gtk2Champlain*.xs>;
 		push @typemaps, 'maps-gtk';
-        push @deps, 'Gtk2';
+		push @deps, 'Gtk2';
 	};
 	if (my $error = $@) {
 		warn "Ignoring the Gtk2 bindings ($error)";
@@ -75,9 +75,9 @@ sub main {
 		File::Spec->catfile(cwd(), 'build', 'champlain.typemap')
 	);
 	$DEPENDS->install(
-        File::Spec->catfile('build', 'champlain-autogen.h'),
-        'champlain-perl.h',
-    );
+		File::Spec->catfile('build', 'champlain-autogen.h'),
+		'champlain-perl.h',
+	);
 	$DEPENDS->save_config(File::Spec->catfile('build', 'IFiles.pm'));
 	
 
@@ -86,7 +86,7 @@ sub main {
 		AUTHOR        => 'Emmanuel Rodriguez <potyl@cpan.org>',
 		NAME          => 'Champlain',
 		VERSION_FROM  => File::Spec->catfile('lib', 'Champlain.pm'),
-    ABSTRACT_FROM => File::Spec->catfile('lib', 'Champlain.pm'),
+		ABSTRACT_FROM => File::Spec->catfile('lib', 'Champlain.pm'),
 		LICENSE       => 'perl, lgpl',
 
 		PREREQ_PM     => {
