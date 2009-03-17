@@ -11,5 +11,9 @@ champlain_view_embed_new (class, ChamplainView *view)
 	C_ARGS: view
 
 
-#ChamplainView*
-#champlain_view_embed_get_view (ChamplainViewEmbed *embed)
+# FIXME the parameter embed should be of type ChamplainViewEmbed. The bindings
+#       fail to generate the proper C code and leave unresolved symbols when
+#       using ChamplainViewEmbed. In order to provide 100% coverage of the API
+#       a GtkWidget has to be passed instead.
+ChamplainView*
+champlain_view_embed_get_view (GtkWidget *embed)
