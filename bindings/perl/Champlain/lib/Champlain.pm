@@ -113,7 +113,7 @@ our %EXPORT_TAGS = (
 our @EXPORT_OK = map { @{ $_ } } values %EXPORT_TAGS;
 
 
-sub dl_load_flags { 0x01 }
+sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
 __PACKAGE__->bootstrap($VERSION);
 
