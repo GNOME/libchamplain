@@ -6,6 +6,7 @@
 #include <champlain/champlain.h>
 
 #ifdef CHAMPLAINPERL_GTK
+#include <gtk2perl.h>
 #include <champlain-gtk/champlain-gtk.h>
 #endif
 
