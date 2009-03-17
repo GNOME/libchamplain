@@ -16,5 +16,6 @@ xs/ChamplainTile.xs
 xs/ChamplainView.xs
 xs/Gtk2ChamplainViewEmbed.xs
 t/Champlain.t
+t/ChamplainLayer.t
 examples/launcher.pl
 examples/gtk2.pl
