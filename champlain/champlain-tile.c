@@ -124,10 +124,10 @@ champlain_tile_set_property (GObject *object,
         champlain_tile_set_state (self, g_value_get_enum (value));
         break;
       case PROP_URI:
-        champlain_tile_set_uri (self, g_value_dup_string (value));
+        champlain_tile_set_uri (self, g_value_get_string (value));
         break;
       case PROP_FILENAME:
-        champlain_tile_set_filename (self, g_value_dup_string (value));
+        champlain_tile_set_filename (self, g_value_get_string (value));
         break;
       case PROP_ACTOR:
         champlain_tile_set_actor (self, g_value_get_object (value));
@@ -151,6 +151,11 @@ champlain_tile_dispose (GObject *object)
 static void
 champlain_tile_finalize (GObject *object)
 {
+  ChamplainTilePrivate *priv = GET_PRIVATE (object);
+
+  g_free (priv->uri);
+  g_free (priv->filename);
+
   G_OBJECT_CLASS (champlain_tile_parent_class)->finalize (object);
 }
 
@@ -309,7 +314,7 @@ champlain_tile_get_state (ChamplainTile *self)
   return priv->state;
 }
 
-gchar *
+const gchar *
 champlain_tile_get_uri (ChamplainTile *self)
 {
   g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
@@ -319,7 +324,7 @@ champlain_tile_get_uri (ChamplainTile *self)
   return priv->uri;
 }
 
-gchar *
+const gchar *
 champlain_tile_get_filename (ChamplainTile *self)
 {
   g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
@@ -405,26 +410,28 @@ champlain_tile_new_full (gint x,
 }
 
 void
-champlain_tile_set_uri (ChamplainTile *self, gchar *uri)
+champlain_tile_set_uri (ChamplainTile *self,
+                        const gchar *uri)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
   g_return_if_fail(uri != NULL);
 
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
-  priv->uri = uri;
+  priv->uri = g_strdup (uri);
   g_object_notify (G_OBJECT (self), "uri");
 }
 
 void
-champlain_tile_set_filename (ChamplainTile *self, gchar *filename)
+champlain_tile_set_filename (ChamplainTile *self,
+                             const gchar *filename)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
   g_return_if_fail(filename != NULL);
 
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
-  priv->filename = filename;
+  priv->filename = g_strdup (filename);
   g_object_notify (G_OBJECT (self), "filename");
 }
 

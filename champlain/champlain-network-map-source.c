@@ -207,14 +207,14 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
 }
 
 ChamplainNetworkMapSource*
-champlain_network_map_source_new_full (gchar *name,
-                                       gchar *license,
-                                       gchar *license_uri,
+champlain_network_map_source_new_full (const gchar *name,
+                                       const gchar *license,
+                                       const gchar *license_uri,
                                        guint min_zoom,
                                        guint max_zoom,
                                        guint tile_size,
                                        ChamplainMapProjection projection,
-                                       gchar *uri_format)
+                                       const gchar *uri_format)
 {
   ChamplainNetworkMapSource * network_map_source;
   network_map_source = g_object_new (CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE, "name", name,
@@ -225,7 +225,7 @@ champlain_network_map_source_new_full (gchar *name,
   return network_map_source;
 }
 
-gchar *
+const gchar *
 champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_map_source,
                                            gint x,
                                            gint y,
@@ -380,7 +380,8 @@ file_loaded_cb (SoupSession *session,
   FileLoadedCallbackContext *ctx = (FileLoadedCallbackContext*) user_data;
   GdkPixbufLoader* loader;
   GError *error = NULL;
-  gchar* path = NULL, *filename = NULL;
+  gchar* path = NULL;
+  const gchar *filename = NULL;
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
@@ -438,7 +439,6 @@ file_loaded_cb (SoupSession *session,
   /*if (tile->to_destroy)
     {
       g_object_unref (loader);
-      g_free (filename);
       g_free (map_filename);
       g_free (tile);
       return;
@@ -521,7 +521,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
   else if (!priv->offline)
     {
       SoupMessage *msg;
-      gchar *uri;
+      const gchar *uri;
       FileLoadedCallbackContext *ctx = g_new0 (FileLoadedCallbackContext, 1);
       ctx->view = view;
       ctx->zoom_level = zoom_level;

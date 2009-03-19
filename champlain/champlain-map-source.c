@@ -384,7 +384,7 @@ champlain_map_source_get_name (ChamplainMapSource *map_source)
 
 void
 champlain_map_source_set_name (ChamplainMapSource *map_source,
-                               const char *name)
+                               const gchar *name)
 {
   ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
 
@@ -400,7 +400,7 @@ champlain_map_source_get_license (ChamplainMapSource *map_source)
 
 void
 champlain_map_source_set_license (ChamplainMapSource *map_source,
-                                  const char *license)
+                                  const gchar *license)
 {
   ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
 

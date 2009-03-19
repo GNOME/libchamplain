@@ -91,11 +91,11 @@ void champlain_map_source_get_tile (ChamplainMapSource *map_source,
     ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile);
 
 void champlain_map_source_set_name (ChamplainMapSource *map_source,
-    const char *name);
+    const gchar *name);
 const gchar * champlain_map_source_get_name (ChamplainMapSource *map_source);
 
 void champlain_map_source_set_license (ChamplainMapSource *map_source,
-    const char *license);
+    const gchar *license);
 const gchar * champlain_map_source_get_license (ChamplainMapSource *map_source);
 
 
