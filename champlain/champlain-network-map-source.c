@@ -114,8 +114,7 @@ champlain_network_map_source_set_property (GObject *object,
         priv->offline = g_value_get_boolean (value);
         break;
       case PROP_PROXY_URI:
-        if (priv->proxy_uri)
-          g_free (priv->proxy_uri);
+        g_free (priv->proxy_uri);
 
         priv->proxy_uri = g_value_dup_string (value);
         if (soup_session)
@@ -130,9 +129,11 @@ champlain_network_map_source_set_property (GObject *object,
 static void
 champlain_network_map_source_finalize (GObject *object)
 {
-  /* ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (object);
-   * ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
-   */
+  ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (object);
+  ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
+  
+  g_free (priv->proxy_uri);
+  g_free (priv->uri_format);
 
   G_OBJECT_CLASS (champlain_network_map_source_parent_class)->finalize (object);
 }
@@ -200,7 +201,8 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
 {
   ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (champlainMapSource);
 
-  priv->proxy_uri = "";
+  priv->proxy_uri = g_strdup ("");
+  priv->uri_format = NULL;
 }
 
 ChamplainNetworkMapSource*
