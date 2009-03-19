@@ -108,6 +108,7 @@ champlain_network_map_source_set_property (GObject *object,
   switch(prop_id)
     {
       case PROP_URI_FORMAT:
+        g_free (priv->uri_format);
         priv->uri_format = g_value_dup_string (value);
         break;
       case PROP_OFFLINE:
@@ -276,6 +277,7 @@ champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *network_ma
 {
   ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
 
+  g_free (priv->uri_format);
   priv->uri_format = g_strdup (uri_format);
 }
 
