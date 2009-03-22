@@ -55,8 +55,8 @@ GType champlain_zoom_level_get_type (void);
 
 ChamplainZoomLevel* champlain_zoom_level_new (void);
 
-gint champlain_zoom_level_get_width (ChamplainZoomLevel *self);
-gint champlain_zoom_level_get_height (ChamplainZoomLevel *self);
+guint champlain_zoom_level_get_width (ChamplainZoomLevel *self);
+guint champlain_zoom_level_get_height (ChamplainZoomLevel *self);
 gint champlain_zoom_level_get_zoom_level (ChamplainZoomLevel *self);
 ClutterActor* champlain_zoom_level_get_actor (ChamplainZoomLevel *self);
 

@@ -245,7 +245,7 @@ champlain_zoom_level_get_nth_tile (ChamplainZoomLevel *self,
   return g_ptr_array_index (priv->tiles, index);
 }
 
-gint
+guint
 champlain_zoom_level_get_width (ChamplainZoomLevel *self)
 {
 
@@ -256,7 +256,7 @@ champlain_zoom_level_get_width (ChamplainZoomLevel *self)
   return priv->width;
 }
 
-gint
+guint
 champlain_zoom_level_get_height (ChamplainZoomLevel *self)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), 0);
