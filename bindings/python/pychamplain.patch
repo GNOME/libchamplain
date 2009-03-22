@@ -1,0 +1,25 @@
+--- champlain/pychamplain.defs.orig	2009-03-22 01:23:50.000000000 +0000
++++ champlain/pychamplain.defs	2009-03-22 01:23:50.000000000 +0000
+@@ -721,14 +721,14 @@
+   )
+ )
+ 
+-(define-method set_actor
+-  (of-object "ChamplainZoomLevel")
+-  (c-name "champlain_zoom_level_set_actor")
+-  (return-type "none")
+-  (parameters
+-    '("ClutterActor*" "actor")
+-  )
+-)
++;(define-method set_actor
++;  (of-object "ChamplainZoomLevel")
++;  (c-name "champlain_zoom_level_set_actor")
++;  (return-type "none")
++;  (parameters
++;    '("ClutterActor*" "actor")
++;  )
++;)
+ 
+ (define-method add_tile
+   (of-object "ChamplainZoomLevel")
