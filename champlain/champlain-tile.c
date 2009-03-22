@@ -141,9 +141,9 @@ static void
 champlain_tile_dispose (GObject *object)
 {
   ChamplainTilePrivate *priv = GET_PRIVATE (object);
-  /* We call destroy here as an actor should not survive its tile */
+
   if (priv->actor != NULL)
-    clutter_actor_destroy (priv->actor);
+    priv->actor = NULL;
 
   G_OBJECT_CLASS (champlain_tile_parent_class)->dispose (object);
 }
@@ -155,6 +155,8 @@ champlain_tile_finalize (GObject *object)
 
   g_free (priv->uri);
   g_free (priv->filename);
+  if (priv->actor != NULL)
+    g_object_unref (G_OBJECT (priv->actor));
 
   G_OBJECT_CLASS (champlain_tile_parent_class)->finalize (object);
 }
@@ -254,8 +256,12 @@ champlain_tile_init (ChamplainTile *self)
   champlain_tile_set_y (self, 0);
   champlain_tile_set_zoom_level (self, 0);
   champlain_tile_set_size (self, 0);
-  champlain_tile_set_uri (self, "");
-  champlain_tile_set_filename (self, "");
+  champlain_tile_set_uri (self, g_strdup (""));
+  champlain_tile_set_filename (self, g_strdup (""));
+
+  /* Can't call champlain_tile_set_actor (self, NULL); because the assertion will fail */
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+  priv->actor = NULL;
 }
 
 ChamplainTile*
@@ -314,7 +320,7 @@ champlain_tile_get_state (ChamplainTile *self)
   return priv->state;
 }
 
-const gchar *
+G_CONST_RETURN gchar *
 champlain_tile_get_uri (ChamplainTile *self)
 {
   g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
@@ -324,7 +330,7 @@ champlain_tile_get_uri (ChamplainTile *self)
   return priv->uri;
 }
 
-const gchar *
+G_CONST_RETURN gchar *
 champlain_tile_get_filename (ChamplainTile *self)
 {
   g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);

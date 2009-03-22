@@ -61,8 +61,8 @@ gint champlain_tile_get_y (ChamplainTile *self);
 gint champlain_tile_get_zoom_level (ChamplainTile *self);
 guint champlain_tile_get_size (ChamplainTile *self);
 ChamplainState champlain_tile_get_state (ChamplainTile *self);
-const gchar * champlain_tile_get_uri (ChamplainTile *self);
-const gchar * champlain_tile_get_filename (ChamplainTile *self);
+G_CONST_RETURN gchar * champlain_tile_get_uri (ChamplainTile *self);
+G_CONST_RETURN gchar * champlain_tile_get_filename (ChamplainTile *self);
 ClutterActor * champlain_tile_get_actor (ChamplainTile *self);
 
 void champlain_tile_set_x (ChamplainTile *self, gint x);
