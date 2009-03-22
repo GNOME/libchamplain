@@ -554,7 +554,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   */
   g_object_class_install_property (object_class,
       PROP_LONGITUDE,
-      g_param_spec_float ("longitude",
+      g_param_spec_double ("longitude",
          "Longitude",
          "The longitude coordonate of the map",
          -180.0f, 180.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
@@ -568,7 +568,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   */
   g_object_class_install_property (object_class,
       PROP_LATITUDE,
-      g_param_spec_float ("latitude",
+      g_param_spec_double ("latitude",
            "Latitude",
            "The latitude coordonate of the map",
            -90.0f, 90.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
@@ -718,6 +718,8 @@ champlain_view_init (ChamplainView *view)
   priv->anchor.x = 0;
   priv->anchor.y = 0;
   priv->state = CHAMPLAIN_STATE_INIT;
+  priv->latitude = 0.0f;
+  priv->longitude = 0.0f;
 
   /* Setup viewport */
   priv->viewport = tidy_viewport_new ();
