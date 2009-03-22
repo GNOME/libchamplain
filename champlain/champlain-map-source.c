@@ -34,6 +34,9 @@
 #include <math.h>
 #include <string.h>
 
+void champlain_map_source_real_get_tile (ChamplainMapSource *map_source,
+    ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile);
+
 enum
 {
   /* normal signals */
@@ -168,7 +171,7 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
   object_class->get_property = champlain_map_source_get_property;
   object_class->set_property = champlain_map_source_set_property;
 
-  klass->get_tile = champlain_map_source_get_tile;
+  klass->get_tile = champlain_map_source_real_get_tile;
 
   /**
   * ChamplainMapSource:name:
@@ -349,7 +352,18 @@ champlain_map_source_get_tile (ChamplainMapSource *map_source,
                                ChamplainZoomLevel *zoom_level,
                                ChamplainTile *tile)
 {
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
+
   CHAMPLAIN_MAP_SOURCE_GET_CLASS (map_source)->get_tile (map_source, view, zoom_level, tile);
+}
+
+void
+champlain_map_source_real_get_tile (ChamplainMapSource *map_source,
+                                    ChamplainView *view,
+                                    ChamplainZoomLevel *zoom_level,
+                                    ChamplainTile *tile)
+{
+  g_error ("Should not be reached");
 }
 
 gdouble
