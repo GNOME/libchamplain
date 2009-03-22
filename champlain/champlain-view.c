@@ -97,6 +97,17 @@ enum
 
 #define GET_PRIVATE(obj)     (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
 
+/* Between state values for go_to */
+typedef struct {
+  ChamplainView *view;
+  ClutterAlpha *alpha;
+  ClutterTimeline *timeline;
+  gdouble to_latitude;
+  gdouble to_longitude;
+  gdouble from_latitude;
+  gdouble from_longitude;
+} GoToContext;
+
 struct _ChamplainViewPrivate
 {
   ClutterActor *stage;
@@ -131,6 +142,9 @@ struct _ChamplainViewPrivate
   ClutterActor *license_actor; /* Contains the licence info */
 
   ChamplainState state; /* View's global state */
+
+  /* champlain_view_go_to's context, kept for stop_go_to */
+  GoToContext *goto_context;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -724,6 +738,7 @@ champlain_view_init (ChamplainView *view)
   priv->state = CHAMPLAIN_STATE_INIT;
   priv->latitude = 0.0f;
   priv->longitude = 0.0f;
+  priv->goto_context = NULL;
 
   /* Setup viewport */
   priv->viewport = tidy_viewport_new ();
@@ -1024,6 +1039,113 @@ champlain_view_center_on (ChamplainView *view,
   view_load_visible_tiles (view);
   view_tiles_reposition (view);
   marker_reposition (view);
+}
+
+static void
+timeline_new_frame (ClutterTimeline *timeline,
+                    gint frame_num,
+                    GoToContext *ctx)
+{
+  gdouble alpha;
+  gdouble lat;
+  gdouble lon;
+
+  alpha = (double) clutter_alpha_get_alpha (ctx->alpha) / CLUTTER_ALPHA_MAX_ALPHA;
+  lat = ctx->to_latitude - ctx->from_latitude;
+  lon = ctx->to_longitude - ctx->from_longitude;
+
+  champlain_view_center_on (ctx->view,
+      ctx->from_latitude + alpha * lat,
+      ctx->from_longitude + alpha * lon);
+}
+
+static void
+timeline_completed (ClutterTimeline *timeline,
+                    ChamplainView *view)
+{
+  champlain_view_stop_go_to (view);
+}
+
+/**
+ * champlain_view_stop_go_to:
+ * @view: a #ChamplainView
+ *
+ * Stop the go to animation.  The view will stay where it was when the
+ * animation was stopped.
+ *
+ * Since: 0.4
+ */
+void
+champlain_view_stop_go_to (ChamplainView *view)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  if (priv->goto_context == NULL)
+    return;
+
+  clutter_timeline_stop (priv->goto_context->timeline);
+
+  g_object_unref (priv->goto_context->timeline);
+  g_object_unref (priv->goto_context->alpha);
+
+  g_free (priv->goto_context);
+  priv->goto_context = NULL;
+}
+
+/**
+ * champlain_view_go_to:
+ * @view: a #ChamplainView
+ * @latitude: the longitude to center the map at
+ * @longitude: the longitude to center the map at
+ *
+ * Move from the current position to these coordinates. All tiles in the
+ * intermediate view WILL be loaded!
+ *
+ * Since: 0.4
+ */
+void
+champlain_view_go_to (ChamplainView *view,
+                      gdouble latitude,
+                      gdouble longitude)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  gint duration;
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  GoToContext *ctx = g_new0 (GoToContext, 1);
+
+  ctx->from_latitude = priv->latitude;
+  ctx->from_longitude = priv->longitude;
+  ctx->to_latitude = latitude;
+  ctx->to_longitude = longitude;
+  ctx->view = view;
+
+  /* We keep a reference for stop */
+  priv->goto_context = ctx;
+
+  /* A ClutterTimeline will be responsible for the animation,
+   * at each frame, the current position will be computer and set
+   * using champlain_view_center_on.  Timelines skip frames if the
+   * computer is not fast enough, so we just need to set the duration.
+   *
+   * To have a nice animation, the duration should be longer if the zoom level
+   * is higher and if the points are far away
+   */
+  duration = 100 * priv->zoom_level *
+    sqrt (pow (latitude - priv->latitude, 2) + pow (longitude - priv->longitude, 2));
+  ctx->timeline = clutter_timeline_new_for_duration (duration);
+  ctx->alpha = clutter_alpha_new_full (ctx->timeline, CLUTTER_ALPHA_SINE_INC, NULL,
+      NULL);
+
+  g_signal_connect (ctx->timeline, "new-frame", G_CALLBACK (timeline_new_frame),
+      ctx);
+  g_signal_connect (ctx->timeline, "completed", G_CALLBACK (timeline_completed),
+      view);
+
+  clutter_timeline_start (ctx->timeline);
 }
 
 /**
