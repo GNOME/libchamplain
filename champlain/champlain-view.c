@@ -1285,7 +1285,7 @@ void
 champlain_view_set_map_source (ChamplainView *view,
                                ChamplainMapSource *source)
 {
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view) ||
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view) &&
       CHAMPLAIN_IS_MAP_SOURCE (source));
 
   ClutterActor *group;
@@ -1339,8 +1339,8 @@ void
 champlain_view_set_decel_rate (ChamplainView *view,
                                gdouble rate)
 {
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view) ||
-      rate > 2.0 ||
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view) &&
+      rate > 2.0 &&
       rate < 0);
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
