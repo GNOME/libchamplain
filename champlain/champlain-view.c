@@ -441,10 +441,10 @@ champlain_view_get_property (GObject *object,
   switch (prop_id)
     {
       case PROP_LONGITUDE:
-        g_value_set_double (value, viewport_get_current_longitude (priv));
+        g_value_set_double (value, priv->longitude);
         break;
       case PROP_LATITUDE:
-        g_value_set_double (value, viewport_get_current_latitude (priv));
+        g_value_set_double (value, priv->latitude);
         break;
       case PROP_ZOOM_LEVEL:
         g_value_set_int (value, priv->zoom_level);
