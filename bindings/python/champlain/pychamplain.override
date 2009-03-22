@@ -4,13 +4,18 @@ headers
 #include <pygobject.h>
 #include <champlain/champlain.h>
 #include <clutter/clutter.h>
+#include "pychamplain.h"
 
 %%
 modulename champlain
 %%
+import gobject.GObject as PyGObject_Type
 import clutter.Actor as PyClutterActor_Type
 import clutter.Group as PyClutterGroup_Type
 %%
 ignore-glob
         *_get_type
+%%
+ignore
+	champlain_zoom_level_set_actor
 %%

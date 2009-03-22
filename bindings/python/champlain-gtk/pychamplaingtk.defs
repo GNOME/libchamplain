@@ -1,5 +1,12 @@
 ;; -*- scheme -*-
 ; object definitions ...
+(define-object ViewEmbed
+  (in-module "Champlain")
+  (parent "GtkAlignment")
+  (c-name "ChamplainViewEmbed")
+  (gtype-id "CHAMPLAIN_TYPE_VIEW_EMBED")
+)
+
 ;; Enumerations and flags ...
 
 

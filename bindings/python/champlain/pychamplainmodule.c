@@ -1,9 +1,8 @@
 #define NO_IMPORT_PYGOBJECT
 
 #include <pygobject.h>
+#include "pychamplain.h"
 
-void champlain_register_classes (PyObject *d);
-void champlain_add_constants(PyObject *module, const gchar *strip_prefix);
 DL_EXPORT(void) initchamplain(void);
 extern PyMethodDef champlain_functions[];
 

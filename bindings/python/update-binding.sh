@@ -9,7 +9,11 @@ python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	champlain-view.h			\
 	champlain-defines.h			\
 	champlain-layer.h			\
+	champlain-map-source.h			\
+	champlain-network-map-source.h		\
 	champlain-marker.h			\
+	champlain-tile.h			\
+	champlain-zoom-level.h			\
  > ../bindings/python/champlain/pychamplain.defs
 
 # Update the list of headers from Makefile.am

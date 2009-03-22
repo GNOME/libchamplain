@@ -3,11 +3,13 @@ headers
 #include <Python.h>
 #include <pygobject.h>
 #include <champlain/champlain.h>
+#include <champlain-gtk/champlain-gtk.h>
 #include <clutter/clutter.h>
-
+#include "../champlain/pychamplain.h"
 %%
 modulename champlain
 %%
+import gtk.Alignment as PyGtkAlignment_Type
 import clutter.Actor as PyClutterActor_Type
 import clutter.Group as PyClutterGroup_Type
 %%
