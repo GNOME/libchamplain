@@ -110,6 +110,22 @@
   )
 )
 
+(define-method go_to
+  (of-object "ChamplainView")
+  (c-name "champlain_view_go_to")
+  (return-type "none")
+  (parameters
+    '("gdouble" "latitude")
+    '("gdouble" "longitude")
+  )
+)
+
+(define-method stop_go_to
+  (of-object "ChamplainView")
+  (c-name "champlain_view_stop_go_to")
+  (return-type "none")
+)
+
 (define-method zoom_in
   (of-object "ChamplainView")
   (c-name "champlain_view_zoom_in")
@@ -673,13 +689,13 @@
 (define-method get_width
   (of-object "ChamplainZoomLevel")
   (c-name "champlain_zoom_level_get_width")
-  (return-type "gint")
+  (return-type "guint")
 )
 
 (define-method get_height
   (of-object "ChamplainZoomLevel")
   (c-name "champlain_zoom_level_get_height")
-  (return-type "gint")
+  (return-type "guint")
 )
 
 (define-method get_zoom_level
@@ -718,15 +734,6 @@
   (return-type "none")
   (parameters
     '("gint" "zoom_level")
-  )
-)
-
-(define-method set_actor
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_set_actor")
-  (return-type "none")
-  (parameters
-    '("ClutterActor*" "actor")
   )
 )
 
