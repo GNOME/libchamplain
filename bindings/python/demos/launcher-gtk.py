@@ -24,11 +24,15 @@ def zoom_changed(spinbutton, view):
 def map_source_changed(widget, view):
     selection = widget.get_active_text()
     if selection == "Open Street Map":
-        view.set_property("map-source", champlain.MAP_SOURCE_OPENSTREETMAP)
+        view.set_property("map-source", champlain.map_source_new_osm_mapnik())
     elif selection == "Open Arial Map":
-        view.set_property("map-source", champlain.MAP_SOURCE_OPENARIALMAP)
+        view.set_property("map-source", champlain.map_source_new_oam())
     elif selection == "Maps for free - Relief":
-        view.set_property("map-source", champlain.MAP_SOURCE_MAPSFORFREE_RELIEF)
+        view.set_property("map-source", champlain.map_source_new_mff_relief())
+    elif selection == "OSM Cycle Map":
+        view.set_property("map-source", champlain.map_source_new_osm_cyclemap())
+    elif selection == "OSM Osmarender":
+        view.set_property("map-source", champlain.map_source_new_osm_osmarender())
     else:
         raise RuntimeException("Illegal state: active text of combobox invalid")
 
@@ -40,17 +44,18 @@ def create_marker_layer():
 
     orange = clutter.Color(0xf3, 0x94, 0x07, 0xbb)
     white = clutter.Color(0xff, 0xff, 0xff, 0xff)
-    marker = champlain.Marker("Montréal", "Airmole 14")
+    black = clutter.Color(0x00, 0x00, 0x00, 0xff)
+    marker = champlain.marker_new_with_label("Montréal", "Airmole 14", black, orange)
     marker.set_position(45.528178, -73.563788)
     layer.add(marker)
 
-#  marker = champlain_marker_new_with_label("New York", "Sans 25", &white, NULL);
-#  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 40.77, -73.98);
-#  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+    marker = champlain.marker_new_with_label("New York", "Sans 25", white, orange);
+    marker.set_position(40.77, -73.98);
+    layer.add(marker)
 
-#  marker = champlain_marker_new_with_label("Saint-Tite-des-Caps", "Serif 12", NULL, &orange);
-#  champlain_marker_set_position(CHAMPLAIN_MARKER(marker), 47.130885, -70.764141);
-#  clutter_container_add(CLUTTER_CONTAINER(layer), marker, NULL);
+    marker = champlain.marker_new_with_label("Saint-Tite-des-Caps", "Serif 12", black, orange);
+    marker.set_position(47.130885, -70.764141);
+    layer.add(marker)
 
     layer.hide()
 
@@ -93,6 +98,8 @@ combo = gtk.combo_box_new_text()
 combo.append_text("Open Street Map")
 combo.append_text("Open Arial Map")
 combo.append_text("Maps for free - Relief")
+combo.append_text("OSM Cycle Map")
+combo.append_text("OSM Osmarender")
 combo.set_active(0)
 combo.connect("changed", map_source_changed, view)
 bbox.add(combo)
