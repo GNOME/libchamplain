@@ -64,8 +64,6 @@ void champlain_zoom_level_set_width (ChamplainZoomLevel *self, guint width);
 void champlain_zoom_level_set_height (ChamplainZoomLevel *self, guint height);
 void champlain_zoom_level_set_zoom_level (ChamplainZoomLevel *self,
     gint zoom_level);
-void champlain_zoom_level_set_actor (ChamplainZoomLevel *self,
-    ClutterActor *actor);
 
 void champlain_zoom_level_add_tile (ChamplainZoomLevel *self,
     ChamplainTile *tile);
