@@ -111,6 +111,8 @@ struct _ChamplainViewPrivate
 
   /* Hack to get smaller x,y coordinates as the clutter limit is G_MAXINT16 */
   ChamplainPoint anchor;
+  gdouble anchor_zoom_level; /* the zoom_level for which the current anchor has
+                                been computed for */
 
   Map *map; /* Contains the current map model */
 
@@ -718,6 +720,7 @@ champlain_view_init (ChamplainView *view)
   priv->viewport_size.height = 0;
   priv->anchor.x = 0;
   priv->anchor.y = 0;
+  priv->anchor_zoom_level = 0;
   priv->state = CHAMPLAIN_STATE_INIT;
   priv->latitude = 0.0f;
   priv->longitude = 0.0f;
@@ -769,6 +772,8 @@ viewport_x_changed_cb (GObject *gobject,
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
   ChamplainPoint rect;
+  ChamplainPoint old_anchor;
+
   tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &rect.x, &rect.y,
       NULL);
 
@@ -776,19 +781,35 @@ viewport_x_changed_cb (GObject *gobject,
       rect.y == priv->viewport_size.y)
       return;
 
+  old_anchor.x = priv->anchor.x;
+  old_anchor.y = priv->anchor.y;
+
+  view_update_anchor (view,
+      rect.x + priv->anchor.x + priv->viewport_size.width / 2.0,
+      rect.y + priv->anchor.y + priv->viewport_size.height / 2.0);
+
+  if (priv->anchor.x - old_anchor.x != 0)
+    {
+      ChamplainPoint diff;
+
+      diff.x = priv->anchor.x - old_anchor.x;
+      diff.y = priv->anchor.y - old_anchor.y;
+
+      DEBUG("Relocating the viewport by %d, %d", diff.x, diff.y);
+      tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
+          rect.x - diff.x, rect.y - diff.y, 0);
+      return;
+    }
+
   priv->viewport_size.x = rect.x;
   priv->viewport_size.y = rect.y;
 
-  priv->longitude = viewport_get_current_longitude (priv);
-  priv->latitude = viewport_get_current_latitude (priv);
-
-  /*view_update_anchor (view,
-      rect.x + priv->anchor.x + priv->viewport_size.width / 2.0,
-      rect.y + priv->anchor.y + priv->viewport_size.height / 2.0);
-  */
-
   view_load_visible_tiles (view);
   view_tiles_reposition (view);
+  marker_reposition (view);
+
+  priv->longitude = viewport_get_current_longitude (priv);
+  priv->latitude = viewport_get_current_latitude (priv);
 
   g_object_notify (G_OBJECT (view), "longitude");
   g_object_notify (G_OBJECT (view), "latitude");
@@ -915,8 +936,18 @@ static void
 view_update_anchor (ChamplainView *view, gint x, gint y)
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  gboolean need_anchor = FALSE;
+  gboolean need_update = FALSE;
 
   if (priv->zoom_level >= 8)
+    need_anchor = TRUE;
+
+  if (priv->anchor_zoom_level != priv->zoom_level ||
+      x - priv->anchor.x + priv->viewport_size.width >= G_MAXINT16 ||
+      y - priv->anchor.y + priv->viewport_size.height >= G_MAXINT16)
+    need_update = TRUE;
+
+  if (need_anchor && need_update)
     {
       gdouble max;
 
@@ -935,11 +966,15 @@ view_update_anchor (ChamplainView *view, gint x, gint y)
         priv->anchor.x = max;
       if (priv->anchor.y > max)
         priv->anchor.y = max;
+
+      priv->anchor_zoom_level = priv->zoom_level;
     }
-  else
+
+  if (need_anchor == FALSE)
     {
       priv->anchor.x = 0;
       priv->anchor.y = 0;
+      priv->anchor_zoom_level = priv->zoom_level;
     }
   DEBUG ("New Anchor (%d, %d) for (%d, %d)", priv->anchor.x, priv->anchor.y, x, y);
 }
