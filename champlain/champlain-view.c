@@ -884,6 +884,11 @@ finger_scroll_button_press_cb (ClutterActor *actor,
 
   if (priv->zoom_on_double_click && event->button == 1 && event->click_count == 2)
     {
+      /* If at last zoom level, don't do anything */
+      if (priv->zoom_level ==
+          champlain_map_source_get_max_zoom_level (priv->map_source))
+        return FALSE;
+
       gint actor_x, actor_y;
       gint rel_x, rel_y;
 
