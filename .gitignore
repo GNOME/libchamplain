@@ -23,6 +23,7 @@ bindings/perl/Champlain/xs/ChamplainMarker.c
 bindings/perl/Champlain/xs/ChamplainNetworkMapSource.c
 bindings/perl/Champlain/xs/ChamplainTile.c
 bindings/perl/Champlain/xs/ChamplainView.c
+bindings/perl/Champlain/xs/ChamplainZoomLevel.c
 bindings/perl/Champlain/xs/Gtk2ChamplainViewEmbed.c
 champlain-gtk/champlain-gtk-marshal.c
 champlain-gtk/champlain-gtk-marshal.h
