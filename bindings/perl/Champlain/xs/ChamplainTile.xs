@@ -36,11 +36,11 @@ ChamplainState
 champlain_tile_get_state (ChamplainTile *self)
 
 
-gchar*
+const gchar*
 champlain_tile_get_uri (ChamplainTile *self)
 
 
-gchar*
+const gchar*
 champlain_tile_get_filename (ChamplainTile *self)
 
 
@@ -69,11 +69,11 @@ champlain_tile_set_state (ChamplainTile *self, ChamplainState state)
 
 
 void
-champlain_tile_set_uri (ChamplainTile *self, gchar* uri)
+champlain_tile_set_uri (ChamplainTile *self, const gchar* uri)
 
 
 void
-champlain_tile_set_filename (ChamplainTile *self, gchar* filename)
+champlain_tile_set_filename (ChamplainTile *self, const gchar* filename)
 
 
 void
