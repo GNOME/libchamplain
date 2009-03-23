@@ -1139,8 +1139,7 @@ champlain_view_go_to (ChamplainView *view,
    * To have a nice animation, the duration should be longer if the zoom level
    * is higher and if the points are far away
    */
-  duration = 100 * priv->zoom_level *
-    sqrt (pow (latitude - priv->latitude, 2) + pow (longitude - priv->longitude, 2));
+  duration = 500 * priv->zoom_level / 2.0;
   ctx->timeline = clutter_timeline_new_for_duration (duration);
   ctx->alpha = clutter_alpha_new_full (ctx->timeline, CLUTTER_ALPHA_SINE_INC, NULL,
       NULL);
@@ -1609,4 +1608,118 @@ champlain_view_set_zoom_on_double_click (ChamplainView *view,
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
   priv->zoom_on_double_click = value;
+}
+
+/**
+ * champlain_view_ensure_visible:
+ * @view: a #ChamplainView
+ * @min_lat: the minimum latitude
+ * @min_lon: the minimum longitude
+ * @max_lat: the maximum latitude
+ * @max_lon: the maximum longitude
+ *
+ * Changes the map's zoom level and center to make sure the given zone is
+ * visible.
+ *
+ * Since: 0.4
+ */
+void
+champlain_view_ensure_visible (ChamplainView *view,
+                               gdouble min_lat,
+                               gdouble min_lon,
+                               gdouble max_lat,
+                               gdouble max_lon,
+                               gboolean animate)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  gint zoom_level = priv->zoom_level;
+  gdouble width, height;
+  gboolean good_size = FALSE;
+
+  width = max_lon - min_lon;
+  height = max_lat - min_lat;
+  width *= 1.1;
+  height *= 1.1;
+
+  DEBUG("Zone to expose (%f, %f) to (%f, %f)", min_lat, min_lon, max_lat, max_lon);
+  do
+    {
+      gint min_x, min_y, max_x, max_y;
+      min_x = champlain_map_source_get_x (priv->map_source, zoom_level, min_lon);
+      min_y = champlain_map_source_get_y (priv->map_source, zoom_level, min_lat);
+
+      max_x = champlain_map_source_get_x (priv->map_source, zoom_level, max_lon);
+      max_y = champlain_map_source_get_y (priv->map_source, zoom_level, max_lat);
+
+      if (min_y - max_y <= priv->viewport_size.height &&
+          max_x - min_x <= priv->viewport_size.width)
+        good_size = TRUE;
+      else
+        zoom_level--;
+
+      if (zoom_level <= 0)
+        break;
+    }
+  while (good_size == FALSE);
+
+  if (good_size == FALSE)
+    {
+      zoom_level = 0;
+      min_lat = min_lon = width = height = 0;
+    }
+
+  DEBUG ("Ideal zoom level is %d", zoom_level);
+  champlain_view_set_zoom_level (view, zoom_level);
+  if (animate)
+    champlain_view_go_to (view, min_lat + height / 2.0, min_lon + width / 2.0);
+  else
+    champlain_view_center_on (view, min_lat + height / 2.0, min_lon + width / 2.0);
+}
+
+/**
+ * champlain_view_ensure_markers_visible:
+ * @view: a #ChamplainView
+ * @markers: a NULL terminated array of #ChamplainMarkers
+ *
+ * Changes the map's zoom level and center to make sure those markers are
+ * visible.
+ *
+ * FIXME: This doesn't take into account the marker's actor size yet
+ *
+ * Since: 0.4
+ */
+void
+champlain_view_ensure_markers_visible (ChamplainView *view,
+                                       ChamplainMarker *markers[],
+                                       gboolean animate)
+{
+  gdouble min_lat, min_lon, max_lat, max_lon;
+  ChamplainMarker *marker = NULL;
+  gint i = 0;
+
+  min_lat = min_lon = 200;
+  max_lat = max_lon = -200;
+
+  marker = markers[i];
+  while (marker != NULL)
+    {
+      gdouble lat, lon;
+      g_object_get (G_OBJECT (marker), "latitude", &lat, "longitude", &lon,
+          NULL);
+
+      if (lon < min_lon)
+        min_lon = lon;
+
+      if (lat < min_lat)
+        min_lat = lat;
+
+      if (lon > max_lon)
+        max_lon = lon;
+
+      if (lat > max_lat)
+        max_lat = lat;
+
+      marker = markers[i++];
+    }
+  champlain_view_ensure_visible (view, min_lat, min_lon, max_lat, max_lon, animate);
 }

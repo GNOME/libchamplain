@@ -75,11 +75,15 @@ void champlain_view_go_to (ChamplainView *view, gdouble latitude, gdouble longit
 void champlain_view_stop_go_to (ChamplainView *view);
 
 void champlain_view_zoom_in (ChamplainView *champlainView);
-
 void champlain_view_zoom_out (ChamplainView *champlainView);
-
 void champlain_view_set_zoom_level (ChamplainView *champlainView,
     gint zoom_level);
+
+void champlain_view_ensure_visible (ChamplainView *view, gdouble min_lat,
+    gdouble min_lon, gdouble max_lat, gdouble max_lon, gboolean animate);
+void champlain_view_ensure_markers_visible (ChamplainView *view,
+    ChamplainMarker *markers[], gboolean animate);
+
 void champlain_view_set_map_source (ChamplainView *champlainView,
     ChamplainMapSource *map_source);
 void champlain_view_set_size (ChamplainView *view, guint width, guint height);

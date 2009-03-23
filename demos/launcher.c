@@ -19,6 +19,7 @@
 #include <champlain/champlain.h>
 
 #define PADDING 10
+ChamplainMarker *markers [4];
 
 static gboolean
 map_view_button_release_cb (ClutterActor *actor,
@@ -69,6 +70,15 @@ zoom_out (ClutterActor *actor,
   return TRUE;
 }
 
+static gboolean
+center (ClutterActor *actor,
+        ClutterButtonEvent *event,
+        ChamplainView * view)
+{
+  champlain_view_ensure_markers_visible (view, markers, TRUE);
+  return TRUE;
+}
+
 static ChamplainLayer *
 create_marker_layer (ChamplainView *view)
 {
@@ -81,6 +91,7 @@ create_marker_layer (ChamplainView *view)
 
   marker = champlain_marker_new_with_label ("Montréal", "Airmole 14", NULL,
       NULL);
+  markers[0] = CHAMPLAIN_MARKER (marker);
   champlain_marker_set_position (CHAMPLAIN_MARKER (marker),
       45.528178, -73.563788);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
@@ -90,14 +101,18 @@ create_marker_layer (ChamplainView *view)
 
   marker = champlain_marker_new_with_label ("New York", "Sans 25", &white,
       NULL);
+  markers[1] = CHAMPLAIN_MARKER (marker);
   champlain_marker_set_position (CHAMPLAIN_MARKER (marker), 40.77, -73.98);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
   marker = champlain_marker_new_with_label ("Saint-Tite-des-Caps", "Serif 12",
       NULL, &orange);
+  markers[2] = CHAMPLAIN_MARKER (marker);
   champlain_marker_set_position (CHAMPLAIN_MARKER (marker), 47.130885,
       -70.764141);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
+
+  markers[3] = NULL;
 
   clutter_actor_show (CLUTTER_ACTOR (layer));
   return layer;
@@ -134,7 +149,7 @@ main (int argc,
 {
   ClutterActor* actor, *stage, *buttons, *button;
   ChamplainLayer *layer;
-  guint width;
+  guint width, total_width = 0;;
 
   g_thread_init (NULL);
   clutter_init (&argc, &argv);
@@ -155,6 +170,7 @@ main (int argc,
   clutter_container_add_actor (CLUTTER_CONTAINER (buttons), button);
   clutter_actor_set_reactive (button, TRUE);
   clutter_actor_get_size (button, &width, NULL);
+  total_width += width + PADDING;
   g_signal_connect (button, "button-release-event",
       G_CALLBACK (zoom_in),
       actor);
@@ -162,9 +178,21 @@ main (int argc,
   button = make_button ("Zoom out");
   clutter_container_add_actor (CLUTTER_CONTAINER (buttons), button);
   clutter_actor_set_reactive (button, TRUE);
-  clutter_actor_set_position (button, width + PADDING, 0);
+  clutter_actor_set_position (button, total_width, 0);
+  clutter_actor_get_size (button, &width, NULL);
+  total_width += width + PADDING;
   g_signal_connect (button, "button-release-event",
       G_CALLBACK (zoom_out),
+      actor);
+
+  button = make_button ("Center on markers");
+  clutter_container_add_actor (CLUTTER_CONTAINER (buttons), button);
+  clutter_actor_set_reactive (button, TRUE);
+  clutter_actor_set_position (button, total_width, 0);
+  clutter_actor_get_size (button, &width, NULL);
+  total_width += width + PADDING;
+  g_signal_connect (button, "button-release-event",
+      G_CALLBACK (center),
       actor);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), buttons);
