@@ -1,8 +1,10 @@
 Revision history for Champlain
 
 
-0.03 Tue Mar 17 13:10:08 CET 2009
+0.03 Sun Mar 22 22:32:44 CET 2009
 	Fixed the binding of champlain_view_embed_get_view()
+	Added support for Champlain::ZoomLevel
+	Added unit tests
 
 
 0.02 Tue Mar 17 09:18:08 CET 2009
