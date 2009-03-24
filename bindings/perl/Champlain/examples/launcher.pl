@@ -6,9 +6,12 @@ use warnings;
 use Glib qw(TRUE FALSE);
 use Clutter qw(-threads-init -init);
 use Champlain;
-use Data::Dumper;
 use FindBin;
 use File::Spec;
+
+
+my $PADDING = 10;
+
 
 exit main();
 
@@ -21,8 +24,26 @@ sub main {
 	# Create the map view
 	my $map = Champlain::View->new();
 	$map->set('scroll-mode', 'kinetic');
-#	$map->set('map-source', 'mapsforfree-relief');
 	$map->set_size(800, 600);
+	$stage->add($map);
+	
+	# Create the zoom buttons
+	my $buttons = Clutter::Group->new();
+	$buttons->set_position($PADDING, $PADDING);
+	$stage->add($buttons);
+	
+	my $button = make_button("Zoom in", sub {
+		$map->zoom_in();
+	});
+	$buttons->add($button);
+	my ($width) = $button->get_size();
+	
+	$button = make_button("Zoom out", sub {
+		$map->zoom_out();
+	});
+	$buttons->add($button);
+	$button->set_position($width + $PADDING, 0);
+	
 	
 	# Create the markers and marker layer
 	my $layer = create_marker_layer($map);
@@ -36,12 +57,42 @@ sub main {
 	$map->set_reactive(TRUE);
 	$map->signal_connect_after("button-release-event", \&map_view_button_release_cb, $map);
 
-	$stage->add($map);
 	$stage->show_all();
 	
 	Clutter->main();
 	
 	return 0;
+}
+
+
+#
+# Creates a button and registers the given callback. The callback will be called
+# each time that the button is clicked.
+#
+sub make_button {
+	my ($text, $callback) = @_;
+
+	my $button = Clutter::Group->new();
+
+	my $white = Clutter::Color->new(0xff, 0xff, 0xff, 0xff);
+	my $button_bg = Clutter::Rectangle->new($white);
+	$button->add($button_bg);
+	$button_bg->set_opacity(0xcc);
+
+	my $black = Clutter::Color->new(0x00, 0x00, 0x00, 0xff);
+	my $button_text = Clutter::Label->new("Sans 10", $text, $black);
+	$button->add($button_text);
+	my ($width, $height) = $button_text->get_size();
+
+	$button_bg->set_size($width + $PADDING * 2, $height + $PADDING * 2);
+	$button_bg->set_position(0, 0);
+	$button_text->set_position($PADDING, $PADDING);
+	
+	
+	$button->set_reactive(TRUE);
+	$button->signal_connect('button-release-event', $callback);
+
+	return $button;
 }
 
 
