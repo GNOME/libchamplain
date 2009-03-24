@@ -6,13 +6,7 @@ use warnings;
 use Glib qw(TRUE FALSE);
 use Clutter qw(-gtk-init);
 use Gtk2 qw(-init);
-
 use Champlain;
-#use Gtk2::Champlain;
-
-use Data::Dumper;
-use FindBin;
-use File::Spec;
 
 
 exit main();
@@ -20,32 +14,104 @@ exit main();
 
 sub main {
 	
-	
-	
 	my $window = Gtk2::Window->new();
-	$window->set_size_request(800, 600);
+	$window->set_border_width(10);
+	$window->set_title("Champlain - Demo");
+	$window->signal_connect('destroy' => sub { Gtk2->main_quit() });
 	
+	my $vbox = Gtk2::VBox->new(FALSE, 10);	
+
 	# Create the map view
 	my $map = Champlain::View->new();
 	my $gtk2_map = Gtk2::Champlain::ViewEmbed->new($map);
-	$map->set('scroll-mode', 'kinetic');
-#	$map->set('map-source', 'mapsforfree-relief');
-	$map->set_size(800, 600);
+	$map->set('scroll-mode', 'kinetic', 'zoom-level', 5);
+	$gtk2_map->set_size_request(640, 480);
 	
 	# Create the markers and marker layer
 	my $layer = create_marker_layer($map);
 	$map->add_layer($layer);
+
+
+	##
+	# Create the top toolbar
+	my $toolbox = Gtk2::HBox->new(FALSE, 10);
+
+	my $child = Gtk2::Button->new_from_stock('gtk-zoom-in');
+	$child->signal_connect('clicked', sub {
+		$map->zoom_in();	
+	});
+	$toolbox->add($child);
+
+	$child = Gtk2::Button->new_from_stock('gtk-zoom-out');
+	$child->signal_connect('clicked', sub {
+		$map->zoom_out();	
+	});
+	$toolbox->add($child);
+
+	$child = Gtk2::ToggleButton->new_with_label("Markers");
+	$child->signal_connect('toggled', sub {
+		if ($layer->get('visible')) {
+			$layer->hide();		
+		}
+		else {
+			$layer->show_all();		
+		}
+	});
+	$toolbox->add($child);
+
+	$child = Gtk2::ComboBox->new_text();
+	my @sources = ();	
+	foreach my $type qw(osm_mapnik oam mff_relief osm_cyclemap osm_osmarender) {
+		my $constructor = "new_$type";
+		my $source = 	Champlain::MapSource->$constructor();
+		push @sources, $source;
+		$child->append_text($source->get_name);
+	}
+	$child->set_active(0);
+	$child->signal_connect('changed', sub {
+		my ($button) = @_;		
+		my $index = $button->get_active;
+		my $source = $sources[$index];		
+		$map->set('map-source', $source);
+	});
+	$toolbox->add($child);
+
+	my $spin = Gtk2::SpinButton->new_with_range(0, 20, 1);
+	$spin->signal_connect('changed', sub {
+		$map->set('zoom-level', $spin->get_value_as_int);
+	});
+	$map->signal_connect('notify::zoom-level', sub {
+		$spin->set_value($map->get('zoom-level'));
+	});
+	$toolbox->add($spin);
+
+	my $image = Gtk2::Image->new_from_stock('gtk-network', 'button');
+	$map->signal_connect('notify::state', sub {
+		my $state = $map->get('state');
+		if ($state eq 'loading') {
+			$image->show();
+		}
+		else {
+			$image->hide();		
+		}
+	});
+	$toolbox->pack_end($image, FALSE, FALSE, 0);
+
 	
 	# Finish initializing the map view
-	$map->set_property("zoom-level", 7);
 	$map->center_on(45.466, -73.75);
 	
-	# Middle click to get the location in the map
-	$map->set_reactive(TRUE);
-	$map->signal_connect_after("button-release-event", \&map_view_button_release_cb, $map);
 
-	$window->add($gtk2_map);
+	my $viewport = Gtk2::Viewport->new();
+	$viewport->set_shadow_type('etched-in');
+	$viewport->add($gtk2_map);
+
+	$vbox->pack_start($toolbox, FALSE, FALSE, 0);
+	$vbox->add($viewport);
+
+	$window->add($vbox);
 	$window->show_all();
+	$image->hide();
 	
 	Gtk2->main();
 	
@@ -72,15 +138,9 @@ sub create_marker_layer {
 	$marker->set_position(40.77, -73.98);
 	$layer->add($marker);
 
-	my $file = File::Spec->catfile($FindBin::Bin, 'who.png');
-	eval {
-		$marker = Champlain::Marker->new_with_image_full($file, 40, 40, 20, 20);
-		$marker->set_position(47.130885, -70.764141);
-		$layer->add($marker);
-	};
-	if (my $error = $@) {
-		warn "Failed to load image $file because $error";
-	}
+	$marker = Champlain::Marker->new_with_label("Bratislava", "Sans 15", $orange, undef);
+	$marker->set_position(47.130885, -70.764141);
+	$layer->add($marker);
 
 	$layer->show();
 	return $layer;
