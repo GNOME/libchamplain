@@ -3,22 +3,24 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 57;
+use Clutter::TestHelper tests => 95;
 
 use Champlain ':coords';
 
 exit tests();
 
 sub tests {
-	test_osm();
+	test_osm_mapnik();
+	test_osm_cyclemap();
+	test_osm_osmarender();
 	test_oam();
 	test_mff();
 	return 0;
 }
 
 
-# OpenStreetMap
-sub test_osm {
+# OpenStreetMap Mapnik
+sub test_osm_mapnik {
 	my $label = "OpenStreetMap";
 	my $map = Champlain::MapSource->new_osm_mapnik();
 	isa_ok($map, 'Champlain::MapSource');
@@ -33,6 +35,39 @@ sub test_osm {
 	generic_map_operations($label, $map);
 }
 
+
+# OpenStreetMap Cycle Map
+sub test_osm_cyclemap {
+	my $label = "OpenStreetMap (cyclemap)";
+	my $map = Champlain::MapSource->new_osm_cyclemap();
+	isa_ok($map, 'Champlain::MapSource');
+	
+	# Map identification
+	is($map->get_name, 'OpenStreetMap Cycle Map', "$label name");
+	is($map->get_min_zoom_level, 0, "$label min zoom");
+	is($map->get_max_zoom_level, 18, "$label max zoom");
+	is($map->get_tile_size, 256, "$label tile size");
+	
+	# Generic map operations
+	generic_map_operations($label, $map);
+}
+
+
+# OpenStreetMap Osmarender
+sub test_osm_osmarender {
+	my $label = "OpenStreetMap (osmarender)";
+	my $map = Champlain::MapSource->new_osm_osmarender();
+	isa_ok($map, 'Champlain::MapSource');
+	
+	# Map identification
+	is($map->get_name, 'OpenStreetMap Osmarender', "$label name");
+	is($map->get_min_zoom_level, 0, "$label min zoom");
+	is($map->get_max_zoom_level, 18, "$label max zoom");
+	is($map->get_tile_size, 256, "$label tile size");
+	
+	# Generic map operations
+	generic_map_operations($label, $map);
+}
 
 # OpenArialMap
 sub test_oam {
