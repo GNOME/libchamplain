@@ -40,7 +40,7 @@ create_marker ()
   /* Create the marker */
   marker = champlain_marker_new ();
 
-  /* Static filled cercle ----------------------------------------------- */
+  /* Static filled circle ----------------------------------------------- */
   bg = clutter_cairo_new (MARKER_SIZE, MARKER_SIZE);
   cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
 
@@ -60,7 +60,7 @@ create_marker ()
   clutter_actor_set_anchor_point_from_gravity (bg, CLUTTER_GRAVITY_CENTER);
   clutter_actor_set_position (bg, 0, 0);
 
-  /* Echo cercle -------------------------------------------------------- */
+  /* Echo circle -------------------------------------------------------- */
   bg = clutter_cairo_new (2 * MARKER_SIZE, 2 * MARKER_SIZE);
   cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
 
@@ -82,7 +82,7 @@ create_marker ()
   clutter_actor_set_position (bg, 0, 0);
   clutter_actor_set_anchor_point_from_gravity (bg, CLUTTER_GRAVITY_CENTER);
 
-  /* Animate the echo cercle */
+  /* Animate the echo circle */
   timeline = clutter_timeline_new_for_duration (1000);
   clutter_timeline_set_loop (timeline, TRUE);
   alpha = clutter_alpha_new_full (timeline, CLUTTER_ALPHA_SINE_INC, NULL, g_object_unref);
