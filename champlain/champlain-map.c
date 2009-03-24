@@ -96,9 +96,8 @@ map_load_visible_tiles (Map *map, ChamplainView *view, ChamplainMapSource *sourc
         ClutterActor *group, *actor;
         actor = champlain_tile_get_actor (tile);
         group = champlain_zoom_level_get_actor (map->current_level);
-        champlain_zoom_level_remove_tile (map->current_level, tile);
-        g_object_unref (tile);
         clutter_container_remove_actor (CLUTTER_CONTAINER (group), actor);
+        champlain_zoom_level_remove_tile (map->current_level, tile);
       }
     }
 
@@ -125,6 +124,7 @@ map_load_visible_tiles (Map *map, ChamplainView *view, ChamplainMapSource *sourc
               g_object_set (G_OBJECT (tile), "x", i, "y", j, NULL);
               champlain_map_source_get_tile (source, view, map->current_level, tile);
               champlain_zoom_level_add_tile (map->current_level, tile);
+              g_object_unref (tile);
             }
         }
     }

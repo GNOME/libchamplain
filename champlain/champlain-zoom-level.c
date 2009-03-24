@@ -111,9 +111,18 @@ static void
 champlain_zoom_level_dispose (GObject *object)
 {
   //FIXME: Get rid of tiles here?
+  guint k;
   ChamplainZoomLevelPrivate *priv = GET_PRIVATE (object);
+  ChamplainZoomLevel *level = CHAMPLAIN_ZOOM_LEVEL (object);
 
   g_object_unref (priv->actor);
+
+  // Get rid of old tiles first
+  for (k = 0; k < champlain_zoom_level_tile_count (level); k++)
+    {
+      ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
+      champlain_zoom_level_remove_tile (level, tile);
+    }
 
   G_OBJECT_CLASS (champlain_zoom_level_parent_class)->dispose (object);
 }
@@ -208,6 +217,7 @@ champlain_zoom_level_add_tile (ChamplainZoomLevel *self,
 
   ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
 
+  g_object_ref (tile);
   g_ptr_array_add (priv->tiles, tile);
   g_signal_emit (self, signals[SIGNAL_TILE_ADDED], 0, tile);
 }
@@ -222,6 +232,7 @@ champlain_zoom_level_remove_tile (ChamplainZoomLevel *self,
 
   g_signal_emit (self, signals[SIGNAL_TILE_REMOVED], 0, tile);
   g_ptr_array_remove_fast (priv->tiles, tile);
+  g_object_unref (tile);
 }
 
 guint

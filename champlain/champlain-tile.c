@@ -447,6 +447,9 @@ champlain_tile_set_actor (ChamplainTile *self, ClutterActor *actor)
 
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
+  if (priv->actor != NULL)
+    g_object_unref (priv->actor);
+
   priv->actor = g_object_ref (actor);
   g_object_notify (G_OBJECT (self), "actor");
 }
