@@ -21,6 +21,16 @@ champlain_map_source_new_mff_relief (class)
 	C_ARGS:
 
 
+ChamplainMapSource*
+champlain_map_source_new_osm_cyclemap (class)
+	C_ARGS:
+
+
+ChamplainMapSource*
+champlain_map_source_new_osm_osmarender (class)
+	C_ARGS:
+
+
 const gchar*
 champlain_map_source_get_name (ChamplainMapSource *map_source)
 
