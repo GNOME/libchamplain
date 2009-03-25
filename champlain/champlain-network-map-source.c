@@ -225,6 +225,7 @@ champlain_network_map_source_new_full (const gchar *name,
   return network_map_source;
 }
 
+#define SIZE 8
 gchar *
 champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_map_source,
                                            gint x,
@@ -245,7 +246,7 @@ champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_ma
   while (token != NULL)
     {
       gint number = G_MAXINT;
-      gchar value[3];
+      gchar value[SIZE];
 
       if (strcmp (token, "X") == 0)
         number = x;
@@ -256,7 +257,7 @@ champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_ma
 
       if (number != G_MAXINT)
         {
-          g_sprintf (value, "%d", number);
+          g_snprintf (value, SIZE, "%d", number);
           g_string_append (ret, value);
         }
       else
