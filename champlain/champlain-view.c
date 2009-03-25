@@ -83,6 +83,8 @@ enum
   PROP_LONGITUDE,
   PROP_LATITUDE,
   PROP_ZOOM_LEVEL,
+  PROP_MIN_ZOOM_LEVEL,
+  PROP_MAX_ZOOM_LEVEL,
   PROP_MAP_SOURCE,
   PROP_DECEL_RATE,
   PROP_SCROLL_MODE,
@@ -96,6 +98,7 @@ enum
 /*static guint signals[LAST_SIGNAL] = { 0, }; */
 
 #define GET_PRIVATE(obj)     (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
+#define ZOOM_LEVEL_OUT_OF_RANGE(priv, level)    (level < priv->min_zoom_level || level > priv->max_zoom_level)
 
 /* Between state values for go_to */
 typedef struct {
@@ -115,6 +118,8 @@ struct _ChamplainViewPrivate
   ChamplainMapSource *map_source; /* Current map tile source */
   ChamplainScrollMode scroll_mode;
   gint zoom_level; /* Holds the current zoom level number */
+  gint min_zoom_level; /* Lowest allowed zoom level */
+  gint max_zoom_level; /* Highest allowed zoom level */
 
   /* Represents the (lat, lon) at the center of the viewport */
   gdouble longitude;
@@ -466,6 +471,12 @@ champlain_view_get_property (GObject *object,
       case PROP_ZOOM_LEVEL:
         g_value_set_int (value, priv->zoom_level);
         break;
+      case PROP_MIN_ZOOM_LEVEL:
+        g_value_set_int (value, priv->min_zoom_level);
+        break;
+      case PROP_MAX_ZOOM_LEVEL:
+        g_value_set_int (value, priv->max_zoom_level);
+        break;
       case PROP_MAP_SOURCE:
         g_value_set_object (value, priv->map_source);
         break;
@@ -517,6 +528,12 @@ champlain_view_set_property (GObject *object,
       break;
     case PROP_ZOOM_LEVEL:
       champlain_view_set_zoom_level (view, g_value_get_int (value));
+      break;
+    case PROP_MIN_ZOOM_LEVEL:
+      champlain_view_set_min_zoom_level (view, g_value_get_int (value));
+      break;
+    case PROP_MAX_ZOOM_LEVEL:
+      champlain_view_set_max_zoom_level (view, g_value_get_int (value));
       break;
     case PROP_MAP_SOURCE:
       champlain_view_set_map_source (view, g_value_get_object (value));
@@ -604,6 +621,33 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            "The level of zoom of the map",
            0, 20, 3, CHAMPLAIN_PARAM_READWRITE));
 
+  /**
+  * ChamplainView:min-zoom-level:
+  *
+  * The lowest allowed level of zoom of the content.
+  *
+  * Since: TODO
+  */
+  g_object_class_install_property (object_class,
+      PROP_MIN_ZOOM_LEVEL,
+      g_param_spec_int ("min-zoom-level",
+           "Min zoom level",
+           "The lowest allowed level of zoom",
+           0, 20, 0, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainView:max-zoom-level:
+  *
+  * The highest allowed level of zoom of the content.
+  *
+  * Since: TODO
+  */
+  g_object_class_install_property (object_class,
+      PROP_MAX_ZOOM_LEVEL,
+      g_param_spec_int ("max-zoom-level",
+           "Max zoom level",
+           "The highest allowed level of zoom",
+           0, 20, 20, CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainView:map-source:
@@ -722,6 +766,8 @@ champlain_view_init (ChamplainView *view)
 
   priv->map_source = champlain_map_source_new_osm_mapnik ();
   priv->zoom_level = 0;
+  priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
+  priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
   priv->keep_center_on_resize = TRUE;
   priv->zoom_on_double_click = TRUE;
   priv->show_license = TRUE;
@@ -1166,6 +1212,10 @@ champlain_view_zoom_in (ChamplainView *view)
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  
+  if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level+1))
+    return;
+  
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
 
   if (!map_zoom_in (priv->map, priv->map_source))
@@ -1196,6 +1246,10 @@ champlain_view_zoom_out (ChamplainView *view)
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  
+  if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level-1))
+    return;
+  
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
 
   if (!map_zoom_out (priv->map, priv->map_source))
@@ -1228,7 +1282,7 @@ champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
-  if (zoom_level == priv->zoom_level)
+  if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE(priv, zoom_level))
     return;
 
   priv->zoom_level = zoom_level;
@@ -1248,6 +1302,60 @@ champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
   champlain_view_center_on (view, priv->latitude, priv->longitude);
 
   g_object_notify (G_OBJECT (view), "zoom-level");
+}
+
+/**
+ * champlain_view_set_min_zoom_level:
+ * @view: a #ChamplainView
+ * @min_zoom_level: a gint
+ *
+ * Changes the lowest allowed zoom level
+ *
+ * Since: TODO
+ */
+void
+champlain_view_set_min_zoom_level (ChamplainView *view, gint min_zoom_level)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  if (priv->min_zoom_level == min_zoom_level || min_zoom_level < 0 ||
+      min_zoom_level > priv->max_zoom_level ||
+      min_zoom_level < champlain_map_source_get_min_zoom_level (priv->map_source))
+    return;
+
+  priv->min_zoom_level = min_zoom_level;
+  
+  if (priv->zoom_level < min_zoom_level)
+    champlain_view_set_zoom_level (view, min_zoom_level);
+}
+
+/**
+ * champlain_view_set_max_zoom_level:
+ * @view: a #ChamplainView
+ * @max_zoom_level: a gint
+ *
+ * Changes the highest allowed zoom level
+ *
+ * Since: TODO
+ */
+void
+champlain_view_set_max_zoom_level (ChamplainView *view, gint max_zoom_level)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  if (priv->max_zoom_level == max_zoom_level || max_zoom_level > 20 ||
+      max_zoom_level < priv->min_zoom_level || 
+      max_zoom_level > champlain_map_source_get_max_zoom_level (priv->map_source))
+    return;
+
+  priv->max_zoom_level = max_zoom_level;
+  
+  if (priv->zoom_level > max_zoom_level)
+    champlain_view_set_zoom_level (view, max_zoom_level);
 }
 
 /**
@@ -1475,6 +1583,9 @@ champlain_view_set_map_source (ChamplainView *view,
 
   g_object_unref (priv->map_source);
   priv->map_source = g_object_ref (source);
+  
+  priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
+  priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
 
   if (priv->map == NULL)
     return;
@@ -1486,9 +1597,14 @@ champlain_view_set_map_source (ChamplainView *view,
   priv->map = map_new ();
 
   /* Keep same zoom level if the new map supports it */
-  if (priv->zoom_level > champlain_map_source_get_max_zoom_level (priv->map_source))
+  if (priv->zoom_level > priv->max_zoom_level)
     {
-      priv->zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
+      priv->zoom_level = priv->max_zoom_level;
+      g_object_notify (G_OBJECT (view), "zoom-level");
+    }
+  else if (priv->zoom_level < priv->min_zoom_level)
+    {
+      priv->zoom_level = priv->min_zoom_level;
       g_object_notify (G_OBJECT (view), "zoom-level");
     }
 
@@ -1659,14 +1775,14 @@ champlain_view_ensure_visible (ChamplainView *view,
       else
         zoom_level--;
 
-      if (zoom_level <= 0)
+      if (zoom_level <= priv->min_zoom_level)
         break;
     }
   while (good_size == FALSE);
 
   if (good_size == FALSE)
     {
-      zoom_level = 0;
+      zoom_level = priv->min_zoom_level;
       min_lat = min_lon = width = height = 0;
     }
 

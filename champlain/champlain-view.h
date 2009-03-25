@@ -78,6 +78,10 @@ void champlain_view_zoom_in (ChamplainView *champlainView);
 void champlain_view_zoom_out (ChamplainView *champlainView);
 void champlain_view_set_zoom_level (ChamplainView *champlainView,
     gint zoom_level);
+void champlain_view_set_min_zoom_level (ChamplainView *view, 
+    gint zoom_level);
+void champlain_view_set_max_zoom_level (ChamplainView *view, 
+    gint zoom_level);
 
 void champlain_view_ensure_visible (ChamplainView *view, gdouble min_lat,
     gdouble min_lon, gdouble max_lat, gdouble max_lon, gboolean animate);
