@@ -239,11 +239,12 @@ scroll_event (ClutterActor *actor,
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
   ClutterActor *group, *new_group;
-  gboolean success = FALSE;
   gdouble lon, lat;
   gint x_diff, y_diff;
   gint actor_x, actor_y;
   gint rel_x, rel_y;
+  gint x2, y2;
+  gdouble lat2, lon2;
 
   group = champlain_zoom_level_get_actor (priv->map->current_level);
   clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
@@ -261,39 +262,43 @@ scroll_event (ClutterActor *actor,
   y_diff = priv->viewport_size.height / 2 - rel_y;
 
   if (event->direction == CLUTTER_SCROLL_UP)
-    success = map_zoom_in (priv->map, priv->map_source);
-  else if (event->direction == CLUTTER_SCROLL_DOWN)
-    success = map_zoom_out (priv->map, priv->map_source);
-
-  if (success)
     {
-      gint x2, y2;
-      gdouble lat2, lon2;
-
-      priv->zoom_level = champlain_zoom_level_get_zoom_level (priv->map->current_level);
-      new_group = champlain_zoom_level_get_actor (priv->map->current_level);
-
-      /* Get the new x,y in the new zoom level */
-      x2 = champlain_map_source_get_x (priv->map_source, priv->zoom_level, lon);
-      y2 = champlain_map_source_get_y (priv->map_source, priv->zoom_level, lat);
-      /* Get the new lon,lat of these new x,y minus the distance from the
-       * viewport center */
-      lon2 = champlain_map_source_get_longitude (priv->map_source,
-          priv->zoom_level, x2 + x_diff);
-      lat2 = champlain_map_source_get_latitude (priv->map_source,
-          priv->zoom_level, y2 + y_diff);
-
-      resize_viewport (view);
-      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
-          group);
-      clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
-          new_group);
-      champlain_view_center_on (view, lat2, lon2);
-
-      g_object_notify (G_OBJECT (view), "zoom-level");
+      if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level + 1))
+        return FALSE;
+      if (!map_zoom_in (priv->map, priv->map_source))
+        return FALSE;
+    }
+  else if (event->direction == CLUTTER_SCROLL_DOWN)
+    {
+      if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level - 1))
+        return FALSE;
+      if (!map_zoom_out (priv->map, priv->map_source))
+        return FALSE;
     }
 
-  return success;
+  priv->zoom_level = champlain_zoom_level_get_zoom_level (priv->map->current_level);
+  new_group = champlain_zoom_level_get_actor (priv->map->current_level);
+
+  /* Get the new x,y in the new zoom level */
+  x2 = champlain_map_source_get_x (priv->map_source, priv->zoom_level, lon);
+  y2 = champlain_map_source_get_y (priv->map_source, priv->zoom_level, lat);
+  /* Get the new lon,lat of these new x,y minus the distance from the
+   * viewport center */
+  lon2 = champlain_map_source_get_longitude (priv->map_source,
+      priv->zoom_level, x2 + x_diff);
+  lat2 = champlain_map_source_get_latitude (priv->map_source,
+      priv->zoom_level, y2 + y_diff);
+
+  resize_viewport (view);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
+      group);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
+      new_group);
+  champlain_view_center_on (view, lat2, lon2);
+
+  g_object_notify (G_OBJECT (view), "zoom-level");
+
+  return TRUE;
 }
 
 static void
@@ -626,7 +631,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * The lowest allowed level of zoom of the content.
   *
-  * Since: TODO
+  * Since: 0.4
   */
   g_object_class_install_property (object_class,
       PROP_MIN_ZOOM_LEVEL,
@@ -640,7 +645,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * The highest allowed level of zoom of the content.
   *
-  * Since: TODO
+  * Since: 0.4
   */
   g_object_class_install_property (object_class,
       PROP_MAX_ZOOM_LEVEL,
@@ -932,7 +937,9 @@ finger_scroll_button_press_cb (ClutterActor *actor,
     {
       /* If at last zoom level, don't do anything */
       if (priv->zoom_level ==
-          champlain_map_source_get_max_zoom_level (priv->map_source))
+          champlain_map_source_get_max_zoom_level (priv->map_source) ||
+          priv->zoom_level == priv->max_zoom_level ||
+          ZOOM_LEVEL_OUT_OF_RANGE (priv, priv->zoom_level + 1))
         return FALSE;
 
       gint actor_x, actor_y;
@@ -1212,10 +1219,10 @@ champlain_view_zoom_in (ChamplainView *view)
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
-  
+
   if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level+1))
     return;
-  
+
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
 
   if (!map_zoom_in (priv->map, priv->map_source))
@@ -1246,10 +1253,10 @@ champlain_view_zoom_out (ChamplainView *view)
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
-  
+
   if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level-1))
     return;
-  
+
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
 
   if (!map_zoom_out (priv->map, priv->map_source))
@@ -1311,7 +1318,7 @@ champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
  *
  * Changes the lowest allowed zoom level
  *
- * Since: TODO
+ * Since: 0.4
  */
 void
 champlain_view_set_min_zoom_level (ChamplainView *view, gint min_zoom_level)
@@ -1320,13 +1327,13 @@ champlain_view_set_min_zoom_level (ChamplainView *view, gint min_zoom_level)
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
-  if (priv->min_zoom_level == min_zoom_level || min_zoom_level < 0 ||
+  if (priv->min_zoom_level == min_zoom_level ||
       min_zoom_level > priv->max_zoom_level ||
       min_zoom_level < champlain_map_source_get_min_zoom_level (priv->map_source))
     return;
 
   priv->min_zoom_level = min_zoom_level;
-  
+
   if (priv->zoom_level < min_zoom_level)
     champlain_view_set_zoom_level (view, min_zoom_level);
 }
@@ -1338,7 +1345,7 @@ champlain_view_set_min_zoom_level (ChamplainView *view, gint min_zoom_level)
  *
  * Changes the highest allowed zoom level
  *
- * Since: TODO
+ * Since: 0.4
  */
 void
 champlain_view_set_max_zoom_level (ChamplainView *view, gint max_zoom_level)
@@ -1347,13 +1354,13 @@ champlain_view_set_max_zoom_level (ChamplainView *view, gint max_zoom_level)
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
-  if (priv->max_zoom_level == max_zoom_level || max_zoom_level > 20 ||
-      max_zoom_level < priv->min_zoom_level || 
+  if (priv->max_zoom_level == max_zoom_level ||
+      max_zoom_level < priv->min_zoom_level ||
       max_zoom_level > champlain_map_source_get_max_zoom_level (priv->map_source))
     return;
 
   priv->max_zoom_level = max_zoom_level;
-  
+
   if (priv->zoom_level > max_zoom_level)
     champlain_view_set_zoom_level (view, max_zoom_level);
 }
@@ -1414,7 +1421,7 @@ champlain_view_get_coords_from_event (ChamplainView *view,
   gint actor_x, actor_y;
   gint rel_x, rel_y;
 
-  clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
+
 
   switch (clutter_event_type (event))
     {
@@ -1584,6 +1591,9 @@ champlain_view_set_map_source (ChamplainView *view,
   g_object_unref (priv->map_source);
   priv->map_source = g_object_ref (source);
   
+  priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
+  priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
+
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
 
