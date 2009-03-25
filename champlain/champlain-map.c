@@ -94,9 +94,12 @@ map_load_visible_tiles (Map *map, ChamplainView *view, ChamplainMapSource *sourc
           tile_y < y_first || tile_y > y_count)
       {
         ClutterActor *group, *actor;
-        actor = champlain_tile_get_actor (tile);
-        group = champlain_zoom_level_get_actor (map->current_level);
-        clutter_container_remove_actor (CLUTTER_CONTAINER (group), actor);
+        if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+          {
+            actor = champlain_tile_get_actor (tile);
+            group = champlain_zoom_level_get_actor (map->current_level);
+            clutter_container_remove_actor (CLUTTER_CONTAINER (group), actor);
+          }
         champlain_zoom_level_remove_tile (map->current_level, tile);
       }
     }
