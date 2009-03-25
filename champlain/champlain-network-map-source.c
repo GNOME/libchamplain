@@ -514,7 +514,6 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
       DEBUG ("Tile loaded from cache");
       champlain_view_tile_ready (view, zoom_level, tile, FALSE);
-      g_object_unref (actor);
       g_object_unref (tile);
       g_object_unref (zoom_level);
     }

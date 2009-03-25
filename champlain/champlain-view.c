@@ -1380,9 +1380,10 @@ view_position_tile (ChamplainView* view, ChamplainTile* tile)
   gint y;
   guint size;
 
-  g_object_get (G_OBJECT (tile), "actor", &actor,
-      "x", &x, "y", &y,
-      "size", &size, NULL);
+  actor = champlain_tile_get_actor (tile);
+  x = champlain_tile_get_x (tile);
+  y = champlain_tile_get_y (tile);
+  size = champlain_tile_get_size (tile);
 
   clutter_actor_set_position (actor,
     (x * size) - priv->anchor.x,
