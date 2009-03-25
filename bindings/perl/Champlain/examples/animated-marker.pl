@@ -1,15 +1,152 @@
 #!/usr/bin/perl
 
+#
+# Custom marker that's animated and drawn through Cairo. The marker is composed
+# of 1 static filled circle and 1 stroked circle animated as an echo.
+#
+package Champain::Ex::AnimatedMarker;
+
+use strict;
+use warnings;
+
+use Glib qw(TRUE FALSE);
+use Clutter;
+use Champlain;
+use Math::Trig ':pi';
+
+my $MARKER_SIZE = 10;
+
+#
+# In order to have the marker animated the timeline and the behaviours must live
+# long enough for the code to use them. One way to do this is to keep the
+# references to this objects as global variables (it's uggly but it works).
+#
+# Another way it so create a base class of Marker and to keep this timeline and
+# the behaviours associated with the marker. This approach is implemented here.
+#
+use Glib::Object::Subclass 'Champlain::Marker' =>
+	properties => [
+		
+		# The timeline controlling the animation
+		Glib::ParamSpec->object(
+			'timeline', 
+			'Timeline',
+			'Timeline controling the animation',
+			'Clutter::Timeline',
+			[ qw(readable writable) ],
+		),
+		
+		# The opacity change in the echo
+		Glib::ParamSpec->object(
+			'behaviour-opacity', 
+			'Behaviour Opacity',
+			'Behaviour controling the opacity of the marker',
+			'Clutter::Behaviour::Opacity',
+			[ qw(readable writable) ],
+		),
+		
+		# The growing of the echo
+		Glib::ParamSpec->object(
+			'behaviour-zoom', 
+			'Behaviour Zoom',
+			'Behaviour controling the zoom of the marker',
+			'Clutter::Behaviour::Scale',
+			[ qw(readable writable) ],
+		),
+	],
+;
+
+
+# Constructor
+sub INIT_INSTANCE {
+	my $self = shift;
+	
+	# The middle dot	
+	my $circle = create_static_circle();
+	$self->add($circle);
+
+	# The echo ring
+	my $echo_circle = create_echo_circle();
+	$self->add($echo_circle);
+
+	# Animate the echo ring
+	$self->create_animation($echo_circle);
+}
+
+
+sub create_animation {
+	my $self = shift;
+	my ($texture) = @_;
+	
+	# Timeline controlling the animation
+	my $timeline = Clutter::Timeline->new_for_duration(1000);
+	$self->set(timeline => $timeline);
+	$timeline->set_loop(TRUE);
+	my $alpha = Clutter::Alpha->new($timeline, \&Clutter::Alpha::sine_inc);
+	
+	# Circle's echo growing
+	my $behaviour_zoom = Clutter::Behaviour::Scale->new($alpha, 0.5, 0.5, 2.0, 2.0);
+	$self->set(behaviour_zoom => $behaviour_zoom);
+	$behaviour_zoom->apply($texture);
+	
+	# Circle's echo fading
+	my $behaviour_opacity = Clutter::Behaviour::Opacity->new($alpha, 255, 0);
+	$self->set(behaviour_opacity => $behaviour_opacity);
+	$behaviour_opacity->apply($texture);
+	$timeline->start();
+}
+
+
+sub create_static_circle {
+	my $texture = Clutter::Texture::Cairo->new($MARKER_SIZE, $MARKER_SIZE);
+	my $cr = $texture->create_context();
+	
+	# Draw the circle
+	$cr->set_source_rgb(0, 0, 0);
+	$cr->arc($MARKER_SIZE/2, $MARKER_SIZE/2, $MARKER_SIZE/2, 0, pi2);
+	$cr->close_path();
+
+	# Fill the circle
+	$cr->set_source_rgba(0.1, 0.1, 0.9, 1.0);
+	$cr->fill();
+	
+	$texture->set_anchor_point_from_gravity('center');
+	$texture->set_position(0, 0);
+
+	return $texture;
+}
+
+
+sub create_echo_circle {
+	my $texture = Clutter::Texture::Cairo->new($MARKER_SIZE * 2, $MARKER_SIZE * 2);
+	my $cr = $texture->create_context();
+	
+	# Draw the circle
+	$cr->set_source_rgb(0, 0, 0);
+	$cr->arc($MARKER_SIZE, $MARKER_SIZE, $MARKER_SIZE * 0.9, 0, pi2);
+	$cr->close_path();
+
+	# Stroke the circle
+	$cr->set_line_width(2.0);
+	$cr->set_source_rgba(0.1, 0.1, 0.7, 1.0);
+	$cr->stroke();
+
+	$texture->set_anchor_point_from_gravity('center');
+	$texture->set_position(0, 0);
+	
+	return $texture;
+}
+
+
+
+package main;
+
 use strict;
 use warnings;
 
 use Glib qw(TRUE FALSE);
 use Clutter qw(-threads-init -init);
 use Champlain;
-use Math::Trig ':pi';
-
-
-my $MARKER_SIZE = 10;
 
 
 exit main();
@@ -31,7 +168,8 @@ sub main {
 	$map->add_layer($layer);
 	
 	# Create the marker
-	my $marker = create_marker();
+	my $marker = Champain::Ex::AnimatedMarker->new();
+	$marker->set_position(45.528178, -73.563788); # Montreal, Canada
 	$layer->add($marker);
 	
 	
@@ -46,94 +184,4 @@ sub main {
 	Clutter->main();
 	
 	return 0;
-}
-
-
-#
-# The marker is drawn with cairo. It is composed of 1 static filled circle and 1
-# stroked circle animated as an echo.
-#
-sub create_marker {
-	my $marker = Champlain::Marker->new();
-	
-	# Static filled circle
-	create_static_circle($marker);
-	
-	
-	# Echo circle
-	my $echo = create_echo_circle($marker);
-	
-	##
-	## Animate the echo circle
-	##
-	my $timeline = Clutter::Timeline->new_for_duration(1000);
-	$timeline->set_loop(TRUE);
-	my $alpha = Clutter::Alpha->new($timeline, \&Clutter::Alpha::sine_inc);
-	
-	my $behaviour = Clutter::Behaviour::Scale->new($alpha, 0.5, 0.5, 2.0, 2.0);
-	$behaviour->apply($echo);
-	
-	$behaviour = Clutter::Behaviour::Opacity->new($alpha, 255, 0);
-	$behaviour->apply($echo);
-	$timeline->signal_connect('new-frame', sub {
-		my ($timeline, $frame) = @_;
-		print $frame, "\n";
-	});
-	$timeline->start();
-	
-	
-	# Sets marker position on the map
-	$marker->set_position(45.528178, -73.563788);
-	
-	return $marker;
-}
-
-
-sub create_static_circle {
-	my ($marker) = @_;
-	
-	my $texture = Clutter::Texture::Cairo->new($MARKER_SIZE, $MARKER_SIZE);
-	my $cr = $texture->create_context();
-	
-	# Draw the circle
-	$cr->set_source_rgb(0, 0, 0);
-	$cr->arc($MARKER_SIZE/2, $MARKER_SIZE/2, $MARKER_SIZE/2, 0, pi2);
-	$cr->close_path();
-
-	# Fill the circle
-	$cr->set_source_rgba(0.1, 0.1, 0.9, 1.0);
-	$cr->fill();
-	
-	# Add the circle to the marker
-	$marker->add($texture);
-	$texture->set_anchor_point_from_gravity('center');
-	$texture->set_position(0, 0);
-	
-	return $texture;
-}
-
-
-sub create_echo_circle {
-	my ($marker) = @_;
-	
-	my $texture = Clutter::Texture::Cairo->new($MARKER_SIZE * 2, $MARKER_SIZE * 2);
-	my $cr = $texture->create_context();
-	
-	# Draw the circle
-	$cr->set_source_rgb(0, 0, 0);
-	$cr->arc($MARKER_SIZE, $MARKER_SIZE, $MARKER_SIZE * 0.9, 0, pi2);
-	$cr->close_path();
-
-	# Stroke the circle
-	$cr->set_line_width(2.0);
-	$cr->set_source_rgba(0.1, 0.1, 0.7, 1.0);
-	$cr->stroke();
-
-	# Add the circle to the marker
-	$marker->add($texture);
-	$texture->lower_bottom(); # Ensure it is under the previous circle
-	$texture->set_position(0, 0);
-	$texture->set_anchor_point_from_gravity('center');
-	
-	return $texture;
 }
