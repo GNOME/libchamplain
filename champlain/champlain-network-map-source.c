@@ -225,7 +225,7 @@ champlain_network_map_source_new_full (const gchar *name,
   return network_map_source;
 }
 
-const gchar *
+gchar *
 champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_map_source,
                                            gint x,
                                            gint y,
@@ -260,7 +260,7 @@ champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_ma
           g_string_append (ret, value);
         }
       else
-        g_string_append (ret, token);
+        g_string_append (ret, g_strdup (token));
 
       token = tokens[++i];
     }
@@ -520,7 +520,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
   else if (!priv->offline)
     {
       SoupMessage *msg;
-      const gchar *uri;
+      gchar *uri;
       FileLoadedCallbackContext *ctx = g_new0 (FileLoadedCallbackContext, 1);
       ctx->view = view;
       ctx->zoom_level = zoom_level;
@@ -540,6 +540,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       soup_session_queue_message (soup_session, msg,
                                   file_loaded_cb,
                                   ctx);
+      g_free (uri);
     }
   /* If a tile is neither in cache or can be fetched, do nothing, it'll show up
    * as empty

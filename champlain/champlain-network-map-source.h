@@ -63,7 +63,7 @@ ChamplainMapSource * champlain_map_source_new_osm_osmarender (void);
 ChamplainMapSource * champlain_map_source_new_oam (void);
 ChamplainMapSource * champlain_map_source_new_mff_relief (void);
 
-const gchar * champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *source,
+gchar * champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *source,
     gint x, gint y, gint z);
 
 void champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *network_map_source,
