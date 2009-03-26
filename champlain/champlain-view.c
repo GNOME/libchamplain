@@ -1741,28 +1741,52 @@ champlain_view_set_zoom_on_double_click (ChamplainView *view,
 /**
  * champlain_view_ensure_visible:
  * @view: a #ChamplainView
- * @min_lat: the minimum latitude
- * @min_lon: the minimum longitude
- * @max_lat: the maximum latitude
- * @max_lon: the maximum longitude
+ * @lat1: the latitude of position 1
+ * @lon1: the longitude of position 1
+ * @lat2: the latitude of position 2
+ * @lon2: the longitude of position 2
  *
- * Changes the map's zoom level and center to make sure the given zone is
- * visible.
+ * Changes the map's zoom level and center to make sure the two given
+ * positions are visible
  *
  * Since: 0.4
  */
 void
 champlain_view_ensure_visible (ChamplainView *view,
-                               gdouble min_lat,
-                               gdouble min_lon,
-                               gdouble max_lat,
-                               gdouble max_lon,
+                               gdouble lat1,
+                               gdouble lon1,
+                               gdouble lat2,
+                               gdouble lon2,
                                gboolean animate)
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   gint zoom_level = priv->zoom_level;
   gdouble width, height;
+  gdouble min_lat,min_lon,max_lat,max_lon;
   gboolean good_size = FALSE;
+  
+  /*We first sort the lat,lon in order to have min and max */
+  if (lat1 < lat2)
+    {
+      min_lat = lat1;
+      max_lat = lat2;
+    }
+  else
+    {
+      max_lat = lat1;
+      min_lat = lat2;
+    }
+    
+  if (lon1 < lon2)
+    {
+      min_lon = lon1;
+      max_lon = lon2;
+    }
+  else
+    {
+      max_lon = lon1;
+      min_lon = lon2;
+    }
 
   width = max_lon - min_lon;
   height = max_lat - min_lat;
