@@ -1421,7 +1421,7 @@ champlain_view_get_coords_from_event (ChamplainView *view,
   gint actor_x, actor_y;
   gint rel_x, rel_y;
 
-
+  clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
 
   switch (clutter_event_type (event))
     {
