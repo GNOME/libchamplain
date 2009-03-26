@@ -489,6 +489,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
                                ChamplainTile *tile)
 {
   gchar* filename;
+  gboolean use_cache = FALSE;
 
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (map_source);
   ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
@@ -505,6 +506,30 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
   champlain_tile_set_size (tile, champlain_map_source_get_tile_size (map_source));
 
   if (g_file_test (filename, G_FILE_TEST_EXISTS))
+    {
+      GTimeVal *date = g_new0 (GTimeVal, 1);
+      GTimeVal *now = g_new0 (GTimeVal, 1);
+      GFileInfo *info;
+      GFile *file;
+
+      file = g_file_new_for_path (filename);
+      info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED,
+          G_FILE_QUERY_INFO_NONE, NULL, NULL);
+      g_file_info_get_modification_time (info, date);
+
+      g_get_current_time (now);
+      g_time_val_add (date, 86400000000); // Cache expires 1 day
+      use_cache = date->tv_sec > now->tv_sec;
+
+      g_object_unref (file);
+      g_object_unref (info);
+      g_free (date);
+      g_free (now);
+    }
+  else
+    use_cache = FALSE;
+
+  if (use_cache == TRUE)
     {
       GError *error = NULL;
       ClutterActor *actor;
