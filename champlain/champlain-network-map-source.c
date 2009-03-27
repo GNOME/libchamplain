@@ -518,7 +518,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       g_file_info_get_modification_time (info, date);
 
       g_get_current_time (now);
-      g_time_val_add (date, 86400000000); // Cache expires 1 day
+      g_time_val_add (date, (24ul * 60ul * 60ul * 1000ul * 1000ul)); // Cache expires 1 day
       use_cache = date->tv_sec > now->tv_sec;
 
       g_object_unref (file);
