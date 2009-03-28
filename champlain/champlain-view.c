@@ -825,6 +825,9 @@ champlain_view_init (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->user_layers);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
+  
+  champlain_view_set_size(view, priv->viewport_size.width,
+      priv->viewport_size.height);
 
   priv->state = CHAMPLAIN_STATE_DONE;
   g_object_notify (G_OBJECT (view), "state");
