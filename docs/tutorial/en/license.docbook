@@ -1,0 +1,19 @@
+<appendix id="license">
+<title>License</title>
+
+<para>
+This document is released under Free Documentation license; the terms of this license
+are detailed below.
+</para>
+
+<sect1 id="fdl-license">
+<title>Free Documentation License</title>
+
+<para>
+<literallayout>
+&fdl-license;
+</literallayout>
+</para>
+
+</sect1>
+</appendix>
