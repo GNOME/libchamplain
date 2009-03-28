@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "/usr/share/xml/docbook/schema/dtd/4.4/docbookx.dtd" [
 
+	<!ENTITY % c "IGNORE">
+	<!ENTITY % python "IGNORE">
+	<!ENTITY % perl "IGNORE">
+
 	<!ENTITY license SYSTEM "license.docbook">
 	<!ENTITY fdl-license SYSTEM "fdl-license">
 	<!ENTITY examples-init SYSTEM "../examples/python/chapter2/01-initialisation.py">
@@ -10,7 +14,7 @@
 <book id="python_champlain" lang="en">
 
 	<bookinfo>
-		<title>Conquering The World With Python And Champlain</title>
+		<title>Conquering The World With <![%python [Python]]> <![%perl [Perl]]> <![%c [C]]>  And Libchamplain</title>
 
 		<author>
 			<firstname>Michael</firstname>
