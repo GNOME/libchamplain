@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import clutter
 import cluttergtk
+import gobject
 import gtk
 import champlain
 import champlaingtk
@@ -61,6 +62,7 @@ def create_marker_layer():
 
     return layer
 
+gobject.threads_init()
 clutter.init()
 
 window = gtk.Window()
