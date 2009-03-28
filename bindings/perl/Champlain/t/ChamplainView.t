@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 37;
+use Clutter::TestHelper tests => 46;
 
 use Champlain ':coords';
 
@@ -85,6 +85,10 @@ sub test_zoom_in_stage {
 	my $min = $map_source->get_min_zoom_level;
 	$view->set_zoom_level($min);
 	is($view->get('zoom-level'), $min, "zoom-out to the minimal level");
+
+	$view->set("zoom-level", $min);
+	is($view->get('zoom-level'), $min, "set('zoom-level') to the minimal level");
+
 	$view->zoom_out();
 	is($view->get('zoom-level'), $min, "zoom-out past minimal level has no effect");
 	
@@ -93,6 +97,10 @@ sub test_zoom_in_stage {
 	my $max = $map_source->get_max_zoom_level;
 	$view->set_zoom_level($max);
 	is($view->get('zoom-level'), $max, "zoom-in to the maximal level");
+
+	$view->set("zoom-level", $max);
+	is($view->get('zoom-level'), $max, "set('zoom-level') to the maximal level");
+
 	$view->zoom_in();
 	is($view->get('zoom-level'), $max, "zoom-in past maximal level has no effect");
 	
@@ -100,15 +108,24 @@ sub test_zoom_in_stage {
 	my $middle = int( ($max - $min) / 2 );
 	$view->set_zoom_level($middle);
 	is($view->get('zoom-level'), $middle, "set zoom to the middle level");
+
+	$view->set("zoom-level", $middle);
+	is($view->get('zoom-level'), $middle, "set('zoom-level', (max-min)/2) to the middle level");
 	
 	
 	# Try to set directly the zoom level to a value inferior to min level
 	$view->set_zoom_level($min - 1);
 	is($view->get('zoom-level'), $middle, "set zoom (min - 1) has no effect");
+
+	$view->set("zoom-level", $min - 1);
+	is($view->get('zoom-level'), $middle, "set('zoom-level', min - 1) has no effect");
 	
 	# Try to set directly the zoom level to a valu superior to max level
 	$view->set_zoom_level($max + 1);
 	is($view->get('zoom-level'), $middle, "set zoom (max + 1) has no effect");
+
+	$view->set("zoom-level", $max + 1);
+	is($view->get('zoom-level'), $middle, "set('zoom-level', max + 1) has no effect");
 }
 
 
@@ -133,6 +150,8 @@ sub test_zoom {
 	# Zoom to a random place
 	$view->set_zoom_level(1);
 	is($view->get('zoom-level'), 0, "set_zoom_level has no effect");
+	$view->set("zoom-level", 1);
+	is($view->get('zoom-level'), 0, "set('zoom-level') has no effect");
 
 	
 	my $map_source = $view->get('map-source');
@@ -141,6 +160,10 @@ sub test_zoom {
 	my $min = $map_source->get_min_zoom_level;
 	$view->set_zoom_level($min);
 	is($view->get('zoom-level'), 0, "zoom-out to the minimal level has no effect");
+	
+	$view->set("zoom-level", $min);
+	is($view->get('zoom-level'), 0, "set('zoom-level') to the minimal level has no effect");
+	
 	$view->zoom_out();
 	is($view->get('zoom-level'), 0, "zoom-out past minimal level has no effect");
 	
@@ -149,6 +172,10 @@ sub test_zoom {
 	my $max = $map_source->get_max_zoom_level;
 	$view->set_zoom_level($max);
 	is($view->get('zoom-level'), 0, "zoom-in to the maximal level has no effect");
+	
+	$view->set("zoom-level", $max);
+	is($view->get('zoom-level'), 0, "set('zoom-level') to the maximal level has no effect");
+
 	$view->zoom_in();
 	is($view->get('zoom-level'), 0, "zoom-in past maximal level has no effect");
 	
@@ -156,6 +183,9 @@ sub test_zoom {
 	# Try to set directly the zoom level to a value inferior to min level
 	$view->set_zoom_level($min - 1);
 	is($view->get('zoom-level'), 0, "set zoom (min - 1) has no effect");
+	
+	$view->set("zoom-level", $min - 1);
+	is($view->get('zoom-level'), 0, "set('zoom-level', min -1) has no effect");
 	
 	# Try to set directly the zoom level to a valu superior to max level
 	$view->set_zoom_level($max + 1);
