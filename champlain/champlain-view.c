@@ -1220,16 +1220,19 @@ champlain_view_zoom_in (ChamplainView *view)
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
+  if (priv->map == NULL)
+    return;
+
   if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level+1))
     return;
 
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
-
   if (!map_zoom_in (priv->map, priv->map_source))
     return;
 
   priv->zoom_level++;
   resize_viewport (view);
+
   clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
       group);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
@@ -1254,16 +1257,19 @@ champlain_view_zoom_out (ChamplainView *view)
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
+  if (priv->map == NULL)
+    return;
+
   if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level-1))
     return;
 
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
-
   if (!map_zoom_out (priv->map, priv->map_source))
     return;
 
   priv->zoom_level--;
   resize_viewport (view);
+
   clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
       group);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
@@ -1289,21 +1295,20 @@ champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
-  if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE(priv, zoom_level))
-    return;
-
-  priv->zoom_level = zoom_level;
-
   if (priv->map == NULL)
     return;
 
-  ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
+  if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE(priv, zoom_level))
+    return;
 
+  ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
   if (!map_zoom_to (priv->map, priv->map_source, zoom_level))
     return;
 
-  ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
+  priv->zoom_level = zoom_level;
   resize_viewport (view);
+
+  ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
   clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), new_group);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
