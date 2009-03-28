@@ -447,7 +447,6 @@ file_loaded_cb (SoupSession *session,
 */
   GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
   ClutterActor *actor = clutter_texture_new();
-  gboolean ret = FALSE;
   if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
       gdk_pixbuf_get_pixels (pixbuf),
       gdk_pixbuf_get_has_alpha (pixbuf),
@@ -469,7 +468,7 @@ file_loaded_cb (SoupSession *session,
     }
 
   champlain_tile_set_actor (ctx->tile, actor);
-  DEBUG ("Tile loaded from network %d", ret);
+  DEBUG ("Tile loaded from network");
 
 cleanup:
   g_object_unref (loader);
