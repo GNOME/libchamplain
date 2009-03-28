@@ -3,9 +3,11 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 95;
+use Clutter::TestHelper tests => 110;
 
 use Champlain ':coords';
+
+my $OSM_LICENSE = "(CC) BY 2.0 OpenStreetMap contributors";
 
 exit tests();
 
@@ -30,6 +32,7 @@ sub test_osm_mapnik {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 18, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
+	is($map->get_license, $OSM_LICENSE, "$label license");
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
@@ -47,6 +50,7 @@ sub test_osm_cyclemap {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 18, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
+	is($map->get_license, $OSM_LICENSE, "$label license");
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
@@ -64,6 +68,7 @@ sub test_osm_osmarender {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 18, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
+	is($map->get_license, $OSM_LICENSE, "$label license");
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
@@ -80,6 +85,7 @@ sub test_oam {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 17, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
+	is($map->get_license, "(CC) BY 3.0 OpenArialMap contributors", "$label license");
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
@@ -97,6 +103,11 @@ sub test_mff {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 11, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
+	is(
+		$map->get_license,
+		"Map data available under GNU Free Documentation license, Version 1.2 or later",
+		"$label license"
+	);
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
@@ -107,6 +118,16 @@ sub test_mff {
 # Genereic checks that should work on all map sources
 sub generic_map_operations {
 	my ($label, $map) = @_;
+	
+	# Rename of the map
+	$map->set_name("No name");
+	is($map->get_name, "No name", "Rename the map");
+	
+	# Relicense the map
+	$map->set_license("Free for all!");
+	is($map->get_license, "Free for all!", "Relicense the map");
+	
+	
 
 	# Ask for the X position of the middle point
 	is(
