@@ -411,6 +411,8 @@ file_loaded_cb (SoupSession *session,
   gchar* path = NULL;
   const gchar *filename = NULL;
   ClutterActor *actor, *previous_actor = NULL;
+  GFile *file;
+  GFileInfo *info;
 
   filename = champlain_tile_get_filename (ctx->tile);
 
@@ -420,8 +422,6 @@ file_loaded_cb (SoupSession *session,
     /* Since we are updating the cache, we can assume that the directories
      * exists */
     GTimeVal *now = g_new0 (GTimeVal, 1);
-    GFile *file;
-    GFileInfo *info;
 
     file = g_file_new_for_path (filename);
     info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED,
@@ -447,6 +447,7 @@ file_loaded_cb (SoupSession *session,
       goto finish;
     }
 
+  /* Load the data from the http response */
   loader = gdk_pixbuf_loader_new();
   if (!gdk_pixbuf_loader_write (loader,
                           (const guchar *) msg->response_body->data,
@@ -473,8 +474,8 @@ file_loaded_cb (SoupSession *session,
       goto cleanup;
     }
 
+  /* Create, if needed, the cache's dirs */
   path = g_path_get_dirname (filename);
-
   if (g_mkdir_with_parents (path, 0700) == -1)
     {
       if (errno != EEXIST)
@@ -485,18 +486,28 @@ file_loaded_cb (SoupSession *session,
         }
     }
 
+  /* Write the cache */
   g_file_set_contents (filename, msg->response_body->data,
       msg->response_body->length, NULL);
 
-  /* If the tile has been marked to be deleted, don't go any further */
-  /*if (tile->to_destroy)
+  /* Verify if the server sent an etag and save it */
+  const gchar *etag = soup_message_headers_get (msg->response_headers, "ETag");
+  DEBUG ("Received ETag %s", etag);
+
+  if (etag != NULL)
     {
-      g_object_unref (loader);
-      g_free (map_filename);
-      g_free (tile);
-      return;
+      file = g_file_new_for_path (filename);
+      info = g_file_query_info (file, G_FILE_ATTRIBUTE_ETAG_VALUE,
+          G_FILE_QUERY_INFO_NONE, NULL, NULL);
+      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE, etag);
+      g_file_set_attributes_from_info (file, info, G_FILE_QUERY_INFO_NONE, NULL,
+          NULL);
+
+      g_object_unref (file);
+      g_object_unref (info);
     }
-*/
+
+  /* Load the image into clutter */
   GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
   actor = clutter_texture_new();
   if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
@@ -548,6 +559,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
   gboolean in_cache = FALSE;
   gboolean validate_cache = FALSE;
   GTimeVal *modified_time = g_new0 (GTimeVal, 1);
+  gchar * etag = NULL;
 
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (map_source);
   ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
@@ -564,18 +576,24 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       GFile *file;
       GError *error = NULL;
       ClutterActor *actor;
+      const gchar *etag_tmp;
 
       in_cache = TRUE;
 
       /* Verify since when is the file in cache */
       file = g_file_new_for_path (filename);
-      info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED,
+      info = g_file_query_info (file,
+          G_FILE_ATTRIBUTE_TIME_MODIFIED "," G_FILE_ATTRIBUTE_ETAG_VALUE,
           G_FILE_QUERY_INFO_NONE, NULL, NULL);
       g_file_info_get_modification_time (info, modified_time);
+      etag_tmp = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE);
+      if (etag_tmp != NULL)
+        etag = g_strdup (etag_tmp);
 
       g_get_current_time (now);
       g_time_val_add (now, (-60ul * 60ul * 1000ul * 1000ul)); // Cache expires 1 hour
       validate_cache = modified_time->tv_sec < now->tv_sec;
+      validate_cache = TRUE;
 
       g_object_unref (file);
       g_object_unref (info);
@@ -633,9 +651,17 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
 
           strftime (value, 100, "%a, %d %b %Y %T %Z", other_time);
 
-          DEBUG("Header %s", value);
+          DEBUG("If-Modified-Since %s", value);
           soup_message_headers_append (msg->request_headers,
-              "If-Modified-Since", g_strdup (value));
+              "If-Modified-Since", value);
+
+          if (etag != NULL)
+            {
+              DEBUG("If-None-Match: %s", etag);
+              soup_message_headers_append (msg->request_headers,
+                  "If-None-Match", etag);
+            }
+
         }
 
       soup_session_queue_message (soup_session, msg,
@@ -648,5 +674,6 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
    * as empty
    */
   g_free (modified_time);
+  g_free (etag);
 }
 
