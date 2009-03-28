@@ -42,7 +42,8 @@ libchamplain_0_3_la_SOURCES = \
 	champlain-zoom-level.c 		\
 	champlain-tile.c		\
 	champlain-map-source.c		\
-	champlain-network-map-source.c
+	champlain-network-map-source.c	\
+	champlain-cache.c
 
 noinst_HEADERS = \
 	champlain-debug.h  		\
@@ -56,7 +57,8 @@ noinst_HEADERS = \
 	champlain-enum-types.h		\
 	champlain-map-source.h		\
 	champlain-network-map-source.h	\
-	champlain-version.h
+	champlain-version.h		\
+	champlain-cache.h
 
 libchamplain_include_HEADERS = \
 	champlain.h 			\
@@ -70,7 +72,8 @@ libchamplain_include_HEADERS = \
 	champlain-zoom-level.h		\
 	champlain-base-marker.h		\
 	champlain-marker.h		\
-	champlain-version.h
+	champlain-version.h		\
+	champlain-cache.h
 
 libchamplain_0_3_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) ../tidy/libtidy-1.0.la
 

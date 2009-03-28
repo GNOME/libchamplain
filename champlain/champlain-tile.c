@@ -43,7 +43,8 @@ enum
   PROP_URI,
   PROP_FILENAME,
   PROP_STATE,
-  PROP_ACTOR
+  PROP_ACTOR,
+  PROP_ETAG
 };
 
 typedef struct _ChamplainTilePrivate ChamplainTilePrivate;
@@ -59,6 +60,9 @@ struct _ChamplainTilePrivate {
   ChamplainState state;
   gchar *filename;
   ClutterActor *actor;
+
+  GTimeVal *modified_time;
+  gchar* etag;
 };
 
 static void
@@ -93,6 +97,9 @@ champlain_tile_get_property (GObject *object,
         break;
       case PROP_ACTOR:
         g_value_set_object (value, champlain_tile_get_actor (self));
+        break;
+      case PROP_ETAG:
+        g_value_set_string (value, champlain_tile_get_etag (self));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -131,6 +138,9 @@ champlain_tile_set_property (GObject *object,
         break;
       case PROP_ACTOR:
         champlain_tile_set_actor (self, g_value_get_object (value));
+        break;
+      case PROP_ETAG:
+        champlain_tile_set_etag (self, g_value_get_string (value));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -244,6 +254,15 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         "The tile's actor",
         CLUTTER_TYPE_ACTOR,
         G_PARAM_READWRITE));
+
+  g_object_class_install_property (object_class,
+      PROP_ETAG,
+      g_param_spec_string ("etag",
+        "Entity Tag",
+        "The entity tag of the tile",
+        NULL,
+        G_PARAM_READWRITE));
+
 }
 
 static void
@@ -258,6 +277,7 @@ champlain_tile_init (ChamplainTile *self)
   priv->size = 0;
   priv->uri = g_strdup ("");
   priv->filename = g_strdup ("");
+  priv->etag = NULL;
 
   /* Can't call champlain_tile_set_actor (self, NULL); because the assertion will fail */
   priv->actor = NULL;
@@ -455,4 +475,61 @@ champlain_tile_set_actor (ChamplainTile *self, ClutterActor *actor)
 
   priv->actor = g_object_ref (actor);
   g_object_notify (G_OBJECT (self), "actor");
+}
+
+const GTimeVal *
+champlain_tile_get_modified_time (ChamplainTile *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_TILE(self), NULL);
+
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  return priv->modified_time;
+}
+
+void
+champlain_tile_set_modified_time (ChamplainTile *self,
+    GTimeVal *time)
+{
+  g_return_if_fail (CHAMPLAIN_TILE(self));
+  g_return_if_fail (time != NULL);
+
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  priv->modified_time = time;
+}
+
+char *
+champlain_tile_get_modified_time_string (ChamplainTile *self)
+{
+  g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  struct tm *other_time = gmtime (&priv->modified_time->tv_sec);
+  char value [100];
+
+  strftime (value, 100, "%a, %d %b %Y %T %Z", other_time);
+
+  return g_strdup (value);
+}
+
+const char *
+champlain_tile_get_etag (ChamplainTile *self)
+{
+  g_return_val_if_fail(CHAMPLAIN_TILE(self), "");
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  return priv->etag;
+}
+
+void
+champlain_tile_set_etag (ChamplainTile *self,
+    const gchar *etag)
+{
+  g_return_if_fail(CHAMPLAIN_TILE(self));
+
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  priv->etag = g_strdup (etag);
+  g_object_notify (G_OBJECT (self), "etag");
 }

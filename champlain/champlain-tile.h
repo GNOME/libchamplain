@@ -64,6 +64,9 @@ ChamplainState champlain_tile_get_state (ChamplainTile *self);
 G_CONST_RETURN gchar * champlain_tile_get_uri (ChamplainTile *self);
 G_CONST_RETURN gchar * champlain_tile_get_filename (ChamplainTile *self);
 ClutterActor * champlain_tile_get_actor (ChamplainTile *self);
+const GTimeVal * champlain_tile_get_modified_time (ChamplainTile *self);
+char * champlain_tile_get_modified_time_string (ChamplainTile *self);
+const char * champlain_tile_get_etag (ChamplainTile *self);
 
 void champlain_tile_set_x (ChamplainTile *self, gint x);
 void champlain_tile_set_y (ChamplainTile *self, gint y);
@@ -73,6 +76,8 @@ void champlain_tile_set_state (ChamplainTile *self, ChamplainState state);
 void champlain_tile_set_uri (ChamplainTile *self, const gchar *uri);
 void champlain_tile_set_filename (ChamplainTile *self, const gchar *filename);
 void champlain_tile_set_actor (ChamplainTile *self, ClutterActor* actor);
+void champlain_tile_set_etag (ChamplainTile *self, const gchar *etag);
+void champlain_tile_set_modified_time (ChamplainTile *self, GTimeVal *time);
 
 G_END_DECLS
 
