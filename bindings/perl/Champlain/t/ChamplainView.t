@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 46;
+use Clutter::TestHelper tests => 44;
 
 use Champlain ':coords';
 
@@ -117,8 +117,9 @@ sub test_zoom_in_stage {
 	$view->set_zoom_level($min - 1);
 	is($view->get('zoom-level'), $middle, "set zoom (min - 1) has no effect");
 
-	$view->set("zoom-level", $min - 1);
-	is($view->get('zoom-level'), $middle, "set('zoom-level', min - 1) has no effect");
+	# NOTE: This gives a warning because -1 out of range for property `zoom-level'
+	#$view->set("zoom-level", $min - 1);
+	#is($view->get('zoom-level'), $middle, "set('zoom-level', min - 1) has no effect");
 	
 	# Try to set directly the zoom level to a valu superior to max level
 	$view->set_zoom_level($max + 1);
@@ -184,8 +185,9 @@ sub test_zoom {
 	$view->set_zoom_level($min - 1);
 	is($view->get('zoom-level'), 0, "set zoom (min - 1) has no effect");
 	
-	$view->set("zoom-level", $min - 1);
-	is($view->get('zoom-level'), 0, "set('zoom-level', min -1) has no effect");
+	# NOTE: This gives a warning because -1 out of range for property `zoom-level'
+	#$view->set("zoom-level", $min - 1);
+	#is($view->get('zoom-level'), 0, "set('zoom-level', min -1) has no effect");
 	
 	# Try to set directly the zoom level to a valu superior to max level
 	$view->set_zoom_level($max + 1);
