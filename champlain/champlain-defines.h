@@ -42,6 +42,8 @@ typedef enum
   CHAMPLAIN_STATE_NONE,
   CHAMPLAIN_STATE_INIT,
   CHAMPLAIN_STATE_LOADING,
+  CHAMPLAIN_STATE_VALIDATING_CACHE, /* Use by tiles when there is cache,
+                                       but it is being validated */
   CHAMPLAIN_STATE_DONE
 } ChamplainState;
 

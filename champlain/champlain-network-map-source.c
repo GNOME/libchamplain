@@ -20,7 +20,7 @@
 
 #include "champlain-network-map-source.h"
 
-#define DEBUG_FLAG CHAMPLAIN_DEBUG_LOADING
+#define DEBUG_FLAG CHAMPLAIN_DEBUG_NETWORK
 #include "champlain-debug.h"
 
 #include "champlain.h"
@@ -207,9 +207,11 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
 {
   ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (champlainMapSource);
 
+  champlainMapSource->priv = priv;
+
   priv->proxy_uri = g_strdup ("");
   priv->uri_format = NULL;
-  champlainMapSource->priv = priv;
+  priv->offline = FALSE;
 }
 
 ChamplainNetworkMapSource*
@@ -408,7 +410,33 @@ file_loaded_cb (SoupSession *session,
   GError *error = NULL;
   gchar* path = NULL;
   const gchar *filename = NULL;
+  ClutterActor *actor, *previous_actor = NULL;
 
+  filename = champlain_tile_get_filename (ctx->tile);
+
+  DEBUG ("Got reply %d", msg->status_code);
+  if (msg->status_code == 304)
+  {
+    /* Since we are updating the cache, we can assume that the directories
+     * exists */
+    GTimeVal *now = g_new0 (GTimeVal, 1);
+    GFile *file;
+    GFileInfo *info;
+
+    file = g_file_new_for_path (filename);
+    info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED,
+        G_FILE_QUERY_INFO_NONE, NULL, NULL);
+
+    g_get_current_time (now);
+    g_file_info_set_modification_time (info, now);
+    g_file_set_attributes_from_info (file, info, G_FILE_QUERY_INFO_NONE, NULL,
+        NULL);
+
+    g_object_unref (file);
+    g_object_unref (info);
+    g_free (now);
+    goto finish;
+  }
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
       DEBUG ("Unable to download tile %d, %d: %s",
@@ -445,7 +473,6 @@ file_loaded_cb (SoupSession *session,
       goto cleanup;
     }
 
-  filename = champlain_tile_get_filename (ctx->tile);
   path = g_path_get_dirname (filename);
 
   if (g_mkdir_with_parents (path, 0700) == -1)
@@ -470,8 +497,8 @@ file_loaded_cb (SoupSession *session,
       return;
     }
 */
-  GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
-  ClutterActor *actor = clutter_texture_new ();
+  GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
+  actor = clutter_texture_new();
   if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
       gdk_pixbuf_get_pixels (pixbuf),
       gdk_pixbuf_get_has_alpha (pixbuf),
@@ -493,6 +520,10 @@ file_loaded_cb (SoupSession *session,
         }
     }
 
+  previous_actor = champlain_tile_get_actor (ctx->tile);
+  if (previous_actor)
+    g_object_ref (previous_actor); /* to be unrefed by the view */
+
   champlain_tile_set_actor (ctx->tile, actor);
   DEBUG ("Tile loaded from network");
 
@@ -501,7 +532,7 @@ cleanup:
   g_free (path);
 finish:
   champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
-  champlain_view_tile_ready (ctx->view, ctx->zoom_level, ctx->tile, TRUE);
+  champlain_view_tile_updated (ctx->view, ctx->zoom_level, ctx->tile, previous_actor);
   g_object_unref (ctx->tile);
   g_object_unref (ctx->zoom_level);
   g_free (ctx);
@@ -514,16 +545,12 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile)
 {
   gchar* filename;
-  gboolean use_cache = FALSE;
+  gboolean in_cache = FALSE;
+  gboolean validate_cache = FALSE;
+  GTimeVal *modified_time = g_new0 (GTimeVal, 1);
 
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (map_source);
   ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
-
-  /* Ref the tile as it may be freeing during the loading
-   * Unref when the loading is done.
-   */
-  g_object_ref (tile);
-  g_object_ref (zoom_level);
 
   /* Try the cached version first */
   filename = get_filename (network_map_source, zoom_level, tile);
@@ -532,43 +559,44 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
 
   if (g_file_test (filename, G_FILE_TEST_EXISTS))
     {
-      GTimeVal *date = g_new0 (GTimeVal, 1);
       GTimeVal *now = g_new0 (GTimeVal, 1);
       GFileInfo *info;
       GFile *file;
-
-      file = g_file_new_for_path (filename);
-      info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED,
-          G_FILE_QUERY_INFO_NONE, NULL, NULL);
-      g_file_info_get_modification_time (info, date);
-
-      g_get_current_time (now);
-      g_time_val_add (date, (24ul * 60ul * 60ul * 1000ul * 1000ul)); // Cache expires 1 day
-      use_cache = date->tv_sec > now->tv_sec;
-
-      g_object_unref (file);
-      g_object_unref (info);
-      g_free (date);
-      g_free (now);
-    }
-  else
-    use_cache = FALSE;
-
-  if (use_cache == TRUE)
-    {
       GError *error = NULL;
       ClutterActor *actor;
 
+      in_cache = TRUE;
+
+      /* Verify since when is the file in cache */
+      file = g_file_new_for_path (filename);
+      info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED,
+          G_FILE_QUERY_INFO_NONE, NULL, NULL);
+      g_file_info_get_modification_time (info, modified_time);
+
+      g_get_current_time (now);
+      g_time_val_add (now, (-60ul * 60ul * 1000ul * 1000ul)); // Cache expires 1 hour
+      validate_cache = modified_time->tv_sec < now->tv_sec;
+
+      g_object_unref (file);
+      g_object_unref (info);
+      g_free (now);
+
+      /* Load the cached version */
       actor = clutter_texture_new_from_file (filename, &error);
       champlain_tile_set_actor (tile, actor);
 
-      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+      if (validate_cache == TRUE)
+        champlain_tile_set_state (tile, CHAMPLAIN_STATE_VALIDATING_CACHE);
+      else
+        champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+
       DEBUG ("Tile loaded from cache");
-      champlain_view_tile_ready (view, zoom_level, tile, FALSE);
-      g_object_unref (tile);
-      g_object_unref (zoom_level);
+      champlain_view_tile_ready (view, zoom_level, tile);
     }
-  else if (!priv->offline)
+
+
+  if ((in_cache == FALSE || (in_cache == TRUE && validate_cache == TRUE)) &&
+      priv->offline == FALSE)
     {
       SoupMessage *msg;
       gchar *uri;
@@ -576,6 +604,12 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       ctx->view = view;
       ctx->zoom_level = zoom_level;
       ctx->tile = tile;
+
+      /* Ref the tile as it may be freeing during the loading
+       * Unref when the loading is done.
+       */
+      g_object_ref (tile);
+      g_object_ref (zoom_level);
 
       if (!soup_session)
         soup_session = soup_session_async_new_with_options ("proxy-uri",
@@ -592,6 +626,18 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
       msg = soup_message_new (SOUP_METHOD_GET, uri);
 
+      if (in_cache == TRUE)
+        {
+          char value [100];
+          struct tm *other_time = gmtime (&modified_time->tv_sec);
+
+          strftime (value, 100, "%a, %d %b %Y %T %Z", other_time);
+
+          DEBUG("Header %s", value);
+          soup_message_headers_append (msg->request_headers,
+              "If-Modified-Since", g_strdup (value));
+        }
+
       soup_session_queue_message (soup_session, msg,
                                   file_loaded_cb,
                                   ctx);
@@ -601,5 +647,6 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
   /* If a tile is neither in cache or can be fetched, do nothing, it'll show up
    * as empty
    */
+  g_free (modified_time);
 }
 

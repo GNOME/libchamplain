@@ -131,8 +131,11 @@ gboolean champlain_view_get_coords_at (ChamplainView *view,
 
 void champlain_view_tile_ready (ChamplainView *view,
     ChamplainZoomLevel *level,
+    ChamplainTile *tile);
+void champlain_view_tile_updated (ChamplainView *view,
+    ChamplainZoomLevel *level,
     ChamplainTile *tile,
-    gboolean animate);
+    ClutterActor *actor);
 
 G_END_DECLS
 

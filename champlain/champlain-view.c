@@ -1476,19 +1476,41 @@ view_tiles_reposition (ChamplainView* view)
 void
 champlain_view_tile_ready (ChamplainView *view,
     ChamplainZoomLevel *level,
-    ChamplainTile *tile,
-    gboolean animate)
+    ChamplainTile *tile)
+{
+  ClutterActor *actor;
+
+  actor = champlain_tile_get_actor (tile);
+
+  clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)), actor, NULL);
+  clutter_actor_show (actor);
+
+  view_position_tile (view, tile);
+  view_update_state (view);
+}
+
+void
+champlain_view_tile_updated (ChamplainView *view,
+                             ChamplainZoomLevel *level,
+                             ChamplainTile *tile,
+                             ClutterActor *previous_actor)
 {
   ClutterActor *actor;
   ClutterEffectTemplate *etemplate;
 
   actor = champlain_tile_get_actor (tile);
-  if (animate)
-    {
-      etemplate = clutter_effect_template_new_for_duration (750, CLUTTER_ALPHA_SINE_INC);
-      clutter_actor_set_opacity(actor, 0);
-      clutter_effect_fade (etemplate, actor, 255, NULL, NULL);
-    }
+  if (previous_actor != NULL)
+  {
+    /* TODO: Don't remove until the fade in the of new time is over */
+    clutter_container_remove_actor (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)),
+        previous_actor);
+    g_object_unref (previous_actor);
+  }
+
+  /* FIXME: etemplate are leaked here */
+  etemplate = clutter_effect_template_new_for_duration (750, CLUTTER_ALPHA_SINE_INC);
+  clutter_actor_set_opacity(actor, 0);
+  clutter_effect_fade (etemplate, actor, 255, NULL, NULL);
 
   clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)), actor, NULL);
   clutter_actor_show (actor);
