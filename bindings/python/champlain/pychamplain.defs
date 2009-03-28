@@ -147,6 +147,47 @@
   )
 )
 
+(define-method set_min_zoom_level
+  (of-object "ChamplainView")
+  (c-name "champlain_view_set_min_zoom_level")
+  (return-type "none")
+  (parameters
+    '("gint" "zoom_level")
+  )
+)
+
+(define-method set_max_zoom_level
+  (of-object "ChamplainView")
+  (c-name "champlain_view_set_max_zoom_level")
+  (return-type "none")
+  (parameters
+    '("gint" "zoom_level")
+  )
+)
+
+(define-method ensure_visible
+  (of-object "ChamplainView")
+  (c-name "champlain_view_ensure_visible")
+  (return-type "none")
+  (parameters
+    '("gdouble" "lat1")
+    '("gdouble" "lon1")
+    '("gdouble" "lat2")
+    '("gdouble" "lon2")
+    '("gboolean" "animate")
+  )
+)
+
+(define-method ensure_markers_visible
+  (of-object "ChamplainView")
+  (c-name "champlain_view_ensure_markers_visible")
+  (return-type "none")
+  (parameters
+    '("ChamplainMarker*[]" "markers")
+    '("gboolean" "animate")
+  )
+)
+
 (define-method set_map_source
   (of-object "ChamplainView")
   (c-name "champlain_view_set_map_source")
@@ -439,7 +480,7 @@
 (define-method get_tile_uri
   (of-object "ChamplainNetworkMapSource")
   (c-name "champlain_network_map_source_get_tile_uri")
-  (return-type "const-gchar*")
+  (return-type "gchar*")
   (parameters
     '("gint" "x")
     '("gint" "y")
