@@ -34,7 +34,7 @@ champlain_marker_new_with_image (class, gchar *filename)
 
 
 ClutterActor*
-champlain_marker_new_with_image_full(class, const gchar *filename, gint width, gint height, gint anchor_x, gint anchor_y)
+champlain_marker_new_with_image_full (class, const gchar *filename, gint width, gint height, gint anchor_x, gint anchor_y)
 	PREINIT:
 		GError *error = NULL;
 	CODE:
