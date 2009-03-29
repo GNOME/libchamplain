@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "/usr/share/xml/docbook/schema/dtd/4.4/docbookx.dtd" [
 
-	<!ENTITY % c "IGNORE">
-	<!ENTITY % python "IGNORE">
-	<!ENTITY % perl "IGNORE">
+	<!ELEMENT xi:include (xi:fallback?) >
+	<!ATTLIST xi:include
+		xmlns:xi   CDATA       #FIXED    "http://www.w3.org/2001/XInclude"
+		href       CDATA       #IMPLIED
+		parse      (xml|text)  "text"
+		xpointer   CDATA       #IMPLIED
+		encoding   CDATA       #IMPLIED 
+		accept     CDATA       #IMPLIED
+		accept-language CDATA  #IMPLIED >
+
+	<!ELEMENT xi:fallback ANY>
+	<!ATTLIST xi:fallback
+		xmlns:xi   CDATA   #FIXED   "http://www.w3.org/2001/XInclude" >
+
+	<!ENTITY % local.para.char.mix "| xi:include">
 
 	<!ENTITY license SYSTEM "license.docbook">
 	<!ENTITY fdl-license SYSTEM "fdl-license">
-	<!ENTITY examples-init SYSTEM "../examples/python/chapter2/01-initialisation.py">
 
 ]> 
  
 <book id="python_champlain" lang="en">
 
 	<bookinfo>
-		<title>Conquering The World With <![%python [Python]]> <![%perl [Perl]]> <![%c [C]]>  And Libchamplain</title>
+		<title>Conquering The World With 
+			<phrase condition="python">Python</phrase>
+			<phrase condition="perl">Perl</phrase>
+			<phrase condition="c">C</phrase>
+			And Libchamplain
+		</title>
 
 		<author>
 			<firstname>Michael</firstname>
@@ -145,9 +161,7 @@ clutter.main()
 				<title>Full Listing</title>
 				<example>
 					<title>Initialisation</title>
-					<programlisting>
-&examples-init;
-					</programlisting>
+					<programlisting condition="python"><xi:include href="../examples/python/chapter2/01-initialisation.py"/></programlisting>
 				</example>
 			</sect2>
 		</sect1>
