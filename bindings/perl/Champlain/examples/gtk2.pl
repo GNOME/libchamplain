@@ -48,6 +48,12 @@ sub main {
 	});
 	$toolbox->add($child);
 
+	$child = Gtk2::Button->new_from_stock('gtk-home');
+	$child->signal_connect('clicked', sub {
+		$map->go_to(48.218611, 17.146397);
+	});
+	$toolbox->add($child);
+
 	$child = Gtk2::ToggleButton->new_with_label("Markers");
 	$child->signal_connect('toggled', sub {
 		if ($layer->get('visible')) {
