@@ -19,30 +19,24 @@
 
 	<!ENTITY license SYSTEM "license.docbook">
 	<!ENTITY fdl-license SYSTEM "fdl-license">
+	<!ENTITY lang "<phrase condition='python'>Python</phrase><phrase condition='perl'>Perl</phrase><phrase condition='c'>C</phrase>">
 
 ]> 
  
-<book id="python_champlain" lang="en">
+<book lang="en">
 
 	<bookinfo>
-		<title>Conquering The World With 
-			<phrase condition="python">Python</phrase>
-			<phrase condition="perl">Perl</phrase>
-			<phrase condition="c">C</phrase>
-			And Libchamplain
-		</title>
+		<title>Conquering The World With &lang; And Libchamplain</title>
 
 		<author>
 			<firstname>Michael</firstname>
 		      	<surname>Sheldon</surname>
 		</author>
 
-		<date>2009-03-22</date>
-
-		<releaseinfo>0.10.1</releaseinfo>
+		<releaseinfo>0.1</releaseinfo>
 
 		<abstract>
-			<para>This is a step-by-step tutorial which will introduce champlain concepts and how to make use of them from within Python. It is released under the <ulink url="http://www.gnu.org/copyleft/fdl.html">GNU Free Documentation License</ulink> a copy of which can be found in <link linkend="fdl-license">Appendix A.</link></para>
+			<para>This is a step-by-step tutorial which will introduce champlain concepts and how to make use of them from within &lang;. It is released under the <ulink url="http://www.gnu.org/copyleft/fdl.html">GNU Free Documentation License</ulink> a copy of which can be found in <link linkend="fdl-license">Appendix A.</link></para>
 		</abstract>
 
 	</bookinfo>
@@ -50,12 +44,12 @@
 	<chapter id="introduction">
 		<title>Introduction</title>
  
-		<para>This tutorial will try introduce most concepts within in champlain and explain how they can be used from within Python. The target audience for this tutorial is programmers with past Python and GTK experience, no experience of either champlain or clutter will be assumed. Chapter 2 will introduce a number of concepts from champlain individually. Chapter 3 will then provide a detailed account of the creation of a simple game from scratch using champlain. Chapter 4 will give an example of creating a plugin for an existing application to add mapping capabilities.</para>
+		<para>This tutorial will try introduce most concepts within in champlain and explain how they can be used from within &lang;. The target audience for this tutorial is programmers with past &lang; and GTK experience, no experience of either champlain or clutter will be assumed. Chapter 2 will introduce a number of concepts from champlain individually. Chapter 3 will then provide a detailed account of the creation of a simple game from scratch using champlain. Chapter 4 will give an example of creating a plugin for an existing application to add mapping capabilities.</para>
 
 		<sect1>
 			<title>Examples</title>
 
-			<para>Each chapter contains a number of examples, the source code for these can be downloaded from the <ulink url="http://www.mikeasoft.com/champy/">Conquering The World With Python And Champlain website</ulink>.</para>
+			<para>Each chapter contains a number of examples, the source code for these can be downloaded from the <ulink url="http://www.mikeasoft.com/champy/">Conquering The World With &lang; And Champlain website</ulink>.</para>
 		</sect1>
  
 	</chapter>
@@ -162,6 +156,7 @@ clutter.main()
 				<example>
 					<title>Initialisation</title>
 					<programlisting condition="python"><xi:include href="../examples/python/chapter2/01-initialisation.py"/></programlisting>
+					<programlisting condition="c"><xi:include href="../examples/c/chapter2/01-initialisation.c"/></programlisting>
 				</example>
 			</sect2>
 		</sect1>
