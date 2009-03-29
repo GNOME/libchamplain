@@ -437,7 +437,13 @@ file_loaded_cb (SoupSession *session,
     g_object_unref (file);
     g_object_unref (info);
     g_free (now);
-    goto finish;
+
+    champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
+    champlain_view_tile_uptodate (ctx->view, ctx->zoom_level, ctx->tile);
+    g_object_unref (ctx->tile);
+    g_object_unref (ctx->zoom_level);
+    g_free (ctx);
+    return;
   }
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
@@ -613,20 +619,28 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       if (in_cache == TRUE)
         {
           const gchar *etag;
-          gchar *date;
 
-          date = champlain_tile_get_modified_time_string (tile);
-          DEBUG("If-Modified-Since %s", date);
-          soup_message_headers_append (msg->request_headers,
-              "If-Modified-Since", date);
-          g_free (date);
-
+          /* If an etag is available, only use it.
+           * OSM servers seems to send now as the modified time for all tiles
+           * Omarender servers set the modified time correctly
+           */
           etag = champlain_tile_get_etag (tile);
           if (etag != NULL)
             {
               DEBUG("If-None-Match: %s", etag);
               soup_message_headers_append (msg->request_headers,
                   "If-None-Match", etag);
+            }
+          else
+            {
+              gchar *date;
+
+              date = champlain_tile_get_modified_time_string (tile);
+              DEBUG("If-Modified-Since %s", date);
+              soup_message_headers_append (msg->request_headers,
+                  "If-Modified-Since", date);
+
+              g_free (date);
             }
         }
 

@@ -1484,8 +1484,16 @@ champlain_view_tile_ready (ChamplainView *view,
 
   clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)), actor, NULL);
   clutter_actor_show (actor);
-
   view_position_tile (view, tile);
+
+  view_update_state (view);
+}
+
+void
+champlain_view_tile_uptodate (ChamplainView *view,
+                              ChamplainZoomLevel *level,
+                              ChamplainTile *tile)
+{
   view_update_state (view);
 }
 
