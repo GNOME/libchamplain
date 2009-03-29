@@ -1,20 +1,22 @@
 Revision history for Champlain
 
 
-0.04 Wed Mar 25 22:04:27 CET 2009
-	Added the map sources osm_cyclemap and osm_osmarender
-	Port of the C demo animated-marker
+0.04 Sun Mar 29 11:45:00 CEST 2009
+	Added the map sources osm_cyclemap and osm_osmarender.
+	Port of the C demo animated-marker.
+	New methods in Champlain::MapSource.
+	New methods in Champlain::View.
 
 
 0.03 Sun Mar 22 22:32:44 CET 2009
-	Fixed the binding of champlain_view_embed_get_view()
-	Added support for Champlain::ZoomLevel
-	Added unit tests
+	Fixed the binding of champlain_view_embed_get_view().
+	Added support for Champlain::ZoomLevel.
+	Added unit tests.
 
 
 0.02 Tue Mar 17 09:18:08 CET 2009
 	Cleanup in the project.
-	Added champlain_view_embed_get_view()
+	Added champlain_view_embed_get_view().
 
 
 0.01 Sat Mar 14 10:33:12 CET 2009
