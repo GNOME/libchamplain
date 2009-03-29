@@ -1223,26 +1223,7 @@ champlain_view_zoom_in (ChamplainView *view)
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
-  if (priv->map == NULL)
-    return;
-
-  if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level+1))
-    return;
-
-  ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
-  if (!map_zoom_in (priv->map, priv->map_source))
-    return;
-
-  priv->zoom_level++;
-  resize_viewport (view);
-
-  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
-      group);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
-      champlain_zoom_level_get_actor (priv->map->current_level));
-  champlain_view_center_on (view, priv->latitude, priv->longitude);
-
-  g_object_notify (G_OBJECT (view), "zoom-level");
+  champlain_view_set_zoom_level (view, priv->zoom_level + 1);
 }
 
 /**
@@ -1260,26 +1241,7 @@ champlain_view_zoom_out (ChamplainView *view)
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
-  if (priv->map == NULL)
-    return;
-
-  if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level-1))
-    return;
-
-  ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
-  if (!map_zoom_out (priv->map, priv->map_source))
-    return;
-
-  priv->zoom_level--;
-  resize_viewport (view);
-
-  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
-      group);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
-      champlain_zoom_level_get_actor (priv->map->current_level));
-  champlain_view_center_on (view, priv->latitude, priv->longitude);
-
-  g_object_notify (G_OBJECT (view), "zoom-level");
+  champlain_view_set_zoom_level (view, priv->zoom_level - 1);
 }
 
 /**
