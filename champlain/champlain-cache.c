@@ -23,6 +23,7 @@
 
 #include <glib.h>
 #include <gio/gio.h>
+#include <sqlite3.h>
 
 G_DEFINE_TYPE (ChamplainCache, champlain_cache, G_TYPE_OBJECT)
 
@@ -39,6 +40,8 @@ typedef struct _ChamplainCachePrivate ChamplainCachePrivate;
 
 struct _ChamplainCachePrivate {
   guint size_limit;
+
+  sqlite3 *data;
 };
 
 static void
@@ -78,7 +81,13 @@ champlain_cache_set_property (GObject *object,
 static void
 champlain_cache_dispose (GObject *object)
 {
-//  ChamplainCachePrivate *priv = GET_PRIVATE (object);
+  gint error;
+
+  ChamplainCachePrivate *priv = GET_PRIVATE (object);
+
+  error = sqlite3_close (priv->data);
+  if (error != SQLITE_OK)
+    g_warning ("Sqlite returned error %d when closing cache.db", error);
 
   G_OBJECT_CLASS (champlain_cache_parent_class)->dispose (object);
 }
@@ -115,7 +124,34 @@ champlain_cache_class_init (ChamplainCacheClass *klass)
 static void
 champlain_cache_init (ChamplainCache *self)
 {
+  gchar *filename, *error_msg = NULL;
+  gint error;
+
+  ChamplainCachePrivate *priv = GET_PRIVATE (self);
+
+  filename = g_build_filename (g_get_user_cache_dir (), "champlain",
+      "cache.db", NULL);
+
   champlain_cache_set_size_limit (self, 10);
+
+  error = sqlite3_open_v2 (filename, &priv->data,
+      SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+  if (error != SQLITE_OK)
+    {
+      g_warning ("Sqlite returned error %d when opening cache.db", error);
+      goto cleanup;
+    }
+
+  sqlite3_exec (priv->data, "CREATE TABLE etags (filename char(500) PRIMARY KEY, etag char (30))", NULL, NULL, &error_msg);
+  if (error_msg != NULL)
+    {
+      g_warning ("Creating table Etag failed: %s", error_msg);
+      sqlite3_free (error_msg);
+      goto cleanup;
+    }
+
+cleanup:
+  g_free (filename);
 }
 
 ChamplainCache*
@@ -154,6 +190,17 @@ champlain_cache_set_size_limit (ChamplainCache *self,
   g_object_notify (G_OBJECT (self), "size-limit");
 }
 
+static int
+set_etag (void *tile,
+    int row_count,
+    char** values,
+    char** headers)
+{
+  g_print ("%s: %s\n", headers[0], values[0]);
+  champlain_tile_set_etag (CHAMPLAIN_TILE (tile), values[0]);
+  return 0; // 0 meaning success
+}
+
 gboolean
 champlain_cache_fill_tile (ChamplainCache *self,
     ChamplainTile *tile)
@@ -165,10 +212,13 @@ champlain_cache_fill_tile (ChamplainCache *self,
   GFile *file;
   GError *error = NULL;
   ClutterActor *actor;
-  const gchar *etag = NULL;
   const gchar *filename;
-  GTimeVal *modified_time = g_new0 (GTimeVal, 1);
+  gchar *error_msg = NULL;
+  gchar *query = NULL;
+  GTimeVal *modified_time;
 
+  ChamplainCachePrivate *priv = GET_PRIVATE (self);
+  modified_time = g_new0 (GTimeVal, 1);
   filename = champlain_tile_get_filename (tile);
 
   if (!g_file_test (filename, G_FILE_TEST_EXISTS))
@@ -181,9 +231,15 @@ champlain_cache_fill_tile (ChamplainCache *self,
   g_file_info_get_modification_time (info, modified_time);
   champlain_tile_set_modified_time (tile, modified_time);
 
-  //TODO: retrieve etag
-  if (etag != NULL)
-    champlain_tile_set_etag (tile, etag);
+  /* Retrieve etag */
+  query = g_strdup_printf ("SELECT etag FROM etags WHERE filename = '%s'",
+      filename);
+  sqlite3_exec (priv->data, query, set_etag, tile, &error_msg);
+  if (error_msg != NULL)
+    {
+      g_warning ("Retrieving Etag failed: %s", error_msg);
+      sqlite3_free (error_msg);
+    }
 
   /* Load the cached version */
   actor = clutter_texture_new_from_file (filename, &error);
@@ -191,6 +247,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
 
   g_object_unref (file);
   g_object_unref (info);
+  g_free (query);
 
   return TRUE;
 }
@@ -218,7 +275,21 @@ void
 champlain_cache_update_tile (ChamplainCache *self,
     ChamplainTile *tile)
 {
+  g_return_if_fail(CHAMPLAIN_CACHE (self));
+  gchar *query, *error = NULL;
 
-  //Save the etag 
+  ChamplainCachePrivate *priv = GET_PRIVATE (self);
 
+  query = g_strdup_printf ("REPLACE INTO etags (filename, etag) VALUES ('%s', '%s');",
+      champlain_tile_get_filename (tile),
+      champlain_tile_get_etag (tile));
+  sqlite3_exec (priv->data, query, NULL, NULL, &error);
+  if (error != NULL)
+    {
+      g_warning ("Saving Etag failed: %s", error);
+      sqlite3_free (error);
+    }
+
+
+  g_free (query);
 }
