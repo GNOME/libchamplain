@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 31;
+use Clutter::TestHelper tests => 40;
 
 use Champlain ':coords';
 
@@ -12,6 +12,7 @@ exit tests();
 
 
 sub tests {
+	test_go_to();
 	test_generic();
 	test_zoom();
 	test_event();
@@ -40,7 +41,7 @@ sub test_generic {
 	$view->set_size(600, 400);
 	is($view->get('width'), 600, "set_size() changed width");
 	is($view->get('height'), 400, "set_size() changed height");
-	
+
 	
 	# Can't be tested but at least we check that it doesn't crash when invoked
 	my $layer = Champlain::Layer->new();
@@ -146,7 +147,7 @@ sub test_event {
 	
 	my $map_source = $view->get('map-source');
 	my $size = $map_source->get_tile_size;
-	ok($size > 0);
+	ok($size > 0, "Tile has a decent size");
 	
 	# NOTE: At the moment this works only if the view is in a stage and if
 	# show_all() was called
@@ -162,10 +163,58 @@ sub test_event {
 	my $middle = int($size/2);
 	$event->x($middle);
 	$event->y($middle);
-	is($event->x, $middle);
-	is($event->y, $middle);
+	is($event->x, $middle, "Fake event is in the middle (x)");
+	is($event->y, $middle, "Fake event is in the middle (y)");
 
 	my ($latitude, $longitude) = $view->get_coords_from_event($event);
 	ok($latitude >= -2.0 && $latitude <= 2.0, "get_coords_from_event() latitude");
 	ok($longitude >= -2.0 && $longitude <= 2.0, "get_coords_from_event() longitude");
+}
+
+
+#
+# Test going to a different location with go_to().
+#
+sub test_go_to {
+	my $view = Champlain::View->new();
+	isa_ok($view, 'Champlain::View');
+
+	# Place the view in the center
+	$view->center_on(0, 0);
+	is($view->get('latitude'), 0, "center_on() reset latitude");
+	is($view->get('longitude'), 0, "center_on() reset longitude");
+	
+	
+	# Go to a different place
+	my ($latitude, $longitude) = (48.218611, 17.146397);
+	$view->go_to($latitude, $longitude);
+
+	# Give us a bit of time to get there  since this is an animation and it
+	# requires an event loop.
+	Glib::Timeout->add (100, sub {
+		Clutter->main_quit();
+		return FALSE;
+	});
+	Clutter->main();
+	
+	# Check if we got somewhere close to desired location (~ 1 degree)
+	my ($current_latitude, $current_longitude) = $view->get('latitude', 'longitude');
+	my $delta_latitude = $view->get('latitude') - $latitude;
+	my $delta_longitude = $view->get('longitude') - $longitude;
+	ok($delta_latitude >= -1 && $delta_latitude <= 1, "go_to() changed latitude close enough");
+	ok($delta_longitude >= -1 && $delta_longitude <= 1, "go_to() changed longitude close enough");
+	
+	
+	
+	# Replace the view in the center
+	$view->center_on(0, 0);
+	is($view->get('latitude'), 0, "center_on() reset latitude");
+	is($view->get('longitude'), 0, "center_on() reset longitude");
+	
+	# Go to a different place. This is too fast and can't be tested properly.
+	$view->go_to($latitude, $longitude);
+	$view->stop_go_to();
+
+	is($view->get('latitude'), 0, "stop_go_to() at latitude 0");
+	is($view->get('longitude'), 0, "stop_go_to() at longitude 0");
 }

@@ -45,3 +45,11 @@ champlain_view_set_map_source (ChamplainView *view, ChamplainMapSource *map_sour
 
 void
 champlain_view_tile_ready (ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile, gboolean animate);
+
+
+void
+champlain_view_go_to (ChamplainView *view, gdouble latitude, gdouble longitude)
+
+
+void
+champlain_view_stop_go_to (ChamplainView *view)
