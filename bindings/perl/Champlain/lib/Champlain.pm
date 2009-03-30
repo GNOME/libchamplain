@@ -97,6 +97,7 @@ our $VERSION = '0.04';
 use base 'DynaLoader';
 use Exporter 'import';
 
+use Clutter;
 
 use constant {
 	MIN_LAT  => -90,
