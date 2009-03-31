@@ -1,177 +1,199 @@
 #!/usr/bin/perl
 
+=head1 NAME
+
+capitals.pl - Show the capitals
+
+=head1 DESCRIPTION
+
+This program takes you into a magical trip and displays the capital cities one
+by one.
+
+=cut
+
 use strict;
 use warnings;
 use open ':std', ':utf8';
- 
-use Net::HTTP::NB;
-use IO::Select;
+
 use Glib qw(TRUE FALSE);
-use URI;
-use Carp;
+use Clutter qw(-gtk-init);
+use Gtk2 qw(-init);
+use Champlain;
+
 use XML::LibXML;
-use Data::Dumper;
+
 
 exit main();
 
 
 sub main {
 
-	my $loop = Glib::MainLoop->new();
+	my $window = Gtk2::Window->new();
+	my $vbox = Gtk2::VBox->new(FALSE, 0);
+	
+	
+	# Create the map stuff
+	my $map = Champlain::View->new();
+	my $gtk2_map = Gtk2::Champlain::ViewEmbed->new($map);
+	$gtk2_map->set_size_request(640, 480);
+	$map->center_on(0, 0);
+	$map->set('scroll-mode', 'kinetic', 'zoom-level', 3);
+	
+	my $layer = Champlain::Layer->new();
+	$map->add_layer($layer);
+	
+	
+	my $viewport = Gtk2::Viewport->new();
+	$viewport->set_shadow_type('etched-in');
+	$viewport->add($gtk2_map);
+	$vbox->pack_start($viewport, TRUE, TRUE, 0);
+	
+	$window->add($vbox);
+	$window->set_size_request($gtk2_map->get_size_request);
+	$window->signal_connect(destroy => sub {
+		Gtk2->main_quit();
+	});
+	$window->show_all();
+
 	
 	my $capitals_url = "http://en.wikipedia.org/wiki/List_of_national_capitals";
 	my $soup = My::Soup->new($capitals_url);
 	
-	my $parser = XML::LibXML->new();
-	$parser->recover_silently(1);
-
 	$soup->do_get(
 		$capitals_url,
 		\&capitals_main_callback,
 		{
-			loop => $loop,
-			parser => $parser,
+			map   => $map,
+			layer => $layer,
+			markers => [],
 		}
 	);
 	
-	Glib::Idle->add(sub {
-		$soup->do_get($capitals_url, sub {
-			my ($soup, $uri, $response, $data) = @_;
-			printf "Downloaded $uri %s - %s\n", $response->code, $response->message;
-			
-			$soup->do_get("/wiki/Madrid", sub {
-				my ($soup, $uri, $response, $data) = @_;
-				printf "Downloaded $uri %s - %s\n", $response->code, $response->message;
-				
-				my $document = $parser->parse_html_string($response->content);
-				my $name = $document->getElementById('firstHeading')->textContent;
-				my ($latitude, $longitude) = (0, 0);
-				
-				my ($geo) = $document->findnodes('id("coordinates")//span[@class="geo"]');
-				if ($geo) {
-#					my @nodes = $coord_node->findnodes('//span[@class="latitude"]');
-#					print "nodes = @nodes\n";
-#					print $coord_node->toString(2);
-#					my $latitude = $coord_node->findvalue('//span[@class="latitude"]');
-#					my $longitude = $coord_node->findvalue('//span[@class="longitude"]');
-					
-#					my ($geo) = $coord_node->findnodes('//span[@class="geo"]');
-					
-					($latitude, $longitude) = split /\s*;\s*/, $geo->textContent;
-					
-#					printf "latitude = --$latitude-- = %.4f\n", dms_to_decimal($latitude);
-#					printf "longitude = $longitude = %.4f\n", dms_to_decimal($longitude);
-				}
-				
-				printf "$name %.4f, %.4f\n", $latitude, $longitude;
-				
-				$loop->quit();
-			});
-			
-		});
-		return FALSE;
-	}) if 0;
 	
-	$loop->run();
+	Gtk2->main();
+	
 	
 	return 0;
 }
 
 
 #
-# Called when the main page with all the capitals is downloaded
+# Called when the main page with all the capitals is downloaded.
 #
 sub capitals_main_callback {
 	my ($soup, $uri, $response, $data) = @_;
 	
-	printf "Downloaded $uri %s - %s\n", $response->code, $response->message;
-	
-	my $document = $data->{parser}->parse_html_string($response->content);
+	my $parser = XML::LibXML->new();
+	$parser->recover_silently(1);
+	$data->{parser} = $parser;
+
+	# Find the table with the capitals
+	my $document = $parser->parse_html_string($response->content);
 	my @nodes = $document->findnodes('//table[@class="wikitable sortable"]/tr/td[1]/a');
 	
-	$data->{nodes} = \@nodes;
-	print "Download the first capital\n";
+	# Get the capitals
+	my @capitals = ();
+	foreach my $node (@nodes) {
+		my $uri = $node->getAttribute('href') or next;
+		my $name = $node->getAttribute('title') or next;
+		my $capitals = {
+			uri => $uri,
+			name => $name,
+		};
+		push @capitals, $capitals;
+	}
+	
+	# Download the capitals (the download is node one capital at a time)
+	$data->{capitals} = \@capitals;
 	download_capital($soup, $data);
-	
-#	foreach my $node (@nodes) {
-#		my $uri = $node->getAttribute('href');
-#		my $name = $node->getAttribute('title');
-#		print "$name -> $uri\n";
-#	}
-#	printf "Found %d\n", scalar @nodes;
-	
-#	$data->{loop}->quit();
 }
 
 
 #
-# Called when the page of a capital is downloaded
+# Called when the page of a capital is downloaded. The page is expected to have
+# the coordinates of the capital.
 #
 sub capital_callback {
 	my ($soup, $uri, $response, $data) = @_;
-	
-	printf "Downloaded $uri %s - %s\n", $response->code, $response->message;
 	
 	my $document = $data->{parser}->parse_html_string($response->content);
 	my $heading = $document->getElementById('firstHeading');
 	if ($heading) {
 		my $name = $document->getElementById('firstHeading')->textContent;
-		my ($latitude, $longitude) = (0, 0);
 				
 		my ($geo) = $document->findnodes('id("coordinates")//span[@class="geo"]');
 		if ($geo) {
-			($latitude, $longitude) = split /\s*;\s*/, $geo->textContent;
+			my ($latitude, $longitude) = split /\s*;\s*/, $geo->textContent;
+			$data->{current}{latitude} = $latitude;
+			$data->{current}{longitude} = $longitude;
+			printf "$name %.4f, %.4f\n", $latitude, $longitude;
+	
+			my $marker = Champlain::Marker->new_with_label($name, "Sans 15", undef, undef);
+			$marker->set_position($latitude, $longitude);
+			if (@{ $data->{markers} } == 5) {
+				my $old = shift @{ $data->{markers} };
+				$data->{layer}->remove($old);
+			}
+			push @{ $data->{markers} }, $marker;
+			$data->{layer}->add($marker);
+			$data->{map}->go_to($latitude, $longitude);
 		}
-		printf "$name %.4f, %.4f\n", $latitude, $longitude;
 	}
 	
-	download_capital($soup, $data);
+	Glib::Timeout->add (1_000, sub {
+		download_capital($soup, $data);
+		return FALSE;
+	});
 }
 
 
+#
+# This function downloads the page of a capital and then call it self again with
+# the next capital to download. This process is repeated until there are no more
+# capitals to download.
+#
+# The capitals to download are taken from $data->{capitals}.
+#
 sub download_capital {
 	my ($soup, $data) = @_;
 
-	print "download_capital nodes data = $data $data->{nodes}\n";
-	
-	my $node = shift @{ $data->{nodes} };
-	if (! defined $node) {
+	my $capital = shift @{ $data->{capitals} };
+	if (! defined $capital) {
 		print "No more capitals to download\n";
-		$data->{loop}->quit();
 		return;
 	}
 	
-	my $uri = $node->getAttribute('href');
-	my $name = $node->getAttribute('title');
-	print "$name -> $uri\n";
+	my $uri = $capital->{uri};
+	my $name = $capital->{name};
+	$data->{current} = $capital;
 	$soup->do_get($uri, \&capital_callback, $data);
 }
 
 
-sub dms_to_decimal {
-	my ($dms) = @_;
-	
-	my $regexp = qr/
-		(\d+)\x{b0}        # Degrees
-		(\d+)\x{2032}      # Minutes
-		(?:(\d+)\x{2032})? # Seconds
-		([NSEW])           # Direction
-	/x;
-	my (@fields) = ($dms =~ /$regexp/);
-	
-	return 0 unless @fields;
-	
-	my ($degrees, $minutes, $seconds, $direction) = map { $_ || 0 } @fields;
-	my $decimal = $degrees + ($minutes * 60 + $seconds)/3600;
-	return ($direction eq 'N' or $direction eq 'E') ? $decimal : -$decimal;
-}
 
-
+#
+# A very cheap implementation of an asynchornous HTTP client that integrates
+# with Glib's main loop. This client implements a rudimentary version of
+# 'Keep-Alive'.
+#
+# Each instance of this class can only make HTTP GET requests and only to a
+# single HTTP server.
+#
+#
+# Usage:
+#
+#   my $soup = My::Soup->new('http://en.wikipedia.com/');
+#   $soup->do_get('http://en.wikipedia.com/Bratislava', sub {
+#     my ($soup, $uri, $response, $data) = @_;
+#     print $response->content;
+#   });
+#
 package My::Soup;
 
 use Glib qw(TRUE FALSE);
-use Data::Dumper;
+use Net::HTTP::NB;
 use HTTP::Response;
+use URI;
 
 
 sub new {
@@ -181,14 +203,26 @@ sub new {
 	my $self = bless {}, ref $class || $class;
 
 	$uri = to_uri($uri);
+	$self->{port} = $uri->port;
+	$self->{host} = $uri->host;
+	
+	$self->connect();
+	
+	return $self;
+}
+
+
+#
+# Connects to the remote HTTP server.
+#
+sub connect {
+	my $self = shift;
 	my $http = Net::HTTP::NB->new(
-		Host      => $uri->host,
-		PeerPort  => $uri->port,
+		Host      => $self->{host},
+		PeerPort  => $self->{port},
 		KeepAlive => 1,
 	);
 	$self->http($http);
-	
-	return $self;
 }
 
 
@@ -216,19 +250,33 @@ sub do_get {
 	my ($uri, $callback, $data) = @_;
 	$uri = to_uri($uri);
 	
-	# Note this is not asynchronous
+	# Note that this is not asynchronous!
 	$self->http->write_request(GET => $uri->path_query);
 	
 	
 	my ($code, $message, %headers);
 	my $content = "";
-	Glib::IO->add_watch($self->http->fileno, 'in', sub {
+	Glib::IO->add_watch($self->http->fileno, ['in'], sub {
+		my (undef, $condition) = @_;
 		
 		# Read the headers
 		if (!$code) {
-			($code, $message, %headers) = $self->http->read_response_headers();
+			eval {
+				($code, $message, %headers) = $self->http->read_response_headers();
+			};
+			if (my $error = $@) {
+				# The server closed the socket reconnect and resume the HTTP GET
+				$self->connect();
+				$self->do_get($uri, $callback, $data);
+				
+				# We abort this I/O watch since another download will be started
+				return FALSE;
+			}
+			
+			# We return and continue when the server will have more data
 			return TRUE;
 		}
+		
 		
 		# Read the content		
 		my $line;
@@ -242,6 +290,7 @@ sub do_get {
 			return TRUE unless length($content) == $headers{'Content-Length'};
 		}
 		elsif ($n) {
+			# There's still data to read
 			return TRUE;
 		}
 		
