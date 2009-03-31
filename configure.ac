@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 m4_define([champlain_major_version], [0])
-m4_define([champlain_minor_version], [9])
-m4_define([champlain_micro_version], [2])
+m4_define([champlain_minor_version], [3])
+m4_define([champlain_micro_version], [0])
 m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
 m4_define([api_version],
@@ -27,12 +27,22 @@ AM_PROG_CC_C_O
 AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
 # Checks for libraries.
-LIBRARY_VERSION=champlain_version
+LIBRARY_VERSION=0:0:0
 # API_VERSION is used to generate pc file only
 API_VERSION=api_version
+CHAMPLAIN_MAJOR_VERSION=champlain_major_version
+CHAMPLAIN_MINOR_VERSION=champlain_minor_version
+CHAMPLAIN_MICRO_VERSION=champlain_micro_version
+CHAMPLAIN_VERSION=champlain_version
+CHAMPLAIN_MAJORMINOR=champlain_api_version
+AC_SUBST(API_VERSION)
+AC_SUBST(CHAMPLAIN_MAJOR_VERSION)
+AC_SUBST(CHAMPLAIN_MINOR_VERSION)
+AC_SUBST(CHAMPLAIN_MICRO_VERSION)
+AC_SUBST(CHAMPLAIN_VERSION)
+AC_SUBST(CHAMPLAIN_MAJORMINOR)
 
 AC_SUBST(LIBRARY_VERSION)
-AC_SUBST(API_VERSION)
 AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 
@@ -183,12 +193,9 @@ fi
 AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
 
 # -----------------------------------------------------------
-GETTEXT_PACKAGE="libchamplain-$API_VERSION"
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
-                   [The prefix for our gettext translation domains.])
 AC_CONFIG_FILES([Makefile
                  champlain/Makefile
+                 champlain/champlain-version.h
                  demos/Makefile
                  tidy/Makefile
                  docs/reference/Makefile

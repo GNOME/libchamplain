@@ -4,7 +4,8 @@ BUILT_SOURCES = \
 	champlain-marshal.c \
 	champlain-enum-types.h \
 	champlain-enum-types.c \
-	stamp-enum-types
+	stamp-enum-types \
+	champlain-version.h
 
 CLEANFILES = $(BUILT_SOURCES)
 
@@ -24,7 +25,8 @@ libchamplain_headers = \
 	champlain-enum-types.h		\
 	champlain-tile.h		\
 	champlain-map-source.h		\
-	champlain-network-map-source.h
+	champlain-network-map-source.h	\
+	champlain-version.h
 
 
 libchamplain_0_3_la_SOURCES = \
@@ -50,7 +52,8 @@ noinst_HEADERS = \
 	champlain-tile.h 		\
 	champlain-enum-types.h		\
 	champlain-map-source.h		\
-	champlain-network-map-source.h
+	champlain-network-map-source.h	\
+	champlain-version.h
 
 libchamplain_include_HEADERS = \
 	champlain.h 			\
@@ -62,7 +65,8 @@ libchamplain_include_HEADERS = \
 	champlain-network-map-source.h	\
 	champlain-tile.h		\
 	champlain-zoom-level.h		\
-	champlain-marker.h
+	champlain-marker.h		\
+	champlain-version.h
 
 libchamplain_0_3_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
 
