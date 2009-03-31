@@ -1,8 +1,17 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-
+m4_define([champlain_major_version], [0])
+m4_define([champlain_minor_version], [9])
+m4_define([champlain_micro_version], [2])
+m4_define([champlain_version],
+          [champlain_major_version.champlain_minor_version.champlain_micro_version])
+m4_define([api_version],
+          [champlain_major_version.champlain_minor_version])
+# if the API changes, set to 0
 AC_PREREQ(2.61)
-AC_INIT(libchamplain, 0.3, pierre-luc@pierlux.com)
+AC_INIT([champlain],
+        [champlain_version],
+        pierre-luc@pierlux.com)
 AC_CONFIG_SRCDIR([champlain/champlain.h])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -18,9 +27,9 @@ AM_PROG_CC_C_O
 AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
 # Checks for libraries.
-LIBRARY_VERSION=1:3:0
+LIBRARY_VERSION=champlain_version
 # API_VERSION is used to generate pc file only
-API_VERSION=0.3
+API_VERSION=api_version
 
 AC_SUBST(LIBRARY_VERSION)
 AC_SUBST(API_VERSION)
@@ -174,7 +183,10 @@ fi
 AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
 
 # -----------------------------------------------------------
-
+GETTEXT_PACKAGE="libchamplain-$API_VERSION"
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
+                   [The prefix for our gettext translation domains.])
 AC_CONFIG_FILES([Makefile
                  champlain/Makefile
                  demos/Makefile
