@@ -127,15 +127,39 @@ sub capital_callback {
 			$data->{current}{latitude} = $latitude;
 			$data->{current}{longitude} = $longitude;
 			printf "$name %.4f, %.4f\n", $latitude, $longitude;
+			
+			my $font = "Sans 15";
+			my $layer = $data->{layer};
+			my @markers = @{ $data->{markers} };
 	
-			my $marker = Champlain::Marker->new_with_label($name, "Sans 15", undef, undef);
-			$marker->set_position($latitude, $longitude);
-			if (@{ $data->{markers} } == 5) {
-				my $old = shift @{ $data->{markers} };
-				$data->{layer}->remove($old);
+			# Keep only a few capitals at each iteration we remove a capital
+			if (@markers == 5) {
+				my $marker = shift @markers;
+				$layer->remove($marker);
 			}
-			push @{ $data->{markers} }, $marker;
-			$data->{layer}->add($marker);
+			
+			# Reset the color of the previous marker
+			if (@markers) {
+				# We first remove the marker
+				my $last = pop @markers;
+				$layer->remove($last);
+				
+				# And then recreate it with another color
+				my $marker = Champlain::Marker->new_with_label($last->{name}, $font, undef, undef);
+				$marker->set_position($last->get('latitude', 'longitude'));
+				push @markers, $marker;
+				$layer->add($marker);
+			}
+			$data->{markers} = \@markers;
+
+			
+			my $white = Clutter::Color->new(0xff, 0xff, 0xff, 0xff);
+			my $orange = Clutter::Color->new(0xf3, 0x94, 0x07, 0xbb);
+			my $marker = Champlain::Marker->new_with_label($name, $font, $white, $orange);
+			$marker->{name} = $name;
+			$marker->set_position($latitude, $longitude);
+			push @markers, $marker;
+			$layer->add($marker);
 			$data->{map}->go_to($latitude, $longitude);
 		}
 	}
