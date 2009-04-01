@@ -16,8 +16,6 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <config.h>
-
 #include <gtk/gtk.h>
 
 #include <champlain/champlain.h>
@@ -173,7 +171,7 @@ main (int argc,
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
   /* give it the title */
-  gtk_window_set_title (GTK_WINDOW (window), PACKAGE " " VERSION);
+  gtk_window_set_title (GTK_WINDOW (window), "libchamplain Gtk+ demo");
 
   /* Connect the destroy event of the window with our on_destroy function
    * When the window is about to be destroyed we get a notificaiton and

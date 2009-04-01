@@ -16,8 +16,6 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <config.h>
-
 #include <champlain/champlain.h>
 #include <clutter-cairo/clutter-cairo.h>
 #include <math.h>
