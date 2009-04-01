@@ -9,14 +9,77 @@
     <releaseinfo>
       for libchamplain &version;
       The latest version of this documentation can be found on-line at
-      <ulink role="online-location" url="http://blog.pierlux.com/projects/libchamplain/">http://blog.pierlux.com/projects/libchamplain/</ulink>.
+      <ulink role="online-location" url="http://projects.gnome.org/libchamplain/">http://projects.gnome.org/libchamplain/</ulink>.
     </releaseinfo>
+    <copyright>
+      <year>2008,2009</year>
+      <holder>Pierre-Luc Beaudoin &lt;pierre-luc@pierlux.com&gt;</holder>
+    </copyright>
+    <legalnotice>
+      <para>
+        Permission is granted to copy, distribute and/or modify this
+        document under the terms of the <citetitle>GNU Free
+        Documentation License</citetitle>, Version 1.1 or any later
+        version published by the Free Software Foundation with no
+        Invariant Sections, no Front-Cover Texts, and no Back-Cover
+        Texts. You may obtain a copy of the <citetitle>GNU Free
+        Documentation License</citetitle> from the Free Software
+        Foundation by visiting <ulink type="http"
+        url="http://www.fsf.org">their Web site</ulink> or by writing
+        to:
+
+        <address>
+          The Free Software Foundation, Inc.,
+          <street>59 Temple Place</street> - Suite 330,
+          <city>Boston</city>, <state>MA</state> <postcode>02111-1307</postcode>,
+          <country>USA</country>
+        </address>
+      </para>
+    </legalnotice>
   </bookinfo>
 
   <chapter>
-    <title>I. API Reference</title>
-    <xi:include href="xml/champlainview.xml"/>
-    <xi:include href="xml/champlainlayer.xml"/>
-    <xi:include href="xml/champlainmarker.xml"/>
+    <title>I. View API Reference</title>
+    <xi:include href="xml/champlain-view.xml"/>
+    <xi:include href="xml/champlain-layer.xml"/>
+    <xi:include href="xml/champlain-marker.xml"/>
+    <xi:include href="xml/champlain-version.xml"/>
   </chapter>
+  <chapter>
+    <title>II. Map Source API Reference</title>
+    <xi:include href="xml/champlain-map-source.xml"/>
+    <xi:include href="xml/champlain-tile.xml"/>
+    <xi:include href="xml/champlain-zoom-level.xml"/>
+  </chapter>
+  <index>
+    <title>Index</title>
+  </index>
+
+  <index role="deprecated">
+    <title>Index of deprecated symbols</title>
+  </index>
+
+  <index role="0.1">
+    <title>Index of new symbols in 0.1</title>
+  </index>
+
+  <index role="0.2">
+    <title>Index of new symbols in 0.2</title>
+  </index>
+
+  <index role="0.2.2">
+    <title>Index of new symbols in 0.2.2</title>
+  </index>
+
+  <index role="0.2.7">
+    <title>Index of new symbols in 0.2.7</title>
+  </index>
+
+  <index role="0.2.8">
+    <title>Index of new symbols in 0.2.8</title>
+  </index>
+
+  <index role="0.4">
+    <title>Index of new symbols in 0.4</title>
+  </index>
 </book>

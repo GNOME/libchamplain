@@ -1,3 +1,9 @@
 #include <champlain.h>
 
 champlain_view_get_type
+champlain_marker_get_type
+champlain_layer_get_type
+champlain_map_source_get_type
+champlain_network_map_source_get_type
+champlain_zoom_level_get_type
+champlain_tile_get_type
