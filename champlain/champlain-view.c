@@ -74,6 +74,7 @@
 enum
 {
   /* normal signals */
+  ANIMATION_COMPLETED,
   LAST_SIGNAL
 };
 
@@ -95,7 +96,7 @@ enum
 };
 
 #define PADDING 10
-/*static guint signals[LAST_SIGNAL] = { 0, }; */
+static guint signals[LAST_SIGNAL] = { 0, };
 
 #define GET_PRIVATE(obj)     (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
 #define ZOOM_LEVEL_OUT_OF_RANGE(priv, level)    (level < priv->min_zoom_level || level > priv->max_zoom_level)
@@ -760,6 +761,23 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            CHAMPLAIN_TYPE_STATE,
            CHAMPLAIN_STATE_INIT,
            G_PARAM_READABLE));
+
+  /**
+  * ChamplainView::animation-completed:
+  * @view: the #ChamplainView that received the signal
+  *
+  * The ::animation-completed signal is emitted when any animation in the view
+  * ends.  This is a detailed signal.  For example, if you want to be signaled
+  * only for go-to animation, you should connect to
+  * "animation-completed::go-to".
+  *
+  * Since: 0.4
+  */
+  signals[ANIMATION_COMPLETED] =
+      g_signal_new ("animation-completed", G_OBJECT_CLASS_TYPE (object_class),
+          G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED, 0, NULL, NULL,
+          g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 0);
+
 }
 
 static void
@@ -1150,6 +1168,8 @@ champlain_view_stop_go_to (ChamplainView *view)
 
   g_object_unref (priv->goto_context->timeline);
   g_object_unref (priv->goto_context->alpha);
+
+  g_signal_emit_by_name (view, "animation-completed::go-to", NULL);
 
   g_free (priv->goto_context);
   priv->goto_context = NULL;
