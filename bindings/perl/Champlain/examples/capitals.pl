@@ -58,16 +58,23 @@ sub main {
 	
 	my $capitals_url = "http://en.wikipedia.org/wiki/List_of_national_capitals";
 	my $soup = My::Soup->new($capitals_url);
+
+	my $data = {
+		map   => $map,
+		layer => $layer,
+		markers => [],
+	};
+
+	# Download the next map after the go-to animation has been completed
+	$map->signal_connect('animation-completed::go-to' => sub {
+		Glib::Timeout->add (1_000, sub {
+			download_capital($soup, $data);
+			return FALSE;
+		});
+	});
 	
-	$soup->do_get(
-		$capitals_url,
-		\&capitals_main_callback,
-		{
-			map   => $map,
-			layer => $layer,
-			markers => [],
-		}
-	);
+	# Start the program by downloading the capital list
+	$soup->do_get($capitals_url, \&capitals_main_callback, $data);
 	
 	
 	Gtk2->main();
@@ -115,59 +122,63 @@ sub capitals_main_callback {
 #
 sub capital_callback {
 	my ($soup, $uri, $response, $data) = @_;
-	
+
 	my $document = $data->{parser}->parse_html_string($response->content);
 	my $heading = $document->getElementById('firstHeading');
-	if ($heading) {
-		my $name = $document->getElementById('firstHeading')->textContent;
-				
-		my ($geo) = $document->findnodes('id("coordinates")//span[@class="geo"]');
-		if ($geo) {
-			my ($latitude, $longitude) = split /\s*;\s*/, $geo->textContent;
-			$data->{current}{latitude} = $latitude;
-			$data->{current}{longitude} = $longitude;
-			printf "$name %.4f, %.4f\n", $latitude, $longitude;
-			
-			my $font = "Sans 15";
-			my $layer = $data->{layer};
-			my @markers = @{ $data->{markers} };
-	
-			# Keep only a few capitals at each iteration we remove a capital
-			if (@markers == 5) {
-				my $marker = shift @markers;
-				$layer->remove($marker);
-			}
-			
-			# Reset the color of the previous marker
-			if (@markers) {
-				# We first remove the marker
-				my $last = pop @markers;
-				$layer->remove($last);
-				
-				# And then recreate it with another color
-				my $marker = Champlain::Marker->new_with_label($last->{name}, $font, undef, undef);
-				$marker->set_position($last->get('latitude', 'longitude'));
-				push @markers, $marker;
-				$layer->add($marker);
-			}
-			$data->{markers} = \@markers;
+	if (!$heading) {
+		download_capital($soup, $data);
+		return;
+	}
 
+	my $name = $document->getElementById('firstHeading')->textContent;
 			
-			my $white = Clutter::Color->new(0xff, 0xff, 0xff, 0xff);
-			my $orange = Clutter::Color->new(0xf3, 0x94, 0x07, 0xbb);
-			my $marker = Champlain::Marker->new_with_label($name, $font, $white, $orange);
-			$marker->{name} = $name;
-			$marker->set_position($latitude, $longitude);
-			push @markers, $marker;
-			$layer->add($marker);
-			$data->{map}->go_to($latitude, $longitude);
-		}
+	my ($geo) = $document->findnodes('id("coordinates")//span[@class="geo"]');
+	if (!$geo) {
+		# The capital has no geographical location, download the next capital
+		download_capital($soup, $data);
+		return;
+	}
+
+	my ($latitude, $longitude) = split /\s*;\s*/, $geo->textContent;
+	$data->{current}{latitude} = $latitude;
+	$data->{current}{longitude} = $longitude;
+	printf "$name %.4f, %.4f\n", $latitude, $longitude;
+	
+	my $font = "Sans 15";
+	my $layer = $data->{layer};
+	my @markers = @{ $data->{markers} };
+	# Keep only a few capitals at each iteration we remove a capital
+	if (@markers == 5) {
+		my $marker = shift @markers;
+		$layer->remove($marker);
 	}
 	
-	Glib::Timeout->add (1_000, sub {
-		download_capital($soup, $data);
-		return FALSE;
-	});
+	# Reset the color of the previous marker
+	if (@markers) {
+		# We first remove the marker
+		my $last = pop @markers;
+		$layer->remove($last);
+		
+		# And then recreate it with another color
+		my $marker = Champlain::Marker->new_with_label($last->{name}, $font, undef, undef);
+		$marker->set_position($last->get('latitude', 'longitude'));
+		push @markers, $marker;
+		$layer->add($marker);
+		$marker->raise_top();
+	}
+	$data->{markers} = \@markers;
+		
+	my $white = Clutter::Color->new(0xff, 0xff, 0xff, 0xff);
+	my $orange = Clutter::Color->new(0xf3, 0x94, 0x07, 0xbb);
+	my $marker = Champlain::Marker->new_with_label($name, $font, $white, $orange);
+	$marker->{name} = $name;
+	$marker->set_position($latitude, $longitude);
+	push @markers, $marker;
+	$layer->add($marker);
+	$marker->raise_top();
+
+	$data->{map}->go_to($latitude, $longitude);
+	return;
 }
 
 
@@ -292,7 +303,6 @@ sub do_get {
 				# The server closed the socket reconnect and resume the HTTP GET
 				$self->connect();
 				$self->do_get($uri, $callback, $data);
-				
 				# We abort this I/O watch since another download will be started
 				return FALSE;
 			}
