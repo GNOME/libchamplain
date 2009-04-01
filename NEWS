@@ -1,6 +1,14 @@
 libchamplain 0.2.9 (2009-02-26)
 ===============================
 
+Fixes:
+
+* Fix symbols' export (some tidy_* were left)
+* Get rid of the svg file
+
+libchamplain 0.2.9 (2009-02-26)
+===============================
+
 Enhancements:
 
 * Add a new animated marker demo
