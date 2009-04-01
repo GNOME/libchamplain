@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008, 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -78,7 +78,7 @@ champlain_network_map_source_get_property (GObject *object,
                                            GParamSpec *pspec)
 {
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE(object);
-  ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
+  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
 
   switch(prop_id)
     {
@@ -103,7 +103,7 @@ champlain_network_map_source_set_property (GObject *object,
                                            GParamSpec *pspec)
 {
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE(object);
-  ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
+  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
 
   switch(prop_id)
     {
@@ -131,7 +131,7 @@ static void
 champlain_network_map_source_finalize (GObject *object)
 {
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (object);
-  ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
+  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
   
   g_free (priv->proxy_uri);
   g_free (priv->uri_format);
@@ -204,6 +204,7 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
 
   priv->proxy_uri = g_strdup ("");
   priv->uri_format = NULL;
+  champlainMapSource->priv = priv;
 }
 
 ChamplainNetworkMapSource*
@@ -232,7 +233,7 @@ champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_ma
                                            gint y,
                                            gint z)
 {
-  ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
+  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
 
   gchar **tokens;
   gchar *token;
@@ -276,7 +277,7 @@ void
 champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *network_map_source,
                                            const gchar *uri_format)
 {
-  ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
+  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
 
   g_free (priv->uri_format);
   priv->uri_format = g_strdup (uri_format);
@@ -337,7 +338,7 @@ get_filename (ChamplainNetworkMapSource *network_map_source,
               ChamplainZoomLevel *level,
               ChamplainTile *tile)
 {
-  //ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
+  //ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
   return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
              "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
              "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
@@ -491,7 +492,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
   gboolean use_cache = FALSE;
 
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (map_source);
-  ChamplainNetworkMapSourcePrivate *priv = GET_PRIVATE (network_map_source);
+  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
 
   /* Ref the tile as it may be freeing during the loading
    * Unref when the loading is done.
