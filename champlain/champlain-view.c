@@ -234,8 +234,8 @@ viewport_get_current_latitude (ChamplainViewPrivate *priv)
 
 static gboolean
 scroll_event (ClutterActor *actor,
-              ClutterScrollEvent *event,
-              ChamplainView *view)
+    ClutterScrollEvent *event,
+    ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
 
@@ -304,7 +304,7 @@ scroll_event (ClutterActor *actor,
 
 static void
 marker_reposition_cb (ChamplainMarker *marker,
-                      ChamplainView *view)
+    ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
   ChamplainMarkerPrivate *marker_priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
@@ -324,16 +324,16 @@ marker_reposition_cb (ChamplainMarker *marker,
 
 static void
 notify_marker_reposition_cb (ChamplainMarker *marker,
-                             GParamSpec *arg1,
-                             ChamplainView *view)
+    GParamSpec *arg1,
+    ChamplainView *view)
 {
   marker_reposition_cb (marker, view);
 }
 
 static void
 layer_add_marker_cb (ClutterGroup *layer,
-                     ChamplainMarker *marker,
-                     ChamplainView *view)
+    ChamplainMarker *marker,
+    ChamplainView *view)
 {
   g_signal_connect (marker, "notify::longitude",
       G_CALLBACK (notify_marker_reposition_cb), view);
@@ -343,7 +343,7 @@ layer_add_marker_cb (ClutterGroup *layer,
 
 static void
 connect_marker_notify_cb (ChamplainMarker *marker,
-                          ChamplainView *view)
+    ChamplainView *view)
 {
   g_signal_connect (marker, "notify::longitude",
       G_CALLBACK (notify_marker_reposition_cb), view);
@@ -351,7 +351,7 @@ connect_marker_notify_cb (ChamplainMarker *marker,
 
 static void
 layer_reposition_cb (ClutterActor *layer,
-                     ChamplainView *view)
+    ChamplainView *view)
 {
   clutter_container_foreach (CLUTTER_CONTAINER (layer),
       CLUTTER_CALLBACK (marker_reposition_cb), view);
@@ -459,9 +459,9 @@ resize_viewport (ChamplainView *view)
 
 static void
 champlain_view_get_property (GObject *object,
-                             guint prop_id,
-                             GValue *value,
-                             GParamSpec *pspec)
+    guint prop_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
@@ -515,9 +515,9 @@ champlain_view_get_property (GObject *object,
 
 static void
 champlain_view_set_property (GObject *object,
-                             guint prop_id,
-                             const GValue *value,
-                             GParamSpec *pspec)
+    guint prop_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
@@ -845,7 +845,7 @@ champlain_view_init (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->user_layers);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
-  
+
   champlain_view_set_size(view, priv->viewport_size.width,
       priv->viewport_size.height);
 
@@ -855,8 +855,8 @@ champlain_view_init (ChamplainView *view)
 
 static void
 viewport_x_changed_cb (GObject *gobject,
-                       GParamSpec *arg1,
-                       ChamplainView *view)
+    GParamSpec *arg1,
+    ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
 
@@ -907,8 +907,8 @@ viewport_x_changed_cb (GObject *gobject,
 //FIXME: move to an handler of actor size change
 void
 champlain_view_set_size (ChamplainView *view,
-                         guint width,
-                         guint height)
+    guint width,
+    guint height)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
@@ -951,8 +951,8 @@ update_license (ChamplainView *view)
 
 static gboolean
 finger_scroll_button_press_cb (ClutterActor *actor,
-                               ClutterButtonEvent *event,
-                               ChamplainView *view)
+    ClutterButtonEvent *event,
+    ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
 
@@ -1029,7 +1029,9 @@ champlain_view_new (void)
 }
 
 static void
-view_update_anchor (ChamplainView *view, gint x, gint y)
+view_update_anchor (ChamplainView *view,
+    gint x,
+    gint y)
 {
   ChamplainViewPrivate *priv = view->priv;
   gboolean need_anchor = FALSE;
@@ -1087,8 +1089,8 @@ view_update_anchor (ChamplainView *view, gint x, gint y)
  */
 void
 champlain_view_center_on (ChamplainView *view,
-                          gdouble latitude,
-                          gdouble longitude)
+    gdouble latitude,
+    gdouble longitude)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
@@ -1124,8 +1126,8 @@ champlain_view_center_on (ChamplainView *view,
 
 static void
 timeline_new_frame (ClutterTimeline *timeline,
-                    gint frame_num,
-                    GoToContext *ctx)
+    gint frame_num,
+    GoToContext *ctx)
 {
   gdouble alpha;
   gdouble lat;
@@ -1190,8 +1192,8 @@ champlain_view_stop_go_to (ChamplainView *view)
  */
 void
 champlain_view_go_to (ChamplainView *view,
-                      gdouble latitude,
-                      gdouble longitude)
+    gdouble latitude,
+    gdouble longitude)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
@@ -1313,7 +1315,8 @@ champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
  * Since: 0.4
  */
 void
-champlain_view_set_min_zoom_level (ChamplainView *view, gint min_zoom_level)
+champlain_view_set_min_zoom_level (ChamplainView *view,
+    gint min_zoom_level)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
@@ -1340,7 +1343,8 @@ champlain_view_set_min_zoom_level (ChamplainView *view, gint min_zoom_level)
  * Since: 0.4
  */
 void
-champlain_view_set_max_zoom_level (ChamplainView *view, gint max_zoom_level)
+champlain_view_set_max_zoom_level (ChamplainView *view,
+    gint max_zoom_level)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
@@ -1367,7 +1371,8 @@ champlain_view_set_max_zoom_level (ChamplainView *view, gint max_zoom_level)
  * Since: 0.2
  */
 void
-champlain_view_add_layer (ChamplainView *view, ChamplainLayer *layer)
+champlain_view_add_layer (ChamplainView *view,
+    ChamplainLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   g_return_if_fail (CLUTTER_IS_ACTOR (layer));
@@ -1400,9 +1405,9 @@ champlain_view_add_layer (ChamplainView *view, ChamplainLayer *layer)
  */
 gboolean
 champlain_view_get_coords_from_event (ChamplainView *view,
-                                      ClutterEvent *event,
-                                      gdouble *latitude,
-                                      gdouble *longitude)
+    ClutterEvent *event,
+    gdouble *latitude,
+    gdouble *longitude)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
   /* Apparently there isn a more precise test */
@@ -1478,7 +1483,8 @@ view_load_visible_tiles (ChamplainView *view)
 }
 
 static void
-view_position_tile (ChamplainView* view, ChamplainTile* tile)
+view_position_tile (ChamplainView* view,
+    ChamplainTile* tile)
 {
   ChamplainViewPrivate *priv = view->priv;
 
@@ -1513,9 +1519,9 @@ view_tiles_reposition (ChamplainView* view)
 
 void
 champlain_view_tile_ready (ChamplainView *view,
-                           ChamplainZoomLevel *level,
-                           ChamplainTile *tile,
-                           gboolean animate)
+    ChamplainZoomLevel *level,
+    ChamplainTile *tile,
+    gboolean animate)
 {
   ClutterActor *actor;
   ClutterEffectTemplate *etemplate;
@@ -1568,7 +1574,7 @@ view_update_state (ChamplainView *view)
  */
 void
 champlain_view_set_map_source (ChamplainView *view,
-                               ChamplainMapSource *source)
+    ChamplainMapSource *source)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view) &&
       CHAMPLAIN_IS_MAP_SOURCE (source));
@@ -1582,7 +1588,7 @@ champlain_view_set_map_source (ChamplainView *view,
 
   g_object_unref (priv->map_source);
   priv->map_source = g_object_ref (source);
-  
+
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
 
@@ -1633,7 +1639,7 @@ champlain_view_set_map_source (ChamplainView *view,
 */
 void
 champlain_view_set_decel_rate (ChamplainView *view,
-                               gdouble rate)
+    gdouble rate)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view) &&
       rate > 2.0 &&
@@ -1655,7 +1661,7 @@ champlain_view_set_decel_rate (ChamplainView *view,
 */
 void
 champlain_view_set_scroll_mode (ChamplainView *view,
-                                ChamplainScrollMode mode)
+    ChamplainScrollMode mode)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
@@ -1678,7 +1684,7 @@ champlain_view_set_scroll_mode (ChamplainView *view,
 */
 void
 champlain_view_set_keep_center_on_resize (ChamplainView *view,
-                                          gboolean value)
+    gboolean value)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
@@ -1700,7 +1706,7 @@ champlain_view_set_keep_center_on_resize (ChamplainView *view,
 */
 void
 champlain_view_set_show_license (ChamplainView *view,
-                                 gboolean value)
+    gboolean value)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
@@ -1721,7 +1727,7 @@ champlain_view_set_show_license (ChamplainView *view,
 */
 void
 champlain_view_set_zoom_on_double_click (ChamplainView *view,
-                                         gboolean value)
+    gboolean value)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
@@ -1745,18 +1751,18 @@ champlain_view_set_zoom_on_double_click (ChamplainView *view,
  */
 void
 champlain_view_ensure_visible (ChamplainView *view,
-                               gdouble lat1,
-                               gdouble lon1,
-                               gdouble lat2,
-                               gdouble lon2,
-                               gboolean animate)
+    gdouble lat1,
+    gdouble lon1,
+    gdouble lat2,
+    gdouble lon2,
+    gboolean animate)
 {
   ChamplainViewPrivate *priv = view->priv;
   gint zoom_level = priv->zoom_level;
   gdouble width, height;
   gdouble min_lat,min_lon,max_lat,max_lon;
   gboolean good_size = FALSE;
-  
+
   /*We first sort the lat,lon in order to have min and max */
   if (lat1 < lat2)
     {
@@ -1768,7 +1774,7 @@ champlain_view_ensure_visible (ChamplainView *view,
       max_lat = lat1;
       min_lat = lat2;
     }
-    
+
   if (lon1 < lon2)
     {
       min_lon = lon1;
@@ -1834,8 +1840,8 @@ champlain_view_ensure_visible (ChamplainView *view,
  */
 void
 champlain_view_ensure_markers_visible (ChamplainView *view,
-                                       ChamplainMarker *markers[],
-                                       gboolean animate)
+    ChamplainMarker *markers[],
+    gboolean animate)
 {
   gdouble min_lat, min_lon, max_lat, max_lon;
   ChamplainMarker *marker = NULL;

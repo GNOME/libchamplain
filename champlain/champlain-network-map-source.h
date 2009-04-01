@@ -64,13 +64,17 @@ ChamplainMapSource * champlain_map_source_new_oam (void);
 ChamplainMapSource * champlain_map_source_new_mff_relief (void);
 
 gchar * champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *source,
-    gint x, gint y, gint z);
+    gint x,
+    gint y,
+    gint z);
 
 void champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *network_map_source,
     const gchar *uri_format);
 
 void champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
-    ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile);
+    ChamplainView *view,
+    ChamplainZoomLevel *level,
+    ChamplainTile *tile);
 
 
 #endif

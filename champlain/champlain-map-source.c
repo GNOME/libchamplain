@@ -74,9 +74,9 @@ struct _ChamplainMapSourcePrivate
 
 static void
 champlain_map_source_get_property (GObject *object,
-                                   guint prop_id,
-                                   GValue *value,
-                                   GParamSpec *pspec)
+    guint prop_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE(object);
   ChamplainMapSourcePrivate *priv = map_source->priv;
@@ -111,9 +111,9 @@ champlain_map_source_get_property (GObject *object,
 
 static void
 champlain_map_source_set_property (GObject *object,
-                                   guint prop_id,
-                                   const GValue *value,
-                                   GParamSpec *pspec)
+    guint prop_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE(object);
   ChamplainMapSourcePrivate *priv = map_source->priv;
@@ -309,8 +309,8 @@ champlain_map_source_get_tile_size (ChamplainMapSource *map_source)
 
 guint
 champlain_map_source_get_x (ChamplainMapSource *map_source,
-                            gint zoom_level,
-                            gdouble longitude)
+    gint zoom_level,
+    gdouble longitude)
 {
   ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
@@ -319,8 +319,8 @@ champlain_map_source_get_x (ChamplainMapSource *map_source,
 
 guint
 champlain_map_source_get_y (ChamplainMapSource *map_source,
-                            gint zoom_level,
-                            gdouble latitude)
+    gint zoom_level,
+    gdouble latitude)
 {
   ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
@@ -331,7 +331,7 @@ champlain_map_source_get_y (ChamplainMapSource *map_source,
 
 guint
 champlain_map_source_get_row_count (ChamplainMapSource *map_source,
-                                    gint zoom_level)
+    gint zoom_level)
 {
   //ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
@@ -340,7 +340,7 @@ champlain_map_source_get_row_count (ChamplainMapSource *map_source,
 
 guint
 champlain_map_source_get_column_count (ChamplainMapSource *map_source,
-                                       gint zoom_level)
+    gint zoom_level)
 {
   //ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
@@ -349,9 +349,9 @@ champlain_map_source_get_column_count (ChamplainMapSource *map_source,
 
 void
 champlain_map_source_get_tile (ChamplainMapSource *map_source,
-                               ChamplainView *view,
-                               ChamplainZoomLevel *zoom_level,
-                               ChamplainTile *tile)
+    ChamplainView *view,
+    ChamplainZoomLevel *zoom_level,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
 
@@ -360,17 +360,17 @@ champlain_map_source_get_tile (ChamplainMapSource *map_source,
 
 void
 champlain_map_source_real_get_tile (ChamplainMapSource *map_source,
-                                    ChamplainView *view,
-                                    ChamplainZoomLevel *zoom_level,
-                                    ChamplainTile *tile)
+    ChamplainView *view,
+    ChamplainZoomLevel *zoom_level,
+    ChamplainTile *tile)
 {
   g_error ("Should not be reached");
 }
 
 gdouble
 champlain_map_source_get_longitude (ChamplainMapSource *map_source,
-                                    gint zoom_level,
-                                    guint x)
+    gint zoom_level,
+    guint x)
 {
   //ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
@@ -380,8 +380,8 @@ champlain_map_source_get_longitude (ChamplainMapSource *map_source,
 
 gdouble
 champlain_map_source_get_latitude (ChamplainMapSource *map_source,
-                                   gint zoom_level,
-                                   guint y)
+    gint zoom_level,
+    guint y)
 {
   //ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
@@ -399,7 +399,7 @@ champlain_map_source_get_name (ChamplainMapSource *map_source)
 
 void
 champlain_map_source_set_name (ChamplainMapSource *map_source,
-                               const gchar *name)
+    const gchar *name)
 {
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
@@ -415,7 +415,7 @@ champlain_map_source_get_license (ChamplainMapSource *map_source)
 
 void
 champlain_map_source_set_license (ChamplainMapSource *map_source,
-                                  const gchar *license)
+    const gchar *license)
 {
   ChamplainMapSourcePrivate *priv = map_source->priv;
 

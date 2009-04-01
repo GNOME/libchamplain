@@ -73,9 +73,9 @@ struct _ChamplainNetworkMapSourcePrivate
 
 static void
 champlain_network_map_source_get_property (GObject *object,
-                                           guint prop_id,
-                                           GValue *value,
-                                           GParamSpec *pspec)
+    guint prop_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE(object);
   ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
@@ -98,9 +98,9 @@ champlain_network_map_source_get_property (GObject *object,
 
 static void
 champlain_network_map_source_set_property (GObject *object,
-                                           guint prop_id,
-                                           const GValue *value,
-                                           GParamSpec *pspec)
+    guint prop_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE(object);
   ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
@@ -132,7 +132,7 @@ champlain_network_map_source_finalize (GObject *object)
 {
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (object);
   ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
-  
+
   g_free (priv->proxy_uri);
   g_free (priv->uri_format);
 
@@ -209,13 +209,13 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
 
 ChamplainNetworkMapSource*
 champlain_network_map_source_new_full (const gchar *name,
-                                       const gchar *license,
-                                       const gchar *license_uri,
-                                       guint min_zoom,
-                                       guint max_zoom,
-                                       guint tile_size,
-                                       ChamplainMapProjection projection,
-                                       const gchar *uri_format)
+    const gchar *license,
+    const gchar *license_uri,
+    guint min_zoom,
+    guint max_zoom,
+    guint tile_size,
+    ChamplainMapProjection projection,
+    const gchar *uri_format)
 {
   ChamplainNetworkMapSource * network_map_source;
   network_map_source = g_object_new (CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE, "name", name,
@@ -229,9 +229,9 @@ champlain_network_map_source_new_full (const gchar *name,
 #define SIZE 8
 gchar *
 champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_map_source,
-                                           gint x,
-                                           gint y,
-                                           gint z)
+    gint x,
+    gint y,
+    gint z)
 {
   ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
 
@@ -275,7 +275,7 @@ champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_ma
 
 void
 champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *network_map_source,
-                                           const gchar *uri_format)
+    const gchar *uri_format)
 {
   ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
 
@@ -335,8 +335,8 @@ champlain_map_source_new_mff_relief (void)
 
 static gchar *
 get_filename (ChamplainNetworkMapSource *network_map_source,
-              ChamplainZoomLevel *level,
-              ChamplainTile *tile)
+    ChamplainZoomLevel *level,
+    ChamplainTile *tile)
 {
   //ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
   return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
@@ -376,8 +376,8 @@ create_error_tile (ChamplainTile* tile)
 
 static void
 file_loaded_cb (SoupSession *session,
-                SoupMessage *msg,
-                gpointer user_data)
+    SoupMessage *msg,
+    gpointer user_data)
 {
   FileLoadedCallbackContext *ctx = (FileLoadedCallbackContext*) user_data;
   GdkPixbufLoader* loader;
@@ -484,9 +484,9 @@ finish:
 
 void
 champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
-                               ChamplainView *view,
-                               ChamplainZoomLevel *zoom_level,
-                               ChamplainTile *tile)
+    ChamplainView *view,
+    ChamplainZoomLevel *zoom_level,
+    ChamplainTile *tile)
 {
   gchar* filename;
   gboolean use_cache = FALSE;

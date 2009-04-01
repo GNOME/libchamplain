@@ -70,28 +70,40 @@ GType champlain_view_get_type (void);
 
 ClutterActor *champlain_view_new (void);
 
-void champlain_view_center_on (ChamplainView *view, gdouble latitude, gdouble longitude);
-void champlain_view_go_to (ChamplainView *view, gdouble latitude, gdouble longitude);
+void champlain_view_center_on (ChamplainView *view,
+    gdouble latitude,
+    gdouble longitude);
+void champlain_view_go_to (ChamplainView *view,
+    gdouble latitude,
+    gdouble longitude);
 void champlain_view_stop_go_to (ChamplainView *view);
 
 void champlain_view_zoom_in (ChamplainView *champlainView);
 void champlain_view_zoom_out (ChamplainView *champlainView);
 void champlain_view_set_zoom_level (ChamplainView *champlainView,
     gint zoom_level);
-void champlain_view_set_min_zoom_level (ChamplainView *view, 
+void champlain_view_set_min_zoom_level (ChamplainView *view,
     gint zoom_level);
-void champlain_view_set_max_zoom_level (ChamplainView *view, 
+void champlain_view_set_max_zoom_level (ChamplainView *view,
     gint zoom_level);
 
-void champlain_view_ensure_visible (ChamplainView *view, gdouble lat1,
-    gdouble lon1, gdouble lat2, gdouble lon2, gboolean animate);
+void champlain_view_ensure_visible (ChamplainView *view,
+    gdouble lat1,
+    gdouble lon1,
+    gdouble lat2,
+    gdouble lon2,
+    gboolean animate);
 void champlain_view_ensure_markers_visible (ChamplainView *view,
-    ChamplainMarker *markers[], gboolean animate);
+    ChamplainMarker *markers[],
+    gboolean animate);
 
 void champlain_view_set_map_source (ChamplainView *champlainView,
     ChamplainMapSource *map_source);
-void champlain_view_set_size (ChamplainView *view, guint width, guint height);
-void champlain_view_set_decel_rate (ChamplainView *view, gdouble rate);
+void champlain_view_set_size (ChamplainView *view,
+    guint width,
+    guint height);
+void champlain_view_set_decel_rate (ChamplainView *view,
+    gdouble rate);
 void champlain_view_set_scroll_mode (ChamplainView *view,
     ChamplainScrollMode mode);
 void champlain_view_set_keep_center_on_resize (ChamplainView *view,
@@ -100,10 +112,17 @@ void champlain_view_set_show_license (ChamplainView *view, gboolean value);
 void champlain_view_set_zoom_on_double_click (ChamplainView *view,
     gboolean value);
 
-void champlain_view_add_layer (ChamplainView *champlainView, ChamplainLayer *layer);
+void champlain_view_add_layer (ChamplainView *champlainView,
+    ChamplainLayer *layer);
 
-gboolean champlain_view_get_coords_from_event (ChamplainView *view, ClutterEvent *event, gdouble *lat, gdouble *lon);
+gboolean champlain_view_get_coords_from_event (ChamplainView *view,
+    ClutterEvent *event,
+    gdouble *lat,
+    gdouble *lon);
 
-void champlain_view_tile_ready (ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile, gboolean animate);
+void champlain_view_tile_ready (ChamplainView *view,
+    ChamplainZoomLevel *level,
+    ChamplainTile *tile,
+    gboolean animate);
 
 #endif
