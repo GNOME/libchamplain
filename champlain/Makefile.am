@@ -51,9 +51,9 @@ champlain-marshal.c: $(CHAMPLAIN_MARSHAL_LIST)
 libchamplain_includedir=$(includedir)/libchamplain-0.2/champlain
 libchamplain_include_HEADERS = champlain.h champlainview.h champlaindefines.h champlainlayer.h champlainmarker.h
 
-libchamplain_0_2_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
+libchamplain_0_2_la_LDFLAGS= -version-info $(LIBRARY_VERSION) \
+    -export-symbols-regex '^champlain_'
 
 AM_CPPFLAGS = $(DEPS_CFLAGS) -I$(top_srcdir)/tidy -I$(top_srcdir) -DCHAMPLAIN_COMPILATION
-AM_LDFLAGS = $(DEPS_LIBS) -export-symbols-regex ^champlain_.*
 
 EXTRA_DIST = $(CHAMPLAIN_MARSHAL_LIST)
