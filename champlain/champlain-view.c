@@ -17,7 +17,7 @@
  */
 
 /**
- * SECTION:champlainview
+ * SECTION:champlain-view
  * @short_description: A #ClutterActor to display maps
  *
  * The #ChamplainView is a ClutterActor to display maps.  It supports two modes

@@ -17,7 +17,7 @@
  */
 
 /**
- * SECTION:champlainlayer
+ * SECTION:champlain-layer
  * @short_description: A container for #ChamplainMarker
  *
  * A ChamplainLayer is little more than a #ClutterContainer. It keeps the

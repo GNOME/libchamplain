@@ -17,7 +17,7 @@
  */
 
 /**
- * SECTION:champlainmarker
+ * SECTION:champlain-marker
  * @short_description: A marker to identify points of interest on a map
  *
  * Markers reprensent points of interest on a map. Markers need to be placed on
