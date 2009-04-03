@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008, 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,8 +43,11 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_ZOOM_LEVEL_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_ZOOM_LEVEL, ChamplainZoomLevelClass))
 
+typedef struct _ChamplainZoomLevelPrivate ChamplainZoomLevelPrivate;
+
 typedef struct {
   GObject parent;
+  ChamplainZoomLevelPrivate *priv;
 } ChamplainZoomLevel;
 
 typedef struct {

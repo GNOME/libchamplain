@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008, 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -46,8 +46,6 @@ enum
   PROP_ZOOM_LEVEL,
   PROP_ACTOR
 };
-
-typedef struct _ChamplainZoomLevelPrivate ChamplainZoomLevelPrivate;
 
 struct _ChamplainZoomLevelPrivate {
   guint width;
@@ -112,8 +110,8 @@ champlain_zoom_level_dispose (GObject *object)
 {
   //FIXME: Get rid of tiles here?
   guint k;
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (object);
   ChamplainZoomLevel *level = CHAMPLAIN_ZOOM_LEVEL (object);
+  ChamplainZoomLevelPrivate *priv = level->priv;
 
   g_object_unref (priv->actor);
 
@@ -201,6 +199,7 @@ champlain_zoom_level_init (ChamplainZoomLevel *self)
 
   priv->tiles = g_ptr_array_sized_new (64);
   priv->actor = g_object_ref (clutter_group_new ());
+  self->priv = priv;
 }
 
 ChamplainZoomLevel*
@@ -215,7 +214,7 @@ champlain_zoom_level_add_tile (ChamplainZoomLevel *self,
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   g_object_ref (tile);
   g_ptr_array_add (priv->tiles, tile);
@@ -228,7 +227,7 @@ champlain_zoom_level_remove_tile (ChamplainZoomLevel *self,
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   g_signal_emit (self, signals[SIGNAL_TILE_REMOVED], 0, tile);
   g_ptr_array_remove_fast (priv->tiles, tile);
@@ -240,7 +239,7 @@ champlain_zoom_level_tile_count (ChamplainZoomLevel *self)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), 0);
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   return priv->tiles->len;
 }
@@ -251,7 +250,7 @@ champlain_zoom_level_get_nth_tile (ChamplainZoomLevel *self,
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), NULL);
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   return g_ptr_array_index (priv->tiles, index);
 }
@@ -262,7 +261,7 @@ champlain_zoom_level_get_width (ChamplainZoomLevel *self)
 
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), 0);
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   return priv->width;
 }
@@ -272,7 +271,7 @@ champlain_zoom_level_get_height (ChamplainZoomLevel *self)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), 0);
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   return priv->height;
 }
@@ -282,7 +281,7 @@ champlain_zoom_level_get_zoom_level (ChamplainZoomLevel *self)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), 0);
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   return priv->zoom_level;
 }
@@ -293,7 +292,7 @@ champlain_zoom_level_set_width (ChamplainZoomLevel *self,
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   priv->width = width;
   g_object_notify (G_OBJECT (self), "width");
@@ -305,7 +304,7 @@ champlain_zoom_level_set_height (ChamplainZoomLevel *self,
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   priv->height = height;
   g_object_notify (G_OBJECT (self), "height");
@@ -318,7 +317,7 @@ champlain_zoom_level_set_zoom_level (ChamplainZoomLevel *self,
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   priv->zoom_level = zoom_level;
   g_object_notify (G_OBJECT (self), "zoom-level");
@@ -330,7 +329,7 @@ champlain_zoom_level_get_actor (ChamplainZoomLevel *self)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), NULL);
 
-  ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  ChamplainZoomLevelPrivate *priv = self->priv;
 
   return priv->actor;
 }
