@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008, 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -74,7 +74,7 @@ champlain_view_embed_get_property (GObject *object,
                                    GParamSpec *pspec)
 {
   ChamplainViewEmbed *embed = CHAMPLAIN_VIEW_EMBED(object);
-  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (embed);
+  ChamplainViewEmbedPrivate *priv = embed->priv;
 
   switch(prop_id)
     {
@@ -93,7 +93,7 @@ champlain_view_embed_set_property (GObject *object,
                                    GParamSpec *pspec)
 {
   ChamplainViewEmbed *embed = CHAMPLAIN_VIEW_EMBED(object);
-  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (embed);
+  ChamplainViewEmbedPrivate *priv = embed->priv;
 
   switch(prop_id)
   {
@@ -121,7 +121,7 @@ static void
 champlain_view_embed_finalize (GObject *object)
 {
   ChamplainViewEmbed *embed = CHAMPLAIN_VIEW_EMBED (object);
-  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (embed);
+  ChamplainViewEmbedPrivate *priv = embed->priv;
 
   g_object_unref (priv->view);
   G_OBJECT_CLASS (champlain_view_embed_parent_class)->finalize (object);
@@ -185,6 +185,7 @@ champlain_view_embed_init (ChamplainViewEmbed *embed)
   clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
 
   gtk_container_add (GTK_CONTAINER (embed), priv->clutter_embed);
+  embed->priv = priv;
 }
 
 static void
@@ -192,7 +193,7 @@ view_size_allocated_cb (GtkWidget *widget,
                         GtkAllocation *allocation,
                         ChamplainViewEmbed *view)
 {
-  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (view);
+  ChamplainViewEmbedPrivate *priv = view->priv;
 
   champlain_view_set_size(priv->view, allocation->width, allocation->height);
 
@@ -205,7 +206,7 @@ mouse_button_cb (GtkWidget *widget,
                  GdkEventButton *event,
                  ChamplainViewEmbed *view)
 {
-  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (view);
+  ChamplainViewEmbedPrivate *priv = view->priv;
 
   if (event->type == GDK_BUTTON_PRESS)
     gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_closed);
@@ -235,6 +236,6 @@ champlain_view_embed_get_view (ChamplainViewEmbed* embed)
 {
   g_return_val_if_fail(CHAMPLAIN_IS_VIEW_EMBED(embed), NULL);
 
-  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (embed);
+  ChamplainViewEmbedPrivate *priv = embed->priv;
   return priv->view;
 }
