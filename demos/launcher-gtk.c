@@ -47,15 +47,15 @@ create_marker_layer ()
 
   ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
   ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
-  marker = champlain_marker_new_with_label ("Montréal", "Airmole 14", NULL, NULL);
+  marker = champlain_marker_new_with_text ("Montréal", "Airmole 14", NULL, NULL);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 45.528178, -73.563788);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  marker = champlain_marker_new_with_label ("New York", "Sans 25", &white, NULL);
+  marker = champlain_marker_new_with_text ("New York", "Sans 25", &white, NULL);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 40.77, -73.98);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  marker = champlain_marker_new_with_label ("Saint-Tite-des-Caps", "Serif 12", NULL, &orange);
+  marker = champlain_marker_new_with_text ("Saint-Tite-des-Caps", "Serif 12", NULL, &orange);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 47.130885, -70.764141);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 

@@ -31,13 +31,33 @@ CHAMPLAIN_MAP_SOURCE_GET_CLASS
 <SECTION>
 <FILE>champlain-marker</FILE>
 ChamplainMarkerPrivate
-<TITLE>ChamplainMarker</TITLE>
-ChamplainMarker
 champlain_marker_new
-champlain_marker_set_position
-champlain_marker_new_with_label
+champlain_marker_new_with_text
 champlain_marker_new_with_image
-champlain_marker_new_with_image_full
+champlain_marker_new_full
+champlain_marker_set_text
+champlain_marker_set_image
+champlain_marker_set_use_markup
+champlain_marker_set_alignment
+champlain_marker_set_color
+champlain_marker_set_text_color
+champlain_marker_set_font_name
+champlain_marker_set_wrap
+champlain_marker_set_wrap_mode
+champlain_marker_set_attributes
+champlain_marker_set_single_line_mode
+champlain_marker_set_ellipsize
+champlain_marker_get_use_markup
+champlain_marker_get_text
+champlain_marker_get_image
+champlain_marker_get_alignment
+champlain_marker_get_color
+champlain_marker_get_text_color
+champlain_marker_get_font_name
+champlain_marker_get_wrap
+champlain_marker_get_wrap_mode
+champlain_marker_get_ellipsize
+champlain_marker_get_single_line_mode
 <SUBSECTION Standard>
 CHAMPLAIN_MARKER
 CHAMPLAIN_IS_MARKER
@@ -49,7 +69,25 @@ CHAMPLAIN_MARKER_GET_CLASS
 </SECTION>
 
 <SECTION>
+<FILE>champlain-base-marker</FILE>
+ChamplainBaseMarkerPrivate
+<TITLE>ChamplainBaseMarker</TITLE>
+ChamplainBaseMarker
+champlain_base_marker_new
+champlain_base_marker_set_position
+<SUBSECTION Standard>
+CHAMPLAIN_BASE_MARKER
+CHAMPLAIN_IS_BASE_MARKER
+CHAMPLAIN_TYPE_BASE_MARKER
+champlain_base_marker_get_type
+CHAMPLAIN_BASE_MARKER_CLASS
+CHAMPLAIN_IS_BASE_MARKER_CLASS
+CHAMPLAIN_BASE_MARKER_GET_CLASS
+</SECTION>
+
+<SECTION>
 <FILE>champlain-zoom-level</FILE>
+ChamplainZoomLevelPrivate
 <TITLE>ChamplainZoomLevel</TITLE>
 ChamplainZoomLevel
 champlain_zoom_level_new
@@ -184,9 +222,8 @@ CHAMPLAIN_LAYER_GET_CLASS
 
 <SECTION>
 <FILE>champlain-private</FILE>
-CHAMPLAIN_MARKER_GET_PRIVATE
 Map
-ChamplainMarkerPrivate
+ChamplainBaseMarkerPrivate
 </SECTION>
 
 <SECTION>
@@ -250,8 +287,6 @@ CHAMPLAIN_API
 CHAMPLAIN_OBSOLETE_API
 ChamplainView
 ChamplainViewClass
-ChamplainMarker
-ChamplainMarkerClass
 CHAMPLAIN_PARAM_READABLE
 CHAMPLAIN_PARAM_READWRITE
 ChamplainState

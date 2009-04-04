@@ -56,14 +56,52 @@ GType champlain_marker_get_type (void);
 
 ClutterActor *champlain_marker_new (void);
 
-ClutterActor *champlain_marker_new_with_label (const gchar *label,
+ClutterActor *champlain_marker_new_with_text (const gchar *text,
     const gchar *font, ClutterColor *text_color, ClutterColor *marker_color);
 
-ClutterActor *champlain_marker_new_with_image(const gchar *filename,
+ClutterActor *champlain_marker_new_with_image (const gchar *filename,
     GError **error);
 
-ClutterActor *champlain_marker_new_with_image_full(const gchar *filename,
-    gint width, gint height, gint anchor_x, gint anchor_y, GError **error);
+ClutterActor *champlain_marker_new_full (const gchar *text,
+    const gchar *image_filename,
+    GError **error);
+
+void champlain_marker_set_text (ChamplainMarker *marker,
+    const gchar *text);
+void champlain_marker_set_image (ChamplainMarker *marker,
+    ClutterActor *image);
+void champlain_marker_set_use_markup (ChamplainMarker *marker,
+    gboolean use_markup);
+void champlain_marker_set_alignment (ChamplainMarker *marker,
+    PangoAlignment alignment);
+void champlain_marker_set_color (ChamplainMarker *marker,
+    const ClutterColor *color);
+void champlain_marker_set_text_color (ChamplainMarker *marker,
+    const ClutterColor *color);
+void champlain_marker_set_font_name (ChamplainMarker *marker,
+    const gchar *font_name);
+void champlain_marker_set_wrap (ChamplainMarker *marker,
+    gboolean wrap);
+void champlain_marker_set_wrap_mode (ChamplainMarker *marker,
+    PangoWrapMode wrap_mode);
+void champlain_marker_set_attributes (ChamplainMarker *marker,
+    PangoAttrList *list);
+void champlain_marker_set_single_line_mode (ChamplainMarker *marker,
+    gboolean mode);
+void champlain_marker_set_ellipsize (ChamplainMarker *marker,
+    PangoEllipsizeMode mode);
+
+gboolean champlain_marker_get_use_markup (ChamplainMarker *marker);
+const gchar * champlain_marker_get_text (ChamplainMarker *marker);
+ClutterActor * champlain_marker_get_image (ChamplainMarker *marker);
+PangoAlignment champlain_marker_get_alignment (ChamplainMarker *marker);
+ClutterColor * champlain_marker_get_color (ChamplainMarker *marker);
+ClutterColor * champlain_marker_get_text_color (ChamplainMarker *marker);
+const gchar * champlain_marker_get_font_name (ChamplainMarker *marker);
+gboolean champlain_marker_get_wrap (ChamplainMarker *marker);
+PangoWrapMode champlain_marker_get_wrap_mode (ChamplainMarker *marker);
+PangoEllipsizeMode champlain_marker_get_ellipsize (ChamplainMarker *marker);
+gboolean champlain_marker_get_single_line_mode (ChamplainMarker *marker);
 
 G_END_DECLS
 
