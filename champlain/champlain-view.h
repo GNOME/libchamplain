@@ -25,6 +25,7 @@
 
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-layer.h>
+#include <champlain/champlain-base-marker.h>
 #include <champlain/champlain-map-source.h>
 #include <champlain/champlain-zoom-level.h>
 
@@ -94,7 +95,7 @@ void champlain_view_ensure_visible (ChamplainView *view,
     gdouble lon2,
     gboolean animate);
 void champlain_view_ensure_markers_visible (ChamplainView *view,
-    ChamplainMarker *markers[],
+    ChamplainBaseMarker *markers[],
     gboolean animate);
 
 void champlain_view_set_map_source (ChamplainView *champlainView,

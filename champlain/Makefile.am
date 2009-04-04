@@ -19,6 +19,7 @@ libchamplain_headers = \
 	champlain-defines.h		\
 	champlain-view.h		\
 	champlain-layer.h 		\
+	champlain-base-marker.h		\
 	champlain-marker.h		\
 	champlain-map.h			\
 	champlain-zoom-level.h		\
@@ -35,6 +36,7 @@ libchamplain_0_3_la_SOURCES = \
 	champlain-debug.c 		\
 	champlain-view.c 		\
 	champlain-layer.c 		\
+	champlain-base-marker.c 	\
 	champlain-marker.c 		\
 	champlain-map.c  		\
 	champlain-zoom-level.c 		\
@@ -45,7 +47,8 @@ libchamplain_0_3_la_SOURCES = \
 noinst_HEADERS = \
 	champlain-debug.h  		\
 	champlain-view.h 		\
-	champlain-marker.c 		\
+	champlain-base-marker.h 	\
+	champlain-marker.h 		\
 	champlain-private.h 		\
 	champlain-map.h  		\
 	champlain-zoom-level.h 		\
@@ -65,6 +68,7 @@ libchamplain_include_HEADERS = \
 	champlain-network-map-source.h	\
 	champlain-tile.h		\
 	champlain-zoom-level.h		\
+	champlain-base-marker.h		\
 	champlain-marker.h		\
 	champlain-version.h
 

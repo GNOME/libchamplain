@@ -21,7 +21,6 @@
 
 #include <glib.h>
 
-#define CHAMPLAIN_MARKER_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
 
 typedef struct _Map Map;
 
@@ -32,7 +31,7 @@ typedef struct
   gint z;
 } ChamplainPoint;
 
-struct _ChamplainMarkerPrivate
+struct _ChamplainBaseMarkerPrivate
 {
   gdouble lon;
   gdouble lat;

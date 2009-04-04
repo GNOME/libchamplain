@@ -94,7 +94,7 @@ create_marker ()
   clutter_timeline_start (timeline);
 
   /* Sets marker position on the map */
-  champlain_marker_set_position (CHAMPLAIN_MARKER (marker),
+  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker),
       45.528178, -73.563788);
 
   return marker;

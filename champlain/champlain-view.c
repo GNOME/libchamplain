@@ -307,7 +307,7 @@ marker_reposition_cb (ChamplainMarker *marker,
     ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
-  ChamplainMarkerPrivate *marker_priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
+  ChamplainBaseMarkerPrivate *marker_priv = CHAMPLAIN_BASE_MARKER(marker)->priv;
 
   gint x, y;
 
@@ -1840,11 +1840,11 @@ champlain_view_ensure_visible (ChamplainView *view,
  */
 void
 champlain_view_ensure_markers_visible (ChamplainView *view,
-    ChamplainMarker *markers[],
+    ChamplainBaseMarker *markers[],
     gboolean animate)
 {
   gdouble min_lat, min_lon, max_lat, max_lon;
-  ChamplainMarker *marker = NULL;
+  ChamplainBaseMarker *marker = NULL;
   gint i = 0;
 
   min_lat = min_lon = 200;

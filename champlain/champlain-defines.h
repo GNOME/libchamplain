@@ -29,9 +29,6 @@
 typedef struct _ChamplainView ChamplainView;
 typedef struct _ChamplainViewClass ChamplainViewClass;
 
-typedef struct _ChamplainMarker ChamplainMarker;
-typedef struct _ChamplainMarkerClass ChamplainMarkerClass;
-
 #define CHAMPLAIN_PARAM_READABLE     \
         (G_PARAM_READABLE |     \
          G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)

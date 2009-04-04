@@ -19,7 +19,7 @@
 #include <champlain/champlain.h>
 
 #define PADDING 10
-ChamplainMarker *markers [4];
+ChamplainBaseMarker *markers [4];
 
 static gboolean
 map_view_button_release_cb (ClutterActor *actor,
@@ -91,8 +91,8 @@ create_marker_layer (ChamplainView *view)
 
   marker = champlain_marker_new_with_label ("Montréal", "Airmole 14", NULL,
       NULL);
-  markers[0] = CHAMPLAIN_MARKER (marker);
-  champlain_marker_set_position (CHAMPLAIN_MARKER (marker),
+  markers[0] = CHAMPLAIN_BASE_MARKER (marker);
+  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker),
       45.528178, -73.563788);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
   clutter_actor_set_reactive (marker, TRUE);
@@ -101,14 +101,14 @@ create_marker_layer (ChamplainView *view)
 
   marker = champlain_marker_new_with_label ("New York", "Sans 25", &white,
       NULL);
-  markers[1] = CHAMPLAIN_MARKER (marker);
-  champlain_marker_set_position (CHAMPLAIN_MARKER (marker), 40.77, -73.98);
+  markers[1] = CHAMPLAIN_BASE_MARKER (marker);
+  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 40.77, -73.98);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
   marker = champlain_marker_new_with_label ("Saint-Tite-des-Caps", "Serif 12",
       NULL, &orange);
-  markers[2] = CHAMPLAIN_MARKER (marker);
-  champlain_marker_set_position (CHAMPLAIN_MARKER (marker), 47.130885,
+  markers[2] = CHAMPLAIN_BASE_MARKER (marker);
+  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 47.130885,
       -70.764141);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 

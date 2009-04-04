@@ -32,6 +32,7 @@
 #include "champlain-layer.h"
 
 #include "champlain-defines.h"
+#include "champlain-base-marker.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
@@ -130,7 +131,7 @@ layer_add_cb (ClutterGroup *layer,
   GList* markers = clutter_container_get_children (CLUTTER_CONTAINER(layer));
   gint size, i;
   gdouble y, tmp_y, low_y;
-  ChamplainMarker *lowest = NULL;
+  ChamplainBaseMarker *lowest = NULL;
 
   size = g_list_length (markers);
   g_object_get(G_OBJECT(marker), "latitude", &y, NULL);
@@ -139,11 +140,11 @@ layer_add_cb (ClutterGroup *layer,
 
   for (i = 0; i < size; i++)
     {
-      ChamplainMarker *prev_marker = (ChamplainMarker*) g_list_nth_data (markers, i);
+      ChamplainBaseMarker *prev_marker = (ChamplainBaseMarker*) g_list_nth_data (markers, i);
       g_object_get(G_OBJECT(prev_marker), "latitude", &tmp_y, NULL);
       tmp_y = 90 - tmp_y;
 
-      if (prev_marker == (ChamplainMarker*) marker)
+      if (prev_marker == (ChamplainBaseMarker*) marker)
         continue;
 
       if (y < tmp_y && tmp_y < low_y)

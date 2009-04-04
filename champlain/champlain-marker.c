@@ -38,6 +38,7 @@
 #include "champlain-marker.h"
 
 #include "champlain.h"
+#include "champlain-base-marker.h"
 #include "champlain-defines.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
@@ -61,15 +62,18 @@ enum
 enum
 {
   PROP_0,
-  PROP_LONGITUDE,
-  PROP_LATITUDE,
-  PROP_ANCHOR_X,
-  PROP_ANCHOR_Y,
 };
 
 //static guint champlain_marker_signals[LAST_SIGNAL] = { 0, };
 
-G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_GROUP);
+struct _ChamplainMarkerPrivate
+{
+  gboolean tmp;
+};
+
+G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CHAMPLAIN_TYPE_BASE_MARKER);
+
+#define CHAMPLAIN_MARKER_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
 
 static void
 champlain_marker_get_property (GObject *object,
@@ -77,17 +81,11 @@ champlain_marker_get_property (GObject *object,
                                GValue *value,
                                GParamSpec *pspec)
 {
-    ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
-    ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
+    //ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
+    //ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
 
     switch (prop_id)
       {
-        case PROP_LONGITUDE:
-          g_value_set_double (value, priv->lon);
-          break;
-        case PROP_LATITUDE:
-          g_value_set_double (value, priv->lat);
-          break;
         default:
           G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       }
@@ -99,23 +97,11 @@ champlain_marker_set_property (GObject *object,
                                const GValue *value,
                                GParamSpec *pspec)
 {
-    ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
-    ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
+    //ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
+    //ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
 
     switch (prop_id)
     {
-      case PROP_LONGITUDE:
-        {
-          gdouble lon = g_value_get_double (value);
-          champlain_marker_set_position (marker, lon, priv->lat);
-          break;
-        }
-      case PROP_LATITUDE:
-        {
-          gdouble lat = g_value_get_double (value);
-          champlain_marker_set_position (marker, priv->lon, lat);
-          break;
-        }
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -131,55 +117,23 @@ champlain_marker_finalize (GObject *object)
 }
 
 static void
-champlain_marker_class_init (ChamplainMarkerClass *champlainMarkerClass)
+champlain_marker_class_init (ChamplainMarkerClass *markerClass)
 {
-  g_type_class_add_private (champlainMarkerClass, sizeof (ChamplainMarkerPrivate));
+  g_type_class_add_private (markerClass, sizeof (ChamplainMarkerPrivate));
 
-  GObjectClass *object_class = G_OBJECT_CLASS (champlainMarkerClass);
+  GObjectClass *object_class = G_OBJECT_CLASS (markerClass);
   object_class->finalize = champlain_marker_finalize;
   object_class->get_property = champlain_marker_get_property;
   object_class->set_property = champlain_marker_set_property;
 
-  /**
-  * ChamplainMarker:longitude:
-  *
-  * The longitude coordonate of the map
-  *
-  * Since: 0.2
-  */
-  g_object_class_install_property (object_class, PROP_LONGITUDE,
-                                  g_param_spec_double ("longitude",
-                                                      "Longitude",
-                                                      "The longitude coordonate of the marker",
-                                                      -180.0f,
-                                                      180.0f,
-                                                      0.0f,
-                                                      CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-  * ChamplainMarker:latitude:
-  *
-  * The latitude coordonate of the map
-  *
-  * Since: 0.2
-  */
-  g_object_class_install_property (object_class, PROP_LATITUDE,
-                                  g_param_spec_double ("latitude",
-                                                      "Latitude",
-                                                      "The latitude coordonate of the marker",
-                                                      -90.0f,
-                                                      90.0f,
-                                                      0.0f,
-                                                      CHAMPLAIN_PARAM_READWRITE));
-
 }
 
 static void
-champlain_marker_init (ChamplainMarker *champlainMarker)
+champlain_marker_init (ChamplainMarker *marker)
 {
-  //ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
+  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
+  marker->priv = priv;
 }
-
 
 /**
  * champlain_marker_new:
@@ -200,30 +154,6 @@ champlain_marker_new (void)
 }
 
 /**
- * champlain_marker_set_position:
- * @marker: a #ChamplainMarker
- * @longitude: the longitude to center the map at
- * @latitude: the longitude to center the map at
- *
- * Positions the marker on the map at the coordinates
- *
- * Since: 0.2
- */
-void
-champlain_marker_set_position (ChamplainMarker *champlainMarker, gdouble latitude, gdouble longitude)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MARKER (champlainMarker));
-
-  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (champlainMarker);
-
-  priv->lon = longitude;
-  priv->lat = latitude;
-
-  g_object_notify (G_OBJECT (champlainMarker), "latitude");
-  g_object_notify (G_OBJECT (champlainMarker), "longitude");
-}
-
-/**
  * champlain_marker_new_with_label:
  * @label: the text of the label
  * @font: the font to use to draw the text, for example "Courrier Bold 11", can be NULL
@@ -240,7 +170,7 @@ champlain_marker_new_with_label (const gchar *label,
                                  ClutterColor *text_color,
                                  ClutterColor *marker_color)
 {
-  ChamplainMarker *champlainMarker = CHAMPLAIN_MARKER (champlain_marker_new ());
+  ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
   ClutterColor default_text_color = { 0x22, 0x22, 0x22, 0xFF },
                default_marker_color = { 0x2A, 0xB1, 0x26, 0xEE },
                darker_color;
@@ -261,7 +191,7 @@ champlain_marker_new_with_label (const gchar *label,
   text_width = clutter_actor_get_width (actor) + 2 * padding;
   text_height = clutter_actor_get_height (actor)+ padding;
   clutter_label_set_color (CLUTTER_LABEL (actor), text_color);
-  clutter_container_add_actor (CLUTTER_CONTAINER (champlainMarker), actor);
+  clutter_container_add_actor (CLUTTER_CONTAINER (marker), actor);
 
   point = (text_height + 2 * padding) / 4.0;
 
@@ -293,12 +223,12 @@ champlain_marker_new_with_label (const gchar *label,
 
 
   cairo_destroy (cr);
-  clutter_container_add_actor (CLUTTER_CONTAINER (champlainMarker), bg);
+  clutter_container_add_actor (CLUTTER_CONTAINER (marker), bg);
   clutter_actor_raise (actor, bg);
 
-  clutter_actor_set_anchor_point (CLUTTER_ACTOR (champlainMarker), 0, text_height + point);
+  clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, text_height + point);
 
-  return CLUTTER_ACTOR (champlainMarker);
+  return CLUTTER_ACTOR (marker);
 }
 
 /**
@@ -316,17 +246,17 @@ champlain_marker_new_with_image (const gchar *filename, GError **error)
   if (filename == NULL)
     return NULL;
 
-  ChamplainMarker *champlainMarker = CHAMPLAIN_MARKER (champlain_marker_new ());
+  ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
   ClutterActor *actor = clutter_texture_new_from_file (filename, error);
 
   if (actor == NULL){
-    g_object_unref (G_OBJECT (champlainMarker));
+    g_object_unref (G_OBJECT (marker));
     return NULL;
   }
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (champlainMarker), actor);
+  clutter_container_add_actor (CLUTTER_CONTAINER (marker), actor);
 
-  return CLUTTER_ACTOR (champlainMarker);
+  return CLUTTER_ACTOR (marker);
 }
 
 /**
@@ -353,21 +283,21 @@ champlain_marker_new_with_image_full (const gchar *filename,
   if (filename == NULL)
     return NULL;
 
-  ChamplainMarker *champlainMarker = CHAMPLAIN_MARKER (champlain_marker_new ());
+  ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
   ClutterActor *actor = clutter_texture_new_from_file (filename, error);
 
   if (actor == NULL)
     {
-      g_object_unref (G_OBJECT (champlainMarker));
+      g_object_unref (G_OBJECT (marker));
       return NULL;
     }
 
   clutter_actor_set_size (actor, width, height);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (champlainMarker), actor);
-  clutter_actor_set_anchor_point (CLUTTER_ACTOR (champlainMarker), anchor_x,
+  clutter_container_add_actor (CLUTTER_CONTAINER (marker), actor);
+  clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), anchor_x,
       anchor_y);
 
-  return CLUTTER_ACTOR (champlainMarker);
+  return CLUTTER_ACTOR (marker);
 }
 

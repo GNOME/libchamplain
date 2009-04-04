@@ -23,10 +23,12 @@
 #ifndef CHAMPLAIN_MARKER_H
 #define CHAMPLAIN_MARKER_H
 
-#include <champlain/champlain-defines.h>
+#include <champlain/champlain-base-marker.h>
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
+
+G_BEGIN_DECLS
 
 #define CHAMPLAIN_TYPE_MARKER     (champlain_marker_get_type())
 #define CHAMPLAIN_MARKER(obj)     (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarker))
@@ -37,25 +39,22 @@
 
 typedef struct _ChamplainMarkerPrivate ChamplainMarkerPrivate;
 
-struct _ChamplainMarker
+typedef struct
 {
-  ClutterGroup group;
+  ChamplainBaseMarker base;
 
   ChamplainMarkerPrivate *priv;
-};
+} ChamplainMarker;
 
-struct _ChamplainMarkerClass
+typedef struct
 {
-  ClutterGroupClass parent_class;
+  ChamplainBaseMarkerClass parent_class;
 
-};
+} ChamplainMarkerClass;
 
 GType champlain_marker_get_type (void);
 
 ClutterActor *champlain_marker_new (void);
-
-void champlain_marker_set_position (ChamplainMarker *marker,
-    gdouble longitude, gdouble latitude);
 
 ClutterActor *champlain_marker_new_with_label (const gchar *label,
     const gchar *font, ClutterColor *text_color, ClutterColor *marker_color);
@@ -65,5 +64,7 @@ ClutterActor *champlain_marker_new_with_image(const gchar *filename,
 
 ClutterActor *champlain_marker_new_with_image_full(const gchar *filename,
     gint width, gint height, gint anchor_x, gint anchor_y, GError **error);
+
+G_END_DECLS
 
 #endif
