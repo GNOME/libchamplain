@@ -76,7 +76,7 @@ sub test_osm_osmarender {
 
 # OpenAerialMap
 sub test_oam {
-	my $label = "OpenArialMap";
+	my $label = "OpenAerialMap";
 	my $map = Champlain::MapSource->new_oam();
 	isa_ok($map, 'Champlain::MapSource');
 	
