@@ -31,7 +31,7 @@ Champlain - Map rendering canvas
 
 Champlain is a Perl binding for the C library libchamplain which provides a
 canvas widget based on Clutter that displays maps from various free map sources
-such as I<OpenStreetMap>, I<OpenArialMap> and I<Maps for free>.
+such as I<OpenStreetMap>, I<OpenAerialMap> and I<Maps for free>.
 
 If the C library is compiled with GTK support then the map widget can also be
 embedded in any GTK application.

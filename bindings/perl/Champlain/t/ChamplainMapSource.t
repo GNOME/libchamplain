@@ -74,7 +74,7 @@ sub test_osm_osmarender {
 	generic_map_operations($label, $map);
 }
 
-# OpenArialMap
+# OpenAerialMap
 sub test_oam {
 	my $label = "OpenArialMap";
 	my $map = Champlain::MapSource->new_oam();

@@ -9,7 +9,7 @@ The library relies on Clutter for all rendering and can easily embedded in any
 Gtk2 application. 
 
 The maps displayed are taken from various sources, all providing maps for free,
-at the moment the following sources area available: OpenStreetMap, OpenArialMap
+at the moment the following sources area available: OpenStreetMap, OpenAerialMap
 and Maps for free. It's also possible to provide other sources through a simple
 API.
 
