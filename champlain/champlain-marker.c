@@ -341,7 +341,7 @@ draw_marker (ChamplainMarker *marker)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
   ClutterColor darker_color;
-  ClutterActor *actor = NULL, *text_actor, *image_actor, *bg;
+  ClutterActor *actor = NULL, *text_actor = NULL, *image_actor = NULL, *bg = NULL;
   cairo_t *cr;
   guint width = 0, height = 0, point;
   guint total_width = 0, total_height = 0;
