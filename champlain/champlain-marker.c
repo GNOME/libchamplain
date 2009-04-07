@@ -341,33 +341,76 @@ draw_marker (ChamplainMarker *marker)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
   ClutterColor darker_color;
-  ClutterActor *actor, *bg;
+  ClutterActor *actor = NULL, *text_actor, *image_actor, *bg;
   cairo_t *cr;
-  guint text_width, text_height, point;
+  guint width = 0, height = 0, point;
+  guint total_width = 0, total_height = 0;
   const gint padding = 5;
   gboolean has_text = FALSE;
+  gboolean has_image = FALSE;
+
+  width = 0;
+  if (priv->image != NULL)
+    {
+      actor = priv->image;
+      clutter_actor_set_position (actor, padding, padding);
+      total_width = clutter_actor_get_width (actor) + 2 * padding;
+      total_height = clutter_actor_get_height (actor) + 2 * padding;
+      if (clutter_actor_get_parent (actor) == NULL)
+        clutter_container_add_actor (CLUTTER_CONTAINER (marker), actor);
+
+      image_actor = actor;
+      has_image = TRUE;
+    }
 
   if (priv->text != NULL && strlen (priv->text) > 0)
-    has_text = TRUE;
+    {
+      ClutterLabel *label;
+      if (priv->text_actor == NULL)
+        actor = clutter_label_new_with_text (priv->font_name, priv->text);
+      else
+        actor = priv->text_actor;
+      label = CLUTTER_LABEL (actor);
 
-  actor = clutter_label_new_with_text (priv->font_name, priv->text);
-  clutter_actor_set_position (actor, padding, padding / 2.0);
-  text_width = clutter_actor_get_width (actor) + 2 * padding;
-  text_height = clutter_actor_get_height (actor)+ padding;
-  clutter_label_set_color (CLUTTER_LABEL (actor), priv->text_color);
-  clutter_container_add_actor (CLUTTER_CONTAINER (marker), actor);
+      clutter_label_set_use_markup (label, priv->use_markup);
+      clutter_label_set_alignment (label, priv->alignment);
+      clutter_label_set_line_wrap (label, priv->wrap);
+      clutter_label_set_line_wrap_mode (label, priv->wrap_mode);
+      clutter_label_set_ellipsize (label, priv->ellipsize);
+      clutter_label_set_attributes (label, priv->attributes);
 
-  point = (text_height + 2 * padding) / 4.0;
+      height = clutter_actor_get_height (actor);
+      if (has_image)
+        clutter_actor_set_position (actor, total_width, (total_height - height) / 2.0);
+      else
+        clutter_actor_set_position (actor, padding, padding / 2.0);
+      total_width += clutter_actor_get_width (actor) + 2 * padding;
 
-  bg = clutter_cairo_new (text_width, text_height + point);
+      height += padding;
+      if (height > total_height)
+        total_height = height;
+      clutter_label_set_color (CLUTTER_LABEL (actor), priv->text_color);
+      if (clutter_actor_get_parent (actor) == NULL)
+        clutter_container_add_actor (CLUTTER_CONTAINER (marker), actor);
+
+      priv->text_actor = text_actor = actor;
+      has_text = TRUE;
+    }
+
+  point = (total_height + 2 * padding) / 4.0;
+
+  if (priv->background != NULL)
+    clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
+
+  bg = clutter_cairo_new (total_width, total_height + point);
   cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
 
   cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_move_to (cr, 0, 0);
-  cairo_line_to (cr, text_width, 0);
-  cairo_line_to (cr, text_width, text_height);
-  cairo_line_to (cr, point, text_height);
-  cairo_line_to (cr, 0, text_height + point);
+  cairo_line_to (cr, total_width, 0);
+  cairo_line_to (cr, total_width, total_height);
+  cairo_line_to (cr, point, total_height);
+  cairo_line_to (cr, 0, total_height + point);
   cairo_close_path (cr);
 
   cairo_set_line_width (cr, 1.0);
@@ -385,12 +428,16 @@ draw_marker (ChamplainMarker *marker)
                         darker_color.alpha / 255.0);
   cairo_stroke (cr);
 
-
   cairo_destroy (cr);
   clutter_container_add_actor (CLUTTER_CONTAINER (marker), bg);
-  clutter_actor_raise (actor, bg);
+  priv->background = bg;
 
-  clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, text_height + point);
+  if (has_text)
+    clutter_actor_raise (text_actor, bg);
+  if (has_image)
+  clutter_actor_raise (image_actor, bg);
+
+  clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, total_height + point);
 }
 
 static void
@@ -409,6 +456,7 @@ champlain_marker_init (ChamplainMarker *marker)
 
   priv->text = NULL;
   priv->image = NULL;
+  priv->background = NULL;
   priv->use_markup = FALSE;
   priv->alignment = PANGO_ALIGN_LEFT;
   priv->attributes = NULL;
@@ -490,12 +538,13 @@ champlain_marker_new_with_image (const gchar *filename, GError **error)
   ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
   ClutterActor *actor = clutter_texture_new_from_file (filename, error);
 
-  if (actor == NULL){
-    g_object_unref (G_OBJECT (marker));
-    return NULL;
-  }
+  if (actor == NULL)
+    {
+      g_object_unref (G_OBJECT (marker));
+      return NULL;
+    }
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (marker), actor);
+  champlain_marker_set_image (marker, actor);
 
   return CLUTTER_ACTOR (marker);
 }
@@ -530,8 +579,9 @@ champlain_marker_new_full (const gchar *text,
       g_object_unref (G_OBJECT (marker));
       return NULL;
     }
-// TODO
-  clutter_container_add_actor (CLUTTER_CONTAINER (marker), actor);
+  champlain_marker_set_image (marker, actor);
+  champlain_marker_set_text (marker, text);
+
   return CLUTTER_ACTOR (marker);
 }
 
