@@ -383,7 +383,8 @@ draw_marker (ChamplainMarker *marker)
       if (has_image)
         clutter_actor_set_position (actor, total_width, (total_height - height) / 2.0);
       else
-        clutter_actor_set_position (actor, padding, padding / 2.0);
+        clutter_actor_set_position (actor, padding, padding);
+
       total_width += clutter_actor_get_width (actor) + 2 * padding;
 
       height += padding;
@@ -405,12 +406,17 @@ draw_marker (ChamplainMarker *marker)
   bg = clutter_cairo_new (total_width, total_height + point);
   cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
 
+  const int radius = 10;
+
   cairo_set_source_rgb (cr, 0, 0, 0);
-  cairo_move_to (cr, 0, 0);
-  cairo_line_to (cr, total_width, 0);
-  cairo_line_to (cr, total_width, total_height);
+  cairo_move_to (cr, radius, 0);
+  cairo_line_to (cr, total_width - radius, 0);
+  cairo_arc (cr, total_width - radius, radius, radius, M_PI/2.0, 0);
+  cairo_line_to (cr, total_width, total_height - radius);
+  cairo_arc (cr, total_width - radius, total_height - radius, radius, 0, M_PI/2.0);
   cairo_line_to (cr, point, total_height);
   cairo_line_to (cr, 0, total_height + point);
+  cairo_arc (cr, radius, radius, radius, M_PI, 3*M_PI/2.0);
   cairo_close_path (cr);
 
   cairo_set_line_width (cr, 1.0);
