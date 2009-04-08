@@ -372,7 +372,7 @@ draw_background (ChamplainMarker *marker, int width, int height, int point)
   cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_move_to (cr, RADIUS, 0);
   cairo_line_to (cr, width - RADIUS, 0);
-  cairo_arc (cr, width - RADIUS, RADIUS, RADIUS - 1, M_PI / 2.0, 0);
+  cairo_arc (cr, width - RADIUS, RADIUS, RADIUS - 1, 3 * M_PI / 2.0, 0);
   cairo_line_to (cr, width, height - RADIUS);
   cairo_arc (cr, width - RADIUS, height - RADIUS, RADIUS - 1, 0, M_PI / 2.0);
   cairo_line_to (cr, point, height);
