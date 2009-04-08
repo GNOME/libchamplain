@@ -336,42 +336,78 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
           PANGO_TYPE_ELLIPSIZE_MODE, PANGO_ELLIPSIZE_NONE, CHAMPLAIN_PARAM_READWRITE));
 }
 
+#define RADIUS 10
+#define PADDING (RADIUS / 2)
+
+static void
+draw_background (ChamplainMarker *marker, int width, int height, int point)
+{
+  ChamplainMarkerPrivate *priv = marker->priv;
+  ClutterActor *bg = NULL;
+  ClutterColor darker_color;
+  cairo_t *cr;
+
+  bg = clutter_cairo_new (width, height + point);
+  cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
+
+  cairo_set_source_rgb (cr, 0, 0, 0);
+  cairo_move_to (cr, RADIUS, 0);
+  cairo_line_to (cr, width - RADIUS, 0);
+  cairo_arc (cr, width - RADIUS, RADIUS, RADIUS - 1, M_PI / 2.0, 0);
+  cairo_line_to (cr, width, height - RADIUS);
+  cairo_arc (cr, width - RADIUS, height - RADIUS, RADIUS - 1, 0, M_PI / 2.0);
+  cairo_line_to (cr, point, height);
+  cairo_line_to (cr, 0, height + point);
+  cairo_arc (cr, RADIUS, RADIUS, RADIUS - 1, M_PI, 3 * M_PI / 2.0);
+  cairo_close_path (cr);
+
+  cairo_set_line_width (cr, 1.0);
+  cairo_set_source_rgba (cr,
+      priv->color->red / 255.0,
+      priv->color->green / 255.0,
+      priv->color->blue / 255.0,
+      priv->color->alpha / 255.0);
+  cairo_fill_preserve (cr);
+  clutter_color_darken (priv->color, &darker_color);
+  cairo_set_source_rgba (cr,
+      darker_color.red / 255.0,
+      darker_color.green / 255.0,
+      darker_color.blue / 255.0,
+      darker_color.alpha / 255.0);
+  cairo_stroke (cr);
+  cairo_destroy (cr);
+
+  clutter_container_add_actor (CLUTTER_CONTAINER (marker), bg);
+
+  if (priv->background != NULL)
+    clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
+
+  priv->background = bg;
+}
+
 static void
 draw_marker (ChamplainMarker *marker)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
-  ClutterColor darker_color;
-  ClutterActor *actor = NULL, *text_actor = NULL, *image_actor = NULL, *bg = NULL;
-  cairo_t *cr;
-  guint width = 0, height = 0, point;
+  guint height = 0, point = 0;
   guint total_width = 0, total_height = 0;
-  const gint padding = 5;
-  gboolean has_text = FALSE;
-  gboolean has_image = FALSE;
 
-  width = 0;
   if (priv->image != NULL)
     {
-      actor = priv->image;
-      clutter_actor_set_position (actor, padding, padding);
-      total_width = clutter_actor_get_width (actor) + 2 * padding;
-      total_height = clutter_actor_get_height (actor) + 2 * padding;
-      if (clutter_actor_get_parent (actor) == NULL)
-        clutter_container_add_actor (CLUTTER_CONTAINER (marker), actor);
-
-      image_actor = actor;
-      has_image = TRUE;
+      clutter_actor_set_position (priv->image, PADDING, PADDING);
+      total_width = clutter_actor_get_width (priv->image) + 2 * PADDING;
+      total_height = clutter_actor_get_height (priv->image) + 2 * PADDING;
+      if (clutter_actor_get_parent (priv->image) == NULL)
+        clutter_container_add_actor (CLUTTER_CONTAINER (marker), priv->image);
     }
 
   if (priv->text != NULL && strlen (priv->text) > 0)
     {
       ClutterLabel *label;
       if (priv->text_actor == NULL)
-        actor = clutter_label_new_with_text (priv->font_name, priv->text);
-      else
-        actor = priv->text_actor;
-      label = CLUTTER_LABEL (actor);
+        priv->text_actor = clutter_label_new_with_text (priv->font_name, priv->text);
 
+      label = CLUTTER_LABEL (priv->text_actor);
       clutter_label_set_use_markup (label, priv->use_markup);
       clutter_label_set_alignment (label, priv->alignment);
       clutter_label_set_line_wrap (label, priv->wrap);
@@ -379,80 +415,41 @@ draw_marker (ChamplainMarker *marker)
       clutter_label_set_ellipsize (label, priv->ellipsize);
       clutter_label_set_attributes (label, priv->attributes);
 
-      height = clutter_actor_get_height (actor);
-      if (has_image)
+      height = clutter_actor_get_height (priv->text_actor);
+      if (priv->image != NULL)
         {
-          clutter_actor_set_position (actor, total_width, (total_height - height) / 2.0);
-          total_width += clutter_actor_get_width (actor) + 2 * padding;
+          clutter_actor_set_position (priv->text_actor, total_width, (total_height - height) / 2.0);
+          total_width += clutter_actor_get_width (priv->text_actor) + 2 * PADDING;
         }
       else
         {
-          clutter_actor_set_position (actor, 2 * padding, padding);
-          total_width += clutter_actor_get_width (actor) + 4 * padding;
+          clutter_actor_set_position (priv->text_actor, 2 * PADDING, PADDING);
+          total_width += clutter_actor_get_width (priv->text_actor) + 4 * PADDING;
         }
 
-      height += 2 * padding;
-
+      height += 2 * PADDING;
       if (height > total_height)
         total_height = height;
-      clutter_label_set_color (CLUTTER_LABEL (actor), priv->text_color);
-      if (clutter_actor_get_parent (actor) == NULL)
-        clutter_container_add_actor (CLUTTER_CONTAINER (marker), actor);
 
-      priv->text_actor = text_actor = actor;
-      has_text = TRUE;
+      clutter_label_set_color (CLUTTER_LABEL (priv->text_actor), priv->text_color);
+      if (clutter_actor_get_parent (priv->text_actor) == NULL)
+        clutter_container_add_actor (CLUTTER_CONTAINER (marker), priv->text_actor);
     }
 
-  if (has_image == FALSE && has_text == FALSE)
-  {
-    total_width = 30;
-    total_height = 30;
-  }
+  if (priv->text_actor == NULL && priv->image == NULL)
+    {
+      total_width = 6 * PADDING;
+      total_height = 6 * PADDING;
+    }
 
-  point = (total_height + 2 * padding) / 4.0;
+  point = (total_height + 2 * PADDING) / 4.0;
 
-  if (priv->background != NULL)
-    clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
+  draw_background (marker, total_width, total_height, point);
 
-  bg = clutter_cairo_new (total_width, total_height + point);
-  cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
-
-  const int radius = 10;
-
-  cairo_set_source_rgb (cr, 0, 0, 0);
-  cairo_move_to (cr, radius, 0);
-  cairo_line_to (cr, total_width - radius, 0);
-  cairo_arc (cr, total_width - radius, radius, radius, M_PI/2.0, 0);
-  cairo_line_to (cr, total_width, total_height - radius);
-  cairo_arc (cr, total_width - radius, total_height - radius, radius, 0, M_PI/2.0);
-  cairo_line_to (cr, point, total_height);
-  cairo_line_to (cr, 0, total_height + point);
-  cairo_arc (cr, radius, radius, radius, M_PI, 3*M_PI/2.0);
-  cairo_close_path (cr);
-
-  cairo_set_line_width (cr, 1.0);
-  cairo_set_source_rgba (cr,
-                        priv->color->red / 255.0,
-                        priv->color->green / 255.0,
-                        priv->color->blue / 255.0,
-                        priv->color->alpha / 255.0);
-  cairo_fill_preserve (cr);
-  clutter_color_darken (priv->color, &darker_color);
-  cairo_set_source_rgba (cr,
-                        darker_color.red / 255.0,
-                        darker_color.green / 255.0,
-                        darker_color.blue / 255.0,
-                        darker_color.alpha / 255.0);
-  cairo_stroke (cr);
-
-  cairo_destroy (cr);
-  clutter_container_add_actor (CLUTTER_CONTAINER (marker), bg);
-  priv->background = bg;
-
-  if (has_text)
-    clutter_actor_raise (text_actor, bg);
-  if (has_image)
-    clutter_actor_raise (image_actor, bg);
+  if (priv->text_actor != NULL)
+    clutter_actor_raise (priv->text_actor, priv->background);
+  if (priv->image != NULL)
+    clutter_actor_raise (priv->image, priv->background);
 
   clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, total_height + point);
 }
