@@ -212,9 +212,15 @@ champlain_marker_finalize (GObject *object)
 
   if (priv->text != NULL)
     g_free (priv->text);
+  priv->text = NULL;
 
   if (priv->image != NULL)
     g_object_unref (priv->image);
+  priv->image = NULL;
+
+  if (priv->background != NULL)
+    g_object_unref (priv->background);
+  priv->background = NULL;
 
   G_OBJECT_CLASS (champlain_marker_parent_class)->finalize (object);
 }
@@ -399,9 +405,13 @@ draw_background (ChamplainMarker *marker, int width, int height, int point)
   clutter_container_add_actor (CLUTTER_CONTAINER (marker), bg);
 
   if (priv->background != NULL)
-    clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
+    {
+      clutter_container_remove_actor (CLUTTER_CONTAINER (marker),
+          priv->background);
+      g_object_unref (priv->background);
+    }
 
-  priv->background = bg;
+  priv->background = g_object_ref (bg);
 }
 
 static void
@@ -424,10 +434,14 @@ draw_marker (ChamplainMarker *marker)
     {
       ClutterLabel *label;
       if (priv->text_actor == NULL)
+      {
         priv->text_actor = clutter_label_new_with_text (priv->font_name, priv->text);
+        g_object_ref (priv->text_actor);
+      }
 
       label = CLUTTER_LABEL (priv->text_actor);
       clutter_label_set_use_markup (label, priv->use_markup);
+      clutter_label_set_text (label, priv->text);
       clutter_label_set_alignment (label, priv->alignment);
       clutter_label_set_line_wrap (label, priv->wrap);
       clutter_label_set_line_wrap_mode (label, priv->wrap_mode);
@@ -490,9 +504,12 @@ draw_marker (ChamplainMarker *marker)
 
 static void
 property_notify (GObject *gobject,
-    GParamSpec *arg1,
+    GParamSpec *pspec,
     gpointer user_data)
 {
+  if (pspec->owner_type == CLUTTER_TYPE_ACTOR)
+    return;
+
   draw_marker (CHAMPLAIN_MARKER (gobject));
 }
 
