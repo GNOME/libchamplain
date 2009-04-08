@@ -101,12 +101,12 @@ create_marker_layer (ChamplainView *view)
   g_signal_connect_after (marker, "button-release-event",
       G_CALLBACK (marker_button_release_cb), view);
 
-  marker = champlain_marker_new_full ("New York", "/usr/share/icons/Tangerine/24x24/actions/stock_home.png", NULL);
+  marker = champlain_marker_new_full ("New York", "/usr/share/icons/Tango/32x32/apps/system-users.png", NULL);
   markers[1] = CHAMPLAIN_BASE_MARKER (marker);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 40.77, -73.98);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  marker = champlain_marker_new_with_image ("/usr/share/icons/Tangerine/24x24/actions/stock_home.png", NULL);
+  marker = champlain_marker_new_with_image ("/usr/share/icons/Tango/32x32/apps/system-users.png", NULL);
   markers[2] = CHAMPLAIN_BASE_MARKER (marker);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 47.130885,
       -70.764141);
