@@ -74,7 +74,7 @@ enum
   PROP_FONT_NAME,
   PROP_WRAP,
   PROP_WRAP_MODE,
-  PROP_SINGLE_LINE_MODE
+  PROP_DRAW_BACKGROUND
 };
 
 //static guint champlain_marker_signals[LAST_SIGNAL] = { 0, };
@@ -93,6 +93,7 @@ struct _ChamplainMarkerPrivate
   PangoWrapMode wrap_mode;
   gboolean single_line_mode;
   PangoEllipsizeMode ellipsize;
+  gboolean draw_background;
 
   ClutterActor *text_actor;
   ClutterActor *shadow;
@@ -143,6 +144,9 @@ champlain_marker_get_property (GObject *object,
         case PROP_WRAP_MODE:
           g_value_set_enum (value, priv->wrap_mode);
           break;
+        case PROP_DRAW_BACKGROUND:
+          g_value_set_boolean (value, priv->draw_background);
+          break;
         case PROP_ELLIPSIZE:
           g_value_set_enum (value, priv->ellipsize);
           break;
@@ -191,6 +195,9 @@ champlain_marker_set_property (GObject *object,
         break;
       case PROP_ELLIPSIZE:
         champlain_marker_set_ellipsize (marker, g_value_get_enum (value));
+        break;
+      case PROP_DRAW_BACKGROUND:
+        champlain_marker_set_draw_background (marker, g_value_get_boolean (value));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -334,6 +341,18 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
   g_object_class_install_property (object_class, PROP_ELLIPSIZE,
       g_param_spec_enum ("ellipsize", "Ellipsize Mode", "The marker's text ellipsize mode",
           PANGO_TYPE_ELLIPSIZE_MODE, PANGO_ELLIPSIZE_NONE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainMarker:draw-background:
+  *
+  * If the marker's has a background
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class, PROP_DRAW_BACKGROUND,
+      g_param_spec_boolean ("draw-background", "Draw Background", "The marker's has a background",
+          TRUE, CHAMPLAIN_PARAM_READWRITE));
+
 }
 
 #define RADIUS 10
@@ -444,14 +463,29 @@ draw_marker (ChamplainMarker *marker)
 
   point = (total_height + 2 * PADDING) / 4.0;
 
-  draw_background (marker, total_width, total_height, point);
+  if (priv->draw_background == TRUE)
+    draw_background (marker, total_width, total_height, point);
+  else if (priv->background != NULL)
+    {
+      clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
+      priv->background = NULL;
+    }
 
-  if (priv->text_actor != NULL)
+  if (priv->text_actor != NULL && priv->background != NULL)
     clutter_actor_raise (priv->text_actor, priv->background);
-  if (priv->image != NULL)
+  if (priv->image != NULL && priv->background != NULL)
     clutter_actor_raise (priv->image, priv->background);
 
-  clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, total_height + point);
+  if (priv->draw_background == TRUE)
+    clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, total_height + point);
+  else if (priv->image != NULL)
+    clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker),
+        clutter_actor_get_width (priv->image) / 2.0,
+        clutter_actor_get_height (priv->image) / 2.0);
+  else if (priv->text_actor != NULL)
+    clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker),
+        0,
+        clutter_actor_get_height (priv->text_actor) / 2.0);
 }
 
 static void
@@ -483,6 +517,7 @@ champlain_marker_init (ChamplainMarker *marker)
   priv->wrap_mode = PANGO_WRAP_WORD;
   priv->single_line_mode = TRUE;
   priv->ellipsize = PANGO_ELLIPSIZE_NONE;
+  priv->draw_background = TRUE;
 
   g_signal_connect (G_OBJECT (marker), "notify", G_CALLBACK (property_notify), NULL);
 }
@@ -870,6 +905,27 @@ champlain_marker_set_single_line_mode (ChamplainMarker *marker,
 }
 
 /**
+ * champlain_marker_set_draw_background:
+ * @marker: The marker
+ * @background: value.
+ *
+ * Set if the marker has a background.
+ *
+ * Since: 0.4
+ */
+void
+champlain_marker_set_draw_background (ChamplainMarker *marker,
+    gboolean background)
+{
+  g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
+
+  ChamplainMarkerPrivate *priv = marker->priv;
+
+  priv->draw_background = background;
+  g_object_notify (G_OBJECT (marker), "draw-background");
+}
+
+/**
  * champlain_marker_get_image:
  * @marker: The marker
  *
@@ -1066,3 +1122,22 @@ champlain_marker_get_single_line_mode (ChamplainMarker *marker)
 
   return priv->single_line_mode;
 }
+
+/**
+ * champlain_marker_get_draw_background:
+ * @marker: The marker
+ *
+ * Returns if the marker's has a background
+ *
+ * Since: 0.4
+ */
+gboolean
+champlain_marker_get_draw_background (ChamplainMarker *marker)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
+
+  ChamplainMarkerPrivate *priv = marker->priv;
+
+  return priv->draw_background;
+}
+
