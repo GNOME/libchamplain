@@ -381,13 +381,18 @@ draw_marker (ChamplainMarker *marker)
 
       height = clutter_actor_get_height (actor);
       if (has_image)
-        clutter_actor_set_position (actor, total_width, (total_height - height) / 2.0);
+        {
+          clutter_actor_set_position (actor, total_width, (total_height - height) / 2.0);
+          total_width += clutter_actor_get_width (actor) + 2 * padding;
+        }
       else
-        clutter_actor_set_position (actor, padding, padding);
+        {
+          clutter_actor_set_position (actor, 2 * padding, padding);
+          total_width += clutter_actor_get_width (actor) + 4 * padding;
+        }
 
-      total_width += clutter_actor_get_width (actor) + 2 * padding;
+      height += 2 * padding;
 
-      height += padding;
       if (height > total_height)
         total_height = height;
       clutter_label_set_color (CLUTTER_LABEL (actor), priv->text_color);
@@ -397,6 +402,12 @@ draw_marker (ChamplainMarker *marker)
       priv->text_actor = text_actor = actor;
       has_text = TRUE;
     }
+
+  if (has_image == FALSE && has_text == FALSE)
+  {
+    total_width = 30;
+    total_height = 30;
+  }
 
   point = (total_height + 2 * padding) / 4.0;
 
@@ -441,7 +452,7 @@ draw_marker (ChamplainMarker *marker)
   if (has_text)
     clutter_actor_raise (text_actor, bg);
   if (has_image)
-  clutter_actor_raise (image_actor, bg);
+    clutter_actor_raise (image_actor, bg);
 
   clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, total_height + point);
 }
@@ -544,13 +555,10 @@ champlain_marker_new_with_image (const gchar *filename, GError **error)
   ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
   ClutterActor *actor = clutter_texture_new_from_file (filename, error);
 
-  if (actor == NULL)
+  if (actor != NULL)
     {
-      g_object_unref (G_OBJECT (marker));
-      return NULL;
+      champlain_marker_set_image (marker, actor);
     }
-
-  champlain_marker_set_image (marker, actor);
 
   return CLUTTER_ACTOR (marker);
 }
@@ -580,12 +588,10 @@ champlain_marker_new_full (const gchar *text,
   ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
   ClutterActor *actor = clutter_texture_new_from_file (filename, error);
 
-  if (actor == NULL)
+  if (actor != NULL)
     {
-      g_object_unref (G_OBJECT (marker));
-      return NULL;
+      champlain_marker_set_image (marker, actor);
     }
-  champlain_marker_set_image (marker, actor);
   champlain_marker_set_text (marker, text);
 
   return CLUTTER_ACTOR (marker);
