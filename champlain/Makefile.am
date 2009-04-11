@@ -84,10 +84,7 @@ AM_CPPFLAGS = 				\
 	-DCHAMPLAIN_COMPILATION 	\
 	$(WARN_CFLAGS)
 
-svgdir = $(datadir)/champlain
-svg_DATA = error.svg
-
-EXTRA_DIST = $(svg_DATA) $(CHAMPLAIN_MARSHAL_LIST)
+EXTRA_DIST = $(CHAMPLAIN_MARSHAL_LIST)
 
 champlain-marshal.h: $(CHAMPLAIN_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --header --prefix=cpl_marshal $< > $(CHAMPLAIN_MARSHAL).h

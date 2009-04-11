@@ -40,6 +40,7 @@
 #include <libsoup/soup.h>
 #include <math.h>
 #include <string.h>
+#include <clutter-cairo.h>
 
 enum
 {
@@ -357,16 +358,33 @@ static void
 create_error_tile (ChamplainTile* tile)
 {
   ClutterActor *actor;
-  ClutterColor red = { 0xff, 0x00, 0x00, 0xff };
+  cairo_t *cr;
+  cairo_pattern_t *pat;
 
-  actor = clutter_texture_new_from_file (DATADIR "/champlain/error.svg", NULL);
-  if (!actor)
-  {
-    /* Just in case the image is not found, put some red.  This should not
-     * happen if libchamplain is installed correctly. */
-    actor = clutter_rectangle_new_with_color (&red);
-    clutter_actor_set_size (actor , 256, 256);
-  }
+  actor = clutter_cairo_new (256, 256);
+  cr = clutter_cairo_create (CLUTTER_CAIRO(actor));
+
+  /* draw a linear gray to white pattern */
+  pat = cairo_pattern_create_linear(128.0, 0.0,  256.0, 128.0);
+  cairo_pattern_add_color_stop_rgb(pat, 0, 0.686, 0.686, 0.686);
+  cairo_pattern_add_color_stop_rgb(pat, 1, 0.925, 0.925, 0.925);
+  cairo_set_source(cr, pat);
+  cairo_rectangle(cr, 0, 0, 256, 256);
+  cairo_fill(cr);
+
+  cairo_pattern_destroy(pat);
+
+  /* draw the red cross */
+  cairo_set_source_rgb(cr, 0.424, 0.078, 0.078);
+  cairo_set_line_width (cr, 14.0);
+  cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
+  cairo_move_to(cr, 24, 24);
+  cairo_line_to(cr, 50, 50);
+  cairo_move_to(cr, 50, 24);
+  cairo_line_to(cr, 24, 50);
+  cairo_stroke(cr);
+
+  cairo_destroy(cr);
 
   champlain_tile_set_actor (tile, actor);
   clutter_actor_show (actor);
