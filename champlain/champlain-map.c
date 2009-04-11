@@ -36,7 +36,9 @@ map_new (void)
 }
 
 void
-map_load_level(Map *map, ChamplainMapSource *map_source, gint zoom_level)
+map_load_level(Map *map,
+    ChamplainMapSource *map_source,
+    gint zoom_level)
 {
   if (map->previous_level)
     g_object_unref (map->previous_level);
@@ -54,7 +56,10 @@ map_load_level(Map *map, ChamplainMapSource *map_source, gint zoom_level)
 }
 
 void
-map_load_visible_tiles (Map *map, ChamplainView *view, ChamplainMapSource *source, ChamplainRectangle viewport)
+map_load_visible_tiles (Map *map,
+    ChamplainView *view,
+    ChamplainMapSource *source,
+    ChamplainRectangle viewport)
 {
   gint size;
 
@@ -134,7 +139,8 @@ map_load_visible_tiles (Map *map, ChamplainView *view, ChamplainMapSource *sourc
 }
 
 gboolean
-map_zoom_in (Map *map, ChamplainMapSource *source)
+map_zoom_in (Map *map,
+    ChamplainMapSource *source)
 {
   guint new_level = champlain_zoom_level_get_zoom_level (map->current_level) + 1;
   if(new_level <= champlain_map_source_get_max_zoom_level (source))
@@ -146,7 +152,8 @@ map_zoom_in (Map *map, ChamplainMapSource *source)
 }
 
 gboolean
-map_zoom_out (Map *map, ChamplainMapSource *source)
+map_zoom_out (Map *map,
+    ChamplainMapSource *source)
 {
   gint new_level = champlain_zoom_level_get_zoom_level (map->current_level) - 1;
   if(new_level >= champlain_map_source_get_min_zoom_level (source))
@@ -164,7 +171,9 @@ map_free (Map *map)
 }
 
 gboolean
-map_zoom_to (Map *map, ChamplainMapSource *source, guint zoomLevel)
+map_zoom_to (Map *map,
+    ChamplainMapSource *source,
+    guint zoomLevel)
 {
   if (zoomLevel<= champlain_map_source_get_max_zoom_level (source))
     {

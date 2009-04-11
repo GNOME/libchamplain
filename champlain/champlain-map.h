@@ -37,16 +37,25 @@ struct _Map
 
 Map *map_new (void);
 
-void map_load_visible_tiles (Map *map, ChamplainView * view, ChamplainMapSource *source, ChamplainRectangle viewport);
+void map_load_visible_tiles (Map *map,
+    ChamplainView * view,
+    ChamplainMapSource *source,
+    ChamplainRectangle viewport);
 
 void map_free (Map *map);
 
-gboolean map_zoom_in (Map *map, ChamplainMapSource *map_source);
+gboolean map_zoom_in (Map *map,
+    ChamplainMapSource *map_source);
 
-gboolean map_zoom_out (Map *map, ChamplainMapSource *map_source);
+gboolean map_zoom_out (Map *map,
+    ChamplainMapSource *map_source);
 
-gboolean map_zoom_to (Map *map, ChamplainMapSource *map_source, guint zoomLevel);
+gboolean map_zoom_to (Map *map,
+    ChamplainMapSource *map_source,
+    guint zoomLevel);
 
-void map_load_level(Map *map, ChamplainMapSource *map_source, gint zoom_level);
+void map_load_level(Map *map,
+    ChamplainMapSource *map_source,
+    gint zoom_level);
 
 #endif

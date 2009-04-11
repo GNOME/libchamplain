@@ -57,9 +57,9 @@ struct _ChamplainZoomLevelPrivate {
 
 static void
 champlain_zoom_level_get_property (GObject *object,
-                                   guint property_id,
-                                   GValue *value,
-                                   GParamSpec *pspec)
+    guint property_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainZoomLevel *self = CHAMPLAIN_ZOOM_LEVEL (object);
   switch (property_id)
@@ -83,9 +83,9 @@ champlain_zoom_level_get_property (GObject *object,
 
 static void
 champlain_zoom_level_set_property (GObject *object,
-                                   guint property_id,
-                                   const GValue *value,
-                                   GParamSpec *pspec)
+    guint property_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainZoomLevel *self = CHAMPLAIN_ZOOM_LEVEL (object);
   switch (property_id)
@@ -156,40 +156,40 @@ champlain_zoom_level_class_init (ChamplainZoomLevelClass *klass)
   g_object_class_install_property (object_class,
       PROP_WIDTH,
       g_param_spec_uint ("width",
-        "Width",
-        "The width of this zoom level",
-        0,
-        G_MAXINT,
-        0,
-        G_PARAM_READWRITE));
+          "Width",
+          "The width of this zoom level",
+          0,
+          G_MAXINT,
+          0,
+          G_PARAM_READWRITE));
 
   g_object_class_install_property (object_class,
       PROP_HEIGHT,
       g_param_spec_uint ("height",
-        "height",
-        "The height of this zoom level",
-        0,
-        G_MAXINT,
-        0,
-        G_PARAM_READWRITE));
+          "height",
+          "The height of this zoom level",
+          0,
+          G_MAXINT,
+          0,
+          G_PARAM_READWRITE));
 
   g_object_class_install_property (object_class,
       PROP_ZOOM_LEVEL,
       g_param_spec_int ("zoom-level",
-        "zoom-level",
-        "The level of this zoom level",
-        G_MININT,
-        G_MAXINT,
-        0,
-        G_PARAM_READWRITE));
+          "zoom-level",
+          "The level of this zoom level",
+          G_MININT,
+          G_MAXINT,
+          0,
+          G_PARAM_READWRITE));
 
   g_object_class_install_property (object_class,
       PROP_ACTOR,
       g_param_spec_object ("actor",
-        "Actor",
-        "The actor containing all the tiles",
-        CLUTTER_TYPE_ACTOR,
-        G_PARAM_READABLE));
+          "Actor",
+          "The actor containing all the tiles",
+          CLUTTER_TYPE_ACTOR,
+          G_PARAM_READABLE));
 }
 
 static void
@@ -210,7 +210,7 @@ champlain_zoom_level_new (void)
 
 void
 champlain_zoom_level_add_tile (ChamplainZoomLevel *self,
-                               ChamplainTile *tile)
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
@@ -223,7 +223,7 @@ champlain_zoom_level_add_tile (ChamplainZoomLevel *self,
 
 void
 champlain_zoom_level_remove_tile (ChamplainZoomLevel *self,
-                                  ChamplainTile *tile)
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
@@ -246,7 +246,7 @@ champlain_zoom_level_tile_count (ChamplainZoomLevel *self)
 
 ChamplainTile *
 champlain_zoom_level_get_nth_tile (ChamplainZoomLevel *self,
-                                   guint index)
+    guint index)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), NULL);
 
@@ -288,7 +288,7 @@ champlain_zoom_level_get_zoom_level (ChamplainZoomLevel *self)
 
 void
 champlain_zoom_level_set_width (ChamplainZoomLevel *self,
-                                guint width)
+    guint width)
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
@@ -300,7 +300,7 @@ champlain_zoom_level_set_width (ChamplainZoomLevel *self,
 
 void
 champlain_zoom_level_set_height (ChamplainZoomLevel *self,
-                                 guint height)
+    guint height)
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
@@ -313,7 +313,7 @@ champlain_zoom_level_set_height (ChamplainZoomLevel *self,
 
 void
 champlain_zoom_level_set_zoom_level (ChamplainZoomLevel *self,
-                                     gint zoom_level)
+    gint zoom_level)
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
