@@ -52,14 +52,15 @@ struct _ChamplainLayerPrivate {
   gpointer spacer;
 };
 
-static void layer_add_cb (ClutterGroup *layer, ClutterActor *marker,
+static void layer_add_cb (ClutterGroup *layer,
+    ClutterActor *marker,
     gpointer data);
 
 static void
 champlain_layer_get_property (GObject *object,
-                             guint property_id,
-                             GValue *value,
-                             GParamSpec *pspec)
+    guint property_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   //ChamplainLayer *self = CHAMPLAIN_LAYER (object);
   switch (property_id)
@@ -71,9 +72,9 @@ champlain_layer_get_property (GObject *object,
 
 static void
 champlain_layer_set_property (GObject *object,
-                             guint property_id,
-                             const GValue *value,
-                             GParamSpec *pspec)
+    guint property_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   //ChamplainLayer *self = CHAMPLAIN_LAYER (object);
   switch (property_id)
@@ -122,9 +123,10 @@ champlain_layer_init (ChamplainLayer *self)
  * where the most north you are, the farther you are.
  */
 static void
-layer_add_cb (ClutterGroup *layer, ClutterActor *marker, gpointer data)
+layer_add_cb (ClutterGroup *layer,
+    ClutterActor *marker,
+    gpointer data)
 {
-
   GList* markers = clutter_container_get_children (CLUTTER_CONTAINER(layer));
   gint size, i;
   gdouble y, tmp_y, low_y;
@@ -152,9 +154,9 @@ layer_add_cb (ClutterGroup *layer, ClutterActor *marker, gpointer data)
     }
 
   if (lowest)
-    clutter_container_lower_child(CLUTTER_CONTAINER(layer), CLUTTER_ACTOR(marker), CLUTTER_ACTOR(lowest));
+    clutter_container_lower_child(CLUTTER_CONTAINER(layer),
+        CLUTTER_ACTOR(marker), CLUTTER_ACTOR(lowest));
 }
-
 
 /**
  * champlain_layer_new:
