@@ -74,6 +74,7 @@ enum
   PROP_FONT_NAME,
   PROP_WRAP,
   PROP_WRAP_MODE,
+  PROP_SINGLE_LINE_MODE,
   PROP_DRAW_BACKGROUND
 };
 
@@ -150,6 +151,9 @@ champlain_marker_get_property (GObject *object,
         case PROP_ELLIPSIZE:
           g_value_set_enum (value, priv->ellipsize);
           break;
+        case PROP_SINGLE_LINE_MODE:
+          g_value_set_enum (value, priv->single_line_mode);
+          break;
         default:
           G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       }
@@ -198,6 +202,9 @@ champlain_marker_set_property (GObject *object,
         break;
       case PROP_DRAW_BACKGROUND:
         champlain_marker_set_draw_background (marker, g_value_get_boolean (value));
+        break;
+      case PROP_SINGLE_LINE_MODE:
+        champlain_marker_set_single_line_mode (marker, g_value_get_boolean (value));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
