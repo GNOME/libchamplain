@@ -40,6 +40,7 @@
 
   <chapter>
     <title>I. View API Reference</title>
+    <xi:include href="xml/champlain.xml"/>
     <xi:include href="xml/champlain-view.xml"/>
     <xi:include href="xml/champlain-layer.xml"/>
     <xi:include href="xml/champlain-base-marker.xml"/>
