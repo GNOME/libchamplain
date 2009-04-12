@@ -22,6 +22,8 @@
 #include <champlain-gtk/champlain-gtk.h>
 #include <clutter-gtk/gtk-clutter-embed.h>
 
+#include <markers.h>
+
 #define OSM_MAP "Open Street Map"
 #define OAM_MAP "Open Arial Map"
 #define MFF_MAP "Maps for free - Relief"
@@ -35,32 +37,6 @@ static void
 on_destroy (GtkWidget *widget, gpointer data)
 {
   gtk_main_quit ();
-}
-
-static ChamplainLayer *
-create_marker_layer ()
-{
-  ClutterActor *marker;
-  ChamplainLayer * layer;
-
-  layer = champlain_layer_new ();
-
-  ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
-  ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
-  marker = champlain_marker_new_with_text ("Montréal", "Airmole 14", NULL, NULL);
-  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 45.528178, -73.563788);
-  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
-
-  marker = champlain_marker_new_with_text ("New York", "Sans 25", &white, NULL);
-  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 40.77, -73.98);
-  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
-
-  marker = champlain_marker_new_with_text ("Saint-Tite-des-Caps", "Serif 12", NULL, &orange);
-  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 47.130885, -70.764141);
-  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
-
-  clutter_actor_hide (CLUTTER_ACTOR (layer));
-  return layer;
 }
 
 static void
@@ -100,7 +76,7 @@ map_source_changed (GtkWidget *widget,
     }
 }
 
-static void 
+static void
 zoom_changed (GtkSpinButton *spinbutton,
               ChamplainView *view)
 {
@@ -108,7 +84,7 @@ zoom_changed (GtkSpinButton *spinbutton,
   g_object_set(G_OBJECT(view), "zoom-level", zoom, NULL);
 }
 
-static void 
+static void
 map_zoom_changed (ChamplainView *view,
                   GParamSpec *gobject,
                   GtkSpinButton *spinbutton)
@@ -183,11 +159,12 @@ main (int argc,
   vbox = gtk_vbox_new(FALSE, 10);
 
   view = champlain_view_new ();
-  widget = champlain_view_embed_new(CHAMPLAIN_VIEW (view));
-  g_object_set(G_OBJECT(view), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
+  widget = champlain_view_embed_new (CHAMPLAIN_VIEW (view));
+  g_object_set (G_OBJECT (view), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
       "zoom-level", 5, NULL);
-  layer = create_marker_layer();
+  layer = create_marker_layer (view);
   champlain_view_add_layer(CHAMPLAIN_VIEW (view), layer);
+  clutter_actor_hide (layer);
 
   gtk_widget_set_size_request(widget, 640, 480);
 
