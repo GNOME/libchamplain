@@ -8,20 +8,16 @@ PROTOTYPES: DISABLE
 
 ClutterActor*
 champlain_marker_new (class)
-	C_ARGS:
-
-
-void
-champlain_marker_set_position (ChamplainMarker *marker, gdouble longitude, gdouble latitude)
+	C_ARGS: /* No args */
 
 
 ClutterActor*
-champlain_marker_new_with_label (class, const gchar *label, const gchar *font, ClutterColor_ornull *text_color, ClutterColor_ornull *marker_color)
-	C_ARGS: label, font, text_color, marker_color
+champlain_marker_new_with_text (class, const gchar *text, const gchar_ornull *font, ClutterColor_ornull *text_color, ClutterColor_ornull *marker_color)
+	C_ARGS: text, font, text_color, marker_color
 
 
 ClutterActor*
-champlain_marker_new_with_image (class, gchar *filename)
+champlain_marker_new_with_image (class, const gchar *filename)
 	PREINIT:
 		GError *error = NULL;
 	CODE:
@@ -34,13 +30,106 @@ champlain_marker_new_with_image (class, gchar *filename)
 
 
 ClutterActor*
-champlain_marker_new_with_image_full (class, const gchar *filename, gint width, gint height, gint anchor_x, gint anchor_y)
+champlain_marker_new_full (class, const gchar *text, const gchar *filename)
 	PREINIT:
 		GError *error = NULL;
 	CODE:
-		RETVAL = champlain_marker_new_with_image_full(filename, width, height, anchor_x, anchor_y, &error);
+		RETVAL = champlain_marker_new_full(text, filename, &error);
 		if (error) {
 			gperl_croak_gerror(NULL, error);
 		}
 	OUTPUT:
 		RETVAL
+
+
+void
+champlain_marker_set_text (ChamplainMarker *marker, const gchar *text)
+
+
+void
+champlain_marker_set_image (ChamplainMarker *marker, ClutterActor *image)
+
+
+void
+champlain_marker_set_use_markup (ChamplainMarker *marker, gboolean use_markup)
+
+
+void
+champlain_marker_set_alignment (ChamplainMarker *marker, PangoAlignment alignment)
+
+
+void
+champlain_marker_set_color (ChamplainMarker *marker, const ClutterColor *color)
+
+
+void
+champlain_marker_set_text_color (ChamplainMarker *marker, const ClutterColor *color)
+
+
+void
+champlain_marker_set_font_name (ChamplainMarker *marker, const gchar *font_name)
+
+
+void
+champlain_marker_set_wrap (ChamplainMarker *marker, gboolean wrap)
+
+
+void
+champlain_marker_set_wrap_mode (ChamplainMarker *marker, PangoWrapMode wrap_mode)
+
+
+void
+champlain_marker_set_attributes (ChamplainMarker *marker, PangoAttrList *list)
+
+
+void
+champlain_marker_set_single_line_mode (ChamplainMarker *marker, gboolean mode)
+
+
+void
+champlain_marker_set_ellipsize (ChamplainMarker *marker, PangoEllipsizeMode mode)
+
+
+gboolean
+champlain_marker_get_use_markup (ChamplainMarker *marker)
+
+
+const gchar*
+champlain_marker_get_text (ChamplainMarker *marker)
+
+
+ClutterActor*
+champlain_marker_get_image (ChamplainMarker *marker)
+
+
+PangoAlignment
+champlain_marker_get_alignment (ChamplainMarker *marker)
+
+
+ClutterColor*
+champlain_marker_get_color (ChamplainMarker *marker)
+
+
+ClutterColor*
+champlain_marker_get_text_color (ChamplainMarker *marker)
+
+
+const gchar*
+champlain_marker_get_font_name (ChamplainMarker *marker)
+
+
+gboolean
+champlain_marker_get_wrap (ChamplainMarker *marker)
+
+
+PangoWrapMode
+champlain_marker_get_wrap_mode (ChamplainMarker *marker)
+
+
+PangoEllipsizeMode
+champlain_marker_get_ellipsize (ChamplainMarker *marker)
+
+
+gboolean
+champlain_marker_get_single_line_mode (ChamplainMarker *marker)
+
