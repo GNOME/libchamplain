@@ -326,7 +326,7 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
   /**
   * ChamplainMarker:wrap:
   *
-  * If the marker's text wrap
+  * If the marker's text wrap is set
   *
   * Since: 0.4
   */
@@ -337,7 +337,7 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
   /**
   * ChamplainMarker:wrap-mode:
   *
-  * If the marker's text wrap mode
+  * The marker's text wrap mode
   *
   * Since: 0.4
   */
@@ -348,7 +348,7 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
   /**
   * ChamplainMarker:ellipsize:
   *
-  * If the marker's ellipsize mode
+  * The marker's ellipsize mode
   *
   * Since: 0.4
   */
@@ -359,12 +359,23 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
   /**
   * ChamplainMarker:draw-background:
   *
-  * If the marker's has a background
+  * If the marker has a background
   *
   * Since: 0.4
   */
   g_object_class_install_property (object_class, PROP_DRAW_BACKGROUND,
-      g_param_spec_boolean ("draw-background", "Draw Background", "The marker's has a background",
+      g_param_spec_boolean ("draw-background", "Draw Background", "The marker has a background",
+          TRUE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainMarker:single-line-mode:
+  *
+  * If the marker is in single line mode
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class, PROP_SINGLE_LINE_MODE,
+      g_param_spec_boolean ("single-line-mode", "Single Line Mode", "The marker's single line mode",
           TRUE, CHAMPLAIN_PARAM_READWRITE));
 
 }
