@@ -30,6 +30,7 @@ CHAMPLAIN_MAP_SOURCE_GET_CLASS
 
 <SECTION>
 <FILE>champlain-marker</FILE>
+<TITLE>ChamplainMarker</TITLE>
 ChamplainMarkerPrivate
 champlain_marker_new
 champlain_marker_new_with_text
@@ -232,6 +233,7 @@ ChamplainBaseMarkerPrivate
 
 <SECTION>
 <FILE>champlain-version</FILE>
+<TITLE>ChamplainVersion</TITLE>
 CHAMPLAIN_MAJOR_VERSION
 CHAMPLAIN_MINOR_VERSION
 CHAMPLAIN_MICRO_VERSION
