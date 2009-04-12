@@ -196,7 +196,6 @@ set_etag (void *tile,
     char** values,
     char** headers)
 {
-  g_print ("%s: %s\n", headers[0], values[0]);
   champlain_tile_set_etag (CHAMPLAIN_TILE (tile), values[0]);
   return 0; // 0 meaning success
 }
