@@ -37,12 +37,15 @@ create_marker_layer (ChamplainView *view)
 {
   ClutterActor *marker;
   ChamplainLayer *layer;
+  ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
 
   layer = champlain_layer_new ();
 
   marker = champlain_marker_new_with_text ("Montréal\n<span size=\"xx-small\">Québec</span>",
       "Serif 14", NULL, NULL);
   champlain_marker_set_use_markup (CHAMPLAIN_MARKER (marker), TRUE);
+  champlain_marker_set_alignment (CHAMPLAIN_MARKER (marker), PANGO_ALIGN_RIGHT);
+  champlain_marker_set_color (CHAMPLAIN_MARKER (marker), &orange);
 
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker),
       45.528178, -73.563788);
@@ -51,19 +54,19 @@ create_marker_layer (ChamplainView *view)
   g_signal_connect_after (marker, "button-release-event",
       G_CALLBACK (marker_button_release_cb), view);
 
-  marker = champlain_marker_new_full ("New York", "/usr/share/icons/gnome/32x32/emblems/emblem-generic.png", NULL);
+  marker = champlain_marker_new_full ("New York", "/usr/share/icons/gnome/24x24/emblems/emblem-generic.png", NULL);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 40.77, -73.98);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  marker = champlain_marker_new_with_image ("/usr/share/icons/Tango/32x32/emblems/emblem-important.png", NULL);
+  marker = champlain_marker_new_with_image ("/usr/share/icons/Tango/24x24/emblems/emblem-important.png", NULL);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 47.130885,
       -70.764141);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  marker = champlain_marker_new_with_image ("/usr/share/icons/Tango/32x32/emblems/emblem-urgent.png", NULL);
+  marker = champlain_marker_new_with_image ("/usr/share/icons/Tango/24x24/emblems/emblem-favorite.png", NULL);
   champlain_marker_set_draw_background (CHAMPLAIN_MARKER (marker), FALSE);
-  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 47,
-      -80);
+  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 45.41484,
+      -71.918907);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
   clutter_actor_show (CLUTTER_ACTOR (layer));
