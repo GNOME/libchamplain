@@ -387,14 +387,16 @@ draw_background (ChamplainMarker *marker, int width, int height, int point)
   cairo_arc (cr, RADIUS, RADIUS, RADIUS - 1, M_PI, 3 * M_PI / 2.0);
   cairo_close_path (cr);
 
-  cairo_set_line_width (cr, 1.0);
+  clutter_color_darken (priv->color, &darker_color);
+
   cairo_set_source_rgba (cr,
       priv->color->red / 255.0,
       priv->color->green / 255.0,
       priv->color->blue / 255.0,
       priv->color->alpha / 255.0);
   cairo_fill_preserve (cr);
-  clutter_color_darken (priv->color, &darker_color);
+
+  cairo_set_line_width (cr, 1.0);
   cairo_set_source_rgba (cr,
       darker_color.red / 255.0,
       darker_color.green / 255.0,
@@ -402,6 +404,9 @@ draw_background (ChamplainMarker *marker, int width, int height, int point)
       darker_color.alpha / 255.0);
   cairo_stroke (cr);
   cairo_destroy (cr);
+
+  if (priv->alignment == PANGO_ALIGN_RIGHT)
+    clutter_actor_set_rotation (bg, CLUTTER_Y_AXIS, 180, clutter_actor_get_width (bg) / 2.0, 0, 0);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (marker), bg);
 
@@ -493,11 +498,16 @@ draw_marker (ChamplainMarker *marker)
     clutter_actor_raise (priv->image, priv->background);
 
   if (priv->draw_background == TRUE)
-    clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, total_height + point);
+  {
+    if (priv->alignment == PANGO_ALIGN_RIGHT)
+      clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), total_width, total_height + point);
+    else
+      clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, total_height + point);
+  }
   else if (priv->image != NULL)
     clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker),
-        clutter_actor_get_width (priv->image) / 2.0,
-        clutter_actor_get_height (priv->image) / 2.0);
+        clutter_actor_get_width (priv->image) / 2.0 + PADDING,
+        clutter_actor_get_height (priv->image) / 2.0 + PADDING);
   else if (priv->text_actor != NULL)
     clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker),
         0,
