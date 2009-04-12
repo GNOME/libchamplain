@@ -1,8 +1,7 @@
 <SECTION>
 <FILE>champlain-map-source</FILE>
-ChamplainMapSourcePrivate
-ChamplainMapProjection
 <TITLE>ChamplainMapSource</TITLE>
+ChamplainMapProjection
 ChamplainMapSource
 champlain_map_source_get_min_zoom_level
 champlain_map_source_get_max_zoom_level
@@ -31,7 +30,7 @@ CHAMPLAIN_MAP_SOURCE_GET_CLASS
 <SECTION>
 <FILE>champlain-marker</FILE>
 <TITLE>ChamplainMarker</TITLE>
-ChamplainMarkerPrivate
+ChamplainMarker
 champlain_marker_new
 champlain_marker_new_with_text
 champlain_marker_new_with_image
@@ -71,7 +70,6 @@ CHAMPLAIN_MARKER_GET_CLASS
 
 <SECTION>
 <FILE>champlain-base-marker</FILE>
-ChamplainBaseMarkerPrivate
 <TITLE>ChamplainBaseMarker</TITLE>
 ChamplainBaseMarker
 champlain_base_marker_new
@@ -88,7 +86,6 @@ CHAMPLAIN_BASE_MARKER_GET_CLASS
 
 <SECTION>
 <FILE>champlain-zoom-level</FILE>
-ChamplainZoomLevelPrivate
 <TITLE>ChamplainZoomLevel</TITLE>
 ChamplainZoomLevel
 champlain_zoom_level_new
@@ -115,9 +112,8 @@ CHAMPLAIN_ZOOM_LEVEL_GET_CLASS
 
 <SECTION>
 <FILE>champlain-view</FILE>
-ChamplainViewPrivate
-ChamplainScrollMode
 <TITLE>ChamplainView</TITLE>
+ChamplainScrollMode
 ChamplainView
 champlain_view_new
 champlain_view_center_on
@@ -152,7 +148,6 @@ CHAMPLAIN_VIEW_GET_CLASS
 
 <SECTION>
 <FILE>champlain-network-map-source</FILE>
-ChamplainNetworkMapSourcePrivate
 <TITLE>ChamplainNetworkMapSource</TITLE>
 ChamplainNetworkMapSource
 champlain_network_map_source_new_full
@@ -223,12 +218,13 @@ CHAMPLAIN_LAYER_GET_CLASS
 
 <SECTION>
 <FILE>champlain-private</FILE>
+<TITLE>ChamplainPrivate</TITLE>
 Map
-ChamplainBaseMarkerPrivate
 </SECTION>
 
 <SECTION>
 <FILE>champlain-marshal</FILE>
+<TITLE>ChamplainMarshal</TITLE>
 </SECTION>
 
 <SECTION>
@@ -245,6 +241,7 @@ CHAMPLAIN_CHECK_VERSION
 
 <SECTION>
 <FILE>champlain-map</FILE>
+<TITLE>ChamplainMap</TITLE>
 Map
 map_new
 map_load_visible_tiles
@@ -257,6 +254,7 @@ map_load_level
 
 <SECTION>
 <FILE>champlain-debug</FILE>
+<TITLE>ChamplainDebug</TITLE>
 ChamplainDebugFlags
 champlain_debug_flag_is_set
 champlain_debug
@@ -267,6 +265,7 @@ DEBUGGING
 
 <SECTION>
 <FILE>champlain-enum-types</FILE>
+<TITLE>ChamplainEnumTypes</TITLE>
 CHAMPLAIN_TYPE_STATE
 champlain_state_get_type
 CHAMPLAIN_TYPE_SCROLL_MODE
@@ -277,6 +276,7 @@ champlain_map_projection_get_type
 
 <SECTION>
 <FILE>champlain</FILE>
+<TITLE>Champlain</TITLE>
 CHAMPLAIN_MIN_LAT
 CHAMPLAIN_MAX_LAT
 CHAMPLAIN_MIN_LONG
