@@ -67,7 +67,7 @@ champlain_marker_set_text_color (ChamplainMarker *marker, const ClutterColor *co
 
 
 void
-champlain_marker_set_font_name (ChamplainMarker *marker, const gchar *font_name)
+champlain_marker_set_font_name (ChamplainMarker *marker, const gchar_ornull *font_name)
 
 
 void
