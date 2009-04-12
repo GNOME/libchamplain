@@ -8,6 +8,7 @@ maps
 maps-gtk
 champlain-perl.h
 xs/Champlain.xs
+xs/ChamplainBaseMarker.xs
 xs/ChamplainLayer.xs
 xs/ChamplainMapSource.xs
 xs/ChamplainMarker.xs
@@ -17,6 +18,7 @@ xs/ChamplainView.xs
 xs/ChamplainZoomLevel.xs
 xs/Gtk2ChamplainViewEmbed.xs
 t/Champlain.t
+t/ChamplainBaseMarker.t
 t/ChamplainLayer.t
 t/ChamplainMapSource.t
 t/ChamplainMarker.t
