@@ -235,6 +235,7 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
   object_class->get_property = champlain_marker_get_property;
   object_class->set_property = champlain_marker_set_property;
 
+  markerClass->draw_marker = draw_marker;
   /**
   * ChamplainMarker:text:
   *
@@ -510,7 +511,7 @@ property_notify (GObject *gobject,
   if (pspec->owner_type == CLUTTER_TYPE_ACTOR)
     return;
 
-  draw_marker (CHAMPLAIN_MARKER (gobject));
+  CHAMPLAIN_MARKER_GET_CLASS (gobject)->draw_marker (CHAMPLAIN_MARKER (gobject));
 }
 
 static void

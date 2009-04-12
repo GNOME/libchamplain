@@ -50,6 +50,8 @@ typedef struct
 {
   ChamplainBaseMarkerClass parent_class;
 
+  void (* draw_marker) (ChamplainMarker *marker);
+
 } ChamplainMarkerClass;
 
 GType champlain_marker_get_type (void);
