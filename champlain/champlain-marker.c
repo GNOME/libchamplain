@@ -442,6 +442,7 @@ draw_marker (ChamplainMarker *marker)
 
       label = CLUTTER_LABEL (priv->text_actor);
       clutter_label_set_use_markup (label, priv->use_markup);
+      clutter_label_set_font_name (label, priv->font_name);
       clutter_label_set_text (label, priv->text);
       clutter_label_set_alignment (label, priv->alignment);
       clutter_label_set_line_wrap (label, priv->wrap);

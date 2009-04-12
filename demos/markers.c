@@ -41,7 +41,7 @@ create_marker_layer (ChamplainView *view)
   layer = champlain_layer_new ();
 
   marker = champlain_marker_new_with_text ("Montréal\n<span size=\"xx-small\">Québec</span>",
-      "Airmole 14", NULL, NULL);
+      "Serif 14", NULL, NULL);
   champlain_marker_set_use_markup (CHAMPLAIN_MARKER (marker), TRUE);
 
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker),
