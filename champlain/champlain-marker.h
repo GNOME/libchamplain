@@ -67,8 +67,7 @@ ClutterActor *champlain_marker_new_from_file (const gchar *filename,
     GError **error);
 
 ClutterActor *champlain_marker_new_full (const gchar *text,
-    ClutterActor *actor,
-    GError **error);
+    ClutterActor *actor);
 
 void champlain_marker_set_text (ChamplainMarker *marker,
     const gchar *text);
