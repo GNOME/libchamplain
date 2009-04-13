@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 158;
+use Clutter::TestHelper tests => 214;
 use Test::Builder;
 
 use Champlain ':coords';
@@ -19,8 +19,9 @@ exit tests();
 sub tests {
 	test_new();
 	test_new_with_text();
-	test_new_with_image();
+	test_new_from_file();
 	test_new_full();
+	test_new_with_image();
 	return 0;
 }
 
@@ -70,39 +71,43 @@ sub test_new_with_text {
 }
 
 
-sub test_new_with_image {
-	my $marker = Champlain::Marker->new_with_image($FILENAME);
+sub test_new_from_file {
+	my $marker = Champlain::Marker->new_from_file($FILENAME);
 	isa_ok($marker, 'Champlain::Marker');
 	isa_ok($marker->get_image, 'Clutter::Actor');
 	generic_test($marker);
 	
 	# Assert that using a file that doesn't exist throws an exception
 	eval {
-		$marker = Champlain::Marker->new_with_image("does-not-exist.gif");
+		$marker = Champlain::Marker->new_from_file("does-not-exist.gif");
 	};
 	isa_ok($@, "Glib::File::Error");
 }
 
 
 sub test_new_full {
-	my $marker = Champlain::Marker->new_full(
-		"hello",
-		$FILENAME,
-	);
+	my $texture = Clutter::Texture->new();	
+	my $marker = Champlain::Marker->new_full("hello", $texture);
 	isa_ok($marker, 'Champlain::Marker');
 	is($marker->get_text, 'hello', "new_full() sets 'text'");
 	isa_ok($marker->get_image, 'Clutter::Actor');
 	generic_test($marker);
-	
-	# Assert that using a file that doesn't exist throws an exception
-	$@ = undef;	
-	eval {
-		$marker = Champlain::Marker->new_full(
-			"test",			
-			"does-not-exist.gif",
-		);
-	};
-	isa_ok($@, "Glib::File::Error");
+
+
+	$marker = Champlain::Marker->new_full("null-image", undef);
+	isa_ok($marker, 'Champlain::Marker');
+	is($marker->get_text, 'null-image', "new_full(text, undef) sets 'text'");
+	is($marker->get_image, undef, "new_full(text, undef) sets no image");
+	generic_test($marker);
+}
+
+
+sub test_new_with_image {
+	my $texture = Clutter::Texture->new();	
+	my $marker = Champlain::Marker->new_with_image($texture);
+	isa_ok($marker, 'Champlain::Marker');
+	isa_ok($marker->get_image, 'Clutter::Actor');
+	generic_test($marker);
 }
 
 

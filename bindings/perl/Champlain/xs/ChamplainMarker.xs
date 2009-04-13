@@ -15,11 +15,11 @@ champlain_marker_new_with_text (class, const gchar *text, const gchar_ornull *fo
 
 
 ClutterActor*
-champlain_marker_new_with_image (class, const gchar *filename)
+champlain_marker_new_from_file (class, const gchar *filename)
 	PREINIT:
 		GError *error = NULL;
 	CODE:
-		RETVAL = champlain_marker_new_with_image(filename, &error);
+		RETVAL = champlain_marker_new_from_file(filename, &error);
 		if (error) {
 			gperl_croak_gerror(NULL, error);
 		}
@@ -28,16 +28,21 @@ champlain_marker_new_with_image (class, const gchar *filename)
 
 
 ClutterActor*
-champlain_marker_new_full (class, const gchar *text, const gchar *filename)
+champlain_marker_new_full (class, const gchar *text, ClutterActor_ornull *actor)
 	PREINIT:
 		GError *error = NULL;
 	CODE:
-		RETVAL = champlain_marker_new_full(text, filename, &error);
+		RETVAL = champlain_marker_new_full(text, actor, &error);
 		if (error) {
 			gperl_croak_gerror(NULL, error);
 		}
 	OUTPUT:
 		RETVAL
+
+
+ClutterActor*
+champlain_marker_new_with_image (class, ClutterActor* actor)
+	C_ARGS: actor
 
 
 void
