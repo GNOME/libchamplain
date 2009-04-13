@@ -65,10 +65,9 @@ sub create_marker_layer {
 	my $layer = Champlain::Layer->new();
 
 	# Download the image as an actor (Clutter::Texture)
-	my $actor = download_texture('http://hexten.net/cpan-faces/potyl.jpg');
+	my $texture = download_texture('http://hexten.net/cpan-faces/potyl.jpg');
 
-	# Transform the pixbuf into a Clutter texture	
-	my $marker = Champlain::Marker->new_with_actor($actor);
+	my $marker = Champlain::Marker->new_with_image($texture);
 	$marker->set_position(47.130885, -70.764141);
 	$layer->add($marker);
 
