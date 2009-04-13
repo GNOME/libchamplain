@@ -21,3 +21,4 @@ champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *source, co
 
 void
 champlain_network_map_source_get_tile (ChamplainMapSource *source, ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile)
+

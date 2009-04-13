@@ -8,7 +8,7 @@ PROTOTYPES: DISABLE
 
 ClutterActor*
 champlain_view_new (class)
-	C_ARGS:
+	C_ARGS: /* No args */
 
 
 void
@@ -53,3 +53,4 @@ champlain_view_go_to (ChamplainView *view, gdouble latitude, gdouble longitude)
 
 void
 champlain_view_stop_go_to (ChamplainView *view)
+

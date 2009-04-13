@@ -13,3 +13,4 @@ champlain_view_embed_new (class, ChamplainView *view)
 
 ChamplainView*
 champlain_view_embed_get_view (ChamplainViewEmbed *embed)
+

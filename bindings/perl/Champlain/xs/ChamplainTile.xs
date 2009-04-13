@@ -8,7 +8,7 @@ PROTOTYPES: DISABLE
 
 ChamplainTile*
 champlain_tile_new (class)
-	C_ARGS:
+	C_ARGS: /* No args */
 
 
 ChamplainTile*
