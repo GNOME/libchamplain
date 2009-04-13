@@ -12,7 +12,7 @@ champlain_marker_new (class)
 
 
 ClutterActor*
-champlain_marker_new_with_text (class, const gchar *text, const gchar_ornull *font, ClutterColor_ornull *text_color, ClutterColor_ornull *marker_color)
+champlain_marker_new_with_text (class, const gchar *text, const gchar_ornull *font = NULL, ClutterColor_ornull *text_color = NULL, ClutterColor_ornull *marker_color = NULL)
 	C_ARGS: text, font, text_color, marker_color
 
 
