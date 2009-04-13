@@ -61,8 +61,7 @@ ClutterActor *champlain_marker_new (void);
 ClutterActor *champlain_marker_new_with_text (const gchar *text,
     const gchar *font, ClutterColor *text_color, ClutterColor *marker_color);
 
-ClutterActor *champlain_marker_new_with_image (ClutterActor *actor,
-    GError **error);
+ClutterActor *champlain_marker_new_with_image (ClutterActor *actor);
 
 ClutterActor *champlain_marker_new_from_file (const gchar *filename,
     GError **error);

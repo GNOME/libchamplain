@@ -617,17 +617,15 @@ champlain_marker_new_with_text (const gchar *text,
 
 /**
  * champlain_marker_new_with_image:
- * @filename: The filename of the image.
- * @error: Return location for an error.
+ * @actor: The actor of the image.
  *
  * Returns a new #ChamplainMarker with a drawn marker containing the given
  * image.
  *
- * Since: 0.2
+ * Since: 0.4
  */
 ClutterActor *
-champlain_marker_new_with_image (ClutterActor *actor,
-    GError **error)
+champlain_marker_new_with_image (ClutterActor *actor)
 {
   ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
   if (actor != NULL)
@@ -646,7 +644,7 @@ champlain_marker_new_with_image (ClutterActor *actor,
  * Returns a new #ChamplainMarker with a drawn marker containing the given
  * image.
  *
- * Since: 0.2
+ * Since: 0.4
  */
 ClutterActor *
 champlain_marker_new_from_file (const gchar *filename,
