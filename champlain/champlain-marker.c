@@ -595,9 +595,9 @@ champlain_marker_new (void)
  */
 ClutterActor *
 champlain_marker_new_with_text (const gchar *text,
-                                 const gchar *font,
-                                 ClutterColor *text_color,
-                                 ClutterColor *marker_color)
+    const gchar *font,
+    ClutterColor *text_color,
+    ClutterColor *marker_color)
 {
   ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
 
@@ -626,7 +626,31 @@ champlain_marker_new_with_text (const gchar *text,
  * Since: 0.2
  */
 ClutterActor *
-champlain_marker_new_with_image (const gchar *filename, GError **error)
+champlain_marker_new_with_image (ClutterActor *actor,
+    GError **error)
+{
+  ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
+  if (actor != NULL)
+    {
+      champlain_marker_set_image (marker, actor);
+    }
+
+  return CLUTTER_ACTOR (marker);
+}
+
+/**
+ * champlain_marker_new_from_file:
+ * @filename: The filename of the image.
+ * @error: Return location for an error.
+ *
+ * Returns a new #ChamplainMarker with a drawn marker containing the given
+ * image.
+ *
+ * Since: 0.2
+ */
+ClutterActor *
+champlain_marker_new_from_file (const gchar *filename,
+    GError **error)
 {
   if (filename == NULL)
     return NULL;
@@ -643,12 +667,9 @@ champlain_marker_new_with_image (const gchar *filename, GError **error)
 }
 
 /**
- * champlain_marker_new_with_image_full:
- * @filename: The name of an image file to load.
- * @width: Width of the image in pixel or -1.
- * @height: Height of the image in pixel or -1.
- * @anchor_x: X coordinate of the anchor point.
- * @anchor_y: Y coordinate of the anchor point.
+ * champlain_marker_new_full:
+ * @text: The text
+ * @actor: The image
  * @error: Return location for an error.
  *
  * Returns a new #ChamplainMarker with a drawn marker containing the given
@@ -658,15 +679,10 @@ champlain_marker_new_with_image (const gchar *filename, GError **error)
  */
 ClutterActor *
 champlain_marker_new_full (const gchar *text,
-    const gchar *filename,
+    ClutterActor *actor,
     GError **error)
 {
-  if (filename == NULL)
-    return NULL;
-
   ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
-  ClutterActor *actor = clutter_texture_new_from_file (filename, error);
-
   if (actor != NULL)
     {
       champlain_marker_set_image (marker, actor);

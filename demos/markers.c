@@ -54,16 +54,17 @@ create_marker_layer (ChamplainView *view)
   g_signal_connect_after (marker, "button-release-event",
       G_CALLBACK (marker_button_release_cb), view);
 
-  marker = champlain_marker_new_full ("New York", "/usr/share/icons/gnome/24x24/emblems/emblem-generic.png", NULL);
+  marker = champlain_marker_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-generic.png", NULL);
+  champlain_marker_set_text (CHAMPLAIN_MARKER (marker), "New York");
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 40.77, -73.98);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  marker = champlain_marker_new_with_image ("/usr/share/icons/Tango/24x24/emblems/emblem-important.png", NULL);
+  marker = champlain_marker_new_from_file ("/usr/share/icons/Tango/24x24/emblems/emblem-important.png", NULL);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 47.130885,
       -70.764141);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  marker = champlain_marker_new_with_image ("/usr/share/icons/Tango/24x24/emblems/emblem-favorite.png", NULL);
+  marker = champlain_marker_new_from_file ("/usr/share/icons/Tango/24x24/emblems/emblem-favorite.png", NULL);
   champlain_marker_set_draw_background (CHAMPLAIN_MARKER (marker), FALSE);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 45.41484,
       -71.918907);
