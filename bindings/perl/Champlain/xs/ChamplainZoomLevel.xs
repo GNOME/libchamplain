@@ -3,8 +3,6 @@
 
 MODULE = Champlain::ZoomLevel  PACKAGE = Champlain::ZoomLevel  PREFIX = champlain_zoom_level_
 
-PROTOTYPES: DISABLE
-
 
 ChamplainZoomLevel*
 champlain_zoom_level_new (class)

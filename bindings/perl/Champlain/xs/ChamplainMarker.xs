@@ -3,8 +3,6 @@
 
 MODULE = Champlain::Marker  PACKAGE = Champlain::Marker  PREFIX = champlain_marker_
 
-PROTOTYPES: DISABLE
-
 
 ClutterActor*
 champlain_marker_new (class)

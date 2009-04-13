@@ -3,8 +3,6 @@
 
 MODULE = Champlain::View  PACKAGE = Champlain::View  PREFIX = champlain_view_
 
-PROTOTYPES: DISABLE
-
 
 ClutterActor*
 champlain_view_new (class)

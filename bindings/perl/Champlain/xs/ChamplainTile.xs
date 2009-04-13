@@ -3,8 +3,6 @@
 
 MODULE = Champlain::Tile  PACKAGE = Champlain::Tile  PREFIX = champlain_tile_
 
-PROTOTYPES: DISABLE
-
 
 ChamplainTile*
 champlain_tile_new (class)

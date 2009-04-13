@@ -3,8 +3,6 @@
 
 MODULE = Champlain::MapSource  PACKAGE = Champlain::MapSource  PREFIX = champlain_map_source_
 
-PROTOTYPES: DISABLE
-
 
 ChamplainMapSource*
 champlain_map_source_new_osm_mapnik (class)

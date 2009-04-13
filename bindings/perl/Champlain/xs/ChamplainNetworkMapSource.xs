@@ -3,8 +3,6 @@
 
 MODULE = Champlain::NetworkMapSource  PACKAGE = Champlain::NetworkMapSource  PREFIX = champlain_network_map_source_
 
-PROTOTYPES: DISABLE
-
 
 ChamplainNetworkMapSource*
 champlain_network_map_source_new_full (class, gchar *name, gchar *license, gchar *license_uri, guint min_zoom, guint map_zoom, guint tile_size, ChamplainMapProjection projection, gchar *uri_format)
