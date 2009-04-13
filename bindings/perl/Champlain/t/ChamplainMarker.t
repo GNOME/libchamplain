@@ -37,9 +37,7 @@ sub test_new_with_text {
 	my $marker;
 
 	# Create a label without mandatory arguments
-	$marker = Champlain::Marker->new_with_text(
-		"Home", undef, undef, undef
-	);
+	$marker = Champlain::Marker->new_with_text("Home");
 	isa_ok($marker, 'Champlain::Marker');
 	is($marker->get_text, 'Home', "new_with_text() sets 'text'");
 	ok($marker->get_font_name, "new_with_text(font = undef) sets 'font_name'");

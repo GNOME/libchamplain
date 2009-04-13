@@ -134,23 +134,17 @@ sub create_marker_layer {
 	
 	my $marker;
 	
-	$marker = Champlain::Marker->new_with_text(
-		"Montr\x{e9}al", "Airmole 14", undef, undef
-	);
+	$marker = Champlain::Marker->new_with_text("Montr\x{e9}al", "Airmole 14");
 	$marker->set_position(45.528178, -73.563788);
 	$marker->set_reactive(TRUE);
 	$marker->signal_connect_after("button-release-event", \&marker_button_release_cb, $map);
 	$layer->add($marker);
 
-	$marker = Champlain::Marker->new_with_text(
-		"New York", "Sans 15", $white, undef
-	);
+	$marker = Champlain::Marker->new_with_text("New York", "Sans 15", $white);
 	$marker->set_position(40.77, -73.98);
 	$layer->add($marker);
 
-	$marker = Champlain::Marker->new_with_text(
-		"Bratislava", "Sans 15", $orange, undef
-	);
+	$marker = Champlain::Marker->new_with_text("Bratislava", "Sans 15", $orange);
 	$marker->set_position(47.130885, -70.764141);
 	$layer->add($marker);
 
