@@ -160,7 +160,7 @@ sub capital_callback {
 		$layer->remove($last);
 		
 		# And then recreate it with another color
-		my $marker = Champlain::Marker->new_with_label($last->{name}, $font, undef, undef);
+		my $marker = Champlain::Marker->new_with_text($last->{name}, $font, undef, undef);
 		$marker->set_position($last->get('latitude', 'longitude'));
 		push @markers, $marker;
 		$layer->add($marker);
@@ -170,7 +170,7 @@ sub capital_callback {
 		
 	my $white = Clutter::Color->new(0xff, 0xff, 0xff, 0xff);
 	my $orange = Clutter::Color->new(0xf3, 0x94, 0x07, 0xbb);
-	my $marker = Champlain::Marker->new_with_label($name, $font, $white, $orange);
+	my $marker = Champlain::Marker->new_with_text($name, $font, $white, $orange);
 	$marker->{name} = $name;
 	$marker->set_position($latitude, $longitude);
 	push @markers, $marker;

@@ -24,7 +24,7 @@ my $MARKER_SIZE = 10;
 # Another way it so create a base class of Marker and to keep this timeline and
 # the behaviours associated with the marker. This approach is implemented here.
 #
-use Glib::Object::Subclass 'Champlain::Marker' =>
+use Glib::Object::Subclass 'Champlain::BaseMarker' =>
 	properties => [
 		
 		# The timeline controlling the animation

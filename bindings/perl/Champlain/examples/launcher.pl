@@ -105,19 +105,23 @@ sub create_marker_layer {
 	
 	my $marker;
 	
-	$marker = Champlain::Marker->new_with_label("Montr\x{e9}al", "Airmole 14", undef, undef);
+	$marker = Champlain::Marker->new_with_text(
+		"Montr\x{e9}al", "Airmole 14", undef, undef
+	);
 	$marker->set_position(45.528178, -73.563788);
 	$marker->set_reactive(TRUE);
 	$marker->signal_connect_after("button-release-event", \&marker_button_release_cb, $map);
 	$layer->add($marker);
 
-	$marker = Champlain::Marker->new_with_label("New York", "Sans 15", $white, undef);
+	$marker = Champlain::Marker->new_with_text(
+		"New York", "Sans 15", $white, undef
+	);
 	$marker->set_position(40.77, -73.98);
 	$layer->add($marker);
 
 	my $file = File::Spec->catfile($FindBin::Bin, 'images', 'who.png');
 	eval {
-		$marker = Champlain::Marker->new_with_image_full($file, 40, 40, 20, 20);
+		$marker = Champlain::Marker->new_with_image($file);
 		$marker->set_position(47.130885, -70.764141);
 		$layer->add($marker);
 	};
@@ -132,18 +136,16 @@ sub create_marker_layer {
 
 sub marker_button_release_cb {
 	my ($marker, $event, $map) = @_;
+	return FALSE unless $event->button == 1 && $event->click_count == 1;
 
-	return FALSE if $event->button != 1 || $event->click_count > 1;
-	
 	print "Montreal was clicked\n";
-
 	return TRUE;
 }
 
 
 sub map_view_button_release_cb {
 	my ($actor, $event, $map) = @_;
-	return FALSE if $event->button != 2 || $event->click_count > 1;
+	return FALSE unless $event->button == 2 && $event->click_count == 1;
 
 	my ($lat, $lon) = $map->get_coords_from_event($event);
 	printf "Map was clicked at %f, %f\n", $lat, $lon;
