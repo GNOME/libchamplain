@@ -36,7 +36,7 @@ create_marker ()
   cairo_t *cr;
 
   /* Create the marker */
-  marker = champlain_marker_new ();
+  marker = champlain_base_marker_new ();
 
   /* Static filled circle ----------------------------------------------- */
   bg = clutter_cairo_new (MARKER_SIZE, MARKER_SIZE);
