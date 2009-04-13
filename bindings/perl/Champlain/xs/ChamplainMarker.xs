@@ -29,15 +29,7 @@ champlain_marker_new_from_file (class, const gchar *filename)
 
 ClutterActor*
 champlain_marker_new_full (class, const gchar *text, ClutterActor_ornull *actor)
-	PREINIT:
-		GError *error = NULL;
-	CODE:
-		RETVAL = champlain_marker_new_full(text, actor, &error);
-		if (error) {
-			gperl_croak_gerror(NULL, error);
-		}
-	OUTPUT:
-		RETVAL
+	C_ARGS: text, actor
 
 
 ClutterActor*
