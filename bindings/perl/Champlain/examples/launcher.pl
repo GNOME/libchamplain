@@ -117,7 +117,7 @@ sub create_marker_layer {
 
 	my $file = File::Spec->catfile($FindBin::Bin, 'images', 'who.png');
 	eval {
-		$marker = Champlain::Marker->new_with_image($file);
+		$marker = Champlain::Marker->new_from_file($file);
 		$marker->set_position(47.130885, -70.764141);
 		$layer->add($marker);
 	};
