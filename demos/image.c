@@ -34,9 +34,11 @@ typedef struct {
  * message as completed successfully.
  * If there's an error building the GdkPixbuf the function will return NULL and
  * set error accordingly.
+ *
+ * The GdkPixbuf has to be freed with g_object_unref.
  */
 static GdkPixbuf*
-messge_to_pixbuf (SoupMessage *message, GError **error)
+pixbuf_new_from_message (SoupMessage *message, GError **error)
 {
   const gchar *mime_type = NULL;
   GdkPixbufLoader *loader = NULL;
@@ -72,6 +74,7 @@ messge_to_pixbuf (SoupMessage *message, GError **error)
 
   pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
   if (pixbuf == NULL) goto cleanup;
+  g_object_ref (G_OBJECT (pixbuf));
   
   /* Cleanup part, the function will always exit here even in case of error */
   cleanup:
@@ -86,9 +89,11 @@ messge_to_pixbuf (SoupMessage *message, GError **error)
  * Transforms a GdkPixbuf into a ClutterTexture.
  * If there's an error building the ClutterActor (the texture) the function
  * will return NULL and set error accordingly.
+ *
+ * The ClutterActor has to be freed with clutter_actor_destroy.
  */
 static ClutterActor*
-pixbuf_to_texture (GdkPixbuf *pixbuf, GError **error)
+texture_new_from_pixbuf (GdkPixbuf *pixbuf, GError **error)
 {
   ClutterActor *texture = NULL;
   const guchar *data;
@@ -157,14 +162,14 @@ image_downloaded_cb (SoupSession *session,
     goto cleanup;
   }
 
-  pixbuf = messge_to_pixbuf (message, &error);
+  pixbuf = pixbuf_new_from_message (message, &error);
   if (error != NULL) {
     g_print ("Failed to convert %s into an image: %s\n", url, error->message);
     goto cleanup;
   }
 
   /* Then transform the pixbuf into a texture */
-  texture = pixbuf_to_texture (pixbuf, &error);
+  texture = texture_new_from_pixbuf (pixbuf, &error);
   if (error != NULL) {
     g_print ("Failed to convert %s into a texture %s: %s\n", url,
       error->message);
@@ -184,6 +189,7 @@ image_downloaded_cb (SoupSession *session,
     {
       g_free (marker_data);
       g_free (url);
+      if (pixbuf != NULL) g_object_unref (G_OBJECT (pixbuf));
       if (texture != NULL) clutter_actor_destroy (CLUTTER_ACTOR (texture));
     }
 }
@@ -247,7 +253,7 @@ main (int argc, char *argv[])
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (actor), "zoom-level", 10,
       "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC, NULL);
-  champlain_view_center_on (CHAMPLAIN_VIEW(actor), 48.21, 16.7);
+  champlain_view_center_on (CHAMPLAIN_VIEW(actor), 48.22, 16.8);
 
   clutter_actor_show_all (stage);
   clutter_main ();
