@@ -22,7 +22,61 @@
 
 
 /**
- * Transforms a pixbuf into a Clutter texture.
+ * Returns a GdkPixbuf from a given SoupMessage. This function assumes that the
+ * message as completed successfully.
+ * If there's an error building the GdkPixbuf the function will return NULL and
+ * set error accordingly.
+ */
+static GdkPixbuf*
+messge_to_pixbuf (SoupMessage *message, GError **error)
+{
+	const gchar *mime_type = NULL;
+	GdkPixbufLoader *loader = NULL;
+	GdkPixbuf *pixbuf = NULL;
+
+	error = NULL;
+
+	/*  Use a pixbuf loader that can load images of the same mime-type as the
+	    message.
+	*/
+	mime_type = soup_message_headers_get (message->response_headers, "Content-Type");
+	loader = gdk_pixbuf_loader_new_with_mime_type (mime_type, error);
+	if (error) {
+		if (loader) {gdk_pixbuf_loader_close (loader, NULL);}
+		goto cleanup;
+	}
+
+	gdk_pixbuf_loader_write (
+		loader, 
+		message->response_body->data,
+		message->response_body->length, 
+		error);
+	if (error) {
+		gdk_pixbuf_loader_close (loader, NULL);
+		goto cleanup;
+	}
+
+	gdk_pixbuf_loader_close (loader, error);
+	if (error) {
+		goto cleanup;
+	}
+
+	pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+	if (pixbuf == NULL) {
+		goto cleanup;
+	}
+
+	/* Cleanup part, the function will always exit here even in case of error */
+	cleanup:
+		if (loader) {g_object_unref (G_OBJECT (loader));}
+	return pixbuf;
+}
+
+
+/**
+ * Transforms a GdkPixbuf into a ClutterTexture.
+ * If there's an error building the ClutterActor (the texture) the function will
+ * return NULL and set error accordingly.
  */
 static ClutterActor*
 pixbuf_to_texture (GdkPixbuf *pixbuf, GError **error)
@@ -32,6 +86,8 @@ pixbuf_to_texture (GdkPixbuf *pixbuf, GError **error)
 	gboolean has_alpha, success;
 	int width, height, rowstride;
 	ClutterTextureFlags flags = 0;
+
+	error = NULL;
 
 	data = gdk_pixbuf_get_pixels (pixbuf);
 	width = gdk_pixbuf_get_width (pixbuf);
@@ -50,12 +106,10 @@ pixbuf_to_texture (GdkPixbuf *pixbuf, GError **error)
 		flags,
 		error);
 	if (! success) {
-		g_print ("Failed to create the texture\n");
 		clutter_actor_destroy (CLUTTER_ACTOR (texture));
-		return NULL;
+		texture = NULL;
 	}
 
-	g_print ("Created the texture\n");
 	return texture;
 }
 
@@ -76,75 +130,35 @@ image_downloaded_cb (SoupSession *session,
   ChamplainLayer *layer = NULL;
 	SoupURI *uri = NULL;
 	char *url = NULL;
-	const gchar *mime_type = NULL;
-	GdkPixbufLoader *loader = NULL;
 	GError *error = NULL;
 	GdkPixbuf *pixbuf = NULL;
 	ClutterActor *texture = NULL;
 	ClutterActor *marker = NULL;
 
-	g_print("Downloaded the image\n");
 	if (data == NULL) {
-		g_print ("Missing the data pointer\n");
 		goto cleanup;
 	}
 	
 	/* Deal only with finished messages */
-	g_print ("message->status_code = %d\n", message->status_code);
-	if (! SOUP_STATUS_IS_SUCCESSFUL(message->status_code)) {
-		g_print ("SOUP message isn't finished\n");
-		goto cleanup;
-	}
-	
 	uri = soup_message_get_uri (message);
 	url = soup_uri_to_string (uri, FALSE);
-
-	/*  Deal only with successful messages */
-	if (! SOUP_STATUS_IS_SUCCESSFUL (message->status_code)) {
-		g_print ("Skipping download of %s since server returned error code %d\n", url, message->status_code);
+	if (! SOUP_STATUS_IS_SUCCESSFUL(message->status_code)) {
+		g_print ("Download of %s failed with error code %d\n", url, message->status_code);
 		goto cleanup;
 	}
 
-	/*  Make sure that we downloaded an image */
-	mime_type = soup_message_headers_get (message->response_headers, "Content-Type");
-
-
-	/*  First transform the image into a pixbuf */
-	loader = gdk_pixbuf_loader_new_with_mime_type (mime_type, &error);
+	pixbuf = messge_to_pixbuf (message, &error);
 	if (error) {
-		g_print ("Can't build a PixbufLoader that will parse a %s image %s\n", mime_type, error->message);
-		if (loader) {gdk_pixbuf_loader_close (loader, NULL);}
+		g_print ("Failed to convert %s into an image: %s\n", url, error->message);
 		goto cleanup;
 	}
-	gdk_pixbuf_loader_write (
-		loader, 
-		message->response_body->data,
-		message->response_body->length, 
-		&error);
-	if (error) {
-		g_print ("Can't parse the image %s: %s\n", url, error->message);
-		gdk_pixbuf_loader_close (loader, NULL);
-		goto cleanup;
-	}
-
-	gdk_pixbuf_loader_close (loader, &error);
-	if (error) {
-		g_print ("Can't close the parser for image %s: %s\n", url, error->message);
-		goto cleanup;
-	}
-	pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
-	if (pixbuf == NULL) {
-		goto cleanup;
-	}
-	g_print ("Got a pixbuf\n");
 
 	/* Then transform the pixbuf into a texture */
 	texture = pixbuf_to_texture (pixbuf, &error);
 	if (error) {
-		g_print ("Can't convert the pixbuf into a texture for image %s: %s\n", url, error->message);
+		g_print ("Failed to convert %s into a texture %s: %s\n", url, error->message);
 		goto cleanup;
 	}
-	g_print ("Got a texture\n");
 
 	/* Finally create a marker with the texture */
 	layer = CHAMPLAIN_LAYER (data);
@@ -157,7 +171,6 @@ image_downloaded_cb (SoupSession *session,
 	/* Cleanup part, the function will always exit here even in case of error */
 	cleanup:
 		g_free (url);
-		if (loader) {g_object_unref (G_OBJECT (loader));}
 		if (texture) {clutter_actor_destroy (CLUTTER_ACTOR (texture));}
 		return;
 }
