@@ -507,6 +507,7 @@ draw_marker (ChamplainMarker *marker)
   else if (priv->background != NULL)
     {
       clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
+      g_object_unref (G_OBJECT (priv->background));
       priv->background = NULL;
     }
 

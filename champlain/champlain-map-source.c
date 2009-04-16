@@ -403,6 +403,7 @@ champlain_map_source_set_name (ChamplainMapSource *map_source,
 {
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
+  g_free (priv->name);
   priv->name = g_strdup (name);
 }
 
@@ -419,6 +420,7 @@ champlain_map_source_set_license (ChamplainMapSource *map_source,
 {
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
+  g_free (priv->license);
   priv->license = g_strdup (license);
 }
 

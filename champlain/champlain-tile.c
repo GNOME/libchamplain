@@ -422,6 +422,7 @@ champlain_tile_set_uri (ChamplainTile *self,
 
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
+  g_free (priv->uri);
   priv->uri = g_strdup (uri);
   g_object_notify (G_OBJECT (self), "uri");
 }
@@ -435,6 +436,7 @@ champlain_tile_set_filename (ChamplainTile *self,
 
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
+  g_free (priv->filename);
   priv->filename = g_strdup (filename);
   g_object_notify (G_OBJECT (self), "filename");
 }
