@@ -21,6 +21,14 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 
+/* The data needed for constructing a marker */
+typedef struct {
+  const ChamplainLayer *layer;
+  gdouble latitude;
+  gdouble longitude;
+} MarkerData;
+
+
 /**
  * Returns a GdkPixbuf from a given SoupMessage. This function assumes that the
  * message as completed successfully.
@@ -129,7 +137,7 @@ image_downloaded_cb (SoupSession *session,
                      SoupMessage *message,
                      gpointer data)
 {
-  ChamplainLayer *layer = NULL;
+  MarkerData *marker_data = NULL;
   SoupURI *uri = NULL;
   char *url = NULL;
   GError *error = NULL;
@@ -138,6 +146,7 @@ image_downloaded_cb (SoupSession *session,
   ClutterActor *marker = NULL;
 
   if (data == NULL) goto cleanup;
+  marker_data = (MarkerData *) data;
   
   /* Deal only with finished messages */
   uri = soup_message_get_uri (message);
@@ -163,32 +172,45 @@ image_downloaded_cb (SoupSession *session,
   }
 
   /* Finally create a marker with the texture */
-  layer = CHAMPLAIN_LAYER (data);
   marker = champlain_marker_new_with_image (texture);
   texture = NULL;
-  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 45.466, -73.75);
-  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
+  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker),
+      marker_data->latitude, marker_data->longitude);
+  clutter_container_add (CLUTTER_CONTAINER (marker_data->layer), marker, NULL);
   clutter_actor_show_all (marker);
 
   /* Cleanup part, the function will always exit here even in case of error */
   cleanup:
     {
+      g_free (marker_data);
       g_free (url);
       if (texture != NULL) clutter_actor_destroy (CLUTTER_ACTOR (texture));
     }
 }
 
 
+/**
+ * Creates a marker at the given position with an image that's downloaded from
+ * the given URL.
+ *
+ */
 static void
 create_marker_from_url (ChamplainLayer *layer,
                         SoupSession *session,
+                        gdouble latitude,
+                        gdouble longitude,
                         const gchar *url)
 {
   SoupMessage *message;
+  MarkerData *data;
+  
+  data = g_new0(MarkerData, 1);
+  data->layer = layer;
+  data->latitude = latitude;
+  data->longitude = longitude;
   
   message = soup_message_new ("GET", url);
-  soup_session_queue_message (session, message, image_downloaded_cb, layer);
-  g_print ("Downloading %s\n",  url);
+  soup_session_queue_message (session, message, image_downloaded_cb, data);
 }
 
 
@@ -198,7 +220,7 @@ main (int argc, char *argv[])
   ClutterActor* actor, *stage;
   ChamplainLayer *layer;
   SoupSession *session;
-
+  
   g_thread_init (NULL);
   clutter_init (&argc, &argv);
 
@@ -214,12 +236,18 @@ main (int argc, char *argv[])
   layer = champlain_layer_new ();
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
   session = soup_session_async_new ();
-  create_marker_from_url (layer, session, "http://hexten.net/cpan-faces/potyl.jpg");
+  create_marker_from_url (layer, session, 48.218611, 17.146397,
+      "http://hexten.net/cpan-faces/potyl.jpg");
+  create_marker_from_url (layer, session, 48.21066, 16.31476,
+      "http://hexten.net/cpan-faces/jkutej.jpg");
+  create_marker_from_url (layer, session, 48.14838, 17.10791,
+      "http://bratislava.pm.org/images/whoiswho/jnthn.jpg");
+      
 
   /* Finish initialising the map view */
-  g_object_set (G_OBJECT (actor), "zoom-level", 12,
+  g_object_set (G_OBJECT (actor), "zoom-level", 10,
       "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC, NULL);
-  champlain_view_center_on (CHAMPLAIN_VIEW(actor), 45.466, -73.75);
+  champlain_view_center_on (CHAMPLAIN_VIEW(actor), 48.21, 16.7);
 
   clutter_actor_show_all (stage);
   clutter_main ();
