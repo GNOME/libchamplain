@@ -2,12 +2,12 @@
 
 =head1 NAME
 
-capitals.pl - Show the capitals
+capitals.pl - Show the world capitals
 
 =head1 DESCRIPTION
 
-This program takes you into a magical trip and displays the capital cities one
-by one.
+This program takes you into a magical trip and displays the world capital cities
+one by one. The list of capitals are fetched on the fly from Wikipedia.
 
 =cut
 
@@ -118,7 +118,8 @@ sub capitals_main_callback {
 
 #
 # Called when the page of a capital is downloaded. The page is expected to have
-# the coordinates of the capital.
+# the coordinates of the capital. If the capital's coordinates can be found then
+# a marker will be displayed for this capital.
 #
 sub capital_callback {
 	my ($soup, $uri, $response, $data) = @_;
@@ -153,18 +154,13 @@ sub capital_callback {
 		$layer->remove($marker);
 	}
 	
-	# Reset the color of the previous marker
 	if (@markers) {
-		# We first remove the marker
-		my $last = pop @markers;
-		$layer->remove($last);
-		
-		# And then recreate it with another color
-		my $marker = Champlain::Marker->new_with_text($last->{name}, $font, undef, undef);
-		$marker->set_position($last->get('latitude', 'longitude'));
-		push @markers, $marker;
-		$layer->add($marker);
-		$marker->raise_top();
+		# Reset the color of the previous marker
+		my $marker = $markers[-1];
+		my $white = Clutter::Color->new(0xff, 0xff, 0xff, 0xff);
+		my $black = Clutter::Color->new(0x00, 0x00, 0x00, 0xff);
+		$marker->set_text_color($white);
+		$marker->set_color($black);
 	}
 	$data->{markers} = \@markers;
 		
@@ -177,6 +173,9 @@ sub capital_callback {
 	$layer->add($marker);
 	$marker->raise_top();
 
+	# Remember that the map view has a signal handler for
+	# 'animation-completed::go-to', this means that once the view is placed on the
+	# location of the new capital that the next capital will be downloaded.
 	$data->{map}->go_to($latitude, $longitude);
 	return;
 }
@@ -207,7 +206,7 @@ sub download_capital {
 
 
 #
-# A very cheap implementation of an asynchornous HTTP client that integrates
+# A very cheap implementation of an asynchronous HTTP client that integrates
 # with Glib's main loop. This client implements a rudimentary version of
 # 'Keep-Alive'.
 #
