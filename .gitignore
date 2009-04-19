@@ -11,6 +11,7 @@ champlain-gtk.pc
 *.o
 *.lo
 *.la
+*.stamp
 bindings/perl/Champlain/Makefile.old
 bindings/perl/Champlain/Champlain.bs
 bindings/perl/Champlain/blib/
@@ -29,14 +30,11 @@ champlain-gtk/champlain-gtk-marshal.c
 champlain-gtk/champlain-gtk-marshal.h
 champlain/champlain-marshal.c
 champlain/champlain-marshal.h
-champlain-gtk/champlain-gtk-marshal.c
-champlain-gtk/champlain-gtk-marshal.h
 champlain/champlain-enum-types.c
 champlain/champlain-enum-types.h
 champlain/launcher
-champlain/champlain-enum-types.c
-champlain/champlain-enum-types.h
 champlain/stamp-enum-types
+champlain/champlain-version.h
 compile
 config.guess
 config.h
