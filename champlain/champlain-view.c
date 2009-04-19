@@ -190,6 +190,10 @@ static void view_position_tile (ChamplainView* view, ChamplainTile* tile);
 static void view_tiles_reposition (ChamplainView* view);
 static void view_update_state (ChamplainView *view);
 static void view_update_anchor (ChamplainView *view, gint x, gint y);
+static gboolean view_set_zoom_level_at (ChamplainView *view,
+    gint zoom_level,
+    gint x,
+    gint y);
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -239,67 +243,14 @@ scroll_event (ClutterActor *actor,
 {
   ChamplainViewPrivate *priv = view->priv;
 
-  ClutterActor *group, *new_group;
-  gdouble lon, lat;
-  gint x_diff, y_diff;
-  gint actor_x, actor_y;
-  gint rel_x, rel_y;
-  gint x2, y2;
-  gdouble lat2, lon2;
-
-  group = champlain_zoom_level_get_actor (priv->map->current_level);
-  clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
-  rel_x = event->x - actor_x;
-  rel_y = event->y - actor_y;
-
-  /* Keep the lon, lat where the mouse is */
-  lon = viewport_get_longitude_at (priv,
-    priv->viewport_size.x + rel_x + priv->anchor.x);
-  lat = viewport_get_latitude_at (priv,
-    priv->viewport_size.y + rel_y + priv->anchor.y);
-
-  /* How far was it from the center of the viewport (in px) */
-  x_diff = priv->viewport_size.width / 2 - rel_x;
-  y_diff = priv->viewport_size.height / 2 - rel_y;
+  gint zoom_level = priv->zoom_level;
 
   if (event->direction == CLUTTER_SCROLL_UP)
-    {
-      if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level + 1))
-        return FALSE;
-      if (!map_zoom_in (priv->map, priv->map_source))
-        return FALSE;
-    }
+    zoom_level = priv->zoom_level + 1;
   else if (event->direction == CLUTTER_SCROLL_DOWN)
-    {
-      if (ZOOM_LEVEL_OUT_OF_RANGE(priv, priv->zoom_level - 1))
-        return FALSE;
-      if (!map_zoom_out (priv->map, priv->map_source))
-        return FALSE;
-    }
+    zoom_level = priv->zoom_level - 1;
 
-  priv->zoom_level = champlain_zoom_level_get_zoom_level (priv->map->current_level);
-  new_group = champlain_zoom_level_get_actor (priv->map->current_level);
-
-  /* Get the new x,y in the new zoom level */
-  x2 = champlain_map_source_get_x (priv->map_source, priv->zoom_level, lon);
-  y2 = champlain_map_source_get_y (priv->map_source, priv->zoom_level, lat);
-  /* Get the new lon,lat of these new x,y minus the distance from the
-   * viewport center */
-  lon2 = champlain_map_source_get_longitude (priv->map_source,
-      priv->zoom_level, x2 + x_diff);
-  lat2 = champlain_map_source_get_latitude (priv->map_source,
-      priv->zoom_level, y2 + y_diff);
-
-  resize_viewport (view);
-  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
-      group);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
-      new_group);
-  champlain_view_center_on (view, lat2, lon2);
-
-  g_object_notify (G_OBJECT (view), "zoom-level");
-
-  return TRUE;
+  return view_set_zoom_level_at (view, zoom_level, event->x, event->y);
 }
 
 static void
@@ -958,60 +909,7 @@ finger_scroll_button_press_cb (ClutterActor *actor,
 
   if (priv->zoom_on_double_click && event->button == 1 && event->click_count == 2)
     {
-      /* If at last zoom level, don't do anything */
-      if (priv->zoom_level ==
-          champlain_map_source_get_max_zoom_level (priv->map_source) ||
-          priv->zoom_level == priv->max_zoom_level ||
-          ZOOM_LEVEL_OUT_OF_RANGE (priv, priv->zoom_level + 1))
-        return FALSE;
-
-      gint actor_x, actor_y;
-      gint rel_x, rel_y;
-
-      clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
-      rel_x = event->x - actor_x;
-      rel_y = event->y - actor_y;
-
-      ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
-      /* Keep the lon, lat where the mouse is */
-      gdouble lon = viewport_get_longitude_at (priv,
-        priv->viewport_size.x + rel_x + priv->anchor.x);
-      gdouble lat = viewport_get_latitude_at (priv,
-        priv->viewport_size.y + rel_y + priv->anchor.y);
-
-      /* How far was it from the center of the viewport (in px) */
-      gint x_diff = priv->viewport_size.width / 2 - rel_x;
-      gint y_diff = priv->viewport_size.height / 2 - rel_y;
-
-      if (map_zoom_in (priv->map, priv->map_source))
-        {
-          gint x2, y2;
-          gdouble lat2, lon2;
-
-          priv->zoom_level++;
-          ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
-
-          /* Get the new x,y in the new zoom level */
-          x2 = champlain_map_source_get_x (priv->map_source, priv->zoom_level, lon);
-          y2 = champlain_map_source_get_y (priv->map_source, priv->zoom_level, lat);
-          /* Get the new lon,lat of these new x,y minus the distance from the
-           * viewport center */
-          lon2 = champlain_map_source_get_longitude (priv->map_source,
-              priv->zoom_level, x2 + x_diff);
-          lat2 = champlain_map_source_get_latitude (priv->map_source,
-              priv->zoom_level, y2 + y_diff);
-
-          resize_viewport (view);
-          clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
-              group);
-          clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
-              new_group);
-          champlain_view_center_on (view, lat2, lon2);
-
-          g_object_notify (G_OBJECT (view), "zoom-level");
-        }
-      champlain_view_center_on (view, lat, lon);
-      return TRUE;
+      return view_set_zoom_level_at (view, priv->zoom_level + 1, event->x, event->y);
     }
   return FALSE; /* Propagate the event */
 }
@@ -1198,10 +1096,13 @@ champlain_view_go_to (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   gint duration;
+  GoToContext *ctx;
 
   ChamplainViewPrivate *priv = view->priv;
-  GoToContext *ctx = g_new0 (GoToContext, 1);
 
+  champlain_view_stop_go_to (view);
+
+  ctx = g_new0 (GoToContext, 1);
   ctx->from_latitude = priv->latitude;
   ctx->from_longitude = priv->longitude;
   ctx->to_latitude = latitude;
@@ -1278,7 +1179,8 @@ champlain_view_zoom_out (ChamplainView *view)
  * Since: 0.4
  */
 void
-champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
+champlain_view_set_zoom_level (ChamplainView *view,
+    gint zoom_level)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
@@ -1289,6 +1191,8 @@ champlain_view_set_zoom_level (ChamplainView *view, gint zoom_level)
 
   if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE(priv, zoom_level))
     return;
+
+  champlain_view_stop_go_to (view);
 
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
   if (!map_zoom_to (priv->map, priv->map_source, zoom_level))
@@ -1872,4 +1776,68 @@ champlain_view_ensure_markers_visible (ChamplainView *view,
       marker = markers[i++];
     }
   champlain_view_ensure_visible (view, min_lat, min_lon, max_lat, max_lon, animate);
+}
+
+/* Sets the zoom level, leaving the (x, y) at the exact same point in the view */
+static gboolean
+view_set_zoom_level_at (ChamplainView *view,
+    gint zoom_level,
+    gint x,
+    gint y)
+{
+  ChamplainViewPrivate *priv = view->priv;
+
+  ClutterActor *group, *new_group;
+  gdouble lon, lat;
+  gint x_diff, y_diff;
+  gint actor_x, actor_y;
+  gint rel_x, rel_y;
+  gint x2, y2;
+  gdouble lat2, lon2;
+
+  if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE(priv, zoom_level))
+    return FALSE;
+
+  champlain_view_stop_go_to (view);
+
+  group = champlain_zoom_level_get_actor (priv->map->current_level);
+  clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
+  rel_x = x - actor_x;
+  rel_y = y - actor_y;
+
+  /* Keep the lon, lat where the mouse is */
+  lon = viewport_get_longitude_at (priv,
+    priv->viewport_size.x + rel_x + priv->anchor.x);
+  lat = viewport_get_latitude_at (priv,
+    priv->viewport_size.y + rel_y + priv->anchor.y);
+
+  /* How far was it from the center of the viewport (in px) */
+  x_diff = priv->viewport_size.width / 2 - rel_x;
+  y_diff = priv->viewport_size.height / 2 - rel_y;
+
+  if (!map_zoom_to (priv->map, priv->map_source, zoom_level))
+    return FALSE;
+
+  priv->zoom_level = champlain_zoom_level_get_zoom_level (priv->map->current_level);
+  new_group = champlain_zoom_level_get_actor (priv->map->current_level);
+
+  /* Get the new x,y in the new zoom level */
+  x2 = champlain_map_source_get_x (priv->map_source, priv->zoom_level, lon);
+  y2 = champlain_map_source_get_y (priv->map_source, priv->zoom_level, lat);
+  /* Get the new lon,lat of these new x,y minus the distance from the
+   * viewport center */
+  lon2 = champlain_map_source_get_longitude (priv->map_source,
+      priv->zoom_level, x2 + x_diff);
+  lat2 = champlain_map_source_get_latitude (priv->map_source,
+      priv->zoom_level, y2 + y_diff);
+
+  resize_viewport (view);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer),
+      group);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
+      new_group);
+  champlain_view_center_on (view, lat2, lon2);
+
+  g_object_notify (G_OBJECT (view), "zoom-level");
+  return TRUE;
 }
