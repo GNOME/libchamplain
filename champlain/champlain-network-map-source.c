@@ -588,6 +588,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
                                   ctx);
       g_free (uri);
     }
+  g_free (filename);
   /* If a tile is neither in cache or can be fetched, do nothing, it'll show up
    * as empty
    */
