@@ -171,6 +171,7 @@ static void champlain_view_get_property (GObject *object, guint prop_id,
 static void champlain_view_set_property (GObject *object, guint prop_id,
     const GValue *value, GParamSpec *pspec);
 static void champlain_view_finalize (GObject *object);
+static void champlain_view_dispose (GObject *object);
 static void champlain_view_class_init (ChamplainViewClass *champlainViewClass);
 static void champlain_view_init (ChamplainView *view);
 static void viewport_x_changed_cb (GObject *gobject, GParamSpec *arg1,
@@ -516,6 +517,24 @@ champlain_view_set_property (GObject *object,
 }
 
 static void
+champlain_view_dispose (GObject *object)
+{
+  ChamplainView *view = CHAMPLAIN_VIEW (object);
+  ChamplainViewPrivate *priv = view->priv;
+
+  g_object_unref (priv->map_source);
+  g_object_unref (priv->license_actor);
+  g_object_unref (priv->finger_scroll);
+  g_object_unref (priv->viewport);
+  g_object_unref (priv->map_layer);
+  g_object_unref (priv->user_layers);
+  g_object_unref (priv->stage);
+
+  if (priv->goto_context)
+    g_free (priv->goto_context);
+}
+
+static void
 champlain_view_finalize (GObject *object)
 {
   /*
@@ -533,6 +552,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
   GObjectClass *object_class = G_OBJECT_CLASS (champlainViewClass);
   object_class->finalize = champlain_view_finalize;
+  object_class->dispose = champlain_view_dispose;
   object_class->get_property = champlain_view_get_property;
   object_class->set_property = champlain_view_set_property;
 
@@ -740,7 +760,7 @@ champlain_view_init (ChamplainView *view)
 
   view->priv = priv;
 
-  priv->map_source = champlain_map_source_new_osm_mapnik ();
+  priv->map_source = g_object_ref (champlain_map_source_new_osm_mapnik ());
   priv->zoom_level = 0;
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
@@ -748,7 +768,7 @@ champlain_view_init (ChamplainView *view)
   priv->zoom_on_double_click = TRUE;
   priv->show_license = TRUE;
   priv->license_actor = NULL;
-  priv->stage = clutter_group_new ();
+  priv->stage = g_object_ref (clutter_group_new ());
   priv->scroll_mode = CHAMPLAIN_SCROLL_MODE_PUSH;
   priv->viewport_size.x = 0;
   priv->viewport_size.y = 0;
@@ -763,14 +783,14 @@ champlain_view_init (ChamplainView *view)
   priv->goto_context = NULL;
 
   /* Setup viewport */
-  priv->viewport = tidy_viewport_new ();
+  priv->viewport = g_object_ref (tidy_viewport_new ());
   g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
 
   g_signal_connect (priv->viewport, "notify::x-origin",
       G_CALLBACK (viewport_x_changed_cb), view);
 
   /* Setup finger scroll */
-  priv->finger_scroll = tidy_finger_scroll_new (priv->scroll_mode);
+  priv->finger_scroll = g_object_ref (tidy_finger_scroll_new (priv->scroll_mode));
 
   g_signal_connect (priv->finger_scroll, "scroll-event",
       G_CALLBACK (scroll_event), view);
@@ -782,7 +802,7 @@ champlain_view_init (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (view), priv->stage);
 
   /* Map Layer */
-  priv->map_layer = clutter_group_new ();
+  priv->map_layer = g_object_ref (clutter_group_new ());
   clutter_actor_show (priv->map_layer);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->map_layer);
@@ -791,7 +811,7 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (finger_scroll_button_press_cb), view);
 
   /* Setup user_layers */
-  priv->user_layers = clutter_group_new ();
+  priv->user_layers = g_object_ref (clutter_group_new ());
   clutter_actor_show (priv->user_layers);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->user_layers);
@@ -883,13 +903,16 @@ update_license (ChamplainView *view)
   ChamplainViewPrivate *priv = view->priv;
 
   if (priv->license_actor)
+  {
+    g_object_unref (priv->license_actor);
     clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage),
         priv->license_actor);
+  }
 
   if (priv->show_license)
     {
-      priv->license_actor = clutter_label_new_with_text ( "sans 8",
-          champlain_map_source_get_license (priv->map_source));
+      priv->license_actor = g_object_ref (clutter_label_new_with_text ( "sans 8",
+          champlain_map_source_get_license (priv->map_source)));
       clutter_actor_set_opacity (priv->license_actor, 128);
       clutter_actor_show (priv->license_actor);
 
