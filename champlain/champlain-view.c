@@ -134,7 +134,7 @@ struct _ChamplainViewPrivate
   Map *map; /* Contains the current map model */
 
   ClutterActor *finger_scroll; /* Contains the viewport */
-  ClutterActor *viewport;  /* Contains the map_layer, licence and markers */
+  ClutterActor *viewport;  /* Contains the map_layer, license and markers */
   ClutterActor *map_layer; /* Contains tiles actors (grouped by zoom level) */
   ChamplainRectangle viewport_size;
 
@@ -145,7 +145,7 @@ struct _ChamplainViewPrivate
   gboolean zoom_on_double_click;
 
   gboolean show_license;
-  ClutterActor *license_actor; /* Contains the licence info */
+  ClutterActor *license_actor; /* Contains the license info */
 
   ChamplainState state; /* View's global state */
 
@@ -521,9 +521,9 @@ champlain_view_dispose (GObject *object)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
-
   g_object_unref (priv->map_source);
-  g_object_unref (priv->license_actor);
+  if (priv->license_actor)
+    g_object_unref (priv->license_actor);
   g_object_unref (priv->finger_scroll);
   g_object_unref (priv->viewport);
   g_object_unref (priv->map_layer);
@@ -909,6 +909,7 @@ update_license (ChamplainView *view)
     g_object_unref (priv->license_actor);
     clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage),
         priv->license_actor);
+    priv->license_actor = NULL;
   }
 
   if (priv->show_license)
