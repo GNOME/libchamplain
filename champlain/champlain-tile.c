@@ -249,16 +249,17 @@ champlain_tile_class_init (ChamplainTileClass *klass)
 static void
 champlain_tile_init (ChamplainTile *self)
 {
-  champlain_tile_set_state (self, CHAMPLAIN_STATE_INIT);
-  champlain_tile_set_x (self, 0);
-  champlain_tile_set_y (self, 0);
-  champlain_tile_set_zoom_level (self, 0);
-  champlain_tile_set_size (self, 0);
-  champlain_tile_set_uri (self, g_strdup (""));
-  champlain_tile_set_filename (self, g_strdup (""));
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  priv->state = CHAMPLAIN_STATE_INIT;
+  priv->x = 0;
+  priv->y = 0;
+  priv->zoom_level = 0;
+  priv->size = 0;
+  priv->uri = g_strdup ("");
+  priv->filename = g_strdup ("");
 
   /* Can't call champlain_tile_set_actor (self, NULL); because the assertion will fail */
-  ChamplainTilePrivate *priv = GET_PRIVATE (self);
   priv->actor = NULL;
 }
 
