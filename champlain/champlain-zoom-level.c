@@ -121,6 +121,7 @@ champlain_zoom_level_dispose (GObject *object)
       ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
       champlain_zoom_level_remove_tile (level, tile);
     }
+  g_ptr_array_free (priv->tiles, TRUE);
 
   G_OBJECT_CLASS (champlain_zoom_level_parent_class)->dispose (object);
 }
