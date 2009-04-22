@@ -530,6 +530,8 @@ champlain_view_dispose (GObject *object)
   g_object_unref (priv->user_layers);
   g_object_unref (priv->stage);
 
+  map_free (priv->map);
+
   if (priv->goto_context)
     g_free (priv->goto_context);
 }
@@ -911,7 +913,7 @@ update_license (ChamplainView *view)
 
   if (priv->show_license)
     {
-      priv->license_actor = g_object_ref (clutter_label_new_with_text ( "sans 8",
+      priv->license_actor = g_object_ref (clutter_label_new_with_text ("sans 8",
           champlain_map_source_get_license (priv->map_source)));
       clutter_actor_set_opacity (priv->license_actor, 128);
       clutter_actor_show (priv->license_actor);
