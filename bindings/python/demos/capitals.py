@@ -103,13 +103,13 @@ class Capitals:
 			#Change the colour of the last marker's text
 			last = self.markers.pop()
 			self.layer.remove(last)
-			marker = champlain.marker_new_with_label(last.name, font, black, orange)
+			marker = champlain.marker_new_with_text(last.name, font, black, orange)
 			marker.set_position(last.get_property("latitude"), last.get_property("longitude"))
 			self.markers.append(marker)
 			self.layer.add(marker)
 			marker.raise_top()
 
-		marker = champlain.marker_new_with_label(name, font, white, orange)
+		marker = champlain.marker_new_with_text(name, font, white, orange)
 		marker.set_position(latitude, longitude)
 		marker.name = name
 		self.markers.append(marker)

@@ -12,6 +12,7 @@ python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	champlain-map-source.h			\
 	champlain-network-map-source.h		\
 	champlain-marker.h			\
+	champlain-base-marker.h			\
 	champlain-tile.h			\
 	champlain-zoom-level.h			\
  > ../bindings/python/champlain/pychamplain.defs

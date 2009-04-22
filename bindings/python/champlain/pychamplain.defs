@@ -1,5 +1,12 @@
 ;; -*- scheme -*-
 ; object definitions ...
+(define-object BaseMarker
+  (in-module "Champlain")
+  (parent "ClutterGroup")
+  (c-name "ChamplainBaseMarker")
+  (gtype-id "CHAMPLAIN_TYPE_BASE_MARKER")
+)
+
 (define-object Layer
   (in-module "Champlain")
   (parent "ClutterGroup")
@@ -16,7 +23,7 @@
 
 (define-object Marker
   (in-module "Champlain")
-  (parent "ClutterGroup")
+  (parent "ChamplainBaseMarker")
   (c-name "ChamplainMarker")
   (gtype-id "CHAMPLAIN_TYPE_MARKER")
 )
@@ -183,7 +190,7 @@
   (c-name "champlain_view_ensure_markers_visible")
   (return-type "none")
   (parameters
-    '("ChamplainMarker*[]" "markers")
+    '("ChamplainBaseMarker*[]" "markers")
     '("gboolean" "animate")
   )
 )
@@ -523,21 +530,11 @@
   (return-type "ClutterActor*")
 )
 
-(define-method set_position
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_position")
-  (return-type "none")
-  (parameters
-    '("gdouble" "longitude")
-    '("gdouble" "latitude")
-  )
-)
-
-(define-function marker_new_with_label
-  (c-name "champlain_marker_new_with_label")
+(define-function marker_new_with_text
+  (c-name "champlain_marker_new_with_text")
   (return-type "ClutterActor*")
   (parameters
-    '("const-gchar*" "label")
+    '("const-gchar*" "text")
     '("const-gchar*" "font")
     '("ClutterColor*" "text_color")
     '("ClutterColor*" "marker_color")
@@ -548,21 +545,239 @@
   (c-name "champlain_marker_new_with_image")
   (return-type "ClutterActor*")
   (parameters
+    '("ClutterActor*" "actor")
+  )
+)
+
+(define-function marker_new_from_file
+  (c-name "champlain_marker_new_from_file")
+  (return-type "ClutterActor*")
+  (parameters
     '("const-gchar*" "filename")
     '("GError**" "error")
   )
 )
 
-(define-function marker_new_with_image_full
-  (c-name "champlain_marker_new_with_image_full")
+(define-function marker_new_full
+  (c-name "champlain_marker_new_full")
   (return-type "ClutterActor*")
   (parameters
-    '("const-gchar*" "filename")
-    '("gint" "width")
-    '("gint" "height")
-    '("gint" "anchor_x")
-    '("gint" "anchor_y")
-    '("GError**" "error")
+    '("const-gchar*" "text")
+    '("ClutterActor*" "actor")
+  )
+)
+
+(define-method set_text
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_text")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "text")
+  )
+)
+
+(define-method set_image
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_image")
+  (return-type "none")
+  (parameters
+    '("ClutterActor*" "image")
+  )
+)
+
+(define-method set_use_markup
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_use_markup")
+  (return-type "none")
+  (parameters
+    '("gboolean" "use_markup")
+  )
+)
+
+(define-method set_alignment
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_alignment")
+  (return-type "none")
+  (parameters
+    '("PangoAlignment" "alignment")
+  )
+)
+
+(define-method set_color
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_color")
+  (return-type "none")
+  (parameters
+    '("const-ClutterColor*" "color")
+  )
+)
+
+(define-method set_text_color
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_text_color")
+  (return-type "none")
+  (parameters
+    '("const-ClutterColor*" "color")
+  )
+)
+
+(define-method set_font_name
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_font_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "font_name")
+  )
+)
+
+(define-method set_wrap
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_wrap")
+  (return-type "none")
+  (parameters
+    '("gboolean" "wrap")
+  )
+)
+
+(define-method set_wrap_mode
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_wrap_mode")
+  (return-type "none")
+  (parameters
+    '("PangoWrapMode" "wrap_mode")
+  )
+)
+
+(define-method set_attributes
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_attributes")
+  (return-type "none")
+  (parameters
+    '("PangoAttrList*" "list")
+  )
+)
+
+(define-method set_single_line_mode
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_single_line_mode")
+  (return-type "none")
+  (parameters
+    '("gboolean" "mode")
+  )
+)
+
+(define-method set_ellipsize
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_ellipsize")
+  (return-type "none")
+  (parameters
+    '("PangoEllipsizeMode" "mode")
+  )
+)
+
+(define-method set_draw_background
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_draw_background")
+  (return-type "none")
+  (parameters
+    '("gboolean" "wrap")
+  )
+)
+
+(define-method get_use_markup
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_use_markup")
+  (return-type "gboolean")
+)
+
+(define-method get_text
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_text")
+  (return-type "const-gchar*")
+)
+
+(define-method get_image
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_image")
+  (return-type "ClutterActor*")
+)
+
+(define-method get_alignment
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_alignment")
+  (return-type "PangoAlignment")
+)
+
+(define-method get_color
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_color")
+  (return-type "ClutterColor*")
+)
+
+(define-method get_text_color
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_text_color")
+  (return-type "ClutterColor*")
+)
+
+(define-method get_font_name
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_font_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_wrap
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_wrap")
+  (return-type "gboolean")
+)
+
+(define-method get_wrap_mode
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_wrap_mode")
+  (return-type "PangoWrapMode")
+)
+
+(define-method get_ellipsize
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_ellipsize")
+  (return-type "PangoEllipsizeMode")
+)
+
+(define-method get_single_line_mode
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_single_line_mode")
+  (return-type "gboolean")
+)
+
+(define-method get_draw_background
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_draw_background")
+  (return-type "gboolean")
+)
+
+
+
+;; From champlain-base-marker.h
+
+(define-function base_marker_get_type
+  (c-name "champlain_base_marker_get_type")
+  (return-type "GType")
+)
+
+(define-function base_marker_new
+  (c-name "champlain_base_marker_new")
+  (is-constructor-of "ChamplainBaseMarker")
+  (return-type "ClutterActor*")
+)
+
+(define-method set_position
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_set_position")
+  (return-type "none")
+  (parameters
+    '("gdouble" "longitude")
+    '("gdouble" "latitude")
   )
 )
 
