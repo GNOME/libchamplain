@@ -267,7 +267,7 @@ champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_ma
           g_string_append (ret, value);
         }
       else
-        g_string_append (ret, g_strdup (token));
+        g_string_append (ret, token);
 
       token = tokens[++i];
     }
