@@ -72,7 +72,7 @@ libchamplain_include_HEADERS = \
 	champlain-marker.h		\
 	champlain-version.h
 
-libchamplain_0_3_la_LIBADD = $(DEPS_LIBS) ../tidy/libtidy-1.0.la
+libchamplain_0_3_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) ../tidy/libtidy-1.0.la
 
 libchamplain_includedir = $(includedir)/libchamplain-0.3/champlain
 
@@ -82,6 +82,7 @@ libchamplain_0_3_la_LDFLAGS = -version-info $(LIBRARY_VERSION) \
 
 AM_CPPFLAGS = 				\
 	$(DEPS_CFLAGS)			\
+	$(SOUP_CFLAGS)			\
 	-DDATADIR=\""$(datadir)"\"	\
 	-I$(top_srcdir)/tidy		\
 	-I$(top_srcdir)			\

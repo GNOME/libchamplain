@@ -52,13 +52,28 @@ PKG_CHECK_MODULES(DEPS,
       clutter-0.8 >= 0.8.4,
       clutter-cairo-0.8 >= 0.8,
       cairo >= 1.4,
-      libsoup-2.4 >= 2.4.1,
       gio-2.0 >= 2.16
   ]
 )
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
 IDT_COMPILE_WARNINGS
+
+# -----------------------------------------------------------
+# Check for libsoup, use libsoup-gnome if available
+# -----------------------------------------------------------
+PKG_CHECK_MODULES(SOUP, libsoup-gnome-2.4 >= 2.27, [
+    have_soup_gnome="yes",
+    AC_DEFINE(HAVE_LIBSOUP_GNOME,1,[libsoup gnome integration])
+    ], have_soup_gnome="no")
+
+if test "x$have_soup_gnome" = "xno"; then
+  PKG_CHECK_MODULES(SOUP, libsoup-2.4 >= 2.4.1,
+     have_soup="yes", have_soup="no")
+fi
+
+AC_SUBST(SOUP_CFLAGS)
+AC_SUBST(SOUP_LIBS)
 
 # -----------------------------------------------------------
 # Enable debug
@@ -210,6 +225,7 @@ echo "          Prefix: ${prefix}"
 echo "  Compiler flags: ${CPPFLAGS}"
 echo "   Documentation: ${enable_gtk_doc}"
 echo "           Debug: ${enable_debug}"
+echo "   libsoup-gnome: ${have_soup_gnome}"
 echo "       Gtk+ View: ${enable_gtk}"
 echo ""
 echo "Bindings:"

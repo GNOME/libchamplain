@@ -37,7 +37,11 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <glib-object.h>
+#ifdef HAVE_LIBSOUP_GNOME
+#include <libsoup/soup-gnome.h>
+#else
 #include <libsoup/soup.h>
+#endif
 #include <math.h>
 #include <string.h>
 #include <clutter-cairo.h>
@@ -574,7 +578,11 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
 
       if (!soup_session)
         soup_session = soup_session_async_new_with_options ("proxy-uri",
-            soup_uri_new (priv->proxy_uri), NULL);
+            soup_uri_new (priv->proxy_uri),
+#ifdef HAVE_LIBSOUP_GNOME
+            SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
+#endif
+            NULL);
 
       uri = champlain_network_map_source_get_tile_uri (network_map_source,
                champlain_tile_get_x (tile), champlain_tile_get_y (tile),
