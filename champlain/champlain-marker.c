@@ -384,7 +384,97 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
 #define PADDING (RADIUS / 2)
 
 static void
-draw_background (ChamplainMarker *marker, int width, int height, int point)
+draw_box (cairo_t *cr,
+   gint width,
+   gint height,
+   gint point,
+   gboolean mirror)
+{
+  if (mirror)
+    {
+      cairo_move_to (cr, RADIUS, 0);
+      cairo_line_to (cr, width - RADIUS, 0);
+      cairo_arc (cr, width - RADIUS, RADIUS, RADIUS - 1, 3 * M_PI / 2.0, 0);
+      cairo_line_to (cr, width, height - RADIUS);
+      cairo_arc (cr, width - RADIUS, height - RADIUS, RADIUS - 1, 0, M_PI / 2.0);
+      cairo_line_to (cr, point, height);
+      cairo_line_to (cr, 0, height + point);
+      cairo_arc (cr, RADIUS, RADIUS, RADIUS - 1, M_PI, 3 * M_PI / 2.0);
+      cairo_close_path (cr);
+    }
+  else
+    {
+      cairo_move_to (cr, RADIUS, 0);
+      cairo_line_to (cr, width - RADIUS, 0);
+      cairo_arc (cr, width - RADIUS, RADIUS, RADIUS - 1, 3 * M_PI / 2.0, 0);
+      cairo_line_to (cr, width, height + point);
+      cairo_line_to (cr, width - point, height);
+      cairo_line_to (cr, RADIUS, height);
+      cairo_arc (cr, RADIUS, height - RADIUS, RADIUS - 1, M_PI / 2.0, M_PI);
+      cairo_line_to (cr, 0, RADIUS);
+      cairo_arc (cr, RADIUS, RADIUS, RADIUS - 1, M_PI, 3 * M_PI / 2.0);
+      cairo_close_path (cr);
+    }
+
+}
+
+static void
+draw_shadow (ChamplainMarker *marker,
+   gint width,
+   gint height,
+   gint point)
+{
+  ChamplainMarkerPrivate *priv = marker->priv;
+  ClutterActor *shadow = NULL;
+  cairo_t *cr;
+  gdouble slope;
+  gdouble scaling;
+  gint x;
+  cairo_matrix_t matrix;
+
+  slope = -0.3;
+  scaling = 0.65;
+  if (priv->alignment == PANGO_ALIGN_LEFT)
+    x = -40 * slope;
+  else
+    x = -58 * slope;
+
+  shadow = clutter_cairo_new (width * 1.5, (height + point));
+  cr = clutter_cairo_create (CLUTTER_CAIRO (shadow));
+
+  cairo_matrix_init (&matrix,
+      1, 0,
+      slope, scaling,
+      x, 0);
+  cairo_set_matrix (cr, &matrix);
+
+  draw_box (cr, width, height, point, priv->alignment == PANGO_ALIGN_LEFT);
+
+  cairo_set_source_rgba (cr, 0, 0, 0, 0.15);
+  cairo_fill (cr);
+
+  cairo_destroy (cr);
+
+  clutter_actor_set_position (shadow, 0, height / 2.0 );
+
+  clutter_container_add_actor (CLUTTER_CONTAINER (marker), shadow);
+
+  if (priv->shadow != NULL)
+    {
+      clutter_container_remove_actor (CLUTTER_CONTAINER (marker),
+          priv->shadow);
+      g_object_unref (priv->shadow);
+    }
+
+  priv->shadow = g_object_ref (shadow);
+}
+
+
+static void
+draw_background (ChamplainMarker *marker,
+    gint width,
+    gint height,
+    gint point)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
   ClutterActor *bg = NULL;
@@ -394,16 +484,7 @@ draw_background (ChamplainMarker *marker, int width, int height, int point)
   bg = clutter_cairo_new (width, height + point);
   cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
 
-  cairo_set_source_rgb (cr, 0, 0, 0);
-  cairo_move_to (cr, RADIUS, 0);
-  cairo_line_to (cr, width - RADIUS, 0);
-  cairo_arc (cr, width - RADIUS, RADIUS, RADIUS - 1, 3 * M_PI / 2.0, 0);
-  cairo_line_to (cr, width, height - RADIUS);
-  cairo_arc (cr, width - RADIUS, height - RADIUS, RADIUS - 1, 0, M_PI / 2.0);
-  cairo_line_to (cr, point, height);
-  cairo_line_to (cr, 0, height + point);
-  cairo_arc (cr, RADIUS, RADIUS, RADIUS - 1, M_PI, 3 * M_PI / 2.0);
-  cairo_close_path (cr);
+  draw_box (cr, width, height, point, priv->alignment == PANGO_ALIGN_LEFT);
 
   clutter_color_darken (priv->color, &darker_color);
 
@@ -422,9 +503,6 @@ draw_background (ChamplainMarker *marker, int width, int height, int point)
       darker_color.alpha / 255.0);
   cairo_stroke (cr);
   cairo_destroy (cr);
-
-  if (priv->alignment == PANGO_ALIGN_RIGHT)
-    clutter_actor_set_rotation (bg, CLUTTER_Y_AXIS, 180, clutter_actor_get_width (bg) / 2.0, 0, 0);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (marker), bg);
 
@@ -503,7 +581,10 @@ draw_marker (ChamplainMarker *marker)
   point = (total_height + 2 * PADDING) / 4.0;
 
   if (priv->draw_background == TRUE)
-    draw_background (marker, total_width, total_height, point);
+    {
+      draw_shadow (marker, total_width, total_height, point);
+      draw_background (marker, total_width, total_height, point);
+    }
   else if (priv->background != NULL)
     {
       clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
