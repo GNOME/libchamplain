@@ -45,4 +45,15 @@ typedef struct
   gint height;
 } ChamplainRectangle;
 
+void champlain_view_tile_ready (ChamplainView *view,
+    ChamplainZoomLevel *level,
+    ChamplainTile *tile);
+void champlain_view_tile_updated (ChamplainView *view,
+    ChamplainZoomLevel *level,
+    ChamplainTile *tile,
+    ClutterActor *actor);
+void champlain_view_tile_uptodate (ChamplainView *view,
+    ChamplainZoomLevel *level,
+    ChamplainTile *tile);
+
 #endif

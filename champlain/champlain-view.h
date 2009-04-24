@@ -129,17 +129,6 @@ gboolean champlain_view_get_coords_at (ChamplainView *view,
     gdouble *lat,
     gdouble *lon);
 
-void champlain_view_tile_ready (ChamplainView *view,
-    ChamplainZoomLevel *level,
-    ChamplainTile *tile);
-void champlain_view_tile_updated (ChamplainView *view,
-    ChamplainZoomLevel *level,
-    ChamplainTile *tile,
-    ClutterActor *actor);
-void champlain_view_tile_uptodate (ChamplainView *view,
-    ChamplainZoomLevel *level,
-    ChamplainTile *tile);
-
 G_END_DECLS
 
 #endif
