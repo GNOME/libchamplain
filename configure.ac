@@ -128,7 +128,7 @@ if test x$enable_managed = xyes; then
   AC_PATH_PROG(GACUTIL, gacutil)
   AC_SUBST(GACUTIL)
 
-  PKG_CHECK_MODULES(GAPI, gapi-2.0 >= 2.12.1)
+  PKG_CHECK_MODULES(GAPI, gapi-2.0 >= 2.13.90)
   AC_PATH_PROG(GAPI_PARSER, gapi2-parser)
   AC_SUBST(GAPI_PARSER)
 
