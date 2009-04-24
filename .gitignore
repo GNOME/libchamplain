@@ -67,3 +67,4 @@ tags
 demos/launcher
 demos/launcher-gtk
 demos/animated-marker
+*.sw?
