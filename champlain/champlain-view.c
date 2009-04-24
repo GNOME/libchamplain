@@ -1210,6 +1210,8 @@ champlain_view_set_zoom_level (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   ChamplainViewPrivate *priv = view->priv;
+  gdouble longitude;
+  gdouble latitude;
 
   if (priv->map == NULL)
     return;
@@ -1224,12 +1226,18 @@ champlain_view_set_zoom_level (ChamplainView *view,
     return;
 
   priv->zoom_level = zoom_level;
+  /* Fix to bug 575133: keep the lat,lon as it gets set to a wrong value
+   * when resizing the viewport, when passing from zoom_level 7 to 6
+   * (or more precisely when anchor is set to 0).
+   */
+  longitude = priv->longitude;
+  latitude = priv->latitude;
   resize_viewport (view);
 
   ClutterActor *new_group = champlain_zoom_level_get_actor (priv->map->current_level);
   clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), group);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), new_group);
-  champlain_view_center_on (view, priv->latitude, priv->longitude);
+  champlain_view_center_on (view, latitude, longitude);
 
   g_object_notify (G_OBJECT (view), "zoom-level");
 }
@@ -1843,7 +1851,7 @@ view_set_zoom_level_at (ChamplainView *view,
   if (!map_zoom_to (priv->map, priv->map_source, zoom_level))
     return FALSE;
 
-  priv->zoom_level = champlain_zoom_level_get_zoom_level (priv->map->current_level);
+  priv->zoom_level = zoom_level;
   new_group = champlain_zoom_level_get_actor (priv->map->current_level);
 
   /* Get the new x,y in the new zoom level */
