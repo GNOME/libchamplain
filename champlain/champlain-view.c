@@ -1530,9 +1530,6 @@ champlain_view_set_map_source (ChamplainView *view,
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
 
-  priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
-  priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
-
   if (priv->map == NULL)
     return;
 
