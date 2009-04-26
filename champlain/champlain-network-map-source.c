@@ -470,8 +470,8 @@ file_loaded_cb (SoupSession *session,
       return;
     }
 */
-  GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
-  ClutterActor *actor = clutter_texture_new();
+  GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+  ClutterActor *actor = clutter_texture_new ();
   if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
       gdk_pixbuf_get_pixels (pixbuf),
       gdk_pixbuf_get_has_alpha (pixbuf),
@@ -482,12 +482,13 @@ file_loaded_cb (SoupSession *session,
       gdk_pixbuf_get_n_channels (pixbuf) / 8,
       0, &error))
     {
-      g_print("BPP: %d", gdk_pixbuf_get_bits_per_sample (pixbuf));
+      g_print ("BPP: %d", gdk_pixbuf_get_bits_per_sample (pixbuf));
       if (error)
         {
           g_warning ("Unable to transfer to clutter: %s", error->message);
           g_error_free (error);
           create_error_tile (ctx->tile);
+          g_object_unref (actor);
           goto cleanup;
         }
     }
