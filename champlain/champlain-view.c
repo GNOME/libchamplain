@@ -783,6 +783,7 @@ champlain_view_init (ChamplainView *view)
   priv->latitude = 0.0f;
   priv->longitude = 0.0f;
   priv->goto_context = NULL;
+  priv->map = NULL;
 
   /* Setup viewport */
   priv->viewport = g_object_ref (tidy_viewport_new ());
@@ -819,7 +820,7 @@ champlain_view_init (ChamplainView *view)
       priv->user_layers);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
 
-  champlain_view_set_size(view, priv->viewport_size.width,
+  champlain_view_set_size (view, priv->viewport_size.width,
       priv->viewport_size.height);
 
   priv->state = CHAMPLAIN_STATE_DONE;
