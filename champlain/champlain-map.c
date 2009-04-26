@@ -168,6 +168,7 @@ void
 map_free (Map *map)
 {
   g_object_unref (map->current_level);
+  g_free (map);
 }
 
 gboolean
