@@ -59,12 +59,12 @@ create_marker_layer (ChamplainView *view)
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 40.77, -73.98);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  marker = champlain_marker_new_from_file ("/usr/share/icons/Tango/24x24/emblems/emblem-important.png", NULL);
+  marker = champlain_marker_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-important.png", NULL);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 47.130885,
       -70.764141);
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
-  marker = champlain_marker_new_from_file ("/usr/share/icons/Tango/24x24/emblems/emblem-favorite.png", NULL);
+  marker = champlain_marker_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-favorite.png", NULL);
   champlain_marker_set_draw_background (CHAMPLAIN_MARKER (marker), FALSE);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 45.41484,
       -71.918907);
