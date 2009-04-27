@@ -156,7 +156,7 @@ image_downloaded_cb (SoupSession *session,
   /* Deal only with finished messages */
   uri = soup_message_get_uri (message);
   url = soup_uri_to_string (uri, FALSE);
-  if (! SOUP_STATUS_IS_SUCCESSFUL(message->status_code)) {
+  if (! SOUP_STATUS_IS_SUCCESSFUL (message->status_code)) {
     g_print ("Download of %s failed with error code %d\n", url,
         message->status_code);
     goto cleanup;
@@ -171,7 +171,7 @@ image_downloaded_cb (SoupSession *session,
   /* Then transform the pixbuf into a texture */
   texture = texture_new_from_pixbuf (pixbuf, &error);
   if (error != NULL) {
-    g_print ("Failed to convert %s into a texture %s: %s\n", url,
+    g_print ("Failed to convert %s into a texture: %s\n", url,
       error->message);
     goto cleanup;
   }
@@ -189,6 +189,7 @@ image_downloaded_cb (SoupSession *session,
     {
       g_free (marker_data);
       g_free (url);
+      if (error != NULL) g_error_free (error);
       if (pixbuf != NULL) g_object_unref (G_OBJECT (pixbuf));
       if (texture != NULL) clutter_actor_destroy (CLUTTER_ACTOR (texture));
     }
@@ -223,7 +224,7 @@ create_marker_from_url (ChamplainLayer *layer,
 int
 main (int argc, char *argv[])
 {
-  ClutterActor* actor, *stage;
+  ClutterActor *view, *stage;
   ChamplainLayer *layer;
   SoupSession *session;
   
@@ -234,13 +235,13 @@ main (int argc, char *argv[])
   clutter_actor_set_size (stage, 800, 600);
 
   /* Create the map view */
-  actor = champlain_view_new ();
-  champlain_view_set_size (CHAMPLAIN_VIEW (actor), 800, 600);
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
+  view = champlain_view_new ();
+  champlain_view_set_size (CHAMPLAIN_VIEW (view), 800, 600);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), view);
 
   /* Create the markers and marker layer */
   layer = champlain_layer_new ();
-  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
+  champlain_view_add_layer (CHAMPLAIN_VIEW (view), layer);
   session = soup_session_async_new ();
   create_marker_from_url (layer, session, 48.218611, 17.146397,
       "http://hexten.net/cpan-faces/potyl.jpg");
@@ -251,9 +252,9 @@ main (int argc, char *argv[])
       
 
   /* Finish initialising the map view */
-  g_object_set (G_OBJECT (actor), "zoom-level", 10,
+  g_object_set (G_OBJECT (view), "zoom-level", 10,
       "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC, NULL);
-  champlain_view_center_on (CHAMPLAIN_VIEW(actor), 48.22, 16.8);
+  champlain_view_center_on (CHAMPLAIN_VIEW(view), 48.22, 16.8);
 
   clutter_actor_show_all (stage);
   clutter_main ();
