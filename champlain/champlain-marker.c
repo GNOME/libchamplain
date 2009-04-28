@@ -639,6 +639,8 @@ queue_redraw (ChamplainMarker *marker)
 static void
 champlain_marker_init (ChamplainMarker *marker)
 {
+  ClutterColor color = {0x33, 0x33, 0x33, 0xff};
+  ClutterColor text_color = {0xee, 0xee, 0xee, 0xff};
   ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker) ;
   marker->priv = priv;
 
@@ -648,10 +650,8 @@ champlain_marker_init (ChamplainMarker *marker)
   priv->use_markup = FALSE;
   priv->alignment = PANGO_ALIGN_LEFT;
   priv->attributes = NULL;
-  priv->color = g_new0 (ClutterColor, 1);
-  clutter_color_parse ("#333", priv->color);
-  priv->text_color = g_new0 (ClutterColor, 1);
-  clutter_color_parse ("#eee", priv->text_color);
+  priv->color = clutter_color_copy (&color);
+  priv->text_color = clutter_color_copy (&text_color);
   priv->font_name = g_strdup ("Sans 11");
   priv->wrap = FALSE;
   priv->wrap_mode = PANGO_WRAP_WORD;
