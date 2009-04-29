@@ -1,4 +1,4 @@
-noinst_PROGRAMS = launcher animated-marker polygons
+noinst_PROGRAMS = launcher animated-marker polygons url-marker
 
 INCLUDES = -I$(top_srcdir)
 
@@ -13,6 +13,11 @@ animated_marker_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.3.la
 
 polygons_SOURCES = polygons.c
 polygons_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.3.la
+
+url_marker_SOURCES = url-marker.c
+url_marker_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.3.la
+url_marker_CPPFLAGS = $(DEPS_CFLAGS) $(SOUP_CFLAGS)
+url_marker_LDADD = $(SOUP_DEPS_LIBS) $(DEPS_LIBS) ../champlain/libchamplain-0.3.la
 
 if ENABLE_GTK
 noinst_PROGRAMS += launcher-gtk
