@@ -23,7 +23,7 @@
 
 /* The data needed for constructing a marker */
 typedef struct {
-  const ChamplainLayer *layer;
+  ChamplainLayer *layer;
   gdouble latitude;
   gdouble longitude;
 } MarkerData;
@@ -43,6 +43,7 @@ pixbuf_new_from_message (SoupMessage *message, GError **error)
   const gchar *mime_type = NULL;
   GdkPixbufLoader *loader = NULL;
   GdkPixbuf *pixbuf = NULL;
+  gboolean pixbuf_is_open = FALSE;
 
   error = NULL;
 
@@ -52,24 +53,19 @@ pixbuf_new_from_message (SoupMessage *message, GError **error)
   mime_type = soup_message_headers_get (message->response_headers,
       "Content-Type");
   loader = gdk_pixbuf_loader_new_with_mime_type (mime_type, error);
-  if (error != NULL)
-	  {
-      if (loader != NULL) gdk_pixbuf_loader_close (loader, NULL);
-      goto cleanup;
-    }
+  if (loader != NULL) pixbuf_is_open = TRUE;
+  if (error != NULL) goto cleanup;
+
 
   gdk_pixbuf_loader_write (
     loader, 
     message->response_body->data,
     message->response_body->length, 
     error);
-  if (error != NULL)
-    {
-      gdk_pixbuf_loader_close (loader, NULL);
-      goto cleanup;
-    }
+  if (error != NULL) goto cleanup;
 
   gdk_pixbuf_loader_close (loader, error);
+  pixbuf_is_open = FALSE;
   if (error != NULL) goto cleanup;
 
   pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
@@ -79,6 +75,7 @@ pixbuf_new_from_message (SoupMessage *message, GError **error)
   /* Cleanup part, the function will always exit here even in case of error */
   cleanup:
     {
+      if (pixbuf_is_open) gdk_pixbuf_loader_close (loader, NULL);
       if (loader != NULL) g_object_unref (G_OBJECT (loader));
     }
   return pixbuf;
@@ -187,6 +184,7 @@ image_downloaded_cb (SoupSession *session,
   /* Cleanup part, the function will always exit here even in case of error */
   cleanup:
     {
+      g_object_unref (marker_data->layer);
       g_free (marker_data);
       g_free (url);
       if (error != NULL) g_error_free (error);
@@ -212,7 +210,7 @@ create_marker_from_url (ChamplainLayer *layer,
   MarkerData *data;
   
   data = g_new0(MarkerData, 1);
-  data->layer = layer;
+  data->layer = g_object_ref (layer);
   data->latitude = latitude;
   data->longitude = longitude;
   
