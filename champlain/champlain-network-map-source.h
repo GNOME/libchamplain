@@ -28,6 +28,8 @@
 
 #include <glib-object.h>
 
+G_BEGIN_DECLS
+
 #define CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE     (champlain_network_map_source_get_type())
 #define CHAMPLAIN_NETWORK_MAP_SOURCE(obj)     (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE, ChamplainNetworkMapSource))
 #define CHAMPLAIN_NETWORK_MAP_SOURCE_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE, ChamplainNetworkMapSourceClass))
@@ -76,5 +78,6 @@ void champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
     ChamplainZoomLevel *level,
     ChamplainTile *tile);
 
+G_END_DECLS
 
 #endif

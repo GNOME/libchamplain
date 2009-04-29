@@ -33,6 +33,8 @@
 #include <glib-object.h>
 #include <clutter/clutter.h>
 
+G_BEGIN_DECLS
+
 #define CHAMPLAIN_TYPE_VIEW     (champlain_view_get_type())
 #define CHAMPLAIN_VIEW(obj)     (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_VIEW, ChamplainView))
 #define CHAMPLAIN_VIEW_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_VIEW, ChamplainViewClass))
@@ -125,5 +127,7 @@ void champlain_view_tile_ready (ChamplainView *view,
     ChamplainZoomLevel *level,
     ChamplainTile *tile,
     gboolean animate);
+
+G_END_DECLS
 
 #endif
