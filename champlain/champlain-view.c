@@ -356,16 +356,12 @@ static void
 resize_viewport (ChamplainView *view)
 {
   gdouble lower, upper;
-  gboolean center = FALSE;
   TidyAdjustment *hadjust, *vadjust;
 
   ChamplainViewPrivate *priv = view->priv;
 
   if (!priv->map)
-    {
-      create_initial_map (view);
-      center = TRUE;
-    }
+    return;
 
   clutter_actor_set_size (priv->finger_scroll, priv->viewport_size.width,
       priv->viewport_size.height);
@@ -402,11 +398,6 @@ resize_viewport (ChamplainView *view)
     }
   g_object_set (vadjust, "lower", lower, "upper", upper,
       "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
-
-  if (center)
-    {
-      champlain_view_center_on (view, priv->latitude, priv->longitude);
-    }
 }
 
 static void
@@ -1026,7 +1017,9 @@ champlain_view_center_on (ChamplainView *view,
   priv->latitude = latitude;
 
   if (!priv->map)
-    return;
+    {
+      create_initial_map (view);
+    }
 
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
