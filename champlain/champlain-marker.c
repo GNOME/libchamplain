@@ -625,7 +625,9 @@ draw_marker (ChamplainMarker *marker)
 static gboolean
 redraw_on_idle (gpointer gobject)
 {
-  CHAMPLAIN_MARKER_GET_CLASS (gobject)->draw_marker (CHAMPLAIN_MARKER (gobject));
+  ChamplainMarker *marker = CHAMPLAIN_MARKER (gobject);
+  CHAMPLAIN_MARKER_GET_CLASS (gobject)->draw_marker (marker);
+  marker->priv->redraw_id = 0;
   return FALSE;
 }
 
@@ -658,6 +660,7 @@ champlain_marker_init (ChamplainMarker *marker)
   priv->single_line_mode = TRUE;
   priv->ellipsize = PANGO_ELLIPSIZE_NONE;
   priv->draw_background = TRUE;
+  priv->redraw_id = 0;
 }
 
 /**
