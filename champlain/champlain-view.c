@@ -1430,11 +1430,86 @@ view_load_visible_tiles (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
   ChamplainRectangle viewport = priv->viewport_size;
+  gint size;
+  ChamplainZoomLevel *level;
 
   viewport.x += priv->anchor.x;
   viewport.y += priv->anchor.y;
 
-  map_load_visible_tiles (priv->map, view, priv->map_source, viewport);
+  size = champlain_map_source_get_tile_size (priv->map_source);
+  level = priv->map->current_level;
+
+  if (viewport.x < 0)
+    viewport.x = 0;
+  if (viewport.y < 0)
+    viewport.y = 0;
+
+  gint x_count = ceil((float)viewport.width / size) + 1;
+  gint y_count = ceil((float)viewport.height / size) + 1;
+
+  gint x_first = viewport.x / size;
+  gint y_first = viewport.y / size;
+
+  x_count += x_first;
+  y_count += y_first;
+
+  if(x_count > champlain_zoom_level_get_width (level))
+    x_count = champlain_zoom_level_get_width (level);
+  if(y_count > champlain_zoom_level_get_height (level))
+    y_count = champlain_zoom_level_get_height (level);
+
+  DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_count, y_count);
+
+  int i, j;
+  guint k;
+
+  // Get rid of old tiles first
+  for (k = 0; k < champlain_zoom_level_tile_count (level); k++)
+    {
+      ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
+      gint tile_x = champlain_tile_get_x (tile);
+      gint tile_y = champlain_tile_get_y (tile);
+      if (tile_x < x_first || tile_x > x_count ||
+          tile_y < y_first || tile_y > y_count)
+      {
+        ClutterActor *group, *actor;
+        if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+          {
+            actor = champlain_tile_get_actor (tile);
+            group = champlain_zoom_level_get_actor (level);
+            clutter_container_remove_actor (CLUTTER_CONTAINER (group), actor);
+          }
+        champlain_zoom_level_remove_tile (level, tile);
+      }
+    }
+
+  //Load new tiles if needed
+  for (i = x_first; i < x_count; i++)
+    {
+      for (j = y_first; j < y_count; j++)
+        {
+          gboolean exist = FALSE;
+          for (k = 0; k < champlain_zoom_level_tile_count (level) && !exist; k++)
+            {
+              ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
+              gint tile_x = champlain_tile_get_x (tile);
+              gint tile_y = champlain_tile_get_y (tile);
+
+              if ( tile_x == i && tile_y == j)
+                exist = TRUE;
+            }
+
+          if(!exist)
+            {
+              DEBUG ("Loading tile %d, %d, %d", champlain_zoom_level_get_zoom_level (level), i, j);
+              ChamplainTile *tile = champlain_tile_new ();
+              g_object_set (G_OBJECT (tile), "x", i, "y", j, NULL);
+              champlain_map_source_get_tile (priv->map_source, view, level, tile);
+              champlain_zoom_level_add_tile (level, tile);
+              g_object_unref (tile);
+            }
+        }
+    }
   view_update_state (view);
 }
 
@@ -1920,3 +1995,4 @@ view_set_zoom_level_at (ChamplainView *view,
   g_object_notify (G_OBJECT (view), "zoom-level");
   return TRUE;
 }
+
