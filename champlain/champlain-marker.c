@@ -820,14 +820,20 @@ champlain_marker_set_image (ChamplainMarker *marker,
     ClutterActor *image)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
-  g_return_if_fail (CLUTTER_IS_ACTOR (image));
 
   ChamplainMarkerPrivate *priv = marker->priv;
 
   if (priv->image != NULL)
     g_object_unref (priv->image);
 
-  priv->image = g_object_ref (image);
+  if (image != NULL)
+    {
+      g_return_if_fail (CLUTTER_IS_ACTOR (image));
+      priv->image = g_object_ref (image);
+    }
+  else
+    priv->image = image;
+
   g_object_notify (G_OBJECT (marker), "image");
   queue_redraw (marker);
 }
