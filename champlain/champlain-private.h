@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -44,16 +44,5 @@ typedef struct
   gint width;
   gint height;
 } ChamplainRectangle;
-
-void champlain_view_tile_ready (ChamplainView *view,
-    ChamplainZoomLevel *level,
-    ChamplainTile *tile);
-void champlain_view_tile_updated (ChamplainView *view,
-    ChamplainZoomLevel *level,
-    ChamplainTile *tile,
-    ClutterActor *actor);
-void champlain_view_tile_uptodate (ChamplainView *view,
-    ChamplainZoomLevel *level,
-    ChamplainTile *tile);
 
 #endif

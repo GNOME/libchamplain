@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,7 @@
 #include <gdk/gdk.h>
 #include <libsoup/soup.h>
 #include <gio/gio.h>
+#include <clutter/clutter.h>
 
 G_DEFINE_TYPE (ChamplainTile, champlain_tile, G_TYPE_OBJECT)
 
@@ -44,6 +45,7 @@ enum
   PROP_FILENAME,
   PROP_STATE,
   PROP_ACTOR,
+  PROP_CONTENT,
   PROP_ETAG
 };
 
@@ -60,6 +62,7 @@ struct _ChamplainTilePrivate {
   ChamplainState state;
   gchar *filename;
   ClutterActor *actor;
+  ClutterActor *content_actor;
 
   GTimeVal *modified_time;
   gchar* etag;
@@ -97,6 +100,9 @@ champlain_tile_get_property (GObject *object,
         break;
       case PROP_ACTOR:
         g_value_set_object (value, champlain_tile_get_actor (self));
+        break;
+      case PROP_CONTENT:
+        g_value_set_object (value, champlain_tile_get_content (self));
         break;
       case PROP_ETAG:
         g_value_set_string (value, champlain_tile_get_etag (self));
@@ -139,6 +145,9 @@ champlain_tile_set_property (GObject *object,
       case PROP_ACTOR:
         champlain_tile_set_actor (self, g_value_get_object (value));
         break;
+      case PROP_CONTENT:
+        champlain_tile_set_content (self, g_value_get_object (value), FALSE);
+        break;
       case PROP_ETAG:
         champlain_tile_set_etag (self, g_value_get_string (value));
         break;
@@ -159,6 +168,7 @@ champlain_tile_dispose (GObject *object)
       g_object_unref (G_OBJECT (priv->actor));
       priv->actor = NULL;
     }
+  g_object_unref (priv->content_actor);
 
   G_OBJECT_CLASS (champlain_tile_parent_class)->dispose (object);
 }
@@ -256,6 +266,14 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         G_PARAM_READWRITE));
 
   g_object_class_install_property (object_class,
+      PROP_CONTENT,
+      g_param_spec_object ("content",
+        "Content",
+        "The tile's content",
+        CLUTTER_TYPE_ACTOR,
+        G_PARAM_READWRITE));
+
+  g_object_class_install_property (object_class,
       PROP_ETAG,
       g_param_spec_string ("etag",
         "Entity Tag",
@@ -279,8 +297,8 @@ champlain_tile_init (ChamplainTile *self)
   priv->filename = g_strdup ("");
   priv->etag = NULL;
 
-  /* Can't call champlain_tile_set_actor (self, NULL); because the assertion will fail */
-  priv->actor = NULL;
+  priv->actor = g_object_ref (clutter_group_new ());
+  priv->content_actor = NULL;
 }
 
 ChamplainTile*
@@ -533,3 +551,81 @@ champlain_tile_set_etag (ChamplainTile *self,
   priv->etag = g_strdup (etag);
   g_object_notify (G_OBJECT (self), "etag");
 }
+
+typedef struct {
+  ChamplainTile *tile;
+  ClutterEffectTemplate *etemplate;
+  ClutterTimeline *timeline;
+  ClutterActor *old_actor;
+} AnimationContext;
+
+static void
+fade_in_completed (ClutterTimeline *timeline,
+    gpointer data)
+{
+  AnimationContext* ctx = (AnimationContext*) data;
+  ChamplainTilePrivate *priv = GET_PRIVATE (ctx->tile);
+
+  if (ctx->old_actor != NULL)
+  {
+    g_object_unref (ctx->old_actor);
+    clutter_container_remove (CLUTTER_CONTAINER (priv->actor), ctx->old_actor, NULL);
+  }
+
+  g_object_unref (ctx->tile);
+  g_object_unref (ctx->timeline);
+  g_object_unref (ctx->etemplate);
+  g_free (ctx);
+
+}
+
+
+void
+champlain_tile_set_content (ChamplainTile *self, ClutterActor *actor, gboolean fade_in)
+{
+  g_return_if_fail(CHAMPLAIN_TILE(self));
+  g_return_if_fail(actor != NULL);
+
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+  ClutterActor *old_actor = NULL;
+
+  if (priv->content_actor != NULL)
+    {
+      if (fade_in == TRUE)
+        old_actor = g_object_ref (priv->content_actor);
+      else
+        clutter_container_remove (CLUTTER_CONTAINER (priv->actor), priv->content_actor, NULL);
+      g_object_unref (priv->content_actor);
+    }
+
+  clutter_container_add (CLUTTER_CONTAINER (priv->actor), actor, NULL);
+
+  /* fixme: etemplate are leaked here */
+  if (fade_in == TRUE)
+    {
+      AnimationContext *ctx = g_new0 (AnimationContext, 1);
+      ctx->tile = g_object_ref (self);
+      ctx->timeline = clutter_timeline_new_for_duration (750);
+      ctx->etemplate = clutter_effect_template_new (ctx->timeline, CLUTTER_ALPHA_SINE_INC);
+      ctx->old_actor = old_actor;
+
+      g_signal_connect (ctx->timeline, "completed", G_CALLBACK (fade_in_completed), ctx);
+
+      clutter_actor_set_opacity (actor, 0);
+      clutter_effect_fade (ctx->etemplate, actor, 255, NULL, NULL);
+    }
+
+  priv->content_actor = g_object_ref (actor);
+  g_object_notify (G_OBJECT (self), "content");
+}
+
+ClutterActor *
+champlain_tile_get_content (ChamplainTile *self)
+{
+  g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
+
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  return priv->content_actor;
+}
+

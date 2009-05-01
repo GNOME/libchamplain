@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -1509,6 +1509,8 @@ view_load_visible_tiles (ChamplainView *view)
               g_object_set (G_OBJECT (tile), "x", i, "y", j, NULL);
 
               g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
+              clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)),
+                  champlain_tile_get_actor (tile), NULL);
 
               champlain_zoom_level_add_tile (level, tile);
               champlain_map_source_get_tile (priv->map_source, view, level, tile);
@@ -1555,62 +1557,13 @@ view_tiles_reposition (ChamplainView* view)
     }
 }
 
-void
-champlain_view_tile_ready (ChamplainView *view,
-    ChamplainZoomLevel *level,
-    ChamplainTile *tile)
-{
-  ClutterActor *actor;
-
-  actor = champlain_tile_get_actor (tile);
-
-  clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)), actor, NULL);
-  clutter_actor_show (actor);
-  view_position_tile (view, tile);
-}
-
-void
-champlain_view_tile_uptodate (ChamplainView *view,
-                              ChamplainZoomLevel *level,
-                              ChamplainTile *tile)
-{
-}
-
-void
-champlain_view_tile_updated (ChamplainView *view,
-                             ChamplainZoomLevel *level,
-                             ChamplainTile *tile,
-                             ClutterActor *previous_actor)
-{
-  ClutterActor *actor;
-  ClutterEffectTemplate *etemplate;
-
-  actor = champlain_tile_get_actor (tile);
-  if (previous_actor != NULL)
-  {
-    /* TODO: Don't remove until the fade in the of new time is over */
-    clutter_container_remove_actor (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)),
-        previous_actor);
-    g_object_unref (previous_actor);
-  }
-
-  /* FIXME: etemplate are leaked here */
-  etemplate = clutter_effect_template_new_for_duration (750, CLUTTER_ALPHA_SINE_INC);
-  clutter_actor_set_opacity(actor, 0);
-  clutter_effect_fade (etemplate, actor, 255, NULL, NULL);
-
-  clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)), actor, NULL);
-  clutter_actor_show (actor);
-
-  view_position_tile (view, tile);
-}
-
 static void
 tile_state_notify (GObject *gobject,
     GParamSpec *pspec,
     gpointer data)
 {
-  view_update_state (CHAMPLAIN_VIEW(data));
+  view_position_tile (CHAMPLAIN_VIEW (data), CHAMPLAIN_TILE (gobject));
+  view_update_state (CHAMPLAIN_VIEW (data));
 }
 
 static void

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -395,7 +395,7 @@ create_error_tile (ChamplainTile* tile)
 
   cairo_destroy (cr);
 
-  champlain_tile_set_actor (tile, actor);
+  champlain_tile_set_content (tile, actor, TRUE);
   clutter_actor_show (actor);
 
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
@@ -411,7 +411,7 @@ file_loaded_cb (SoupSession *session,
   GError *error = NULL;
   gchar* path = NULL;
   const gchar *filename = NULL;
-  ClutterActor *actor, *previous_actor = NULL;
+  ClutterActor *actor;
   GFile *file;
   GFileInfo *info;
   ChamplainCache *cache = champlain_cache_get_default ();
@@ -439,7 +439,6 @@ file_loaded_cb (SoupSession *session,
     g_free (now);
 
     champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
-    champlain_view_tile_uptodate (ctx->view, ctx->zoom_level, ctx->tile);
     g_object_unref (ctx->tile);
     g_object_unref (ctx->zoom_level);
     g_free (ctx);
@@ -532,11 +531,7 @@ file_loaded_cb (SoupSession *session,
         }
     }
 
-  previous_actor = champlain_tile_get_actor (ctx->tile);
-  if (previous_actor)
-    g_object_ref (previous_actor); /* to be unrefed by the view */
-
-  champlain_tile_set_actor (ctx->tile, actor);
+  champlain_tile_set_content (ctx->tile, actor, TRUE);
   DEBUG ("Tile loaded from network");
 
 cleanup:
@@ -544,7 +539,6 @@ cleanup:
   g_free (path);
 finish:
   champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
-  champlain_view_tile_updated (ctx->view, ctx->zoom_level, ctx->tile, previous_actor);
   g_object_unref (ctx->tile);
   g_object_unref (ctx->zoom_level);
   g_free (ctx);
@@ -581,7 +575,6 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
         champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 
       DEBUG ("Tile loaded from cache");
-      champlain_view_tile_ready (view, zoom_level, tile);
     }
 
 

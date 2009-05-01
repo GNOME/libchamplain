@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+* Copyright (C) 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -242,7 +242,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
 
   /* Load the cached version */
   actor = clutter_texture_new_from_file (filename, &error);
-  champlain_tile_set_actor (tile, actor);
+  champlain_tile_set_content (tile, actor, FALSE);
 
   g_object_unref (file);
   g_object_unref (info);
