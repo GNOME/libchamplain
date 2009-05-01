@@ -1331,7 +1331,7 @@ champlain_view_add_layer (ChamplainView *view,
  * @latitude: a variable where to put the latitude of the event
  * @longitude: a variable where to put the longitude of the event
  *
- * Returns a new #ChamplainView ready to be used as a #ClutterActor.
+ * Returns the latitude, longitude coordinates for the given ClutterEvent.
  *
  * Since: 0.2.8
  */
@@ -1345,12 +1345,7 @@ champlain_view_get_coords_from_event (ChamplainView *view,
   /* Apparently there isn a more precise test */
   g_return_val_if_fail (event, FALSE);
 
-  ChamplainViewPrivate *priv = view->priv;
   guint x, y;
-  gint actor_x, actor_y;
-  gint rel_x, rel_y;
-
-  clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
 
   switch (clutter_event_type (event))
     {
@@ -1387,6 +1382,35 @@ champlain_view_get_coords_from_event (ChamplainView *view,
       default:
         return FALSE;
     }
+
+  return champlain_view_get_coords_at (view, x, y, latitude, longitude);
+}
+
+/**
+ * champlain_view_get_coords_at:
+ * @view: a #ChamplainView
+ * @x: the x position in the view
+ * @y: the y position in the view
+ * @latitude: a variable where to put the latitude of the event
+ * @longitude: a variable where to put the longitude of the event
+ *
+ * Returns the latitude, longitude coordinates for the given x, y position in
+ * the view.  Use if you get coordinates from GtkEvents for example.
+ *
+ * Since: 0.4
+ */
+gboolean champlain_view_get_coords_at (ChamplainView *view,
+    guint x,
+    guint y,
+    gdouble *latitude,
+    gdouble *longitude)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+  ChamplainViewPrivate *priv = view->priv;
+  gint actor_x, actor_y;
+  gint rel_x, rel_y;
+
+  clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
 
   rel_x = x - actor_x;
   rel_y = y - actor_y;

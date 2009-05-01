@@ -123,6 +123,12 @@ gboolean champlain_view_get_coords_from_event (ChamplainView *view,
     gdouble *lat,
     gdouble *lon);
 
+gboolean champlain_view_get_coords_at (ChamplainView *view,
+    guint x,
+    guint y,
+    gdouble *lat,
+    gdouble *lon);
+
 void champlain_view_tile_ready (ChamplainView *view,
     ChamplainZoomLevel *level,
     ChamplainTile *tile,
