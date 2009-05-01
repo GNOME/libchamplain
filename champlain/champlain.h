@@ -29,6 +29,7 @@
 #include <glib.h>
 
 #include "champlain/champlain-defines.h"
+#include "champlain/champlain-cache.h"
 #include "champlain/champlain-layer.h"
 #include "champlain/champlain-base-marker.h"
 #include "champlain/champlain-marker.h"

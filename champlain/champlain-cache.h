@@ -57,7 +57,8 @@ GType champlain_cache_get_type (void);
 ChamplainCache* champlain_cache_get_default (void);
 
 void champlain_cache_update_tile (ChamplainCache *self,
-    ChamplainTile *tile);
+    ChamplainTile *tile,
+    guint filesize);
 gboolean champlain_cache_fill_tile (ChamplainCache *self,
     ChamplainTile *tile);
 gboolean champlain_cache_tile_is_expired (ChamplainCache *self,
@@ -68,6 +69,7 @@ void champlain_cache_set_size_limit (ChamplainCache *self,
 guint champlain_cache_get_size_limit (ChamplainCache *self);
 
 void champlain_cache_purge (ChamplainCache *self);
+void champlain_cache_purge_on_idle (ChamplainCache *self);
 
 G_END_DECLS
 

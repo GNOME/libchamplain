@@ -25,6 +25,7 @@
 
 #include <glib.h>
 #include <gio/gio.h>
+#include <string.h>
 #include <sqlite3.h>
 
 G_DEFINE_TYPE (ChamplainCache, champlain_cache, G_TYPE_OBJECT)
@@ -45,6 +46,10 @@ struct _ChamplainCachePrivate {
 
   sqlite3 *data;
 };
+
+static void
+inc_popularity (ChamplainCache *self,
+    ChamplainTile *tile);
 
 static void
 champlain_cache_get_property (GObject *object,
@@ -134,7 +139,7 @@ champlain_cache_init (ChamplainCache *self)
   filename = g_build_filename (g_get_user_cache_dir (), "champlain",
       "cache.db", NULL);
 
-  champlain_cache_set_size_limit (self, 10);
+  champlain_cache_set_size_limit (self, 100000000);
 
   error = sqlite3_open_v2 (filename, &priv->data,
       SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
@@ -144,7 +149,7 @@ champlain_cache_init (ChamplainCache *self)
       goto cleanup;
     }
 
-  sqlite3_exec (priv->data, "CREATE TABLE etags (filename char(500) PRIMARY KEY, etag char (30))", NULL, NULL, &error_msg);
+  sqlite3_exec (priv->data, "CREATE TABLE tiles (filename char(500) PRIMARY KEY, etag CHAR (30), popularity INT DEFAULT 1, size INT DEFAULT 0)", NULL, NULL, &error_msg);
   if (error_msg != NULL)
     {
       DEBUG ("Creating table Etag failed: %s", error_msg);
@@ -184,7 +189,7 @@ void
 champlain_cache_set_size_limit (ChamplainCache *self,
     guint size_limit)
 {
-  g_return_if_fail(CHAMPLAIN_CACHE (self));
+  g_return_if_fail (CHAMPLAIN_CACHE (self));
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
 
@@ -233,7 +238,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
   champlain_tile_set_modified_time (tile, modified_time);
 
   /* Retrieve etag */
-  query = g_strdup_printf ("SELECT etag FROM etags WHERE filename = '%s'",
+  query = g_strdup_printf ("SELECT etag FROM tiles WHERE filename = '%s'",
       filename);
   sqlite3_exec (priv->data, query, set_etag, tile, &error_msg);
   if (error_msg != NULL)
@@ -249,6 +254,8 @@ champlain_cache_fill_tile (ChamplainCache *self,
   g_object_unref (file);
   g_object_unref (info);
   g_free (query);
+
+  inc_popularity (self, tile);
 
   return TRUE;
 }
@@ -272,25 +279,152 @@ champlain_cache_tile_is_expired (ChamplainCache *self,
   return validate_cache;
 }
 
-void
-champlain_cache_update_tile (ChamplainCache *self,
+static void
+inc_popularity (ChamplainCache *self,
     ChamplainTile *tile)
 {
-  g_return_if_fail(CHAMPLAIN_CACHE (self));
+  g_return_if_fail (CHAMPLAIN_CACHE (self));
   gchar *query, *error = NULL;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
 
-  query = g_strdup_printf ("REPLACE INTO etags (filename, etag) VALUES ('%s', '%s');",
-      champlain_tile_get_filename (tile),
-      champlain_tile_get_etag (tile));
+  query = g_strdup_printf ("UPDATE tiles SET popularity = popularity + 1 WHERE filename = '%s';",
+      champlain_tile_get_filename (tile));
   sqlite3_exec (priv->data, query, NULL, NULL, &error);
   if (error != NULL)
     {
-      DEBUG ("Saving Etag failed: %s", error);
+      DEBUG ("Updating popularity failed: %s", error);
       sqlite3_free (error);
     }
-
-
   g_free (query);
 }
+
+static void
+delete_tile (ChamplainCache *self,
+    const gchar *filename)
+{
+  g_return_if_fail (CHAMPLAIN_CACHE (self));
+  gchar *query, *error = NULL;
+  GError *gerror;
+  GFile *file;
+
+  ChamplainCachePrivate *priv = GET_PRIVATE (self);
+
+  query = g_strdup_printf ("DELETE FROM tiles WHERE filename = '%s';", filename);
+  sqlite3_exec (priv->data, query, NULL, NULL, &error);
+  if (error != NULL)
+    {
+      DEBUG ("Deleting tile from db failed: %s", error);
+      sqlite3_free (error);
+    }
+  g_free (query);
+
+  if (!g_file_test (filename, G_FILE_TEST_EXISTS))
+    return;
+
+  file = g_file_new_for_path (filename);
+  if (!g_file_delete (file, NULL, &gerror))
+    {
+        DEBUG ("Deleting tile from disk failed: %s", gerror->message);
+        g_error_free (gerror);
+    }
+  g_object_unref (file);
+}
+
+void
+champlain_cache_update_tile (ChamplainCache *self,
+    ChamplainTile *tile,
+    guint size)
+{
+  g_return_if_fail (CHAMPLAIN_CACHE (self));
+  gchar *query, *error = NULL;
+
+  ChamplainCachePrivate *priv = GET_PRIVATE (self);
+
+  query = g_strdup_printf ("REPLACE INTO tiles (filename, etag, size) VALUES ('%s', '%s', %d);",
+      champlain_tile_get_filename (tile),
+      champlain_tile_get_etag (tile),
+      size);
+  sqlite3_exec (priv->data, query, NULL, NULL, &error);
+  if (error != NULL)
+    {
+      DEBUG ("Saving Etag and size failed: %s", error);
+      sqlite3_free (error);
+    }
+  g_free (query);
+}
+
+static gboolean
+purge_on_idle (gpointer data)
+{
+  champlain_cache_purge (CHAMPLAIN_CACHE (data));
+  return FALSE;
+}
+
+void
+champlain_cache_purge_on_idle (ChamplainCache *self)
+{
+  g_return_if_fail (CHAMPLAIN_CACHE (self));
+  g_idle_add (purge_on_idle, self);
+}
+
+void
+champlain_cache_purge (ChamplainCache *self)
+{
+  g_return_if_fail (CHAMPLAIN_CACHE (self));
+
+  ChamplainCachePrivate *priv = GET_PRIVATE (self);
+  gchar *query;
+  sqlite3_stmt *stmt;
+  int rc = 0;
+  guint current_size = 0;
+
+  query = g_strdup_printf ("SELECT SUM (size) FROM tiles;");
+  rc = sqlite3_prepare (priv->data, query, strlen (query), &stmt, NULL);
+  if (rc != SQLITE_OK)
+    {
+      DEBUG ("Can't compute cache size %s", sqlite3_errmsg(priv->data));
+    }
+  g_free (query);
+
+  rc = sqlite3_step (stmt);
+  current_size = sqlite3_column_int (stmt, 0);
+  if (current_size < priv->size_limit)
+    {
+      DEBUG ("Cache doesn't need to be purged at %d bytes", current_size);
+      sqlite3_finalize (stmt);
+      return;
+    }
+
+  sqlite3_finalize (stmt);
+
+  /* Ok, delete the less popular tiles until size_limit reached */
+  query = g_strdup_printf ("SELECT filename, size FROM tiles ORDER BY popularity;");
+  rc = sqlite3_prepare (priv->data, query, strlen (query), &stmt, NULL);
+  if (rc != SQLITE_OK)
+    {
+      DEBUG ("Can't fetch tiles to delete: %s", sqlite3_errmsg(priv->data));
+    }
+
+  rc = sqlite3_step (stmt);
+  while (rc == SQLITE_ROW && current_size > priv->size_limit)
+    {
+      const char *filename = sqlite3_column_text (stmt, 0);
+      guint size;
+
+      filename = sqlite3_column_text (stmt, 0);
+      size = sqlite3_column_int (stmt, 1);
+      DEBUG ("Deleting %s of size %d", filename, size);
+
+      delete_tile (self, filename);
+
+      current_size -= size;
+
+      rc = sqlite3_step (stmt);
+    }
+  DEBUG ("Cache size is now %d", current_size);
+
+  sqlite3_finalize (stmt);
+  g_free (query);
+}
+

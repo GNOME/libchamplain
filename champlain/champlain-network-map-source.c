@@ -36,7 +36,7 @@
 #include <gdk/gdk.h>
 #include <gio/gio.h>
 #include <glib.h>
-#include <glib/gprintf.h>
+#include <glib/gstdio.h>
 #include <glib-object.h>
 #ifdef HAVE_LIBSOUP_GNOME
 #include <libsoup/soup-gnome.h>
@@ -44,6 +44,7 @@
 #include <libsoup/soup.h>
 #endif
 #include <math.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <clutter-cairo.h>
 
@@ -414,6 +415,7 @@ file_loaded_cb (SoupSession *session,
   ClutterActor *actor;
   GFile *file;
   GFileInfo *info;
+  guint filesize = 0;
   ChamplainCache *cache = champlain_cache_get_default ();
 
   filename = champlain_tile_get_filename (ctx->tile);
@@ -494,8 +496,13 @@ file_loaded_cb (SoupSession *session,
     }
 
   /* Write the cache */
-  g_file_set_contents (filename, msg->response_body->data,
-      msg->response_body->length, NULL);
+  if (g_file_set_contents (filename, msg->response_body->data,
+      msg->response_body->length, NULL))
+    {
+      struct stat info;
+      g_stat (filename, &info);
+      filesize = info.st_size;
+    }
 
   /* Verify if the server sent an etag and save it */
   const gchar *etag = soup_message_headers_get (msg->response_headers, "ETag");
@@ -505,7 +512,7 @@ file_loaded_cb (SoupSession *session,
     {
       champlain_tile_set_etag (ctx->tile, etag);
     }
-  champlain_cache_update_tile (cache, ctx->tile);
+  champlain_cache_update_tile (cache, ctx->tile, filesize); //XXX
 
   /* Load the image into clutter */
   GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
