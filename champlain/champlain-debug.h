@@ -34,7 +34,8 @@ typedef enum
   CHAMPLAIN_DEBUG_ENGINE = 1 << 2,
   CHAMPLAIN_DEBUG_VIEW = 1 << 3,
   CHAMPLAIN_DEBUG_NETWORK = 1 << 4,
-  CHAMPLAIN_DEBUG_OTHER = 1 << 5,
+  CHAMPLAIN_DEBUG_CACHE = 1 << 5,
+  CHAMPLAIN_DEBUG_OTHER = 1 << 6,
 } ChamplainDebugFlags;
 
 gboolean champlain_debug_flag_is_set (ChamplainDebugFlags flag);

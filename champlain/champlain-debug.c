@@ -39,6 +39,7 @@ static GDebugKey keys[] = {
   { "Engine", CHAMPLAIN_DEBUG_ENGINE },
   { "View", CHAMPLAIN_DEBUG_VIEW },
   { "Network", CHAMPLAIN_DEBUG_NETWORK },
+  { "Cache", CHAMPLAIN_DEBUG_CACHE },
   { "Other", CHAMPLAIN_DEBUG_OTHER },
   { 0, }
 };

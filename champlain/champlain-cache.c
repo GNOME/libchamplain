@@ -18,6 +18,8 @@
 
 #include "champlain-cache.h"
 
+#define DEBUG_FLAG CHAMPLAIN_DEBUG_CACHE
+#include "champlain-debug.h"
 #include "champlain-enum-types.h"
 #include "champlain-private.h"
 
@@ -87,7 +89,7 @@ champlain_cache_dispose (GObject *object)
 
   error = sqlite3_close (priv->data);
   if (error != SQLITE_OK)
-    g_warning ("Sqlite returned error %d when closing cache.db", error);
+    DEBUG ("Sqlite returned error %d when closing cache.db", error);
 
   G_OBJECT_CLASS (champlain_cache_parent_class)->dispose (object);
 }
@@ -138,14 +140,14 @@ champlain_cache_init (ChamplainCache *self)
       SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
   if (error != SQLITE_OK)
     {
-      g_warning ("Sqlite returned error %d when opening cache.db", error);
+      DEBUG ("Sqlite returned error %d when opening cache.db", error);
       goto cleanup;
     }
 
   sqlite3_exec (priv->data, "CREATE TABLE etags (filename char(500) PRIMARY KEY, etag char (30))", NULL, NULL, &error_msg);
   if (error_msg != NULL)
     {
-      g_warning ("Creating table Etag failed: %s", error_msg);
+      DEBUG ("Creating table Etag failed: %s", error_msg);
       sqlite3_free (error_msg);
       goto cleanup;
     }
@@ -236,7 +238,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
   sqlite3_exec (priv->data, query, set_etag, tile, &error_msg);
   if (error_msg != NULL)
     {
-      g_warning ("Retrieving Etag failed: %s", error_msg);
+      DEBUG ("Retrieving Etag failed: %s", error_msg);
       sqlite3_free (error_msg);
     }
 
@@ -285,7 +287,7 @@ champlain_cache_update_tile (ChamplainCache *self,
   sqlite3_exec (priv->data, query, NULL, NULL, &error);
   if (error != NULL)
     {
-      g_warning ("Saving Etag failed: %s", error);
+      DEBUG ("Saving Etag failed: %s", error);
       sqlite3_free (error);
     }
 
