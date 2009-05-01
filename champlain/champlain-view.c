@@ -195,6 +195,9 @@ static gboolean view_set_zoom_level_at (ChamplainView *view,
     gint zoom_level,
     gint x,
     gint y);
+static void tile_state_notify (GObject *gobject,
+    GParamSpec *pspec,
+    gpointer data);
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -1504,8 +1507,12 @@ view_load_visible_tiles (ChamplainView *view)
               DEBUG ("Loading tile %d, %d, %d", champlain_zoom_level_get_zoom_level (level), i, j);
               ChamplainTile *tile = champlain_tile_new ();
               g_object_set (G_OBJECT (tile), "x", i, "y", j, NULL);
-              champlain_map_source_get_tile (priv->map_source, view, level, tile);
+
+              g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
+
               champlain_zoom_level_add_tile (level, tile);
+              champlain_map_source_get_tile (priv->map_source, view, level, tile);
+
               g_object_unref (tile);
             }
         }
@@ -1560,8 +1567,6 @@ champlain_view_tile_ready (ChamplainView *view,
   clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)), actor, NULL);
   clutter_actor_show (actor);
   view_position_tile (view, tile);
-
-  view_update_state (view);
 }
 
 void
@@ -1569,7 +1574,6 @@ champlain_view_tile_uptodate (ChamplainView *view,
                               ChamplainZoomLevel *level,
                               ChamplainTile *tile)
 {
-  view_update_state (view);
 }
 
 void
@@ -1599,7 +1603,14 @@ champlain_view_tile_updated (ChamplainView *view,
   clutter_actor_show (actor);
 
   view_position_tile (view, tile);
-  view_update_state (view);
+}
+
+static void
+tile_state_notify (GObject *gobject,
+    GParamSpec *pspec,
+    gpointer data)
+{
+  view_update_state (CHAMPLAIN_VIEW(data));
 }
 
 static void
@@ -1995,4 +2006,3 @@ view_set_zoom_level_at (ChamplainView *view,
   g_object_notify (G_OBJECT (view), "zoom-level");
   return TRUE;
 }
-
