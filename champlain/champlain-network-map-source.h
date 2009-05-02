@@ -75,7 +75,7 @@ void champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *netwo
 
 void champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
     ChamplainView *view,
-    ChamplainZoomLevel *level,
+    gint zoom_level,
     ChamplainTile *tile);
 
 G_END_DECLS

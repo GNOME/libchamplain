@@ -35,7 +35,7 @@
 #include <string.h>
 
 void champlain_map_source_real_get_tile (ChamplainMapSource *map_source,
-    ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile);
+    ChamplainView *view, gint zoom_level, ChamplainTile *tile);
 
 enum
 {
@@ -350,7 +350,7 @@ champlain_map_source_get_column_count (ChamplainMapSource *map_source,
 void
 champlain_map_source_get_tile (ChamplainMapSource *map_source,
     ChamplainView *view,
-    ChamplainZoomLevel *zoom_level,
+    gint zoom_level,
     ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
@@ -361,7 +361,7 @@ champlain_map_source_get_tile (ChamplainMapSource *map_source,
 void
 champlain_map_source_real_get_tile (ChamplainMapSource *map_source,
     ChamplainView *view,
-    ChamplainZoomLevel *zoom_level,
+    gint zoom_level,
     ChamplainTile *tile)
 {
   g_error ("Should not be reached");

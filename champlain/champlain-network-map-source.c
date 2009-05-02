@@ -344,7 +344,7 @@ champlain_map_source_new_mff_relief (void)
 
 static gchar *
 get_filename (ChamplainNetworkMapSource *network_map_source,
-    ChamplainZoomLevel *level,
+    gint zoom_level,
     ChamplainTile *tile)
 {
   //ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
@@ -352,13 +352,12 @@ get_filename (ChamplainNetworkMapSource *network_map_source,
              "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
              "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
              CACHE_SUBDIR, champlain_map_source_get_name (CHAMPLAIN_MAP_SOURCE (network_map_source)),
-             champlain_zoom_level_get_zoom_level (level),
+             zoom_level,
              champlain_tile_get_x (tile), champlain_tile_get_y (tile));
 }
 
 typedef struct {
   ChamplainView *view;
-  ChamplainZoomLevel *zoom_level;
   ChamplainTile *tile;
 } FileLoadedCallbackContext;
 
@@ -442,7 +441,6 @@ file_loaded_cb (SoupSession *session,
 
     champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
     g_object_unref (ctx->tile);
-    g_object_unref (ctx->zoom_level);
     g_free (ctx);
     return;
   }
@@ -547,14 +545,13 @@ cleanup:
 finish:
   champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
   g_object_unref (ctx->tile);
-  g_object_unref (ctx->zoom_level);
   g_free (ctx);
 }
 
 void
 champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
     ChamplainView *view,
-    ChamplainZoomLevel *zoom_level,
+    gint zoom_level,
     ChamplainTile *tile)
 {
   gchar* filename;
@@ -592,14 +589,12 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
       gchar *uri;
       FileLoadedCallbackContext *ctx = g_new0 (FileLoadedCallbackContext, 1);
       ctx->view = view;
-      ctx->zoom_level = zoom_level;
       ctx->tile = tile;
 
       /* Ref the tile as it may be freeing during the loading
        * Unref when the loading is done.
        */
       g_object_ref (tile);
-      g_object_ref (zoom_level);
 
       if (!soup_session)
         soup_session = soup_session_async_new_with_options ("proxy-uri",
@@ -611,7 +606,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
 
       uri = champlain_network_map_source_get_tile_uri (network_map_source,
                champlain_tile_get_x (tile), champlain_tile_get_y (tile),
-               champlain_zoom_level_get_zoom_level (zoom_level));
+               zoom_level);
       champlain_tile_set_uri (tile, uri);
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
       msg = soup_message_new (SOUP_METHOD_GET, uri);

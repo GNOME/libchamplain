@@ -59,7 +59,7 @@ struct _ChamplainMapSourceClass
 
   void (*get_tile) (ChamplainMapSource *map_source,
                     ChamplainView *view,
-                    ChamplainZoomLevel *zoom_level,
+                    gint zoom_level,
                     ChamplainTile *tile);
 };
 
@@ -95,7 +95,7 @@ guint champlain_map_source_get_column_count (ChamplainMapSource *map_source,
 
 void champlain_map_source_get_tile (ChamplainMapSource *map_source,
     ChamplainView *view,
-    ChamplainZoomLevel *level,
+    gint zoom_level,
     ChamplainTile *tile);
 
 void champlain_map_source_set_name (ChamplainMapSource *map_source,

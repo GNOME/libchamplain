@@ -15,6 +15,34 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+/**
+ * SECTION:champlain-tile
+ * @short_description: An object that represent map tiles
+ *
+ * The #ChamplainView is a ClutterActor to display maps.  It supports two modes
+ * of scrolling:
+ * <itemizedlist>
+ *   <listitem><para>Push: the normal behavior where the maps doesn't move
+ *   after the user stopped scrolling;</para></listitem>
+ *   <listitem><para>Kinetic: the iPhone-like behavior where the maps
+ *   decelerate after the user stopped scrolling.</para></listitem>
+ * </itemizedlist>
+ *
+ * You can use the same #ChamplainView to display many types of maps.  In
+ * Champlain they are called map sources.  You can change the #map-source
+ * property at anytime to replace the current displayed map.
+ *
+ * The maps are downloaded from Internet from open maps sources (like
+ * <ulink role="online-location"
+ * url="http://www.openstreetmap.org">OpenStreetMap</ulink>).  Maps are divided
+ * in tiles for each zoom level.  When a tile is requested, #ChamplainView will
+ * first check if it is in cache (in the user's cache dir under champlain). If
+ * an error occurs during download, an error tile will be displayed.
+ *
+ * The button-press-event and button-release-event signals are emitted each
+ * time a mouse button is pressed on the @view.  Coordinates can be converted
+ * with #champlain_view_get_coords_from_event.
+ */
 
 #include "champlain-tile.h"
 

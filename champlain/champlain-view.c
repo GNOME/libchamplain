@@ -1513,7 +1513,8 @@ view_load_visible_tiles (ChamplainView *view)
                   champlain_tile_get_actor (tile), NULL);
 
               champlain_zoom_level_add_tile (level, tile);
-              champlain_map_source_get_tile (priv->map_source, view, level, tile);
+              champlain_map_source_get_tile (priv->map_source, view,
+                  champlain_zoom_level_get_zoom_level (level), tile);
 
               g_object_unref (tile);
             }
