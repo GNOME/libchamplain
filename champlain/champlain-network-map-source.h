@@ -73,9 +73,7 @@ gchar * champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *so
 void champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *network_map_source,
     const gchar *uri_format);
 
-void champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
-    ChamplainView *view,
-    gint zoom_level,
+void champlain_network_map_source_fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile);
 
 G_END_DECLS

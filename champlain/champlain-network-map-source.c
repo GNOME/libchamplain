@@ -159,7 +159,7 @@ champlain_network_map_source_class_init (ChamplainNetworkMapSourceClass *klass)
   object_class->set_property = champlain_network_map_source_set_property;
 
   ChamplainMapSourceClass *map_source_class = CHAMPLAIN_MAP_SOURCE_CLASS (klass);
-  map_source_class->get_tile = champlain_network_map_source_get_tile;
+  map_source_class->fill_tile = champlain_network_map_source_fill_tile;
 
   /**
   * ChamplainNetworkMapSource:uri-format
@@ -344,7 +344,6 @@ champlain_map_source_new_mff_relief (void)
 
 static gchar *
 get_filename (ChamplainNetworkMapSource *network_map_source,
-    gint zoom_level,
     ChamplainTile *tile)
 {
   //ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
@@ -352,14 +351,9 @@ get_filename (ChamplainNetworkMapSource *network_map_source,
              "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
              "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
              CACHE_SUBDIR, champlain_map_source_get_name (CHAMPLAIN_MAP_SOURCE (network_map_source)),
-             zoom_level,
+             champlain_tile_get_zoom_level (tile),
              champlain_tile_get_x (tile), champlain_tile_get_y (tile));
 }
-
-typedef struct {
-  ChamplainView *view;
-  ChamplainTile *tile;
-} FileLoadedCallbackContext;
 
 static void
 create_error_tile (ChamplainTile* tile)
@@ -406,7 +400,7 @@ file_loaded_cb (SoupSession *session,
     SoupMessage *msg,
     gpointer user_data)
 {
-  FileLoadedCallbackContext *ctx = (FileLoadedCallbackContext*) user_data;
+  ChamplainTile *tile = CHAMPLAIN_TILE (user_data);
   GdkPixbufLoader* loader;
   GError *error = NULL;
   gchar* path = NULL;
@@ -417,7 +411,7 @@ file_loaded_cb (SoupSession *session,
   guint filesize = 0;
   ChamplainCache *cache = champlain_cache_get_default ();
 
-  filename = champlain_tile_get_filename (ctx->tile);
+  filename = champlain_tile_get_filename (tile);
 
   DEBUG ("Got reply %d", msg->status_code);
   if (msg->status_code == 304)
@@ -439,18 +433,17 @@ file_loaded_cb (SoupSession *session,
     g_object_unref (info);
     g_free (now);
 
-    champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
-    g_object_unref (ctx->tile);
-    g_free (ctx);
+    champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+    g_object_unref (tile);
     return;
   }
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
       DEBUG ("Unable to download tile %d, %d: %s",
-          champlain_tile_get_x (ctx->tile),
-          champlain_tile_get_y (ctx->tile),
+          champlain_tile_get_x (tile),
+          champlain_tile_get_y (tile),
           soup_status_get_phrase(msg->status_code));
-      create_error_tile (ctx->tile);
+      create_error_tile (tile);
       goto finish;
     }
 
@@ -465,7 +458,7 @@ file_loaded_cb (SoupSession *session,
         {
           g_warning ("Unable to load the pixbuf: %s", error->message);
           g_error_free (error);
-          create_error_tile (ctx->tile);
+          create_error_tile (tile);
           goto cleanup;
         }
 
@@ -477,7 +470,7 @@ file_loaded_cb (SoupSession *session,
     {
       g_warning ("Unable to close the pixbuf loader: %s", error->message);
       g_error_free (error);
-      create_error_tile (ctx->tile);
+      create_error_tile (tile);
       goto cleanup;
     }
 
@@ -508,9 +501,9 @@ file_loaded_cb (SoupSession *session,
 
   if (etag != NULL)
     {
-      champlain_tile_set_etag (ctx->tile, etag);
+      champlain_tile_set_etag (tile, etag);
     }
-  champlain_cache_update_tile (cache, ctx->tile, filesize); //XXX
+  champlain_cache_update_tile (cache, tile, filesize); //XXX
 
   /* Load the image into clutter */
   GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
@@ -530,40 +523,38 @@ file_loaded_cb (SoupSession *session,
         {
           g_warning ("Unable to transfer to clutter: %s", error->message);
           g_error_free (error);
-          create_error_tile (ctx->tile);
+          create_error_tile (tile);
           g_object_unref (actor);
           goto cleanup;
         }
     }
 
-  champlain_tile_set_content (ctx->tile, actor, TRUE);
+  champlain_tile_set_content (tile, actor, TRUE);
   DEBUG ("Tile loaded from network");
 
 cleanup:
   g_object_unref (loader);
   g_free (path);
 finish:
-  champlain_tile_set_state (ctx->tile, CHAMPLAIN_STATE_DONE);
-  g_object_unref (ctx->tile);
-  g_free (ctx);
+  champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+  g_object_unref (tile);
 }
 
 void
-champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
-    ChamplainView *view,
-    gint zoom_level,
+champlain_network_map_source_fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile)
 {
   gchar* filename;
   gboolean in_cache = FALSE;
   gboolean validate_cache = FALSE;
+  gint zoom_level = champlain_tile_get_zoom_level (tile);
 
   ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (map_source);
   ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
   ChamplainCache *cache = champlain_cache_get_default ();
 
   /* Try the cached version first */
-  filename = get_filename (network_map_source, zoom_level, tile);
+  filename = get_filename (network_map_source, tile);
   champlain_tile_set_filename (tile, filename);
   champlain_tile_set_size (tile, champlain_map_source_get_tile_size (map_source));
 
@@ -587,9 +578,6 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
     {
       SoupMessage *msg;
       gchar *uri;
-      FileLoadedCallbackContext *ctx = g_new0 (FileLoadedCallbackContext, 1);
-      ctx->view = view;
-      ctx->tile = tile;
 
       /* Ref the tile as it may be freeing during the loading
        * Unref when the loading is done.
@@ -641,7 +629,7 @@ champlain_network_map_source_get_tile (ChamplainMapSource *map_source,
 
       soup_session_queue_message (soup_session, msg,
                                   file_loaded_cb,
-                                  ctx);
+                                  tile);
       g_free (uri);
     }
   g_free (filename);

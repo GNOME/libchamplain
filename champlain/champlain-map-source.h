@@ -57,9 +57,7 @@ struct _ChamplainMapSourceClass
 {
   GObjectClass parent_class;
 
-  void (*get_tile) (ChamplainMapSource *map_source,
-                    ChamplainView *view,
-                    gint zoom_level,
+  void (*fill_tile) (ChamplainMapSource *map_source,
                     ChamplainTile *tile);
 };
 
@@ -93,9 +91,7 @@ guint champlain_map_source_get_row_count (ChamplainMapSource *map_source,
 guint champlain_map_source_get_column_count (ChamplainMapSource *map_source,
     gint zoom_level);
 
-void champlain_map_source_get_tile (ChamplainMapSource *map_source,
-    ChamplainView *view,
-    gint zoom_level,
+void champlain_map_source_fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile);
 
 void champlain_map_source_set_name (ChamplainMapSource *map_source,
