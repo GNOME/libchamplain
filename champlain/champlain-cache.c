@@ -26,6 +26,9 @@
  *
  * Tiles most frequently asked gain in "popularity".  This popularity will be taken
  * into account when purging the cache.
+ *
+ * Unless you are implementing your own ChamplainMapSource, the only function you
+ * should need are #champlain_cache_purge and #champlain_cache_purge_on_idle.
  */
 
 #include "champlain-cache.h"
