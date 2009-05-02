@@ -17,20 +17,20 @@
  */
 
 /**
- * SECTION:champlain-base_marker
- * @short_description: A base_marker to identify points of interest on a map
+ * SECTION:champlain-base-marker
+ * @short_description: A base marker to identify points of interest on a map
  *
- * BaseMarkers reprensent points of interest on a map. BaseMarkers need to be placed on
- * a layer (a #ClutterGroup).  Layers have to be added to a #ChamplainView for
- * the base_markers to show on the map.
+ * Base markers reprensent points of interest on a map. Base markers need to be
+ * placed on a layer (a #ClutterGroup).  Layers have to be added to a
+ * #ChamplainView for the base_markers to show on the map.
  *
- * A base_marker is nothing more than a regular #ClutterActor.  You can draw on it
- * what ever you want.  Don't forget to set the anchor position in the base_marker
- * using #champlain_base_marker_set_anchor.  Set the base_markers position on the map
- * using #champlain_base_marker_set_position.
+ * A basemarker is nothing more than a regular #ClutterActor.  You can draw on
+ * it what ever you want.  Don't forget to set the anchor position in the base
+ * marker using #clutter_actor_set_anchor_point. Set the base_markers position
+ * on the map using #champlain_base_marker_set_position.
  *
- * Champlain has a default type of base_markers with text. To create one,
- * use #champlain_base_marker_new_with_label.
+ * Champlain has a more evoluted type of markers with text and image support.
+ * See #ChamplainMarker.
  */
 
 #include "config.h"
