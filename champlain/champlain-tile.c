@@ -19,29 +19,7 @@
  * SECTION:champlain-tile
  * @short_description: An object that represent map tiles
  *
- * The #ChamplainView is a ClutterActor to display maps.  It supports two modes
- * of scrolling:
- * <itemizedlist>
- *   <listitem><para>Push: the normal behavior where the maps doesn't move
- *   after the user stopped scrolling;</para></listitem>
- *   <listitem><para>Kinetic: the iPhone-like behavior where the maps
- *   decelerate after the user stopped scrolling.</para></listitem>
- * </itemizedlist>
- *
- * You can use the same #ChamplainView to display many types of maps.  In
- * Champlain they are called map sources.  You can change the #map-source
- * property at anytime to replace the current displayed map.
- *
- * The maps are downloaded from Internet from open maps sources (like
- * <ulink role="online-location"
- * url="http://www.openstreetmap.org">OpenStreetMap</ulink>).  Maps are divided
- * in tiles for each zoom level.  When a tile is requested, #ChamplainView will
- * first check if it is in cache (in the user's cache dir under champlain). If
- * an error occurs during download, an error tile will be displayed.
- *
- * The button-press-event and button-release-event signals are emitted each
- * time a mouse button is pressed on the @view.  Coordinates can be converted
- * with #champlain_view_get_coords_from_event.
+ * This object represents map tiles. Tiles are loaded by #ChamplainMapSource.
  */
 
 #include "champlain-tile.h"
@@ -98,9 +76,9 @@ struct _ChamplainTilePrivate {
 
 static void
 champlain_tile_get_property (GObject *object,
-                             guint property_id,
-                             GValue *value,
-                             GParamSpec *pspec)
+    guint property_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainTile *self = CHAMPLAIN_TILE (object);
   switch (property_id)
@@ -142,9 +120,9 @@ champlain_tile_get_property (GObject *object,
 
 static void
 champlain_tile_set_property (GObject *object,
-                             guint property_id,
-                             const GValue *value,
-                             GParamSpec *pspec)
+    guint property_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainTile *self = CHAMPLAIN_TILE (object);
   switch (property_id)
@@ -169,9 +147,6 @@ champlain_tile_set_property (GObject *object,
         break;
       case PROP_FILENAME:
         champlain_tile_set_filename (self, g_value_get_string (value));
-        break;
-      case PROP_ACTOR:
-        champlain_tile_set_actor (self, g_value_get_object (value));
         break;
       case PROP_CONTENT:
         champlain_tile_set_content (self, g_value_get_object (value), FALSE);
@@ -220,6 +195,13 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   object_class->finalize = champlain_tile_finalize;
 
 
+  /**
+  * ChamplainTile:x:
+  *
+  * The x position of the tile
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_X,
       g_param_spec_int ("x",
@@ -230,6 +212,13 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         0,
         G_PARAM_READWRITE));
 
+  /**
+  * ChamplainTile:y:
+  *
+  * The y position of the tile
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_Y,
       g_param_spec_int ("y",
@@ -240,6 +229,13 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         0,
         G_PARAM_READWRITE));
 
+  /**
+  * ChamplainTile:zoom-level:
+  *
+  * The zoom level of the tile
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_ZOOM_LEVEL,
       g_param_spec_int ("zoom-level",
@@ -250,6 +246,13 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         0,
         G_PARAM_READWRITE));
 
+  /**
+  * ChamplainTile:size:
+  *
+  * The size of the tile in pixels
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_SIZE,
       g_param_spec_uint ("size",
@@ -260,6 +263,13 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         256,
         G_PARAM_READWRITE));
 
+  /**
+  * ChamplainTile:state:
+  *
+  * The state of the tile
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_STATE,
       g_param_spec_enum ("state",
@@ -269,6 +279,13 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         CHAMPLAIN_STATE_NONE,
         G_PARAM_READWRITE));
 
+  /**
+  * ChamplainTile:uri:
+  *
+  * The remote uri of the tile
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_URI,
       g_param_spec_string ("uri",
@@ -277,6 +294,13 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         "",
         G_PARAM_READWRITE));
 
+  /**
+  * ChamplainTile:filename:
+  *
+  * The local path of the cached tile
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_FILENAME,
       g_param_spec_string ("filename",
@@ -285,14 +309,30 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         "",
         G_PARAM_READWRITE));
 
+  /**
+  * ChamplainTile:actor:
+  *
+  * The #ClutterActor where the tile content is rendered.  Should never change
+  * during the tile's life.
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_ACTOR,
       g_param_spec_object ("actor",
         "Actor",
         "The tile's actor",
         CLUTTER_TYPE_ACTOR,
-        G_PARAM_READWRITE));
+        G_PARAM_READABLE));
 
+  /**
+  * ChamplainTile:content:
+  *
+  * The #ClutterActor with the specific image content.  When changing this
+  * property, the new actor will be faded in.
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_CONTENT,
       g_param_spec_object ("content",
@@ -301,6 +341,15 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         CLUTTER_TYPE_ACTOR,
         G_PARAM_READWRITE));
 
+  /**
+  * ChamplainTile:etag:
+  *
+  * The tile's ETag. This information is sent by some web servers as a mean
+  * to identify if a tile has changed.  This information is saved in the cache
+  * and sent in GET queries.
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_ETAG,
       g_param_spec_string ("etag",
@@ -329,12 +378,27 @@ champlain_tile_init (ChamplainTile *self)
   priv->content_actor = NULL;
 }
 
+/**
+ * champlain_tile_new:
+ *
+ * Returns a new #ChamplainTile
+ *
+ * Since: 0.4
+ */
 ChamplainTile*
 champlain_tile_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_TILE, NULL);
 }
 
+/**
+ * champlain_tile_get_x:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's x position
+ *
+ * Since: 0.4
+ */
 gint
 champlain_tile_get_x (ChamplainTile *self)
 {
@@ -345,6 +409,14 @@ champlain_tile_get_x (ChamplainTile *self)
   return priv->x;
 }
 
+/**
+ * champlain_tile_get_y:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's y position
+ *
+ * Since: 0.4
+ */
 gint
 champlain_tile_get_y (ChamplainTile *self)
 {
@@ -355,6 +427,14 @@ champlain_tile_get_y (ChamplainTile *self)
   return priv->y;
 }
 
+/**
+ * champlain_tile_get_zoom_level:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's zoom level
+ *
+ * Since: 0.4
+ */
 gint
 champlain_tile_get_zoom_level (ChamplainTile *self)
 {
@@ -365,6 +445,14 @@ champlain_tile_get_zoom_level (ChamplainTile *self)
   return priv->zoom_level;
 }
 
+/**
+ * champlain_tile_get_size:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's size in pixels
+ *
+ * Since: 0.4
+ */
 guint
 champlain_tile_get_size (ChamplainTile *self)
 {
@@ -375,6 +463,14 @@ champlain_tile_get_size (ChamplainTile *self)
   return priv->size;
 }
 
+/**
+ * champlain_tile_get_state:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's #ChamplainState
+ *
+ * Since: 0.4
+ */
 ChamplainState
 champlain_tile_get_state (ChamplainTile *self)
 {
@@ -385,6 +481,14 @@ champlain_tile_get_state (ChamplainTile *self)
   return priv->state;
 }
 
+/**
+ * champlain_tile_get_uri:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's remote uri
+ *
+ * Since: 0.4
+ */
 G_CONST_RETURN gchar *
 champlain_tile_get_uri (ChamplainTile *self)
 {
@@ -395,6 +499,14 @@ champlain_tile_get_uri (ChamplainTile *self)
   return priv->uri;
 }
 
+/**
+ * champlain_tile_get_filename:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's local filename
+ *
+ * Since: 0.4
+ */
 G_CONST_RETURN gchar *
 champlain_tile_get_filename (ChamplainTile *self)
 {
@@ -405,6 +517,15 @@ champlain_tile_get_filename (ChamplainTile *self)
   return priv->filename;
 }
 
+/**
+ * champlain_tile_get_actor:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's actor.  This actor should not change during the tile's
+ * lifetime.
+ *
+ * Since: 0.4
+ */
 ClutterActor *
 champlain_tile_get_actor (ChamplainTile *self)
 {
@@ -415,8 +536,18 @@ champlain_tile_get_actor (ChamplainTile *self)
   return priv->actor;
 }
 
+/**
+ * champlain_tile_set_x:
+ * @self: the #ChamplainTile
+ * @x: the position
+ *
+ * Sets the tile's x position
+ *
+ * Since: 0.4
+ */
 void
-champlain_tile_set_x (ChamplainTile *self, gint x)
+champlain_tile_set_x (ChamplainTile *self,
+    gint x)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
 
@@ -426,8 +557,18 @@ champlain_tile_set_x (ChamplainTile *self, gint x)
   g_object_notify (G_OBJECT (self), "x");
 }
 
+/**
+ * champlain_tile_set_y:
+ * @self: the #ChamplainTile
+ * @y: the position
+ *
+ * Sets the tile's y position
+ *
+ * Since: 0.4
+ */
 void
-champlain_tile_set_y (ChamplainTile *self, gint y)
+champlain_tile_set_y (ChamplainTile *self,
+    gint y)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
 
@@ -437,8 +578,18 @@ champlain_tile_set_y (ChamplainTile *self, gint y)
   g_object_notify (G_OBJECT (self), "y");
 }
 
+/**
+ * champlain_tile_set_zoom_level:
+ * @self: the #ChamplainTile
+ * @zoom_level: the zoom level
+ *
+ * Sets the tile's zoom level
+ *
+ * Since: 0.4
+ */
 void
-champlain_tile_set_zoom_level (ChamplainTile *self, gint zoom_level)
+champlain_tile_set_zoom_level (ChamplainTile *self,
+    gint zoom_level)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
 
@@ -448,8 +599,18 @@ champlain_tile_set_zoom_level (ChamplainTile *self, gint zoom_level)
   g_object_notify (G_OBJECT (self), "zoom-level");
 }
 
+/**
+ * champlain_tile_set_size:
+ * @self: the #ChamplainTile
+ * @size: the size in pixels
+ *
+ * Sets the tile's zoom level
+ *
+ * Since: 0.4
+ */
 void
-champlain_tile_set_size (ChamplainTile *self, guint size)
+champlain_tile_set_size (ChamplainTile *self,
+    guint size)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
 
@@ -459,8 +620,18 @@ champlain_tile_set_size (ChamplainTile *self, guint size)
   g_object_notify (G_OBJECT (self), "size");
 }
 
+/**
+ * champlain_tile_set_state:
+ * @self: the #ChamplainTile
+ * @state: a #ChamplainState
+ *
+ * Sets the tile's #ChamplainState
+ *
+ * Since: 0.4
+ */
 void
-champlain_tile_set_state (ChamplainTile *self, ChamplainState state)
+champlain_tile_set_state (ChamplainTile *self,
+    ChamplainState state)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
 
@@ -470,19 +641,40 @@ champlain_tile_set_state (ChamplainTile *self, ChamplainState state)
   g_object_notify (G_OBJECT (self), "state");
 }
 
+/**
+ * champlain_tile_new_full:
+ * @self: the #ChamplainTile
+ * @x: the x position
+ * @y: the y position
+ * @size: the size in pixels
+ * @zoom_level: the zoom level
+ *
+ * Returns a #ChamplainTile
+ *
+ * Since: 0.4
+ */
 ChamplainTile*
 champlain_tile_new_full (gint x,
-                         gint y,
-                         guint size,
-                         gint zoom_level)
+    gint y,
+    guint size,
+    gint zoom_level)
 {
   return g_object_new (CHAMPLAIN_TYPE_TILE, "x", x, "y", y, "zoom-level",
       zoom_level, "size", size, NULL);
 }
 
+/**
+ * champlain_tile_set_uri:
+ * @self: the #ChamplainTile
+ * @uri: the uri
+ *
+ * Sets the tile's x position
+ *
+ * Since: 0.4
+ */
 void
 champlain_tile_set_uri (ChamplainTile *self,
-                        const gchar *uri)
+    const gchar *uri)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
   g_return_if_fail(uri != NULL);
@@ -494,6 +686,15 @@ champlain_tile_set_uri (ChamplainTile *self,
   g_object_notify (G_OBJECT (self), "uri");
 }
 
+/**
+ * champlain_tile_set_filename:
+ * @self: the #ChamplainTile
+ * @filename: a local path to an image
+ *
+ * Returns the tile's x position
+ *
+ * Since: 0.4
+ */
 void
 champlain_tile_set_filename (ChamplainTile *self,
                              const gchar *filename)
@@ -508,21 +709,14 @@ champlain_tile_set_filename (ChamplainTile *self,
   g_object_notify (G_OBJECT (self), "filename");
 }
 
-void
-champlain_tile_set_actor (ChamplainTile *self, ClutterActor *actor)
-{
-  g_return_if_fail(CHAMPLAIN_TILE(self));
-  g_return_if_fail(actor != NULL);
-
-  ChamplainTilePrivate *priv = GET_PRIVATE (self);
-
-  if (priv->actor != NULL)
-    g_object_unref (priv->actor);
-
-  priv->actor = g_object_ref (actor);
-  g_object_notify (G_OBJECT (self), "actor");
-}
-
+/**
+ * champlain_tile_get_modified_time:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's last modified time
+ *
+ * Since: 0.4
+ */
 const GTimeVal *
 champlain_tile_get_modified_time (ChamplainTile *self)
 {
@@ -533,6 +727,15 @@ champlain_tile_get_modified_time (ChamplainTile *self)
   return priv->modified_time;
 }
 
+/**
+ * champlain_tile_set_modified_time:
+ * @self: the #ChamplainTile
+ * @time: a #GTimeVal
+ *
+ * Sets the tile's modified time
+ *
+ * Since: 0.4
+ */
 void
 champlain_tile_set_modified_time (ChamplainTile *self,
     GTimeVal *time)
@@ -545,6 +748,14 @@ champlain_tile_set_modified_time (ChamplainTile *self,
   priv->modified_time = time;
 }
 
+/**
+ * champlain_tile_get_modified_time_string:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's modified time as a string
+ *
+ * Since: 0.4
+ */
 char *
 champlain_tile_get_modified_time_string (ChamplainTile *self)
 {
@@ -559,6 +770,14 @@ champlain_tile_get_modified_time_string (ChamplainTile *self)
   return g_strdup (value);
 }
 
+/**
+ * champlain_tile_get_etag:
+ * @self: the #ChamplainTile
+ *
+ * Returns the tile's ETag
+ *
+ * Since: 0.4
+ */
 const char *
 champlain_tile_get_etag (ChamplainTile *self)
 {
@@ -568,6 +787,15 @@ champlain_tile_get_etag (ChamplainTile *self)
   return priv->etag;
 }
 
+/**
+ * champlain_tile_set_etag:
+ * @self: the #ChamplainTile
+ * @etag: the tile's ETag as sent by the server
+ *
+ * Sets the tile's ETag
+ *
+ * Since: 0.4
+ */
 void
 champlain_tile_set_etag (ChamplainTile *self,
     const gchar *etag)
@@ -607,9 +835,20 @@ fade_in_completed (ClutterTimeline *timeline,
 
 }
 
-
+/**
+ * champlain_tile_set_content:
+ * @self: the #ChamplainTile
+ * @actor: the new content
+ * @fade_in: if the new content should be faded in
+ *
+ * Returns the tile's content
+ *
+ * Since: 0.4
+ */
 void
-champlain_tile_set_content (ChamplainTile *self, ClutterActor *actor, gboolean fade_in)
+champlain_tile_set_content (ChamplainTile *self,
+    ClutterActor *actor,
+    gboolean fade_in)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
   g_return_if_fail(actor != NULL);
@@ -647,6 +886,13 @@ champlain_tile_set_content (ChamplainTile *self, ClutterActor *actor, gboolean f
   g_object_notify (G_OBJECT (self), "content");
 }
 
+/**
+ * champlain_tile_get_content:
+ *
+ * Returns the tile's content
+ *
+ * Since: 0.4
+ */
 ClutterActor *
 champlain_tile_get_content (ChamplainTile *self)
 {

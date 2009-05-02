@@ -54,7 +54,10 @@ typedef struct {
 GType champlain_tile_get_type (void);
 
 ChamplainTile* champlain_tile_new (void);
-ChamplainTile* champlain_tile_new_full (gint x, gint y, guint size, gint zoom_level);
+ChamplainTile* champlain_tile_new_full (gint x,
+    gint y,
+    guint size,
+    gint zoom_level);
 
 gint champlain_tile_get_x (ChamplainTile *self);
 gint champlain_tile_get_y (ChamplainTile *self);
@@ -69,17 +72,26 @@ const GTimeVal * champlain_tile_get_modified_time (ChamplainTile *self);
 char * champlain_tile_get_modified_time_string (ChamplainTile *self);
 const char * champlain_tile_get_etag (ChamplainTile *self);
 
-void champlain_tile_set_x (ChamplainTile *self, gint x);
+void champlain_tile_set_x (ChamplainTile *self,
+    gint x);
 void champlain_tile_set_y (ChamplainTile *self, gint y);
-void champlain_tile_set_zoom_level (ChamplainTile *self, gint zoom_level);
-void champlain_tile_set_size (ChamplainTile *self, guint size);
-void champlain_tile_set_state (ChamplainTile *self, ChamplainState state);
-void champlain_tile_set_uri (ChamplainTile *self, const gchar *uri);
-void champlain_tile_set_filename (ChamplainTile *self, const gchar *filename);
-void champlain_tile_set_actor (ChamplainTile *self, ClutterActor* actor);
-void champlain_tile_set_content (ChamplainTile *self, ClutterActor* actor, gboolean fade_in);
-void champlain_tile_set_etag (ChamplainTile *self, const gchar *etag);
-void champlain_tile_set_modified_time (ChamplainTile *self, GTimeVal *time);
+void champlain_tile_set_zoom_level (ChamplainTile *self,
+    gint zoom_level);
+void champlain_tile_set_size (ChamplainTile *self,
+    guint size);
+void champlain_tile_set_state (ChamplainTile *self,
+    ChamplainState state);
+void champlain_tile_set_uri (ChamplainTile *self,
+    const gchar *uri);
+void champlain_tile_set_filename (ChamplainTile *self,
+    const gchar *filename);
+void champlain_tile_set_content (ChamplainTile *self,
+    ClutterActor* actor,
+    gboolean fade_in);
+void champlain_tile_set_etag (ChamplainTile *self,
+    const gchar *etag);
+void champlain_tile_set_modified_time (ChamplainTile *self,
+    GTimeVal *time);
 
 G_END_DECLS
 
