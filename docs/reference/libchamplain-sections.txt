@@ -294,3 +294,18 @@ CHAMPLAIN_PARAM_READWRITE
 ChamplainState
 </SECTION>
 
+<SECTION>
+<FILE>champlain-cache</FILE>
+ChamplainCache
+ChamplainCacheClass
+champlain_cache_fill_tile
+champlain_cache_get_default
+champlain_cache_get_size_limit
+champlain_cache_get_type
+champlain_cache_purge
+champlain_cache_purge_on_idle
+champlain_cache_set_size_limit
+champlain_cache_tile_is_expired
+champlain_cache_update_tile
+</SECTION>
+

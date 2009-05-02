@@ -188,7 +188,7 @@ cleanup:
 /**
  * champlain_cache_get_default:
  *
- * Return the #ChamplainCache singleton
+ * Returns the #ChamplainCache singleton
  *
  * Since: 0.4
  */
@@ -405,7 +405,7 @@ delete_tile (ChamplainCache *self,
  * champlain_cache_update_tile:
  * @self: the #ChamplainCache
  * @tile: the #ChamplainTile to fill
- * @size: the filesize on the disk
+ * @filesize: the filesize on the disk
  *
  * Update the tile's information in the cache such as Etag and filesize.
  * Also increase the tile's popularity.
@@ -415,7 +415,7 @@ delete_tile (ChamplainCache *self,
 void
 champlain_cache_update_tile (ChamplainCache *self,
     ChamplainTile *tile,
-    guint size)
+    guint filesize)
 {
   g_return_if_fail (CHAMPLAIN_CACHE (self));
   gchar *query, *error = NULL;
@@ -425,7 +425,7 @@ champlain_cache_update_tile (ChamplainCache *self,
   query = g_strdup_printf ("REPLACE INTO tiles (filename, etag, size) VALUES ('%s', '%s', %d);",
       champlain_tile_get_filename (tile),
       champlain_tile_get_etag (tile),
-      size);
+      filesize);
   sqlite3_exec (priv->data, query, NULL, NULL, &error);
   if (error != NULL)
     {

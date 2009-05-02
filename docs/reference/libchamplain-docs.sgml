@@ -52,7 +52,7 @@
     <xi:include href="xml/champlain-map-source.xml"/>
     <xi:include href="xml/champlain-network-map-source.xml"/>
     <xi:include href="xml/champlain-tile.xml"/>
-    <xi:include href="xml/champlain-zoom-level.xml"/>
+    <xi:include href="xml/champlain-cache.xml"/>
   </chapter>
   <index>
     <title>Index</title>
