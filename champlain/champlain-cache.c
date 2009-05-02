@@ -16,6 +16,18 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-cache
+ * @short_description: Manages cached tiles
+ *
+ * #ChamplainCache is an object to interogate the cache for previously downloaded
+ * tiles. ChamplainCache is a singleton, there should be only one instance shared
+ * by all map sources.
+ *
+ * Tiles most frequently asked gain in "popularity".  This popularity will be taken
+ * into account when purging the cache.
+ */
+
 #include "champlain-cache.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_CACHE
@@ -117,6 +129,15 @@ champlain_cache_class_init (ChamplainCacheClass *klass)
   object_class->dispose = champlain_cache_dispose;
   object_class->finalize = champlain_cache_finalize;
 
+  /**
+  * ChamplainCache:size-limit:
+  *
+  * The cache size limit in bytes.
+  *
+  * Note: this new value will not be applied until you call #champlain_cache_purge
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_SIZE_LIMIT,
       g_param_spec_uint ("size-limit",
@@ -124,7 +145,7 @@ champlain_cache_class_init (ChamplainCacheClass *klass)
         "The cache's size limit (Mb)",
         1,
         G_MAXINT,
-        10,
+        100000000,
         G_PARAM_READWRITE));
 }
 
@@ -161,6 +182,13 @@ cleanup:
   g_free (filename);
 }
 
+/**
+ * champlain_cache_get_default:
+ *
+ * Return the #ChamplainCache singleton
+ *
+ * Since: 0.4
+ */
 ChamplainCache*
 champlain_cache_get_default (void)
 {
@@ -175,6 +203,14 @@ champlain_cache_get_default (void)
   return g_object_ref (instance);
 }
 
+/**
+ * champlain_cache_get_size_limit:
+ * @self: the #ChamplainCache
+ *
+ * Returns the cache size limit in bytes
+ *
+ * Since: 0.4
+ */
 guint
 champlain_cache_get_size_limit (ChamplainCache *self)
 {
@@ -185,6 +221,15 @@ champlain_cache_get_size_limit (ChamplainCache *self)
   return priv->size_limit;
 }
 
+/**
+ * champlain_cache_set_size_limit:
+ * @self: the #ChamplainCache
+ * @size_limit: the cache limit in bytes
+ *
+ * Sets the cache size limit in bytes
+ *
+ * Since: 0.4
+ */
 void
 champlain_cache_set_size_limit (ChamplainCache *self,
     guint size_limit)
@@ -207,6 +252,18 @@ set_etag (void *tile,
   return 0; // 0 meaning success
 }
 
+/**
+ * champlain_cache_fill_tile:
+ * @self: the #ChamplainCache
+ * @tile: the #ChamplainTile to fill
+ *
+ * Loads data from disk for the given tile
+ *
+ * Returns TRUE if the tile was in cache, false if it needs to be
+ * loaded from network
+ *
+ * Since: 0.4
+ */
 gboolean
 champlain_cache_fill_tile (ChamplainCache *self,
     ChamplainTile *tile)
@@ -260,6 +317,16 @@ champlain_cache_fill_tile (ChamplainCache *self,
   return TRUE;
 }
 
+/**
+ * champlain_cache_tile_is_expired:
+ * @self: the #ChamplainCache
+ * @tile: the #ChamplainTile to fill
+ *
+ * Returns TRUE if the tile should be
+ * reloaded from network
+ *
+ * Since: 0.4
+ */
 gboolean
 champlain_cache_tile_is_expired (ChamplainCache *self,
     ChamplainTile *tile)
@@ -331,6 +398,17 @@ delete_tile (ChamplainCache *self,
   g_object_unref (file);
 }
 
+/**
+ * champlain_cache_update_tile:
+ * @self: the #ChamplainCache
+ * @tile: the #ChamplainTile to fill
+ * @size: the filesize on the disk
+ *
+ * Update the tile's information in the cache such as Etag and filesize.
+ * Also increase the tile's popularity.
+ *
+ * Since: 0.4
+ */
 void
 champlain_cache_update_tile (ChamplainCache *self,
     ChamplainTile *tile,
@@ -361,6 +439,15 @@ purge_on_idle (gpointer data)
   return FALSE;
 }
 
+/**
+ * champlain_cache_purge_on_idle:
+ * @self: the #ChamplainCache
+ *
+ * Purge the cache from the less popular tiles until cache's size limit is reached.
+ * This is a non blocking call as the purge will happen when the application is idle
+ *
+ * Since: 0.4
+ */
 void
 champlain_cache_purge_on_idle (ChamplainCache *self)
 {
@@ -368,6 +455,14 @@ champlain_cache_purge_on_idle (ChamplainCache *self)
   g_idle_add (purge_on_idle, self);
 }
 
+/**
+ * champlain_cache_purge:
+ * @self: the #ChamplainCache
+ *
+ * Purge the cache from the less popular tiles until cache's size limit is reached.
+ *
+ * Since: 0.4
+ */
 void
 champlain_cache_purge (ChamplainCache *self)
 {
