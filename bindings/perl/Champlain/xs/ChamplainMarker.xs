@@ -18,11 +18,13 @@ ClutterActor*
 champlain_marker_new_from_file (class, const gchar *filename)
 	PREINIT:
 		GError *error = NULL;
+
 	CODE:
 		RETVAL = champlain_marker_new_from_file(filename, &error);
 		if (error) {
 			gperl_croak_gerror(NULL, error);
 		}
+
 	OUTPUT:
 		RETVAL
 
