@@ -16,6 +16,21 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-map-source-factory
+ * @short_description: Manages #ChamplainMapSource
+ *
+ * This factory manages the create of #ChamplainMapSource. It contains names
+ * and constructor functions for each available map sources in libchamplain.
+ * You can add your own with #champlain_map_source_factory_register.
+ *
+ * To get the wanted map source, use #champlain_map_source_factory_create. It
+ * will return a ready to use #ChamplainMapSource.
+ *
+ * To get the list of registered map sources, use
+ * #champlain_map_source_factory_get_list.
+ * 
+ */
 #include "config.h"
 
 #include "champlain-map-source-factory.h"
@@ -143,6 +158,13 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
       champlain_map_source_new_mff_relief);
 }
 
+/**
+ * champlain_map_source_factory_get_default:
+ *
+ * Returns the singleton #ChamplainMapSourceFactory
+ *
+ * Since: 0.4
+ */
 ChamplainMapSourceFactory *
 champlain_map_source_factory_get_default (void)
 {
@@ -157,6 +179,14 @@ champlain_map_source_factory_get_default (void)
   return g_object_ref (instance);
 }
 
+/**
+ * champlain_map_source_factory_get_list:
+ *
+ * Returns the list of registered map sources, the list should be freed with
+ * #g_strfreev.
+ *
+ * Since: 0.4
+ */
 gchar **
 champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
 {
@@ -182,6 +212,16 @@ champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
   return ret;
 }
 
+/**
+ * champlain_map_source_factory_create:
+ * @factory: the Factory
+ * @name: the wanted map source name
+ *
+ * Returns a ready to use #ChamplainMapSource matching the given name, returns
+ * NULL is none match.
+ *
+ * Since: 0.4
+ */
 ChamplainMapSource *
 champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     const gchar *name)
@@ -200,6 +240,20 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
   return NULL;
 }
 
+/**
+ * champlain_map_source_factory_register:
+ * @factory: the Factory
+ * @name: the new map source name
+ * @constructor: the new map source constructor function
+ *
+ * Register the new map source with the given constructor.  When this map
+ * source is requested, the given constructor will be given to build the
+ * map source.
+ *
+ * Returns TRUE if the registration suceeded.
+ *
+ * Since: 0.4
+ */
 gboolean
 champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
     const gchar *name,

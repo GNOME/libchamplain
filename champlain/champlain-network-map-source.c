@@ -16,6 +16,20 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-network-map-source
+ * @short_description: A base object for network map sources
+ *
+ * This object is specialized for map tiles that can be downloaded
+ * from a web server.  This include all web based map services such as
+ * OpenStreetMap, Google Maps, Yahoo Maps and more.  This object contains
+ * all mechanisms necessary to download and cache (with the help of
+ * #ChamplainCache) tiles.
+ *
+ * Some preconfigured network map sources are built-in this library,
+ * see #ChamplainMapSourceFactory.
+ *
+ */
 #include "config.h"
 
 #include "champlain-network-map-source.h"
@@ -84,8 +98,8 @@ champlain_network_map_source_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE(object);
-  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
+  ChamplainNetworkMapSource *source = CHAMPLAIN_NETWORK_MAP_SOURCE(object);
+  ChamplainNetworkMapSourcePrivate *priv = source->priv;
 
   switch(prop_id)
     {
@@ -109,8 +123,8 @@ champlain_network_map_source_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE(object);
-  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
+  ChamplainNetworkMapSource *source = CHAMPLAIN_NETWORK_MAP_SOURCE(object);
+  ChamplainNetworkMapSourcePrivate *priv = source->priv;
 
   switch(prop_id)
     {
@@ -137,8 +151,8 @@ champlain_network_map_source_set_property (GObject *object,
 static void
 champlain_network_map_source_finalize (GObject *object)
 {
-  ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (object);
-  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
+  ChamplainNetworkMapSource *source = CHAMPLAIN_NETWORK_MAP_SOURCE (object);
+  ChamplainNetworkMapSourcePrivate *priv = source->priv;
 
   g_free (priv->proxy_uri);
   g_free (priv->uri_format);
@@ -164,7 +178,7 @@ champlain_network_map_source_class_init (ChamplainNetworkMapSourceClass *klass)
   /**
   * ChamplainNetworkMapSource:uri-format
   *
-  * The uri format for the map source
+  * The uri format for the map source, see #champlain_network_map_source_set_uri_format
   *
   * Since: 0.4
   */
@@ -216,6 +230,21 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
   priv->offline = FALSE;
 }
 
+/**
+ * champlain_network_map_source_new_full:
+ * @name: the map source's name
+ * @license: the map source's license
+ * @license_uri: the map source's license URI
+ * @min_zoom: the map source's minimum zoom level
+ * @max_zoom: the map source's maximum zoom level
+ * @tile_size: the map source's tile size (in pixels)
+ * @projection: the map source's projection
+ * @uri_format: the URI to fetch the tiles from, see #champlain_network_map_source_set_uri_format
+ *
+ * Returns a constructed #ChamplainNetworkMapSource
+ *
+ * Since: 0.4
+ */
 ChamplainNetworkMapSource*
 champlain_network_map_source_new_full (const gchar *name,
     const gchar *license,
@@ -226,23 +255,35 @@ champlain_network_map_source_new_full (const gchar *name,
     ChamplainMapProjection projection,
     const gchar *uri_format)
 {
-  ChamplainNetworkMapSource * network_map_source;
-  network_map_source = g_object_new (CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE, "name", name,
+  ChamplainNetworkMapSource * source;
+  source = g_object_new (CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE, "name", name,
       "license", license, "license-uri", license_uri,
       "min-zoom-level", min_zoom, "max-zoom-level", max_zoom,
       "tile-size", tile_size, "projection", projection,
       "uri-format", uri_format, NULL);
-  return network_map_source;
+  return source;
 }
 
+/**
+ * champlain_network_map_source_get_tile_uri:
+ * @source: the #ChamplainNetworkMapSource
+ * @x: the x position of the tile
+ * @y: the y position of the tile
+ * @z: the zool level of the tile
+ *
+ * Returns a contruscted URI with the given parameters based on the map
+ * source's URI format.
+ *
+ * Since: 0.4
+ */
 #define SIZE 8
 gchar *
-champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_map_source,
+champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *source,
     gint x,
     gint y,
     gint z)
 {
-  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
+  ChamplainNetworkMapSourcePrivate *priv = source->priv;
 
   gchar **tokens;
   gchar *token;
@@ -282,25 +323,41 @@ champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *network_ma
   return token;
 }
 
+/**
+ * champlain_network_map_source_set_uri_format:
+ * @source: the #ChamplainNetworkMapSource
+ * @uri_format: the URI format
+ *
+ * A URI format is a URI where x, y and zoom level information have been
+ * marked for parsing and insertion.  There can be an unlimited number of
+ * marked items in a URI format.  They are delimited by "#" before and after
+ * the variable name. There are 3 defined variable names: X, Y, and Z.
+ *
+ * For example, this is the OpenStreetMap URI format:
+ * "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png"
+ *
+ *
+ * Since: 0.4
+ */
 void
-champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *network_map_source,
+champlain_network_map_source_set_uri_format (ChamplainNetworkMapSource *source,
     const gchar *uri_format)
 {
-  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
+  ChamplainNetworkMapSourcePrivate *priv = source->priv;
 
   g_free (priv->uri_format);
   priv->uri_format = g_strdup (uri_format);
 }
 
 static gchar *
-get_filename (ChamplainNetworkMapSource *network_map_source,
+get_filename (ChamplainNetworkMapSource *source,
     ChamplainTile *tile)
 {
-  //ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
+  //ChamplainNetworkMapSourcePrivate *priv = source->priv;
   return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
              "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
              "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
-             CACHE_SUBDIR, champlain_map_source_get_name (CHAMPLAIN_MAP_SOURCE (network_map_source)),
+             CACHE_SUBDIR, champlain_map_source_get_name (CHAMPLAIN_MAP_SOURCE (source)),
              champlain_tile_get_zoom_level (tile),
              champlain_tile_get_x (tile), champlain_tile_get_y (tile));
 }
@@ -490,6 +547,17 @@ finish:
   g_object_unref (tile);
 }
 
+/**
+ * champlain_network_map_source_fill_tile:
+ * @map_source: the #ChamplainNetworkMapSource
+ * @tile: the #ChamplainTile
+ *
+ * Fills the passed tile with image data.  If not in #ChamplainCache, this function
+ * will initiate an async download of the image at the map source's URI format.
+ * Once done, the tile's state will be set to #CHAMPLAIN_STATE_DONE.
+ *
+ * Since: 0.4
+ */
 void
 champlain_network_map_source_fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile)
@@ -499,12 +567,12 @@ champlain_network_map_source_fill_tile (ChamplainMapSource *map_source,
   gboolean validate_cache = FALSE;
   gint zoom_level = champlain_tile_get_zoom_level (tile);
 
-  ChamplainNetworkMapSource *network_map_source = CHAMPLAIN_NETWORK_MAP_SOURCE (map_source);
-  ChamplainNetworkMapSourcePrivate *priv = network_map_source->priv;
+  ChamplainNetworkMapSource *source = CHAMPLAIN_NETWORK_MAP_SOURCE (map_source);
+  ChamplainNetworkMapSourcePrivate *priv = source->priv;
   ChamplainCache *cache = champlain_cache_get_default ();
 
   /* Try the cached version first */
-  filename = get_filename (network_map_source, tile);
+  filename = get_filename (source, tile);
   champlain_tile_set_filename (tile, filename);
   champlain_tile_set_size (tile, champlain_map_source_get_tile_size (map_source));
 
@@ -542,7 +610,7 @@ champlain_network_map_source_fill_tile (ChamplainMapSource *map_source,
 #endif
             NULL);
 
-      uri = champlain_network_map_source_get_tile_uri (network_map_source,
+      uri = champlain_network_map_source_get_tile_uri (source,
                champlain_tile_get_x (tile), champlain_tile_get_y (tile),
                zoom_level);
       champlain_tile_set_uri (tile, uri);

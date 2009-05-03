@@ -61,6 +61,14 @@ gchar ** champlain_map_source_factory_get_list (ChamplainMapSourceFactory *facto
 ChamplainMapSource * champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     const gchar *id);
 
+/**
+ * ChamplainMapSourceConstructor:
+ *
+ * A #ChamplainMapSource constructor.  It should return a ready to use
+ * #ChamplainMapSource.
+ *
+ * Since: 0.4
+ */
 typedef ChamplainMapSource * (*ChamplainMapSourceConstructor) ();
 #define CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR (f) ((ChamplainMapSourceConstructor) (f))
 

@@ -18,7 +18,7 @@
 
 /**
  * SECTION:champlain-base-marker
- * @short_description: a base marker to identify points of interest on a map
+ * @short_description: A base marker to identify points of interest on a map
  *
  * Base markers reprensent points of interest on a map. base markers need to be
  * placed on a layer (a #cluttergroup).  layers have to be added to a
