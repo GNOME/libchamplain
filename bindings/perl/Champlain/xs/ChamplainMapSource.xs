@@ -4,31 +4,6 @@
 MODULE = Champlain::MapSource  PACKAGE = Champlain::MapSource  PREFIX = champlain_map_source_
 
 
-ChamplainMapSource*
-champlain_map_source_new_osm_mapnik (class)
-	C_ARGS: /* No args */
-
-
-ChamplainMapSource*
-champlain_map_source_new_oam (class)
-	C_ARGS: /* No args */
-
-
-ChamplainMapSource*
-champlain_map_source_new_mff_relief (class)
-	C_ARGS: /* No args */
-
-
-ChamplainMapSource*
-champlain_map_source_new_osm_cyclemap (class)
-	C_ARGS: /* No args */
-
-
-ChamplainMapSource*
-champlain_map_source_new_osm_osmarender (class)
-	C_ARGS: /* No args */
-
-
 const gchar*
 champlain_map_source_get_name (ChamplainMapSource *map_source)
 
@@ -83,4 +58,3 @@ champlain_map_source_set_license (ChamplainMapSource *map_source, const gchar *l
 
 const gchar*
 champlain_map_source_get_license (ChamplainMapSource *map_source)
-
