@@ -593,12 +593,22 @@ draw_marker (ChamplainMarker *marker)
       draw_shadow (marker, total_width, total_height, point);
       draw_background (marker, total_width, total_height, point);
     }
-  else if (priv->background != NULL)
-    {
-      clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
-      g_object_unref (G_OBJECT (priv->background));
-      priv->background = NULL;
-    }
+  else
+  {
+    if (priv->background != NULL)
+      {
+        clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
+        g_object_unref (G_OBJECT (priv->background));
+        priv->background = NULL;
+      }
+
+    if (priv->shadow != NULL)
+      {
+        clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->shadow);
+        g_object_unref (G_OBJECT (priv->shadow));
+        priv->shadow = NULL;
+      }
+  }
 
   if (priv->text_actor != NULL && priv->background != NULL)
     clutter_actor_raise (priv->text_actor, priv->background);
