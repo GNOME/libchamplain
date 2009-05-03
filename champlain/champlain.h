@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,6 +36,7 @@
 #include "champlain/champlain-view.h"
 #include "champlain/champlain-enum-types.h"
 #include "champlain/champlain-map-source.h"
+#include "champlain/champlain-map-source-factory.h"
 #include "champlain/champlain-network-map-source.h"
 #include "champlain/champlain-version.h"
 

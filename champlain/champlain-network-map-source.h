@@ -59,12 +59,6 @@ ChamplainNetworkMapSource* champlain_network_map_source_new_full (
     guint min_zoom, guint map_zoom, guint tile_size,
     ChamplainMapProjection projection, const gchar *uri_format);
 
-ChamplainMapSource * champlain_map_source_new_osm_mapnik (void);
-ChamplainMapSource * champlain_map_source_new_osm_cyclemap (void);
-ChamplainMapSource * champlain_map_source_new_osm_osmarender (void);
-ChamplainMapSource * champlain_map_source_new_oam (void);
-ChamplainMapSource * champlain_map_source_new_mff_relief (void);
-
 gchar * champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *source,
     gint x,
     gint y,

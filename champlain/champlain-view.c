@@ -58,6 +58,7 @@
 #include "champlain-map.h"
 #include "champlain-marshal.h"
 #include "champlain-map-source.h"
+#include "champlain-map-source-factory.h"
 #include "champlain-private.h"
 #include "champlain-tile.h"
 #include "champlain-zoom-level.h"
@@ -116,6 +117,7 @@ struct _ChamplainViewPrivate
 {
   ClutterActor *stage;
 
+  ChamplainMapSourceFactory *factory; /* The map source factory */
   ChamplainMapSource *map_source; /* Current map tile source */
   ChamplainScrollMode scroll_mode;
   gint zoom_level; /* Holds the current zoom level number */
@@ -515,6 +517,7 @@ champlain_view_dispose (GObject *object)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
+  g_object_unref (priv->factory);
   g_object_unref (priv->map_source);
   if (priv->license_actor)
     g_object_unref (priv->license_actor);
@@ -756,7 +759,8 @@ champlain_view_init (ChamplainView *view)
 
   view->priv = priv;
 
-  priv->map_source = g_object_ref (champlain_map_source_new_osm_mapnik ());
+  priv->factory = champlain_map_source_factory_get_default ();
+  priv->map_source = champlain_map_source_factory_create (priv->factory, CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK);
   priv->zoom_level = 0;
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);

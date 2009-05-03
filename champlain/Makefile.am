@@ -22,11 +22,11 @@ libchamplain_headers = \
 	champlain-base-marker.h		\
 	champlain-marker.h		\
 	champlain-map.h			\
-	champlain-zoom-level.h		\
 	champlain-enum-types.h		\
 	champlain-tile.h		\
 	champlain-map-source.h		\
 	champlain-network-map-source.h	\
+	champlain-map-source-factory.h	\
 	champlain-version.h
 
 
@@ -43,6 +43,7 @@ libchamplain_0_3_la_SOURCES = \
 	champlain-tile.c		\
 	champlain-map-source.c		\
 	champlain-network-map-source.c	\
+	champlain-map-source-factory.c	\
 	champlain-cache.c
 
 noinst_HEADERS = \
@@ -57,6 +58,7 @@ noinst_HEADERS = \
 	champlain-enum-types.h		\
 	champlain-map-source.h		\
 	champlain-network-map-source.h	\
+	champlain-map-source-factory.h	\
 	champlain-version.h		\
 	champlain-cache.h
 
@@ -68,6 +70,7 @@ libchamplain_include_HEADERS = \
 	champlain-layer.h 		\
 	champlain-map-source.h		\
 	champlain-network-map-source.h	\
+	champlain-map-source-factory.h	\
 	champlain-tile.h		\
 	champlain-zoom-level.h		\
 	champlain-base-marker.h		\

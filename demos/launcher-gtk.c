@@ -24,12 +24,6 @@
 
 #include <markers.h>
 
-#define OSM_MAP "Open Street Map"
-#define OAM_MAP "Open Arial Map"
-#define MFF_MAP "Maps for free - Relief"
-#define OSM_CYCLE "OSM Cycle Map"
-#define OSM_OSMA "OSM Osmarender"
-
 /*
  * Terminate the main loop.
  */
@@ -53,27 +47,17 @@ static void
 map_source_changed (GtkWidget *widget,
                     ChamplainView *view)
 {
-  gchar* selection = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
-  if (g_strcmp0 (selection, OSM_MAP) == 0)
-    {
-      g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_osm_mapnik (), NULL);
-    }
-  else if (g_strcmp0 (selection, OAM_MAP) == 0)
-    {
-      g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_oam (), NULL);
-    }
-  else if (g_strcmp0 (selection, MFF_MAP) == 0)
-    {
-      g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_mff_relief (), NULL);
-    }
-  else if (g_strcmp0 (selection, OSM_CYCLE) == 0)
-    {
-      g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_osm_cyclemap (), NULL);
-    }
-  else if (g_strcmp0 (selection, OSM_OSMA) == 0)
-    {
-      g_object_set (G_OBJECT (view), "map-source", champlain_map_source_new_osm_osmarender (), NULL);
-    }
+  gchar* selection;
+  ChamplainMapSource *source;
+
+  selection = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
+  ChamplainMapSourceFactory *factory = champlain_map_source_factory_get_default ();
+  source = champlain_map_source_factory_create (factory, selection);
+
+  g_object_set (G_OBJECT (view), "map-source", source, NULL);
+
+  g_object_unref (factory);
+  g_object_unref (source);
 }
 
 static void
@@ -126,6 +110,28 @@ zoom_out (GtkWidget *widget,
           ChamplainView *view)
 {
   champlain_view_zoom_out(view);
+}
+
+static void
+build_combo_box (GtkComboBox *box)
+{
+  ChamplainMapSourceFactory *factory;
+  gchar **sources;
+  gchar *name;
+  gint i = 0;
+
+  factory = champlain_map_source_factory_get_default ();
+  sources = champlain_map_source_factory_get_list (factory);
+  name = sources[i];
+
+  while (name != NULL)
+  {
+    gtk_combo_box_append_text(GTK_COMBO_BOX(box), g_strdup (name));
+    name = sources[++i];
+  }
+
+  g_strfreev (sources);
+  g_object_unref (factory);
 }
 
 int
@@ -182,11 +188,7 @@ main (int argc,
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
   button = gtk_combo_box_new_text();
-  gtk_combo_box_append_text(GTK_COMBO_BOX(button), OSM_MAP);
-  gtk_combo_box_append_text(GTK_COMBO_BOX(button), OAM_MAP);
-  gtk_combo_box_append_text(GTK_COMBO_BOX(button), MFF_MAP);
-  gtk_combo_box_append_text(GTK_COMBO_BOX(button), OSM_CYCLE);
-  gtk_combo_box_append_text(GTK_COMBO_BOX(button), OSM_OSMA);
+  build_combo_box (button);
   gtk_combo_box_set_active(GTK_COMBO_BOX(button), 0);
   g_signal_connect (button, "changed", G_CALLBACK (map_source_changed), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);

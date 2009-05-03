@@ -292,56 +292,6 @@ champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *network_ma
   priv->uri_format = g_strdup (uri_format);
 }
 
-ChamplainMapSource *
-champlain_map_source_new_osm_cyclemap (void)
-{
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenStreetMap Cycle Map",
-      "(CC) BY 2.0 OpenStreetMap contributors",
-      "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
-      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://andy.sandbox.cloudmade.com/tiles/cycle/#Z#/#X#/#Y#.png"));
-}
-
-ChamplainMapSource *
-champlain_map_source_new_osm_osmarender (void)
-{
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenStreetMap Osmarender",
-      "(CC) BY 2.0 OpenStreetMap contributors",
-      "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
-      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png"));
-}
-
-ChamplainMapSource *
-champlain_map_source_new_osm_mapnik (void)
-{
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenStreetMap Mapnik",
-      "(CC) BY 2.0 OpenStreetMap contributors",
-      "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
-      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png"));
-}
-
-ChamplainMapSource *
-champlain_map_source_new_oam (void)
-{
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenArialMap",
-      "(CC) BY 3.0 OpenArialMap contributors",
-      "http://creativecommons.org/licenses/by/3.0/", 0, 17, 256,
-      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg"));
-}
-
-ChamplainMapSource *
-champlain_map_source_new_mff_relief (void)
-{
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("MapsForFree Relief",
-      "Map data available under GNU Free Documentation license, Version 1.2 or later",
-      "http://www.gnu.org/copyleft/fdl.html", 0, 11, 256,
-      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "http://maps-for-free.com/layer/relief/z#Z#/row#Y#/#Z#_#X#-#Y#.jpg"));
-}
-
 static gchar *
 get_filename (ChamplainNetworkMapSource *network_map_source,
     ChamplainTile *tile)
