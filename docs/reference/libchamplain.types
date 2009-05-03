@@ -8,3 +8,4 @@ champlain_map_source_get_type
 champlain_network_map_source_get_type
 champlain_tile_get_type
 champlain_cache_get_type
+champlain_map_source_factory_get_type

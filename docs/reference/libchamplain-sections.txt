@@ -17,6 +17,10 @@ champlain_map_source_set_name
 champlain_map_source_get_name
 champlain_map_source_set_license
 champlain_map_source_get_license
+champlain_map_source_set_license_uri
+champlain_map_source_get_license_uri
+champlain_map_source_set_projection
+champlain_map_source_get_projection
 <SUBSECTION Standard>
 CHAMPLAIN_MAP_SOURCE
 CHAMPLAIN_IS_MAP_SOURCE
@@ -157,7 +161,7 @@ champlain_map_source_new_osm_osmarender
 champlain_map_source_new_oam
 champlain_map_source_new_mff_relief
 champlain_network_map_source_get_tile_uri
-champlain_network_map_source_set_tile_uri
+champlain_network_map_source_set_uri_format
 champlain_network_map_source_fill_tile
 <SUBSECTION Standard>
 CHAMPLAIN_NETWORK_MAP_SOURCE
@@ -296,16 +300,43 @@ ChamplainState
 
 <SECTION>
 <FILE>champlain-cache</FILE>
+<TITLE>ChamplainCache</TITLE>
 ChamplainCache
 ChamplainCacheClass
 champlain_cache_fill_tile
 champlain_cache_get_default
 champlain_cache_get_size_limit
-champlain_cache_get_type
 champlain_cache_purge
 champlain_cache_purge_on_idle
 champlain_cache_set_size_limit
 champlain_cache_tile_is_expired
 champlain_cache_update_tile
+<SUBSECTION Standard>
+CHAMPLAIN_CACHE
+CHAMPLAIN_IS_CACHE
+CHAMPLAIN_TYPE_CACHE
+champlain_cache_get_type
+CHAMPLAIN_CACHE_CLASS
+CHAMPLAIN_IS_CACHE_CLASS
+CHAMPLAIN_CACHE_GET_CLASS
+</SECTION>
+
+<SECTION>
+<FILE>champlain-map-source-factory</FILE>
+<TITLE>ChamplainMapSourceFactory</TITLE>
+ChamplainMapSourceFactory
+ChamplainMapSourceConstructor
+champlain_map_source_factory_get_default
+champlain_map_source_factory_get_list
+champlain_map_source_factory_create
+champlain_map_source_factory_register
+<SUBSECTION Standard>
+CHAMPLAIN_MAP_SOURCE_FACTORY
+CHAMPLAIN_IS_MAP_SOURCE_FACTORY
+CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY
+champlain_map_source_factory_get_type
+CHAMPLAIN_MAP_SOURCE_FACTORY_CLASS
+CHAMPLAIN_IS_MAP_SOURCE_FACTORY_CLASS
+CHAMPLAIN_MAP_SOURCE_FACTORY_GET_CLASS
 </SECTION>
 

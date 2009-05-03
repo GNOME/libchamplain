@@ -16,6 +16,20 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-map-source
+ * @short_description: A base class for map sources
+ *
+ * #ChamplainTiles come from map sources which are represented by
+ * #ChamplainMapSource.  This is should be considered an abstract
+ * type as it does nothing of interest.
+ *
+ * When loading new tiles, #ChamplainView calls #champlain_map_source_get_tile
+ * on the current #ChamplainMapSource passing it a #ChamplainTile to be filled
+ * with the image.  #ChamplainMapSources should check with #ChamplainCache
+ * if the image is already locally available with #champlain_cache_fill_tile.
+ */
+
 #include "config.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_LOADING
@@ -264,14 +278,14 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
   g_object_class_install_property (object_class, PROP_TILE_SIZE, pspec);
 
   /**
-  * ChamplainMapSource:map-projection
+  * ChamplainMapSource:projection
   *
   * The map projection of the map source
   *
   * Since: 0.4
   */
-  pspec = g_param_spec_enum ("map-projection",
-                             "Map Projection",
+  pspec = g_param_spec_enum ("projection",
+                             "Projection",
                              "The map projection",
                              CHAMPLAIN_TYPE_MAP_PROJECTION,
                              CHAMPLAIN_MAP_PROJECTION_MERCATOR,
@@ -286,6 +300,14 @@ champlain_map_source_init (ChamplainMapSource *champlainMapSource)
   champlainMapSource->priv = priv;
 }
 
+/**
+ * champlain_map_source_get_max_zoom_level:
+ * @map_source: a #ChamplainMapSource
+ *
+ * Returns the maximum zoom level this map source supports
+ *
+ * Since: 0.4
+ */
 gint
 champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source)
 {
@@ -293,6 +315,14 @@ champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source)
   return priv->max_zoom_level;
 }
 
+/**
+ * champlain_map_source_get_min_zoom_level:
+ * @map_source: a #ChamplainMapSource
+ *
+ * Returns the miminum zoom level this map source supports
+ *
+ * Since: 0.4
+ */
 gint
 champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source)
 {
@@ -300,6 +330,14 @@ champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source)
   return priv->min_zoom_level;
 }
 
+/**
+ * champlain_map_source_get_tile_size:
+ * @map_source: a #ChamplainMapSource
+ *
+ * Returns the tile's size (width and height) in pixels for this map source
+ *
+ * Since: 0.4
+ */
 guint
 champlain_map_source_get_tile_size (ChamplainMapSource *map_source)
 {
@@ -307,6 +345,17 @@ champlain_map_source_get_tile_size (ChamplainMapSource *map_source)
   return priv->tile_size;
 }
 
+/**
+ * champlain_map_source_get_x:
+ * @map_source: a #ChamplainMapSource
+ * @zoom_level: the zoom level
+ * @longitude: a longitude
+ *
+ * Returns the x position on the map using this map source's projection.
+ * (0, 0) is located at the top left.
+ *
+ * Since: 0.4
+ */
 guint
 champlain_map_source_get_x (ChamplainMapSource *map_source,
     gint zoom_level,
@@ -317,6 +366,17 @@ champlain_map_source_get_x (ChamplainMapSource *map_source,
   return ((longitude + 180.0) / 360.0 * pow(2.0, zoom_level)) * priv->tile_size;
 }
 
+/**
+ * champlain_map_source_get_y:
+ * @map_source: a #ChamplainMapSource
+ * @zoom_level: the zoom level
+ * @latitude: a latitude
+ *
+ * Returns the y position on the map using this map source's projection.
+ * (0, 0) is located at the top left.
+ *
+ * Since: 0.4
+ */
 guint
 champlain_map_source_get_y (ChamplainMapSource *map_source,
     gint zoom_level,
@@ -329,6 +389,15 @@ champlain_map_source_get_y (ChamplainMapSource *map_source,
         M_PI) / 2.0 * pow (2.0, zoom_level)) * priv->tile_size;
 }
 
+/**
+ * champlain_map_source_get_row_count:
+ * @map_source: a #ChamplainMapSource
+ * @zoom_level: the zoom level
+ *
+ * Returns the number of tiles in a row at this zoom level for this map source.
+ *
+ * Since: 0.4
+ */
 guint
 champlain_map_source_get_row_count (ChamplainMapSource *map_source,
     gint zoom_level)
@@ -338,6 +407,16 @@ champlain_map_source_get_row_count (ChamplainMapSource *map_source,
   return pow (2, zoom_level);
 }
 
+/**
+ * champlain_map_source_get_column_count:
+ * @map_source: a #ChamplainMapSource
+ * @zoom_level: the zoom level
+ *
+ * Returns the number of tiles in a column at this zoom level for this map
+ * source.
+ *
+ * Since: 0.4
+ */
 guint
 champlain_map_source_get_column_count (ChamplainMapSource *map_source,
     gint zoom_level)
@@ -347,6 +426,16 @@ champlain_map_source_get_column_count (ChamplainMapSource *map_source,
   return pow (2, zoom_level);
 }
 
+/**
+ * champlain_map_source_fill_tile:
+ * @map_source: a #ChamplainMapSource
+ * @tile: A #ChamplainTile
+ *
+ * Fills the tile with image data (either from cache, network or rendered
+ * locally).
+ *
+ * Since: 0.4
+ */
 void
 champlain_map_source_fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile)
@@ -363,6 +452,17 @@ champlain_map_source_real_fill_tile (ChamplainMapSource *map_source,
   g_error ("Should not be reached");
 }
 
+/**
+ * champlain_map_source_get_longitude:
+ * @map_source: a #ChamplainMapSource
+ * @zoom_level: the zoom level
+ * @x: a x position
+ *
+ * Returns the longitude corresponding to this x position in the map source's
+ * projection.
+ *
+ * Since: 0.4
+ */
 gdouble
 champlain_map_source_get_longitude (ChamplainMapSource *map_source,
     gint zoom_level,
@@ -374,6 +474,17 @@ champlain_map_source_get_longitude (ChamplainMapSource *map_source,
   return dx / pow (2.0, zoom_level) * 360.0 - 180;
 }
 
+/**
+ * champlain_map_source_get_latitude:
+ * @map_source: a #ChamplainMapSource
+ * @zoom_level: the zoom level
+ * @y: a y position
+ *
+ * Returns the latitude corresponding to this y position in the map source's
+ * projection.
+ *
+ * Since: 0.4
+ */
 gdouble
 champlain_map_source_get_latitude (ChamplainMapSource *map_source,
     gint zoom_level,
@@ -386,6 +497,14 @@ champlain_map_source_get_latitude (ChamplainMapSource *map_source,
   return 180.0 / M_PI * atan (0.5 * (exp (n) - exp (-n)));
 }
 
+/**
+ * champlain_map_source_get_name:
+ * @map_source: a #ChamplainMapSource
+ *
+ * Returns the map source's name.
+ *
+ * Since: 0.4
+ */
 const gchar *
 champlain_map_source_get_name (ChamplainMapSource *map_source)
 {
@@ -393,6 +512,15 @@ champlain_map_source_get_name (ChamplainMapSource *map_source)
   return priv->name;
 }
 
+/**
+ * champlain_map_source_set_name:
+ * @map_source: a #ChamplainMapSource
+ * @name: a name
+ *
+ * Sets the map source's name.
+ *
+ * Since: 0.4
+ */
 void
 champlain_map_source_set_name (ChamplainMapSource *map_source,
     const gchar *name)
@@ -401,8 +529,17 @@ champlain_map_source_set_name (ChamplainMapSource *map_source,
 
   g_free (priv->name);
   priv->name = g_strdup (name);
+  g_object_notify (G_OBJECT (map_source), "name");
 }
 
+/**
+ * champlain_map_source_get_license:
+ * @map_source: a #ChamplainMapSource
+ *
+ * Returns the map source's license.
+ *
+ * Since: 0.4
+ */
 const gchar *
 champlain_map_source_get_license (ChamplainMapSource *map_source)
 {
@@ -410,6 +547,15 @@ champlain_map_source_get_license (ChamplainMapSource *map_source)
   return priv->license;
 }
 
+/**
+ * champlain_map_source_set_license:
+ * @map_source: a #ChamplainMapSource
+ * @license: the licence
+ *
+ * Sets the map source's license.
+ *
+ * Since: 0.4
+ */
 void
 champlain_map_source_set_license (ChamplainMapSource *map_source,
     const gchar *license)
@@ -418,5 +564,77 @@ champlain_map_source_set_license (ChamplainMapSource *map_source,
 
   g_free (priv->license);
   priv->license = g_strdup (license);
+  g_object_notify (G_OBJECT (map_source), "license");
+}
+
+/**
+ * champlain_map_source_get_license_uri:
+ * @map_source: a #ChamplainMapSource
+ *
+ * Returns the map source's license URI.
+ *
+ * Since: 0.4
+ */
+const gchar *
+champlain_map_source_get_license_uri (ChamplainMapSource *map_source)
+{
+  ChamplainMapSourcePrivate *priv = map_source->priv;
+
+  return priv->license_uri;
+}
+
+/**
+ * champlain_map_source_set_license_uri:
+ * @map_source: a #ChamplainMapSource
+ * @license_uri: the licence URI
+ *
+ * Sets the map source's license URI.
+ *
+ * Since: 0.4
+ */
+void
+champlain_map_source_set_license_uri (ChamplainMapSource *map_source,
+    const gchar *license_uri)
+{
+  ChamplainMapSourcePrivate *priv = map_source->priv;
+
+  g_free (priv->license_uri);
+  priv->license = g_strdup (license_uri);
+  g_object_notify (G_OBJECT (map_source), "license-uri");
+}
+
+/**
+ * champlain_map_source_get_projection:
+ * @map_source: a #ChamplainMapSource
+ *
+ * Returns the map source's projection.
+ *
+ * Since: 0.4
+ */
+ChamplainMapProjection
+champlain_map_source_get_projection (ChamplainMapSource *map_source)
+{
+  ChamplainMapSourcePrivate *priv = map_source->priv;
+
+  return priv->map_projection;
+}
+
+/**
+ * champlain_map_source_set_projection:
+ * @map_source: a #ChamplainMapSource
+ * @projection: a #ChamplainMapProjection
+ *
+ * Sets the map source's projection.
+ *
+ * Since: 0.4
+ */
+void
+champlain_map_source_set_projection (ChamplainMapSource *map_source,
+    ChamplainMapProjection projection)
+{
+  ChamplainMapSourcePrivate *priv = map_source->priv;
+
+  priv->map_projection = projection;
+  g_object_notify (G_OBJECT (map_source), "projection");
 }
 

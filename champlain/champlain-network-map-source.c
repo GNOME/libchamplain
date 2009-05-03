@@ -230,7 +230,7 @@ champlain_network_map_source_new_full (const gchar *name,
   network_map_source = g_object_new (CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE, "name", name,
       "license", license, "license-uri", license_uri,
       "min-zoom-level", min_zoom, "max-zoom-level", max_zoom,
-      "tile-size", tile_size, "map-projection", projection,
+      "tile-size", tile_size, "projection", projection,
       "uri-format", uri_format, NULL);
   return network_map_source;
 }

@@ -40,19 +40,23 @@
 
   <chapter>
     <title>I. View API Reference</title>
-    <xi:include href="xml/champlain.xml"/>
     <xi:include href="xml/champlain-view.xml"/>
     <xi:include href="xml/champlain-layer.xml"/>
     <xi:include href="xml/champlain-base-marker.xml"/>
     <xi:include href="xml/champlain-marker.xml"/>
-    <xi:include href="xml/champlain-version.xml"/>
   </chapter>
   <chapter>
     <title>II. Map Source API Reference</title>
+    <xi:include href="xml/champlain-map-source-factory.xml"/>
     <xi:include href="xml/champlain-map-source.xml"/>
     <xi:include href="xml/champlain-network-map-source.xml"/>
     <xi:include href="xml/champlain-tile.xml"/>
     <xi:include href="xml/champlain-cache.xml"/>
+  </chapter>
+  <chapter>
+    <title>III. Utility API Reference</title>
+    <xi:include href="xml/champlain.xml"/>
+    <xi:include href="xml/champlain-version.xml"/>
   </chapter>
   <index>
     <title>Index</title>
