@@ -74,6 +74,6 @@ void
 champlain_tile_set_filename (ChamplainTile *self, const gchar* filename)
 
 
-void
-champlain_tile_set_actor (ChamplainTile *self, ClutterActor* actor)
+#void
+#champlain_tile_set_actor (ChamplainTile *self, ClutterActor* actor)
 

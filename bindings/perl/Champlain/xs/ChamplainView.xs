@@ -41,8 +41,8 @@ void
 champlain_view_set_map_source (ChamplainView *view, ChamplainMapSource *map_source);
 
 
-void
-champlain_view_tile_ready (ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile, gboolean animate);
+#void
+#champlain_view_tile_ready (ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile, gboolean animate);
 
 
 void

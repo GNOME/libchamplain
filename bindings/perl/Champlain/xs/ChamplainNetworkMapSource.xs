@@ -13,10 +13,10 @@ const gchar*
 champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *source, gint x, gint y, gint z)
 
 
-void
-champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *source, const gchar *uri_format)
+#void
+#champlain_network_map_source_set_tile_uri (ChamplainNetworkMapSource *source, const gchar *uri_format)
 
 
-void
-champlain_network_map_source_get_tile (ChamplainMapSource *source, ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile)
+#void
+#champlain_network_map_source_get_tile (ChamplainMapSource *source, ChamplainView *view, ChamplainZoomLevel *level, ChamplainTile *tile)
 
