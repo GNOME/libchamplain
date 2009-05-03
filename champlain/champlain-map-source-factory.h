@@ -79,7 +79,7 @@ gboolean champlain_map_source_factory_register (ChamplainMapSourceFactory *facto
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap Mapnik"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap Osmarender"
 #define CHAMPLAIN_MAP_SOURCE_OSM_CYCLEMAP "OpenStreetMap CycleMap"
-#define CHAMPLAIN_MAP_SOURCE_OAM "OpenArialMap"
+#define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
 #define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "MapsForFree Relief"
 
 G_END_DECLS
