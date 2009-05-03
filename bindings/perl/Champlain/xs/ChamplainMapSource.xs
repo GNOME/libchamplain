@@ -58,3 +58,11 @@ champlain_map_source_set_license (ChamplainMapSource *map_source, const gchar *l
 
 const gchar*
 champlain_map_source_get_license (ChamplainMapSource *map_source)
+
+
+void
+champlain_map_source_set_projection (ChamplainMapSource *map_source, ChamplainMapProjection projection)
+
+
+ChamplainMapProjection
+champlain_map_source_get_projection (ChamplainMapSource *map_source)
