@@ -9,3 +9,4 @@ CHAMPLAIN_TYPE_TILE                ChamplainTile              GObject  Champlain
 CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE  ChamplainNetworkMapSource  GObject  Champlain::NetworkMapSource
 CHAMPLAIN_TYPE_MAP_PROJECTION      ChamplainMapProjection     GEnum    Champlain::MapProjection
 CHAMPLAIN_TYPE_STATE               ChamplainState             GEnum    Champlain::State
+CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY  ChamplainMapSourceFactory  GObject  Champlain::MapSourceFactory
