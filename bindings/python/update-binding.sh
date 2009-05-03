@@ -6,10 +6,12 @@ cd ../../champlain
 python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	-m champlain				\
 	champlain.h				\
+	champlain-cache.h			\
 	champlain-view.h			\
 	champlain-defines.h			\
 	champlain-layer.h			\
 	champlain-map-source.h			\
+	champlain-map-source-factory.h		\
 	champlain-network-map-source.h		\
 	champlain-marker.h			\
 	champlain-base-marker.h			\
