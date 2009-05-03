@@ -58,6 +58,7 @@ champlain_map_source_set_license (ChamplainMapSource *map_source, const gchar *l
 
 const gchar*
 champlain_map_source_get_license (ChamplainMapSource *map_source)
+<<<<<<< HEAD:bindings/perl/Champlain/xs/ChamplainMapSource.xs
 
 
 void
@@ -66,3 +67,5 @@ champlain_map_source_set_projection (ChamplainMapSource *map_source, ChamplainMa
 
 ChamplainMapProjection
 champlain_map_source_get_projection (ChamplainMapSource *map_source)
+=======
+>>>>>>> Remove the constructors as they don't exist any longer:bindings/perl/Champlain/xs/ChamplainMapSource.xs
