@@ -21,7 +21,6 @@ class LauncherGTK:
 
 		self.view = champlain.View()
 		self.view.set_property("scroll-mode", champlain.SCROLL_MODE_KINETIC)
-		self.view.set_property("zoom-level", 5)
 	
 		self.layer = DemoMarkerLayer()
 		self.view.add_layer(self.layer)
@@ -43,11 +42,9 @@ class LauncherGTK:
 		bbox.add(button)
 
 		combo = gtk.combo_box_new_text()
-		combo.append_text("Open Street Map")
-		combo.append_text("Open Arial Map")
-		combo.append_text("Maps for free - Relief")
-		combo.append_text("OSM Cycle Map")
-		combo.append_text("OSM Osmarender")
+		self.map_source_factory = champlain.map_source_factory_get_default()
+		for source in self.map_source_factory.get_list():
+			combo.append_text(source)
 		combo.set_active(0)
 		combo.connect("changed", self.map_source_changed)
 		bbox.add(combo)
@@ -55,6 +52,7 @@ class LauncherGTK:
 		self.spinbutton = gtk.SpinButton(gtk.Adjustment(lower=0, upper=20, value=1, step_incr=1))
 		self.spinbutton.connect("changed", self.zoom_changed)
 		self.view.connect("notify::zoom-level", self.map_zoom_changed)
+		self.spinbutton.set_value(5)
 		bbox.add(self.spinbutton)
 
 		vbox.pack_start(bbox, expand=False, fill=False)
@@ -89,18 +87,8 @@ class LauncherGTK:
 
 	def map_source_changed(self, widget):
 		selection = widget.get_active_text()
-		if selection == "Open Street Map":
-			self.view.set_property("map-source", champlain.map_source_new_osm_mapnik())
-		elif selection == "Open Arial Map":
-			self.view.set_property("map-source", champlain.map_source_new_oam())
-		elif selection == "Maps for free - Relief":
-			self.view.set_property("map-source", champlain.map_source_new_mff_relief())
-		elif selection == "OSM Cycle Map":
-			self.view.set_property("map-source", champlain.map_source_new_osm_cyclemap())
-		elif selection == "OSM Osmarender":
-			self.view.set_property("map-source", champlain.map_source_new_osm_osmarender())
-		else:
-			raise RuntimeException("Illegal state: active text of combobox invalid")
+		source = self.map_source_factory.create(selection);
+		self.view.set_property("map-source", source)
 
 	def map_zoom_changed(self, widget, value):
 		self.spinbutton.set_value(self.view.get_property("zoom-level"))

@@ -20,3 +20,28 @@ ignore-glob
 ignore
 	champlain_zoom_level_set_actor
 %%
+override champlain_map_source_factory_get_list kwargs
+static PyObject *
+_wrap_champlain_map_source_factory_get_list(PyGObject *self) {
+	gchar **list;
+	gchar *item;
+	PyObject *ret;
+	int i = 0;
+
+	list = champlain_map_source_factory_get_list(CHAMPLAIN_MAP_SOURCE_FACTORY(self->obj));
+	
+	ret = PyList_New(0);
+	item = list[i];
+	while (item != NULL) {
+		PyList_Append (ret, PyString_FromString(item));
+		item = list[++i];
+	}
+
+	if (!list) {
+		Py_INCREF (Py_None);
+		return Py_None;
+	}
+	
+	return ret;
+}
+%%
