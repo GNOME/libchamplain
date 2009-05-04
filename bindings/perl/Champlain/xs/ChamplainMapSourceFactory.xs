@@ -5,7 +5,8 @@ MODULE = Champlain::MapSourceFactory  PACKAGE = Champlain::MapSourceFactory  PRE
 
 
 ChamplainMapSourceFactory*
-champlain_map_source_factory_get_default ()
+champlain_map_source_factory_get_default (class)
+	C_ARGS: /* No args */
 
 
 #gchar**
@@ -39,7 +40,7 @@ OSM_OSMARENDER (class)
 
 
 const gchar*
-OSM_CYCLEMA (class)
+OSM_CYCLEMAP (class)
 	CODE:
 		RETVAL = CHAMPLAIN_MAP_SOURCE_OSM_CYCLEMAP;
 
