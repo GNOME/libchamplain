@@ -72,8 +72,3 @@ champlain_tile_set_uri (ChamplainTile *self, const gchar* uri)
 
 void
 champlain_tile_set_filename (ChamplainTile *self, const gchar* filename)
-
-
-#void
-#champlain_tile_set_actor (ChamplainTile *self, ClutterActor* actor)
-

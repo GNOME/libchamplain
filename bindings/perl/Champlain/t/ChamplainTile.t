@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 32;
+use Clutter::TestHelper tests => 30;
 
 use Champlain ':coords';
 
@@ -29,7 +29,7 @@ sub test_new_full {
 	is($tile->get_state(), 'init', "get_state() full tile");
 	is($tile->get_uri(), '', "get_uri() full tile");
 	is($tile->get_filename(), '', "get_filename() full tile");
-	is($tile->get_actor(), undef, "get_actor() full tile");
+	isa_ok($tile->get_actor(), 'Clutter::Actor', "get_actor() full tile");
 	
 	test_all_setters($tile);
 }
@@ -46,7 +46,7 @@ sub test_new_empty {
 	is($tile->get_state(), 'init', "get_state() default tile");
 	is($tile->get_uri(), '', "get_uri() default tile");
 	is($tile->get_filename(), '', "get_filename() default tile");
-	is($tile->get_actor(), undef, "get_actor() default tile");
+	isa_ok($tile->get_actor(), 'Clutter::Actor', "get_actor() default tile");
 	
 	test_all_setters($tile);
 }
@@ -72,18 +72,4 @@ sub test_all_setters {
 	
 	$tile->set_uri('http://localhost/tile/2/100-250.png');
 	is($tile->get_uri(), 'http://localhost/tile/2/100-250.png', "set_uri()");
-	
-	my $actor = Clutter::Ex::DeadActor->new();
-	$tile->set_actor($actor);
-	is($tile->get_actor(), $actor, "set_actor()");
 }
-
-
-#
-# An empty actor.
-#
-package Clutter::Ex::DeadActor;
-use Glib::Object::Subclass 'Clutter::Actor',;
-
-# This is a an empty actor. This class is needed because Clutter::Actor is an
-# abstract class.
