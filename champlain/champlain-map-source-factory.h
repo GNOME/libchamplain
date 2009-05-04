@@ -25,6 +25,7 @@
 
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-map-source.h>
+#include <champlain/champlain-map-source-desc.h>
 
 #include <glib-object.h>
 
@@ -56,31 +57,19 @@ GType champlain_map_source_factory_get_type (void);
 
 ChamplainMapSourceFactory * champlain_map_source_factory_get_default (void);
 
-gchar ** champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory);
+GSList * champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory);
 
 ChamplainMapSource * champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     const gchar *id);
 
-/**
- * ChamplainMapSourceConstructor:
- *
- * A #ChamplainMapSource constructor.  It should return a ready to use
- * #ChamplainMapSource.
- *
- * Since: 0.4
- */
-typedef ChamplainMapSource * (*ChamplainMapSourceConstructor) ();
-#define CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR (f) ((ChamplainMapSourceConstructor) (f))
-
 gboolean champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
-    const gchar *id,
-    ChamplainMapSourceConstructor callback);
+    ChamplainMapSourceDesc *desc);
 
-#define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap Mapnik"
-#define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap Osmarender"
-#define CHAMPLAIN_MAP_SOURCE_OSM_CYCLEMAP "OpenStreetMap CycleMap"
-#define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
-#define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "MapsForFree Relief"
+#define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm::mapnik"
+#define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "osm::osmarender"
+#define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "osm::cyclemap"
+#define CHAMPLAIN_MAP_SOURCE_OAM "oam"
+#define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "mff::relief"
 
 G_END_DECLS
 

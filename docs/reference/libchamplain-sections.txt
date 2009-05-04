@@ -325,6 +325,7 @@ CHAMPLAIN_CACHE_GET_CLASS
 <FILE>champlain-map-source-factory</FILE>
 <TITLE>ChamplainMapSourceFactory</TITLE>
 ChamplainMapSourceFactory
+ChamplainMapSourceDesc
 ChamplainMapSourceConstructor
 champlain_map_source_factory_get_default
 champlain_map_source_factory_get_list

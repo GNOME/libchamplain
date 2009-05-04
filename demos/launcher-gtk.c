@@ -24,6 +24,10 @@
 
 #include <markers.h>
 
+#define N_COLS 2
+#define COL_ID 0
+#define COL_NAME 1
+
 /*
  * Terminate the main loop.
  */
@@ -47,16 +51,27 @@ static void
 map_source_changed (GtkWidget *widget,
                     ChamplainView *view)
 {
-  gchar* selection;
+  gchar* id;
   ChamplainMapSource *source;
+  GtkTreeIter iter;
+  GtkTreeModel *model;
 
-  selection = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
+  if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (widget), &iter))
+    return;
+
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (widget));
+
+  gtk_tree_model_get (model, &iter, COL_ID, &id, -1);
+
   ChamplainMapSourceFactory *factory = champlain_map_source_factory_get_default ();
-  source = champlain_map_source_factory_create (factory, selection);
+  source = champlain_map_source_factory_create (factory, id);
 
-  g_object_set (G_OBJECT (view), "map-source", source, NULL);
+  if (source != NULL)
+    {
+      g_object_set (G_OBJECT (view), "map-source", source, NULL);
+      g_object_unref (factory);
+    }
 
-  g_object_unref (factory);
   g_object_unref (source);
 }
 
@@ -116,22 +131,41 @@ static void
 build_combo_box (GtkComboBox *box)
 {
   ChamplainMapSourceFactory *factory;
-  gchar **sources;
-  gchar *name;
+  GSList *sources;
   gint i = 0;
+  GtkTreeStore *store;
+  GtkTreeIter parent;
+  GtkCellRenderer *cell;
+
+  store = gtk_tree_store_new (N_COLS, G_TYPE_STRING, /* id */
+      G_TYPE_STRING, /* name */
+      -1);
 
   factory = champlain_map_source_factory_get_default ();
   sources = champlain_map_source_factory_get_list (factory);
-  name = sources[i];
 
-  while (name != NULL)
+  while (sources != NULL)
   {
-    gtk_combo_box_append_text(GTK_COMBO_BOX(box), g_strdup (name));
-    name = sources[++i];
+    ChamplainMapSourceDesc *desc;
+
+    desc = (ChamplainMapSourceDesc*) sources->data;
+
+    gtk_tree_store_append( store, &parent, NULL );
+    gtk_tree_store_set( store, &parent, COL_ID, g_strdup (desc->id),
+        COL_NAME, g_strdup (desc->name), -1);
+
+    sources = g_slist_next (sources);
   }
 
-  g_strfreev (sources);
+  g_slist_free (sources);
   g_object_unref (factory);
+
+  gtk_combo_box_set_model (box, store);
+
+  cell = gtk_cell_renderer_text_new ();
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (box), cell, FALSE);
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (box), cell,
+      "text", COL_NAME, NULL );
 }
 
 int
@@ -187,7 +221,7 @@ main (int argc,
   g_signal_connect (button, "toggled", G_CALLBACK (toggle_layer), layer);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
-  button = gtk_combo_box_new_text();
+  button = gtk_combo_box_new ();
   build_combo_box (button);
   gtk_combo_box_set_active(GTK_COMBO_BOX(button), 0);
   g_signal_connect (button, "changed", G_CALLBACK (map_source_changed), view);

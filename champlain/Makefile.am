@@ -27,6 +27,7 @@ libchamplain_headers = \
 	champlain-map-source.h		\
 	champlain-network-map-source.h	\
 	champlain-map-source-factory.h	\
+	champlain-map-source-desc.h	\
 	champlain-version.h
 
 
@@ -59,6 +60,7 @@ noinst_HEADERS = \
 	champlain-map-source.h		\
 	champlain-network-map-source.h	\
 	champlain-map-source-factory.h	\
+	champlain-map-source-desc.h	\
 	champlain-version.h		\
 	champlain-cache.h
 
@@ -71,6 +73,7 @@ libchamplain_include_HEADERS = \
 	champlain-map-source.h		\
 	champlain-network-map-source.h	\
 	champlain-map-source-factory.h	\
+	champlain-map-source-desc.h	\
 	champlain-tile.h		\
 	champlain-zoom-level.h		\
 	champlain-base-marker.h		\

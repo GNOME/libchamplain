@@ -132,10 +132,70 @@ champlain_map_source_factory_class_init (ChamplainMapSourceFactoryClass *klass)
   object_class->set_property = champlain_map_source_factory_set_property;
 }
 
-typedef struct {
-  gchar *name;
-  ChamplainMapSourceConstructor constructor;
-} MapSourceConstructor;
+static
+ChamplainMapSourceDesc OSM_MAPNIK_DESC =
+  {
+    CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
+    "OpenStreetMap Mapnik",
+    "(CC) BY 2.0 OpenStreetMap contributor",
+    "http://creativecommons.org/licenses/by/2.0/",
+    0,
+    18,
+    CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+    champlain_map_source_new_osm_mapnik
+  };
+
+static
+ChamplainMapSourceDesc OSM_OSMARENDER_DESC =
+  {
+    CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
+    "OpenStreetMap Osmarender",
+    "(CC) BY 2.0 OpenStreetMap contributor",
+    "http://creativecommons.org/licenses/by/2.0/",
+    0,
+    18,
+    CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+    champlain_map_source_new_osm_osmarender
+  };
+
+static
+ChamplainMapSourceDesc OSM_CYCLEMAP_DESC =
+  {
+    CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
+    "OpenStreetMap Cycle Map",
+    "(CC) BY 2.0 OpenStreetMap contributor",
+    "http://creativecommons.org/licenses/by/2.0/",
+    0,
+    18,
+    CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+    champlain_map_source_new_osm_cyclemap
+  };
+
+static
+ChamplainMapSourceDesc OAM_DESC =
+  {
+    CHAMPLAIN_MAP_SOURCE_OAM,
+    "OpenAerialMap",
+    "(CC) BY 3.0 OpenAerialMap contributor",
+    "http://creativecommons.org/licenses/by/3.0/",
+    0,
+    17,
+    CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+    champlain_map_source_new_oam
+  };
+
+static
+ChamplainMapSourceDesc MFF_RELIEF_DESC =
+  {
+    CHAMPLAIN_MAP_SOURCE_MFF_RELIEF,
+    "Maps For Free Relief",
+    "GNU Free Documentation Licence, version 1.2 or later",
+    "http://www.gnu.org/copyleft/fdl.html",
+    0,
+    11,
+    CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+    champlain_map_source_new_mff_relief
+  };
 
 static void
 champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
@@ -146,16 +206,11 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 
   priv->registered_sources = NULL;
 
-  champlain_map_source_factory_register (factory, CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
-      champlain_map_source_new_osm_mapnik);
-  champlain_map_source_factory_register (factory, CHAMPLAIN_MAP_SOURCE_OSM_CYCLEMAP,
-      champlain_map_source_new_osm_cyclemap);
-  champlain_map_source_factory_register (factory, CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
-      champlain_map_source_new_osm_osmarender);
-  champlain_map_source_factory_register (factory, CHAMPLAIN_MAP_SOURCE_OAM,
-      champlain_map_source_new_oam);
-  champlain_map_source_factory_register (factory, CHAMPLAIN_MAP_SOURCE_MFF_RELIEF,
-      champlain_map_source_new_mff_relief);
+  champlain_map_source_factory_register (factory, &OSM_MAPNIK_DESC);
+  champlain_map_source_factory_register (factory, &OSM_CYCLEMAP_DESC);
+  champlain_map_source_factory_register (factory, &OSM_OSMARENDER_DESC);
+  champlain_map_source_factory_register (factory, &OAM_DESC);
+  champlain_map_source_factory_register (factory, &MFF_RELIEF_DESC);
 }
 
 /**
@@ -182,40 +237,21 @@ champlain_map_source_factory_get_default (void)
 /**
  * champlain_map_source_factory_get_list:
  *
- * Returns the list of registered map sources, the list should be freed with
- * #g_strfreev.
+ * Returns the list of registered map sources, the items should not be freed,
+ * the list should be freed with #g_slist_free.
  *
  * Since: 0.4
  */
-gchar **
+GSList *
 champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
 {
-
-  gint count;
-  gchar **ret;
-  GSList *item;
-
-  count = g_slist_length (factory->priv->registered_sources);
-  ret = g_new0(char*, count + 1);
-  item = factory->priv->registered_sources;
-
-  count = 0;
-  while (item != NULL)
-    {
-      MapSourceConstructor *cons = (MapSourceConstructor*) item->data;
-      ret[count] = g_strdup (cons->name);
-      item = g_slist_next (item);
-      count++;
-    }
-  ret[count] = NULL;
-
-  return ret;
+  return g_slist_copy (factory->priv->registered_sources);
 }
 
 /**
  * champlain_map_source_factory_create:
  * @factory: the Factory
- * @name: the wanted map source name
+ * @id: the wanted map source id
  *
  * Returns a ready to use #ChamplainMapSource matching the given name, returns
  * NULL is none match.
@@ -224,7 +260,7 @@ champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
  */
 ChamplainMapSource *
 champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
-    const gchar *name)
+    const gchar *id)
 {
   GSList *item;
 
@@ -232,9 +268,9 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
 
   while (item != NULL)
     {
-      MapSourceConstructor *cons = (MapSourceConstructor*) item->data;
-      if (strcmp (cons->name, name) == 0)
-        return cons->constructor ();
+      ChamplainMapSourceDesc *desc = (ChamplainMapSourceDesc*) item->data;
+      if (strcmp (desc->id, id) == 0)
+        return desc->constructor ();
       item = g_slist_next (item);
     }
   return NULL;
@@ -246,9 +282,11 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  * @name: the new map source name
  * @constructor: the new map source constructor function
  *
- * Register the new map source with the given constructor.  When this map
- * source is requested, the given constructor will be given to build the
- * map source.
+ * Registers the new map source with the given constructor.  When this map
+ * source is requested, the given constructor will be used to build the
+ * map source.  #ChamplainMapSourceFactory will take ownership of the passed
+ * ChamplainMapSourceDesc, so don't free it. They will not be freed either so
+ * you can use static structs here.
  *
  * Returns TRUE if the registration suceeded.
  *
@@ -256,23 +294,18 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  */
 gboolean
 champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
-    const gchar *name,
-    ChamplainMapSourceConstructor callback)
+    ChamplainMapSourceDesc *desc)
 {
-  MapSourceConstructor *cons;
 
   /* FIXME: check for existing factory with that name? */
-  cons = g_slice_new0(MapSourceConstructor);
-  cons->name = g_strdup (name);
-  cons->constructor = callback;
-  factory->priv->registered_sources = g_slist_append (factory->priv->registered_sources, cons);
+  factory->priv->registered_sources = g_slist_append (factory->priv->registered_sources, desc);
   return TRUE;
 }
 
 static ChamplainMapSource *
 champlain_map_source_new_osm_cyclemap (void)
 {
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_CYCLEMAP,
+  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
       "(CC) BY 2.0 OpenStreetMap contributors",
       "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
@@ -292,7 +325,7 @@ champlain_map_source_new_osm_osmarender (void)
 static ChamplainMapSource *
 champlain_map_source_new_osm_mapnik (void)
 {
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
+  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenStreetMap Mapnik",
       "(CC) BY 2.0 OpenStreetMap contributors",
       "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
@@ -303,7 +336,7 @@ static ChamplainMapSource *
 champlain_map_source_new_oam (void)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OAM,
-      "(CC) BY 3.0 OpenArialMap contributors",
+      "(CC) BY 3.0 OpenAerialMap contributors",
       "http://creativecommons.org/licenses/by/3.0/", 0, 17, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
       "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg"));
@@ -317,4 +350,4 @@ champlain_map_source_new_mff_relief (void)
       "http://www.gnu.org/copyleft/fdl.html", 0, 11, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
       "http://maps-for-free.com/layer/relief/z#Z#/row#Y#/#Z#_#X#-#Y#.jpg"));
-}
+} 
