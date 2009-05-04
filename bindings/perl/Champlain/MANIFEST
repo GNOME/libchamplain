@@ -22,6 +22,7 @@ t/Champlain.t
 t/ChamplainBaseMarker.t
 t/ChamplainLayer.t
 t/ChamplainMapSource.t
+t/ChamplainMapSourceFactory.t
 t/ChamplainMarker.t
 t/ChamplainNetworkMapSource.t
 t/ChamplainTile.t
