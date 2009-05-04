@@ -9,8 +9,23 @@ champlain_map_source_factory_get_default (class)
 	C_ARGS: /* No args */
 
 
-#gchar**
-#champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
+void
+champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
+	PREINIT:
+		gchar **list = NULL;
+		gchar *item = NULL;
+		gint i = 0;
+	
+	PPCODE:
+		list = champlain_map_source_factory_get_list(factory);
+		
+		item = list[0];
+		while (item != NULL) {
+			XPUSHs(sv_2mortal(newSVGChar(item)));
+			item = list[++i];
+		}
+		
+		g_strfreev(list);
 
 
 ChamplainMapSource*

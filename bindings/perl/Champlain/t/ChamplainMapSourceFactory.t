@@ -38,6 +38,9 @@ sub test_map_factory {
 	generic_create($factory, Champlain::MapSourceFactory->OSM_CYCLEMAP);
 	generic_create($factory, Champlain::MapSourceFactory->OAM);
 	generic_create($factory, Champlain::MapSourceFactory->MFF_RELIEF);
+	
+	my @maps = $factory->get_list();
+	ok(@maps >= 5, "Maps factory has the default maps");
 }
 
 
