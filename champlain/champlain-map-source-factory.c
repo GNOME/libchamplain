@@ -285,7 +285,7 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  * Registers the new map source with the given constructor.  When this map
  * source is requested, the given constructor will be used to build the
  * map source.  #ChamplainMapSourceFactory will take ownership of the passed
- * ChamplainMapSourceDesc, so don't free it. They will not be freed either so
+ * #ChamplainMapSourceDesc, so don't free it. They will not be freed either so
  * you can use static structs here.
  *
  * Returns TRUE if the registration suceeded.

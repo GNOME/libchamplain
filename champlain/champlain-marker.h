@@ -39,20 +39,22 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainMarkerPrivate ChamplainMarkerPrivate;
 
-typedef struct
+typedef struct _ChamplainMarker ChamplainMarker;
+typedef struct _ChamplainMarkerClass ChamplainMarkerClass;
+
+struct _ChamplainMarker
 {
   ChamplainBaseMarker base;
 
   ChamplainMarkerPrivate *priv;
-} ChamplainMarker;
+};
 
-typedef struct
+struct _ChamplainMarkerClass
 {
   ChamplainBaseMarkerClass parent_class;
 
   void (* draw_marker) (ChamplainMarker *marker);
-
-} ChamplainMarkerClass;
+};
 
 GType champlain_marker_get_type (void);
 
