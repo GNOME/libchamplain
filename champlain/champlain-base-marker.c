@@ -21,7 +21,7 @@
  * @short_description: A base marker to identify points of interest on a map
  *
  * Base markers reprensent points of interest on a map. base markers need to be
- * placed on a layer (a #cluttergroup).  layers have to be added to a
+ * placed on a layer (a #ChamplainLayer).  layers have to be added to a
  * #champlainview for the base_markers to show on the map.
  *
  * a basemarker is nothing more than a regular #clutteractor.  you can draw on
