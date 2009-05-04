@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 3;
+use Clutter::TestHelper tests => 4;
 
 use Champlain ':coords';
 
@@ -37,12 +37,8 @@ sub test_all {
 		"get_tile_uri()"
 	);
 	
-	
-	# Change the tile URI and check that there's a change
-	$map_source->set_tile_uri('http://www.it-is-not-free.org/hidden/#X#-#Y#_#Z#.png');
-	is(
-		$map_source->get_tile_uri(50, 75, 6),
-		'http://www.it-is-not-free.org/hidden/50-75_6.png',
-		"get_tile_uri() changed"
-	);
+	my $tile = Champlain::Tile->new();
+	is($tile->get_state(), 'init');
+	$map_source->fill_tile($tile);
+	is($tile->get_state(), 'loading');
 }
