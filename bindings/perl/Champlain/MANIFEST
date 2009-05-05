@@ -9,6 +9,7 @@ maps-gtk
 champlain-perl.h
 xs/Champlain.xs
 xs/ChamplainBaseMarker.xs
+xs/ChamplainCache.xs
 xs/ChamplainLayer.xs
 xs/ChamplainMapSource.xs
 xs/ChamplainMapSourceFactory.xs
