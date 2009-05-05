@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 110;
+use Clutter::TestHelper tests => 22;
 
 use Champlain ':coords';
 
@@ -68,6 +68,6 @@ sub generic_create {
 	my ($factory, $id, $name) = @_;
 	my $map = $factory->create($id);
 	isa_ok($map, 'Champlain::MapSource');
-#	is($map->get_id, $id);
+	is($map->get_id, $id);
 	is($map->get_name, $name);
 }
