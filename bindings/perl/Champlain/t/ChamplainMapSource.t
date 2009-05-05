@@ -24,7 +24,7 @@ sub tests {
 # OpenStreetMap Mapnik
 sub test_osm_mapnik {
 	my $label = "OpenStreetMap";
-	my $map = Champlain::MapSource->new_osm_mapnik();
+	my $map = get_osm_mapnik();
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
@@ -42,7 +42,7 @@ sub test_osm_mapnik {
 # OpenStreetMap Cycle Map
 sub test_osm_cyclemap {
 	my $label = "OpenStreetMap (cyclemap)";
-	my $map = Champlain::MapSource->new_osm_cyclemap();
+	my $map = get_osm_cycle_map();
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
@@ -60,7 +60,7 @@ sub test_osm_cyclemap {
 # OpenStreetMap Osmarender
 sub test_osm_osmarender {
 	my $label = "OpenStreetMap (osmarender)";
-	my $map = Champlain::MapSource->new_osm_osmarender();
+	my $map = get_osm_osmarender();
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
@@ -74,10 +74,11 @@ sub test_osm_osmarender {
 	generic_map_operations($label, $map);
 }
 
+
 # OpenAerialMap
 sub test_oam {
 	my $label = "OpenAerialMap";
-	my $map = Champlain::MapSource->new_oam();
+	my $map = get_oam();
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
@@ -85,7 +86,7 @@ sub test_oam {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 17, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
-	is($map->get_license, "(CC) BY 3.0 OpenArialMap contributors", "$label license");
+	is($map->get_license, "(CC) BY 3.0 OpenAerialMap contributors", "$label license");
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
@@ -214,4 +215,34 @@ sub generic_map_operations {
 		1,
 		"$label column count at min zoom"
 	);
+}
+
+
+sub get_osm_mapnik {
+	my $factory = Champlain::MapSourceFactory->get_default();
+	return $factory->create(Champlain::MapSourceFactory->OSM_MAPNIK);
+}
+
+
+sub get_osm_cycle_map {
+	my $factory = Champlain::MapSourceFactory->get_default();
+	return $factory->create(Champlain::MapSourceFactory->OSM_CYCLE_MAP);
+}
+
+
+sub get_osm_osmarender {
+	my $factory = Champlain::MapSourceFactory->get_default();
+	return $factory->create(Champlain::MapSourceFactory->OSM_OSMARENDER);
+}
+
+
+sub get_oam {
+	my $factory = Champlain::MapSourceFactory->get_default();
+	return $factory->create(Champlain::MapSourceFactory->OAM);
+}
+
+
+sub get_mff {
+	my $factory = Champlain::MapSourceFactory->get_default();
+	return $factory->create(Champlain::MapSourceFactory->MFF_RELIEF);
 }
