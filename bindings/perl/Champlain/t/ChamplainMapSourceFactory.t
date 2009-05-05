@@ -22,7 +22,7 @@ sub test_map_source_names {
 	# Map identification
 	is(Champlain::MapSourceFactory->OSM_MAPNIK, 'OpenStreetMap Mapnik');
 	is(Champlain::MapSourceFactory->OSM_OSMARENDER, 'OpenStreetMap Osmarender');
-	is(Champlain::MapSourceFactory->OSM_CYCLEMAP, 'OpenStreetMap CycleMap');
+	is(Champlain::MapSourceFactory->OSM_CYCLE_MAP, 'OpenStreetMap CycleMap');
 	is(Champlain::MapSourceFactory->OAM, 'OpenAerialMap');
 	is(Champlain::MapSourceFactory->MFF_RELIEF, 'MapsForFree Relief');
 }
@@ -35,7 +35,7 @@ sub test_map_factory {
 	
 	generic_create($factory, Champlain::MapSourceFactory->OSM_MAPNIK);
 	generic_create($factory, Champlain::MapSourceFactory->OSM_OSMARENDER);
-	generic_create($factory, Champlain::MapSourceFactory->OSM_CYCLEMAP);
+	generic_create($factory, Champlain::MapSourceFactory->OSM_CYCLE_MAP);
 	generic_create($factory, Champlain::MapSourceFactory->OAM);
 	generic_create($factory, Champlain::MapSourceFactory->MFF_RELIEF);
 	

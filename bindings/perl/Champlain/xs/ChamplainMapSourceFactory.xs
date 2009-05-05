@@ -12,20 +12,18 @@ champlain_map_source_factory_get_default (class)
 void
 champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
 	PREINIT:
-		gchar **list = NULL;
-		gchar *item = NULL;
-		gint i = 0;
+		GSList *list = NULL;
+		GSList *item = NULL;
 	
 	PPCODE:
 		list = champlain_map_source_factory_get_list(factory);
 		
-		item = list[0];
-		while (item != NULL) {
-			XPUSHs(sv_2mortal(newSVGChar(item)));
-			item = list[++i];
+		for (item = list; item != NULL; item = item->next) {
+//			ChamplainMapSourceDesc *desc = CHAMAPLAIN_MAP_SOURCE_DESC(item->data);
+//			XPUSHs(sv_2mortal(newSVChamplainMapSourceDesc(desc)));
 		}
 		
-		g_strfreev(list);
+		g_slist_free(list);
 
 
 ChamplainMapSource*
@@ -55,9 +53,9 @@ OSM_OSMARENDER (class)
 
 
 const gchar*
-OSM_CYCLEMAP (class)
+OSM_CYCLE_MAP (class)
 	CODE:
-		RETVAL = CHAMPLAIN_MAP_SOURCE_OSM_CYCLEMAP;
+		RETVAL = CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP;
 
 	OUTPUT:
 		RETVAL
