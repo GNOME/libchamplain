@@ -232,6 +232,7 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
 
 /**
  * champlain_network_map_source_new_full:
+ * @id: the map source's id
  * @name: the map source's name
  * @license: the map source's license
  * @license_uri: the map source's license URI
