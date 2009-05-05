@@ -16,7 +16,7 @@ sub tests {
 	test_osm_cyclemap();
 	test_osm_osmarender();
 	test_oam();
-	test_mff();
+	test_mff_relief();
 	return 0;
 }
 
@@ -82,7 +82,7 @@ sub test_oam {
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
-	is($map->get_name, 'OpenArialMap', "$label name");
+	is($map->get_name, 'OpenAerialMap', "$label name");
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 17, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
@@ -94,13 +94,13 @@ sub test_oam {
 
 
 # Maps for Free
-sub test_mff {
+sub test_mff_relief {
 	my $label = "Maps for Free";
-	my $map = Champlain::MapSource->new_mff_relief();
+	my $map = get_mff_relief();
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
-	is($map->get_name, 'MapsForFree Relief', "$label name");
+	is($map->get_name, 'Maps for Free Relief', "$label name");
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 11, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
@@ -242,7 +242,7 @@ sub get_oam {
 }
 
 
-sub get_mff {
+sub get_mff_relief {
 	my $factory = Champlain::MapSourceFactory->get_default();
 	return $factory->create(Champlain::MapSourceFactory->MFF_RELIEF);
 }
