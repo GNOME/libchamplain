@@ -1,3 +1,69 @@
+libchamplain 0.3 (2009-05-04)
+===============================
+
+First development release leading to 0.4
+
+Enhancements:
+
+* Add a way to have custom map sources
+* Add a way to list available map sources
+* Add a way to disable double click to zoom
+* Add a way to access convert x,y in the view to lat,lon
+* The code now follows more closely the coding style guidelines
+* The code is now much easier to bind to other languages
+* Now include (but broken for this release): Perl, C# and Python bindings
+* 569944: No Python bindings
+* 557641: Smooth movement to a new position
+* 557642: Keep the center of the map in the center after a resize
+* 557644: Double click to zoom
+* 557965: Add a way to know the maximum and minimum zoom level
+* 577666: Replace error.svg with a cairo drawing
+* 568931: No disk cache management
+* 574809: Provide a way to make visible a bunch of markers
+* 576055: Implement advanced markers
+* 571702: Host application should be able to limit the maximum and ... 
+* 559522: Lack of user feedback during loading of tiles
+
+Fixes:
+
+* 558026: zoom in + center_on != center_on + zoom in
+* 575902: ChamplainNetworkMapSource crashes when setting "proxy-uri"
+* 576698: Segfault on 32bits platform
+* 561700: The map is glued to the center
+* 575133: Position lost on zoom out (from level 7 to 6)
+* 579846: All property changes cause the marker to be rerendered
+* 557531: champlain_view_new contains initialization code
+* 557532: champlain_view_embed_new contains initialization code
+* 558177: center_on + setting the zoom level can give the wrong result
+* 567594: config.h.in should not be in VCS
+* 569984: Current position lost on window resize
+* 570314: Zoom-in zooms at the wrong place if actor is not position...
+* 574167: Callbacks of demos/launcher.c return no values
+* 575138: It is possible to zoom below zoom level 0
+* 575139: Corrupted map when double clicking at max level
+* 575140: launcher-gtk ignores zoom-level on startup
+* 576159: Various memory management fixes for ChamplainTile
+* 576204: Properties latitude and longitude are registered are not ...
+* 576206: Getter for the properties latitude and longitude returns ...
+* 576287: Zooming doesn't stay within the map-source boundaries
+* 576733: animated-marker.py not working and not very pythonistic
+* 577169: There is no way to tell when a champlain_view_go_to is done
+* 580371: demos/launcher doesn't start at the right position
+* 573937: Support proxies
+* 576860: launcher.py demo should be more "pythonistic"
+* 558020: Unwanted wrap effect when panning at zoom level >= 8
+* 575601: Return const gchar* insted of gchar*
+* 576677: Demos are not compilable out of the tree
+* 576680: Introduce versionning functions and constants
+* 576831: ensure_visible is not fool proof
+* 559446: OpenStreetMap Mapnik is missing a zoom level
+* 575645: Properties enum has same comment as the signals enum
+* 575903: Memory leaks in champlain-network-map-source.c
+* 576695: Missing "Index of all symbols"
+* 576832: Any go_to should stop a previous and not yet finished go_to
+* 580785: decel-rate of a view is not set correctly
+
+
 libchamplain 0.2.10 (2009-04-02)
 ===============================
  
