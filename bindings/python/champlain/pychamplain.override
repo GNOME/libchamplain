@@ -23,25 +23,25 @@ ignore
 override champlain_map_source_factory_get_list kwargs
 static PyObject *
 _wrap_champlain_map_source_factory_get_list(PyGObject *self) {
-	gchar **list;
-	gchar *item;
+	GSList *iter, *list;
 	PyObject *ret;
-	int i = 0;
 
 	list = champlain_map_source_factory_get_list(CHAMPLAIN_MAP_SOURCE_FACTORY(self->obj));
 	
 	ret = PyList_New(0);
-	item = list[i];
-	while (item != NULL) {
-		PyList_Append (ret, PyString_FromString(item));
-		item = list[++i];
+	for(iter = list; iter != NULL; iter = iter->next) {
+		PyObject *item = PyDict_New();
+		ChamplainMapSourceDesc *desc = (ChamplainMapSourceDesc *) iter->data;
+		PyDict_SetItemString(item, "id", PyString_FromString(desc->id));
+		PyDict_SetItemString(item, "name", PyString_FromString(desc->name));
+		PyDict_SetItemString(item, "license", PyString_FromString(desc->license));
+		PyDict_SetItemString(item, "license_uri", PyString_FromString(desc->license_uri));
+		PyDict_SetItemString(item, "min_zoom_level", PyInt_FromLong(desc->min_zoom_level));
+		PyDict_SetItemString(item, "max_zoom_level", PyInt_FromLong(desc->max_zoom_level));
+		PyList_Append(ret, item);
+		Py_DECREF(item);
 	}
 
-	if (!list) {
-		Py_INCREF (Py_None);
-		return Py_None;
-	}
-	
 	return ret;
 }
 %%

@@ -43,8 +43,12 @@ class LauncherGTK:
 
 		combo = gtk.combo_box_new_text()
 		self.map_source_factory = champlain.map_source_factory_get_default()
+		liststore = gtk.ListStore(str, str)
 		for source in self.map_source_factory.get_list():
-			combo.append_text(source)
+			liststore.append([source["id"], source["name"]])
+			combo.append_text(source["name"])
+		combo.set_model(liststore)
+		combo.set_attributes(combo.get_cells()[0], text=1)
 		combo.set_active(0)
 		combo.connect("changed", self.map_source_changed)
 		bbox.add(combo)
@@ -86,8 +90,10 @@ class LauncherGTK:
 		self.view.set_property("zoom-level", self.spinbutton.get_value_as_int())
 
 	def map_source_changed(self, widget):
-		selection = widget.get_active_text()
-		source = self.map_source_factory.create(selection);
+		model = widget.get_model()
+		iter = widget.get_active_iter()
+		id = model.get_value(iter, 0)
+		source = self.map_source_factory.create(id);
 		self.view.set_property("map-source", source)
 
 	def map_zoom_changed(self, widget, value):

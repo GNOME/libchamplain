@@ -550,6 +550,10 @@
 
 
 
+;; From champlain-map-source-desc.h
+
+
+
 ;; From champlain-map-source-factory.h
 
 (define-function map_source_factory_get_type
@@ -565,7 +569,7 @@
 (define-method get_list
   (of-object "ChamplainMapSourceFactory")
   (c-name "champlain_map_source_factory_get_list")
-  (return-type "gchar**")
+  (return-type "GSList*")
 )
 
 (define-method create
@@ -582,8 +586,7 @@
   (c-name "champlain_map_source_factory_register")
   (return-type "gboolean")
   (parameters
-    '("const-gchar*" "id")
-    '("ChamplainMapSourceConstructor" "callback")
+    '("ChamplainMapSourceDesc*" "desc")
   )
 )
 
