@@ -306,6 +306,7 @@ static ChamplainMapSource *
 champlain_map_source_new_osm_cyclemap (void)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
+      "OpenStreetMap Cycle Map",
       "(CC) BY 2.0 OpenStreetMap contributors",
       "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
@@ -316,6 +317,7 @@ static ChamplainMapSource *
 champlain_map_source_new_osm_osmarender (void)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
+      "OpenStreetMap Osmarender",
       "(CC) BY 2.0 OpenStreetMap contributors",
       "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
@@ -325,7 +327,8 @@ champlain_map_source_new_osm_osmarender (void)
 static ChamplainMapSource *
 champlain_map_source_new_osm_mapnik (void)
 {
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full ("OpenStreetMap Mapnik",
+  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
+      "OpenStreetMap Mapnik",
       "(CC) BY 2.0 OpenStreetMap contributors",
       "http://creativecommons.org/licenses/by/2.0/", 0, 18, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
@@ -336,6 +339,7 @@ static ChamplainMapSource *
 champlain_map_source_new_oam (void)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OAM,
+      "OpenAerialMap",
       "(CC) BY 3.0 OpenAerialMap contributors",
       "http://creativecommons.org/licenses/by/3.0/", 0, 17, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,
@@ -346,6 +350,7 @@ static ChamplainMapSource *
 champlain_map_source_new_mff_relief (void)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_MFF_RELIEF,
+      "Maps for Free Relief",
       "Map data available under GNU Free Documentation license, Version 1.2 or later",
       "http://www.gnu.org/copyleft/fdl.html", 0, 11, 256,
       CHAMPLAIN_MAP_PROJECTION_MERCATOR,

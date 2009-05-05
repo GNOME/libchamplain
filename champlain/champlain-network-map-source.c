@@ -246,7 +246,8 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
  * Since: 0.4
  */
 ChamplainNetworkMapSource*
-champlain_network_map_source_new_full (const gchar *name,
+champlain_network_map_source_new_full (const gchar *id,
+    const gchar *name,
     const gchar *license,
     const gchar *license_uri,
     guint min_zoom,
@@ -256,8 +257,8 @@ champlain_network_map_source_new_full (const gchar *name,
     const gchar *uri_format)
 {
   ChamplainNetworkMapSource * source;
-  source = g_object_new (CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE, "name", name,
-      "license", license, "license-uri", license_uri,
+  source = g_object_new (CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE, "id", id,
+      "name", name, "license", license, "license-uri", license_uri,
       "min-zoom-level", min_zoom, "max-zoom-level", max_zoom,
       "tile-size", tile_size, "projection", projection,
       "uri-format", uri_format, NULL);

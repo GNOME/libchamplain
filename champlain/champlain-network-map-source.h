@@ -54,10 +54,15 @@ struct _ChamplainNetworkMapSourceClass
 
 GType champlain_network_map_source_get_type (void);
 
-ChamplainNetworkMapSource* champlain_network_map_source_new_full (
-    const gchar *name, const gchar *license, const gchar *license_uri,
-    guint min_zoom, guint max_zoom, guint tile_size,
-    ChamplainMapProjection projection, const gchar *uri_format);
+ChamplainNetworkMapSource* champlain_network_map_source_new_full (const gchar *id,
+    const gchar *name,
+    const gchar *license,
+    const gchar *license_uri,
+    guint min_zoom,
+    guint max_zoom,
+    guint tile_size,
+    ChamplainMapProjection projection,
+    const gchar *uri_format);
 
 gchar * champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *source,
     gint x,

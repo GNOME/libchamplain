@@ -60,6 +60,7 @@ enum
 enum
 {
   PROP_0,
+  PROP_ID,
   PROP_NAME,
   PROP_LICENSE,
   PROP_LICENSE_URI,
@@ -77,6 +78,7 @@ G_DEFINE_TYPE (ChamplainMapSource, champlain_map_source, G_TYPE_OBJECT);
 
 struct _ChamplainMapSourcePrivate
 {
+  gchar *id;
   gchar *name;
   gchar *license;
   gchar *license_uri;
@@ -97,6 +99,9 @@ champlain_map_source_get_property (GObject *object,
 
   switch(prop_id)
     {
+      case PROP_ID:
+        g_value_set_string (value, priv->id);
+        break;
       case PROP_NAME:
         g_value_set_string (value, priv->name);
         break;
@@ -134,6 +139,9 @@ champlain_map_source_set_property (GObject *object,
 
   switch(prop_id)
     {
+      case PROP_ID:
+        champlain_map_source_set_id (map_source,
+            g_value_get_string (value));
       case PROP_NAME:
         champlain_map_source_set_name (map_source,
             g_value_get_string (value));
@@ -186,6 +194,20 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
   object_class->set_property = champlain_map_source_set_property;
 
   klass->fill_tile = champlain_map_source_real_fill_tile;
+
+  /**
+  * ChamplainMapSource:id:
+  *
+  * The name of the map source
+  *
+  * Since: 0.4
+  */
+  pspec = g_param_spec_string ("id",
+                               "Id",
+                               "The id of the map source",
+                               "",
+                               (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+  g_object_class_install_property (object_class, PROP_ID, pspec);
 
   /**
   * ChamplainMapSource:name:
@@ -636,5 +658,40 @@ champlain_map_source_set_projection (ChamplainMapSource *map_source,
 
   priv->map_projection = projection;
   g_object_notify (G_OBJECT (map_source), "projection");
+}
+
+/**
+ * champlain_map_source_get_id:
+ * @map_source: a #ChamplainMapSource
+ *
+ * Returns the map source's id.
+ *
+ * Since: 0.4
+ */
+const gchar *
+champlain_map_source_get_id (ChamplainMapSource *map_source)
+{
+  ChamplainMapSourcePrivate *priv = map_source->priv;
+  return priv->id;
+}
+
+/**
+ * champlain_map_source_set_id:
+ * @map_source: a #ChamplainMapSource
+ * @id: a id
+ *
+ * Sets the map source's id.
+ *
+ * Since: 0.4
+ */
+void
+champlain_map_source_set_id (ChamplainMapSource *map_source,
+    const gchar *id)
+{
+  ChamplainMapSourcePrivate *priv = map_source->priv;
+
+  g_free (priv->id);
+  priv->id = g_strdup (id);
+  g_object_notify (G_OBJECT (map_source), "id");
 }
 
