@@ -20,11 +20,11 @@ sub tests {
 
 sub test_map_source_names {
 	# Map identification
-	is(Champlain::MapSourceFactory->OSM_MAPNIK, 'OpenStreetMap Mapnik');
-	is(Champlain::MapSourceFactory->OSM_OSMARENDER, 'OpenStreetMap Osmarender');
-	is(Champlain::MapSourceFactory->OSM_CYCLE_MAP, 'OpenStreetMap CycleMap');
-	is(Champlain::MapSourceFactory->OAM, 'OpenAerialMap');
-	is(Champlain::MapSourceFactory->MFF_RELIEF, 'MapsForFree Relief');
+	is(Champlain::MapSourceFactory->OSM_MAPNIK, 'osm::mapnik');
+	is(Champlain::MapSourceFactory->OSM_OSMARENDER, 'osm::osmarender');
+	is(Champlain::MapSourceFactory->OSM_CYCLE_MAP, 'osm::cyclemap');
+	is(Champlain::MapSourceFactory->OAM, 'oam');
+	is(Champlain::MapSourceFactory->MFF_RELIEF, 'mff::relief');
 }
 
 
@@ -33,11 +33,31 @@ sub test_map_factory {
 	my $factory = Champlain::MapSourceFactory->get_default();
 	isa_ok($factory, 'Champlain::MapSourceFactory');
 	
-	generic_create($factory, Champlain::MapSourceFactory->OSM_MAPNIK);
-	generic_create($factory, Champlain::MapSourceFactory->OSM_OSMARENDER);
-	generic_create($factory, Champlain::MapSourceFactory->OSM_CYCLE_MAP);
-	generic_create($factory, Champlain::MapSourceFactory->OAM);
-	generic_create($factory, Champlain::MapSourceFactory->MFF_RELIEF);
+	generic_create(
+		$factory,
+		Champlain::MapSourceFactory->OSM_MAPNIK,
+		"OpenStreetMap Mapnik"
+	);
+	generic_create(
+		$factory,
+		Champlain::MapSourceFactory->OSM_OSMARENDER,
+		"OpenStreetMap Osmarender"
+	);
+	generic_create(
+		$factory,
+		Champlain::MapSourceFactory->OSM_CYCLE_MAP,
+		"OpenStreetMap Cycle Map"
+	);
+	generic_create(
+		$factory,
+		Champlain::MapSourceFactory->OAM,
+		"OpenAerialMap"
+	);
+	generic_create(
+		$factory,
+		Champlain::MapSourceFactory->MFF_RELIEF,
+		"Maps for Free Relief"
+	);
 	
 	my @maps = $factory->get_list();
 	ok(@maps >= 5, "Maps factory has the default maps");
@@ -45,8 +65,9 @@ sub test_map_factory {
 
 
 sub generic_create {
-	my ($factory, $id) = @_;
+	my ($factory, $id, $name) = @_;
 	my $map = $factory->create($id);
 	isa_ok($map, 'Champlain::MapSource');
-	is($map->get_name, $id);
+#	is($map->get_id, $id);
+	is($map->get_name, $name);
 }
