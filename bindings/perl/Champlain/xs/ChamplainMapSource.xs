@@ -66,3 +66,11 @@ champlain_map_source_set_projection (ChamplainMapSource *map_source, ChamplainMa
 
 ChamplainMapProjection
 champlain_map_source_get_projection (ChamplainMapSource *map_source)
+
+
+void
+champlain_map_source_set_id (ChamplainMapSource *map_source, const gchar *id)
+
+
+const gchar*
+champlain_map_source_get_id (ChamplainMapSource *map_source)
