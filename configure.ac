@@ -9,7 +9,7 @@ m4_define([api_version],
           [champlain_major_version.champlain_minor_version])
 # if the API changes, set to 0
 AC_PREREQ(2.61)
-AC_INIT([champlain],
+AC_INIT([libchamplain],
         [champlain_version],
         pierre-luc@pierlux.com)
 AC_CONFIG_SRCDIR([champlain/champlain.h])
