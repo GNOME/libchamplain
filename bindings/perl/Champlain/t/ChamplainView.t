@@ -50,10 +50,11 @@ sub test_generic {
 	
 	# Change the map source (get a different map source)
 	my $source_original = $view->get('map-source');
-	my $source_new = Champlain::MapSource->new_osm_mapnik();
-	if ($source_original->get_name eq $source_new->get_name) {
+	my $factory = Champlain::MapSourceFactory->get_default();
+	my $source_new = $factory->create(Champlain::MapSourceFactory->OSM_MAPNIK);
+	if ($source_original->get_id eq $source_new->get_id) {
 		# Same kind of map source, take another one
-		$source_new = Champlain::MapSource->new_oam();
+		$source_new = $factory->create(Champlain::MapSourceFactory->OAM);
 	}
 	$view->set_map_source($source_new);
 	is($view->get('map-source'), $source_new, "Change map source");
