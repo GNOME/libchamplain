@@ -5,8 +5,8 @@ MODULE = Champlain::NetworkMapSource  PACKAGE = Champlain::NetworkMapSource  PRE
 
 
 ChamplainNetworkMapSource*
-champlain_network_map_source_new_full (class, gchar *name, gchar *license, gchar *license_uri, guint min_zoom, guint map_zoom, guint tile_size, ChamplainMapProjection projection, gchar *uri_format)
-	C_ARGS: name, license, license_uri, min_zoom, map_zoom, tile_size, projection, uri_format
+champlain_network_map_source_new_full (class, gchar *id, gchar *name, gchar *license, gchar *license_uri, guint min_zoom, guint map_zoom, guint tile_size, ChamplainMapProjection projection, gchar *uri_format)
+	C_ARGS: id, name, license, license_uri, min_zoom, map_zoom, tile_size, projection, uri_format
 
 
 const gchar*
