@@ -154,16 +154,6 @@ if test x$enable_managed = xyes; then
   AC_SUBST(CHAMPLAIN_GTK_APIVERSION)
 
   AC_CONFIG_FILES([
-    bindings/managed/Makefile
-    bindings/managed/champlain/Makefile
-    bindings/managed/champlain/AssemblyInfo.cs
-    bindings/managed/champlain/champlain-sharp.pc
-    bindings/managed/champlain/champlain-sharp.dll.config
-    bindings/managed/champlain-gtk/Makefile
-    bindings/managed/champlain-gtk/AssemblyInfo.cs
-    bindings/managed/champlain-gtk/champlain-gtk-sharp.pc
-    bindings/managed/champlain-gtk/champlain-gtk-sharp.dll.config
-    bindings/managed/samples/Makefile
   ])
 fi
 
@@ -189,12 +179,6 @@ if test x$enable_python = xyes; then
       gtk+-2.0
    ], have_python="yes", have_python="no")
 
-  AC_CONFIG_FILES([
-   bindings/python/Makefile
-   bindings/python/champlain/Makefile
-   bindings/python/champlain-gtk/Makefile
-  ])
-
   if test "x$have_python" = "xyes" ; then
     AC_CHECK_PROGS([PYGOBJECTCODEGEN], [pygobject-codegen-2.0 pygtk-codegen-2.0])
     AM_CHECK_PYTHON_HEADERS(,have_python="no")
@@ -216,6 +200,20 @@ AC_CONFIG_FILES([Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
                  champlain.pc
+                 bindings/python/Makefile
+                 bindings/python/champlain/Makefile
+                 bindings/python/champlain-gtk/Makefile
+                 bindings/python/demos/Makefile
+                 bindings/managed/Makefile
+                 bindings/managed/champlain/Makefile
+                 bindings/managed/champlain/AssemblyInfo.cs
+                 bindings/managed/champlain/champlain-sharp.pc
+                 bindings/managed/champlain/champlain-sharp.dll.config
+                 bindings/managed/champlain-gtk/Makefile
+                 bindings/managed/champlain-gtk/AssemblyInfo.cs
+                 bindings/managed/champlain-gtk/champlain-gtk-sharp.pc
+                 bindings/managed/champlain-gtk/champlain-gtk-sharp.dll.config
+                 bindings/managed/samples/Makefile
                  bindings/Makefile])
 AC_OUTPUT
 

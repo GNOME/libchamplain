@@ -19,3 +19,5 @@ launcher_gtk_LDADD = $(GTK_DEPS_LIBS) $(DEPS_LIBS) \
 		../champlain-gtk/libchamplain-gtk-0.3.la \
 		../champlain/libchamplain-0.3.la
 endif
+
+EXTRA_DIST= markers.h

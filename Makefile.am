@@ -13,10 +13,6 @@ champlain-gtk-@API_VERSION@.pc: champlain-gtk.pc
 	@cp -f $< $@
 endif
 
-if ENABLE_PYTHON
-SUBDIRS += bindings/python
-endif
-
 pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
 
@@ -28,4 +24,4 @@ CLEANFILES = $(pcfiles)
 SUBDIRS += demos bindings
 
 ChangeLog: Makefile.am
-	git-log --pretty=short > ChangeLog
+	git log --pretty=short > ChangeLog
