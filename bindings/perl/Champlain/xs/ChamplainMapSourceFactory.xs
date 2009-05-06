@@ -1,6 +1,41 @@
 #include "champlain-perl.h"
 
 
+SV*
+newSVChamplainMapSourceDesc (ChamplainMapSourceDesc *desc) {
+	HV *hash = NULL;
+	SV *sv = NULL;
+	HV *stash = NULL;
+	
+	if (desc == NULL) {
+		return &PL_sv_undef;
+	}
+	
+	hash = newHV();
+	sv = newRV_noinc((SV *) hash);
+	
+	/* Copy the data members of the struct into the hash */
+	hv_store(hash, "id", 2, newSVGChar(desc->id), 0);
+	hv_store(hash, "name", 4, newSVGChar(desc->name), 0);
+	hv_store(hash, "license", 7, newSVGChar(desc->license), 0);
+	hv_store(hash, "license_uri", 11, newSVGChar(desc->license_uri), 0);
+	hv_store(hash, "min_zoom_level", 14, newSViv(desc->min_zoom_level), 0);
+	hv_store(hash, "max_zoom_level", 14, newSViv(desc->max_zoom_level), 0);
+	hv_store(hash, "projection", 10, newSVChamplainMapProjection(desc->projection), 0);
+
+	/*
+	   This is tricky as we have to wrap the C callback into a Perl sub.
+	   hv_store(hash, "constructor", 11, newSVChamplainMapProjection(desc->projection), 0);
+	*/
+	
+	/* Bless this stuff */
+	stash = gv_stashpv("Champlain::MapSourceDesc", TRUE);
+	sv_bless(sv, stash);
+	
+	return sv;
+}
+
+
 MODULE = Champlain::MapSourceFactory  PACKAGE = Champlain::MapSourceFactory  PREFIX = champlain_map_source_factory_
 
 
@@ -19,8 +54,8 @@ champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
 		list = champlain_map_source_factory_get_list(factory);
 		
 		for (item = list; item != NULL; item = item->next) {
-//			ChamplainMapSourceDesc *desc = CHAMAPLAIN_MAP_SOURCE_DESC(item->data);
-//			XPUSHs(sv_2mortal(newSVChamplainMapSourceDesc(desc)));
+			ChamplainMapSourceDesc *desc = CHAMPLAIN_MAP_SOURCE_DESC(item->data);
+			XPUSHs(sv_2mortal(newSVChamplainMapSourceDesc(desc)));
 		}
 		
 		g_slist_free(list);
