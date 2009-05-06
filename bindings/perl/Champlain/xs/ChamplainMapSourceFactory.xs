@@ -36,6 +36,87 @@ newSVChamplainMapSourceDesc (ChamplainMapSourceDesc *desc) {
 }
 
 
+ChamplainMapSourceDesc*
+SvChamplainMapSourceDesc (SV *data) {
+	HV *hash;
+	SV **s;
+	ChamplainMapSourceDesc *desc;
+	gboolean is_valid = TRUE;
+
+	if ((!data) || (!SvOK(data)) || (!SvRV(data)) || (SvTYPE(SvRV(data)) != SVt_PVHV)) {
+		croak("SvChamplainMapSourceDesc: value must be an hashref");
+	}
+
+	hash = (HV *) SvRV(data);
+	
+	/*
+	 * We must set at least one of the following keys:
+	 *   - text
+	 *   - uris
+	 *   - filename
+	 */
+	desc = g_new0(ChamplainMapSourceDesc, 1);
+	
+	if (! ((s = hv_fetch(hash, "id", 2, 0)) && SvOK(*s))) {
+		desc->id = SvGChar(*s);
+	}
+	else {
+		g_free(desc);
+		croak("SvChamplainMapSourceDesc: requires the key: 'id'");
+	}
+	
+	if (! ((s = hv_fetch(hash, "name", 4, 0)) && SvOK(*s))) {
+		desc->name = SvGChar(*s);
+	}
+	else {
+		g_free(desc);
+		croak("SvChamplainMapSourceDesc: requires the key: 'name'");
+	}
+	
+	if (! ((s = hv_fetch(hash, "license", 7, 0)) && SvOK(*s))) {
+		desc->license = SvGChar(*s);
+	}
+	else {
+		g_free(desc);
+		croak("SvChamplainMapSourceDesc: requires the key: 'license'");
+	}
+	
+	if (! ((s = hv_fetch(hash, "license_uri", 11, 0)) && SvOK(*s))) {
+		desc->license_uri = SvGChar(*s);
+	}
+	else {
+		g_free(desc);
+		croak("SvChamplainMapSourceDesc: requires the key: 'license_uri'");
+	}
+	
+	if (! ((s = hv_fetch(hash, "min_zoom_level", 14, 0)) && SvOK(*s))) {
+		desc->min_zoom_level = (gint)SvIV(*s);
+	}
+	else {
+		g_free(desc);
+		croak("SvChamplainMapSourceDesc: requires the key: 'min_zoom_level'");
+	}
+	
+	if (! ((s = hv_fetch(hash, "max_zoom_level", 14, 0)) && SvOK(*s))) {
+		desc->max_zoom_level = (gint)SvIV(*s);
+	}
+	else {
+		g_free(desc);
+		croak("SvChamplainMapSourceDesc: requires the key: 'max_zoom_level'");
+	}
+	
+	if (! ((s = hv_fetch(hash, "projection", 10, 0)) && SvOK(*s))) {
+		desc->projection = SvChamplainMapProjection(*s);
+	}
+	else {
+		g_free(desc);
+		croak("SvChamplainMapSourceDesc: requires the key: 'projection'");
+	}
+
+	return desc;
+}
+
+
 MODULE = Champlain::MapSourceFactory  PACKAGE = Champlain::MapSourceFactory  PREFIX = champlain_map_source_factory_
 
 
