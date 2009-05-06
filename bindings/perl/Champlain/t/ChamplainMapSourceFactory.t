@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 22;
+use Clutter::TestHelper tests => 31;
 
 use Champlain ':coords';
 
@@ -59,8 +59,27 @@ sub test_map_factory {
 		"Maps for Free Relief"
 	);
 	
+	# Get the maps available
 	my @maps = $factory->get_list();
 	ok(@maps >= 5, "Maps factory has the default maps");
+	
+	# Find the OAM map and check that the it's properly described
+	my @found = grep { $_->{id} eq Champlain::MapSourceFactory->OAM } @maps;
+	is(scalar(@found), 1);
+	if (@found) {
+		my ($oam_map) = @found;
+		isa_ok($oam_map, 'Champlain::MapSourceDesc');
+		is($oam_map->{id}, Champlain::MapSourceFactory->OAM);
+		is($oam_map->{name}, 'OpenAerialMap');
+		is($oam_map->{license}, "(CC) BY 3.0 OpenAerialMap contributor");
+		is($oam_map->{license_uri}, 'http://creativecommons.org/licenses/by/3.0/');
+		is($oam_map->{min_zoom_level}, 0);
+		is($oam_map->{max_zoom_level}, 17);
+		is($oam_map->{projection}, 'mercator');
+	}
+	else {
+		fail("Can't test a Champlain::MapSourceDesc without a map description") for 1 .. 8;
+	}
 }
 
 
