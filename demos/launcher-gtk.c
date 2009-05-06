@@ -131,7 +131,7 @@ static void
 build_combo_box (GtkComboBox *box)
 {
   ChamplainMapSourceFactory *factory;
-  GSList *sources;
+  GSList *sources, *iter;
   gint i = 0;
   GtkTreeStore *store;
   GtkTreeIter parent;
@@ -143,18 +143,19 @@ build_combo_box (GtkComboBox *box)
 
   factory = champlain_map_source_factory_get_default ();
   sources = champlain_map_source_factory_get_list (factory);
-
-  while (sources != NULL)
+  
+  iter = sources;
+  while (iter != NULL)
   {
     ChamplainMapSourceDesc *desc;
 
-    desc = (ChamplainMapSourceDesc*) sources->data;
+    desc = (ChamplainMapSourceDesc*) iter->data;
 
-    gtk_tree_store_append( store, &parent, NULL );
-    gtk_tree_store_set( store, &parent, COL_ID, g_strdup (desc->id),
-        COL_NAME, g_strdup (desc->name), -1);
+    gtk_tree_store_append (store, &parent, NULL );
+    gtk_tree_store_set (store, &parent, COL_ID, desc->id,
+        COL_NAME, desc->name, -1);
 
-    sources = g_slist_next (sources);
+    iter = g_slist_next (iter);
   }
 
   g_slist_free (sources);
