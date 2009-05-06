@@ -160,7 +160,7 @@ build_combo_box (GtkComboBox *box)
   g_slist_free (sources);
   g_object_unref (factory);
 
-  gtk_combo_box_set_model (box, store);
+  gtk_combo_box_set_model (box, GTK_TREE_MODEL (store));
 
   cell = gtk_cell_renderer_text_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (box), cell, FALSE);
@@ -202,9 +202,9 @@ main (int argc,
   widget = champlain_view_embed_new (CHAMPLAIN_VIEW (view));
   g_object_set (G_OBJECT (view), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
       "zoom-level", 5, NULL);
-  layer = create_marker_layer (view);
+  layer = create_marker_layer (CHAMPLAIN_VIEW (view));
   champlain_view_add_layer(CHAMPLAIN_VIEW (view), layer);
-  clutter_actor_hide (layer);
+  clutter_actor_hide (CLUTTER_ACTOR (layer));
 
   gtk_widget_set_size_request(widget, 640, 480);
 
@@ -222,8 +222,8 @@ main (int argc,
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
   button = gtk_combo_box_new ();
-  build_combo_box (button);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(button), 0);
+  build_combo_box (GTK_COMBO_BOX (button));
+  gtk_combo_box_set_active (GTK_COMBO_BOX (button), 0);
   g_signal_connect (button, "changed", G_CALLBACK (map_source_changed), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
