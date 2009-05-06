@@ -42,6 +42,8 @@ _wrap_champlain_map_source_factory_get_list(PyGObject *self) {
 		Py_DECREF(item);
 	}
 
+	g_slist_free(list);
+
 	return ret;
 }
 %%
