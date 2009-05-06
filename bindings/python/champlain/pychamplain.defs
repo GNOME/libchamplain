@@ -488,6 +488,21 @@
   )
 )
 
+(define-method set_id
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_set_id")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "id")
+  )
+)
+
+(define-method get_id
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_id")
+  (return-type "const-gchar*")
+)
+
 (define-method set_name
   (of-object "ChamplainMapSource")
   (c-name "champlain_map_source_set_name")
@@ -603,6 +618,7 @@
   (c-name "champlain_network_map_source_new_full")
   (return-type "ChamplainNetworkMapSource*")
   (parameters
+    '("const-gchar*" "id")
     '("const-gchar*" "name")
     '("const-gchar*" "license")
     '("const-gchar*" "license_uri")
