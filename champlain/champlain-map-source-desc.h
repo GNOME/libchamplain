@@ -38,6 +38,8 @@ G_BEGIN_DECLS
 typedef ChamplainMapSource * (*ChamplainMapSourceConstructor) ();
 #define CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR (f) ((ChamplainMapSourceConstructor) (f))
 
+#define CHAMPLAIN_MAP_SOURCE_DESC(obj)     ((ChamplainMapSourceDesc *) (obj))
+
 /**
  * ChamplainMapSourceDesc:
  *
