@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 50;
+use Clutter::TestHelper tests => 58;
 
 use Champlain ':coords';
 
@@ -79,11 +79,24 @@ sub test_generic {
 	is($view->get('decel-rate'), 1.5, "set_decel_rate()");
 
 	
-	# Change the decel rate
+	# Change the scroll mode
 	$view->set_scroll_mode('push');
 	is($view->get('scroll-mode'), 'push', "set_scroll_mode('push')");
 	$view->set_scroll_mode('kinetic');
 	is($view->get('scroll-mode'), 'kinetic', "set_scroll_mode('kinetic')");
+
+	
+	# Change the show license property
+	$view->set_show_license(TRUE);
+	ok($view->get('show-license'), "set_show_license(TRUE)");
+	$view->set_show_license(FALSE);
+	ok(!$view->get('show-license'), "set_show_license(FALSE)");
+	
+	# Change the set zoom on double click property
+	$view->set_zoom_on_double_click(TRUE);
+	ok($view->get('zoom-on-double-click'), "set_zoom_on_double_click(TRUE)");
+	$view->set_zoom_on_double_click(FALSE);
+	ok(!$view->get('zoom-on-double-click'), "set_zoom_on_double_click(FALSE)");
 }
 
 
