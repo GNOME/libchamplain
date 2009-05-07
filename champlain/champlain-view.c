@@ -440,7 +440,7 @@ champlain_view_get_property (GObject *object,
       case PROP_DECEL_RATE:
         {
           gdouble decel = 0.0;
-          g_object_get (priv->finger_scroll, "decel-rate", decel, NULL);
+          g_object_get (priv->finger_scroll, "decel-rate", &decel, NULL);
           g_value_set_double (value, decel);
           break;
         }
