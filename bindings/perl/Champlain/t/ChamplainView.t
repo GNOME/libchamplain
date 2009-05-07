@@ -70,6 +70,20 @@ sub test_generic {
 	}
 	$view->set_map_source($source_new);
 	is($view->get('map-source'), $source_new, "Change map source");
+
+	
+	# Change the decel rate
+	$view->set_decel_rate(0.5);
+	is($view->get('decel-rate'), 0.5, "set_decel_rate()");
+	$view->set_decel_rate(1.5);
+	is($view->get('decel-rate'), 1.5, "set_decel_rate()");
+
+	
+	# Change the decel rate
+	$view->set_scroll_mode('push');
+	is($view->get('scroll-mode'), 'push', "set_scroll_mode('push')");
+	$view->set_scroll_mode('kinetic');
+	is($view->get('scroll-mode'), 'kinetic', "set_scroll_mode('kinetic')");
 }
 
 
