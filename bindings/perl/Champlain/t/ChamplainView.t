@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 40;
+use Clutter::TestHelper tests => 42;
 
 use Champlain ':coords';
 
@@ -182,6 +182,10 @@ sub test_event {
 	my ($latitude, $longitude) = $view->get_coords_from_event($event);
 	ok($latitude >= -2.0 && $latitude <= 2.0, "get_coords_from_event() latitude");
 	ok($longitude >= -2.0 && $longitude <= 2.0, "get_coords_from_event() longitude");
+
+	($latitude, $longitude) = $view->get_coords_at($event->x, $event->y);
+	ok($latitude >= -2.0 && $latitude <= 2.0, "get_coords_at() latitude");
+	ok($longitude >= -2.0 && $longitude <= 2.0, "get_coords_at() longitude");
 }
 
 
