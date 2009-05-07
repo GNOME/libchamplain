@@ -97,6 +97,10 @@ sub test_generic {
 	ok($view->get('zoom-on-double-click'), "set_zoom_on_double_click(TRUE)");
 	$view->set_zoom_on_double_click(FALSE);
 	ok(!$view->get('zoom-on-double-click'), "set_zoom_on_double_click(FALSE)");
+	
+	
+	# Call ensure_visible(), it's to test, but at least we test that it doesn't crash
+	$view->ensure_visible(10, 10, 30, 30, TRUE);
 }
 
 
