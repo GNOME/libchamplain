@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 120;
+use Clutter::TestHelper tests => 125;
 
 use Champlain ':coords';
 
@@ -34,6 +34,7 @@ sub test_osm_mapnik {
 	is($map->get_max_zoom_level, 18, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
 	is($map->get_license, $OSM_LICENSE, "$label license");
+	is($map->get_license_uri, 'http://creativecommons.org/licenses/by/2.0/' , "$label license_uri");
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
@@ -53,6 +54,7 @@ sub test_osm_cyclemap {
 	is($map->get_max_zoom_level, 18, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
 	is($map->get_license, $OSM_LICENSE, "$label license");
+	is($map->get_license_uri, 'http://creativecommons.org/licenses/by/2.0/' , "$label license_uri");
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
@@ -72,6 +74,7 @@ sub test_osm_osmarender {
 	is($map->get_max_zoom_level, 18, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
 	is($map->get_license, $OSM_LICENSE, "$label license");
+	is($map->get_license_uri, 'http://creativecommons.org/licenses/by/2.0/' , "$label license_uri");
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
@@ -91,6 +94,7 @@ sub test_oam {
 	is($map->get_max_zoom_level, 17, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
 	is($map->get_license, "(CC) BY 3.0 OpenAerialMap contributors", "$label license");
+	is($map->get_license_uri, 'http://creativecommons.org/licenses/by/3.0/' , "$label license_uri");
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
@@ -114,6 +118,7 @@ sub test_mff_relief {
 		"Map data available under GNU Free Documentation license, Version 1.2 or later",
 		"$label license"
 	);
+	is($map->get_license_uri, 'http://www.gnu.org/copyleft/fdl.html' , "$label license_uri");
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
