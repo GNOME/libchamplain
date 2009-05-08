@@ -28,6 +28,7 @@ champlain_cache_set_size_limit (ChamplainCache *self, guint size_limit)
 guint
 champlain_cache_get_size_limit (ChamplainCache *self)
 
+
 void
 champlain_cache_purge (ChamplainCache *self)
 
