@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 214;
+use Clutter::TestHelper tests => 228;
 use Test::Builder;
 
 use Champlain ':coords';
@@ -120,7 +120,7 @@ sub generic_test {
 	ok(!$marker->get_wrap, "wrap is false by default");
 	is($marker->get_ellipsize, 'none', "ellipsize is 'none' by default");
 	ok($marker->get_single_line_mode, "single_line_mode is true by default");
-
+	ok($marker->get_draw_background, "draw-background is true by default");
 
 	# Test the setters
 	$marker->set_use_markup(TRUE);
@@ -135,8 +135,11 @@ sub generic_test {
 	$marker->set_ellipsize('start');
 	is($marker->get_ellipsize, 'start', "set_ellipsize()");
 
-	$marker->set_single_line_mode(TRUE);
-	ok($marker->get_single_line_mode, "set_single_line_mode()");
+	$marker->set_single_line_mode(FALSE);
+	ok(!$marker->get_single_line_mode, "set_single_line_mode()");
+
+	$marker->set_draw_background(FALSE);
+	ok(!$marker->get_draw_background, "set_draw_background()");
 
 	
 	$marker->set_text("dummy test");
@@ -165,10 +168,8 @@ sub generic_test {
 	is($marker->get_font_name, "Mono 14", "set_font_name()");
 	$marker->set_font_name(undef);
 	is($marker->get_font_name, undef, "set_font_name(undef)");
-
-	# Can't be tested but at least we call it
-#	$marker->set_attributes('as');
 }
+
 
 #
 # Assert that two colors are unique.
