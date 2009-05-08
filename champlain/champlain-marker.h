@@ -96,7 +96,7 @@ void champlain_marker_set_single_line_mode (ChamplainMarker *marker,
 void champlain_marker_set_ellipsize (ChamplainMarker *marker,
     PangoEllipsizeMode mode);
 void champlain_marker_set_draw_background (ChamplainMarker *marker,
-    gboolean wrap);
+    gboolean background);
 
 gboolean champlain_marker_get_use_markup (ChamplainMarker *marker);
 const gchar * champlain_marker_get_text (ChamplainMarker *marker);
