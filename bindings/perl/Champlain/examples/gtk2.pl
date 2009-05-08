@@ -6,6 +6,7 @@ use warnings;
 use Glib qw(TRUE FALSE);
 use Clutter qw(-gtk-init);
 use Gtk2 qw(-init);
+use Gtk2::SimpleList;
 use Champlain;
 
 
@@ -64,23 +65,8 @@ sub main {
 		}
 	});
 	$toolbox->add($child);
-
-	$child = Gtk2::ComboBox->new_text();
-	my @sources = ();	
-	foreach my $type qw(osm_mapnik oam mff_relief osm_cyclemap osm_osmarender) {
-		my $constructor = "new_$type";
-		my $source = 	Champlain::MapSource->$constructor();
-		push @sources, $source;
-		$child->append_text($source->get_name);
-	}
-	$child->set_active(0);
-	$child->signal_connect('changed', sub {
-		my ($button) = @_;		
-		my $index = $button->get_active;
-		my $source = $sources[$index];		
-		$map->set('map-source', $source);
-	});
-	$toolbox->add($child);
+	
+	$toolbox->add(create_combo_box($map));
 
 	my $spin = Gtk2::SpinButton->new_with_range(0, 20, 1);
 	$spin->signal_connect('changed', sub {
@@ -122,6 +108,55 @@ sub main {
 	Gtk2->main();
 	
 	return 0;
+}
+
+
+sub create_combo_box {
+	my ($map) = @_;
+	
+
+	# Create a simple list that will be used as the data model of the ComboBox
+	my $model = Gtk2::ListStore->new(
+		'Glib::String',
+		'Glib::String',
+		#'Champlain::MapSourceDesc', doesn't work as it's not are registered type
+	);
+	my $active = 0; # Tells which map source is active
+	my $index = 0;
+	my $current_source = $map->get('map-source')->get_id;
+	my $factory = Champlain::MapSourceFactory->get_default;
+	foreach my $desc (sort { $a->{name} cmp $b->{name} } $factory->get_list) {
+		my $iter = $model->append();
+		$model->set($iter, 
+			0, $desc->{name},
+			1, $desc->{id},
+		);
+		
+		if ($current_source eq $desc->{id}) {
+			$active = $index;
+		}
+		
+		++$index;
+	}
+
+	my $combo = Gtk2::ComboBox->new_text();
+	$combo->set_model($model);
+	$combo->set_active($active);
+	
+	
+	$combo->signal_connect('changed', sub {
+		my ($button) = @_;
+
+		# Get the ID of the map source selected
+		my $iter = $button->get_active_iter;
+		my $id = $model->get($iter, 1);
+		
+		# Create that map source
+		my $source = $factory->create($id);
+		$map->set_map_source($source);
+	});
+	
+	return $combo;
 }
 
 
@@ -170,4 +205,3 @@ sub map_view_button_release_cb {
 	printf "Map was clicked at %f, %f\n", $lat, $lon;
 	return TRUE;
 }
-
