@@ -1,14 +1,10 @@
 Revision history for Champlain
 
 
-0.04 Sun Mar 29 13:14:58 CEST 2009
-	Added the map sources osm_cyclemap and osm_osmarender.
-	Port of the C demo animated-marker.
-	New methods in Champlain::MapSource.
-	New methods in Champlain::View.
-	New markers API.
-	Added unit tests for Champlain::ZoomLevel.
-	New example: capitals.pl.
+0.04 Sun May 10 22:14:32 CEST 2009
+	Bindings for the version 0.3 of libchamplain.
+	More complete unit tests.
+	New examples: capitals.pl, image.pl and anumated-marker.pl.
 
 
 0.03 Sun Mar 22 22:32:44 CET 2009
