@@ -28,7 +28,11 @@ t/ChamplainMarker.t
 t/ChamplainNetworkMapSource.t
 t/ChamplainTile.t
 t/ChamplainView.t
+t/ChamplainZoomLevel.t
 t/Gtk2ChamplainViewEmbed.t
+examples/animated-marker.pl
+examples/capitals.pl
+examples/image.pl
 examples/launcher.pl
 examples/gtk2.pl
 examples/images/who.png
