@@ -214,11 +214,9 @@ sub test_event {
 	# NOTE: At the moment this works only if the view is in a stage and if
 	# show_all() was called
 	my $stage = Clutter::Stage->get_default();
-	$stage->set_size($size, $size);
 	$view->set_size($size, $size);
 	$view->center_on(0, 0);
 	$stage->add($view);
-	$stage->show_all();
 	
 	# Create a fake event in the middle of the tile
 	my $event = Clutter::Event->new('button_press');
@@ -335,14 +333,11 @@ sub test_ensure_markers_visible {
 		$layer->add($marker);
 	}
 	$view->add_layer($layer);
-	$layer->show();
 
-	# Must add the view to a stage for this test
+	# Must add the view to a stage and give a size for this test
 	my $stage = Clutter::Stage->get_default();
 	$stage->add($view);
 	$view->set_size(400, 400);
-	$stage->set_size($view->get_size);
-	$stage->show_all();
 
 	$view->ensure_markers_visible(\@markers, TRUE);
 
@@ -386,6 +381,11 @@ sub create_marker {
 #
 sub run_animation_loop {
 	my ($view) = @_;
+
+#	if (my $stage = $view->get_stage) {
+#		$stage->show_all();
+#	}
+
 
 	# Give us a bit of time to get there since this is an animation and it
 	# requires an event loop. We add an idle timeout in order to make sure that we
