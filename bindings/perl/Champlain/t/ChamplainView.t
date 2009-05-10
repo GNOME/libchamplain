@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 58;
+use Clutter::TestHelper tests => 70;
 
 use Champlain ':coords';
 
@@ -13,6 +13,8 @@ exit tests();
 
 sub tests {
 	test_go_to();
+	test_ensure_visible();
+	test_ensure_markers_visible();
 	test_generic();
 	test_zoom();
 	test_event();
@@ -253,13 +255,7 @@ sub test_go_to {
 	my ($latitude, $longitude) = (48.218611, 17.146397);
 	$view->go_to($latitude, $longitude);
 
-	# Give us a bit of time to get there  since this is an animation and it
-	# requires an event loop.
-	Glib::Timeout->add (100, sub {
-		Clutter->main_quit();
-		return FALSE;
-	});
-	Clutter->main();
+	run_animation_loop($view);
 	
 	# Check if we got somewhere close to desired location (~ 1 degree)
 	my ($current_latitude, $current_longitude) = $view->get('latitude', 'longitude');
@@ -277,8 +273,126 @@ sub test_go_to {
 	
 	# Go to a different place. This is too fast and can't be tested properly.
 	$view->go_to($latitude, $longitude);
-	$view->stop_go_to();
+	Glib::Idle->add(sub {$view->stop_go_to()});
+	run_animation_loop($view);
 
 	is($view->get('latitude'), 0, "stop_go_to() at latitude 0");
 	is($view->get('longitude'), 0, "stop_go_to() at longitude 0");
+}
+
+
+#
+# Test ensure_visible().
+#
+sub test_ensure_visible {
+	my $view = Champlain::View->new();
+	isa_ok($view, 'Champlain::View');
+
+	# Place the view in the center and zoomed
+	$view->center_on(0, 0);
+	$view->set_zoom_level(6);
+	is($view->get('latitude'), 0);
+	is($view->get('longitude'), 0);
+	is($view->get('zoom-level'), 6);
+
+	# Must add the view to a stage for this test
+	my $stage = Clutter::Stage->get_default();
+	$view->set_size(400, 400);
+	$stage->add($view);
+
+	# Ensure that 2 points are visible
+	my (@marker1) = (48.218611, 17.146397);
+	my (@marker2) = (48.21066, 16.31476);
+	$view->ensure_visible(@marker1, @marker2, TRUE);
+
+	run_animation_loop($view);
+	
+	# Check if we got somewhere close to the middle of the markers (~ 1 degree)
+	my $middle_latitude = ($marker1[0] + $marker2[0]) / 2;
+	my $middle_longitude = ($marker1[1] + $marker2[1]) / 2;
+	my ($current_latitude, $current_longitude) = $view->get('latitude', 'longitude');
+	my $delta_latitude = $view->get('latitude') - $middle_latitude;
+	my $delta_longitude = $view->get('longitude') - $middle_longitude;
+	ok($delta_latitude >= -1 && $delta_latitude <= 1, "ensure_visible() changed latitude close enough (delta: $delta_latitude)");
+	ok($delta_longitude >= -1 && $delta_longitude <= 1, "ensure_visible() changed longitude close enough (delta: $delta_longitude)");
+}
+
+
+#
+# Test ensure_markers_visible().
+#
+sub test_ensure_markers_visible {
+	my $view = Champlain::View->new();
+	isa_ok($view, 'Champlain::View');
+
+	# Place the view in the center and zoomed
+	$view->center_on(0, 0);
+	$view->set_zoom_level(6);
+	is($view->get('latitude'), 0);
+	is($view->get('longitude'), 0);
+	is($view->get('zoom-level'), 6);
+
+	# Ensure that some markers are visible
+	my @markers = (
+		create_marker('A', 48.218611, 17.146397),
+		create_marker('B', 48.14838,  17.10791),
+		create_marker('C', 48.21066,  16.31476),
+	);
+	
+	my $layer = Champlain::Layer->new();
+	foreach my $marker (@markers) {
+		$layer->add($marker);
+	}
+	$view->add_layer($layer);
+	$layer->show();
+
+	# Must add the view to a stage for this test
+	my $stage = Clutter::Stage->get_default();
+	$stage->add($view);
+	$view->set_size(400, 400);
+	$stage->set_size($view->get_size);
+	$stage->show_all();
+
+	$view->ensure_markers_visible(\@markers, TRUE);
+
+	run_animation_loop($view);
+	
+	# Check if we got somewhere close to the middle of the markers (~ 1 degree)
+	my $middle_latitude = 48.0; # More or less
+	my $middle_longitude = 16.5;
+	my ($current_latitude, $current_longitude) = $view->get('latitude', 'longitude');
+printf "current = (%0.4f, %0.4f)\n", $current_latitude, $current_longitude;
+	my $delta_latitude = $view->get('latitude') - $middle_latitude;
+	my $delta_longitude = $view->get('longitude') - $middle_longitude;
+	ok($delta_latitude >= -1 && $delta_latitude <= 1, "ensure_visible() changed latitude close enough (delta: $delta_latitude)");
+	ok($delta_longitude >= -1 && $delta_longitude <= 1, "ensure_visible() changed longitude close enough (delta: $delta_longitude)");
+}
+
+
+sub create_marker {
+	my ($label, $latitude, $longitude) = @_;
+	my $marker = Champlain::Marker->new_with_text($label);
+	$marker->set_position($latitude, $longitude);
+	return $marker;
+}
+
+
+#
+# Runs a main loop for the purpose of executing one animation. The main loop is
+# timed in case where the test doesn't work.
+#
+sub run_animation_loop {
+	my ($view) = @_;
+
+	# Give us a bit of time to get there since this is an animation and it
+	# requires an event loop. We add an idle timeout in order to make sure that we
+	# don't wait forever.
+	$view->signal_connect('animation-completed' => sub {
+		Clutter->main_quit();
+	});
+	Glib::Timeout->add(3000, sub {
+		Clutter->main_quit();
+		return FALSE;
+	});
+	Clutter->main();
 }
