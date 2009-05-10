@@ -61,11 +61,6 @@ void
 champlain_view_ensure_visible (ChamplainView *view, gdouble lat1, gdouble lon1, gdouble lat2, gdouble lon2, gboolean animate)
 
 
-# FIXME the order there is important for perl
-#void
-#champlain_view_ensure_markers_visible (ChamplainView *view, ChamplainBaseMarker *markers[], gboolean animate)
-
-
 void
 champlain_view_set_decel_rate (ChamplainView *view, gdouble rate)
 
@@ -88,3 +83,24 @@ champlain_view_set_zoom_on_double_click (ChamplainView *view, gboolean value)
 
 void
 champlain_view_get_coords_at (ChamplainView *view, guint x, guint y, OUTLIST gdouble latitude, OUTLIST gdouble longitude)
+
+
+void
+champlain_view_ensure_markers_visible (ChamplainView *view, AV *av_markers, gboolean animate)
+	PREINIT:
+		ChamplainBaseMarker** markers = NULL;
+		int i = 0;
+		int last_index = 0;
+	
+	CODE:
+		last_index = av_len(av_markers);
+		markers = g_new0(ChamplainBaseMarker*, last_index + 2); /* size + NULL ended */
+		
+		for (i = last_index; i >= 0; --i) {
+			SV **sv_ref = av_fetch(av_markers, i, FALSE);
+			ChamplainBaseMarker *marker = SvChamplainBaseMarker(*sv_ref);
+			markers[i] = marker;
+		}
+		
+		champlain_view_ensure_markers_visible(view, markers, animate);
+		g_free(markers);
