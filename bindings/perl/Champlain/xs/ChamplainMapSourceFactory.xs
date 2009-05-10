@@ -1,6 +1,21 @@
 #include "champlain-perl.h"
 
 
+/**
+ * Returns the value of the given key or croaks if there's no such key.
+ */
+static SV*
+fetch_or_croak (HV* hash , const char* key , I32 klen) {
+
+	SV **s = hv_fetch(hash, key, klen, 0);
+	if (s != NULL && SvOK(*s)) {
+		return *s;
+	}
+	
+	croak("Hashref requires the key: '%s'", key);
+}
+
+
 SV*
 newSVChamplainMapSourceDesc (ChamplainMapSourceDesc *desc) {
 	HV *hash = NULL;
@@ -39,9 +54,8 @@ newSVChamplainMapSourceDesc (ChamplainMapSourceDesc *desc) {
 ChamplainMapSourceDesc*
 SvChamplainMapSourceDesc (SV *data) {
 	HV *hash;
-	SV **s;
-	ChamplainMapSourceDesc *desc;
-	gboolean is_valid = TRUE;
+	SV *value;
+	ChamplainMapSourceDesc desc = {0,};
 
 	if ((!data) || (!SvOK(data)) || (!SvRV(data)) || (SvTYPE(SvRV(data)) != SVt_PVHV)) {
 		croak("SvChamplainMapSourceDesc: value must be an hashref");
@@ -49,70 +63,36 @@ SvChamplainMapSourceDesc (SV *data) {
 
 	hash = (HV *) SvRV(data);
 	
-	/*
-	 * We must set at least one of the following keys:
-	 *   - text
-	 *   - uris
-	 *   - filename
-	 */
-	desc = g_new0(ChamplainMapSourceDesc, 1);
-	if ((s = hv_fetch(hash, "id", 2, 0)) && SvOK(*s)) {
-		desc->id = SvGChar(*s);
-	}
-	else {
-		g_free(desc);
-		croak("SvChamplainMapSourceDesc: requires the key: 'id'");
+	/* All keys are mandatory */
+	if (value = fetch_or_croak(hash, "id", 2)) {
+		desc.id = SvGChar(value);
 	}
 	
-	if ((s = hv_fetch(hash, "name", 4, 0)) && SvOK(*s)) {
-		desc->name = SvGChar(*s);
-	}
-	else {
-		g_free(desc);
-		croak("SvChamplainMapSourceDesc: requires the key: 'name'");
+	if (value = fetch_or_croak(hash, "name", 4)) {
+		desc.name = SvGChar(value);
 	}
 	
-	if ((s = hv_fetch(hash, "license", 7, 0)) && SvOK(*s)) {
-		desc->license = SvGChar(*s);
-	}
-	else {
-		g_free(desc);
-		croak("SvChamplainMapSourceDesc: requires the key: 'license'");
+	if (value = fetch_or_croak(hash, "license", 7)) {
+		desc.license = SvGChar(value);
 	}
 	
-	if ((s = hv_fetch(hash, "license_uri", 11, 0)) && SvOK(*s)) {
-		desc->license_uri = SvGChar(*s);
-	}
-	else {
-		g_free(desc);
-		croak("SvChamplainMapSourceDesc: requires the key: 'license_uri'");
+	if (value = fetch_or_croak(hash, "license_uri", 11)) {
+		desc.license_uri = SvGChar(value);
 	}
 	
-	if ((s = hv_fetch(hash, "min_zoom_level", 14, 0)) && SvOK(*s)) {
-		desc->min_zoom_level = (gint)SvIV(*s);
-	}
-	else {
-		g_free(desc);
-		croak("SvChamplainMapSourceDesc: requires the key: 'min_zoom_level'");
+	if (value = fetch_or_croak(hash, "min_zoom_level", 14)) {
+		desc.min_zoom_level = (gint)SvIV(value);
 	}
 	
-	if ((s = hv_fetch(hash, "max_zoom_level", 14, 0)) && SvOK(*s)) {
-		desc->max_zoom_level = (gint)SvIV(*s);
-	}
-	else {
-		g_free(desc);
-		croak("SvChamplainMapSourceDesc: requires the key: 'max_zoom_level'");
+	if (value = fetch_or_croak(hash, "max_zoom_level", 14)) {
+		desc.max_zoom_level = (gint)SvIV(value);
 	}
 	
-	if ((s = hv_fetch(hash, "projection", 10, 0)) && SvOK(*s)) {
-		desc->projection = SvChamplainMapProjection(*s);
-	}
-	else {
-		g_free(desc);
-		croak("SvChamplainMapSourceDesc: requires the key: 'projection'");
+	if (value = fetch_or_croak(hash, "projection", 10)) {
+		desc.projection = SvChamplainMapProjection(value);
 	}
 
-	return desc;
+	return g_memdup(&desc, sizeof(desc));
 }
 
 
