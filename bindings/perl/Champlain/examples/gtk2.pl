@@ -25,7 +25,8 @@ sub main {
 	# Create the map view
 	my $map = Champlain::View->new();
 	my $gtk2_map = Gtk2::Champlain::ViewEmbed->new($map);
-	$map->set('scroll-mode', 'kinetic', 'zoom-level', 5);
+	$map->set_scroll_mode('kinetic');
+	$map->set_zoom_level(5);
 	$gtk2_map->set_size_request(640, 480);
 	
 	# Create the markers and marker layer
@@ -70,7 +71,7 @@ sub main {
 
 	my $spin = Gtk2::SpinButton->new_with_range(0, 20, 1);
 	$spin->signal_connect('changed', sub {
-		$map->set('zoom-level', $spin->get_value_as_int);
+		$map->set_zoom_level($spin->get_value_as_int);
 	});
 	$map->signal_connect('notify::zoom-level', sub {
 		$spin->set_value($map->get('zoom-level'));
@@ -180,7 +181,7 @@ sub create_marker_layer {
 	$layer->add($marker);
 
 	$marker = Champlain::Marker->new_with_text("Bratislava", "Sans 15", $orange);
-	$marker->set_position(47.130885, -70.764141);
+	$marker->set_position(48.148377, 17.107311);
 	$layer->add($marker);
 
 	$layer->show();

@@ -37,7 +37,8 @@ sub main {
 	my $gtk2_map = Gtk2::Champlain::ViewEmbed->new($map);
 	$gtk2_map->set_size_request(640, 480);
 	$map->center_on(0, 0);
-	$map->set('scroll-mode', 'kinetic', 'zoom-level', 3);
+	$map->set_scroll_mode('kinetic');
+	$map->set_zoom_level(3);
 	
 	my $layer = Champlain::Layer->new();
 	$map->add_layer($layer);

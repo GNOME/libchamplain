@@ -23,7 +23,7 @@ sub main {
 	
 	# Create the map view
 	my $map = Champlain::View->new();
-	$map->set('scroll-mode', 'kinetic');
+	$map->set_scroll_mode('kinetic');
 	$map->set_size(800, 600);
 	$stage->add($map);
 	
