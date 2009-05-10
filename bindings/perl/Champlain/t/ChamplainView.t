@@ -257,13 +257,8 @@ sub test_go_to {
 
 	run_animation_loop($view);
 	
-	# Check if we got somewhere close to desired location (~ 1 degree)
-	my ($current_latitude, $current_longitude) = $view->get('latitude', 'longitude');
-	my $delta_latitude = $view->get('latitude') - $latitude;
-	my $delta_longitude = $view->get('longitude') - $longitude;
-	ok($delta_latitude >= -1 && $delta_latitude <= 1, "go_to() changed latitude close enough");
-	ok($delta_longitude >= -1 && $delta_longitude <= 1, "go_to() changed longitude close enough");
-	
+	# Check if we got somewhere close to desired location
+	is_view_near($view, $latitude, $longitude);
 	
 	
 	# Replace the view in the center
@@ -307,14 +302,10 @@ sub test_ensure_visible {
 
 	run_animation_loop($view);
 	
-	# Check if we got somewhere close to the middle of the markers (~ 1 degree)
+	# Check if we got somewhere close to the middle of the markers
 	my $middle_latitude = ($marker1[0] + $marker2[0]) / 2;
 	my $middle_longitude = ($marker1[1] + $marker2[1]) / 2;
-	my ($current_latitude, $current_longitude) = $view->get('latitude', 'longitude');
-	my $delta_latitude = $view->get('latitude') - $middle_latitude;
-	my $delta_longitude = $view->get('longitude') - $middle_longitude;
-	ok($delta_latitude >= -1 && $delta_latitude <= 1, "ensure_visible() changed latitude close enough (delta: $delta_latitude)");
-	ok($delta_longitude >= -1 && $delta_longitude <= 1, "ensure_visible() changed longitude close enough (delta: $delta_longitude)");
+	is_view_near($view, $middle_latitude, $middle_longitude);
 }
 
 
@@ -357,15 +348,27 @@ sub test_ensure_markers_visible {
 
 	run_animation_loop($view);
 	
-	# Check if we got somewhere close to the middle of the markers (~ 1 degree)
-	my $middle_latitude = 48.0; # More or less
-	my $middle_longitude = 16.5;
+	# Check if we got somewhere close to the middle of the markers
+	is_view_near($view, 48.0, 16.5, 5.0);
+}
+
+
+#
+# Test if the view is near the given (latitude, longitude). This function checks
+# if the cordinate is close to the given point by accepting an error margin. If
+# no margin is given then one degree is assumed.
+#
+sub is_view_near {
+	my ($view, $latitude, $longitude, $delta) = @_;
+	$delta = 1.0 unless defined $delta;
+	
+	# Check if the view is close to the given position
 	my ($current_latitude, $current_longitude) = $view->get('latitude', 'longitude');
-printf "current = (%0.4f, %0.4f)\n", $current_latitude, $current_longitude;
-	my $delta_latitude = $view->get('latitude') - $middle_latitude;
-	my $delta_longitude = $view->get('longitude') - $middle_longitude;
-	ok($delta_latitude >= -1 && $delta_latitude <= 1, "ensure_visible() changed latitude close enough (delta: $delta_latitude)");
-	ok($delta_longitude >= -1 && $delta_longitude <= 1, "ensure_visible() changed longitude close enough (delta: $delta_longitude)");
+	my $delta_latitude = $current_latitude - $latitude;
+	my $delta_longitude = $current_longitude - $longitude;
+	my $tester = Test::Builder->new();
+	$tester->ok($delta_latitude >= -$delta && $delta_latitude <= $delta, "ensure_visible() changed latitude close enough (delta: $delta_latitude)");
+	$tester->ok($delta_longitude >= -$delta && $delta_longitude <= $delta, "ensure_visible() changed longitude close enough (delta: $delta_longitude)");
 }
 
 
