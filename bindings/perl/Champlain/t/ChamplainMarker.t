@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 228;
+use Clutter::TestHelper tests => 312;
 use Test::Builder;
 
 use Champlain ':coords';
@@ -155,14 +155,26 @@ sub generic_test {
 	my $color = Clutter::Color->new(0xca, 0xfe, 0xbe, 0xef);
 	$marker->set_color($color);
 	is_color($marker->get_color, $color, "set_color()");
-#	$marker->set_color(undef);
-#	is($marker->get_color, undef, "set_color(undef)");
+
+	# Setting the background color to undef resets the color to the default value
+	$marker->set_color(undef);
+	is_color(
+		$marker->get_color, 
+		Champlain::Marker->new()->get_color, 
+		"set_color(undef) resets the color"
+	);
 
 	my $text_color = Clutter::Color->new(0xca, 0xfe, 0xbe, 0xef);
 	$marker->set_text_color($text_color);
 	is_color($marker->get_text_color, $text_color, "set_text_color()");
-#	$marker->set_text_color(undef);
-#	is($marker->get_text_color, undef, "set_text_color(undef)");
+	
+	# Setting the text color to undef resets the color to the default value
+	$marker->set_text_color(undef);
+	is_color(
+		$marker->get_text_color, 
+		Champlain::Marker->new()->get_text_color, 
+		"set_text_color(undef) resets the color"
+	);
 
 	$marker->set_font_name("Mono 14");
 	is($marker->get_font_name, "Mono 14", "set_font_name()");
