@@ -53,6 +53,9 @@
 #include <math.h>
 #include <string.h>
 
+static ClutterColor DEFAULT_COLOR = {0x33, 0x33, 0x33, 0xff};
+static ClutterColor DEFAULT_TEXT_COLOR = {0xee, 0xee, 0xee, 0xff};
+
 enum
 {
   /* normal signals */
@@ -650,8 +653,6 @@ queue_redraw (ChamplainMarker *marker)
 static void
 champlain_marker_init (ChamplainMarker *marker)
 {
-  ClutterColor color = {0x33, 0x33, 0x33, 0xff};
-  ClutterColor text_color = {0xee, 0xee, 0xee, 0xff};
   ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker) ;
   marker->priv = priv;
 
@@ -661,8 +662,8 @@ champlain_marker_init (ChamplainMarker *marker)
   priv->use_markup = FALSE;
   priv->alignment = PANGO_ALIGN_LEFT;
   priv->attributes = NULL;
-  priv->color = clutter_color_copy (&color);
-  priv->text_color = clutter_color_copy (&text_color);
+  priv->color = clutter_color_copy (&DEFAULT_COLOR);
+  priv->text_color = clutter_color_copy (&DEFAULT_TEXT_COLOR);
   priv->font_name = g_strdup ("Sans 11");
   priv->wrap = FALSE;
   priv->wrap_mode = PANGO_WRAP_WORD;
@@ -894,7 +895,8 @@ champlain_marker_set_alignment (ChamplainMarker *marker,
 /**
  * champlain_marker_set_color:
  * @marker: The marker
- * @color: The marker's background color.
+ * @color: The marker's background color or NULL to reset the background to the
+ *         default color. The color parameter is copied.
  *
  * Set the marker's background color.
  *
@@ -911,6 +913,9 @@ champlain_marker_set_color (ChamplainMarker *marker,
   if (priv->color != NULL)
     clutter_color_free (priv->color);
 
+  if (color == NULL)
+     color = &DEFAULT_COLOR;
+
   priv->color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (marker), "color");
   queue_redraw (marker);
@@ -919,7 +924,8 @@ champlain_marker_set_color (ChamplainMarker *marker,
 /**
  * champlain_marker_set_text_color:
  * @marker: The marker
- * @color: The marker's text color.
+ * @color: The marker's text color or NULL to reset the text to the default
+ *         color. The color parameter is copied.
  *
  * Set the marker's text color.
  *
@@ -935,6 +941,9 @@ champlain_marker_set_text_color (ChamplainMarker *marker,
 
   if (priv->text_color != NULL)
     clutter_color_free (priv->text_color);
+
+  if (color == NULL)
+     color = &DEFAULT_TEXT_COLOR;
 
   priv->text_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (marker), "text-color");
@@ -1271,7 +1280,7 @@ champlain_marker_get_wrap_mode (ChamplainMarker *marker)
  * champlain_marker_get_ellipsize:
  * @marker: The marker
  *
- * Returns the marker's text ellipsize mode;
+ * Returns the marker's text ellipsize mode.
  *
  * Since: 0.4
  */
@@ -1289,7 +1298,7 @@ champlain_marker_get_ellipsize (ChamplainMarker *marker)
  * champlain_marker_get_single_line_mode:
  * @marker: The marker
  *
- * Returns the marker's text single side mode;
+ * Returns the marker's text single side mode.
  *
  * Since: 0.4
  */
@@ -1307,7 +1316,7 @@ champlain_marker_get_single_line_mode (ChamplainMarker *marker)
  * champlain_marker_get_draw_background:
  * @marker: The marker
  *
- * Returns if the marker's has a background
+ * Returns if the marker's has a background.
  *
  * Since: 0.4
  */
