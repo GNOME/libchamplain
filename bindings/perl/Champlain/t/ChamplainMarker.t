@@ -12,6 +12,10 @@ use File::Spec;
 # Path to a valid image
 my $FILENAME = File::Spec->catfile('examples', 'images', 'who.png');
 
+my $DEFAULT_COLOR = Champlain::Marker->new()->get_color;
+my $DEFAULT_TEXT_COLOR = Champlain::Marker->new()->get_text_color;
+my $DEFAULT_FONT_NAME = Champlain::Marker->new()->get_font_name;
+
 
 exit tests();
 
@@ -160,7 +164,7 @@ sub generic_test {
 	$marker->set_color(undef);
 	is_color(
 		$marker->get_color, 
-		Champlain::Marker->new()->get_color, 
+		$DEFAULT_COLOR,
 		"set_color(undef) resets the color"
 	);
 
@@ -172,14 +176,14 @@ sub generic_test {
 	$marker->set_text_color(undef);
 	is_color(
 		$marker->get_text_color, 
-		Champlain::Marker->new()->get_text_color, 
+		$DEFAULT_TEXT_COLOR, 
 		"set_text_color(undef) resets the color"
 	);
 
 	$marker->set_font_name("Mono 14");
 	is($marker->get_font_name, "Mono 14", "set_font_name()");
 	$marker->set_font_name(undef);
-	is($marker->get_font_name, undef, "set_font_name(undef)");
+	is($marker->get_font_name, $DEFAULT_FONT_NAME, "set_font_name(undef)");
 }
 
 
