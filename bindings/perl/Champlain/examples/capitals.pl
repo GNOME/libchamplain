@@ -158,10 +158,8 @@ sub capital_callback {
 	if (@markers) {
 		# Reset the color of the previous marker
 		my $marker = $markers[-1];
-		my $white = Clutter::Color->new(0xff, 0xff, 0xff, 0xff);
-		my $black = Clutter::Color->new(0x00, 0x00, 0x00, 0xff);
-		$marker->set_text_color($white);
-		$marker->set_color($black);
+		$marker->set_text_color(undef);
+		$marker->set_color(undef);
 	}
 	$data->{markers} = \@markers;
 		
