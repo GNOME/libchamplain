@@ -56,11 +56,11 @@ champlain_marker_set_alignment (ChamplainMarker *marker, PangoAlignment alignmen
 
 
 void
-champlain_marker_set_color (ChamplainMarker *marker, const ClutterColor *color)
+champlain_marker_set_color (ChamplainMarker *marker, const ClutterColor_ornull *color)
 
 
 void
-champlain_marker_set_text_color (ChamplainMarker *marker, const ClutterColor *color)
+champlain_marker_set_text_color (ChamplainMarker *marker, const ClutterColor_ornull *color)
 
 
 void
