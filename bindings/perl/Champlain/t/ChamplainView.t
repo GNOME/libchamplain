@@ -50,7 +50,7 @@ sub test_generic {
 	#
 	my $source_original = $view->get('map-source');
 	ok($view->get('width') == 0 || $view->get('width') == $source_original->get_tile_size, "original width");
-	ok($view->get('height') || $view->get('height') == $source_original->get_tile_size, "original height");
+	ok($view->get('height') == 0 || $view->get('height') == $source_original->get_tile_size, "original height");
 
 	# set_size() can be tested by checking the properties width and height
 	$view->set_size(600, 400);
