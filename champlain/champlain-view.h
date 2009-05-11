@@ -129,6 +129,16 @@ gboolean champlain_view_get_coords_at (ChamplainView *view,
     gdouble *lat,
     gdouble *lon);
 
+gint champlain_view_get_zoom_level (ChamplainView *view);
+gint champlain_view_get_min_zoom_level (ChamplainView *view);
+gint champlain_view_get_max_zoom_level (ChamplainView *view);
+ChamplainMapSource* champlain_view_get_map_source (ChamplainView *view);
+gdouble champlain_view_get_decel_rate (ChamplainView *view);
+ChamplainScrollMode champlain_view_get_scroll_mode (ChamplainView *view);
+gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
+gboolean champlain_view_get_show_license (ChamplainView *view);
+gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
+
 G_END_DECLS
 
 #endif

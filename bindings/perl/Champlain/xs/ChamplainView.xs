@@ -23,7 +23,7 @@ champlain_view_zoom_in (ChamplainView *view)
 
 void
 champlain_view_zoom_out (ChamplainView *view)
-	
+
 
 void
 champlain_view_add_layer (ChamplainView *view, ChamplainLayer *layer)
@@ -104,3 +104,37 @@ champlain_view_ensure_markers_visible (ChamplainView *view, AV *av_markers, gboo
 		
 		champlain_view_ensure_markers_visible(view, markers, animate);
 		g_free(markers);
+
+gint
+champlain_view_get_zoom_level (ChamplainView *view)
+
+
+gint
+champlain_view_get_min_zoom_level (ChamplainView *view)
+
+
+gint
+champlain_view_get_max_zoom_level (ChamplainView *view)
+
+
+ChamplainMapSource*
+champlain_view_get_map_source (ChamplainView *view)
+
+gdouble
+champlain_view_get_decel_rate (ChamplainView *view)
+
+
+ChamplainScrollMode
+champlain_view_get_scroll_mode (ChamplainView *view)
+
+
+gboolean
+champlain_view_get_keep_center_on_resize (ChamplainView *view)
+
+
+gboolean
+champlain_view_get_show_license (ChamplainView *view)
+
+
+gboolean
+champlain_view_get_zoom_on_double_click (ChamplainView *view)

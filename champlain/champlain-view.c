@@ -1963,3 +1963,164 @@ view_set_zoom_level_at (ChamplainView *view,
   g_object_notify (G_OBJECT (view), "zoom-level");
   return TRUE;
 }
+
+/**
+ * champlain_view_get_zoom_level:
+ * @view: The view
+ *
+ * Returns the view's current zoom level.
+ *
+ * Since: 0.4
+ */
+gint
+champlain_view_get_zoom_level (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  return priv->zoom_level;
+}
+
+/**
+ * champlain_view_get_min_zoom_level:
+ * @view: The view
+ *
+ * Returns the view's minimal zoom level allowed.
+ *
+ * Since: 0.4
+ */
+gint
+champlain_view_get_min_zoom_level (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  return priv->min_zoom_level;
+}
+
+/**
+ * champlain_view_get_max_zoom_level:
+ * @view: The view
+ *
+ * Returns the view's maximal zoom level allowed.
+ *
+ * Since: 0.4
+ */
+gint
+champlain_view_get_max_zoom_level (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  return priv->max_zoom_level;
+}
+
+/**
+ * champlain_view_get_map_source:
+ * @view: The view
+ *
+ * Returns the view's current map source. If you need to keep a reference to the
+ * map source then you have to call #g_object_ref.
+ *
+ * Since: 0.4
+ */
+ChamplainMapSource*
+champlain_view_get_map_source (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  return priv->map_source;
+}
+
+/**
+ * champlain_view_get_decel_rate:
+ * @view: The view
+ *
+ * Returns the view's deceleration rate.
+ *
+ * Since: 0.4
+ */
+gdouble
+champlain_view_get_decel_rate (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble decel = 0.0;
+  g_object_get (priv->finger_scroll, "decel-rate", &decel, NULL);
+  return decel;
+}
+
+/**
+ * champlain_view_get_scroll_mode:
+ * @view: The view
+ *
+ * Returns the view's scroll mode behaviour.
+ *
+ * Since: 0.4
+ */
+ChamplainScrollMode
+champlain_view_get_scroll_mode (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), CHAMPLAIN_SCROLL_MODE_PUSH);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->scroll_mode;
+}
+
+/**
+ * champlain_view_get_keep_center_on_resize:
+ * @view: The view
+ *
+ * Returns TRUE if the view keeps the center or resize.
+ *
+ * Since: 0.4
+ */
+gboolean
+champlain_view_get_keep_center_on_resize (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->keep_center_on_resize;
+}
+
+/**
+ * champlain_view_get_keep_center_on_resize:
+ * @view: The view
+ *
+ * Returns TRUE if the view displays the license.
+ *
+ * Since: 0.4
+ */
+gboolean
+champlain_view_get_show_license (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->show_license;
+}
+
+/**
+ * champlain_view_get_zoom_on_double_click:
+ * @view: The view
+ *
+ * Returns TRUE if the view zooms on double click.
+ *
+ * Since: 0.4
+ */
+gboolean
+champlain_view_get_zoom_on_double_click (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->zoom_on_double_click;
+}
+
