@@ -71,7 +71,8 @@ sub test_generic {
 		$source_new = $factory->create(Champlain::MapSourceFactory->OAM);
 	}
 	$view->set_map_source($source_new);
-	is($view->get('map-source'), $source_new, "Change map source");
+	is($view->get('map-source'), $source_new, "set_map_source()");
+	is($view->get_map_source, $source_new, "get_map_source()");
 
 	
 	# Change the decel rate
@@ -79,6 +80,7 @@ sub test_generic {
 	is($view->get('decel-rate'), 0.5, "set_decel_rate()");
 	$view->set_decel_rate(1.5);
 	is($view->get('decel-rate'), 1.5, "set_decel_rate()");
+	is($view->get_decel_rate, 1.5, "get_decel_rate()");
 
 	
 	# Change the scroll mode
@@ -86,6 +88,7 @@ sub test_generic {
 	is($view->get('scroll-mode'), 'push', "set_scroll_mode('push')");
 	$view->set_scroll_mode('kinetic');
 	is($view->get('scroll-mode'), 'kinetic', "set_scroll_mode('kinetic')");
+	is($view->get_scroll_mode, 'kinetic', "get_scroll_mode()");
 
 	
 	# Change the show license property
@@ -93,12 +96,23 @@ sub test_generic {
 	ok($view->get('show-license'), "set_show_license(TRUE)");
 	$view->set_show_license(FALSE);
 	ok(!$view->get('show-license'), "set_show_license(FALSE)");
+	ok(!$view->get_show_license, "get_show_license");
+	
 	
 	# Change the set zoom on double click property
 	$view->set_zoom_on_double_click(TRUE);
 	ok($view->get('zoom-on-double-click'), "set_zoom_on_double_click(TRUE)");
 	$view->set_zoom_on_double_click(FALSE);
 	ok(!$view->get('zoom-on-double-click'), "set_zoom_on_double_click(FALSE)");
+	ok(!$view->get_zoom_on_double_click, "get_zoom_on_double_click()");
+	
+	
+	# Change the keep center on resize property
+	$view->set_keep_center_on_resize(TRUE);
+	ok($view->get('keep-center-on-resize'), "set_keep_center_on_resize(TRUE)");
+	$view->set_keep_center_on_resize(FALSE);
+	ok(!$view->get('keep-center-on-resize'), "set_keep_center_on_resize(FALSE)");
+	ok(!$view->get_keep_center_on_resize, "get_keep_center_on_resize()");
 	
 	
 	# Call ensure_visible(), it's to test, but at least we test that it doesn't crash
@@ -133,6 +147,7 @@ sub test_zoom {
 	my $min = $map_source->get_min_zoom_level;
 	$view->set_zoom_level($min);
 	is($view->get('zoom-level'), $min, "zoom-out to the minimal level");
+	is($view->get_zoom_level, $min, "get_zoom_level()");
 
 	$view->set("zoom-level", $min);
 	is($view->get('zoom-level'), $min, "set('zoom-level') to the minimal level");
@@ -181,6 +196,7 @@ sub test_zoom {
 	$view->set_zoom_level(1);
 	is($view->get('zoom-level'), 1, "set('zoom-level', 1)");
 	is($view->get('min-zoom-level'), $min, "defaullt min-zoom-level");
+	is($view->get_min_zoom_level, $min, "get_min_zoom_level()");
 	$view->set_min_zoom_level(3);
 	is($view->get('min-zoom-level'), 3, "set_min_zoom_level(3)");
 	is($view->get('zoom-level'), 3, "zoom-level level is 3 after setting min-zoom-level to 3");
@@ -188,6 +204,7 @@ sub test_zoom {
 	$view->set_zoom_level(6);
 	is($view->get('zoom-level'), 6, "set('zoom-level', 6)");
 	is($view->get('max-zoom-level'), $max, "defaullt max-zoom-level");
+	is($view->get_max_zoom_level, $max, "get_max_zoom_level()");
 	$view->set_max_zoom_level(4);
 	is($view->get('max-zoom-level'), 4, "set_mx_zoom_level(4)");
 	is($view->get('zoom-level'), 4, "zoom-level level is 4 after setting min-zoom-level to 4");
