@@ -44,7 +44,7 @@ champlain_marker_set_text (ChamplainMarker *marker, const gchar *text)
 
 
 void
-champlain_marker_set_image (ChamplainMarker *marker, ClutterActor *image)
+champlain_marker_set_image (ChamplainMarker *marker, ClutterActor_ornull *image)
 
 
 void
