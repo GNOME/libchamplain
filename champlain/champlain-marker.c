@@ -53,6 +53,8 @@
 #include <math.h>
 #include <string.h>
 
+#define DEFAULT_FONT_NAME "Sans 11"
+
 static ClutterColor DEFAULT_COLOR = {0x33, 0x33, 0x33, 0xff};
 static ClutterColor DEFAULT_TEXT_COLOR = {0xee, 0xee, 0xee, 0xff};
 
@@ -664,7 +666,7 @@ champlain_marker_init (ChamplainMarker *marker)
   priv->attributes = NULL;
   priv->color = clutter_color_copy (&DEFAULT_COLOR);
   priv->text_color = clutter_color_copy (&DEFAULT_TEXT_COLOR);
-  priv->font_name = g_strdup ("Sans 11");
+  priv->font_name = g_strdup (DEFAULT_FONT_NAME);
   priv->wrap = FALSE;
   priv->wrap_mode = PANGO_WRAP_WORD;
   priv->single_line_mode = TRUE;
@@ -818,8 +820,8 @@ champlain_marker_set_text (ChamplainMarker *marker,
 
 /**
  * champlain_marker_set_image:
- * @marker: The marker
- * @image: The image as a @ClutterActor
+ * @marker: The marker.
+ * @image: The image as a @ClutterActor or NULL to remove the current image.
  *
  * Sets the marker's image.
  *
@@ -951,9 +953,10 @@ champlain_marker_set_text_color (ChamplainMarker *marker,
 }
 
 /**
- * champlain_marker_set_text_color:
+ * champlain_marker_set_font_name:
  * @marker: The marker
- * @font_name: The marker's font name.
+ * @font_name: The marker's font name or NULL to reset the font to the default
+ *             value.
  *
  * Set the marker's font name such as "Sans 12".
  *
@@ -969,6 +972,9 @@ champlain_marker_set_font_name (ChamplainMarker *marker,
 
   if (priv->font_name != NULL)
     g_free (priv->font_name);
+
+  if (font_name == NULL)
+    font_name = DEFAULT_FONT_NAME;
 
   priv->font_name = g_strdup (font_name);
   g_object_notify (G_OBJECT (marker), "font-name");
