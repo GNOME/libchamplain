@@ -21,6 +21,8 @@ champlain_map_source_set_license_uri
 champlain_map_source_get_license_uri
 champlain_map_source_set_projection
 champlain_map_source_get_projection
+champlain_map_source_get_id
+champlain_map_source_set_id
 <SUBSECTION Standard>
 CHAMPLAIN_MAP_SOURCE
 CHAMPLAIN_IS_MAP_SOURCE
@@ -39,6 +41,7 @@ champlain_marker_new
 champlain_marker_new_with_text
 champlain_marker_new_with_image
 champlain_marker_new_full
+champlain_marker_new_from_file
 champlain_marker_set_text
 champlain_marker_set_image
 champlain_marker_set_use_markup
@@ -62,6 +65,8 @@ champlain_marker_get_wrap
 champlain_marker_get_wrap_mode
 champlain_marker_get_ellipsize
 champlain_marker_get_single_line_mode
+champlain_marker_get_draw_background
+champlain_marker_set_draw_background
 <SUBSECTION Standard>
 CHAMPLAIN_MARKER
 CHAMPLAIN_IS_MARKER
@@ -204,6 +209,13 @@ champlain_tile_set_state
 champlain_tile_set_uri
 champlain_tile_set_filename
 champlain_tile_set_actor
+champlain_tile_get_content
+champlain_tile_get_etag
+champlain_tile_get_modified_time
+champlain_tile_get_modified_time_string
+champlain_tile_set_content
+champlain_tile_set_etag
+champlain_tile_set_modified_time
 <SUBSECTION Standard>
 CHAMPLAIN_TILE
 CHAMPLAIN_IS_TILE
