@@ -173,10 +173,10 @@ champlain_cache_init (ChamplainCache *self)
       goto cleanup;
     }
 
-  sqlite3_exec (priv->data, "CREATE TABLE tiles (filename char(500) PRIMARY KEY, etag CHAR (30), popularity INT DEFAULT 1, size INT DEFAULT 0)", NULL, NULL, &error_msg);
+  sqlite3_exec (priv->data, "CREATE TABLE tiles (filename TEXT PRIMARY KEY, etag TEXT, popularity INT DEFAULT 1, size INT DEFAULT 0)", NULL, NULL, &error_msg);
   if (error_msg != NULL)
     {
-      DEBUG ("Creating table Etag failed: %s", error_msg);
+      DEBUG ("Creating table 'tiles' failed: %s", error_msg);
       sqlite3_free (error_msg);
       goto cleanup;
     }
