@@ -29,7 +29,7 @@
  *
  * To get the list of registered map sources, use
  * #champlain_map_source_factory_get_list.
- * 
+ *
  */
 #include "config.h"
 
@@ -228,6 +228,7 @@ champlain_map_source_factory_get_default (void)
   if (G_UNLIKELY (instance == NULL))
     {
       instance = g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, NULL);
+      g_object_add_weak_pointer (G_OBJECT (instance), (gpointer*)&instance);
       return instance;
     }
 
