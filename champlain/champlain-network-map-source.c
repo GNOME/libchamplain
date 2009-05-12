@@ -489,9 +489,8 @@ file_loaded_cb (SoupSession *session,
     {
       if (errno != EEXIST)
         {
-          g_warning ("Unable to create the image cache: %s",
-                     g_strerror (errno));
-          g_object_unref (loader);
+          g_warning ("Unable to create the image cache path '%s': %s",
+                     path, g_strerror (errno));
         }
     }
 
