@@ -668,7 +668,7 @@ champlain_tile_new_full (gint x,
  * @self: the #ChamplainTile
  * @uri: the uri
  *
- * Sets the tile's x position
+ * Sets the tile's uri
  *
  * Since: 0.4
  */
@@ -691,7 +691,7 @@ champlain_tile_set_uri (ChamplainTile *self,
  * @self: the #ChamplainTile
  * @filename: a local path to an image
  *
- * Returns the tile's x position
+ * Sets the tile's filename
  *
  * Since: 0.4
  */
