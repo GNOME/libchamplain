@@ -449,14 +449,14 @@ delete_tile (ChamplainCache *self,
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
 
-  query = g_strdup_printf ("DELETE FROM tiles WHERE filename = '%s';", filename);
+  query = sqlite3_mprintf ("DELETE FROM tiles WHERE filename = %Q", filename);
   sqlite3_exec (priv->data, query, NULL, NULL, &error);
   if (error != NULL)
     {
       DEBUG ("Deleting tile from db failed: %s", error);
       sqlite3_free (error);
     }
-  g_free (query);
+  sqlite3_free (query);
 
   if (!g_file_test (filename, G_FILE_TEST_EXISTS))
     return;
@@ -491,7 +491,7 @@ champlain_cache_update_tile (ChamplainCache *self,
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
 
-  query = g_strdup_printf ("REPLACE INTO tiles (filename, etag, size) VALUES ('%s', '%s', %d);",
+  query = sqlite3_mprintf ("REPLACE INTO tiles (filename, etag, size) VALUES (%Q, %Q, %d)",
       champlain_tile_get_filename (tile),
       champlain_tile_get_etag (tile),
       filesize);
@@ -501,7 +501,7 @@ champlain_cache_update_tile (ChamplainCache *self,
       DEBUG ("Saving Etag and size failed: %s", error);
       sqlite3_free (error);
     }
-  g_free (query);
+  sqlite3_free (query);
 }
 
 static gboolean
@@ -548,15 +548,22 @@ champlain_cache_purge (ChamplainCache *self)
   guint highest_popularity = 0;
   gchar *error;
 
-  query = g_strdup_printf ("SELECT SUM (size) FROM tiles;");
+  query = "SELECT SUM (size) FROM tiles";
   rc = sqlite3_prepare (priv->data, query, strlen (query), &stmt, NULL);
   if (rc != SQLITE_OK)
     {
       DEBUG ("Can't compute cache size %s", sqlite3_errmsg(priv->data));
     }
-  g_free (query);
 
   rc = sqlite3_step (stmt);
+  if (rc != SQLITE_ROW)
+    {
+      DEBUG ("Failed to count the total cache consumption %s", 
+          sqlite3_errmsg(priv->data));
+      sqlite3_finalize (stmt);
+      return;
+    }
+
   current_size = sqlite3_column_int (stmt, 0);
   if (current_size < priv->size_limit)
     {
@@ -568,7 +575,7 @@ champlain_cache_purge (ChamplainCache *self)
   sqlite3_finalize (stmt);
 
   /* Ok, delete the less popular tiles until size_limit reached */
-  query = g_strdup_printf ("SELECT filename, size, popularity FROM tiles ORDER BY popularity;");
+  query = "SELECT filename, size, popularity FROM tiles ORDER BY popularity";
   rc = sqlite3_prepare (priv->data, query, strlen (query), &stmt, NULL);
   if (rc != SQLITE_OK)
     {
@@ -595,9 +602,8 @@ champlain_cache_purge (ChamplainCache *self)
   DEBUG ("Cache size is now %d", current_size);
 
   sqlite3_finalize (stmt);
-  g_free (query);
 
-  query = g_strdup_printf ("UPDATE tiles SET popularity = popularity - %d;",
+  query = sqlite3_mprintf ("UPDATE tiles SET popularity = popularity - %d",
       highest_popularity);
   sqlite3_exec (priv->data, query, NULL, NULL, &error);
   if (error != NULL)
@@ -605,6 +611,6 @@ champlain_cache_purge (ChamplainCache *self)
       DEBUG ("Updating popularity failed: %s", error);
       sqlite3_free (error);
     }
-  g_free (query);
+  sqlite3_free (query);
 }
 
