@@ -61,6 +61,7 @@ struct _ChamplainCachePrivate {
 
   sqlite3 *data;
   sqlite3_stmt *stmt_select;
+  sqlite3_stmt *stmt_update;
 };
 
 static void
@@ -110,6 +111,9 @@ champlain_cache_dispose (GObject *object)
   
   if (priv->stmt_select)
     sqlite3_finalize (priv->stmt_select);
+  
+  if (priv->stmt_update)
+    sqlite3_finalize (priv->stmt_update);
 
   error = sqlite3_close (priv->data);
   if (error != SQLITE_OK)
@@ -170,6 +174,7 @@ champlain_cache_init (ChamplainCache *self)
   champlain_cache_set_size_limit (self, 100000000);
 
   priv->stmt_select = NULL;
+  priv->stmt_update = NULL;
 
   error = sqlite3_open_v2 (filename, &priv->data,
       SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
@@ -199,6 +204,16 @@ champlain_cache_init (ChamplainCache *self)
     {
       priv->stmt_select = NULL;
       DEBUG ("Sqlite returned error code %d when creating select Etag statement", error);
+      goto cleanup;
+    }
+
+  error = sqlite3_prepare_v2 (priv->data, 
+      "UPDATE tiles SET popularity = popularity + 1 WHERE filename = ?", -1,
+      &priv->stmt_update, NULL);
+  if (error != SQLITE_OK)
+    {
+      priv->stmt_update = NULL;
+      DEBUG ("Sqlite returned error code %d when creating update popularity statement", error);
       goto cleanup;
     }
 
@@ -396,19 +411,31 @@ inc_popularity (ChamplainCache *self,
     ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_CACHE (self));
-  gchar *query, *error = NULL;
+  int sql_rc = SQLITE_OK;
+  const gchar *filename = NULL;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
 
-  query = g_strdup_printf ("UPDATE tiles SET popularity = popularity + 1 WHERE filename = '%s';",
-      champlain_tile_get_filename (tile));
-  sqlite3_exec (priv->data, query, NULL, NULL, &error);
-  if (error != NULL)
+  filename = champlain_tile_get_filename (tile);
+  
+  sql_rc = sqlite3_bind_text (priv->stmt_update, 1, filename, -1, SQLITE_STATIC);
+  if (sql_rc != SQLITE_OK)
     {
-      DEBUG ("Updating popularity failed: %s", error);
-      sqlite3_free (error);
+      DEBUG ("Failed to prepare the SQL query for updating the popularity of '%s', got error: %s", 
+          filename, sqlite3_errmsg (priv->data));
+      goto cleanup;
     }
-  g_free (query);
+
+  sql_rc = sqlite3_step (priv->stmt_update);
+  if (sql_rc != SQLITE_DONE)
+    {
+      DEBUG ("Failed to update the popularity of '%s', got error: %s",
+          filename, sqlite3_errmsg (priv->data));
+      goto cleanup;
+    }
+
+cleanup:
+  sqlite3_reset (priv->stmt_update);
 }
 
 static void
