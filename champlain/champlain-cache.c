@@ -310,14 +310,9 @@ champlain_cache_fill_tile (ChamplainCache *self,
   GTimeVal *modified_time = NULL;
   int sql_rc = SQLITE_OK;
   gboolean cache_hit = FALSE;
-  GTimer *timer;
-  gulong microseconds;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
   
-  timer = g_timer_new ();
-  g_timer_start (timer);
-
   modified_time = g_new0 (GTimeVal, 1);
   filename = champlain_tile_get_filename (tile);
 
@@ -369,10 +364,6 @@ champlain_cache_fill_tile (ChamplainCache *self,
   champlain_tile_set_content (tile, actor, FALSE);
 
   inc_popularity (self, tile);
-  g_timer_stop (timer);
-  g_timer_elapsed (timer, &microseconds);
-  g_timer_destroy (timer);
-  g_print ("%s: %6lu %s hit:%s\n", __FUNCTION__, microseconds, filename, cache_hit ? "TRUE" : "FALSE");
 
 cleanup:
   sqlite3_reset (priv->stmt_select);
