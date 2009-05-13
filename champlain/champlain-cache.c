@@ -203,7 +203,8 @@ champlain_cache_init (ChamplainCache *self)
   if (error != SQLITE_OK)
     {
       priv->stmt_select = NULL;
-      DEBUG ("Sqlite returned error code %d when creating select Etag statement", error);
+      DEBUG ("Failed to prepare the select Etag statement, error: %s", 
+					sqlite3_errmsg (priv->data));
       goto cleanup;
     }
 
@@ -213,7 +214,8 @@ champlain_cache_init (ChamplainCache *self)
   if (error != SQLITE_OK)
     {
       priv->stmt_update = NULL;
-      DEBUG ("Sqlite returned error code %d when creating update popularity statement", error);
+      DEBUG ("Failed to prepare the update popularity statement, error: %s",
+					sqlite3_errmsg (priv->data));
       goto cleanup;
     }
 
@@ -312,14 +314,15 @@ champlain_cache_fill_tile (ChamplainCache *self,
   gulong microseconds;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
+  
+  timer = g_timer_new ();
+  g_timer_start (timer);
+
   modified_time = g_new0 (GTimeVal, 1);
   filename = champlain_tile_get_filename (tile);
 
   if (!g_file_test (filename, G_FILE_TEST_EXISTS))
-    return FALSE;
-  
-  timer = g_timer_new ();
-  g_timer_start (timer);
+    goto cleanup;
 
   file = g_file_new_for_path (filename);
   info = g_file_query_info (file,
@@ -336,7 +339,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
   sql_rc = sqlite3_bind_text (priv->stmt_select, 1, filename, -1, SQLITE_STATIC);
   if (sql_rc != SQLITE_OK)
     {
-      DEBUG ("Failed to prepare the SQL query for finding the Etag of '%s', got error: %s", 
+      DEBUG ("Failed to prepare the SQL query for finding the Etag of '%s', error: %s", 
           filename, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
@@ -350,13 +353,13 @@ champlain_cache_fill_tile (ChamplainCache *self,
     }
   else if (sql_rc == SQLITE_DONE)
     {
-      DEBUG ("Can't find the Etag of '%s', got error: %s", 
+      DEBUG ("Can't find the Etag of '%s', error: %s", 
           filename, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
   else
     {
-      DEBUG ("Failed to finding the Etag of '%s', got error: %s",
+      DEBUG ("Failed to finding the Etag of '%s', error: %s",
           filename, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
@@ -421,7 +424,7 @@ inc_popularity (ChamplainCache *self,
   sql_rc = sqlite3_bind_text (priv->stmt_update, 1, filename, -1, SQLITE_STATIC);
   if (sql_rc != SQLITE_OK)
     {
-      DEBUG ("Failed to prepare the SQL query for updating the popularity of '%s', got error: %s", 
+      DEBUG ("Failed to set values to the popularity query of '%s', error: %s", 
           filename, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
@@ -429,7 +432,7 @@ inc_popularity (ChamplainCache *self,
   sql_rc = sqlite3_step (priv->stmt_update);
   if (sql_rc != SQLITE_DONE)
     {
-      DEBUG ("Failed to update the popularity of '%s', got error: %s",
+      DEBUG ("Failed to update the popularity of '%s', error: %s",
           filename, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
@@ -552,14 +555,14 @@ champlain_cache_purge (ChamplainCache *self)
   rc = sqlite3_prepare (priv->data, query, strlen (query), &stmt, NULL);
   if (rc != SQLITE_OK)
     {
-      DEBUG ("Can't compute cache size %s", sqlite3_errmsg(priv->data));
+      DEBUG ("Can't compute cache size %s", sqlite3_errmsg (priv->data));
     }
 
   rc = sqlite3_step (stmt);
   if (rc != SQLITE_ROW)
     {
       DEBUG ("Failed to count the total cache consumption %s", 
-          sqlite3_errmsg(priv->data));
+          sqlite3_errmsg (priv->data));
       sqlite3_finalize (stmt);
       return;
     }
