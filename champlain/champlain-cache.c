@@ -60,6 +60,7 @@ struct _ChamplainCachePrivate {
   guint size_limit;
 
   sqlite3 *data;
+  sqlite3_stmt *stmt_select;
 };
 
 static void
@@ -106,6 +107,9 @@ champlain_cache_dispose (GObject *object)
   gint error;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (object);
+  
+  if (priv->stmt_select)
+    sqlite3_finalize (priv->stmt_select);
 
   error = sqlite3_close (priv->data);
   if (error != SQLITE_OK)
@@ -165,6 +169,8 @@ champlain_cache_init (ChamplainCache *self)
 
   champlain_cache_set_size_limit (self, 100000000);
 
+  priv->stmt_select = NULL;
+
   error = sqlite3_open_v2 (filename, &priv->data,
       SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
   if (error != SQLITE_OK)
@@ -180,6 +186,17 @@ champlain_cache_init (ChamplainCache *self)
       sqlite3_free (error_msg);
       goto cleanup;
     }
+
+  error = sqlite3_prepare_v2 (priv->data, 
+      "SELECT etag FROM tiles WHERE filename = ?", -1,
+      &priv->stmt_select, NULL);
+  if (error != SQLITE_OK)
+    {
+      priv->stmt_select = NULL;
+      DEBUG ("Sqlite returned error code %d when creating select Etag statement", error);
+      goto cleanup;
+    }
+  
 
 cleanup:
   g_free (filename);
@@ -245,16 +262,6 @@ champlain_cache_set_size_limit (ChamplainCache *self,
   g_object_notify (G_OBJECT (self), "size-limit");
 }
 
-static int
-set_etag (void *tile,
-    int row_count,
-    char** values,
-    char** headers)
-{
-  champlain_tile_set_etag (CHAMPLAIN_TILE (tile), values[0]);
-  return 0; // 0 meaning success
-}
-
 /**
  * champlain_cache_fill_tile:
  * @self: the #ChamplainCache
@@ -279,9 +286,11 @@ champlain_cache_fill_tile (ChamplainCache *self,
   GError *error = NULL;
   ClutterActor *actor;
   const gchar *filename;
-  gchar *error_msg = NULL;
-  gchar *query = NULL;
   GTimeVal *modified_time;
+  int sql_error = SQLITE_OK;
+  int sql_rc = SQLITE_DONE;
+  GTimer *timer;
+  gulong microseconds;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
   modified_time = g_new0 (GTimeVal, 1);
@@ -289,6 +298,9 @@ champlain_cache_fill_tile (ChamplainCache *self,
 
   if (!g_file_test (filename, G_FILE_TEST_EXISTS))
     return FALSE;
+  
+  timer = g_timer_new ();
+  g_timer_start (timer);
 
   file = g_file_new_for_path (filename);
   info = g_file_query_info (file,
@@ -298,25 +310,35 @@ champlain_cache_fill_tile (ChamplainCache *self,
   champlain_tile_set_modified_time (tile, modified_time);
 
   /* Retrieve etag */
-  query = g_strdup_printf ("SELECT etag FROM tiles WHERE filename = '%s'",
-      filename);
-  sqlite3_exec (priv->data, query, set_etag, tile, &error_msg);
-  if (error_msg != NULL)
-    {
-      DEBUG ("Retrieving Etag failed: %s", error_msg);
-      sqlite3_free (error_msg);
-    }
+  sql_error = sqlite3_bind_text (priv->stmt_select, 1, filename, -1, SQLITE_STATIC);
+  if (sql_error != SQLITE_OK)
+    DEBUG ("Retrieving Etag of '%s' failed with error code: %d", filename, sql_error);
 
+  sql_rc = sqlite3_step (priv->stmt_select);
+  if (sql_rc == SQLITE_ROW)
+    {
+      const gchar *etag = (const gchar *) sqlite3_column_text (priv->stmt_select, 0);
+      g_print ("file %s has Etag %s\n", filename, etag);
+      champlain_tile_set_etag (CHAMPLAIN_TILE (tile), etag);
+    }
+  else if (sql_rc == SQLITE_DONE)
+    DEBUG ("Can't find the Etag of '%s'", filename);
+  
+  sqlite3_reset (priv->stmt_select);
+
+ 
   /* Load the cached version */
   actor = clutter_texture_new_from_file (filename, &error);
   champlain_tile_set_content (tile, actor, FALSE);
 
   g_object_unref (file);
   g_object_unref (info);
-  g_free (query);
 
   inc_popularity (self, tile);
-
+  g_timer_stop (timer);
+  g_timer_elapsed (timer, &microseconds);
+  g_timer_destroy (timer);
+  g_print ("%s: %6lu %s\n\n", __FUNCTION__, microseconds, filename);
   return TRUE;
 }
 
