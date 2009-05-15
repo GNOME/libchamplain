@@ -372,6 +372,7 @@ champlain_tile_init (ChamplainTile *self)
   priv->size = 0;
   priv->uri = g_strdup ("");
   priv->filename = g_strdup ("");
+  priv->modified_time = NULL;
   priv->etag = NULL;
 
   priv->actor = g_object_ref (clutter_group_new ());
@@ -761,6 +762,9 @@ champlain_tile_get_modified_time_string (ChamplainTile *self)
 {
   g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  if (priv->modified_time == NULL)
+    return NULL;
 
   struct tm *other_time = gmtime (&priv->modified_time->tv_sec);
   char value [100];
