@@ -46,7 +46,6 @@
 #include "champlain-zoom-level.h"
 
 #include <clutter/clutter.h>
-#include <clutter-cairo/clutter-cairo.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <cairo.h>

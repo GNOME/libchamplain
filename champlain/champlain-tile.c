@@ -826,11 +826,11 @@ champlain_tile_set_etag (ChamplainTile *self,
 
 typedef struct {
   ChamplainTile *tile;
-  ClutterEffectTemplate *etemplate;
+  //ClutterEffectTemplate *etemplate;
   ClutterTimeline *timeline;
   ClutterActor *old_actor;
 } AnimationContext;
-
+/*
 static void
 fade_in_completed (ClutterTimeline *timeline,
     gpointer data)
@@ -846,10 +846,11 @@ fade_in_completed (ClutterTimeline *timeline,
 
   g_object_unref (ctx->tile);
   g_object_unref (ctx->timeline);
-  g_object_unref (ctx->etemplate);
+  //g_object_unref (ctx->etemplate);
   g_free (ctx);
 
 }
+*/
 
 /**
  * champlain_tile_set_content:
@@ -883,7 +884,7 @@ champlain_tile_set_content (ChamplainTile *self,
 
   clutter_container_add (CLUTTER_CONTAINER (priv->actor), actor, NULL);
 
-  /* fixme: etemplate are leaked here */
+  /* fixme: etemplate are leaked here 
   if (fade_in == TRUE)
     {
       AnimationContext *ctx = g_new0 (AnimationContext, 1);
@@ -897,6 +898,7 @@ champlain_tile_set_content (ChamplainTile *self,
       clutter_actor_set_opacity (actor, 0);
       clutter_effect_fade (ctx->etemplate, actor, 255, NULL, NULL);
     }
+  */
 
   priv->content_actor = g_object_ref (actor);
   g_object_notify (G_OBJECT (self), "content");

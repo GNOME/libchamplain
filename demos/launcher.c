@@ -70,7 +70,7 @@ make_button (char *text)
   clutter_container_add_actor (CLUTTER_CONTAINER (button), button_bg);
   clutter_actor_set_opacity (button_bg, 0xcc);
 
-  button_text = clutter_label_new_full ("Sans 10", text, &black);
+  button_text = clutter_text_new_full ("Sans 10", text, &black);
   clutter_container_add_actor (CLUTTER_CONTAINER (button), button_text);
   clutter_actor_get_size (button_text, &width, &height);
 

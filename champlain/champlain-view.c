@@ -1137,7 +1137,7 @@ update_license (ChamplainView *view)
 
   if (priv->show_license)
     {
-      priv->license_actor = g_object_ref (clutter_label_new_with_text ("sans 8",
+      priv->license_actor = g_object_ref (clutter_text_new_with_text ("sans 8",
           champlain_map_source_get_license (priv->map_source)));
       clutter_actor_set_opacity (priv->license_actor, 128);
       clutter_actor_show (priv->license_actor);
@@ -1283,7 +1283,7 @@ timeline_new_frame (ClutterTimeline *timeline,
   gdouble lat;
   gdouble lon;
 
-  alpha = (double) clutter_alpha_get_alpha (ctx->alpha) / CLUTTER_ALPHA_MAX_ALPHA;
+  alpha = clutter_alpha_get_alpha (ctx->alpha);
   lat = ctx->to_latitude - ctx->from_latitude;
   lon = ctx->to_longitude - ctx->from_longitude;
 
@@ -1374,8 +1374,7 @@ champlain_view_go_to (ChamplainView *view,
    */
   duration = 500 * priv->zoom_level / 2.0;
   ctx->timeline = clutter_timeline_new_for_duration (duration);
-  ctx->alpha = clutter_alpha_new_full (ctx->timeline, CLUTTER_ALPHA_SINE_INC, NULL,
-      NULL);
+  ctx->alpha = clutter_alpha_new_full (ctx->timeline, CLUTTER_EASE_OUT_SINE);
 
   g_signal_connect (ctx->timeline, "new-frame", G_CALLBACK (timeline_new_frame),
       ctx);

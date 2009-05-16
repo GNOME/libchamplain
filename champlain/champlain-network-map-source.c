@@ -60,7 +60,6 @@
 #include <math.h>
 #include <sys/stat.h>
 #include <string.h>
-#include <clutter-cairo.h>
 
 enum
 {
@@ -387,8 +386,8 @@ create_error_tile (ChamplainTile* tile)
   guint size;
 
   size = champlain_tile_get_size (tile);
-  actor = clutter_cairo_new (size, size);
-  cr = clutter_cairo_create (CLUTTER_CAIRO(actor));
+  actor = clutter_cairo_texture_new (size, size);
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE(actor));
 
   /* draw a linear gray to white pattern */
   pat = cairo_pattern_create_linear (size / 2.0, 0.0,  size, size / 2.0);

@@ -46,7 +46,6 @@
 #include "champlain-zoom-level.h"
 
 #include <clutter/clutter.h>
-#include <clutter-cairo/clutter-cairo.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <cairo.h>
@@ -468,8 +467,8 @@ draw_shadow (ChamplainMarker *marker,
   else
     x = -58 * slope;
 
-  shadow = clutter_cairo_new (width + x, (height + point));
-  cr = clutter_cairo_create (CLUTTER_CAIRO (shadow));
+  shadow = clutter_cairo_texture_new (width + x, (height + point));
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (shadow));
 
   cairo_matrix_init (&matrix,
       1, 0,
@@ -512,8 +511,8 @@ draw_background (ChamplainMarker *marker,
   ClutterColor darker_color;
   cairo_t *cr;
 
-  bg = clutter_cairo_new (width, height + point);
-  cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
+  bg = clutter_cairo_texture_new (width, height + point);
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (bg));
 
   /* If selected, add the selection color to the marker's color */
   if (base_priv->highlighted)
@@ -572,22 +571,22 @@ draw_marker (ChamplainMarker *marker)
 
   if (priv->text != NULL && strlen (priv->text) > 0)
     {
-      ClutterLabel *label;
+      ClutterText *label;
       if (priv->text_actor == NULL)
       {
-        priv->text_actor = clutter_label_new_with_text (priv->font_name, priv->text);
+        priv->text_actor = clutter_text_new_with_text (priv->font_name, priv->text);
         g_object_ref (priv->text_actor);
       }
 
-      label = CLUTTER_LABEL (priv->text_actor);
-      clutter_label_set_use_markup (label, priv->use_markup);
-      clutter_label_set_font_name (label, priv->font_name);
-      clutter_label_set_text (label, priv->text);
-      clutter_label_set_alignment (label, priv->alignment);
-      clutter_label_set_line_wrap (label, priv->wrap);
-      clutter_label_set_line_wrap_mode (label, priv->wrap_mode);
-      clutter_label_set_ellipsize (label, priv->ellipsize);
-      clutter_label_set_attributes (label, priv->attributes);
+      label = CLUTTER_TEXT (priv->text_actor);
+      clutter_text_set_use_markup (label, priv->use_markup);
+      clutter_text_set_font_name (label, priv->font_name);
+      clutter_text_set_text (label, priv->text);
+      clutter_text_set_line_alignment (label, priv->alignment);
+      clutter_text_set_line_wrap (label, priv->wrap);
+      clutter_text_set_line_wrap_mode (label, priv->wrap_mode);
+      clutter_text_set_ellipsize (label, priv->ellipsize);
+      clutter_text_set_attributes (label, priv->attributes);
 
       height = clutter_actor_get_height (priv->text_actor);
       if (priv->image != NULL)
@@ -605,7 +604,7 @@ draw_marker (ChamplainMarker *marker)
       if (height > total_height)
         total_height = height;
 
-      clutter_label_set_color (CLUTTER_LABEL (priv->text_actor), priv->text_color);
+      clutter_text_set_color (CLUTTER_TEXT (priv->text_actor), priv->text_color);
       if (clutter_actor_get_parent (priv->text_actor) == NULL)
         clutter_container_add_actor (CLUTTER_CONTAINER (marker), priv->text_actor);
     }

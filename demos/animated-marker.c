@@ -17,7 +17,6 @@
  */
 
 #include <champlain/champlain.h>
-#include <clutter-cairo/clutter-cairo.h>
 #include <math.h>
 
 #define MARKER_SIZE 10
@@ -39,8 +38,8 @@ create_marker ()
   marker = champlain_base_marker_new ();
 
   /* Static filled circle ----------------------------------------------- */
-  bg = clutter_cairo_new (MARKER_SIZE, MARKER_SIZE);
-  cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
+  bg = clutter_cairo_texture_new (MARKER_SIZE, MARKER_SIZE);
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (bg));
 
   /* Draw the circle */
   cairo_set_source_rgb (cr, 0, 0, 0);
@@ -59,8 +58,8 @@ create_marker ()
   clutter_actor_set_position (bg, 0, 0);
 
   /* Echo circle -------------------------------------------------------- */
-  bg = clutter_cairo_new (2 * MARKER_SIZE, 2 * MARKER_SIZE);
-  cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
+  bg = clutter_cairo_texture_new (2 * MARKER_SIZE, 2 * MARKER_SIZE);
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (bg));
 
   /* Draw the circle */
   cairo_set_source_rgb (cr, 0, 0, 0);
@@ -83,7 +82,7 @@ create_marker ()
   /* Animate the echo circle */
   timeline = clutter_timeline_new_for_duration (1000);
   clutter_timeline_set_loop (timeline, TRUE);
-  alpha = clutter_alpha_new_full (timeline, CLUTTER_ALPHA_SINE_INC, NULL, g_object_unref);
+  alpha = clutter_alpha_new_full (timeline, CLUTTER_EASE_OUT_SINE);
 
   behaviour = clutter_behaviour_scale_new (alpha, 0.5, 0.5, 2.0, 2.0);
   clutter_behaviour_apply (behaviour, bg);
