@@ -24,7 +24,7 @@
 #define __TIDY_SCROLL_VIEW_H__
 
 #include <glib-object.h>
-#include <clutter/clutter-actor.h>
+#include <clutter/clutter.h>
 
 G_BEGIN_DECLS
 

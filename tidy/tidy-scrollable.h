@@ -24,7 +24,7 @@
 #define __TIDY_SCROLLABLE_H__
 
 #include <glib-object.h>
-#include <tidy/tidy-adjustment.h>
+#include "tidy-adjustment.h"
 
 G_BEGIN_DECLS
 
@@ -39,7 +39,7 @@ typedef struct _TidyScrollableInterface TidyScrollableInterface;
 struct _TidyScrollableInterface
 {
   GTypeInterface parent;
-  
+
   void (* set_adjustments) (TidyScrollable  *scrollable,
                             TidyAdjustment  *hadjustment,
                             TidyAdjustment  *vadjustment);

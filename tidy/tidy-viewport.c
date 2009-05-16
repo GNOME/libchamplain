@@ -54,10 +54,10 @@ struct _TidyViewportPrivate
   ClutterUnit x;
   ClutterUnit y;
   ClutterUnit z;
-  
+
   TidyAdjustment *hadjustment;
   TidyAdjustment *vadjustment;
-  
+
   gboolean sync_adjustments;
 };
 
@@ -80,21 +80,21 @@ tidy_viewport_get_property (GObject    *object,
                             GParamSpec *pspec)
 {
   TidyAdjustment *adjustment;
-  
+
   TidyViewportPrivate *priv = TIDY_VIEWPORT (object)->priv;
 
   switch (prop_id)
     {
     case PROP_X_ORIGIN:
-      g_value_set_int (value, CLUTTER_UNITS_TO_DEVICE (priv->x));
+      g_value_set_int (value, priv->x);
       break;
 
     case PROP_Y_ORIGIN:
-      g_value_set_int (value, CLUTTER_UNITS_TO_DEVICE (priv->y));
+      g_value_set_int (value, priv->y);
       break;
 
     case PROP_Z_ORIGIN:
-      g_value_set_int (value, CLUTTER_UNITS_TO_DEVICE (priv->z));
+      g_value_set_int (value, priv->z);
       break;
 
     case PROP_HADJUST :
@@ -106,7 +106,7 @@ tidy_viewport_get_property (GObject    *object,
       scrollable_get_adjustments (TIDY_SCROLLABLE (object), NULL, &adjustment);
       g_value_set_object (value, adjustment);
       break;
-    
+
     case PROP_SYNC_ADJUST :
       g_value_set_boolean (value, priv->sync_adjustments);
       break;
@@ -129,21 +129,21 @@ tidy_viewport_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_X_ORIGIN:
-      tidy_viewport_set_originu (viewport,
+      tidy_viewport_set_origin (viewport,
                                  g_value_get_int (value),
                                  priv->y,
                                  priv->z);
       break;
 
     case PROP_Y_ORIGIN:
-      tidy_viewport_set_originu (viewport,
+      tidy_viewport_set_origin (viewport,
                                  priv->x,
                                  g_value_get_int (value),
                                  priv->z);
       break;
 
     case PROP_Z_ORIGIN:
-      tidy_viewport_set_originu (viewport,
+      tidy_viewport_set_origin (viewport,
                                  priv->x,
                                  priv->y,
                                  g_value_get_int (value));
@@ -206,15 +206,15 @@ static void
 tidy_viewport_paint (ClutterActor *self)
 {
   TidyViewportPrivate *priv = TIDY_VIEWPORT (self)->priv;
-  
+
   cogl_push_matrix ();
-  
-  cogl_translatex (CLUTTER_UNITS_TO_FIXED (priv->x) * -1,
-                   CLUTTER_UNITS_TO_FIXED (priv->y) * -1,
-                   CLUTTER_UNITS_TO_FIXED (priv->z) * -1);
-  
+
+  cogl_translate ((priv->x) * -1.0,
+                  (priv->y) * -1.0,
+                  (priv->z) * -1.0);
+
   CLUTTER_ACTOR_CLASS (tidy_viewport_parent_class)->paint (self);
-  
+
   cogl_pop_matrix ();
 }
 
@@ -230,8 +230,8 @@ tidy_viewport_allocate (ClutterActor          *self,
                         const ClutterActorBox *box,
                         gboolean               absolute_origin_changed)
 {
-  ClutterFixed prev_value;
-  
+  CoglFixed prev_value;
+
   TidyViewportPrivate *priv = TIDY_VIEWPORT (self)->priv;
 
   /* Chain up */
@@ -245,23 +245,23 @@ tidy_viewport_allocate (ClutterActor          *self,
         {
           g_object_set (G_OBJECT (priv->hadjustment),
                        "lower", 0.0,
-                       "upper", CLUTTER_UNITS_TO_FLOAT (box->x2 - box->x1),
+                       "upper", (box->x2 - box->x1),
                        NULL);
-          
+
           /* Make sure value is clamped */
-          prev_value = tidy_adjustment_get_valuex (priv->hadjustment);
-          tidy_adjustment_set_valuex (priv->hadjustment, prev_value);
+          prev_value = tidy_adjustment_get_value (priv->hadjustment);
+          tidy_adjustment_set_value (priv->hadjustment, prev_value);
         }
-      
+
       if (priv->vadjustment)
         {
           g_object_set (G_OBJECT (priv->vadjustment),
                        "lower", 0.0,
-                       "upper", CLUTTER_UNITS_TO_FLOAT (box->y2 - box->y1),
+                       "upper", (box->y2 - box->y1),
                        NULL);
-          
-          prev_value = tidy_adjustment_get_valuex (priv->vadjustment);
-          tidy_adjustment_set_valuex (priv->vadjustment, prev_value);
+
+          prev_value = tidy_adjustment_get_value (priv->vadjustment);
+          tidy_adjustment_set_value (priv->vadjustment, prev_value);
         }
     }
 }
@@ -277,11 +277,11 @@ tidy_viewport_class_init (TidyViewportClass *klass)
   gobject_class->get_property = tidy_viewport_get_property;
   gobject_class->set_property = tidy_viewport_set_property;
   gobject_class->dispose = tidy_viewport_dispose;
-  
+
   actor_class->paint = tidy_viewport_paint;
   actor_class->pick = tidy_viewport_pick;
   actor_class->allocate = tidy_viewport_allocate;
-  
+
   g_object_class_install_property (gobject_class,
                                    PROP_X_ORIGIN,
                                    g_param_spec_int ("x-origin",
@@ -320,7 +320,7 @@ tidy_viewport_class_init (TidyViewportClass *klass)
                                                          "viewport size",
                                                          TRUE,
                                                          G_PARAM_READWRITE));
-  
+
   g_object_class_override_property (gobject_class,
                                     PROP_HADJUST,
                                     "hadjustment");
@@ -336,12 +336,12 @@ hadjustment_value_notify_cb (TidyAdjustment *adjustment,
                              TidyViewport   *viewport)
 {
   TidyViewportPrivate *priv = viewport->priv;
-  ClutterFixed value;
+  gdouble value;
 
-  value = tidy_adjustment_get_valuex (adjustment);
-  
-  tidy_viewport_set_originu (viewport,
-                             CLUTTER_UNITS_FROM_FIXED (value),
+  value = tidy_adjustment_get_value (adjustment);
+
+  tidy_viewport_set_origin (viewport,
+                             value,
                              priv->y,
                              priv->z);
 }
@@ -351,13 +351,13 @@ vadjustment_value_notify_cb (TidyAdjustment *adjustment, GParamSpec *arg1,
                              TidyViewport *viewport)
 {
   TidyViewportPrivate *priv = viewport->priv;
-  ClutterFixed value;
+  gdouble value;
 
-  value = tidy_adjustment_get_valuex (adjustment);
-  
-  tidy_viewport_set_originu (viewport,
+  value = tidy_adjustment_get_value (adjustment);
+
+  tidy_viewport_set_origin (viewport,
                              priv->x,
-                             CLUTTER_UNITS_FROM_FIXED (value),
+                             value,
                              priv->z);
 }
 
@@ -367,7 +367,7 @@ scrollable_set_adjustments (TidyScrollable *scrollable,
                             TidyAdjustment *vadjustment)
 {
   TidyViewportPrivate *priv = TIDY_VIEWPORT (scrollable)->priv;
-  
+
   if (hadjustment != priv->hadjustment)
     {
       if (priv->hadjustment)
@@ -377,7 +377,7 @@ scrollable_set_adjustments (TidyScrollable *scrollable,
                                                 scrollable);
           g_object_unref (priv->hadjustment);
         }
-      
+
       if (hadjustment)
         {
           g_object_ref (hadjustment);
@@ -385,7 +385,7 @@ scrollable_set_adjustments (TidyScrollable *scrollable,
                             G_CALLBACK (hadjustment_value_notify_cb),
                             scrollable);
         }
-      
+
       priv->hadjustment = hadjustment;
     }
 
@@ -398,7 +398,7 @@ scrollable_set_adjustments (TidyScrollable *scrollable,
                                                 scrollable);
           g_object_unref (priv->vadjustment);
         }
-      
+
       if (vadjustment)
         {
           g_object_ref (vadjustment);
@@ -406,7 +406,7 @@ scrollable_set_adjustments (TidyScrollable *scrollable,
                             G_CALLBACK (vadjustment_value_notify_cb),
                             scrollable);
         }
-      
+
       priv->vadjustment = vadjustment;
     }
 }
@@ -417,11 +417,11 @@ scrollable_get_adjustments (TidyScrollable *scrollable,
                             TidyAdjustment **vadjustment)
 {
   TidyViewportPrivate *priv;
-  
+
   g_return_if_fail (TIDY_IS_VIEWPORT (scrollable));
-  
+
   priv = ((TidyViewport *)scrollable)->priv;
-  
+
   if (hadjustment)
     {
       if (priv->hadjustment)
@@ -429,25 +429,25 @@ scrollable_get_adjustments (TidyScrollable *scrollable,
       else
         {
           TidyAdjustment *adjustment;
-          ClutterFixed width, stage_width, increment;
-          
-          width = CLUTTER_UNITS_TO_FIXED(clutter_actor_get_widthu (CLUTTER_ACTOR(scrollable)));
-          stage_width = CLUTTER_UNITS_TO_FIXED(clutter_actor_get_widthu (clutter_stage_get_default ()));
-          increment = MAX (CFX_ONE, MIN(stage_width, width));
-          
-          adjustment = tidy_adjustment_newx (CLUTTER_UNITS_TO_FIXED(priv->x),
-                                             0,
-                                             width,
-                                             CFX_ONE,
-                                             increment,
-                                             increment);
+          guint width, stage_width, increment;
+
+          width = clutter_actor_get_width (CLUTTER_ACTOR(scrollable));
+          stage_width = clutter_actor_get_width (clutter_stage_get_default ());
+          increment = MAX (1, MIN(stage_width, width));
+
+          adjustment = tidy_adjustment_new (priv->x,
+                                            0,
+                                            width,
+                                            1,
+                                            increment,
+                                            increment);
           scrollable_set_adjustments (scrollable,
                                       adjustment,
                                       priv->vadjustment);
           *hadjustment = adjustment;
         }
     }
-  
+
   if (vadjustment)
     {
       if (priv->vadjustment)
@@ -455,18 +455,18 @@ scrollable_get_adjustments (TidyScrollable *scrollable,
       else
         {
           TidyAdjustment *adjustment;
-          ClutterFixed height, stage_height, increment;
-          
-          height = CLUTTER_UNITS_TO_FIXED(clutter_actor_get_heightu (CLUTTER_ACTOR(scrollable)));
-          stage_height = CLUTTER_UNITS_TO_FIXED(clutter_actor_get_heightu (clutter_stage_get_default ()));
-          increment = MAX (CFX_ONE, MIN(stage_height, height));
-          
-          adjustment = tidy_adjustment_newx (CLUTTER_UNITS_TO_FIXED(priv->y),
-                                             0,
-                                             height,
-                                             CFX_ONE,
-                                             increment,
-                                             increment);
+          guint height, stage_height, increment;
+
+          height = clutter_actor_get_height (CLUTTER_ACTOR(scrollable));
+          stage_height = clutter_actor_get_height (clutter_stage_get_default ());
+          increment = MAX (1, MIN(stage_height, height));
+
+          adjustment = tidy_adjustment_new (priv->y,
+                                            0,
+                                            height,
+                                            1,
+                                            increment,
+                                            increment);
           scrollable_set_adjustments (scrollable,
                                       priv->hadjustment,
                                       adjustment);
@@ -489,10 +489,10 @@ clip_notify_cb (ClutterActor *actor,
 {
   gint width, height;
   TidyViewportPrivate *priv = self->priv;
-  
+
   if (!priv->sync_adjustments)
     return;
-  
+
   if (!clutter_actor_has_clip (actor))
     {
       if (priv->hadjustment)
@@ -501,12 +501,12 @@ clip_notify_cb (ClutterActor *actor,
         g_object_set (priv->vadjustment, "page-size", (gdouble)1.0, NULL);
       return;
     }
-  
+
   clutter_actor_get_clip (actor, NULL, NULL, &width, &height);
 
   if (priv->hadjustment)
     g_object_set (priv->hadjustment, "page-size", (gdouble)width, NULL);
-  
+
   if (priv->vadjustment)
     g_object_set (priv->vadjustment, "page-size", (gdouble)height, NULL);
 }
@@ -515,9 +515,9 @@ static void
 tidy_viewport_init (TidyViewport *self)
 {
   self->priv = VIEWPORT_PRIVATE (self);
-  
+
   self->priv->sync_adjustments = TRUE;
-  
+
   g_signal_connect (self, "notify::clip",
                     G_CALLBACK (clip_notify_cb), self);
 }
@@ -529,27 +529,27 @@ tidy_viewport_new (void)
 }
 
 void
-tidy_viewport_set_originu (TidyViewport *viewport,
-                           ClutterUnit   x,
-                           ClutterUnit   y,
-                           ClutterUnit   z)
+tidy_viewport_set_origin (TidyViewport *viewport,
+                          gint x,
+                          gint y,
+                          gint z)
 {
   TidyViewportPrivate *priv;
-  
+
   g_return_if_fail (TIDY_IS_VIEWPORT (viewport));
-  
+
   priv = viewport->priv;
 
   g_object_freeze_notify (G_OBJECT (viewport));
-  
+
   if (x != priv->x)
     {
       priv->x = x;
       g_object_notify (G_OBJECT (viewport), "x-origin");
-      
+
       if (priv->hadjustment)
-        tidy_adjustment_set_valuex (priv->hadjustment,
-                                    CLUTTER_UNITS_TO_FIXED (x));
+        tidy_adjustment_set_value (priv->hadjustment,
+                                    x);
     }
 
   if (y != priv->y)
@@ -558,8 +558,8 @@ tidy_viewport_set_originu (TidyViewport *viewport,
       g_object_notify (G_OBJECT (viewport), "y-origin");
 
       if (priv->vadjustment)
-        tidy_adjustment_set_valuex (priv->vadjustment,
-                                    CLUTTER_UNITS_TO_FIXED (y));
+        tidy_adjustment_set_value (priv->vadjustment,
+                                    y);
     }
 
   if (z != priv->z)
@@ -567,38 +567,24 @@ tidy_viewport_set_originu (TidyViewport *viewport,
       priv->z = z;
       g_object_notify (G_OBJECT (viewport), "z-origin");
     }
-  
+
   g_object_thaw_notify (G_OBJECT (viewport));
 
   clutter_actor_queue_redraw (CLUTTER_ACTOR (viewport));
 }
 
 void
-tidy_viewport_set_origin (TidyViewport *viewport,
-                          gint          x,
-                          gint          y,
-                          gint          z)
-{
-  g_return_if_fail (TIDY_IS_VIEWPORT (viewport));
-  
-  tidy_viewport_set_originu (viewport,
-                             CLUTTER_UNITS_FROM_DEVICE (x),
-                             CLUTTER_UNITS_FROM_DEVICE (y),
-                             CLUTTER_UNITS_FROM_DEVICE (z));
-}
-
-void
-tidy_viewport_get_originu (TidyViewport *viewport,
-                           ClutterUnit  *x,
-                           ClutterUnit  *y,
-                           ClutterUnit  *z)
+tidy_viewport_get_origin (TidyViewport *viewport,
+                          gint *x,
+                          gint *y,
+                          gint *z)
 {
   TidyViewportPrivate *priv;
-  
+
   g_return_if_fail (TIDY_IS_VIEWPORT (viewport));
-  
+
   priv = viewport->priv;
-  
+
   if (x)
     *x = priv->x;
 
@@ -607,26 +593,4 @@ tidy_viewport_get_originu (TidyViewport *viewport,
 
   if (z)
     *z = priv->z;
-}
-
-void
-tidy_viewport_get_origin (TidyViewport *viewport,
-                          gint         *x,
-                          gint         *y,
-                          gint         *z)
-{
-  TidyViewportPrivate *priv;
-  
-  g_return_if_fail (TIDY_IS_VIEWPORT (viewport));
-  
-  priv = viewport->priv;
-  
-  if (x)
-    *x = CLUTTER_UNITS_TO_DEVICE (priv->x);
-
-  if (y)
-    *y = CLUTTER_UNITS_TO_DEVICE (priv->y);
-
-  if (z)
-    *z = CLUTTER_UNITS_TO_DEVICE (priv->z);
 }

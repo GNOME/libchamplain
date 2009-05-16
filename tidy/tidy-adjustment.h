@@ -24,7 +24,7 @@
 #define __TIDY_ADJUSTMENT_H__
 
 #include <glib-object.h>
-#include <clutter/clutter-fixed.h>
+#include <clutter/clutter.h>
 
 G_BEGIN_DECLS
 
@@ -50,7 +50,7 @@ struct _TidyAdjustment
 {
   /*< private >*/
   GObject parent_instance;
-  
+
   TidyAdjustmentPrivate *priv;
 };
 
@@ -77,24 +77,12 @@ TidyAdjustment *tidy_adjustment_new          (gdouble         value,
                                               gdouble         step_increment,
                                               gdouble         page_increment,
                                               gdouble         page_size);
-TidyAdjustment *tidy_adjustment_newx         (ClutterFixed    value,
-                                              ClutterFixed    lower,
-                                              ClutterFixed    upper,
-                                              ClutterFixed    step_increment,
-                                              ClutterFixed    page_increment,
-                                              ClutterFixed    page_size);
 gdouble         tidy_adjustment_get_value    (TidyAdjustment *adjustment);
-ClutterFixed    tidy_adjustment_get_valuex   (TidyAdjustment *adjustment);
 void            tidy_adjustment_set_value    (TidyAdjustment *adjustment,
                                               gdouble         value);
-void            tidy_adjustment_set_valuex   (TidyAdjustment *adjustment,
-                                              ClutterFixed    value);
 void            tidy_adjustment_clamp_page   (TidyAdjustment *adjustment,
                                               gdouble         lower,
                                               gdouble         upper);
-void            tidy_adjustment_clamp_pagex  (TidyAdjustment *adjustment,
-                                              ClutterFixed    lower,
-                                              ClutterFixed    upper);
 void            tidy_adjustment_set_values   (TidyAdjustment *adjustment,
                                               gdouble         value,
                                               gdouble         lower,
@@ -102,13 +90,6 @@ void            tidy_adjustment_set_values   (TidyAdjustment *adjustment,
                                               gdouble         step_increment,
                                               gdouble         page_increment,
                                               gdouble         page_size);
-void            tidy_adjustment_set_valuesx  (TidyAdjustment *adjustment,
-                                              ClutterFixed    value,
-                                              ClutterFixed    lower,
-                                              ClutterFixed    upper,
-                                              ClutterFixed    step_increment,
-                                              ClutterFixed    page_increment,
-                                              ClutterFixed    page_size);
 void            tidy_adjustment_get_values   (TidyAdjustment *adjustment,
                                               gdouble        *value,
                                               gdouble        *lower,
@@ -116,20 +97,9 @@ void            tidy_adjustment_get_values   (TidyAdjustment *adjustment,
                                               gdouble        *step_increment,
                                               gdouble        *page_increment,
                                               gdouble        *page_size);
-void            tidy_adjustment_get_valuesx  (TidyAdjustment *adjustment,
-                                              ClutterFixed   *value,
-                                              ClutterFixed   *lower,
-                                              ClutterFixed   *upper,
-                                              ClutterFixed   *step_increment,
-                                              ClutterFixed   *page_increment,
-                                              ClutterFixed   *page_size);
 
 void            tidy_adjustment_interpolate  (TidyAdjustment *adjustment,
                                               gdouble         value,
-                                              guint           n_frames,
-                                              guint           fps);
-void            tidy_adjustment_interpolatex (TidyAdjustment *adjustment,
-                                              ClutterFixed    value,
                                               guint           n_frames,
                                               guint           fps);
 

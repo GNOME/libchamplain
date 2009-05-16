@@ -24,7 +24,7 @@
 #define __TIDY_VIEWPORT_H__
 
 #include <glib-object.h>
-#include <clutter/clutter-group.h>
+#include <clutter/clutter.h>
 
 G_BEGIN_DECLS
 
@@ -42,7 +42,7 @@ typedef struct _TidyViewportClass     TidyViewportClass;
 struct _TidyViewport
 {
   ClutterGroup parent;
-  
+
   TidyViewportPrivate *priv;
 };
 
@@ -55,25 +55,15 @@ GType tidy_viewport_get_type (void) G_GNUC_CONST;
 
 ClutterActor * tidy_viewport_new         (void);
 
-void           tidy_viewport_set_originu (TidyViewport *viewport,
-                                          ClutterUnit   x,
-                                          ClutterUnit   y,
-                                          ClutterUnit   z);
-
 void           tidy_viewport_set_origin  (TidyViewport *viewport,
                                           gint          x,
                                           gint          y,
                                           gint          z);
 
-void           tidy_viewport_get_originu (TidyViewport *viewport,
-                                          ClutterUnit  *x,
-                                          ClutterUnit  *y,
-                                          ClutterUnit  *z);
-
 void           tidy_viewport_get_origin  (TidyViewport *viewport,
-                                          gint         *x,
-                                          gint         *y,
-                                          gint         *z);
+                                          gfloat         *x,
+                                          gfloat         *y,
+                                          gfloat         *z);
 void           tidy_viewport_stop        (TidyViewport *viewport);
 
 G_END_DECLS

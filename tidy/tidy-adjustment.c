@@ -25,9 +25,7 @@
 #endif
 
 #include <glib-object.h>
-#include <clutter/clutter-alpha.h>
-#include <clutter/clutter-fixed.h>
-#include <clutter/clutter-timeline.h>
+#include <clutter/clutter.h>
 
 #include "tidy-adjustment.h"
 #include "tidy-marshal.h"
@@ -39,19 +37,19 @@ G_DEFINE_TYPE (TidyAdjustment, tidy_adjustment, G_TYPE_OBJECT)
 
 struct _TidyAdjustmentPrivate
 {
-  ClutterFixed lower;
-  ClutterFixed upper;
-  ClutterFixed value;
-  ClutterFixed step_increment;
-  ClutterFixed page_increment;
-  ClutterFixed page_size;
+  gdouble lower;
+  gdouble upper;
+  gdouble value;
+  gdouble step_increment;
+  gdouble page_increment;
+  gdouble page_size;
 
   /* For interpolation */
   ClutterTimeline *interpolation;
-  ClutterFixed     dx;
-  ClutterFixed     old_position;
-  ClutterFixed     new_position;
-  
+  gdouble     dx;
+  gdouble     old_position;
+  gdouble     new_position;
+
   /* For elasticity */
   gboolean      elastic;
   ClutterAlpha *bounce_alpha;
@@ -67,7 +65,7 @@ enum
   PROP_STEP_INC,
   PROP_PAGE_INC,
   PROP_PAGE_SIZE,
-  
+
   PROP_ELASTIC,
 };
 
@@ -102,29 +100,29 @@ tidy_adjustment_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_LOWER:
-      g_value_set_double (value, CLUTTER_FIXED_TO_DOUBLE (priv->lower));
+      g_value_set_double (value, priv->lower);
       break;
 
     case PROP_UPPER:
-      g_value_set_double (value, CLUTTER_FIXED_TO_DOUBLE (priv->upper));
+      g_value_set_double (value, priv->upper);
       break;
 
     case PROP_VALUE:
-      g_value_set_double (value, CLUTTER_FIXED_TO_DOUBLE (priv->value));
+      g_value_set_double (value, priv->value);
       break;
 
     case PROP_STEP_INC:
-      g_value_set_double (value, CLUTTER_FIXED_TO_DOUBLE (priv->step_increment));
+      g_value_set_double (value, priv->step_increment);
       break;
 
     case PROP_PAGE_INC:
-      g_value_set_double (value, CLUTTER_FIXED_TO_DOUBLE (priv->page_increment));
+      g_value_set_double (value, priv->page_increment);
       break;
 
     case PROP_PAGE_SIZE:
-      g_value_set_double (value, CLUTTER_FIXED_TO_DOUBLE (priv->page_size));
+      g_value_set_double (value, priv->page_size);
       break;
-    
+
     case PROP_ELASTIC:
       g_value_set_boolean (value, priv->elastic);
       break;
@@ -168,7 +166,7 @@ tidy_adjustment_set_property (GObject      *object,
     case PROP_PAGE_SIZE:
       tidy_adjustment_set_page_size (adj, g_value_get_double (value));
       break;
-    
+
     case PROP_ELASTIC:
       tidy_adjustment_set_elastic (adj, g_value_get_boolean (value));
       break;
@@ -188,7 +186,7 @@ stop_interpolation (TidyAdjustment *adjustment)
       clutter_timeline_stop (priv->interpolation);
       g_object_unref (priv->interpolation);
       priv->interpolation = NULL;
-      
+
       if (priv->bounce_alpha)
         {
           g_object_unref (priv->bounce_alpha);
@@ -321,64 +319,22 @@ tidy_adjustment_new (gdouble value,
                        NULL);
 }
 
-TidyAdjustment *
-tidy_adjustment_newx (ClutterFixed value,
-                      ClutterFixed lower,
-                      ClutterFixed upper,
-                      ClutterFixed step_increment,
-                      ClutterFixed page_increment,
-                      ClutterFixed page_size)
-{
-  TidyAdjustment *retval;
-  TidyAdjustmentPrivate *priv;
-
-  retval = g_object_new (TIDY_TYPE_ADJUSTMENT, NULL);
-  priv = retval->priv;
-
-  priv->value = value;
-  priv->lower = lower;
-  priv->upper = upper;
-  priv->step_increment = step_increment;
-  priv->page_increment = page_increment;
-  priv->page_size = page_size;
-
-  return retval;
-}
-
-ClutterFixed
-tidy_adjustment_get_valuex (TidyAdjustment *adjustment)
-{
-  TidyAdjustmentPrivate *priv;
-  
-  g_return_val_if_fail (TIDY_IS_ADJUSTMENT (adjustment), 0);
-  
-  priv = adjustment->priv;
-  
-  if (adjustment->priv->interpolation)
-    {
-      return MAX (priv->lower, MIN (priv->upper - priv->page_size,
-                                    adjustment->priv->new_position));
-    }
-  else
-    return adjustment->priv->value;
-}
-
 gdouble
 tidy_adjustment_get_value (TidyAdjustment *adjustment)
 {
   g_return_val_if_fail (TIDY_IS_ADJUSTMENT (adjustment), 0.0);
 
-  return CLUTTER_FIXED_TO_FLOAT (adjustment->priv->value);
+  return adjustment->priv->value;
 }
 
 void
-tidy_adjustment_set_valuex (TidyAdjustment *adjustment,
-                            ClutterFixed    value)
+tidy_adjustment_set_value (TidyAdjustment *adjustment,
+                           double value)
 {
   TidyAdjustmentPrivate *priv;
-  
+
   g_return_if_fail (TIDY_IS_ADJUSTMENT (adjustment));
-  
+
   priv = adjustment->priv;
 
   stop_interpolation (adjustment);
@@ -395,31 +351,24 @@ tidy_adjustment_set_valuex (TidyAdjustment *adjustment,
 }
 
 void
-tidy_adjustment_set_value (TidyAdjustment *adjustment,
-                           gdouble         value)
-{
-  tidy_adjustment_set_valuex (adjustment, CLUTTER_FLOAT_TO_FIXED (value));
-}
-
-void
-tidy_adjustment_clamp_pagex (TidyAdjustment *adjustment,
-                             ClutterFixed    lower,
-                             ClutterFixed    upper)
+tidy_adjustment_clamp_page (TidyAdjustment *adjustment,
+                            double lower,
+                            double upper)
 {
   gboolean changed;
   TidyAdjustmentPrivate *priv;
-  
+
   g_return_if_fail (TIDY_IS_ADJUSTMENT (adjustment));
-  
+
   priv = adjustment->priv;
-  
+
   stop_interpolation (adjustment);
 
   lower = CLAMP (lower, priv->lower, priv->upper - priv->page_size);
   upper = CLAMP (upper, priv->lower + priv->page_size, priv->upper);
-  
+
   changed = FALSE;
-  
+
   if (priv->value + priv->page_size > upper)
     {
       priv->value = upper - priv->page_size;
@@ -431,19 +380,9 @@ tidy_adjustment_clamp_pagex (TidyAdjustment *adjustment,
       priv->value = lower;
       changed = TRUE;
     }
-  
+
   if (changed)
     g_object_notify (G_OBJECT (adjustment), "value");
-}
-
-void
-tidy_adjustment_clamp_page (TidyAdjustment *adjustment,
-                            gdouble         lower,
-                            gdouble         upper)
-{
-  tidy_adjustment_clamp_pagex (adjustment,
-                               CLUTTER_FLOAT_TO_FIXED (lower),
-                               CLUTTER_FLOAT_TO_FIXED (upper));
 }
 
 static void
@@ -451,17 +390,16 @@ tidy_adjustment_set_lower (TidyAdjustment *adjustment,
                            gdouble         lower)
 {
   TidyAdjustmentPrivate *priv = adjustment->priv;
-  ClutterFixed value = CLUTTER_FLOAT_TO_FIXED (lower);
-  
-  if (priv->lower != value)
+
+  if (priv->lower != lower)
     {
-      priv->lower = value;
+      priv->lower = lower;
 
       g_signal_emit (adjustment, signals[CHANGED], 0);
 
       g_object_notify (G_OBJECT (adjustment), "lower");
 
-      tidy_adjustment_clamp_pagex (adjustment, priv->lower, priv->upper);
+      tidy_adjustment_clamp_page (adjustment, priv->lower, priv->upper);
     }
 }
 
@@ -470,17 +408,16 @@ tidy_adjustment_set_upper (TidyAdjustment *adjustment,
                            gdouble         upper)
 {
   TidyAdjustmentPrivate *priv = adjustment->priv;
-  ClutterFixed value = CLUTTER_FLOAT_TO_FIXED (upper);
-  
-  if (priv->upper != value)
+
+  if (priv->upper != upper)
     {
-      priv->upper = value;
+      priv->upper = upper;
 
       g_signal_emit (adjustment, signals[CHANGED], 0);
 
       g_object_notify (G_OBJECT (adjustment), "upper");
-      
-      tidy_adjustment_clamp_pagex (adjustment, priv->lower, priv->upper);
+
+      tidy_adjustment_clamp_page (adjustment, priv->lower, priv->upper);
     }
 }
 
@@ -489,11 +426,10 @@ tidy_adjustment_set_step_increment (TidyAdjustment *adjustment,
                                     gdouble         step)
 {
   TidyAdjustmentPrivate *priv = adjustment->priv;
-  ClutterFixed value = CLUTTER_FLOAT_TO_FIXED (step);
-  
-  if (priv->step_increment != value)
+
+  if (priv->step_increment != step)
     {
-      priv->step_increment = value;
+      priv->step_increment = step;
 
       g_signal_emit (adjustment, signals[CHANGED], 0);
 
@@ -506,11 +442,10 @@ tidy_adjustment_set_page_increment (TidyAdjustment *adjustment,
                                     gdouble        page)
 {
   TidyAdjustmentPrivate *priv = adjustment->priv;
-  ClutterFixed value = CLUTTER_FLOAT_TO_FIXED (page);
 
-  if (priv->page_increment != value)
+  if (priv->page_increment != page)
     {
-      priv->page_increment = value;
+      priv->page_increment = page;
 
       g_signal_emit (adjustment, signals[CHANGED], 0);
 
@@ -523,40 +458,39 @@ tidy_adjustment_set_page_size (TidyAdjustment *adjustment,
                                gdouble         size)
 {
   TidyAdjustmentPrivate *priv = adjustment->priv;
-  ClutterFixed value = CLUTTER_FLOAT_TO_FIXED (size);
 
-  if (priv->page_size != value)
+  if (priv->page_size != size)
     {
-      priv->page_size = value;
+      priv->page_size = size;
 
       g_signal_emit (adjustment, signals[CHANGED], 0);
 
       g_object_notify (G_OBJECT (adjustment), "page_size");
 
-      tidy_adjustment_clamp_pagex (adjustment, priv->lower, priv->upper);
+      tidy_adjustment_clamp_page (adjustment, priv->lower, priv->upper);
     }
 }
 
 void
 tidy_adjustment_set_valuesx (TidyAdjustment *adjustment,
-                             ClutterFixed    value,
-                             ClutterFixed    lower,
-                             ClutterFixed    upper,
-                             ClutterFixed    step_increment,
-                             ClutterFixed    page_increment,
-                             ClutterFixed    page_size)
+                             gdouble    value,
+                             gdouble    lower,
+                             gdouble    upper,
+                             gdouble    step_increment,
+                             gdouble    page_increment,
+                             gdouble    page_size)
 {
   TidyAdjustmentPrivate *priv;
   gboolean emit_changed = FALSE;
-  
+
   g_return_if_fail (TIDY_IS_ADJUSTMENT (adjustment));
-  
+
   priv = adjustment->priv;
-  
+
   stop_interpolation (adjustment);
 
   emit_changed = FALSE;
-  
+
   g_object_freeze_notify (G_OBJECT (adjustment));
 
   if (priv->lower != lower)
@@ -598,8 +532,8 @@ tidy_adjustment_set_valuesx (TidyAdjustment *adjustment,
 
       g_object_notify (G_OBJECT (adjustment), "page-size");
     }
-  
-  tidy_adjustment_set_valuex (adjustment, value);
+
+  tidy_adjustment_set_value (adjustment, value);
 
   if (emit_changed)
     g_signal_emit (G_OBJECT (adjustment), signals[CHANGED], 0);
@@ -608,38 +542,20 @@ tidy_adjustment_set_valuesx (TidyAdjustment *adjustment,
 }
 
 void
-tidy_adjustment_set_values (TidyAdjustment *adjustment,
-                            gdouble         value,
-                            gdouble         lower,
-                            gdouble         upper,
-                            gdouble         step_increment,
-                            gdouble         page_increment,
-                            gdouble         page_size)
-{
-  tidy_adjustment_set_valuesx (adjustment,
-                               CLUTTER_FLOAT_TO_FIXED (value),
-                               CLUTTER_FLOAT_TO_FIXED (lower),
-                               CLUTTER_FLOAT_TO_FIXED (upper),
-                               CLUTTER_FLOAT_TO_FIXED (step_increment),
-                               CLUTTER_FLOAT_TO_FIXED (page_increment),
-                               CLUTTER_FLOAT_TO_FIXED (page_size));
-}
-
-void
 tidy_adjustment_get_valuesx (TidyAdjustment *adjustment,
-                             ClutterFixed   *value,
-                             ClutterFixed   *lower,
-                             ClutterFixed   *upper,
-                             ClutterFixed   *step_increment,
-                             ClutterFixed   *page_increment,
-                             ClutterFixed   *page_size)
+                             gdouble   *value,
+                             gdouble   *lower,
+                             gdouble   *upper,
+                             gdouble   *step_increment,
+                             gdouble   *page_increment,
+                             gdouble   *page_size)
 {
   TidyAdjustmentPrivate *priv;
-  
+
   g_return_if_fail (TIDY_IS_ADJUSTMENT (adjustment));
-  
+
   priv = adjustment->priv;
-  
+
   if (lower)
     *lower = priv->lower;
 
@@ -647,7 +563,7 @@ tidy_adjustment_get_valuesx (TidyAdjustment *adjustment,
     *upper = priv->upper;
 
   if (value)
-    *value = tidy_adjustment_get_valuex (adjustment);
+    *value = tidy_adjustment_get_value (adjustment);
 
   if (step_increment)
     *step_increment = priv->step_increment;
@@ -669,28 +585,28 @@ tidy_adjustment_get_values (TidyAdjustment *adjustment,
                             gdouble        *page_size)
 {
   TidyAdjustmentPrivate *priv;
-  
+
   g_return_if_fail (TIDY_IS_ADJUSTMENT (adjustment));
-  
+
   priv = adjustment->priv;
-  
+
   if (lower)
-    *lower = CLUTTER_FIXED_TO_DOUBLE (priv->lower);
+    *lower = priv->lower;
 
   if (upper)
-    *upper = CLUTTER_FIXED_TO_DOUBLE (priv->upper);
+    *upper = priv->upper;
 
   if (value)
-    *value = CLUTTER_FIXED_TO_DOUBLE (tidy_adjustment_get_valuex (adjustment));
+    *value = tidy_adjustment_get_value (adjustment);
 
   if (step_increment)
-    *step_increment = CLUTTER_FIXED_TO_DOUBLE (priv->step_increment);
+    *step_increment = priv->step_increment;
 
   if (page_increment)
-    *page_increment = CLUTTER_FIXED_TO_DOUBLE (priv->page_increment);
+    *page_increment = priv->page_increment;
 
   if (page_size)
-    *page_size = CLUTTER_FIXED_TO_DOUBLE (priv->page_size);
+    *page_size = priv->page_size;
 }
 
 static void
@@ -703,18 +619,16 @@ interpolation_new_frame_cb (ClutterTimeline *timeline,
   priv->interpolation = NULL;
   if (priv->elastic && priv->bounce_alpha)
     {
-      gdouble progress = clutter_alpha_get_alpha (priv->bounce_alpha) /
-        (gdouble)CLUTTER_ALPHA_MAX_ALPHA;
-      gdouble dx = CLUTTER_FIXED_TO_FLOAT (priv->old_position) +
-        CLUTTER_FIXED_TO_FLOAT (priv->new_position - priv->old_position) *
+      gdouble progress = clutter_alpha_get_alpha (priv->bounce_alpha) / 1;
+      gdouble dx = priv->old_position +
+        (priv->new_position - priv->old_position) *
         progress;
       tidy_adjustment_set_value (adjustment, dx);
     }
   else
-    tidy_adjustment_set_valuex (adjustment,
+    tidy_adjustment_set_value (adjustment,
                                 priv->old_position +
-                                clutter_qmulx (CLUTTER_INT_TO_FIXED (frame_num),
-                                               priv->dx));
+                                frame_num * priv->dx);
   priv->interpolation = timeline;
 }
 
@@ -725,7 +639,7 @@ interpolation_completed_cb (ClutterTimeline *timeline,
   TidyAdjustmentPrivate *priv = adjustment->priv;
   
   stop_interpolation (adjustment);
-  tidy_adjustment_set_valuex (adjustment,
+  tidy_adjustment_set_value (adjustment,
                               priv->new_position);
 }
 
@@ -740,7 +654,7 @@ static guint32
 bounce_alpha_func (ClutterAlpha *alpha,
                    gpointer      user_data)
 {
-  ClutterFixed progress, angle;
+  gdouble progress, angle;
   ClutterTimeline *timeline = clutter_alpha_get_timeline (alpha);
   
   progress = clutter_timeline_get_progressx (timeline);
@@ -752,8 +666,8 @@ bounce_alpha_func (ClutterAlpha *alpha,
 */
 
 void
-tidy_adjustment_interpolatex (TidyAdjustment *adjustment,
-                              ClutterFixed    value,
+tidy_adjustment_interpolate (TidyAdjustment *adjustment,
+                              gdouble         value,
                               guint           n_frames,
                               guint           fps)
 {
@@ -763,22 +677,20 @@ tidy_adjustment_interpolatex (TidyAdjustment *adjustment,
 
   if (n_frames <= 1)
     {
-      tidy_adjustment_set_valuex (adjustment, value);
+      tidy_adjustment_set_value (adjustment, value);
       return;
     }
 
   priv->old_position = priv->value;
   priv->new_position = value;
 
-  priv->dx = clutter_qdivx (priv->new_position - priv->old_position,
-                            CLUTTER_INT_TO_FIXED (n_frames));
+  priv->dx = (priv->new_position - priv->old_position) * n_frames;
   priv->interpolation = clutter_timeline_new (n_frames, fps);
-  
+
   if (priv->elastic)
     priv->bounce_alpha = clutter_alpha_new_full (priv->interpolation,
-                                                 CLUTTER_ALPHA_SINE_INC,
-                                                 NULL, NULL);
-  
+                                                 CLUTTER_EASE_OUT_SINE);
+
   g_signal_connect (priv->interpolation,
                     "new-frame",
                     G_CALLBACK (interpolation_new_frame_cb),
@@ -787,20 +699,8 @@ tidy_adjustment_interpolatex (TidyAdjustment *adjustment,
                     "completed",
                     G_CALLBACK (interpolation_completed_cb),
                     adjustment);
-  
-  clutter_timeline_start (priv->interpolation);
-}
 
-void
-tidy_adjustment_interpolate (TidyAdjustment *adjustment,
-                              gdouble        value,
-                              guint          n_frames,
-                              guint          fps)
-{
-  tidy_adjustment_interpolatex (adjustment,
-                                CLUTTER_FLOAT_TO_FIXED (value),
-                                n_frames,
-                                fps);
+  clutter_timeline_start (priv->interpolation);
 }
 
 gboolean
@@ -823,25 +723,25 @@ tidy_adjustment_clamp (TidyAdjustment *adjustment,
                        guint           fps)
 {
   TidyAdjustmentPrivate *priv = adjustment->priv;
-  ClutterFixed dest = priv->value;
-  
+  gdouble dest = priv->value;
+
   if (priv->value < priv->lower)
     dest = priv->lower;
   if (priv->value > priv->upper - priv->page_size)
     dest = priv->upper - priv->page_size;
-  
+
   if (dest != priv->value)
     {
       if (interpolate)
-        tidy_adjustment_interpolatex (adjustment,
+        tidy_adjustment_interpolate (adjustment,
                                       dest,
                                       n_frames,
                                       fps);
       else
-        tidy_adjustment_set_valuex (adjustment, dest);
-      
+        tidy_adjustment_set_value (adjustment, dest);
+
       return TRUE;
     }
-  
+
   return FALSE;
 }
