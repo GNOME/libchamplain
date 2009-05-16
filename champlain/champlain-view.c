@@ -1374,7 +1374,7 @@ champlain_view_go_to (ChamplainView *view,
    */
   duration = 500 * priv->zoom_level / 2.0;
   ctx->timeline = clutter_timeline_new_for_duration (duration);
-  ctx->alpha = clutter_alpha_new_full (ctx->timeline, CLUTTER_EASE_OUT_SINE);
+  ctx->alpha = clutter_alpha_new_full (ctx->timeline, CLUTTER_EASE_IN_OUT_CIRC);
 
   g_signal_connect (ctx->timeline, "new-frame", G_CALLBACK (timeline_new_frame),
       ctx);

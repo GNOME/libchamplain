@@ -826,31 +826,26 @@ champlain_tile_set_etag (ChamplainTile *self,
 
 typedef struct {
   ChamplainTile *tile;
-  //ClutterEffectTemplate *etemplate;
-  ClutterTimeline *timeline;
   ClutterActor *old_actor;
 } AnimationContext;
-/*
+
 static void
-fade_in_completed (ClutterTimeline *timeline,
+fade_in_completed (ClutterAnimation *animation,
     gpointer data)
 {
   AnimationContext* ctx = (AnimationContext*) data;
   ChamplainTilePrivate *priv = GET_PRIVATE (ctx->tile);
 
   if (ctx->old_actor != NULL)
-  {
-    g_object_unref (ctx->old_actor);
-    clutter_container_remove (CLUTTER_CONTAINER (priv->actor), ctx->old_actor, NULL);
-  }
+    {
+      g_object_unref (ctx->old_actor);
+      clutter_container_remove (CLUTTER_CONTAINER (priv->actor), ctx->old_actor, NULL);
+    }
 
   g_object_unref (ctx->tile);
-  g_object_unref (ctx->timeline);
-  //g_object_unref (ctx->etemplate);
   g_free (ctx);
-
 }
-*/
+
 
 /**
  * champlain_tile_set_content:
@@ -884,21 +879,20 @@ champlain_tile_set_content (ChamplainTile *self,
 
   clutter_container_add (CLUTTER_CONTAINER (priv->actor), actor, NULL);
 
-  /* fixme: etemplate are leaked here 
+  /* fixme: etemplate are leaked here */
   if (fade_in == TRUE)
     {
+      ClutterAnimation *animation;
+      clutter_actor_set_opacity (actor, 0);
+
       AnimationContext *ctx = g_new0 (AnimationContext, 1);
       ctx->tile = g_object_ref (self);
-      ctx->timeline = clutter_timeline_new_for_duration (750);
-      ctx->etemplate = clutter_effect_template_new (ctx->timeline, CLUTTER_ALPHA_SINE_INC);
+      animation = clutter_actor_animate (actor, CLUTTER_EASE_IN_CUBIC,
+          500, "opacity", 255, NULL);
       ctx->old_actor = old_actor;
 
-      g_signal_connect (ctx->timeline, "completed", G_CALLBACK (fade_in_completed), ctx);
-
-      clutter_actor_set_opacity (actor, 0);
-      clutter_effect_fade (ctx->etemplate, actor, 255, NULL, NULL);
+      g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), ctx);
     }
-  */
 
   priv->content_actor = g_object_ref (actor);
   g_object_notify (G_OBJECT (self), "content");
