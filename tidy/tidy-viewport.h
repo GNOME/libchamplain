@@ -56,9 +56,9 @@ GType tidy_viewport_get_type (void) G_GNUC_CONST;
 ClutterActor * tidy_viewport_new         (void);
 
 void           tidy_viewport_set_origin  (TidyViewport *viewport,
-                                          gint          x,
-                                          gint          y,
-                                          gint          z);
+                                          float          x,
+                                          float          y,
+                                          float          z);
 
 void           tidy_viewport_get_origin  (TidyViewport *viewport,
                                           gfloat         *x,

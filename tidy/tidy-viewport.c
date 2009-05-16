@@ -530,9 +530,9 @@ tidy_viewport_new (void)
 
 void
 tidy_viewport_set_origin (TidyViewport *viewport,
-                          gint x,
-                          gint y,
-                          gint z)
+                          float x,
+                          float y,
+                          float z)
 {
   TidyViewportPrivate *priv;
 
@@ -575,9 +575,9 @@ tidy_viewport_set_origin (TidyViewport *viewport,
 
 void
 tidy_viewport_get_origin (TidyViewport *viewport,
-                          gint *x,
-                          gint *y,
-                          gint *z)
+                          float *x,
+                          float *y,
+                          float *z)
 {
   TidyViewportPrivate *priv;
 

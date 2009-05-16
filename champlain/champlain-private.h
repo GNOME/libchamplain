@@ -24,13 +24,6 @@
 
 typedef struct _Map Map;
 
-typedef struct
-{
-  gint x;
-  gint y;
-  gint z;
-} ChamplainIntPoint;
-
 struct _ChamplainBaseMarkerPrivate
 {
   gdouble lon;
@@ -52,8 +45,8 @@ struct _ChamplainPolygonPrivate {
 
 typedef struct
 {
-  gint x;
-  gint y;
+  gfloat x;
+  gfloat y;
   gint width;
   gint height;
 } ChamplainRectangle;

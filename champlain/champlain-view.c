@@ -1079,7 +1079,7 @@ viewport_x_changed_cb (GObject *gobject,
       diff.x = priv->anchor.x - old_anchor.x;
       diff.y = priv->anchor.y - old_anchor.y;
 
-      DEBUG("Relocating the viewport by %d, %d", diff.x, diff.y);
+      DEBUG("Relocating the viewport by %f, %f", diff.x, diff.y);
       tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
           rect.x - diff.x, rect.y - diff.y, 0);
       return;
@@ -1221,7 +1221,7 @@ view_update_anchor (ChamplainView *view,
       priv->anchor.y = 0;
       priv->anchor_zoom_level = priv->zoom_level;
     }
-  DEBUG ("New Anchor (%d, %d) for (%d, %d)", priv->anchor.x, priv->anchor.y, x, y);
+  DEBUG ("New Anchor (%f, %f) for (%d, %d)", priv->anchor.x, priv->anchor.y, x, y);
 }
 
 /**

@@ -189,8 +189,8 @@ motion_event_cb (ClutterActor *actor,
   TidyFingerScrollPrivate *priv = scroll->priv;
 
   if (clutter_actor_transform_stage_point (actor,
-                                           CLUTTER_UNITS_FROM_DEVICE(event->x),
-                                           CLUTTER_UNITS_FROM_DEVICE(event->y),
+                                           event->x,
+                                           event->y,
                                            &x, &y))
     {
       TidyFingerScrollMotion *motion;
@@ -378,11 +378,11 @@ button_release_event_cb (ClutterActor *actor,
       ClutterUnit x, y;
 
       if (clutter_actor_transform_stage_point (actor,
-                                               CLUTTER_UNITS_FROM_DEVICE(event->x),
-                                               CLUTTER_UNITS_FROM_DEVICE(event->y),
+                                               event->x,
+                                               event->y,
                                                &x, &y))
         {
-          ClutterUnit frac, x_origin, y_origin;
+          double frac, x_origin, y_origin;
           GTimeVal release_time, motion_time;
           TidyAdjustment *hadjust, *vadjust;
           glong time_diff;
@@ -592,8 +592,8 @@ captured_event_cb (ClutterActor     *actor,
 
       if ((bevent->button == 1) &&
           (clutter_actor_transform_stage_point (actor,
-                                           CLUTTER_UNITS_FROM_DEVICE(bevent->x),
-                                           CLUTTER_UNITS_FROM_DEVICE(bevent->y),
+                                           bevent->x,
+                                           bevent->y,
                                            &motion->x, &motion->y)))
         {
           g_get_current_time (&motion->time);
