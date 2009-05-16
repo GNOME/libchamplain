@@ -49,8 +49,7 @@ PKG_CHECK_MODULES(DEPS,
   [   glib-2.0 >= 2.16,
       gobject-2.0 >= 2.10,
       gdk-2.0 >= 2.10,
-      clutter-0.8 >= 0.8.4,
-      clutter-cairo-0.8 >= 0.8,
+      clutter-0.9 >= 0.9
       cairo >= 1.4,
       gio-2.0 >= 2.16,
       sqlite3 >= 3.0
@@ -105,7 +104,7 @@ if test x$enable_gtk = xyes; then
   AC_SUBST(GTK_DEPS_LIBS)
   PKG_CHECK_MODULES(GTK_DEPS,
     [   gtk+-2.0 >= 2.12
-        clutter-gtk-0.8 >= 0.8
+        clutter-gtk-0.9 >= 0.9
     ]
   )
 
