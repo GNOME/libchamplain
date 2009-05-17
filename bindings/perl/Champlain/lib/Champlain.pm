@@ -146,5 +146,23 @@ sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
 __PACKAGE__->bootstrap($VERSION);
 
-1;
 
+package Champlain::MapSourceDesc;
+
+BEGIN {
+	# Create getters and setters for the properties
+	my @properties = qw(
+		id name license license_uri min_zoom_level max_zoom_level projection
+	);
+	foreach my $property (@properties) {
+		my $get_name = join '::', __PACKAGE__, "get_$property";
+		my $set_same = join '::', __PACKAGE__, "set_$property";
+		my $getter = sub {return $_[0]->{$property};};
+		my $setter = sub {return $_[0]->{$property} = $_[1];};
+		no strict;
+		*{$get_name} = $getter;
+		*{$set_same} = $setter;
+	}
+}
+
+1;
