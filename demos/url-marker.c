@@ -45,7 +45,7 @@ pixbuf_new_from_message (SoupMessage *message, GError **error)
   GdkPixbuf *pixbuf = NULL;
   gboolean pixbuf_is_open = FALSE;
 
-  error = NULL;
+  *error = NULL;
 
   /*  Use a pixbuf loader that can load images of the same mime-type as the
       message.
@@ -54,7 +54,7 @@ pixbuf_new_from_message (SoupMessage *message, GError **error)
       "Content-Type");
   loader = gdk_pixbuf_loader_new_with_mime_type (mime_type, error);
   if (loader != NULL) pixbuf_is_open = TRUE;
-  if (error != NULL) goto cleanup;
+  if (*error != NULL) goto cleanup;
 
 
   gdk_pixbuf_loader_write (
@@ -62,22 +62,19 @@ pixbuf_new_from_message (SoupMessage *message, GError **error)
     message->response_body->data,
     message->response_body->length, 
     error);
-  if (error != NULL) goto cleanup;
+  if (*error != NULL) goto cleanup;
 
   gdk_pixbuf_loader_close (loader, error);
   pixbuf_is_open = FALSE;
-  if (error != NULL) goto cleanup;
+  if (*error != NULL) goto cleanup;
 
   pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
   if (pixbuf == NULL) goto cleanup;
   g_object_ref (G_OBJECT (pixbuf));
   
-  /* Cleanup part, the function will always exit here even in case of error */
-  cleanup:
-    {
-      if (pixbuf_is_open) gdk_pixbuf_loader_close (loader, NULL);
-      if (loader != NULL) g_object_unref (G_OBJECT (loader));
-    }
+cleanup:
+  if (pixbuf_is_open) gdk_pixbuf_loader_close (loader, NULL);
+  if (loader != NULL) g_object_unref (G_OBJECT (loader));
   return pixbuf;
 }
 
@@ -98,7 +95,7 @@ texture_new_from_pixbuf (GdkPixbuf *pixbuf, GError **error)
   int width, height, rowstride;
   ClutterTextureFlags flags = 0;
 
-  error = NULL;
+  *error = NULL;
 
   data = gdk_pixbuf_get_pixels (pixbuf);
   width = gdk_pixbuf_get_width (pixbuf);
@@ -181,16 +178,13 @@ image_downloaded_cb (SoupSession *session,
   clutter_container_add (CLUTTER_CONTAINER (marker_data->layer), marker, NULL);
   clutter_actor_show_all (marker);
 
-  /* Cleanup part, the function will always exit here even in case of error */
-  cleanup:
-    {
-      g_object_unref (marker_data->layer);
-      g_free (marker_data);
-      g_free (url);
-      if (error != NULL) g_error_free (error);
-      if (pixbuf != NULL) g_object_unref (G_OBJECT (pixbuf));
-      if (texture != NULL) clutter_actor_destroy (CLUTTER_ACTOR (texture));
-    }
+cleanup:
+  g_object_unref (marker_data->layer);
+  g_free (marker_data);
+  g_free (url);
+  if (error != NULL) g_error_free (error);
+  if (pixbuf != NULL) g_object_unref (G_OBJECT (pixbuf));
+  if (texture != NULL) clutter_actor_destroy (CLUTTER_ACTOR (texture));
 }
 
 
