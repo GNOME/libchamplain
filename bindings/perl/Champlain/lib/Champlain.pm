@@ -109,9 +109,37 @@ use constant {
 
 our %EXPORT_TAGS = (
 	coords => [qw(MIN_LAT MAX_LAT MIN_LONG MAX_LONG)],
+	maps => [qw(
+		MAP_OSM_MAPNIK
+		MAP_OSM_OSMARENDER
+		MAP_OSM_CYCLE_MAP
+		MAP_OAM
+		MAP_MFF_RELIEF
+	)],
 );
 
 our @EXPORT_OK = map { @{ $_ } } values %EXPORT_TAGS;
+
+
+sub MAP_OSM_MAPNIK {
+	return Champlain::MapSourceFactory->OSM_MAPNIK;
+}
+
+sub MAP_OSM_OSMARENDER {
+	return Champlain::MapSourceFactory->OSM_OSMARENDER;
+}
+
+sub MAP_OSM_CYCLE_MAP {
+	return Champlain::MapSourceFactory->OSM_CYCLE_MAP;
+}
+
+sub MAP_OAM {
+	return Champlain::MapSourceFactory->OAM;
+}
+
+sub MAP_MFF_RELIEF {
+	return Champlain::MapSourceFactory->MFF_RELIEF;
+}
 
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }

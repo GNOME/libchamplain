@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 11;
+use Clutter::TestHelper tests => 16;
 
-use Champlain ':coords';
+#use Champlain qw(:coords :maps);
+use Champlain qw(:coords :maps);
 
 exit tests();
 
@@ -33,6 +34,12 @@ sub test_version {
 		Champlain::MICRO_VERSION,
 	);
 	is_deeply(\@version, \@expected, "GET_VERSION_INFO");
+
+	is(MAP_OSM_MAPNIK, Champlain::MapSourceFactory->OSM_MAPNIK, "MAP_OSM_MAPNIK exists");
+	is(MAP_OSM_OSMARENDER, Champlain::MapSourceFactory->OSM_OSMARENDER, "MAP_OSM_OSMARENDER exists");
+	is(MAP_OSM_CYCLE_MAP, Champlain::MapSourceFactory->OSM_CYCLE_MAP, "MAP_OSM_CYCLE_MAP exists");
+	is(MAP_OAM, Champlain::MapSourceFactory->OAM, "MAP_OAM exists");
+	is(MAP_MFF_RELIEF, Champlain::MapSourceFactory->MFF_RELIEF, "MAP_MFF_RELIEF exists");
 }
 
 
