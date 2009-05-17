@@ -5,7 +5,7 @@ use warnings;
 
 use Clutter::TestHelper tests => 125;
 
-use Champlain ':coords';
+use Champlain qw(:coords :maps);
 
 my $OSM_LICENSE = "(CC) BY 2.0 OpenStreetMap contributors";
 
@@ -233,29 +233,29 @@ sub generic_map_operations {
 
 sub get_osm_mapnik {
 	my $factory = Champlain::MapSourceFactory->get_default();
-	return $factory->create(Champlain::MapSourceFactory->OSM_MAPNIK);
+	return $factory->create(MAP_OSM_MAPNIK);
 }
 
 
 sub get_osm_cycle_map {
 	my $factory = Champlain::MapSourceFactory->get_default();
-	return $factory->create(Champlain::MapSourceFactory->OSM_CYCLE_MAP);
+	return $factory->create(MAP_OSM_CYCLE_MAP);
 }
 
 
 sub get_osm_osmarender {
 	my $factory = Champlain::MapSourceFactory->get_default();
-	return $factory->create(Champlain::MapSourceFactory->OSM_OSMARENDER);
+	return $factory->create(MAP_OSM_OSMARENDER);
 }
 
 
 sub get_oam {
 	my $factory = Champlain::MapSourceFactory->get_default();
-	return $factory->create(Champlain::MapSourceFactory->OAM);
+	return $factory->create(MAP_OAM);
 }
 
 
 sub get_mff_relief {
 	my $factory = Champlain::MapSourceFactory->get_default();
-	return $factory->create(Champlain::MapSourceFactory->MFF_RELIEF);
+	return $factory->create(MAP_MFF_RELIEF);
 }
