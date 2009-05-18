@@ -73,11 +73,16 @@ struct _ChamplainMapSourceFactoryPrivate
   GSList *registered_sources;
 };
 
-static ChamplainMapSource * champlain_map_source_new_osm_mapnik (void);
-static ChamplainMapSource * champlain_map_source_new_osm_cyclemap (void);
-static ChamplainMapSource * champlain_map_source_new_osm_osmarender (void);
-static ChamplainMapSource * champlain_map_source_new_oam (void);
-static ChamplainMapSource * champlain_map_source_new_mff_relief (void);
+static ChamplainMapSource * champlain_map_source_new_osm_mapnik (
+     ChamplainMapSourceDesc *desc, gpointer *data);
+static ChamplainMapSource * champlain_map_source_new_osm_cyclemap (
+    ChamplainMapSourceDesc *desc, gpointer *data);
+static ChamplainMapSource * champlain_map_source_new_osm_osmarender (
+    ChamplainMapSourceDesc *desc, gpointer *data);
+static ChamplainMapSource * champlain_map_source_new_oam (
+    ChamplainMapSourceDesc *desc, gpointer *data);
+static ChamplainMapSource * champlain_map_source_new_mff_relief (
+    ChamplainMapSourceDesc *desc, gpointer *data);
 
 
 static void
@@ -168,7 +173,8 @@ ChamplainMapSourceDesc OSM_MAPNIK_DESC =
     0,
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_osm_mapnik
+    champlain_map_source_new_osm_mapnik,
+    NULL
   };
 
 static
@@ -181,7 +187,8 @@ ChamplainMapSourceDesc OSM_OSMARENDER_DESC =
     0,
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_osm_osmarender
+    champlain_map_source_new_osm_osmarender,
+    NULL
   };
 
 static
@@ -194,7 +201,8 @@ ChamplainMapSourceDesc OSM_CYCLEMAP_DESC =
     0,
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_osm_cyclemap
+    champlain_map_source_new_osm_cyclemap,
+    NULL
   };
 
 static
@@ -207,7 +215,8 @@ ChamplainMapSourceDesc OAM_DESC =
     0,
     17,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_oam
+    champlain_map_source_new_oam,
+    NULL
   };
 
 static
@@ -220,7 +229,8 @@ ChamplainMapSourceDesc MFF_RELIEF_DESC =
     0,
     11,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_mff_relief
+    champlain_map_source_new_mff_relief,
+    NULL
   };
 
 static void
@@ -232,11 +242,16 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 
   priv->registered_sources = NULL;
 
-  champlain_map_source_factory_register (factory, &OSM_MAPNIK_DESC);
-  champlain_map_source_factory_register (factory, &OSM_CYCLEMAP_DESC);
-  champlain_map_source_factory_register (factory, &OSM_OSMARENDER_DESC);
-  champlain_map_source_factory_register (factory, &OAM_DESC);
-  champlain_map_source_factory_register (factory, &MFF_RELIEF_DESC);
+  champlain_map_source_factory_register (factory, &OSM_MAPNIK_DESC,
+      OSM_MAPNIK_DESC.constructor, OSM_MAPNIK_DESC.data);
+  champlain_map_source_factory_register (factory, &OSM_CYCLEMAP_DESC,
+      OSM_CYCLEMAP_DESC.constructor, OSM_CYCLEMAP_DESC.data);
+  champlain_map_source_factory_register (factory, &OSM_OSMARENDER_DESC,
+      OSM_OSMARENDER_DESC.constructor, OSM_OSMARENDER_DESC.data);
+  champlain_map_source_factory_register (factory, &OAM_DESC,
+      OAM_DESC.constructor, OAM_DESC.data);
+  champlain_map_source_factory_register (factory, &MFF_RELIEF_DESC,
+      MFF_RELIEF_DESC.constructor, MFF_RELIEF_DESC.data);
 }
 
 /**
@@ -299,9 +314,9 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
 
   while (item != NULL)
     {
-      ChamplainMapSourceDesc *desc = (ChamplainMapSourceDesc*) item->data;
+      ChamplainMapSourceDesc *desc = CHAMPLAIN_MAP_SOURCE_DESC (item->data);
       if (strcmp (desc->id, id) == 0)
-        return desc->constructor ();
+        return desc->constructor (desc, desc->data);
       item = g_slist_next (item);
     }
   return NULL;
@@ -309,9 +324,9 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
 
 /**
  * champlain_map_source_factory_register:
- * @factory: the Factory
- * @name: the new map source name
+ * @desc: the description of the map source
  * @constructor: the new map source constructor function
+ * @data: data to be passed to the constructor function, or NULL
  *
  * Registers the new map source with the given constructor.  When this map
  * source is requested, the given constructor will be used to build the
@@ -325,16 +340,20 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  */
 gboolean
 champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
-    ChamplainMapSourceDesc *desc)
+    ChamplainMapSourceDesc *desc, ChamplainMapSourceConstructor constructor,
+    gpointer data)
 {
 
   /* FIXME: check for existing factory with that name? */
+  desc->constructor = constructor;
+  desc->data = data;
   factory->priv->registered_sources = g_slist_append (factory->priv->registered_sources, desc);
   return TRUE;
 }
 
 static ChamplainMapSource *
-champlain_map_source_new_osm_cyclemap (void)
+champlain_map_source_new_osm_cyclemap (
+     ChamplainMapSourceDesc *desc, gpointer *data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
       "OpenStreetMap Cycle Map",
@@ -345,7 +364,8 @@ champlain_map_source_new_osm_cyclemap (void)
 }
 
 static ChamplainMapSource *
-champlain_map_source_new_osm_osmarender (void)
+champlain_map_source_new_osm_osmarender (
+     ChamplainMapSourceDesc *desc, gpointer *data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
       "OpenStreetMap Osmarender",
@@ -356,7 +376,8 @@ champlain_map_source_new_osm_osmarender (void)
 }
 
 static ChamplainMapSource *
-champlain_map_source_new_osm_mapnik (void)
+champlain_map_source_new_osm_mapnik (
+     ChamplainMapSourceDesc *desc, gpointer *data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
       "OpenStreetMap Mapnik",
@@ -367,7 +388,8 @@ champlain_map_source_new_osm_mapnik (void)
 }
 
 static ChamplainMapSource *
-champlain_map_source_new_oam (void)
+champlain_map_source_new_oam (
+     ChamplainMapSourceDesc *desc, gpointer *data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OAM,
       "OpenAerialMap",
@@ -378,7 +400,8 @@ champlain_map_source_new_oam (void)
 }
 
 static ChamplainMapSource *
-champlain_map_source_new_mff_relief (void)
+champlain_map_source_new_mff_relief (
+    ChamplainMapSourceDesc *desc, gpointer *data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_MFF_RELIEF,
       "Maps for Free Relief",
