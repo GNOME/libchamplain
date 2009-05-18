@@ -36,8 +36,8 @@ G_DEFINE_TYPE (TidyFingerScroll, tidy_finger_scroll, TIDY_TYPE_SCROLL_VIEW)
 
 typedef struct {
   /* Units to store the origin of a click when scrolling */
-  ClutterUnit x;
-  ClutterUnit y;
+  gfloat x;
+  gfloat y;
   GTimeVal    time;
 } TidyFingerScrollMotion;
 
@@ -184,7 +184,7 @@ motion_event_cb (ClutterActor *actor,
                  ClutterMotionEvent *event,
                  TidyFingerScroll *scroll)
 {
-  ClutterUnit x, y;
+  gfloat x, y;
 
   TidyFingerScrollPrivate *priv = scroll->priv;
 
@@ -375,7 +375,7 @@ button_release_event_cb (ClutterActor *actor,
 
   if ((priv->mode == TIDY_FINGER_SCROLL_MODE_KINETIC) && (child))
     {
-      ClutterUnit x, y;
+      gfloat x, y;
 
       if (clutter_actor_transform_stage_point (actor,
                                                event->x,

@@ -24,6 +24,13 @@
 
 typedef struct _Map Map;
 
+typedef struct
+{
+  gfloat x;
+  gfloat y;
+  gfloat z;
+} ChamplainFloatPoint;
+
 struct _ChamplainBaseMarkerPrivate
 {
   gdouble lon;

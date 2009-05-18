@@ -637,7 +637,7 @@ interpolation_completed_cb (ClutterTimeline *timeline,
                             TidyAdjustment  *adjustment)
 {
   TidyAdjustmentPrivate *priv = adjustment->priv;
-  
+ 
   stop_interpolation (adjustment);
   tidy_adjustment_set_value (adjustment,
                               priv->new_position);
