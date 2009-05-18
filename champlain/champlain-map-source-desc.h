@@ -27,6 +27,10 @@
 
 G_BEGIN_DECLS
 
+
+typedef struct _ChamplainMapSourceDesc ChamplainMapSourceDesc;
+
+
 /**
  * ChamplainMapSourceConstructor:
  *
@@ -35,7 +39,8 @@ G_BEGIN_DECLS
  *
  * Since: 0.4
  */
-typedef ChamplainMapSource * (*ChamplainMapSourceConstructor) ();
+typedef ChamplainMapSource * (*ChamplainMapSourceConstructor) (
+    ChamplainMapSourceDesc *desc, gpointer *data);
 #define CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR (f) ((ChamplainMapSourceConstructor) (f))
 
 #define CHAMPLAIN_MAP_SOURCE_DESC(obj)     ((ChamplainMapSourceDesc *) (obj))
@@ -47,7 +52,7 @@ typedef ChamplainMapSource * (*ChamplainMapSourceConstructor) ();
  *
  * Since: 0.4
  */
-typedef struct {
+struct _ChamplainMapSourceDesc {
   gchar *id;
   gchar *name;
   gchar *license;
@@ -56,7 +61,8 @@ typedef struct {
   gint max_zoom_level;
   ChamplainMapProjection projection;
   ChamplainMapSourceConstructor constructor;
-} ChamplainMapSourceDesc;
+  gpointer *data;
+};
 
 G_END_DECLS
 
