@@ -40,7 +40,7 @@ typedef struct _ChamplainMapSourceDesc ChamplainMapSourceDesc;
  * Since: 0.4
  */
 typedef ChamplainMapSource * (*ChamplainMapSourceConstructor) (
-    ChamplainMapSourceDesc *desc, gpointer *data);
+    ChamplainMapSourceDesc *desc, gpointer data);
 #define CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR (f) ((ChamplainMapSourceConstructor) (f))
 
 #define CHAMPLAIN_MAP_SOURCE_DESC(obj)     ((ChamplainMapSourceDesc *) (obj))

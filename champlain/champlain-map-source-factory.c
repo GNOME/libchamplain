@@ -74,15 +74,15 @@ struct _ChamplainMapSourceFactoryPrivate
 };
 
 static ChamplainMapSource * champlain_map_source_new_osm_mapnik (
-     ChamplainMapSourceDesc *desc, gpointer *data);
+     ChamplainMapSourceDesc *desc, gpointer data);
 static ChamplainMapSource * champlain_map_source_new_osm_cyclemap (
-    ChamplainMapSourceDesc *desc, gpointer *data);
+    ChamplainMapSourceDesc *desc, gpointer data);
 static ChamplainMapSource * champlain_map_source_new_osm_osmarender (
-    ChamplainMapSourceDesc *desc, gpointer *data);
+    ChamplainMapSourceDesc *desc, gpointer data);
 static ChamplainMapSource * champlain_map_source_new_oam (
-    ChamplainMapSourceDesc *desc, gpointer *data);
+    ChamplainMapSourceDesc *desc, gpointer data);
 static ChamplainMapSource * champlain_map_source_new_mff_relief (
-    ChamplainMapSourceDesc *desc, gpointer *data);
+    ChamplainMapSourceDesc *desc, gpointer data);
 
 
 static void
@@ -353,7 +353,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
 
 static ChamplainMapSource *
 champlain_map_source_new_osm_cyclemap (
-     ChamplainMapSourceDesc *desc, gpointer *data)
+     ChamplainMapSourceDesc *desc, gpointer data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
       "OpenStreetMap Cycle Map",
@@ -365,7 +365,7 @@ champlain_map_source_new_osm_cyclemap (
 
 static ChamplainMapSource *
 champlain_map_source_new_osm_osmarender (
-     ChamplainMapSourceDesc *desc, gpointer *data)
+     ChamplainMapSourceDesc *desc, gpointer data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
       "OpenStreetMap Osmarender",
@@ -377,7 +377,7 @@ champlain_map_source_new_osm_osmarender (
 
 static ChamplainMapSource *
 champlain_map_source_new_osm_mapnik (
-     ChamplainMapSourceDesc *desc, gpointer *data)
+     ChamplainMapSourceDesc *desc, gpointer data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
       "OpenStreetMap Mapnik",
@@ -389,7 +389,7 @@ champlain_map_source_new_osm_mapnik (
 
 static ChamplainMapSource *
 champlain_map_source_new_oam (
-     ChamplainMapSourceDesc *desc, gpointer *data)
+     ChamplainMapSourceDesc *desc, gpointer data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_OAM,
       "OpenAerialMap",
@@ -401,7 +401,7 @@ champlain_map_source_new_oam (
 
 static ChamplainMapSource *
 champlain_map_source_new_mff_relief (
-    ChamplainMapSourceDesc *desc, gpointer *data)
+    ChamplainMapSourceDesc *desc, gpointer data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (CHAMPLAIN_MAP_SOURCE_MFF_RELIEF,
       "Maps for Free Relief",

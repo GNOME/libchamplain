@@ -8,7 +8,7 @@ champlainperl_constructor_create (SV *func, SV *data) {
 
 
 static ChamplainMapSource*
-champlainperl_constructor (ChamplainMapSourceDesc *desc, gpointer *data) {
+champlainperl_constructor (ChamplainMapSourceDesc *desc, gpointer data) {
 	GPerlCallback *callback = (GPerlCallback *) data;
 	GValue return_value = { 0, };
 	ChamplainMapSource *retval;
