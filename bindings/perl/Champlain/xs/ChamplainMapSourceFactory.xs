@@ -1,5 +1,33 @@
 #include "champlain-perl.h"
 
+static GPerlCallback*
+champlainperl_constructor_create (SV *func, SV *data) {
+	GType param_types[2] = { G_TYPE_POINTER, G_TYPE_POINTER, };
+	return gperl_callback_new (func, data, 2, param_types, CHAMPLAIN_TYPE_MAP_SOURCE);
+}
+
+
+static ChamplainMapSource*
+champlainperl_constructor (ChamplainMapSourceDesc *desc, gpointer *data) {
+	GPerlCallback *callback = (GPerlCallback *) data;
+	GValue return_value = { 0, };
+	ChamplainMapSource *retval;
+	
+	if (callback == NULL) {
+		g_print ("Data is null!\n");
+		croak("Chammplain::MapSourceFactory constructor callback is missing the data parameter");
+	}
+	
+	g_value_init(&return_value, callback->return_type);
+	
+	gperl_callback_invoke(callback, &return_value, desc, data);
+	
+	retval = g_value_get_object (&return_value);
+	g_value_unset(&return_value);
+	
+	return retval;
+}
+
 
 /**
  * Returns the value of the given key or croaks if there's no such key.
@@ -65,19 +93,19 @@ SvChamplainMapSourceDesc (SV *data) {
 	
 	/* All keys are mandatory */
 	if (value = fetch_or_croak(hash, "id", 2)) {
-		desc.id = SvGChar(value);
+		desc.id = g_strdup(SvGChar(value));
 	}
 	
 	if (value = fetch_or_croak(hash, "name", 4)) {
-		desc.name = SvGChar(value);
+		desc.name = g_strdup(SvGChar(value));
 	}
 	
 	if (value = fetch_or_croak(hash, "license", 7)) {
-		desc.license = SvGChar(value);
+		desc.license = g_strdup(SvGChar(value));
 	}
 	
 	if (value = fetch_or_croak(hash, "license_uri", 11)) {
-		desc.license_uri = SvGChar(value);
+		desc.license_uri = g_strdup(SvGChar(value));
 	}
 	
 	if (value = fetch_or_croak(hash, "min_zoom_level", 14)) {
@@ -126,15 +154,16 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory, const g
 
 
 gboolean
-champlain_map_source_factory_register (ChamplainMapSourceFactory *factory, SV *data)
+champlain_map_source_factory_register (ChamplainMapSourceFactory *factory, SV *sv_desc, SV* sv_constructor, SV *sv_data=NULL)
 	PREINIT:
 		ChamplainMapSourceDesc *desc = NULL;
 		SV *sv = NULL;
+		GPerlCallback *callback = NULL;
 	
 	CODE:
-		
-		desc = SvChamplainMapSourceDesc(data);
-		RETVAL = champlain_map_source_factory_register(factory, desc);
+		desc = SvChamplainMapSourceDesc(sv_desc);
+		callback = champlainperl_constructor_create(sv_constructor, NULL);
+		RETVAL = champlain_map_source_factory_register(factory, desc, champlainperl_constructor, callback);
 
 	OUTPUT:
 		RETVAL
