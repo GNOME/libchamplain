@@ -64,8 +64,10 @@ GSList * champlain_map_source_factory_get_list (ChamplainMapSourceFactory *facto
 ChamplainMapSource * champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     const gchar *id);
 
-gboolean champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
-    ChamplainMapSourceDesc *desc);
+gboolean
+champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
+    ChamplainMapSourceDesc *desc, ChamplainMapSourceConstructor constructor,
+    gpointer data);
 
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm::mapnik"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "osm::osmarender"
