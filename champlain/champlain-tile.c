@@ -838,8 +838,8 @@ fade_in_completed (ClutterAnimation *animation,
 
   if (ctx->old_actor != NULL)
     {
-      g_object_unref (ctx->old_actor);
       clutter_container_remove (CLUTTER_CONTAINER (priv->actor), ctx->old_actor, NULL);
+      g_object_unref (ctx->old_actor);
     }
 
   g_object_unref (ctx->tile);
@@ -870,6 +870,10 @@ champlain_tile_set_content (ChamplainTile *self,
 
   if (priv->content_actor != NULL)
     {
+      /* it sometimes happen that the priv->content_actor has been destroyed,
+       * this assert will help determine when with no impact on the user */
+      g_assert (CLUTTER_IS_ACTOR (priv->content_actor));
+
       if (fade_in == TRUE)
         old_actor = g_object_ref (priv->content_actor);
       else
@@ -879,7 +883,6 @@ champlain_tile_set_content (ChamplainTile *self,
 
   clutter_container_add (CLUTTER_CONTAINER (priv->actor), actor, NULL);
 
-  /* fixme: etemplate are leaked here */
   if (fade_in == TRUE)
     {
       ClutterAnimation *animation;
