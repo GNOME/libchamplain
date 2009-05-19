@@ -73,16 +73,8 @@ struct _ChamplainMapSourceFactoryPrivate
   GSList *registered_sources;
 };
 
-static ChamplainMapSource * champlain_map_source_new_osm_mapnik (
+static ChamplainMapSource * champlain_map_source_new_generic (
      ChamplainMapSourceDesc *desc, gpointer data);
-static ChamplainMapSource * champlain_map_source_new_osm_cyclemap (
-    ChamplainMapSourceDesc *desc, gpointer data);
-static ChamplainMapSource * champlain_map_source_new_osm_osmarender (
-    ChamplainMapSourceDesc *desc, gpointer data);
-static ChamplainMapSource * champlain_map_source_new_oam (
-    ChamplainMapSourceDesc *desc, gpointer data);
-static ChamplainMapSource * champlain_map_source_new_mff_relief (
-    ChamplainMapSourceDesc *desc, gpointer data);
 
 
 static void
@@ -173,8 +165,8 @@ ChamplainMapSourceDesc OSM_MAPNIK_DESC =
     0,
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_osm_mapnik,
-    NULL
+    champlain_map_source_new_generic,
+    "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png"
   };
 
 static
@@ -187,8 +179,8 @@ ChamplainMapSourceDesc OSM_OSMARENDER_DESC =
     0,
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_osm_osmarender,
-    NULL
+    champlain_map_source_new_generic,
+    "http://tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png"
   };
 
 static
@@ -201,8 +193,8 @@ ChamplainMapSourceDesc OSM_CYCLEMAP_DESC =
     0,
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_osm_cyclemap,
-    NULL
+    champlain_map_source_new_generic,
+    "http://andy.sandbox.cloudmade.com/tiles/cycle/#Z#/#X#/#Y#.png"
   };
 
 static
@@ -215,8 +207,8 @@ ChamplainMapSourceDesc OAM_DESC =
     0,
     17,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_oam,
-    NULL
+    champlain_map_source_new_generic,
+    "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg"
   };
 
 static
@@ -229,8 +221,8 @@ ChamplainMapSourceDesc MFF_RELIEF_DESC =
     0,
     11,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-    champlain_map_source_new_mff_relief,
-    NULL
+    champlain_map_source_new_generic,
+    "http://maps-for-free.com/layer/relief/z#Z#/row#Y#/#Z#_#X#-#Y#.jpg"
   };
 
 static void
@@ -352,7 +344,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
 }
 
 static ChamplainMapSource *
-champlain_map_source_new_osm_cyclemap (
+champlain_map_source_new_generic (
      ChamplainMapSourceDesc *desc, gpointer data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (
@@ -364,68 +356,5 @@ champlain_map_source_new_osm_cyclemap (
       desc->max_zoom_level,
       256,
       desc->projection,
-      "http://andy.sandbox.cloudmade.com/tiles/cycle/#Z#/#X#/#Y#.png"));
+      (const gchar *)desc->data));
 }
-
-static ChamplainMapSource *
-champlain_map_source_new_osm_osmarender (
-     ChamplainMapSourceDesc *desc, gpointer data)
-{
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (
-      desc->id,
-      desc->name,
-      desc->license,
-      desc->license_uri,
-      desc->min_zoom_level,
-      desc->max_zoom_level,
-      256,
-      desc->projection,
-      "http://tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png"));
-}
-
-static ChamplainMapSource *
-champlain_map_source_new_osm_mapnik (
-     ChamplainMapSourceDesc *desc, gpointer data)
-{
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (
-      desc->id,
-      desc->name,
-      desc->license,
-      desc->license_uri,
-      desc->min_zoom_level,
-      desc->max_zoom_level,
-      256,
-      desc->projection,
-      "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png"));
-}
-
-static ChamplainMapSource *
-champlain_map_source_new_oam (
-     ChamplainMapSourceDesc *desc, gpointer data)
-{
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (
-      desc->id,
-      desc->name,
-      desc->license,
-      desc->license_uri,
-      desc->min_zoom_level,
-      desc->max_zoom_level,
-      256,
-      desc->projection,
-      "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg"));
-}
-
-static ChamplainMapSource *
-champlain_map_source_new_mff_relief (
-    ChamplainMapSourceDesc *desc, gpointer data)
-{
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (      desc->id,
-      desc->name,
-      desc->license,
-      desc->license_uri,
-      desc->min_zoom_level,
-      desc->max_zoom_level,
-      256,
-      desc->projection,
-      "http://maps-for-free.com/layer/relief/z#Z#/row#Y#/#Z#_#X#-#Y#.jpg"));
-} 
