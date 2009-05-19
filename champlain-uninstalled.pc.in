@@ -3,7 +3,7 @@ exec_prefix=
 abs_top_srcdir=@abs_top_srcdir@
 abs_top_builddir=@abs_top_builddir@
 
-Name: libchamplain
+Name: libchamplain (uninstalled copy)
 Description: Map View for Clutter
 Version: @VERSION@
 Libs: ${abs_top_builddir}/champlain/libchamplain-@API_VERSION@.la

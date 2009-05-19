@@ -3,7 +3,7 @@ exec_prefix=
 abs_top_srcdir=@abs_top_srcdir@
 abs_top_builddir=@abs_top_builddir@
 
-Name: libchamplain-gtk
+Name: libchamplain-gtk (uninstalled copy)
 Description: Gtk+ Widget wrapper for libchamplain
 Version: @VERSION@
 Libs: ${abs_top_builddir}/champlain-gtk/libchamplain-gtk-@API_VERSION@.la
