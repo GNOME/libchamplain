@@ -168,7 +168,7 @@ ChamplainMapSourceDesc OSM_MAPNIK_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
     "OpenStreetMap Mapnik",
-    "(CC) BY 2.0 OpenStreetMap contributor",
+    "(CC) BY 2.0 OpenStreetMap contributors",
     "http://creativecommons.org/licenses/by/2.0/",
     0,
     18,
@@ -182,7 +182,7 @@ ChamplainMapSourceDesc OSM_OSMARENDER_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
     "OpenStreetMap Osmarender",
-    "(CC) BY 2.0 OpenStreetMap contributor",
+    "(CC) BY 2.0 OpenStreetMap contributors",
     "http://creativecommons.org/licenses/by/2.0/",
     0,
     18,
@@ -196,7 +196,7 @@ ChamplainMapSourceDesc OSM_CYCLEMAP_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
     "OpenStreetMap Cycle Map",
-    "(CC) BY 2.0 OpenStreetMap contributor",
+    "(CC) BY 2.0 OpenStreetMap contributors",
     "http://creativecommons.org/licenses/by/2.0/",
     0,
     18,
@@ -210,7 +210,7 @@ ChamplainMapSourceDesc OAM_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OAM,
     "OpenAerialMap",
-    "(CC) BY 3.0 OpenAerialMap contributor",
+    "(CC) BY 3.0 OpenAerialMap contributors",
     "http://creativecommons.org/licenses/by/3.0/",
     0,
     17,
@@ -223,8 +223,8 @@ static
 ChamplainMapSourceDesc MFF_RELIEF_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_MFF_RELIEF,
-    "Maps For Free Relief",
-    "GNU Free Documentation Licence, version 1.2 or later",
+    "Maps for Free Relief",
+    "Map data available under GNU Free Documentation license, Version 1.2 or later",
     "http://www.gnu.org/copyleft/fdl.html",
     0,
     11,
