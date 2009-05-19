@@ -62,11 +62,12 @@ struct _ChamplainCachePrivate {
   sqlite3 *data;
   sqlite3_stmt *stmt_select;
   sqlite3_stmt *stmt_update;
+
+  GSList *popularity_queue;
+  guint popularity_id;
 };
 
-static void
-inc_popularity (ChamplainCache *self,
-    ChamplainTile *tile);
+static gboolean inc_popularity (gpointer data);
 
 static void
 champlain_cache_get_property (GObject *object,
@@ -167,6 +168,8 @@ champlain_cache_init (ChamplainCache *self)
   gint error;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
+  priv->popularity_queue = NULL;
+  priv->popularity_id = 0;
 
   filename = g_build_filename (g_get_user_cache_dir (), "champlain",
       "cache.db", NULL);
@@ -363,7 +366,11 @@ champlain_cache_fill_tile (ChamplainCache *self,
   actor = clutter_texture_new_from_file (filename, &error);
   champlain_tile_set_content (tile, actor, FALSE);
 
-  inc_popularity (self, tile);
+  priv->popularity_queue = g_slist_prepend (priv->popularity_queue,
+      g_strdup (filename));
+
+  if (priv->popularity_id == 0)
+    priv->popularity_id = g_idle_add (inc_popularity, self);
 
 cleanup:
   sqlite3_reset (priv->stmt_select);
@@ -400,18 +407,24 @@ champlain_cache_tile_is_expired (ChamplainCache *self,
   return validate_cache;
 }
 
-static void
-inc_popularity (ChamplainCache *self,
-    ChamplainTile *tile)
+static gboolean
+inc_popularity (gpointer data)
 {
-  g_return_if_fail (CHAMPLAIN_CACHE (self));
   int sql_rc = SQLITE_OK;
   const gchar *filename = NULL;
+  ChamplainCache *cache = CHAMPLAIN_CACHE (data);
+  ChamplainCachePrivate *priv = GET_PRIVATE (cache);
+  GSList *last;
 
-  ChamplainCachePrivate *priv = GET_PRIVATE (self);
+  if (priv->popularity_queue == NULL)
+    {
+      priv->popularity_id = 0;
+      return FALSE;
+    }
 
-  filename = champlain_tile_get_filename (tile);
-  
+  last = g_slist_last (priv->popularity_queue);
+  filename = last->data;
+
   sql_rc = sqlite3_bind_text (priv->stmt_update, 1, filename, -1, SQLITE_STATIC);
   if (sql_rc != SQLITE_OK)
     {
@@ -430,6 +443,13 @@ inc_popularity (ChamplainCache *self,
 
 cleanup:
   sqlite3_reset (priv->stmt_update);
+  g_free (query);
+
+  priv->popularity_queue = g_slist_remove  (priv->popularity_queue, filename);
+  g_free (filename);
+
+  /* Ask to be called again until the list is emptied */
+  return TRUE;
 }
 
 static void
