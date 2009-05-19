@@ -565,6 +565,11 @@ champlain_tile_set_x (ChamplainTile *self,
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
   priv->x = x;
+
+  if (priv->actor != NULL)
+    clutter_actor_set_position (priv->actor, priv->x * priv->size,
+        priv->y * priv->size);
+
   g_object_notify (G_OBJECT (self), "x");
 }
 
@@ -586,6 +591,9 @@ champlain_tile_set_y (ChamplainTile *self,
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
   priv->y = y;
+  if (priv->actor != NULL)
+    clutter_actor_set_position (priv->actor, priv->x * priv->size,
+        priv->y * priv->size);
   g_object_notify (G_OBJECT (self), "y");
 }
 
@@ -628,6 +636,10 @@ champlain_tile_set_size (ChamplainTile *self,
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
   priv->size = size;
+
+  if (priv->actor != NULL)
+    clutter_actor_set_position (priv->actor, priv->x * priv->size,
+        priv->y * priv->size);
   g_object_notify (G_OBJECT (self), "size");
 }
 
