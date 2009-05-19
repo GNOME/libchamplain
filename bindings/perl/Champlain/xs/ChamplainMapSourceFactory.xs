@@ -19,8 +19,8 @@ champlainperl_constructor (ChamplainMapSourceDesc *desc, gpointer data) {
 	}
 	
 	g_value_init(&return_value, callback->return_type);
-	
-	gperl_callback_invoke(callback, &return_value, desc, data);
+	/* FIXME desc is not passed as a Champlain::MapSourceDesc to the perl callback */
+	gperl_callback_invoke(callback, &return_value, desc);
 	
 	retval = g_value_get_object (&return_value);
 	g_value_unset(&return_value);
