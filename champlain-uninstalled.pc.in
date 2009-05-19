@@ -1,0 +1,11 @@
+prefix=
+exec_prefix=
+libdir=@abs_top_srcdir@
+includedir=@abs_top_builddir@
+
+Name: libchamplain
+Description: Map View for Clutter
+Version: @VERSION@
+Libs: ${abs_top_builddir}/champlain/libchamplain-@API_VERSION@.la
+Cflags: -I${abs_top_srcdir} -I${abs_top_builddir}
+Requires: gobject-2.0 clutter-0.8

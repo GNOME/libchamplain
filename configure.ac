@@ -108,7 +108,8 @@ if test x$enable_gtk = xyes; then
   AC_CONFIG_FILES([champlain-gtk/Makefile
                    docs/reference-gtk/Makefile
                    docs/reference-gtk/version.xml
-                   champlain-gtk.pc])
+                   champlain-gtk.pc
+                   champlain-gtk-uninstalled.pc])
 
   AC_DEFINE(ENABLE_GTK, [], [Enable Gtk+ view code])
 fi
@@ -201,6 +202,7 @@ AC_CONFIG_FILES([Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
                  champlain.pc
+                 champlain-uninstalled.pc
                  bindings/python/Makefile
                  bindings/python/champlain/Makefile
                  bindings/python/champlain-gtk/Makefile
