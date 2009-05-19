@@ -35,7 +35,7 @@ sub test_get_set {
 	isa_ok($oam, 'Champlain::MapSourceDesc');
 	is($oam->{id}, Champlain::MapSourceFactory->OAM);
 	is($oam->{name}, 'OpenAerialMap');
-	is($oam->{license}, "(CC) BY 3.0 OpenAerialMap contributor");
+	is($oam->{license}, "(CC) BY 3.0 OpenAerialMap contributors");
 	is($oam->{license_uri}, 'http://creativecommons.org/licenses/by/3.0/');
 	is($oam->{min_zoom_level}, 0);
 	is($oam->{max_zoom_level}, 17);
