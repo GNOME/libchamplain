@@ -351,9 +351,8 @@ champlain_cache_fill_tile (ChamplainCache *self,
     }
   else if (sql_rc == SQLITE_DONE)
     {
-      DEBUG ("Can't find the Etag of '%s', error: %s",
-          filename, sqlite3_errmsg (priv->data));
-      goto cleanup;
+      DEBUG ("'%s' does't have an etag",
+          filename);
     }
   else
     {
