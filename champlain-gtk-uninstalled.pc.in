@@ -1,11 +1,11 @@
 prefix=
 exec_prefix=
-libdir=@abs_top_srcdir@
-includedir=@abs_top_builddir@
+abs_top_srcdir=@abs_top_srcdir@
+abs_top_builddir=@abs_top_builddir@
 
 Name: libchamplain-gtk
 Description: Gtk+ Widget wrapper for libchamplain
 Version: @VERSION@
-Libs: ${abs_top_builddir}/champlain/libchamplain-gtk-@API_VERSION@.la
+Libs: ${abs_top_builddir}/champlain-gtk/libchamplain-gtk-@API_VERSION@.la
 Cflags: -I${abs_top_srcdir} -I${abs_top_builddir}
 Requires: champlain-@API_VERSION@ gobject-2.0 clutter-0.8 clutter-gtk-0.8 gtk+-2.0
