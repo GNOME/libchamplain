@@ -109,10 +109,10 @@ champlain_cache_dispose (GObject *object)
   gint error;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (object);
-  
+
   if (priv->stmt_select)
     sqlite3_finalize (priv->stmt_select);
-  
+
   if (priv->stmt_update)
     sqlite3_finalize (priv->stmt_update);
 
@@ -187,7 +187,7 @@ champlain_cache_init (ChamplainCache *self)
       goto cleanup;
     }
 
-  sqlite3_exec (priv->data, 
+  sqlite3_exec (priv->data,
       "CREATE TABLE IF NOT EXISTS tiles ("
       "filename TEXT PRIMARY KEY, etag TEXT, "
       "popularity INT DEFAULT 1, "
@@ -200,18 +200,18 @@ champlain_cache_init (ChamplainCache *self)
       goto cleanup;
     }
 
-  error = sqlite3_prepare_v2 (priv->data, 
+  error = sqlite3_prepare_v2 (priv->data,
       "SELECT etag FROM tiles WHERE filename = ?", -1,
       &priv->stmt_select, NULL);
   if (error != SQLITE_OK)
     {
       priv->stmt_select = NULL;
-      DEBUG ("Failed to prepare the select Etag statement, error: %s", 
-					sqlite3_errmsg (priv->data));
+      DEBUG ("Failed to prepare the select Etag statement, error: %s",
+      sqlite3_errmsg (priv->data));
       goto cleanup;
     }
 
-  error = sqlite3_prepare_v2 (priv->data, 
+  error = sqlite3_prepare_v2 (priv->data,
       "UPDATE tiles SET popularity = popularity + 1 WHERE filename = ?", -1,
       &priv->stmt_update, NULL);
   if (error != SQLITE_OK)
@@ -315,7 +315,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
   gboolean cache_hit = FALSE;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
-  
+
   modified_time = g_new0 (GTimeVal, 1);
   filename = champlain_tile_get_filename (tile);
 
@@ -337,7 +337,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
   sql_rc = sqlite3_bind_text (priv->stmt_select, 1, filename, -1, SQLITE_STATIC);
   if (sql_rc != SQLITE_OK)
     {
-      DEBUG ("Failed to prepare the SQL query for finding the Etag of '%s', error: %s", 
+      DEBUG ("Failed to prepare the SQL query for finding the Etag of '%s', error: %s",
           filename, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
@@ -351,7 +351,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
     }
   else if (sql_rc == SQLITE_DONE)
     {
-      DEBUG ("Can't find the Etag of '%s', error: %s", 
+      DEBUG ("Can't find the Etag of '%s', error: %s",
           filename, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
@@ -361,7 +361,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
           filename, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
- 
+
   /* Load the cached version */
   actor = clutter_texture_new_from_file (filename, &error);
   champlain_tile_set_content (tile, actor, FALSE);
@@ -374,7 +374,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
 
 cleanup:
   sqlite3_reset (priv->stmt_select);
-  
+
   return cache_hit;
 }
 
@@ -411,7 +411,7 @@ static gboolean
 inc_popularity (gpointer data)
 {
   int sql_rc = SQLITE_OK;
-  const gchar *filename = NULL;
+  gchar *filename = NULL;
   ChamplainCache *cache = CHAMPLAIN_CACHE (data);
   ChamplainCachePrivate *priv = GET_PRIVATE (cache);
   GSList *last;
@@ -428,7 +428,7 @@ inc_popularity (gpointer data)
   sql_rc = sqlite3_bind_text (priv->stmt_update, 1, filename, -1, SQLITE_STATIC);
   if (sql_rc != SQLITE_OK)
     {
-      DEBUG ("Failed to set values to the popularity query of '%s', error: %s", 
+      DEBUG ("Failed to set values to the popularity query of '%s', error: %s",
           filename, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
@@ -443,7 +443,6 @@ inc_popularity (gpointer data)
 
 cleanup:
   sqlite3_reset (priv->stmt_update);
-  g_free (query);
 
   priv->popularity_queue = g_slist_remove  (priv->popularity_queue, filename);
   g_free (filename);
@@ -572,7 +571,7 @@ champlain_cache_purge (ChamplainCache *self)
   rc = sqlite3_step (stmt);
   if (rc != SQLITE_ROW)
     {
-      DEBUG ("Failed to count the total cache consumption %s", 
+      DEBUG ("Failed to count the total cache consumption %s",
           sqlite3_errmsg (priv->data));
       sqlite3_finalize (stmt);
       return;
