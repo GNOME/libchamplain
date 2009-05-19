@@ -92,6 +92,9 @@ struct _ChamplainNetworkMapSourcePrivate
   gchar *proxy_uri;
 };
 
+static void fill_tile (ChamplainMapSource *map_source,
+    ChamplainTile *tile);
+
 static void
 champlain_network_map_source_get_property (GObject *object,
     guint prop_id,
@@ -173,7 +176,7 @@ champlain_network_map_source_class_init (ChamplainNetworkMapSourceClass *klass)
   object_class->set_property = champlain_network_map_source_set_property;
 
   ChamplainMapSourceClass *map_source_class = CHAMPLAIN_MAP_SOURCE_CLASS (klass);
-  map_source_class->fill_tile = champlain_network_map_source_fill_tile;
+  map_source_class->fill_tile = fill_tile;
 
   /**
   * ChamplainNetworkMapSource:uri-format
@@ -548,19 +551,8 @@ finish:
   g_object_unref (tile);
 }
 
-/**
- * champlain_network_map_source_fill_tile:
- * @map_source: the #ChamplainNetworkMapSource
- * @tile: the #ChamplainTile
- *
- * Fills the passed tile with image data.  If not in #ChamplainCache, this function
- * will initiate an async download of the image at the map source's URI format.
- * Once done, the tile's state will be set to #CHAMPLAIN_STATE_DONE.
- *
- * Since: 0.4
- */
-void
-champlain_network_map_source_fill_tile (ChamplainMapSource *map_source,
+static void
+fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile)
 {
   gchar* filename;
