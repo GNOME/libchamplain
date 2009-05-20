@@ -2,14 +2,18 @@ SUBDIRS = tidy champlain docs/reference
 
 ACLOCAL_AMFLAGS = -I m4
 
-pcfiles = champlain-@API_VERSION@.pc
+pcfiles = champlain-@API_VERSION@.pc champlain-@API_VERSION@-uninstalled.pc
 champlain-@API_VERSION@.pc: champlain.pc
+	@cp -f $< $@
+champlain-@API_VERSION@-uninstalled.pc: champlain-uninstalled.pc
 	@cp -f $< $@
 
 if ENABLE_GTK
 SUBDIRS += champlain-gtk docs/reference-gtk
-pcfiles += champlain-gtk-@API_VERSION@.pc
+pcfiles += champlain-gtk-@API_VERSION@.pc champlain-gtk-@API_VERSION@-uninstalled.pc
 champlain-gtk-@API_VERSION@.pc: champlain-gtk.pc
+	@cp -f $< $@
+champlain-gtk-@API_VERSION@-uninstalled.pc: champlain-gtk-uninstalled.pc
 	@cp -f $< $@
 endif
 
