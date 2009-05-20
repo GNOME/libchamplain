@@ -64,7 +64,7 @@ static gboolean mouse_button_cb (GtkWidget *widget, GdkEventButton *event,
     ChamplainViewEmbed *view);
 static void view_size_allocated_cb (GtkWidget *widget,
     GtkAllocation *allocation, ChamplainViewEmbed *view);
-static void view_show_cb (GtkWidget *widget,
+static void view_realize_cb (GtkWidget *widget,
     ChamplainViewEmbed *view);
 
 G_DEFINE_TYPE (ChamplainViewEmbed, champlain_view_embed, GTK_TYPE_ALIGNMENT);
@@ -171,8 +171,8 @@ champlain_view_embed_init (ChamplainViewEmbed *embed)
                     G_CALLBACK (view_size_allocated_cb),
                     embed);
   g_signal_connect (priv->clutter_embed,
-                    "show",
-                    G_CALLBACK (view_show_cb),
+                    "realize",
+                    G_CALLBACK (view_realize_cb),
                     embed);
   g_signal_connect (priv->clutter_embed,
                     "button-press-event",
@@ -195,7 +195,7 @@ champlain_view_embed_init (ChamplainViewEmbed *embed)
 }
 
 static void
-view_show_cb (GtkWidget *widget,
+view_realize_cb (GtkWidget *widget,
     ChamplainViewEmbed *view)
 {
   ChamplainViewEmbedPrivate *priv = view->priv;
