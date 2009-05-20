@@ -68,6 +68,8 @@ struct _ChamplainCachePrivate {
 };
 
 static gboolean inc_popularity (gpointer data);
+static void delete_tile (ChamplainCache *self,
+    const gchar *filename);
 
 static void
 champlain_cache_get_property (GObject *object,
@@ -347,7 +349,6 @@ champlain_cache_fill_tile (ChamplainCache *self,
     {
       const gchar *etag = (const gchar *) sqlite3_column_text (priv->stmt_select, 0);
       champlain_tile_set_etag (CHAMPLAIN_TILE (tile), etag);
-      cache_hit = TRUE;
     }
   else if (sql_rc == SQLITE_DONE)
     {
@@ -363,7 +364,19 @@ champlain_cache_fill_tile (ChamplainCache *self,
 
   /* Load the cached version */
   actor = clutter_texture_new_from_file (filename, &error);
-  champlain_tile_set_content (tile, actor, FALSE);
+  if (error == NULL)
+    {
+        champlain_tile_set_content (tile, actor, FALSE);
+        cache_hit = TRUE;
+    }
+  else
+    {
+      DEBUG ("Failed to load tile %s, error: %s",
+          filename, error->message);
+      /* remote from the history */
+      delete_tile (self, filename);
+      goto cleanup;
+    }
 
   priv->popularity_queue = g_slist_prepend (priv->popularity_queue,
       g_strdup (filename));
