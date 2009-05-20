@@ -64,6 +64,8 @@ static gboolean mouse_button_cb (GtkWidget *widget, GdkEventButton *event,
     ChamplainViewEmbed *view);
 static void view_size_allocated_cb (GtkWidget *widget,
     GtkAllocation *allocation, ChamplainViewEmbed *view);
+static void view_show_cb (GtkWidget *widget,
+    ChamplainViewEmbed *view);
 
 G_DEFINE_TYPE (ChamplainViewEmbed, champlain_view_embed, GTK_TYPE_ALIGNMENT);
 
@@ -169,6 +171,10 @@ champlain_view_embed_init (ChamplainViewEmbed *embed)
                     G_CALLBACK (view_size_allocated_cb),
                     embed);
   g_signal_connect (priv->clutter_embed,
+                    "show",
+                    G_CALLBACK (view_show_cb),
+                    embed);
+  g_signal_connect (priv->clutter_embed,
                     "button-press-event",
                     G_CALLBACK (mouse_button_cb),
                     embed);
@@ -189,6 +195,16 @@ champlain_view_embed_init (ChamplainViewEmbed *embed)
 }
 
 static void
+view_show_cb (GtkWidget *widget,
+    ChamplainViewEmbed *view)
+{
+  ChamplainViewEmbedPrivate *priv = view->priv;
+
+  // Setup mouse cursor to a hand
+  gdk_window_set_cursor (priv->clutter_embed->window, priv->cursor_hand_open);
+}
+
+static void
 view_size_allocated_cb (GtkWidget *widget,
                         GtkAllocation *allocation,
                         ChamplainViewEmbed *view)
@@ -196,9 +212,6 @@ view_size_allocated_cb (GtkWidget *widget,
   ChamplainViewEmbedPrivate *priv = view->priv;
 
   champlain_view_set_size(priv->view, allocation->width, allocation->height);
-
-  // Setup mouse cursor to a hand
-  gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_open);
 }
 
 static gboolean
