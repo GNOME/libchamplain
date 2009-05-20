@@ -8,4 +8,4 @@ Description: Gtk+ Widget wrapper for libchamplain
 Version: @VERSION@
 Libs: -L${libdir} -lchamplain-gtk-@API_VERSION@
 Cflags: -I${includedir}/libchamplain-gtk-@API_VERSION@
-Requires: champlain-@API_VERSION@ gobject-2.0 clutter-0.8 clutter-gtk-0.8 gtk+-2.0
+Requires: champlain-@API_VERSION@ gobject-2.0 clutter-1.0 clutter-gtk-1.0 gtk+-2.0
