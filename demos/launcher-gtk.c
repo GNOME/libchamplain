@@ -208,8 +208,8 @@ main (int argc,
   vbox = gtk_vbox_new(FALSE, 10);
 
   widget = champlain_view_embed_new ();
-
   view = champlain_view_embed_get_view (CHAMPLAIN_VIEW_EMBED (widget));
+
   g_object_set (G_OBJECT (view), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
       "zoom-level", 5, NULL);
   layer = create_marker_layer (CHAMPLAIN_VIEW (view));

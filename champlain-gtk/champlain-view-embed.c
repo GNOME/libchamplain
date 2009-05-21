@@ -158,8 +158,8 @@ champlain_view_embed_init (ChamplainViewEmbed *embed)
   ClutterActor *stage;
 
   ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (embed);
+  embed->priv = priv;
 
-  priv->view = NULL;
   priv->clutter_embed = gtk_clutter_embed_new ();
 
   g_signal_connect (priv->clutter_embed,
@@ -182,12 +182,13 @@ champlain_view_embed_init (ChamplainViewEmbed *embed)
   priv->cursor_hand_open = gdk_cursor_new(GDK_HAND1);
   priv->cursor_hand_closed = gdk_cursor_new(GDK_FLEUR);
 
+  priv->view = NULL;
+  champlain_view_embed_set_view (embed, champlain_view_new ());
   // Setup stage
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
   clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
 
   gtk_container_add (GTK_CONTAINER (embed), priv->clutter_embed);
-  embed->priv = priv;
 }
 
 static void
