@@ -48,6 +48,9 @@ struct _ChamplainViewEmbedPrivate
 
   GdkCursor *cursor_hand_open;
   GdkCursor *cursor_hand_closed;
+
+  guint width;
+  guint height;
 };
 
 
@@ -101,17 +104,10 @@ champlain_view_embed_set_property (GObject *object,
   {
     case PROP_VIEW:
       {
-        ClutterActor *stage;
-        stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
+        ChamplainView *view;
 
-        if (priv->view != NULL)
-          {
-            g_object_unref (priv->view);
-            clutter_container_remove_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
-          }
-
-        priv->view = g_value_dup_object (value);
-        clutter_container_add_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
+        view = g_value_get_object (value);
+        champlain_view_embed_set_view (CHAMPLAIN_VIEW_EMBED (object), view);
         break;
       }
     default:
@@ -152,7 +148,7 @@ champlain_view_embed_class_init (ChamplainViewEmbedClass *klass)
          "Champlain view",
          "The ChamplainView to embed into the Gtk+ widget",
          CHAMPLAIN_TYPE_VIEW,
-         CHAMPLAIN_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+         CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
@@ -211,7 +207,11 @@ view_size_allocated_cb (GtkWidget *widget,
 {
   ChamplainViewEmbedPrivate *priv = view->priv;
 
-  champlain_view_set_size(priv->view, allocation->width, allocation->height);
+  if (priv->view != NULL)
+    champlain_view_set_size (priv->view, allocation->width, allocation->height);
+
+  priv->width = allocation->width;
+  priv->height = allocation->height;
 }
 
 static gboolean
@@ -237,11 +237,9 @@ mouse_button_cb (GtkWidget *widget,
  * Since: 0.2.1
  */
 GtkWidget *
-champlain_view_embed_new (ChamplainView *view)
+champlain_view_embed_new ()
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
-
-  return g_object_new (CHAMPLAIN_TYPE_VIEW_EMBED, "champlain-view", view, NULL);
+  return g_object_new (CHAMPLAIN_TYPE_VIEW_EMBED, NULL);
 }
 
 ChamplainView *
@@ -251,4 +249,27 @@ champlain_view_embed_get_view (ChamplainViewEmbed* embed)
 
   ChamplainViewEmbedPrivate *priv = embed->priv;
   return priv->view;
+}
+
+void
+champlain_view_embed_set_view (ChamplainViewEmbed* embed,
+    ChamplainView *view)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW_EMBED(embed));
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewEmbedPrivate *priv = embed->priv;
+  ClutterActor *stage;
+
+  if (priv->view != NULL)
+    {
+      g_object_unref (priv->view);
+      clutter_container_remove_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
+    }
+
+  priv->view = g_object_ref (view);
+  champlain_view_set_size (priv->view, priv->width, priv->height);
+
+  stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
 }

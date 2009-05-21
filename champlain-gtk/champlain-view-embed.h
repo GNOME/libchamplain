@@ -55,8 +55,9 @@ typedef struct _ChamplainViewEmbedClass ChamplainViewEmbedClass;
 
 GType champlain_view_embed_get_type (void);
 
-GtkWidget *champlain_view_embed_new (ChamplainView* view);
+GtkWidget *champlain_view_embed_new ();
 
 ChamplainView *champlain_view_embed_get_view (ChamplainViewEmbed* embed);
+void champlain_view_embed_set_view (ChamplainViewEmbed* embed, ChamplainView *view);
 
 #endif
