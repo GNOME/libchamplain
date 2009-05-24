@@ -73,6 +73,10 @@ if test "x$have_soup_gnome" = "xno"; then
      have_soup="yes", have_soup="no")
 fi
 
+if test "x$have_soup" = "xno" && test "x$have_soup_gnome" = "xno"; then
+   AC_MSG_ERROR([Couldn't find libsoup or libsoup-gnome.])
+fi
+
 AC_SUBST(SOUP_CFLAGS)
 AC_SUBST(SOUP_LIBS)
 
