@@ -2200,7 +2200,15 @@ draw_line (ChamplainView *view, cairo_t *cr, ChamplainLine *line)
       cairo_line_to (cr, x, y);
       list = list->next;
     }
-  cairo_stroke (cr);
+
+  if (line->priv->closed_path)
+    cairo_close_path (cr);
+
+  if (line->priv->fill)
+    cairo_fill_preserve (cr);
+
+  if (line->priv->stroke)
+    cairo_stroke (cr);
 }
 
 static void

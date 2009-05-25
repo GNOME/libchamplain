@@ -20,7 +20,7 @@
 #define CHAMPLAIN_PRIVATE_H
 
 #include <glib.h>
-
+#include <clutter/clutter.h>
 
 typedef struct _Map Map;
 
@@ -39,6 +39,11 @@ struct _ChamplainBaseMarkerPrivate
 
 struct _ChamplainLinePrivate {
   GList *points;
+  gboolean closed_path;
+  ClutterColor *line_color;
+  gboolean fill;
+  ClutterColor *fill_color;
+  gboolean stroke;
 };
 
 typedef struct

@@ -44,7 +44,13 @@ G_DEFINE_TYPE (ChamplainLine, champlain_line, G_TYPE_OBJECT)
 
 enum
 {
-  PROP_0
+  PROP_0,
+  PROP_CLOSED_PATH,
+  PROP_LINE_WIDTH,
+  PROP_LINE_COLOR,
+  PROP_FILL,
+  PROP_FILL_COLOR,
+  PROP_STROKE,
 };
 
 static void
@@ -53,9 +59,25 @@ champlain_line_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  //ChamplainLine *self = CHAMPLAIN_LINE (object);
+  ChamplainLinePrivate *priv = GET_PRIVATE (object);
+
   switch (property_id)
     {
+      case PROP_CLOSED_PATH:
+        g_value_set_boolean (value, priv->closed_path);
+        break;
+      case PROP_FILL:
+        g_value_set_boolean (value, priv->fill);
+        break;
+      case PROP_STROKE:
+        g_value_set_boolean (value, priv->stroke);
+        break;
+      case PROP_FILL_COLOR:
+        clutter_value_set_color (value, priv->fill_color);
+        break;
+      case PROP_LINE_COLOR:
+        clutter_value_set_color (value, priv->line_color);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -67,9 +89,27 @@ champlain_line_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-  //ChamplainLine *self = CHAMPLAIN_LINE (object);
+  ChamplainLinePrivate *priv = GET_PRIVATE (object);
+
   switch (property_id)
     {
+      case PROP_CLOSED_PATH:
+        priv->closed_path = g_value_get_boolean (value);
+        break;
+      case PROP_FILL:
+        priv->fill = g_value_get_boolean (value);
+        break;
+      case PROP_STROKE:
+        priv->stroke = g_value_get_boolean (value);
+        break;
+      case PROP_FILL_COLOR:
+        clutter_color_free (priv->fill_color);
+        priv->fill_color = clutter_color_copy (clutter_value_get_color (value));
+        break;
+      case PROP_LINE_COLOR:
+        clutter_color_free (priv->line_color);
+        priv->line_color = clutter_color_copy (clutter_value_get_color (value));
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -100,6 +140,48 @@ champlain_line_class_init (ChamplainLineClass *klass)
   object_class->set_property = champlain_line_set_property;
   object_class->dispose = champlain_line_dispose;
   object_class->finalize = champlain_line_finalize;
+
+  /**
+  * ChamplainLine:close-path:
+  *
+  * The shape is a closed path
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+      PROP_CLOSED_PATH,
+      g_param_spec_boolean ("closed-path",
+         "Closed Path",
+         "The Path is Closed",
+         FALSE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainLine:fill:
+  *
+  * The shape should be filled
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+      PROP_FILL,
+      g_param_spec_boolean ("fill",
+         "Fill",
+         "The shape is filled",
+         FALSE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainLine:stroke:
+  *
+  * The shape should be stroked
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+      PROP_STROKE,
+      g_param_spec_boolean ("stroke",
+         "Stroke",
+         "The shape is stroked",
+         FALSE, CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
@@ -108,6 +190,8 @@ champlain_line_init (ChamplainLine *self)
   self->priv = GET_PRIVATE (self);
 
   self->priv->points = NULL;
+  self->priv->fill = FALSE;
+  self->priv->stroke = TRUE;
 }
 
 /**
