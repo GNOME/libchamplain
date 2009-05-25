@@ -1203,7 +1203,7 @@ champlain_marker_get_alignment (ChamplainMarker *marker)
 ClutterColor *
 champlain_marker_get_color (ChamplainMarker *marker)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
+  g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), NULL);
 
   ChamplainMarkerPrivate *priv = marker->priv;
 
@@ -1221,7 +1221,7 @@ champlain_marker_get_color (ChamplainMarker *marker)
 ClutterColor *
 champlain_marker_get_text_color (ChamplainMarker *marker)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
+  g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), NULL);
 
   ChamplainMarkerPrivate *priv = marker->priv;
 
