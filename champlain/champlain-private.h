@@ -37,6 +37,10 @@ struct _ChamplainBaseMarkerPrivate
   gdouble lat;
 };
 
+struct _ChamplainLinePrivate {
+  GList *points;
+};
+
 typedef struct
 {
   gint x;

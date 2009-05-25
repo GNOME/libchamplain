@@ -855,7 +855,7 @@ champlain_view_init (ChamplainView *view)
       priv->user_layers);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
 
-  /* Setup user_layers */
+  /* Setup line layer */
   priv->line_layer = g_object_ref (clutter_cairo_new (800, 600));
   clutter_actor_show (priv->line_layer);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
@@ -1094,6 +1094,7 @@ champlain_view_center_on (ChamplainView *view,
 
   view_load_visible_tiles (view);
   view_tiles_reposition (view);
+  view_update_lines (view);
   marker_reposition (view);
 }
 
@@ -2185,16 +2186,45 @@ champlain_view_add_line (ChamplainView *view,
 static void
 view_update_lines (ChamplainView *view)
 {
-  cairo_t *cr;
-  cr = clutter_cairo_create (CLUTTER_CAIRO (view->priv->line_layer));
+  ChamplainViewPrivate *priv = view->priv;
 
-  cairo_move_to (cr, 0, 0);
-  cairo_line_to (cr, 100, 0);
-  cairo_line_to (cr, 100, 200);
-  cairo_line_to (cr, 100, 100);
-  cairo_line_to (cr, 0, 100);
+  if (priv->line == NULL)
+    return;
+
+  cairo_t *cr;
+  cr = clutter_cairo_create (CLUTTER_CAIRO (priv->line_layer));
+
+  /* Clear the drawing area */
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_rectangle (cr, 0, 0, 800, 600);
+  cairo_fill (cr);
+
+  /* Draw the line */
+  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+  GList *list = g_list_first (priv->line->priv->points);
+  while (list != NULL)
+    {
+      ChamplainPoint *point = (ChamplainPoint*) list->data;
+      gint x, y;
+
+      x = champlain_map_source_get_x (priv->map_source, priv->zoom_level,
+          point->lon);
+      y = champlain_map_source_get_y (priv->map_source, priv->zoom_level,
+          point->lat);
+
+      x -= priv->viewport_size.x + priv->anchor.x;
+      y -= priv->viewport_size.y + priv->anchor.y;
+
+      cairo_line_to (cr, x, y);
+      list = list->next;
+    }
+  gint x, y;
+
+  x = priv->viewport_size.x;
+  y = priv->viewport_size.y;
 
   cairo_stroke (cr);
   cairo_destroy (cr);
 
+  clutter_actor_set_position (priv->line_layer, x, y);
 }

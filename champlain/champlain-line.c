@@ -32,6 +32,7 @@
 #include "champlain-line.h"
 
 #include "champlain-defines.h"
+#include "champlain-private.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
@@ -44,10 +45,6 @@ G_DEFINE_TYPE (ChamplainLine, champlain_line, G_TYPE_OBJECT)
 enum
 {
   PROP_0
-};
-
-struct _ChamplainLinePrivate {
-  GList *points;
 };
 
 static void

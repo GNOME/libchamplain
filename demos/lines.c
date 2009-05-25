@@ -109,8 +109,8 @@ main (int argc,
 
   /* draw a line */
   line = champlain_line_new ();
-  champlain_line_add_point (line, -40, -70);
-  champlain_line_add_point (line, -45, -75);
+  champlain_line_add_point (line, 44, -74);
+  champlain_line_add_point (line, 45, -75);
   champlain_view_add_line (CHAMPLAIN_VIEW (actor), line);
 
 
