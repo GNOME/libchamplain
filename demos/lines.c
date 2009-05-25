@@ -113,6 +113,10 @@ main (int argc,
   champlain_line_add_point (line, 45, -75);
   champlain_view_add_line (CHAMPLAIN_VIEW (actor), line);
 
+  line = champlain_line_new ();
+  champlain_line_add_point (line, 44, -75);
+  champlain_line_add_point (line, 45, -74);
+  champlain_view_add_line (CHAMPLAIN_VIEW (actor), line);
 
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (actor), "zoom-level", 12,

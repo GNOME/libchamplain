@@ -142,7 +142,6 @@ struct _ChamplainViewPrivate
   ChamplainRectangle viewport_size;
 
   ClutterActor *user_layers; /* Contains the markers */
-  ClutterActor *line_layer;  /* Contains the lines */
 
   gboolean keep_center_on_resize;
 
@@ -156,7 +155,10 @@ struct _ChamplainViewPrivate
   /* champlain_view_go_to's context, kept for stop_go_to */
   GoToContext *goto_context;
 
-  ChamplainLine *line;
+  /* Lines and shapes */
+  GList *lines;
+  ClutterActor *line_layer;  /* Contains the lines */
+
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -854,6 +856,8 @@ champlain_view_init (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->user_layers);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
+
+  priv->lines = NULL;
 
   /* Setup line layer */
   priv->line_layer = g_object_ref (clutter_cairo_new (800, 600));
@@ -2173,35 +2177,13 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
   return priv->zoom_on_double_click;
 }
 
-void
-champlain_view_add_line (ChamplainView *view,
-    ChamplainLine *line)
-{
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
-
-  view->priv->line = g_object_ref (line);
-}
-
 static void
-view_update_lines (ChamplainView *view)
+draw_line (ChamplainView *view, cairo_t *cr, ChamplainLine *line)
 {
   ChamplainViewPrivate *priv = view->priv;
 
-  if (priv->line == NULL)
-    return;
-
-  cairo_t *cr;
-  cr = clutter_cairo_create (CLUTTER_CAIRO (priv->line_layer));
-
-  /* Clear the drawing area */
-  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-  cairo_rectangle (cr, 0, 0, 800, 600);
-  cairo_fill (cr);
-
-  /* Draw the line */
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
-  GList *list = g_list_first (priv->line->priv->points);
+  GList *list = g_list_first (line->priv->points);
   while (list != NULL)
     {
       ChamplainPoint *point = (ChamplainPoint*) list->data;
@@ -2218,13 +2200,81 @@ view_update_lines (ChamplainView *view)
       cairo_line_to (cr, x, y);
       list = list->next;
     }
-  gint x, y;
+  cairo_stroke (cr);
+}
 
+static void
+view_update_lines (ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  GList * lines;
+    cairo_t *cr;
+    gint x, y;
+
+  if (priv->lines == NULL)
+    return;
+
+  cr = clutter_cairo_create (CLUTTER_CAIRO (priv->line_layer));
+
+  /* Clear the drawing area */
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_rectangle (cr, 0, 0, 800, 600);
+  cairo_fill (cr);
+
+  lines = priv->lines;
+  while (lines != NULL)
+    {
+      ChamplainLine *line;
+
+      line = CHAMPLAIN_LINE (lines->data);
+      draw_line (view, cr, line);
+      lines = lines->next;
+    }
+
+  /* Position the layer in the viewport */
   x = priv->viewport_size.x;
   y = priv->viewport_size.y;
 
-  cairo_stroke (cr);
   cairo_destroy (cr);
 
   clutter_actor_set_position (priv->line_layer, x, y);
+}
+
+/**
+ * champlain_view_add_line:
+ * @view: a #ChamplainView
+ * @line: a #ChamplainLine
+ *
+ * Adds a #ChamplainLine to the #ChamplainView
+ *
+ * Since: 0.4
+ */
+void
+champlain_view_add_line (ChamplainView *view,
+    ChamplainLine *line)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+
+  view->priv->lines = g_list_append (view->priv->lines, g_object_ref (line));
+}
+
+/**
+ * champlain_view_remove_line:
+ * @view: a #ChamplainView
+ * @line: a #ChamplainLine
+ *
+ * Removes a #ChamplainLine to the #ChamplainView
+ *
+ * Since: 0.4
+ */
+void
+champlain_view_remove_line (ChamplainView *view,
+    ChamplainLine *line)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+
+  view->priv->lines = g_list_remove (view->priv->lines, line);
+  g_object_unref (line);
 }

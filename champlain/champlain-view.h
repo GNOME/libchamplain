@@ -142,6 +142,9 @@ gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
 
 void champlain_view_add_line (ChamplainView *view,
     ChamplainLine *line);
+void champlain_view_remove_line (ChamplainView *view,
+    ChamplainLine *line);
+
 
 G_END_DECLS
 
