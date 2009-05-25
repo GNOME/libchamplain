@@ -2204,8 +2204,20 @@ draw_line (ChamplainView *view, cairo_t *cr, ChamplainLine *line)
   if (line->priv->closed_path)
     cairo_close_path (cr);
 
+  cairo_set_source_rgba (cr,
+      line->priv->fill_color->red / 255.0,
+      line->priv->fill_color->green / 255.0,
+      line->priv->fill_color->blue / 255.0,
+      line->priv->fill_color->alpha / 255.0);
+
   if (line->priv->fill)
     cairo_fill_preserve (cr);
+
+  cairo_set_source_rgba (cr,
+      line->priv->stroke_color->red / 255.0,
+      line->priv->stroke_color->green / 255.0,
+      line->priv->stroke_color->blue / 255.0,
+      line->priv->stroke_color->alpha / 255.0);
 
   if (line->priv->stroke)
     cairo_stroke (cr);

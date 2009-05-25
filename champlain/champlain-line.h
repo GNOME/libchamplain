@@ -26,6 +26,7 @@
 #include <champlain/champlain-defines.h>
 
 #include <glib-object.h>
+#include <clutter/clutter.h>
 
 G_BEGIN_DECLS
 
@@ -66,6 +67,12 @@ void champlain_line_add_point (ChamplainLine *line,
     gdouble lon);
 
 void champlain_line_clear_points (ChamplainLine *line);
+void champlain_line_set_fill_color (ChamplainLine *line,
+    const ClutterColor *color);
+void champlain_line_set_stroke_color (ChamplainLine *line,
+    const ClutterColor *color);
+ClutterColor * champlain_line_get_fill_color (ChamplainLine *line);
+ClutterColor * champlain_line_get_stroke_color (ChamplainLine *line);
 
 G_END_DECLS
 

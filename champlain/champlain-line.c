@@ -18,12 +18,12 @@
 
 /**
  * SECTION:champlain-line
- * @short_description: A container for #ChamplainMarker
+ * @short_description: A container for #ChamplainLine
  *
  * A ChamplainLine is little more than a #ClutterContainer. It keeps the
- * markers ordered so that they display correctly.
+ * lines ordered so that they display correctly.
  *
- * Use #clutter_container_add to add markers to the line and
+ * Use #clutter_container_add to add lines to the line and
  * #clutter_container_remove to remove them.
  */
 
@@ -37,6 +37,9 @@
 #include <clutter/clutter.h>
 #include <glib.h>
 
+static ClutterColor DEFAULT_FILL_COLOR = {0xcc, 0x00, 0x00, 0xaa};
+static ClutterColor DEFAULT_STROKE_COLOR = {0xa4, 0x00, 0x00, 0xff};
+
 G_DEFINE_TYPE (ChamplainLine, champlain_line, G_TYPE_OBJECT)
 
 #define GET_PRIVATE(o) \
@@ -46,8 +49,8 @@ enum
 {
   PROP_0,
   PROP_CLOSED_PATH,
-  PROP_LINE_WIDTH,
-  PROP_LINE_COLOR,
+  PROP_STROKE_WIDTH,
+  PROP_STROKE_COLOR,
   PROP_FILL,
   PROP_FILL_COLOR,
   PROP_STROKE,
@@ -75,8 +78,8 @@ champlain_line_get_property (GObject *object,
       case PROP_FILL_COLOR:
         clutter_value_set_color (value, priv->fill_color);
         break;
-      case PROP_LINE_COLOR:
-        clutter_value_set_color (value, priv->line_color);
+      case PROP_STROKE_COLOR:
+        clutter_value_set_color (value, priv->stroke_color);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -103,12 +106,10 @@ champlain_line_set_property (GObject *object,
         priv->stroke = g_value_get_boolean (value);
         break;
       case PROP_FILL_COLOR:
-        clutter_color_free (priv->fill_color);
-        priv->fill_color = clutter_color_copy (clutter_value_get_color (value));
+        champlain_line_set_fill_color (CHAMPLAIN_LINE (object), clutter_value_get_color (value));
         break;
-      case PROP_LINE_COLOR:
-        clutter_color_free (priv->line_color);
-        priv->line_color = clutter_color_copy (clutter_value_get_color (value));
+      case PROP_STROKE_COLOR:
+        champlain_line_set_stroke_color (CHAMPLAIN_LINE (object), clutter_value_get_color (value));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -181,7 +182,7 @@ champlain_line_class_init (ChamplainLineClass *klass)
       g_param_spec_boolean ("stroke",
          "Stroke",
          "The shape is stroked",
-         FALSE, CHAMPLAIN_PARAM_READWRITE));
+         TRUE, CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
@@ -192,6 +193,9 @@ champlain_line_init (ChamplainLine *self)
   self->priv->points = NULL;
   self->priv->fill = FALSE;
   self->priv->stroke = TRUE;
+
+  self->priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
+  self->priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
 }
 
 /**
@@ -235,3 +239,90 @@ champlain_line_clear_points (ChamplainLine *self)
   g_list_free (self->priv->points);
 }
 
+/**
+ * champlain_line_set_fill_color:
+ * @line: The line
+ * @color: The line's fill color or NULL to reset to the
+ *         default color. The color parameter is copied.
+ *
+ * Set the line's fill color.
+ *
+ * Since: 0.4
+ */
+void
+champlain_line_set_fill_color (ChamplainLine *line,
+    const ClutterColor *color)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+
+  ChamplainLinePrivate *priv = line->priv;
+
+  if (priv->fill_color != NULL)
+    clutter_color_free (priv->fill_color);
+
+  if (color == NULL)
+     color = &DEFAULT_FILL_COLOR;
+
+  priv->fill_color = clutter_color_copy (color);
+  g_object_notify (G_OBJECT (line), "fill-color");
+}
+
+/**
+ * champlain_line_set_stoke_color:
+ * @line: The line
+ * @color: The line's stroke color or NULL to reset to the
+ *         default color. The color parameter is copied.
+ *
+ * Set the line's stroke color.
+ *
+ * Since: 0.4
+ */
+void
+champlain_line_set_stroke_color (ChamplainLine *line,
+    const ClutterColor *color)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+
+  ChamplainLinePrivate *priv = line->priv;
+
+  if (priv->stroke_color != NULL)
+    clutter_color_free (priv->stroke_color);
+
+  if (color == NULL)
+     color = &DEFAULT_STROKE_COLOR;
+
+  priv->stroke_color = clutter_color_copy (color);
+  g_object_notify (G_OBJECT (line), "stroke-color");
+}
+
+/**
+ * champlain_line_get_color:
+ * @line: The line
+ *
+ * Returns the line's fill color.
+ *
+ * Since: 0.4
+ */
+ClutterColor *
+champlain_line_get_fill_color (ChamplainLine *line)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), NULL);
+
+  return line->priv->fill_color;
+}
+
+/**
+ * champlain_line_get_stroke_color:
+ * @line: The line
+ *
+ * Returns the line's stroke color.
+ *
+ * Since: 0.4
+ */
+ClutterColor *
+champlain_line_get_stroke_color (ChamplainLine *line)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), NULL);
+
+  return line->priv->stroke_color;
+}

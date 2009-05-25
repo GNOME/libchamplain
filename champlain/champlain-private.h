@@ -40,7 +40,7 @@ struct _ChamplainBaseMarkerPrivate
 struct _ChamplainLinePrivate {
   GList *points;
   gboolean closed_path;
-  ClutterColor *line_color;
+  ClutterColor *stroke_color;
   gboolean fill;
   ClutterColor *fill_color;
   gboolean stroke;
