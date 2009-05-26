@@ -74,6 +74,15 @@ void champlain_line_set_stroke_color (ChamplainLine *line,
 ClutterColor * champlain_line_get_fill_color (ChamplainLine *line);
 ClutterColor * champlain_line_get_stroke_color (ChamplainLine *line);
 
+gboolean champlain_line_get_fill (ChamplainLine *line);
+void champlain_line_set_fill (ChamplainLine *line,
+    gboolean value);
+gboolean champlain_line_get_stroke (ChamplainLine *line);
+void champlain_line_set_stroke (ChamplainLine *line,
+    gboolean value);
+void champlain_line_set_stroke_width (ChamplainLine *line,
+    gdouble value);
+gdouble champlain_line_get_stroke_width (ChamplainLine *line);
 G_END_DECLS
 
 #endif

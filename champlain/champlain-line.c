@@ -81,6 +81,9 @@ champlain_line_get_property (GObject *object,
       case PROP_STROKE_COLOR:
         clutter_value_set_color (value, priv->stroke_color);
         break;
+      case PROP_STROKE_WIDTH:
+        g_value_set_double (value, priv->stroke_width);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -100,16 +103,24 @@ champlain_line_set_property (GObject *object,
         priv->closed_path = g_value_get_boolean (value);
         break;
       case PROP_FILL:
-        priv->fill = g_value_get_boolean (value);
+        champlain_line_set_fill (CHAMPLAIN_LINE (object),
+            g_value_get_boolean (value));
         break;
       case PROP_STROKE:
-        priv->stroke = g_value_get_boolean (value);
+        champlain_line_set_stroke (CHAMPLAIN_LINE (object),
+            g_value_get_boolean (value));
         break;
       case PROP_FILL_COLOR:
-        champlain_line_set_fill_color (CHAMPLAIN_LINE (object), clutter_value_get_color (value));
+        champlain_line_set_fill_color (CHAMPLAIN_LINE (object),
+            clutter_value_get_color (value));
         break;
       case PROP_STROKE_COLOR:
-        champlain_line_set_stroke_color (CHAMPLAIN_LINE (object), clutter_value_get_color (value));
+        champlain_line_set_stroke_color (CHAMPLAIN_LINE (object),
+            clutter_value_get_color (value));
+        break;
+      case PROP_STROKE_WIDTH:
+        champlain_line_set_stroke_width (CHAMPLAIN_LINE (object),
+            g_value_get_double (value));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -152,9 +163,9 @@ champlain_line_class_init (ChamplainLineClass *klass)
   g_object_class_install_property (object_class,
       PROP_CLOSED_PATH,
       g_param_spec_boolean ("closed-path",
-         "Closed Path",
-         "The Path is Closed",
-         FALSE, CHAMPLAIN_PARAM_READWRITE));
+          "Closed Path",
+          "The Path is Closed",
+          FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainLine:fill:
@@ -166,9 +177,9 @@ champlain_line_class_init (ChamplainLineClass *klass)
   g_object_class_install_property (object_class,
       PROP_FILL,
       g_param_spec_boolean ("fill",
-         "Fill",
-         "The shape is filled",
-         FALSE, CHAMPLAIN_PARAM_READWRITE));
+          "Fill",
+          "The shape is filled",
+          FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainLine:stroke:
@@ -180,9 +191,55 @@ champlain_line_class_init (ChamplainLineClass *klass)
   g_object_class_install_property (object_class,
       PROP_STROKE,
       g_param_spec_boolean ("stroke",
-         "Stroke",
-         "The shape is stroked",
-         TRUE, CHAMPLAIN_PARAM_READWRITE));
+          "Stroke",
+          "The shape is stroked",
+          TRUE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainLine:stroke-color:
+  *
+  * The line's stroke color
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+      PROP_STROKE_COLOR,
+      clutter_param_spec_color ("stroke-color",
+        "Stroke Color",
+        "The line's stroke color",
+        &DEFAULT_STROKE_COLOR,
+        CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainLine:text-color:
+  *
+  * The line's fill color
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+      PROP_FILL_COLOR,
+      clutter_param_spec_color ("fill-color",
+          "Fill Color",
+          "The line's fill color",
+          &DEFAULT_FILL_COLOR,
+          CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainLine:stroke-width:
+  *
+  * The line's stroke width (in pixels)
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+      PROP_STROKE_WIDTH,
+      g_param_spec_double ("stroke-width",
+          "Stroke Width",
+          "The line's stroke width",
+          0, 100.0,
+          2.0,
+          CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
@@ -193,6 +250,7 @@ champlain_line_init (ChamplainLine *self)
   self->priv->points = NULL;
   self->priv->fill = FALSE;
   self->priv->stroke = TRUE;
+  self->priv->stroke_width = 2.0;
 
   self->priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   self->priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
@@ -325,4 +383,106 @@ champlain_line_get_stroke_color (ChamplainLine *line)
   g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), NULL);
 
   return line->priv->stroke_color;
+}
+
+/**
+ * champlain_line_set_stroke:
+ * @line: The line
+ * @value: if the line is stroked
+ *
+ * Sets the line to have a stroke
+ *
+ * Since: 0.4
+ */
+void
+champlain_line_set_stroke (ChamplainLine *line,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+
+  line->priv->stroke = value;
+}
+
+/**
+ * champlain_line_get_stroke:
+ * @line: The line
+ *
+ * Returns if the line has a stroke
+ *
+ * Since: 0.4
+ */
+gboolean
+champlain_line_get_stroke (ChamplainLine *line)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), FALSE);
+
+  return line->priv->stroke;
+}
+
+/**
+ * champlain_line_set_fill:
+ * @line: The line
+ * @value: if the line is filled
+ *
+ * Sets the line to have be filled
+ *
+ * Since: 0.4
+ */
+void
+champlain_line_set_fill (ChamplainLine *line,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+
+  line->priv->fill = value;
+}
+
+/**
+ * champlain_line_get_fill:
+ * @line: The line
+ *
+ * Returns if the line is filled
+ *
+ * Since: 0.4
+ */
+gboolean
+champlain_line_get_fill (ChamplainLine *line)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), FALSE);
+
+  return line->priv->fill;
+}
+
+/**
+ * champlain_line_set_stroke_width:
+ * @line: The line
+ * @value: the width of the stroke (in pixels)
+ *
+ * Sets the width of the stroke
+ *
+ * Since: 0.4
+ */
+void
+champlain_line_set_stroke_width (ChamplainLine *line,
+    gdouble value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+
+  line->priv->stroke_width = value;
+}
+
+/**
+ * champlain_line_get_stroke_width:
+ * @line: The line
+ *
+ * Returns the width of the stroke
+ *
+ * Since: 0.4
+ */
+gdouble
+champlain_line_get_stroke_width (ChamplainLine *line)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), 0);
+
+  return line->priv->stroke_width;
 }

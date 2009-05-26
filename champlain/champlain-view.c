@@ -2219,6 +2219,8 @@ draw_line (ChamplainView *view, cairo_t *cr, ChamplainLine *line)
       line->priv->stroke_color->blue / 255.0,
       line->priv->stroke_color->alpha / 255.0);
 
+  cairo_set_line_width (cr, line->priv->stroke_width);
+
   if (line->priv->stroke)
     cairo_stroke (cr);
 }

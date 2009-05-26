@@ -44,6 +44,7 @@ struct _ChamplainLinePrivate {
   gboolean fill;
   ClutterColor *fill_color;
   gboolean stroke;
+  gdouble stroke_width;
 };
 
 typedef struct
