@@ -299,9 +299,6 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
       g_param_spec_enum ("alignment", "Alignment", "The marker's alignment",
           PANGO_TYPE_ALIGNMENT, PANGO_ALIGN_LEFT, CHAMPLAIN_PARAM_READWRITE));
 
-  static const ClutterColor color = {50, 50, 50, 255};
-  static const ClutterColor text_color = {240, 240, 240, 255};
-
   /**
   * ChamplainMarker:color:
   *
@@ -311,7 +308,7 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
   */
   g_object_class_install_property (object_class, PROP_COLOR,
       clutter_param_spec_color ("color", "Color", "The marker's color",
-          &color, CHAMPLAIN_PARAM_READWRITE));
+          &DEFAULT_COLOR, CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainMarker:text-color:
@@ -322,7 +319,7 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
   */
   g_object_class_install_property (object_class, PROP_TEXT_COLOR,
       clutter_param_spec_color ("text-color", "Text Color", "The marker's text color",
-          &text_color, CHAMPLAIN_PARAM_READWRITE));
+          &DEFAULT_TEXT_COLOR, CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainMarker:font-name:
