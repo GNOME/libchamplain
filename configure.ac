@@ -134,7 +134,7 @@ if test x$enable_managed = xyes; then
   AC_PATH_PROG(GACUTIL, gacutil)
   AC_SUBST(GACUTIL)
 
-  PKG_CHECK_MODULES(GAPI, gapi-2.0 >= 2.13.90)
+  PKG_CHECK_MODULES(GAPI, gapi-2.0 >= 2.12.0)
   AC_PATH_PROG(GAPI_PARSER, gapi2-parser)
   AC_SUBST(GAPI_PARSER)
 
@@ -144,7 +144,7 @@ if test x$enable_managed = xyes; then
   AC_PATH_PROG(GAPI_FIXUP, gapi2-fixup)
   AC_SUBST(GAPI_FIXUP)
 
-  PKG_CHECK_MODULES(GTKSHARP, gtk-sharp-2.0 > 2.3.92)
+  PKG_CHECK_MODULES(GTKSHARP, gtk-sharp-2.0 > 2.12.0)
   AC_SUBST(GTKSHARP_LIBS)
 
   PKG_CHECK_MODULES(CLUTTERSHARP, clutter-sharp >= 0.8.0)
