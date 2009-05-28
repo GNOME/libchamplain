@@ -121,7 +121,8 @@ champlain_zoom_level_dispose (GObject *object)
 
   if (priv->tiles != NULL)
     {
-      for (k = 0; k < champlain_zoom_level_tile_count (level); k++)
+      int count = champlain_zoom_level_tile_count (level);
+      for (k = 0; k < count; k++)
         {
           ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
           champlain_zoom_level_remove_tile (level, tile);

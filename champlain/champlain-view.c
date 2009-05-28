@@ -517,61 +517,61 @@ champlain_view_dispose (GObject *object)
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
 
-  if (priv->factory)
+  if (priv->factory != NULL)
     {
       g_object_unref (priv->factory);
       priv->factory = NULL;
     }
 
-  if (priv->map_source)
+  if (priv->map_source != NULL)
     {
       g_object_unref (priv->map_source);
       priv->map_source = NULL;
     }
 
-  if (priv->license_actor)
+  if (priv->license_actor != NULL)
     {
       g_object_unref (priv->license_actor);
       priv->license_actor = NULL;
     }
 
-  if (priv->finger_scroll)
+  if (priv->finger_scroll != NULL)
     {
       g_object_unref (priv->finger_scroll);
       priv->finger_scroll = NULL;
     }
 
-  if (priv->viewport)
+  if (priv->viewport != NULL)
     {
       g_object_unref (priv->viewport);
       priv->viewport = NULL;
     }
 
-  if (priv->map_layer)
+  if (priv->map_layer != NULL)
     {
       g_object_unref (priv->map_layer);
       priv->map_layer = NULL;
     }
 
-  if (priv->user_layers)
+  if (priv->user_layers != NULL)
     {
       g_object_unref (priv->user_layers);
       priv->user_layers = NULL;
     }
 
-  if (priv->stage)
+  if (priv->stage != NULL)
     {
       g_object_unref (priv->stage);
       priv->stage = NULL;
     }
 
-  if (priv->map)
+  if (priv->map != NULL)
     {
       map_free (priv->map);
       priv->map = NULL;
     }
 
-  if (priv->goto_context)
+  if (priv->goto_context != NULL)
     g_free (priv->goto_context);
 
   G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
