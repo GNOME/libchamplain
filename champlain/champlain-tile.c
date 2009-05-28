@@ -164,14 +164,17 @@ champlain_tile_dispose (GObject *object)
 {
   ChamplainTilePrivate *priv = GET_PRIVATE (object);
 
-  g_free (priv->uri);
-  g_free (priv->filename);
   if (priv->actor != NULL)
     {
       g_object_unref (G_OBJECT (priv->actor));
       priv->actor = NULL;
     }
-  g_object_unref (priv->content_actor);
+
+  if (priv->content_actor != NULL)
+    {
+      g_object_unref (G_OBJECT (priv->content_actor));
+      priv->content_actor = NULL;
+    }
 
   G_OBJECT_CLASS (champlain_tile_parent_class)->dispose (object);
 }
@@ -179,6 +182,11 @@ champlain_tile_dispose (GObject *object)
 static void
 champlain_tile_finalize (GObject *object)
 {
+  ChamplainTilePrivate *priv = GET_PRIVATE (object);
+
+  g_free (priv->uri);
+  g_free (priv->filename);
+
   G_OBJECT_CLASS (champlain_tile_parent_class)->finalize (object);
 }
 

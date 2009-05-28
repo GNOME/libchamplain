@@ -172,7 +172,6 @@ static void champlain_view_get_property (GObject *object, guint prop_id,
     GValue *value, GParamSpec *pspec);
 static void champlain_view_set_property (GObject *object, guint prop_id,
     const GValue *value, GParamSpec *pspec);
-static void champlain_view_finalize (GObject *object);
 static void champlain_view_dispose (GObject *object);
 static void champlain_view_class_init (ChamplainViewClass *champlainViewClass);
 static void champlain_view_init (ChamplainView *view);
@@ -517,31 +516,65 @@ champlain_view_dispose (GObject *object)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
-  g_object_unref (priv->factory);
-  g_object_unref (priv->map_source);
-  if (priv->license_actor)
-    g_object_unref (priv->license_actor);
-  g_object_unref (priv->finger_scroll);
-  g_object_unref (priv->viewport);
-  g_object_unref (priv->map_layer);
-  g_object_unref (priv->user_layers);
-  g_object_unref (priv->stage);
 
-  map_free (priv->map);
+  if (priv->factory)
+    {
+      g_object_unref (priv->factory);
+      priv->factory = NULL;
+    }
+
+  if (priv->map_source)
+    {
+      g_object_unref (priv->map_source);
+      priv->map_source = NULL;
+    }
+
+  if (priv->license_actor)
+    {
+      g_object_unref (priv->license_actor);
+      priv->license_actor = NULL;
+    }
+
+  if (priv->finger_scroll)
+    {
+      g_object_unref (priv->finger_scroll);
+      priv->finger_scroll = NULL;
+    }
+
+  if (priv->viewport)
+    {
+      g_object_unref (priv->viewport);
+      priv->viewport = NULL;
+    }
+
+  if (priv->map_layer)
+    {
+      g_object_unref (priv->map_layer);
+      priv->map_layer = NULL;
+    }
+
+  if (priv->user_layers)
+    {
+      g_object_unref (priv->user_layers);
+      priv->user_layers = NULL;
+    }
+
+  if (priv->stage)
+    {
+      g_object_unref (priv->stage);
+      priv->stage = NULL;
+    }
+
+  if (priv->map)
+    {
+      map_free (priv->map);
+      priv->map = NULL;
+    }
 
   if (priv->goto_context)
     g_free (priv->goto_context);
-}
 
-static void
-champlain_view_finalize (GObject *object)
-{
-  /*
-  ChamplainView *view = CHAMPLAIN_VIEW (object);
-  ChamplainViewPrivate *priv = view->priv;
-  */
-
-  G_OBJECT_CLASS (champlain_view_parent_class)->finalize (object);
+  G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
 }
 
 static void
@@ -550,7 +583,6 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   g_type_class_add_private (champlainViewClass, sizeof (ChamplainViewPrivate));
 
   GObjectClass *object_class = G_OBJECT_CLASS (champlainViewClass);
-  object_class->finalize = champlain_view_finalize;
   object_class->dispose = champlain_view_dispose;
   object_class->get_property = champlain_view_get_property;
   object_class->set_property = champlain_view_set_property;

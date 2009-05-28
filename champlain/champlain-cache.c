@@ -113,14 +113,24 @@ champlain_cache_dispose (GObject *object)
   ChamplainCachePrivate *priv = GET_PRIVATE (object);
 
   if (priv->stmt_select)
-    sqlite3_finalize (priv->stmt_select);
+    {
+      sqlite3_finalize (priv->stmt_select);
+      priv->stmt_select = NULL;
+    }
 
   if (priv->stmt_update)
-    sqlite3_finalize (priv->stmt_update);
+    {
+      sqlite3_finalize (priv->stmt_update);
+      priv->stmt_update = NULL;
+    }
 
-  error = sqlite3_close (priv->data);
-  if (error != SQLITE_OK)
-    DEBUG ("Sqlite returned error %d when closing cache.db", error);
+  if (priv->data != NULL)
+  {
+    error = sqlite3_close (priv->data);
+    if (error != SQLITE_OK)
+      DEBUG ("Sqlite returned error %d when closing cache.db", error);
+    priv->data = NULL;
+  }
 
   G_OBJECT_CLASS (champlain_cache_parent_class)->dispose (object);
 }

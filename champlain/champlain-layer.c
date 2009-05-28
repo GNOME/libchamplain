@@ -86,20 +86,6 @@ champlain_layer_set_property (GObject *object,
 }
 
 static void
-champlain_layer_dispose (GObject *object)
-{
-  //ChamplainLayerPrivate *priv = GET_PRIVATE (object);
-
-  G_OBJECT_CLASS (champlain_layer_parent_class)->dispose (object);
-}
-
-static void
-champlain_layer_finalize (GObject *object)
-{
-  G_OBJECT_CLASS (champlain_layer_parent_class)->finalize (object);
-}
-
-static void
 champlain_layer_class_init (ChamplainLayerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -108,8 +94,6 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
 
   object_class->get_property = champlain_layer_get_property;
   object_class->set_property = champlain_layer_set_property;
-  object_class->dispose = champlain_layer_dispose;
-  object_class->finalize = champlain_layer_finalize;
 }
 
 static void

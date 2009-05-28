@@ -113,15 +113,22 @@ champlain_zoom_level_dispose (GObject *object)
   ChamplainZoomLevel *level = CHAMPLAIN_ZOOM_LEVEL (object);
   ChamplainZoomLevelPrivate *priv = level->priv;
 
-  g_object_unref (priv->actor);
+  if (priv->actor != NULL)
+  {
+    g_object_unref (priv->actor);
+    priv->actor = NULL;
+  }
 
-  // Get rid of old tiles first
-  for (k = 0; k < champlain_zoom_level_tile_count (level); k++)
+  if (priv->tiles != NULL)
     {
-      ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
-      champlain_zoom_level_remove_tile (level, tile);
+      for (k = 0; k < champlain_zoom_level_tile_count (level); k++)
+        {
+          ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
+          champlain_zoom_level_remove_tile (level, tile);
+        }
+      g_ptr_array_free (priv->tiles, TRUE);
+      priv->tiles = NULL;
     }
-  g_ptr_array_free (priv->tiles, TRUE);
 
   G_OBJECT_CLASS (champlain_zoom_level_parent_class)->dispose (object);
 }
