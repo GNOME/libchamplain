@@ -84,7 +84,10 @@ map_zoom_out (Map *map,
 void
 map_free (Map *map)
 {
-  g_object_unref (map->current_level);
+  if (map->previous_level != NULL)
+    g_object_unref (map->previous_level);
+  if (map->current_level != NULL)
+    g_object_unref (map->current_level);
   g_free (map);
 }
 
