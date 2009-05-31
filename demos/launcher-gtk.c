@@ -63,7 +63,7 @@ map_source_changed (GtkWidget *widget,
 
   gtk_tree_model_get (model, &iter, COL_ID, &id, -1);
 
-  ChamplainMapSourceFactory *factory = champlain_map_source_factory_get_default ();
+  ChamplainMapSourceFactory *factory = champlain_map_source_factory_dup_default ();
   source = champlain_map_source_factory_create (factory, id);
 
   if (source != NULL)
@@ -141,9 +141,9 @@ build_combo_box (GtkComboBox *box)
       G_TYPE_STRING, /* name */
       -1);
 
-  factory = champlain_map_source_factory_get_default ();
+  factory = champlain_map_source_factory_dup_default ();
   sources = champlain_map_source_factory_get_list (factory);
-  
+
   iter = sources;
   while (iter != NULL)
   {

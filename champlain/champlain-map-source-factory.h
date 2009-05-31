@@ -55,7 +55,7 @@ struct _ChamplainMapSourceFactoryClass
 
 GType champlain_map_source_factory_get_type (void);
 
-ChamplainMapSourceFactory * champlain_map_source_factory_get_default (void);
+ChamplainMapSourceFactory * champlain_map_source_factory_dup_default (void);
 
 GSList * champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory);
 

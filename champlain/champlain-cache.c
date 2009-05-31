@@ -278,9 +278,11 @@ cleanup:
 }
 
 /**
- * champlain_cache_get_default:
+ * champlain_cache_dup_default:
  *
- * Returns the #ChamplainCache singleton
+ * Returns the #ChamplainCache singleton, use #g_object_unref when not neeeded
+ * anymore.
+ *
  *
  * Since: 0.4
  */

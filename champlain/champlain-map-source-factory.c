@@ -62,6 +62,7 @@ enum
 };
 
 /* static guint champlain_map_source_factory_signals[LAST_SIGNAL] = { 0, }; */
+static ChamplainMapSourceFactory *instance = NULL;
 
 G_DEFINE_TYPE (ChamplainMapSourceFactory, champlain_map_source_factory, G_TYPE_OBJECT);
 
@@ -121,12 +122,37 @@ champlain_map_source_factory_finalize (GObject *object)
   G_OBJECT_CLASS (champlain_map_source_factory_parent_class)->finalize (object);
 }
 
+static GObject *
+champlain_map_source_factory_constructor (GType type,
+    guint n_construct_params,
+    GObjectConstructParam *construct_params)
+{
+  GObject *retval;
+
+  if (instance == NULL)
+    {
+      retval = G_OBJECT_CLASS (champlain_map_source_factory_parent_class)->constructor
+          (type, n_construct_params, construct_params);
+
+      instance = CHAMPLAIN_MAP_SOURCE_FACTORY (retval);
+      g_object_add_weak_pointer (retval, (gpointer) &instance);
+    }
+  else
+    {
+      retval = g_object_ref (instance);
+    }
+
+  return retval;
+}
+
 static void
 champlain_map_source_factory_class_init (ChamplainMapSourceFactoryClass *klass)
 {
   g_type_class_add_private (klass, sizeof (ChamplainMapSourceFactoryPrivate));
 
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->constructor = champlain_map_source_factory_constructor;
   object_class->finalize = champlain_map_source_factory_finalize;
   object_class->get_property = champlain_map_source_factory_get_property;
   object_class->set_property = champlain_map_source_factory_set_property;
@@ -214,25 +240,17 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 }
 
 /**
- * champlain_map_source_factory_get_default:
+ * champlain_map_source_factory_dup_default:
  *
- * Returns the singleton #ChamplainMapSourceFactory
+ * Returns the singleton #ChamplainMapSourceFactory, it should be freed
+ * using #g_object_unref when not needed.
  *
  * Since: 0.4
  */
 ChamplainMapSourceFactory *
-champlain_map_source_factory_get_default (void)
+champlain_map_source_factory_dup_default (void)
 {
-  static ChamplainMapSourceFactory *instance = NULL;
-
-  if (G_UNLIKELY (instance == NULL))
-    {
-      instance = g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, NULL);
-      g_object_add_weak_pointer (G_OBJECT (instance), (gpointer*)&instance);
-      return instance;
-    }
-
-  return g_object_ref (instance);
+  return g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, NULL);
 }
 
 /**
