@@ -421,7 +421,7 @@ file_loaded_cb (SoupSession *session,
   GFile *file;
   GFileInfo *info;
   guint filesize = 0;
-  ChamplainCache *cache = champlain_cache_get_default ();
+  ChamplainCache *cache = champlain_cache_dup_default ();
 
   filename = champlain_tile_get_filename (tile);
 
@@ -545,6 +545,7 @@ file_loaded_cb (SoupSession *session,
 
 cleanup:
   g_object_unref (loader);
+  g_object_unref (cache);
   g_free (path);
 finish:
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
@@ -562,7 +563,7 @@ fill_tile (ChamplainMapSource *map_source,
 
   ChamplainNetworkMapSource *source = CHAMPLAIN_NETWORK_MAP_SOURCE (map_source);
   ChamplainNetworkMapSourcePrivate *priv = source->priv;
-  ChamplainCache *cache = champlain_cache_get_default ();
+  ChamplainCache *cache = champlain_cache_dup_default ();
 
   /* Try the cached version first */
   filename = get_filename (source, tile);
@@ -647,5 +648,6 @@ fill_tile (ChamplainMapSource *map_source,
   /* If a tile is neither in cache or can be fetched, do nothing, it'll show up
    * as empty
    */
+  g_object_unref (cache);
 }
 

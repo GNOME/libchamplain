@@ -54,7 +54,7 @@ typedef struct {
 
 GType champlain_cache_get_type (void);
 
-ChamplainCache* champlain_cache_get_default (void);
+ChamplainCache* champlain_cache_dup_default (void);
 
 void champlain_cache_update_tile (ChamplainCache *self,
     ChamplainTile *tile,

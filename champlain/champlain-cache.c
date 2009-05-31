@@ -57,6 +57,8 @@ enum
 
 typedef struct _ChamplainCachePrivate ChamplainCachePrivate;
 
+static ChamplainCache *instance = NULL;
+
 struct _ChamplainCachePrivate {
   guint size_limit;
 
@@ -142,6 +144,29 @@ champlain_cache_finalize (GObject *object)
   G_OBJECT_CLASS (champlain_cache_parent_class)->finalize (object);
 }
 
+static GObject *
+champlain_cache_constructor (GType type,
+    guint n_construct_params,
+    GObjectConstructParam *construct_params)
+{
+  GObject *retval;
+
+  if (instance == NULL)
+    {
+      retval = G_OBJECT_CLASS (champlain_cache_parent_class)->constructor
+          (type, n_construct_params, construct_params);
+
+      instance = CHAMPLAIN_CACHE (retval);
+      g_object_add_weak_pointer (retval, (gpointer) &instance);
+    }
+  else
+    {
+      retval = g_object_ref (instance);
+    }
+
+  return retval;
+}
+
 static void
 champlain_cache_class_init (ChamplainCacheClass *klass)
 {
@@ -149,6 +174,7 @@ champlain_cache_class_init (ChamplainCacheClass *klass)
 
   g_type_class_add_private (klass, sizeof (ChamplainCachePrivate));
 
+  object_class->constructor = champlain_cache_constructor;
   object_class->get_property = champlain_cache_get_property;
   object_class->set_property = champlain_cache_set_property;
   object_class->dispose = champlain_cache_dispose;
@@ -259,17 +285,9 @@ cleanup:
  * Since: 0.4
  */
 ChamplainCache*
-champlain_cache_get_default (void)
+champlain_cache_dup_default (void)
 {
-  static ChamplainCache * instance = NULL;
-
-  if (G_UNLIKELY (instance == NULL))
-    {
-      instance = g_object_new (CHAMPLAIN_TYPE_CACHE, NULL);
-      return instance;
-    }
-
-  return g_object_ref (instance);
+  return g_object_new (CHAMPLAIN_TYPE_CACHE, NULL);
 }
 
 /**
@@ -404,7 +422,10 @@ champlain_cache_fill_tile (ChamplainCache *self,
       g_strdup (filename));
 
   if (priv->popularity_id == 0)
+  {
+    g_object_ref (self);
     priv->popularity_id = g_idle_add (inc_popularity, self);
+  }
 
 cleanup:
   sqlite3_reset (priv->stmt_select);
@@ -452,6 +473,7 @@ inc_popularity (gpointer data)
 
   if (priv->popularity_queue == NULL)
     {
+      g_object_unref (cache);
       priv->popularity_id = 0;
       return FALSE;
     }
