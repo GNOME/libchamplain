@@ -107,13 +107,13 @@ champlain_base_marker_set_property (GObject *object,
       case PROP_LONGITUDE:
         {
           gdouble lon = g_value_get_double (value);
-          champlain_base_marker_set_position (base_marker, lon, priv->lat);
+          champlain_base_marker_set_position (base_marker, priv->lat, lon);
           break;
         }
       case PROP_LATITUDE:
         {
           gdouble lat = g_value_get_double (value);
-          champlain_base_marker_set_position (base_marker, priv->lon, lat);
+          champlain_base_marker_set_position (base_marker, lat, priv->lon);
           break;
         }
       default:
