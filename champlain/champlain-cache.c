@@ -38,6 +38,7 @@
 #include "champlain-enum-types.h"
 #include "champlain-private.h"
 
+#include <errno.h>
 #include <glib.h>
 #include <gio/gio.h>
 #include <string.h>
@@ -176,7 +177,7 @@ champlain_cache_class_init (ChamplainCacheClass *klass)
 static void
 champlain_cache_init (ChamplainCache *self)
 {
-  gchar *filename, *error_msg = NULL;
+  gchar *path, *filename, *error_msg = NULL;
   gint error;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
@@ -191,9 +192,20 @@ champlain_cache_init (ChamplainCache *self)
   priv->stmt_select = NULL;
   priv->stmt_update = NULL;
 
+  /* Create, if needed, the cache's dirs */
+  path = g_path_get_dirname (filename);
+  if (g_mkdir_with_parents (path, 0700) == -1)
+    {
+      if (errno != EEXIST)
+        {
+          g_warning ("Unable to create the image cache path '%s': %s",
+                     path, g_strerror (errno));
+        }
+    }
+
   error = sqlite3_open_v2 (filename, &priv->data,
       SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
-  if (error != SQLITE_OK)
+  if (error == SQLITE_ERROR)
     {
       DEBUG ("Sqlite returned error %d when opening cache.db", error);
       goto cleanup;
@@ -208,7 +220,7 @@ champlain_cache_init (ChamplainCache *self)
   if (error_msg != NULL)
     {
       DEBUG ("Creating table 'tiles' failed: %s", error_msg);
-      sqlite3_free (error_msg);
+          sqlite3_free (error_msg);
       goto cleanup;
     }
 
@@ -218,8 +230,8 @@ champlain_cache_init (ChamplainCache *self)
   if (error != SQLITE_OK)
     {
       priv->stmt_select = NULL;
-      DEBUG ("Failed to prepare the select Etag statement, error: %s",
-      sqlite3_errmsg (priv->data));
+      DEBUG ("Failed to prepare the select Etag statement, error:%d: %s",
+          error, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
 
@@ -230,12 +242,13 @@ champlain_cache_init (ChamplainCache *self)
     {
       priv->stmt_update = NULL;
       DEBUG ("Failed to prepare the update popularity statement, error: %s",
-					sqlite3_errmsg (priv->data));
+          sqlite3_errmsg (priv->data));
       goto cleanup;
     }
 
 cleanup:
   g_free (filename);
+  g_free (path);
 }
 
 /**
@@ -344,10 +357,9 @@ champlain_cache_fill_tile (ChamplainCache *self,
   g_object_unref (file);
   g_object_unref (info);
 
-
   /* Retrieve etag */
   sql_rc = sqlite3_bind_text (priv->stmt_select, 1, filename, -1, SQLITE_STATIC);
-  if (sql_rc != SQLITE_OK)
+  if (sql_rc == SQLITE_ERROR)
     {
       DEBUG ("Failed to prepare the SQL query for finding the Etag of '%s', error: %s",
           filename, sqlite3_errmsg (priv->data));
@@ -365,10 +377,10 @@ champlain_cache_fill_tile (ChamplainCache *self,
       DEBUG ("'%s' does't have an etag",
           filename);
     }
-  else
+  else if (sql_rc == SQLITE_ERROR)
     {
-      DEBUG ("Failed to finding the Etag of '%s', error: %s",
-          filename, sqlite3_errmsg (priv->data));
+      DEBUG ("Failed to finding the Etag of '%s', %d error: %s",
+          filename, sql_rc, sqlite3_errmsg (priv->data));
       goto cleanup;
     }
 

@@ -454,7 +454,7 @@ file_loaded_cb (SoupSession *session,
       DEBUG ("Unable to download tile %d, %d: %s",
           champlain_tile_get_x (tile),
           champlain_tile_get_y (tile),
-          soup_status_get_phrase(msg->status_code));
+          soup_status_get_phrase (msg->status_code));
       create_error_tile (tile);
       goto finish;
     }
