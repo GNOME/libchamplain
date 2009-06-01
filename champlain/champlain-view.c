@@ -853,6 +853,8 @@ champlain_view_init (ChamplainView *view)
   champlain_view_set_size (view, priv->viewport_size.width,
       priv->viewport_size.height);
 
+  resize_viewport (view);
+
   priv->state = CHAMPLAIN_STATE_DONE;
   g_object_notify (G_OBJECT (view), "state");
 }
