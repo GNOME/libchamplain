@@ -5,7 +5,7 @@ MODULE = Champlain::Cache  PACKAGE = Champlain::Cache  PREFIX = champlain_cache_
 
 
 ChamplainCache*
-champlain_cache_get_default (class)
+champlain_cache_dup_default (class)
 	C_ARGS: /* No args */
 
 

@@ -100,7 +100,7 @@ MODULE = Champlain::MapSourceFactory  PACKAGE = Champlain::MapSourceFactory  PRE
 
 
 ChamplainMapSourceFactory*
-champlain_map_source_factory_get_default (class)
+champlain_map_source_factory_dup_default (class)
 	C_ARGS: /* No args */
 
 
