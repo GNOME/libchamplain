@@ -47,4 +47,10 @@ typedef enum
   CHAMPLAIN_STATE_DONE
 } ChamplainState;
 
+typedef struct
+{
+  double lat;
+  double lon;
+} ChamplainPoint;
+
 #endif

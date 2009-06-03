@@ -64,6 +64,7 @@
 #include "champlain-zoom-level.h"
 
 #include <clutter/clutter.h>
+#include <clutter-cairo/clutter-cairo.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <math.h>
@@ -129,7 +130,7 @@ struct _ChamplainViewPrivate
   gdouble latitude;
 
   /* Hack to get smaller x,y coordinates as the clutter limit is G_MAXINT16 */
-  ChamplainPoint anchor;
+  ChamplainIntPoint anchor;
   gdouble anchor_zoom_level; /* the zoom_level for which the current anchor has
                                 been computed for */
 
@@ -141,6 +142,7 @@ struct _ChamplainViewPrivate
   ChamplainRectangle viewport_size;
 
   ClutterActor *user_layers; /* Contains the markers */
+  ClutterActor *line_layer;  /* Contains the lines */
 
   gboolean keep_center_on_resize;
 
@@ -153,6 +155,8 @@ struct _ChamplainViewPrivate
 
   /* champlain_view_go_to's context, kept for stop_go_to */
   GoToContext *goto_context;
+
+  ChamplainLine *line;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -199,6 +203,7 @@ static gboolean view_set_zoom_level_at (ChamplainView *view,
 static void tile_state_notify (GObject *gobject,
     GParamSpec *pspec,
     gpointer data);
+static void view_update_lines (ChamplainView *view);
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -850,6 +855,14 @@ champlain_view_init (ChamplainView *view)
       priv->user_layers);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
 
+  /* Setup user_layers */
+  priv->line_layer = g_object_ref (clutter_cairo_new (800, 600));
+  clutter_actor_show (priv->line_layer);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
+      priv->line_layer);
+  clutter_actor_raise (priv->line_layer, priv->map_layer);
+  clutter_actor_set_position (priv->line_layer, 0, 0);
+
   champlain_view_set_size (view, priv->viewport_size.width,
       priv->viewport_size.height);
 
@@ -866,8 +879,8 @@ viewport_x_changed_cb (GObject *gobject,
 {
   ChamplainViewPrivate *priv = view->priv;
 
-  ChamplainPoint rect;
-  ChamplainPoint old_anchor;
+  ChamplainIntPoint rect;
+  ChamplainIntPoint old_anchor;
 
   tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &rect.x, &rect.y,
       NULL);
@@ -885,7 +898,7 @@ viewport_x_changed_cb (GObject *gobject,
 
   if (priv->anchor.x - old_anchor.x != 0)
     {
-      ChamplainPoint diff;
+      ChamplainIntPoint diff;
 
       diff.x = priv->anchor.x - old_anchor.x;
       diff.y = priv->anchor.y - old_anchor.y;
@@ -902,6 +915,7 @@ viewport_x_changed_cb (GObject *gobject,
   view_load_visible_tiles (view);
   view_tiles_reposition (view);
   marker_reposition (view);
+  view_update_lines (view);
 
   priv->longitude = viewport_get_current_longitude (priv);
   priv->latitude = viewport_get_current_latitude (priv);
@@ -2158,3 +2172,29 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
   return priv->zoom_on_double_click;
 }
 
+void
+champlain_view_add_line (ChamplainView *view,
+    ChamplainLine *line)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+
+  view->priv->line = g_object_ref (line);
+}
+
+static void
+view_update_lines (ChamplainView *view)
+{
+  cairo_t *cr;
+  cr = clutter_cairo_create (CLUTTER_CAIRO (view->priv->line_layer));
+
+  cairo_move_to (cr, 0, 0);
+  cairo_line_to (cr, 100, 0);
+  cairo_line_to (cr, 100, 200);
+  cairo_line_to (cr, 100, 100);
+  cairo_line_to (cr, 0, 100);
+
+  cairo_stroke (cr);
+  cairo_destroy (cr);
+
+}

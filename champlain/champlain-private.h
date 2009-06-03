@@ -29,7 +29,7 @@ typedef struct
   gint x;
   gint y;
   gint z;
-} ChamplainPoint;
+} ChamplainIntPoint;
 
 struct _ChamplainBaseMarkerPrivate
 {

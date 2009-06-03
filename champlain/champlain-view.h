@@ -24,8 +24,9 @@
 #define CHAMPLAIN_VIEW_H
 
 #include <champlain/champlain-defines.h>
-#include <champlain/champlain-layer.h>
 #include <champlain/champlain-base-marker.h>
+#include <champlain/champlain-layer.h>
+#include <champlain/champlain-line.h>
 #include <champlain/champlain-map-source.h>
 #include <champlain/champlain-zoom-level.h>
 
@@ -138,6 +139,9 @@ ChamplainScrollMode champlain_view_get_scroll_mode (ChamplainView *view);
 gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
 gboolean champlain_view_get_show_license (ChamplainView *view);
 gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
+
+void champlain_view_add_line (ChamplainView *view,
+    ChamplainLine *line);
 
 G_END_DECLS
 
