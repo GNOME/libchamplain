@@ -16,7 +16,7 @@ sub tests {
 
 
 sub test_get_set {
-	my $factory = Champlain::MapSourceFactory->get_default();
+	my $factory = Champlain::MapSourceFactory->dup_default();
 	isa_ok($factory, 'Champlain::MapSourceFactory');
 	
 	# Get the maps available

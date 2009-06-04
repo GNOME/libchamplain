@@ -232,30 +232,30 @@ sub generic_map_operations {
 
 
 sub get_osm_mapnik {
-	my $factory = Champlain::MapSourceFactory->get_default();
+	my $factory = Champlain::MapSourceFactory->dup_default();
 	return $factory->create(MAP_OSM_MAPNIK);
 }
 
 
 sub get_osm_cycle_map {
-	my $factory = Champlain::MapSourceFactory->get_default();
+	my $factory = Champlain::MapSourceFactory->dup_default();
 	return $factory->create(MAP_OSM_CYCLE_MAP);
 }
 
 
 sub get_osm_osmarender {
-	my $factory = Champlain::MapSourceFactory->get_default();
+	my $factory = Champlain::MapSourceFactory->dup_default();
 	return $factory->create(MAP_OSM_OSMARENDER);
 }
 
 
 sub get_oam {
-	my $factory = Champlain::MapSourceFactory->get_default();
+	my $factory = Champlain::MapSourceFactory->dup_default();
 	return $factory->create(MAP_OAM);
 }
 
 
 sub get_mff_relief {
-	my $factory = Champlain::MapSourceFactory->get_default();
+	my $factory = Champlain::MapSourceFactory->dup_default();
 	return $factory->create(MAP_MFF_RELIEF);
 }

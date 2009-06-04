@@ -30,7 +30,7 @@ sub test_map_source_names {
 
 
 sub test_map_factory {
-	my $factory = Champlain::MapSourceFactory->get_default();
+	my $factory = Champlain::MapSourceFactory->dup_default();
 	isa_ok($factory, 'Champlain::MapSourceFactory');
 	
 	generic_create(
