@@ -125,7 +125,7 @@ sub create_combo_box {
 	my $active = 0; # Tells which map source is active
 	my $index = 0;
 	my $current_source = $map->get('map-source')->get_id;
-	my $factory = Champlain::MapSourceFactory->get_default;
+	my $factory = Champlain::MapSourceFactory->dup_default;
 	foreach my $desc (sort { $a->{name} cmp $b->{name} } $factory->get_list) {
 		my $iter = $model->append();
 		$model->set($iter, 
