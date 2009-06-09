@@ -456,7 +456,9 @@ file_loaded_cb (SoupSession *session,
           champlain_tile_get_x (tile),
           champlain_tile_get_y (tile),
           soup_status_get_phrase (msg->status_code));
-      create_error_tile (tile);
+
+      if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_VALIDATING_CACHE)
+        create_error_tile (tile);
       goto finish;
     }
 
@@ -530,7 +532,6 @@ file_loaded_cb (SoupSession *session,
       gdk_pixbuf_get_n_channels (pixbuf) / 8,
       0, &error))
     {
-      g_print ("BPP: %d", gdk_pixbuf_get_bits_per_sample (pixbuf));
       if (error)
         {
           g_warning ("Unable to transfer to clutter: %s", error->message);
@@ -609,7 +610,9 @@ fill_tile (ChamplainMapSource *map_source,
                champlain_tile_get_x (tile), champlain_tile_get_y (tile),
                zoom_level);
       champlain_tile_set_uri (tile, uri);
-      champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
+
+      if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_VALIDATING_CACHE)
+        champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
       msg = soup_message_new (SOUP_METHOD_GET, uri);
 
       if (in_cache == TRUE)
