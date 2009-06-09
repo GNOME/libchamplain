@@ -427,28 +427,29 @@ file_loaded_cb (SoupSession *session,
 
   DEBUG ("Got reply %d", msg->status_code);
   if (msg->status_code == 304)
-  {
-    /* Since we are updating the cache, we can assume that the directories
-     * exists */
-    GTimeVal *now = g_new0 (GTimeVal, 1);
+    {
+      /* Since we are updating the cache, we can assume that the directories
+       * exists */
+      GTimeVal *now = g_new0 (GTimeVal, 1);
 
-    file = g_file_new_for_path (filename);
-    info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED,
-        G_FILE_QUERY_INFO_NONE, NULL, NULL);
+      file = g_file_new_for_path (filename);
+      info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED,
+          G_FILE_QUERY_INFO_NONE, NULL, NULL);
 
-    g_get_current_time (now);
-    g_file_info_set_modification_time (info, now);
-    g_file_set_attributes_from_info (file, info, G_FILE_QUERY_INFO_NONE, NULL,
-        NULL);
+      g_get_current_time (now);
+      g_file_info_set_modification_time (info, now);
+      g_file_set_attributes_from_info (file, info, G_FILE_QUERY_INFO_NONE, NULL,
+          NULL);
 
-    g_object_unref (file);
-    g_object_unref (info);
-    g_free (now);
+      g_object_unref (file);
+      g_object_unref (info);
+      g_free (now);
 
-    champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-    g_object_unref (tile);
-    return;
-  }
+      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+      g_object_unref (tile);
+      return;
+    }
+
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
       DEBUG ("Unable to download tile %d, %d: %s",
