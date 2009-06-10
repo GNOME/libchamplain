@@ -17,19 +17,19 @@
  */
 
 /**
- * SECTION:champlain-line
- * @short_description: A container for #ChamplainLine
+ * SECTION:champlain-polygon
+ * @short_description: A container for #ChamplainPolygon
  *
- * A ChamplainLine is little more than a #ClutterContainer. It keeps the
- * lines ordered so that they display correctly.
+ * A ChamplainPolygon is little more than a #ClutterContainer. It keeps the
+ * polygons ordered so that they display correctly.
  *
- * Use #clutter_container_add to add lines to the line and
+ * Use #clutter_container_add to add polygons to the polygon and
  * #clutter_container_remove to remove them.
  */
 
 #include "config.h"
 
-#include "champlain-line.h"
+#include "champlain-polygon.h"
 
 #include "champlain-defines.h"
 #include "champlain-private.h"
@@ -40,10 +40,10 @@
 static ClutterColor DEFAULT_FILL_COLOR = {0xcc, 0x00, 0x00, 0xaa};
 static ClutterColor DEFAULT_STROKE_COLOR = {0xa4, 0x00, 0x00, 0xff};
 
-G_DEFINE_TYPE (ChamplainLine, champlain_line, G_TYPE_OBJECT)
+G_DEFINE_TYPE (ChamplainPolygon, champlain_polygon, G_TYPE_OBJECT)
 
 #define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_LINE, ChamplainLinePrivate))
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_POLYGON, ChamplainPolygonPrivate))
 
 enum
 {
@@ -57,12 +57,12 @@ enum
 };
 
 static void
-champlain_line_get_property (GObject *object,
+champlain_polygon_get_property (GObject *object,
     guint property_id,
     GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainLinePrivate *priv = GET_PRIVATE (object);
+  ChamplainPolygonPrivate *priv = GET_PRIVATE (object);
 
   switch (property_id)
     {
@@ -90,12 +90,12 @@ champlain_line_get_property (GObject *object,
 }
 
 static void
-champlain_line_set_property (GObject *object,
+champlain_polygon_set_property (GObject *object,
     guint property_id,
     const GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainLinePrivate *priv = GET_PRIVATE (object);
+  ChamplainPolygonPrivate *priv = GET_PRIVATE (object);
 
   switch (property_id)
     {
@@ -103,23 +103,23 @@ champlain_line_set_property (GObject *object,
         priv->closed_path = g_value_get_boolean (value);
         break;
       case PROP_FILL:
-        champlain_line_set_fill (CHAMPLAIN_LINE (object),
+        champlain_polygon_set_fill (CHAMPLAIN_POLYGON (object),
             g_value_get_boolean (value));
         break;
       case PROP_STROKE:
-        champlain_line_set_stroke (CHAMPLAIN_LINE (object),
+        champlain_polygon_set_stroke (CHAMPLAIN_POLYGON (object),
             g_value_get_boolean (value));
         break;
       case PROP_FILL_COLOR:
-        champlain_line_set_fill_color (CHAMPLAIN_LINE (object),
+        champlain_polygon_set_fill_color (CHAMPLAIN_POLYGON (object),
             clutter_value_get_color (value));
         break;
       case PROP_STROKE_COLOR:
-        champlain_line_set_stroke_color (CHAMPLAIN_LINE (object),
+        champlain_polygon_set_stroke_color (CHAMPLAIN_POLYGON (object),
             clutter_value_get_color (value));
         break;
       case PROP_STROKE_WIDTH:
-        champlain_line_set_stroke_width (CHAMPLAIN_LINE (object),
+        champlain_polygon_set_stroke_width (CHAMPLAIN_POLYGON (object),
             g_value_get_double (value));
         break;
       default:
@@ -128,33 +128,33 @@ champlain_line_set_property (GObject *object,
 }
 
 static void
-champlain_line_dispose (GObject *object)
+champlain_polygon_dispose (GObject *object)
 {
-  //ChamplainLinePrivate *priv = GET_PRIVATE (object);
+  //ChamplainPolygonPrivate *priv = GET_PRIVATE (object);
 
-  G_OBJECT_CLASS (champlain_line_parent_class)->dispose (object);
+  G_OBJECT_CLASS (champlain_polygon_parent_class)->dispose (object);
 }
 
 static void
-champlain_line_finalize (GObject *object)
+champlain_polygon_finalize (GObject *object)
 {
-  G_OBJECT_CLASS (champlain_line_parent_class)->finalize (object);
+  G_OBJECT_CLASS (champlain_polygon_parent_class)->finalize (object);
 }
 
 static void
-champlain_line_class_init (ChamplainLineClass *klass)
+champlain_polygon_class_init (ChamplainPolygonClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainLinePrivate));
+  g_type_class_add_private (klass, sizeof (ChamplainPolygonPrivate));
 
-  object_class->get_property = champlain_line_get_property;
-  object_class->set_property = champlain_line_set_property;
-  object_class->dispose = champlain_line_dispose;
-  object_class->finalize = champlain_line_finalize;
+  object_class->get_property = champlain_polygon_get_property;
+  object_class->set_property = champlain_polygon_set_property;
+  object_class->dispose = champlain_polygon_dispose;
+  object_class->finalize = champlain_polygon_finalize;
 
   /**
-  * ChamplainLine:close-path:
+  * ChamplainPolygon:close-path:
   *
   * The shape is a closed path
   *
@@ -168,7 +168,7 @@ champlain_line_class_init (ChamplainLineClass *klass)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainLine:fill:
+  * ChamplainPolygon:fill:
   *
   * The shape should be filled
   *
@@ -182,7 +182,7 @@ champlain_line_class_init (ChamplainLineClass *klass)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainLine:stroke:
+  * ChamplainPolygon:stroke:
   *
   * The shape should be stroked
   *
@@ -196,9 +196,9 @@ champlain_line_class_init (ChamplainLineClass *klass)
           TRUE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainLine:stroke-color:
+  * ChamplainPolygon:stroke-color:
   *
-  * The line's stroke color
+  * The polygon's stroke color
   *
   * Since: 0.4
   */
@@ -206,14 +206,14 @@ champlain_line_class_init (ChamplainLineClass *klass)
       PROP_STROKE_COLOR,
       clutter_param_spec_color ("stroke-color",
         "Stroke Color",
-        "The line's stroke color",
+        "The polygon's stroke color",
         &DEFAULT_STROKE_COLOR,
         CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainLine:text-color:
+  * ChamplainPolygon:text-color:
   *
-  * The line's fill color
+  * The polygon's fill color
   *
   * Since: 0.4
   */
@@ -221,14 +221,14 @@ champlain_line_class_init (ChamplainLineClass *klass)
       PROP_FILL_COLOR,
       clutter_param_spec_color ("fill-color",
           "Fill Color",
-          "The line's fill color",
+          "The polygon's fill color",
           &DEFAULT_FILL_COLOR,
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainLine:stroke-width:
+  * ChamplainPolygon:stroke-width:
   *
-  * The line's stroke width (in pixels)
+  * The polygon's stroke width (in pixels)
   *
   * Since: 0.4
   */
@@ -236,14 +236,14 @@ champlain_line_class_init (ChamplainLineClass *klass)
       PROP_STROKE_WIDTH,
       g_param_spec_double ("stroke-width",
           "Stroke Width",
-          "The line's stroke width",
+          "The polygon's stroke width",
           0, 100.0,
           2.0,
           CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
-champlain_line_init (ChamplainLine *self)
+champlain_polygon_init (ChamplainPolygon *self)
 {
   self->priv = GET_PRIVATE (self);
 
@@ -257,24 +257,24 @@ champlain_line_init (ChamplainLine *self)
 }
 
 /**
- * champlain_line_new:
+ * champlain_polygon_new:
  *
- * Returns a new #ChamplainLine ready to be to draw lines on the map
+ * Returns a new #ChamplainPolygon ready to be to draw polygons on the map
  *
  * Since: 0.4
  */
-ChamplainLine *
-champlain_line_new ()
+ChamplainPolygon *
+champlain_polygon_new ()
 {
-  return g_object_new (CHAMPLAIN_TYPE_LINE, NULL);
+  return g_object_new (CHAMPLAIN_TYPE_POLYGON, NULL);
 }
 
 void
-champlain_line_add_point (ChamplainLine *self,
+champlain_polygon_add_point (ChamplainPolygon *self,
     gdouble lat,
     gdouble lon)
 {
-  g_return_if_fail (CHAMPLAIN_IS_LINE (self));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (self));
 
   ChamplainPoint *point = g_new0 (ChamplainPoint, 1);
   point->lat = lat;
@@ -284,9 +284,9 @@ champlain_line_add_point (ChamplainLine *self,
 }
 
 void
-champlain_line_clear_points (ChamplainLine *self)
+champlain_polygon_clear_points (ChamplainPolygon *self)
 {
-  g_return_if_fail (CHAMPLAIN_IS_LINE (self));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (self));
 
   GList *next = self->priv->points;
   while (next != NULL)
@@ -298,22 +298,22 @@ champlain_line_clear_points (ChamplainLine *self)
 }
 
 /**
- * champlain_line_set_fill_color:
- * @line: The line
- * @color: The line's fill color or NULL to reset to the
+ * champlain_polygon_set_fill_color:
+ * @polygon: The polygon
+ * @color: The polygon's fill color or NULL to reset to the
  *         default color. The color parameter is copied.
  *
- * Set the line's fill color.
+ * Set the polygon's fill color.
  *
  * Since: 0.4
  */
 void
-champlain_line_set_fill_color (ChamplainLine *line,
+champlain_polygon_set_fill_color (ChamplainPolygon *polygon,
     const ClutterColor *color)
 {
-  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainLinePrivate *priv = line->priv;
+  ChamplainPolygonPrivate *priv = polygon->priv;
 
   if (priv->fill_color != NULL)
     clutter_color_free (priv->fill_color);
@@ -322,26 +322,26 @@ champlain_line_set_fill_color (ChamplainLine *line,
      color = &DEFAULT_FILL_COLOR;
 
   priv->fill_color = clutter_color_copy (color);
-  g_object_notify (G_OBJECT (line), "fill-color");
+  g_object_notify (G_OBJECT (polygon), "fill-color");
 }
 
 /**
- * champlain_line_set_stoke_color:
- * @line: The line
- * @color: The line's stroke color or NULL to reset to the
+ * champlain_polygon_set_stoke_color:
+ * @polygon: The polygon
+ * @color: The polygon's stroke color or NULL to reset to the
  *         default color. The color parameter is copied.
  *
- * Set the line's stroke color.
+ * Set the polygon's stroke color.
  *
  * Since: 0.4
  */
 void
-champlain_line_set_stroke_color (ChamplainLine *line,
+champlain_polygon_set_stroke_color (ChamplainPolygon *polygon,
     const ClutterColor *color)
 {
-  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainLinePrivate *priv = line->priv;
+  ChamplainPolygonPrivate *priv = polygon->priv;
 
   if (priv->stroke_color != NULL)
     clutter_color_free (priv->stroke_color);
@@ -350,112 +350,112 @@ champlain_line_set_stroke_color (ChamplainLine *line,
      color = &DEFAULT_STROKE_COLOR;
 
   priv->stroke_color = clutter_color_copy (color);
-  g_object_notify (G_OBJECT (line), "stroke-color");
+  g_object_notify (G_OBJECT (polygon), "stroke-color");
 }
 
 /**
- * champlain_line_get_color:
- * @line: The line
+ * champlain_polygon_get_color:
+ * @polygon: The polygon
  *
- * Returns the line's fill color.
+ * Returns the polygon's fill color.
  *
  * Since: 0.4
  */
 ClutterColor *
-champlain_line_get_fill_color (ChamplainLine *line)
+champlain_polygon_get_fill_color (ChamplainPolygon *polygon)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), NULL);
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
-  return line->priv->fill_color;
+  return polygon->priv->fill_color;
 }
 
 /**
- * champlain_line_get_stroke_color:
- * @line: The line
+ * champlain_polygon_get_stroke_color:
+ * @polygon: The polygon
  *
- * Returns the line's stroke color.
+ * Returns the polygon's stroke color.
  *
  * Since: 0.4
  */
 ClutterColor *
-champlain_line_get_stroke_color (ChamplainLine *line)
+champlain_polygon_get_stroke_color (ChamplainPolygon *polygon)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), NULL);
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
-  return line->priv->stroke_color;
+  return polygon->priv->stroke_color;
 }
 
 /**
- * champlain_line_set_stroke:
- * @line: The line
- * @value: if the line is stroked
+ * champlain_polygon_set_stroke:
+ * @polygon: The polygon
+ * @value: if the polygon is stroked
  *
- * Sets the line to have a stroke
+ * Sets the polygon to have a stroke
  *
  * Since: 0.4
  */
 void
-champlain_line_set_stroke (ChamplainLine *line,
+champlain_polygon_set_stroke (ChamplainPolygon *polygon,
     gboolean value)
 {
-  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  line->priv->stroke = value;
+  polygon->priv->stroke = value;
 }
 
 /**
- * champlain_line_get_stroke:
- * @line: The line
+ * champlain_polygon_get_stroke:
+ * @polygon: The polygon
  *
- * Returns if the line has a stroke
+ * Returns if the polygon has a stroke
  *
  * Since: 0.4
  */
 gboolean
-champlain_line_get_stroke (ChamplainLine *line)
+champlain_polygon_get_stroke (ChamplainPolygon *polygon)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), FALSE);
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), FALSE);
 
-  return line->priv->stroke;
+  return polygon->priv->stroke;
 }
 
 /**
- * champlain_line_set_fill:
- * @line: The line
- * @value: if the line is filled
+ * champlain_polygon_set_fill:
+ * @polygon: The polygon
+ * @value: if the polygon is filled
  *
- * Sets the line to have be filled
+ * Sets the polygon to have be filled
  *
  * Since: 0.4
  */
 void
-champlain_line_set_fill (ChamplainLine *line,
+champlain_polygon_set_fill (ChamplainPolygon *polygon,
     gboolean value)
 {
-  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  line->priv->fill = value;
+  polygon->priv->fill = value;
 }
 
 /**
- * champlain_line_get_fill:
- * @line: The line
+ * champlain_polygon_get_fill:
+ * @polygon: The polygon
  *
- * Returns if the line is filled
+ * Returns if the polygon is filled
  *
  * Since: 0.4
  */
 gboolean
-champlain_line_get_fill (ChamplainLine *line)
+champlain_polygon_get_fill (ChamplainPolygon *polygon)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), FALSE);
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), FALSE);
 
-  return line->priv->fill;
+  return polygon->priv->fill;
 }
 
 /**
- * champlain_line_set_stroke_width:
- * @line: The line
+ * champlain_polygon_set_stroke_width:
+ * @polygon: The polygon
  * @value: the width of the stroke (in pixels)
  *
  * Sets the width of the stroke
@@ -463,26 +463,26 @@ champlain_line_get_fill (ChamplainLine *line)
  * Since: 0.4
  */
 void
-champlain_line_set_stroke_width (ChamplainLine *line,
+champlain_polygon_set_stroke_width (ChamplainPolygon *polygon,
     gdouble value)
 {
-  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  line->priv->stroke_width = value;
+  polygon->priv->stroke_width = value;
 }
 
 /**
- * champlain_line_get_stroke_width:
- * @line: The line
+ * champlain_polygon_get_stroke_width:
+ * @polygon: The polygon
  *
  * Returns the width of the stroke
  *
  * Since: 0.4
  */
 gdouble
-champlain_line_get_stroke_width (ChamplainLine *line)
+champlain_polygon_get_stroke_width (ChamplainPolygon *polygon)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_LINE (line), 0);
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), 0);
 
-  return line->priv->stroke_width;
+  return polygon->priv->stroke_width;
 }

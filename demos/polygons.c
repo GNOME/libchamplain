@@ -68,7 +68,7 @@ main (int argc,
     char *argv[])
 {
   ClutterActor* actor, *stage, *buttons, *button;
-  ChamplainLine *line;
+  ChamplainPolygon *polygon;
   guint width, total_width = 0;;
 
   g_thread_init (NULL);
@@ -108,35 +108,35 @@ main (int argc,
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), buttons);
 
   /* draw a line */
-  line = champlain_line_new ();
+  polygon = champlain_polygon_new ();
   /* Cheap approx of Highway 10 */
-  champlain_line_add_point (line, 45.4095, -73.3197);
-  champlain_line_add_point (line, 45.4104, -73.2846);
-  champlain_line_add_point (line, 45.4178, -73.2239);
-  champlain_line_add_point (line, 45.4176, -73.2181);
-  champlain_line_add_point (line, 45.4151, -73.2126);
-  champlain_line_add_point (line, 45.4016, -73.1926);
-  champlain_line_add_point (line, 45.3994, -73.1877);
-  champlain_line_add_point (line, 45.4000, -73.1815);
-  champlain_line_add_point (line, 45.4151, -73.1218);
-  champlain_line_set_stroke_width (line, 5.0);
-  champlain_view_add_line (CHAMPLAIN_VIEW (actor), line);
+  champlain_polygon_add_point (polygon, 45.4095, -73.3197);
+  champlain_polygon_add_point (polygon, 45.4104, -73.2846);
+  champlain_polygon_add_point (polygon, 45.4178, -73.2239);
+  champlain_polygon_add_point (polygon, 45.4176, -73.2181);
+  champlain_polygon_add_point (polygon, 45.4151, -73.2126);
+  champlain_polygon_add_point (polygon, 45.4016, -73.1926);
+  champlain_polygon_add_point (polygon, 45.3994, -73.1877);
+  champlain_polygon_add_point (polygon, 45.4000, -73.1815);
+  champlain_polygon_add_point (polygon, 45.4151, -73.1218);
+  champlain_polygon_set_stroke_width (polygon, 5.0);
+  champlain_view_add_polygon (CHAMPLAIN_VIEW (actor), polygon);
 
   /* draw a polygon */
-  line = champlain_line_new ();
-  champlain_line_add_point (line, 45.1386, -73.9196);
-  champlain_line_add_point (line, 45.1229, -73.8991);
-  champlain_line_add_point (line, 45.0946, -73.9531);
-  champlain_line_add_point (line, 45.1085, -73.9714);
-  champlain_line_add_point (line, 45.1104, -73.9761);
-  champlain_view_add_line (CHAMPLAIN_VIEW (actor), line);
-  g_object_set (line, "closed-path", TRUE, NULL);
-  g_object_set (line, "fill", TRUE, NULL);
+  polygon = champlain_polygon_new ();
+  champlain_polygon_add_point (polygon, 45.1386, -73.9196);
+  champlain_polygon_add_point (polygon, 45.1229, -73.8991);
+  champlain_polygon_add_point (polygon, 45.0946, -73.9531);
+  champlain_polygon_add_point (polygon, 45.1085, -73.9714);
+  champlain_polygon_add_point (polygon, 45.1104, -73.9761);
+  champlain_view_add_polygon (CHAMPLAIN_VIEW (actor), polygon);
+  g_object_set (polygon, "closed-path", TRUE, NULL);
+  g_object_set (polygon, "fill", TRUE, NULL);
 
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (actor), "zoom-level", 9,
       "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC, NULL);
-  champlain_view_center_on(CHAMPLAIN_VIEW(actor), 45.466, -73.75);
+  champlain_view_center_on (CHAMPLAIN_VIEW (actor), 45.466, -73.75);
 
   clutter_actor_show (stage);
   clutter_main ();

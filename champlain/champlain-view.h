@@ -26,7 +26,7 @@
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-base-marker.h>
 #include <champlain/champlain-layer.h>
-#include <champlain/champlain-line.h>
+#include <champlain/champlain-polygon.h>
 #include <champlain/champlain-map-source.h>
 #include <champlain/champlain-zoom-level.h>
 
@@ -140,10 +140,10 @@ gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
 gboolean champlain_view_get_show_license (ChamplainView *view);
 gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
 
-void champlain_view_add_line (ChamplainView *view,
-    ChamplainLine *line);
-void champlain_view_remove_line (ChamplainView *view,
-    ChamplainLine *line);
+void champlain_view_add_polygon (ChamplainView *view,
+    ChamplainPolygon *polygon);
+void champlain_view_remove_polygon (ChamplainView *view,
+    ChamplainPolygon *polygon);
 
 
 G_END_DECLS

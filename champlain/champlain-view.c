@@ -59,6 +59,7 @@
 #include "champlain-marshal.h"
 #include "champlain-map-source.h"
 #include "champlain-map-source-factory.h"
+#include "champlain-polygon.h"
 #include "champlain-private.h"
 #include "champlain-tile.h"
 #include "champlain-zoom-level.h"
@@ -156,8 +157,8 @@ struct _ChamplainViewPrivate
   GoToContext *goto_context;
 
   /* Lines and shapes */
-  GList *lines;
-  ClutterActor *line_layer;  /* Contains the lines */
+  GList *polygons;
+  ClutterActor *polygon_layer;  /* Contains the polygons */
 
 };
 
@@ -205,7 +206,7 @@ static gboolean view_set_zoom_level_at (ChamplainView *view,
 static void tile_state_notify (GObject *gobject,
     GParamSpec *pspec,
     gpointer data);
-static void view_update_lines (ChamplainView *view);
+static void view_update_polygons (ChamplainView *view);
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -857,15 +858,15 @@ champlain_view_init (ChamplainView *view)
       priv->user_layers);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
 
-  priv->lines = NULL;
+  priv->polygons = NULL;
 
-  /* Setup line layer */
-  priv->line_layer = g_object_ref (clutter_cairo_new (800, 600));
-  clutter_actor_show (priv->line_layer);
+  /* Setup polygon layer */
+  priv->polygon_layer = g_object_ref (clutter_cairo_new (800, 600));
+  clutter_actor_show (priv->polygon_layer);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
-      priv->line_layer);
-  clutter_actor_raise (priv->line_layer, priv->map_layer);
-  clutter_actor_set_position (priv->line_layer, 0, 0);
+      priv->polygon_layer);
+  clutter_actor_raise (priv->polygon_layer, priv->map_layer);
+  clutter_actor_set_position (priv->polygon_layer, 0, 0);
 
   champlain_view_set_size (view, priv->viewport_size.width,
       priv->viewport_size.height);
@@ -919,7 +920,7 @@ viewport_x_changed_cb (GObject *gobject,
   view_load_visible_tiles (view);
   view_tiles_reposition (view);
   marker_reposition (view);
-  view_update_lines (view);
+  view_update_polygons (view);
 
   priv->longitude = viewport_get_current_longitude (priv);
   priv->latitude = viewport_get_current_latitude (priv);
@@ -1098,7 +1099,7 @@ champlain_view_center_on (ChamplainView *view,
 
   view_load_visible_tiles (view);
   view_tiles_reposition (view);
-  view_update_lines (view);
+  view_update_polygons (view);
   marker_reposition (view);
 }
 
@@ -2178,12 +2179,12 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
 }
 
 static void
-draw_line (ChamplainView *view, cairo_t *cr, ChamplainLine *line)
+draw_polygon (ChamplainView *view, cairo_t *cr, ChamplainPolygon *polygon)
 {
   ChamplainViewPrivate *priv = view->priv;
 
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
-  GList *list = g_list_first (line->priv->points);
+  GList *list = g_list_first (polygon->priv->points);
   while (list != NULL)
     {
       ChamplainPoint *point = (ChamplainPoint*) list->data;
@@ -2201,56 +2202,56 @@ draw_line (ChamplainView *view, cairo_t *cr, ChamplainLine *line)
       list = list->next;
     }
 
-  if (line->priv->closed_path)
+  if (polygon->priv->closed_path)
     cairo_close_path (cr);
 
   cairo_set_source_rgba (cr,
-      line->priv->fill_color->red / 255.0,
-      line->priv->fill_color->green / 255.0,
-      line->priv->fill_color->blue / 255.0,
-      line->priv->fill_color->alpha / 255.0);
+      polygon->priv->fill_color->red / 255.0,
+      polygon->priv->fill_color->green / 255.0,
+      polygon->priv->fill_color->blue / 255.0,
+      polygon->priv->fill_color->alpha / 255.0);
 
-  if (line->priv->fill)
+  if (polygon->priv->fill)
     cairo_fill_preserve (cr);
 
   cairo_set_source_rgba (cr,
-      line->priv->stroke_color->red / 255.0,
-      line->priv->stroke_color->green / 255.0,
-      line->priv->stroke_color->blue / 255.0,
-      line->priv->stroke_color->alpha / 255.0);
+      polygon->priv->stroke_color->red / 255.0,
+      polygon->priv->stroke_color->green / 255.0,
+      polygon->priv->stroke_color->blue / 255.0,
+      polygon->priv->stroke_color->alpha / 255.0);
 
-  cairo_set_line_width (cr, line->priv->stroke_width);
+  cairo_set_line_width (cr, polygon->priv->stroke_width);
 
-  if (line->priv->stroke)
+  if (polygon->priv->stroke)
     cairo_stroke (cr);
 }
 
 static void
-view_update_lines (ChamplainView *view)
+view_update_polygons (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
-  GList * lines;
-    cairo_t *cr;
-    gint x, y;
+  GList *polygons;
+  cairo_t *cr;
+  gint x, y;
 
-  if (priv->lines == NULL)
+  if (priv->polygons == NULL)
     return;
 
-  cr = clutter_cairo_create (CLUTTER_CAIRO (priv->line_layer));
+  cr = clutter_cairo_create (CLUTTER_CAIRO (priv->polygon_layer));
 
   /* Clear the drawing area */
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
   cairo_rectangle (cr, 0, 0, 800, 600);
   cairo_fill (cr);
 
-  lines = priv->lines;
-  while (lines != NULL)
+  polygons = priv->polygons;
+  while (polygons != NULL)
     {
-      ChamplainLine *line;
+      ChamplainPolygon *polygon;
 
-      line = CHAMPLAIN_LINE (lines->data);
-      draw_line (view, cr, line);
-      lines = lines->next;
+      polygon = CHAMPLAIN_POLYGON (polygons->data);
+      draw_polygon (view, cr, polygon);
+      polygons = polygons->next;
     }
 
   /* Position the layer in the viewport */
@@ -2259,44 +2260,44 @@ view_update_lines (ChamplainView *view)
 
   cairo_destroy (cr);
 
-  clutter_actor_set_position (priv->line_layer, x, y);
+  clutter_actor_set_position (priv->polygon_layer, x, y);
 }
 
 /**
- * champlain_view_add_line:
+ * champlain_view_add_polygon:
  * @view: a #ChamplainView
- * @line: a #ChamplainLine
+ * @polygon: a #ChamplainPolygon
  *
- * Adds a #ChamplainLine to the #ChamplainView
+ * Adds a #ChamplainPolygon to the #ChamplainView
  *
  * Since: 0.4
  */
 void
-champlain_view_add_line (ChamplainView *view,
-    ChamplainLine *line)
+champlain_view_add_polygon (ChamplainView *view,
+    ChamplainPolygon *polygon)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  view->priv->lines = g_list_append (view->priv->lines, g_object_ref (line));
+  view->priv->polygons = g_list_append (view->priv->polygons, g_object_ref (polygon));
 }
 
 /**
- * champlain_view_remove_line:
+ * champlain_view_remove_polygon:
  * @view: a #ChamplainView
- * @line: a #ChamplainLine
+ * @polygon: a #ChamplainPolygon
  *
- * Removes a #ChamplainLine to the #ChamplainView
+ * Removes a #ChamplainPolygon to the #ChamplainView
  *
  * Since: 0.4
  */
 void
-champlain_view_remove_line (ChamplainView *view,
-    ChamplainLine *line)
+champlain_view_remove_polygon (ChamplainView *view,
+    ChamplainPolygon *polygon)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_LINE (line));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  view->priv->lines = g_list_remove (view->priv->lines, line);
-  g_object_unref (line);
+  view->priv->polygons = g_list_remove (view->priv->polygons, polygon);
+  g_object_unref (polygon);
 }

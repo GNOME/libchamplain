@@ -28,7 +28,7 @@ libchamplain_headers = \
 	champlain-network-map-source.h	\
 	champlain-map-source-factory.h	\
 	champlain-map-source-desc.h	\
-	champlain-line.h		\
+	champlain-polygon.h		\
 	champlain-version.h
 
 
@@ -47,7 +47,7 @@ libchamplain_0_3_la_SOURCES = \
 	champlain-network-map-source.c	\
 	champlain-map-source-factory.c	\
 	champlain-cache.c		\
-	champlain-line.c
+	champlain-polygon.c
 
 noinst_HEADERS = \
 	champlain-debug.h  		\
@@ -65,7 +65,7 @@ noinst_HEADERS = \
 	champlain-map-source-desc.h	\
 	champlain-version.h		\
 	champlain-cache.h		\
-	champlain-line.h		\
+	champlain-polygon.h		\
 	champlain-version.h
 
 libchamplain_include_HEADERS = \
@@ -84,7 +84,7 @@ libchamplain_include_HEADERS = \
 	champlain-marker.h		\
 	champlain-version.h		\
 	champlain-cache.h		\
-	champlain-line.h		\
+	champlain-polygon.h		\
 	champlain-version.h
 
 libchamplain_0_3_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) ../tidy/libtidy-1.0.la

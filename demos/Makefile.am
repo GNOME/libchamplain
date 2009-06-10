@@ -1,4 +1,4 @@
-noinst_PROGRAMS = launcher animated-marker lines
+noinst_PROGRAMS = launcher animated-marker polygons
 
 INCLUDES = -I$(top_srcdir)
 
@@ -11,8 +11,8 @@ launcher_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.3.la
 animated_marker_SOURCES = animated-marker.c
 animated_marker_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.3.la
 
-lines_SOURCES = lines.c
-lines_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.3.la
+polygons_SOURCES = polygons.c
+polygons_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.3.la
 
 if ENABLE_GTK
 noinst_PROGRAMS += launcher-gtk

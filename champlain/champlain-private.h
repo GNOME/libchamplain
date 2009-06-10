@@ -37,7 +37,7 @@ struct _ChamplainBaseMarkerPrivate
   gdouble lat;
 };
 
-struct _ChamplainLinePrivate {
+struct _ChamplainPolygonPrivate {
   GList *points;
   gboolean closed_path;
   ClutterColor *stroke_color;
