@@ -28,6 +28,8 @@
 #define COL_ID 0
 #define COL_NAME 1
 
+static ChamplainPolygon *polygon;
+
 /*
  * Terminate the main loop.
  */
@@ -42,9 +44,15 @@ toggle_layer (GtkToggleButton *widget,
               ClutterActor *layer)
 {
   if(gtk_toggle_button_get_active(widget))
-    clutter_actor_show_all(layer);
+    {
+      champlain_polygon_show (polygon);
+      clutter_actor_show_all (layer);
+    }
   else
-    clutter_actor_hide(layer);
+    {
+      champlain_polygon_hide (polygon);
+      clutter_actor_hide (layer);
+    }
 }
 
 static void
@@ -206,6 +214,21 @@ main (int argc,
   layer = create_marker_layer (CHAMPLAIN_VIEW (view));
   champlain_view_add_layer(CHAMPLAIN_VIEW (view), layer);
   clutter_actor_hide (CLUTTER_ACTOR (layer));
+
+  polygon = champlain_polygon_new ();
+  /* Cheap approx of Highway 10 */
+  champlain_polygon_append_point (polygon, 45.4095, -73.3197);
+  champlain_polygon_append_point (polygon, 45.4104, -73.2846);
+  champlain_polygon_append_point (polygon, 45.4178, -73.2239);
+  champlain_polygon_append_point (polygon, 45.4176, -73.2181);
+  champlain_polygon_append_point (polygon, 45.4151, -73.2126);
+  champlain_polygon_append_point (polygon, 45.4016, -73.1926);
+  champlain_polygon_append_point (polygon, 45.3994, -73.1877);
+  champlain_polygon_append_point (polygon, 45.4000, -73.1815);
+  champlain_polygon_append_point (polygon, 45.4151, -73.1218);
+  champlain_polygon_set_stroke_width (polygon, 5.0);
+  champlain_view_add_polygon (CHAMPLAIN_VIEW (view), polygon);
+  champlain_polygon_hide (polygon);
 
   gtk_widget_set_size_request(widget, 640, 480);
 

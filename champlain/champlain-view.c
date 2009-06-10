@@ -365,10 +365,82 @@ license_set_position (ChamplainView *view)
 }
 
 static void
+draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
+{
+  cairo_t *cr;
+  ChamplainViewPrivate *priv = view->priv;
+
+  if (polygon->priv->visible == FALSE)
+    return;
+
+  cr = clutter_cairo_create (CLUTTER_CAIRO (polygon->priv->actor));
+
+  /* Clear the drawing area */
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_rectangle (cr, 0, 0,
+      view->priv->viewport_size.width,
+      view->priv->viewport_size.height);
+  cairo_fill (cr);
+
+  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+  GList *list = g_list_first (polygon->priv->points);
+  while (list != NULL)
+    {
+      ChamplainPoint *point = (ChamplainPoint*) list->data;
+      gint x, y;
+
+      x = champlain_map_source_get_x (priv->map_source, priv->zoom_level,
+          point->lon);
+      y = champlain_map_source_get_y (priv->map_source, priv->zoom_level,
+          point->lat);
+
+      x -= priv->viewport_size.x + priv->anchor.x;
+      y -= priv->viewport_size.y + priv->anchor.y;
+
+      cairo_line_to (cr, x, y);
+      list = list->next;
+    }
+
+  if (polygon->priv->closed_path)
+    cairo_close_path (cr);
+
+  cairo_set_source_rgba (cr,
+      polygon->priv->fill_color->red / 255.0,
+      polygon->priv->fill_color->green / 255.0,
+      polygon->priv->fill_color->blue / 255.0,
+      polygon->priv->fill_color->alpha / 255.0);
+
+  if (polygon->priv->fill)
+    cairo_fill_preserve (cr);
+
+  cairo_set_source_rgba (cr,
+      polygon->priv->stroke_color->red / 255.0,
+      polygon->priv->stroke_color->green / 255.0,
+      polygon->priv->stroke_color->blue / 255.0,
+      polygon->priv->stroke_color->alpha / 255.0);
+
+  cairo_set_line_width (cr, polygon->priv->stroke_width);
+
+  if (polygon->priv->stroke)
+    cairo_stroke (cr);
+
+  cairo_destroy (cr);
+}
+
+static void
+notify_polygon_visible_cb (ChamplainPolygon *polygon,
+    GParamSpec *arg1,
+    ChamplainView *view)
+{
+  draw_polygon (view, polygon);
+}
+
+static void
 resize_viewport (ChamplainView *view)
 {
   gdouble lower, upper;
   TidyAdjustment *hadjust, *vadjust;
+  GList *polygons;
 
   ChamplainViewPrivate *priv = view->priv;
 
@@ -410,6 +482,37 @@ resize_viewport (ChamplainView *view)
     }
   g_object_set (vadjust, "lower", lower, "upper", upper,
       "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
+
+  /* Resize polygon actors */
+  if (priv->viewport_size.width == 0 ||
+      priv->viewport_size.height == 0)
+    return;
+
+  polygons = priv->polygons;
+  while (polygons != NULL)
+    {
+      ChamplainPolygon *polygon;
+
+      polygon = CHAMPLAIN_POLYGON (polygons->data);
+
+      if (polygon->priv->actor != NULL)
+        {
+          g_object_unref (polygon->priv->actor);
+          clutter_container_remove_actor (CLUTTER_CONTAINER (view->priv->polygon_layer),
+              polygon->priv->actor);
+        }
+
+      polygon->priv->actor = g_object_ref (clutter_cairo_new (
+          view->priv->viewport_size.width,
+          view->priv->viewport_size.height));
+      g_object_set (G_OBJECT (polygon->priv->actor), "visible",
+          polygon->priv->visible, NULL);
+      clutter_container_add_actor (CLUTTER_CONTAINER (view->priv->polygon_layer),
+          polygon->priv->actor);
+      clutter_actor_set_position (polygon->priv->actor, 0, 0);
+      draw_polygon (view, polygon);
+      polygons = polygons->next;
+    }
 }
 
 static void
@@ -2190,64 +2293,6 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
 }
 
 static void
-draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
-{
-  cairo_t *cr;
-  ChamplainViewPrivate *priv = view->priv;
-
-  cr = clutter_cairo_create (CLUTTER_CAIRO (polygon->priv->actor));
-
-  /* Clear the drawing area */
-  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-  cairo_rectangle (cr, 0, 0, 800, 600); //XXX
-  cairo_fill (cr);
-
-  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
-  GList *list = g_list_first (polygon->priv->points);
-  while (list != NULL)
-    {
-      ChamplainPoint *point = (ChamplainPoint*) list->data;
-      gint x, y;
-
-      x = champlain_map_source_get_x (priv->map_source, priv->zoom_level,
-          point->lon);
-      y = champlain_map_source_get_y (priv->map_source, priv->zoom_level,
-          point->lat);
-
-      x -= priv->viewport_size.x + priv->anchor.x;
-      y -= priv->viewport_size.y + priv->anchor.y;
-
-      cairo_line_to (cr, x, y);
-      list = list->next;
-    }
-
-  if (polygon->priv->closed_path)
-    cairo_close_path (cr);
-
-  cairo_set_source_rgba (cr,
-      polygon->priv->fill_color->red / 255.0,
-      polygon->priv->fill_color->green / 255.0,
-      polygon->priv->fill_color->blue / 255.0,
-      polygon->priv->fill_color->alpha / 255.0);
-
-  if (polygon->priv->fill)
-    cairo_fill_preserve (cr);
-
-  cairo_set_source_rgba (cr,
-      polygon->priv->stroke_color->red / 255.0,
-      polygon->priv->stroke_color->green / 255.0,
-      polygon->priv->stroke_color->blue / 255.0,
-      polygon->priv->stroke_color->alpha / 255.0);
-
-  cairo_set_line_width (cr, polygon->priv->stroke_width);
-
-  if (polygon->priv->stroke)
-    cairo_stroke (cr);
-
-  cairo_destroy (cr);
-}
-
-static void
 view_update_polygons (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
@@ -2291,6 +2336,20 @@ champlain_view_add_polygon (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
   view->priv->polygons = g_list_append (view->priv->polygons, g_object_ref (polygon));
+
+  g_signal_connect (polygon, "notify::visible",
+      G_CALLBACK (notify_polygon_visible_cb), view);
+
+  if (view->priv->viewport_size.width == 0 ||
+      view->priv->viewport_size.height == 0)
+    return;
+
+  polygon->priv->actor = g_object_ref (clutter_cairo_new (
+      view->priv->viewport_size.width,
+      view->priv->viewport_size.height));
+  g_object_set (G_OBJECT (polygon->priv->actor), "visible",
+      polygon->priv->visible, NULL);
+  clutter_actor_set_position (polygon->priv->actor, 0, 0);
   clutter_container_add_actor (CLUTTER_CONTAINER (view->priv->polygon_layer),
       polygon->priv->actor);
 }

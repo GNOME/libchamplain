@@ -88,6 +88,10 @@ void champlain_polygon_set_stroke (ChamplainPolygon *polygon,
 void champlain_polygon_set_stroke_width (ChamplainPolygon *polygon,
     gdouble value);
 gdouble champlain_polygon_get_stroke_width (ChamplainPolygon *polygon);
+
+void champlain_polygon_show (ChamplainPolygon *polygon);
+void champlain_polygon_hide (ChamplainPolygon *polygon);
+
 G_END_DECLS
 
 #endif

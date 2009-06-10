@@ -55,6 +55,7 @@ enum
   PROP_FILL,
   PROP_FILL_COLOR,
   PROP_STROKE,
+  PROP_VISIBLE,
 };
 
 static void
@@ -84,6 +85,9 @@ champlain_polygon_get_property (GObject *object,
         break;
       case PROP_STROKE_WIDTH:
         g_value_set_double (value, priv->stroke_width);
+        break;
+      case PROP_VISIBLE:
+        g_value_set_boolean (value, priv->visible);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -123,6 +127,12 @@ champlain_polygon_set_property (GObject *object,
         champlain_polygon_set_stroke_width (CHAMPLAIN_POLYGON (object),
             g_value_get_double (value));
         break;
+      case PROP_VISIBLE:
+        if (g_value_get_boolean (value) == TRUE)
+            champlain_polygon_show (CHAMPLAIN_POLYGON (object));
+        else
+            champlain_polygon_hide (CHAMPLAIN_POLYGON (object));
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -131,7 +141,13 @@ champlain_polygon_set_property (GObject *object,
 static void
 champlain_polygon_dispose (GObject *object)
 {
-  //ChamplainPolygonPrivate *priv = GET_PRIVATE (object);
+  ChamplainPolygonPrivate *priv = GET_PRIVATE (object);
+
+  if (priv->actor != NULL)
+    {
+      g_object_unref (priv->actor);
+      priv->actor = NULL;
+    }
 
   G_OBJECT_CLASS (champlain_polygon_parent_class)->dispose (object);
 }
@@ -241,6 +257,21 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
           0, 100.0,
           2.0,
           CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainPolygon:visible:
+  *
+  * Wether the polygon is visible
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+      PROP_VISIBLE,
+      g_param_spec_boolean ("visible",
+          "Visible",
+          "The polygon's visibility",
+          TRUE,
+          CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
@@ -248,6 +279,7 @@ champlain_polygon_init (ChamplainPolygon *self)
 {
   self->priv = GET_PRIVATE (self);
 
+  self->priv->visible = TRUE;
   self->priv->points = NULL;
   self->priv->fill = FALSE;
   self->priv->stroke = TRUE;
@@ -255,8 +287,6 @@ champlain_polygon_init (ChamplainPolygon *self)
 
   self->priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   self->priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
-  self->priv->actor = g_object_ref (clutter_cairo_new (800, 600));
-  clutter_actor_set_position (self->priv->actor, 0, 0);
 }
 
 /**
@@ -470,6 +500,7 @@ champlain_polygon_set_stroke (ChamplainPolygon *polygon,
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
   polygon->priv->stroke = value;
+  g_object_notify (G_OBJECT (polygon), "stroke");
 }
 
 /**
@@ -504,6 +535,7 @@ champlain_polygon_set_fill (ChamplainPolygon *polygon,
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
   polygon->priv->fill = value;
+  g_object_notify (G_OBJECT (polygon), "fill");
 }
 
 /**
@@ -538,6 +570,7 @@ champlain_polygon_set_stroke_width (ChamplainPolygon *polygon,
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
   polygon->priv->stroke_width = value;
+  g_object_notify (G_OBJECT (polygon), "stroke-width");
 }
 
 /**
@@ -554,4 +587,42 @@ champlain_polygon_get_stroke_width (ChamplainPolygon *polygon)
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), 0);
 
   return polygon->priv->stroke_width;
+}
+
+/**
+ * champlain_polygon_show:
+ * @polygon: The polygon
+ *
+ * Makes the polygon visible
+ *
+ * Since: 0.4
+ */
+void
+champlain_polygon_show (ChamplainPolygon *polygon)
+{
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
+
+  polygon->priv->visible = TRUE;
+  if (polygon->priv->actor != NULL)
+    clutter_actor_show (polygon->priv->actor);
+  g_object_notify (G_OBJECT (polygon), "visible");
+}
+
+/**
+ * champlain_polygon_hide:
+ * @polygon: The polygon
+ *
+ * Hides the polygon
+ *
+ * Since: 0.4
+ */
+void
+champlain_polygon_hide (ChamplainPolygon *polygon)
+{
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
+
+  polygon->priv->visible = FALSE;
+  if (polygon->priv->actor != NULL)
+    clutter_actor_hide (polygon->priv->actor);
+  g_object_notify (G_OBJECT (polygon), "visible");
 }
