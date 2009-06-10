@@ -35,6 +35,7 @@
 #include "champlain-private.h"
 
 #include <clutter/clutter.h>
+#include <clutter-cairo/clutter-cairo.h>
 #include <glib.h>
 
 static ClutterColor DEFAULT_FILL_COLOR = {0xcc, 0x00, 0x00, 0xaa};
@@ -254,6 +255,8 @@ champlain_polygon_init (ChamplainPolygon *self)
 
   self->priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   self->priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
+  self->priv->actor = g_object_ref (clutter_cairo_new (800, 600));
+  clutter_actor_set_position (self->priv->actor, 0, 0);
 }
 
 /**

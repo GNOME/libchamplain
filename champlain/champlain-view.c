@@ -524,6 +524,7 @@ champlain_view_dispose (GObject *object)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
+  GList *polygons;
 
   if (priv->factory != NULL)
     {
@@ -577,6 +578,17 @@ champlain_view_dispose (GObject *object)
     {
       map_free (priv->map);
       priv->map = NULL;
+    }
+
+  polygons = priv->polygons;
+  while (polygons != NULL)
+    {
+      ChamplainPolygon *polygon;
+
+      polygon = CHAMPLAIN_POLYGON (polygons->data);
+      polygons = polygons->next;
+      g_object_unref (polygon);
+      priv->polygons = g_list_remove (polygons, polygon);
     }
 
   if (priv->goto_context != NULL)
@@ -861,12 +873,11 @@ champlain_view_init (ChamplainView *view)
   priv->polygons = NULL;
 
   /* Setup polygon layer */
-  priv->polygon_layer = g_object_ref (clutter_cairo_new (800, 600));
+  priv->polygon_layer = g_object_ref (clutter_group_new ());
   clutter_actor_show (priv->polygon_layer);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->polygon_layer);
   clutter_actor_raise (priv->polygon_layer, priv->map_layer);
-  clutter_actor_set_position (priv->polygon_layer, 0, 0);
 
   champlain_view_set_size (view, priv->viewport_size.width,
       priv->viewport_size.height);
@@ -2179,9 +2190,17 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
 }
 
 static void
-draw_polygon (ChamplainView *view, cairo_t *cr, ChamplainPolygon *polygon)
+draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
 {
+  cairo_t *cr;
   ChamplainViewPrivate *priv = view->priv;
+
+  cr = clutter_cairo_create (CLUTTER_CAIRO (polygon->priv->actor));
+
+  /* Clear the drawing area */
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_rectangle (cr, 0, 0, 800, 600); //XXX
+  cairo_fill (cr);
 
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
   GList *list = g_list_first (polygon->priv->points);
@@ -2224,6 +2243,8 @@ draw_polygon (ChamplainView *view, cairo_t *cr, ChamplainPolygon *polygon)
 
   if (polygon->priv->stroke)
     cairo_stroke (cr);
+
+  cairo_destroy (cr);
 }
 
 static void
@@ -2231,18 +2252,10 @@ view_update_polygons (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
   GList *polygons;
-  cairo_t *cr;
   gint x, y;
 
   if (priv->polygons == NULL)
     return;
-
-  cr = clutter_cairo_create (CLUTTER_CAIRO (priv->polygon_layer));
-
-  /* Clear the drawing area */
-  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-  cairo_rectangle (cr, 0, 0, 800, 600);
-  cairo_fill (cr);
 
   polygons = priv->polygons;
   while (polygons != NULL)
@@ -2250,15 +2263,13 @@ view_update_polygons (ChamplainView *view)
       ChamplainPolygon *polygon;
 
       polygon = CHAMPLAIN_POLYGON (polygons->data);
-      draw_polygon (view, cr, polygon);
+      draw_polygon (view, polygon);
       polygons = polygons->next;
     }
 
   /* Position the layer in the viewport */
   x = priv->viewport_size.x;
   y = priv->viewport_size.y;
-
-  cairo_destroy (cr);
 
   clutter_actor_set_position (priv->polygon_layer, x, y);
 }
@@ -2280,6 +2291,8 @@ champlain_view_add_polygon (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
   view->priv->polygons = g_list_append (view->priv->polygons, g_object_ref (polygon));
+  clutter_container_add_actor (CLUTTER_CONTAINER (view->priv->polygon_layer),
+      polygon->priv->actor);
 }
 
 /**
@@ -2299,5 +2312,7 @@ champlain_view_remove_polygon (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
   view->priv->polygons = g_list_remove (view->priv->polygons, polygon);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (view->priv->polygon_layer),
+      polygon->priv->actor);
   g_object_unref (polygon);
 }
