@@ -110,25 +110,25 @@ main (int argc,
   /* draw a line */
   polygon = champlain_polygon_new ();
   /* Cheap approx of Highway 10 */
-  champlain_polygon_add_point (polygon, 45.4095, -73.3197);
-  champlain_polygon_add_point (polygon, 45.4104, -73.2846);
-  champlain_polygon_add_point (polygon, 45.4178, -73.2239);
-  champlain_polygon_add_point (polygon, 45.4176, -73.2181);
-  champlain_polygon_add_point (polygon, 45.4151, -73.2126);
-  champlain_polygon_add_point (polygon, 45.4016, -73.1926);
-  champlain_polygon_add_point (polygon, 45.3994, -73.1877);
-  champlain_polygon_add_point (polygon, 45.4000, -73.1815);
-  champlain_polygon_add_point (polygon, 45.4151, -73.1218);
+  champlain_polygon_append_point (polygon, 45.4095, -73.3197);
+  champlain_polygon_append_point (polygon, 45.4104, -73.2846);
+  champlain_polygon_append_point (polygon, 45.4178, -73.2239);
+  champlain_polygon_append_point (polygon, 45.4176, -73.2181);
+  champlain_polygon_append_point (polygon, 45.4151, -73.2126);
+  champlain_polygon_append_point (polygon, 45.4016, -73.1926);
+  champlain_polygon_append_point (polygon, 45.3994, -73.1877);
+  champlain_polygon_append_point (polygon, 45.4000, -73.1815);
+  champlain_polygon_append_point (polygon, 45.4151, -73.1218);
   champlain_polygon_set_stroke_width (polygon, 5.0);
   champlain_view_add_polygon (CHAMPLAIN_VIEW (actor), polygon);
 
   /* draw a polygon */
   polygon = champlain_polygon_new ();
-  champlain_polygon_add_point (polygon, 45.1386, -73.9196);
-  champlain_polygon_add_point (polygon, 45.1229, -73.8991);
-  champlain_polygon_add_point (polygon, 45.0946, -73.9531);
-  champlain_polygon_add_point (polygon, 45.1085, -73.9714);
-  champlain_polygon_add_point (polygon, 45.1104, -73.9761);
+  champlain_polygon_append_point (polygon, 45.1386, -73.9196);
+  champlain_polygon_append_point (polygon, 45.1229, -73.8991);
+  champlain_polygon_append_point (polygon, 45.0946, -73.9531);
+  champlain_polygon_append_point (polygon, 45.1085, -73.9714);
+  champlain_polygon_append_point (polygon, 45.1104, -73.9761);
   champlain_view_add_polygon (CHAMPLAIN_VIEW (actor), polygon);
   g_object_set (polygon, "closed-path", TRUE, NULL);
   g_object_set (polygon, "fill", TRUE, NULL);

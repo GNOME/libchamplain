@@ -269,20 +269,70 @@ champlain_polygon_new ()
   return g_object_new (CHAMPLAIN_TYPE_POLYGON, NULL);
 }
 
-void
-champlain_polygon_add_point (ChamplainPolygon *self,
+/**
+ * champlain_polygon_append_point:
+ * @polygon: The polygon
+ * @lat: the latitude
+ * @lon: the longitude
+ *
+ * Adds point at the end of the list of points in the polygon
+ *
+ * Returns the added point, should not be freed.
+ *
+ * Since: 0.4
+ */
+ChamplainPoint *
+champlain_polygon_append_point (ChamplainPolygon *self,
     gdouble lat,
     gdouble lon)
 {
-  g_return_if_fail (CHAMPLAIN_IS_POLYGON (self));
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (self), NULL);
 
   ChamplainPoint *point = g_new0 (ChamplainPoint, 1);
   point->lat = lat;
   point->lon = lon;
 
   self->priv->points = g_list_append (self->priv->points, point);
+  return point;
 }
 
+/**
+ * champlain_polygon_insert_point:
+ * @polygon: The polygon
+ * @lat: the latitude
+ * @lon: the longitude
+ * @pos: where to insert the point
+ *
+ * Adds point at the given position in the list of points in the polygon
+ *
+ * Returns the added point, should not be freed.
+ *
+ * Since: 0.4
+ */
+ChamplainPoint *
+champlain_polygon_insert_point (ChamplainPolygon *self,
+    gdouble lat,
+    gdouble lon,
+    gint pos)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (self), NULL);
+
+  ChamplainPoint *point = g_new0 (ChamplainPoint, 1);
+  point->lat = lat;
+  point->lon = lon;
+
+  self->priv->points = g_list_insert (self->priv->points, point, pos);
+  return point;
+}
+
+/**
+ * champlain_polygon_clear_points:
+ * @polygon: The polygon
+ *
+ * Remove all points from the polygon
+ *
+ * Since: 0.4
+ */
 void
 champlain_polygon_clear_points (ChamplainPolygon *self)
 {
@@ -295,6 +345,22 @@ champlain_polygon_clear_points (ChamplainPolygon *self)
     next = g_list_next (next);
   }
   g_list_free (self->priv->points);
+}
+
+/**
+ * champlain_polygon_get_points:
+ * @polygon: The polygon
+ *
+ * Returns a list of all points from the polygon, it shouldn't be freed.
+ *
+ * Since: 0.4
+ */
+GList *
+champlain_polygon_get_points (ChamplainPolygon *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (self), NULL);
+
+  return self->priv->points;
 }
 
 /**

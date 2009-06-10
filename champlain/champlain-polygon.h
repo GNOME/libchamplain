@@ -60,13 +60,18 @@ typedef struct {
 
 GType champlain_polygon_get_type (void);
 
-ChamplainPolygon* champlain_polygon_new (void);
+ChamplainPolygon * champlain_polygon_new (void);
 
-void champlain_polygon_add_point (ChamplainPolygon *polygon,
+ChamplainPoint * champlain_polygon_append_point (ChamplainPolygon *polygon,
     gdouble lat,
     gdouble lon);
-
+ChamplainPoint * champlain_polygon_insert_point (ChamplainPolygon *polygon,
+    gdouble lat,
+    gdouble lon,
+    gint pos);
 void champlain_polygon_clear_points (ChamplainPolygon *polygon);
+GList *champlain_polygon_get_points (ChamplainPolygon *polygon);
+
 void champlain_polygon_set_fill_color (ChamplainPolygon *polygon,
     const ClutterColor *color);
 void champlain_polygon_set_stroke_color (ChamplainPolygon *polygon,
