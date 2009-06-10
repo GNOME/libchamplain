@@ -18,13 +18,9 @@
 
 /**
  * SECTION:champlain-polygon
- * @short_description: A container for #ChamplainPolygon
+ * @short_description: A polygon to be drawn on the map
  *
- * A ChamplainPolygon is little more than a #ClutterContainer. It keeps the
- * polygons ordered so that they display correctly.
- *
- * Use #clutter_container_add to add polygons to the polygon and
- * #clutter_container_remove to remove them.
+ * A ChamplainPolygon is a set of point forming a shape on the map.  This API is based on Cairo's.
  */
 
 #include "config.h"
@@ -292,7 +288,7 @@ champlain_polygon_init (ChamplainPolygon *self)
 /**
  * champlain_polygon_new:
  *
- * Returns a new #ChamplainPolygon ready to be to draw polygons on the map
+ * Returns a new empty #ChamplainPolygon
  *
  * Since: 0.4
  */

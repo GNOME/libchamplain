@@ -2359,7 +2359,7 @@ champlain_view_add_polygon (ChamplainView *view,
  * @view: a #ChamplainView
  * @polygon: a #ChamplainPolygon
  *
- * Removes a #ChamplainPolygon to the #ChamplainView
+ * Removes a #ChamplainPolygon from #ChamplainView
  *
  * Since: 0.4
  */

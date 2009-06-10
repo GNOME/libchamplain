@@ -154,6 +154,8 @@ champlain_view_get_scroll_mode
 champlain_view_get_show_license
 champlain_view_get_zoom_level
 champlain_view_get_zoom_on_double_click
+champlain_view_add_polygon
+champlain_view_remove_polygon
 <SUBSECTION Standard>
 CHAMPLAIN_VIEW
 CHAMPLAIN_IS_VIEW
@@ -325,7 +327,7 @@ ChamplainState
 ChamplainCache
 ChamplainCacheClass
 champlain_cache_fill_tile
-champlain_cache_get_default
+champlain_cache_dup_default
 champlain_cache_get_size_limit
 champlain_cache_purge
 champlain_cache_purge_on_idle
@@ -348,7 +350,7 @@ CHAMPLAIN_CACHE_GET_CLASS
 ChamplainMapSourceFactory
 ChamplainMapSourceDesc
 ChamplainMapSourceConstructor
-champlain_map_source_factory_get_default
+champlain_map_source_factory_dup_default
 champlain_map_source_factory_get_list
 champlain_map_source_factory_create
 champlain_map_source_factory_register
@@ -362,3 +364,33 @@ CHAMPLAIN_IS_MAP_SOURCE_FACTORY_CLASS
 CHAMPLAIN_MAP_SOURCE_FACTORY_GET_CLASS
 </SECTION>
 
+<SECTION>
+<FILE>champlain-polygon</FILE>
+<TITLE>ChamplainPolygon</TITLE>
+ChamplainPolygon
+champlain_polygon_new
+champlain_polygon_append_point
+champlain_polygon_clear_points
+champlain_polygon_get_fill
+champlain_polygon_get_fill_color
+champlain_polygon_get_points
+champlain_polygon_get_stroke
+champlain_polygon_get_stroke_color
+champlain_polygon_get_stroke_width
+champlain_polygon_hide
+champlain_polygon_insert_point
+champlain_polygon_set_fill
+champlain_polygon_set_fill_color
+champlain_polygon_set_stroke
+champlain_polygon_set_stroke_color
+champlain_polygon_set_stroke_width
+champlain_polygon_show
+<SUBSECTION Standard>
+CHAMPLAIN_POLYGON_FACTORY
+CHAMPLAIN_IS_POLYGON
+CHAMPLAIN_TYPE_POLYGON
+champlain_polygon_get_type
+CHAMPLAIN_POLYGON_CLASS
+CHAMPLAIN_IS_POLYGON_CLASS
+CHAMPLAIN_POLYGON_GET_CLASS
+</SECTION>
