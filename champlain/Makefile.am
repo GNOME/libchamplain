@@ -47,6 +47,7 @@ libchamplain_0_3_la_SOURCES = \
 	champlain-map-source.c		\
 	champlain-network-map-source.c	\
 	champlain-map-source-factory.c	\
+	champlain-map-source-desc.c	\
 	champlain-point.c		\
 	champlain-cache.c		\
 	champlain-polygon.c

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This file is inspired by clutter-color.c which is
  * Copyright (C) 2006 OpenedHand, and has the same license.

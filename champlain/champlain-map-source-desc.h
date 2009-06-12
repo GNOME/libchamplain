@@ -24,6 +24,7 @@
 #define CHAMPLAIN_MAP_SOURCE_DESC_H
 
 #include <glib-object.h>
+#include "champlain-map-source.h"
 
 G_BEGIN_DECLS
 
@@ -64,6 +65,15 @@ struct _ChamplainMapSourceDesc {
   gchar *uri_format;
   gpointer data;
 };
+
+GType champlain_map_source_desc_get_type (void) G_GNUC_CONST;
+#define CHAMPLAIN_TYPE_MAP_SOURCE_DESC (champlain_map_source_desc_get_type ())
+
+ChamplainMapSourceDesc * champlain_map_source_desc_copy (const ChamplainMapSourceDesc *desc);
+
+void champlain_map_source_desc_free (ChamplainMapSourceDesc *desc);
+
+ChamplainMapSourceDesc * champlain_map_source_desc_new (void);
 
 G_END_DECLS
 
