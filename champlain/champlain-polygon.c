@@ -31,7 +31,6 @@
 #include "champlain-private.h"
 
 #include <clutter/clutter.h>
-#include <clutter-cairo/clutter-cairo.h>
 #include <glib.h>
 
 static ClutterColor DEFAULT_FILL_COLOR = {0xcc, 0x00, 0x00, 0xaa};

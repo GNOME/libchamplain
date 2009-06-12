@@ -65,7 +65,6 @@
 #include "champlain-zoom-level.h"
 
 #include <clutter/clutter.h>
-#include <clutter-cairo/clutter-cairo.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <math.h>
@@ -369,7 +368,7 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
   if (polygon->priv->visible == FALSE)
     return;
 
-  cr = clutter_cairo_create (CLUTTER_CAIRO (polygon->priv->actor));
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (polygon->priv->actor));
 
   /* Clear the drawing area */
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
@@ -390,8 +389,8 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
       y = champlain_map_source_get_y (priv->map_source, priv->zoom_level,
           point->lat);
 
-      x -= priv->viewport_size.x + priv->anchor.x;
-      y -= priv->viewport_size.y + priv->anchor.y;
+      x -= priv->viewport_size.x;
+      y -= priv->viewport_size.y;
 
       cairo_line_to (cr, x, y);
       list = list->next;
@@ -501,7 +500,7 @@ resize_viewport (ChamplainView *view)
               polygon->priv->actor);
         }
 
-      polygon->priv->actor = g_object_ref (clutter_cairo_new (
+      polygon->priv->actor = g_object_ref (clutter_cairo_texture_new (
           view->priv->viewport_size.width,
           view->priv->viewport_size.height));
       g_object_set (G_OBJECT (polygon->priv->actor), "visible",
@@ -2276,7 +2275,7 @@ champlain_view_add_polygon (ChamplainView *view,
     return;
   }
 
-  polygon->priv->actor = g_object_ref (clutter_cairo_new (
+  polygon->priv->actor = g_object_ref (clutter_cairo_texture_new (
       view->priv->viewport_size.width,
       view->priv->viewport_size.height));
   g_object_set (G_OBJECT (polygon->priv->actor), "visible",
