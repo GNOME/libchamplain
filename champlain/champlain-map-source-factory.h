@@ -67,7 +67,7 @@ ChamplainMapSource * champlain_map_source_factory_create (ChamplainMapSourceFact
 gboolean
 champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
     ChamplainMapSourceDesc *desc, ChamplainMapSourceConstructor constructor,
-    gpointer data);
+    gpointer user_data);
 
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm::mapnik"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "osm::osmarender"

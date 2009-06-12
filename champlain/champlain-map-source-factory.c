@@ -166,7 +166,8 @@ ChamplainMapSourceDesc OSM_MAPNIK_DESC =
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
     champlain_map_source_new_generic,
-    "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png"
+    "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png",
+    NULL
   };
 
 static
@@ -180,7 +181,8 @@ ChamplainMapSourceDesc OSM_OSMARENDER_DESC =
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
     champlain_map_source_new_generic,
-    "http://tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png"
+    "http://tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png",
+    NULL
   };
 
 static
@@ -194,7 +196,8 @@ ChamplainMapSourceDesc OSM_CYCLEMAP_DESC =
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
     champlain_map_source_new_generic,
-    "http://andy.sandbox.cloudmade.com/tiles/cycle/#Z#/#X#/#Y#.png"
+    "http://andy.sandbox.cloudmade.com/tiles/cycle/#Z#/#X#/#Y#.png",
+    NULL
   };
 
 static
@@ -208,7 +211,8 @@ ChamplainMapSourceDesc OAM_DESC =
     17,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
     champlain_map_source_new_generic,
-    "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg"
+    "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg",
+    NULL
   };
 
 static
@@ -222,7 +226,8 @@ ChamplainMapSourceDesc MFF_RELIEF_DESC =
     11,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
     champlain_map_source_new_generic,
-    "http://maps-for-free.com/layer/relief/z#Z#/row#Y#/#Z#_#X#-#Y#.jpg"
+    "http://maps-for-free.com/layer/relief/z#Z#/row#Y#/#Z#_#X#-#Y#.jpg",
+    NULL
   };
 
 static void
@@ -345,7 +350,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
 
 static ChamplainMapSource *
 champlain_map_source_new_generic (
-     ChamplainMapSourceDesc *desc, gpointer data)
+     ChamplainMapSourceDesc *desc, gpointer user_data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (
       desc->id,
@@ -356,5 +361,5 @@ champlain_map_source_new_generic (
       desc->max_zoom_level,
       256,
       desc->projection,
-      (const gchar *)desc->data));
+      desc->uri_format));
 }

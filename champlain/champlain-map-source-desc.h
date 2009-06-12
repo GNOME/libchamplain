@@ -61,6 +61,7 @@ struct _ChamplainMapSourceDesc {
   gint max_zoom_level;
   ChamplainMapProjection projection;
   ChamplainMapSourceConstructor constructor;
+  gchar *uri_format;
   gpointer data;
 };
 
