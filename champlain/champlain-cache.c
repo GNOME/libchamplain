@@ -463,7 +463,7 @@ champlain_cache_tile_is_expired (ChamplainCache *self,
   gboolean validate_cache = FALSE;
 
   g_get_current_time (now);
-  g_time_val_add (now, (-60ul * 60ul * 1000ul * 1000ul)); // Cache expires 1 hour
+  g_time_val_add (now, (-24ul * 60ul * 60ul * 1000ul * 1000ul)); // Cache expires 1 day
   validate_cache = modified_time->tv_sec < now->tv_sec;
 
   g_free (now);
