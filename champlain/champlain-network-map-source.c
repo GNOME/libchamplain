@@ -599,12 +599,16 @@ fill_tile (ChamplainMapSource *map_source,
       g_object_ref (tile);
 
       if (!soup_session)
-        soup_session = soup_session_async_new_with_options ("proxy-uri",
-            soup_uri_new (priv->proxy_uri),
+        {
+          soup_session = soup_session_async_new_with_options ("proxy-uri",
+                soup_uri_new (priv->proxy_uri),
 #ifdef HAVE_LIBSOUP_GNOME
-            SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
+              SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
 #endif
-            NULL);
+              NULL);
+          g_object_set (G_OBJECT (soup_session), "user-agent", "libchamplain/"
+              CHAMPLAIN_VERSION_S, NULL);
+        }
 
       uri = champlain_network_map_source_get_tile_uri (source,
                champlain_tile_get_x (tile), champlain_tile_get_y (tile),
