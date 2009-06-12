@@ -292,6 +292,12 @@ champlain_cache_dup_default (void)
   return g_object_new (CHAMPLAIN_TYPE_CACHE, NULL);
 }
 
+ChamplainCache*
+champlain_cache_get_default (void)
+{
+  return champlain_cache_dup_default ();
+}
+
 /**
  * champlain_cache_get_size_limit:
  * @self: the #ChamplainCache

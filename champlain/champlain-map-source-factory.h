@@ -56,8 +56,10 @@ struct _ChamplainMapSourceFactoryClass
 GType champlain_map_source_factory_get_type (void);
 
 ChamplainMapSourceFactory * champlain_map_source_factory_dup_default (void);
+ChamplainMapSourceFactory * champlain_map_source_factory_get_default (void) G_GNUC_DEPRECATED;
 
 GSList * champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *factory);
+GSList * champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory) G_GNUC_DEPRECATED;
 
 ChamplainMapSource * champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     const gchar *id);

@@ -655,3 +655,9 @@ fill_tile (ChamplainMapSource *map_source,
   g_object_unref (cache);
 }
 
+void
+champlain_network_map_source_fill_tile (ChamplainMapSource *map_source,
+    ChamplainTile *tile)
+{
+  fill_tile (map_source, tile);
+}

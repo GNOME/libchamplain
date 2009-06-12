@@ -253,6 +253,12 @@ champlain_map_source_factory_dup_default (void)
   return g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, NULL);
 }
 
+ChamplainMapSourceFactory *
+champlain_map_source_factory_get_default (void)
+{
+  return champlain_map_source_factory_dup_default ();
+}
+
 /**
  * champlain_map_source_factory_dup_list:
  *
@@ -265,6 +271,12 @@ GSList *
 champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *factory)
 {
   return g_slist_copy (factory->priv->registered_sources);
+}
+
+GSList *
+champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
+{
+  return champlain_map_source_factory_dup_list (factory);
 }
 
 /**
