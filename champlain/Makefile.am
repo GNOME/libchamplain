@@ -17,6 +17,7 @@ lib_LTLIBRARIES = libchamplain-0.3.la
 libchamplain_headers = \
 	champlain.h 			\
 	champlain-defines.h		\
+	champlain-point.h		\
 	champlain-view.h		\
 	champlain-layer.h 		\
 	champlain-base-marker.h		\
@@ -46,6 +47,7 @@ libchamplain_0_3_la_SOURCES = \
 	champlain-map-source.c		\
 	champlain-network-map-source.c	\
 	champlain-map-source-factory.c	\
+	champlain-point.c		\
 	champlain-cache.c		\
 	champlain-polygon.c
 
@@ -55,6 +57,7 @@ noinst_HEADERS = \
 	champlain-base-marker.h 	\
 	champlain-marker.h 		\
 	champlain-private.h 		\
+	champlain-point.h 		\
 	champlain-map.h  		\
 	champlain-zoom-level.h 		\
 	champlain-tile.h 		\
@@ -72,6 +75,7 @@ libchamplain_include_HEADERS = \
 	champlain.h 			\
 	champlain-view.h 		\
 	champlain-defines.h 		\
+	champlain-point.h 		\
 	champlain-enum-types.h		\
 	champlain-layer.h 		\
 	champlain-map-source.h		\

@@ -317,9 +317,7 @@ champlain_polygon_append_point (ChamplainPolygon *self,
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (self), NULL);
 
-  ChamplainPoint *point = g_new0 (ChamplainPoint, 1);
-  point->lat = lat;
-  point->lon = lon;
+  ChamplainPoint *point = champlain_point_new (lat, lon);
 
   self->priv->points = g_list_append (self->priv->points, point);
   return point;
@@ -346,9 +344,7 @@ champlain_polygon_insert_point (ChamplainPolygon *self,
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (self), NULL);
 
-  ChamplainPoint *point = g_new0 (ChamplainPoint, 1);
-  point->lat = lat;
-  point->lon = lon;
+  ChamplainPoint *point = champlain_point_new (lat, lon);
 
   self->priv->points = g_list_insert (self->priv->points, point, pos);
   return point;
@@ -370,7 +366,7 @@ champlain_polygon_clear_points (ChamplainPolygon *self)
   GList *next = self->priv->points;
   while (next != NULL)
   {
-    g_free (next->data);
+    champlain_point_free (next->data);
     next = g_list_next (next);
   }
   g_list_free (self->priv->points);

@@ -35,6 +35,7 @@
 #include "champlain/champlain-marker.h"
 #include "champlain/champlain-view.h"
 #include "champlain/champlain-enum-types.h"
+#include "champlain/champlain-point.h"
 #include "champlain/champlain-map-source.h"
 #include "champlain/champlain-map-source-factory.h"
 #include "champlain/champlain-network-map-source.h"

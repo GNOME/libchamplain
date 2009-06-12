@@ -23,7 +23,7 @@
 #ifndef CHAMPLAIN_POLYGON_H
 #define CHAMPLAIN_POLYGON_H
 
-#include <champlain/champlain-defines.h>
+#include <champlain/champlain-point.h>
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
