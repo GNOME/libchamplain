@@ -299,6 +299,9 @@ champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
  * Returns a ready to use #ChamplainMapSource matching the given name, returns
  * NULL is none match.
  *
+ * The id should not contain any character that can't be in a filename as it
+ * will be used as the cache directory name for that map source.
+ *
  * Since: 0.4
  */
 ChamplainMapSource *

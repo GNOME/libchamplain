@@ -69,11 +69,11 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
     ChamplainMapSourceDesc *desc, ChamplainMapSourceConstructor constructor,
     gpointer user_data);
 
-#define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm::mapnik"
-#define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "osm::osmarender"
-#define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "osm::cyclemap"
+#define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm-mapnik"
+#define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "osm-osmarender"
+#define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "osm-cyclemap"
 #define CHAMPLAIN_MAP_SOURCE_OAM "oam"
-#define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "mff::relief"
+#define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "mff-relief"
 
 G_END_DECLS
 

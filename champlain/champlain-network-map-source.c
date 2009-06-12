@@ -362,7 +362,7 @@ get_filename (ChamplainNetworkMapSource *source,
   return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
              "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
              "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
-             CACHE_SUBDIR, champlain_map_source_get_name (CHAMPLAIN_MAP_SOURCE (source)),
+             CACHE_SUBDIR, champlain_map_source_get_id (CHAMPLAIN_MAP_SOURCE (source)),
              champlain_tile_get_zoom_level (tile),
              champlain_tile_get_x (tile), champlain_tile_get_y (tile));
 }
