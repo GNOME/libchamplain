@@ -157,9 +157,6 @@ if test x$enable_managed = xyes; then
   CHAMPLAIN_GTK_APIVERSION=0.3
   AC_SUBST(CHAMPLAIN_APIVERSION)
   AC_SUBST(CHAMPLAIN_GTK_APIVERSION)
-
-  AC_CONFIG_FILES([
-  ])
 fi
 
 AM_CONDITIONAL(ENABLE_MANAGED, test "x$enable_managed" = "xyes")
