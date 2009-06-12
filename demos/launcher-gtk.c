@@ -183,7 +183,7 @@ main (int argc,
 {
   GtkWidget *window;
   GtkWidget *widget, *vbox, *bbox, *button, *viewport;
-  ClutterActor *view;
+  ChamplainView *view;
   ChamplainLayer *layer;
 
   g_thread_init (NULL);
@@ -207,13 +207,13 @@ main (int argc,
 
   vbox = gtk_vbox_new(FALSE, 10);
 
-  widget = champlain_view_embed_new ();
-  view = champlain_view_embed_get_view (CHAMPLAIN_VIEW_EMBED (widget));
+  widget = gtk_champlain_embed_new ();
+  view = gtk_champlain_embed_get_view (GTK_CHAMPLAIN_EMBED (widget));
 
   g_object_set (G_OBJECT (view), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
       "zoom-level", 5, NULL);
-  layer = create_marker_layer (CHAMPLAIN_VIEW (view));
-  champlain_view_add_layer(CHAMPLAIN_VIEW (view), layer);
+  layer = create_marker_layer (view);
+  champlain_view_add_layer(view, layer);
   clutter_actor_hide (CLUTTER_ACTOR (layer));
 
   polygon = champlain_polygon_new ();
@@ -231,7 +231,7 @@ main (int argc,
   champlain_view_add_polygon (CHAMPLAIN_VIEW (view), polygon);
   champlain_polygon_hide (polygon);
 
-  gtk_widget_set_size_request(widget, 640, 480);
+  gtk_widget_set_size_request (widget, 640, 480);
 
   bbox =  gtk_hbox_new (FALSE, 10);
   button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_IN);

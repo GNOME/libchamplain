@@ -21,7 +21,7 @@
 
 #define __CHAMPLAIN_GTK_CHAMPLAIN_GTK_H_INSIDE__
 
-#include <champlain-gtk/champlain-view-embed.h>
+#include <champlain-gtk/gtk-champlain-embed.h>
 
 #undef __CHAMPLAIN_GTK_CHAMPLAIN_GTK_H_INSIDE__
 

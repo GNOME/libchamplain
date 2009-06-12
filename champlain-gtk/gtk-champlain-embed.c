@@ -16,14 +16,24 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:gtk-champlain-embed
+ * @short_description: A Gtk+ Widget that embeds a #ChamplainView
+ *
+ * Since #ChamplainView is a #ClutterActor, you cannot embed it directly
+ * into a Gtk+ application.  This widget solves this problem.  It creates
+ * the #ChamplainView for you, you can get it with
+ * #gtk_champlain_embed_get_view.
+ */
 #include "config.h"
 
-#include <champlain-view-embed.h>
 #include <champlain/champlain.h>
 
 #include <gtk/gtk.h>
 #include <clutter/clutter.h>
 #include <clutter-gtk/gtk-clutter-embed.h>
+
+#include "gtk-champlain-embed.h"
 
 enum
 {
@@ -37,11 +47,11 @@ enum
   PROP_VIEW
 };
 
-//static guint champlain_view_embed_embed_signals[LAST_SIGNAL] = { 0, };
+//static guint gtk_champlain_embed_embed_signals[LAST_SIGNAL] = { 0, };
 
-#define CHAMPLAIN_VIEW_EMBED_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_VIEW_EMBED, ChamplainViewEmbedPrivate))
+#define GTK_CHAMPLAIN_EMBED_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), GTK_CHAMPLAIN_TYPE_EMBED, GtkChamplainEmbedPrivate))
 
-struct _ChamplainViewEmbedPrivate
+struct _GtkChamplainEmbedPrivate
 {
   GtkWidget *clutter_embed;
   ChamplainView *view;
@@ -54,32 +64,32 @@ struct _ChamplainViewEmbedPrivate
 };
 
 
-static void champlain_view_embed_get_property(GObject *object, guint prop_id,
+static void gtk_champlain_embed_get_property (GObject *object, guint prop_id,
     GValue *value, GParamSpec *pspec);
-static void champlain_view_embed_set_property(GObject *object, guint prop_id,
+static void gtk_champlain_embed_set_property (GObject *object, guint prop_id,
     const GValue *value, GParamSpec *pspec);
-static void champlain_view_embed_finalize (GObject *object);
-static void champlain_view_embed_class_init (ChamplainViewEmbedClass *klass);
-static void champlain_view_embed_init (ChamplainViewEmbed *view);
+static void gtk_champlain_embed_finalize (GObject *object);
+static void gtk_champlain_embed_class_init (GtkChamplainEmbedClass *klass);
+static void gtk_champlain_embed_init (GtkChamplainEmbed *view);
 static void view_size_allocated_cb (GtkWidget *widget,
-    GtkAllocation *allocation, ChamplainViewEmbed *view);
+    GtkAllocation *allocation, GtkChamplainEmbed *view);
 static gboolean mouse_button_cb (GtkWidget *widget, GdkEventButton *event,
-    ChamplainViewEmbed *view);
+    GtkChamplainEmbed *view);
 static void view_size_allocated_cb (GtkWidget *widget,
-    GtkAllocation *allocation, ChamplainViewEmbed *view);
+    GtkAllocation *allocation, GtkChamplainEmbed *view);
 static void view_realize_cb (GtkWidget *widget,
-    ChamplainViewEmbed *view);
+    GtkChamplainEmbed *view);
 
-G_DEFINE_TYPE (ChamplainViewEmbed, champlain_view_embed, GTK_TYPE_ALIGNMENT);
+G_DEFINE_TYPE (GtkChamplainEmbed, gtk_champlain_embed, GTK_TYPE_ALIGNMENT);
 
 static void
-champlain_view_embed_get_property (GObject *object,
+gtk_champlain_embed_get_property (GObject *object,
                                    guint prop_id,
                                    GValue *value,
                                    GParamSpec *pspec)
 {
-  ChamplainViewEmbed *embed = CHAMPLAIN_VIEW_EMBED(object);
-  ChamplainViewEmbedPrivate *priv = embed->priv;
+  GtkChamplainEmbed *embed = GTK_CHAMPLAIN_EMBED (object);
+  GtkChamplainEmbedPrivate *priv = embed->priv;
 
   switch(prop_id)
     {
@@ -87,56 +97,48 @@ champlain_view_embed_get_property (GObject *object,
         g_value_set_object (value, priv->view);
         break;
       default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
 
 static void
-champlain_view_embed_set_property (GObject *object,
+gtk_champlain_embed_set_property (GObject *object,
                                    guint prop_id,
                                    const GValue *value,
                                    GParamSpec *pspec)
 {
-  ChamplainViewEmbed *embed = CHAMPLAIN_VIEW_EMBED(object);
-  ChamplainViewEmbedPrivate *priv = embed->priv;
+  //GtkChamplainEmbed *embed = GTK_CHAMPLAIN_EMBED (object);
+  //GtkChamplainEmbedPrivate *priv = embed->priv;
 
   switch(prop_id)
   {
-    case PROP_VIEW:
-      {
-        ChamplainView *view;
-
-        view = g_value_get_object (value);
-        champlain_view_embed_set_view (CHAMPLAIN_VIEW_EMBED (object), view);
-        break;
-      }
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
   }
 }
 
 static void
-champlain_view_embed_finalize (GObject *object)
+gtk_champlain_embed_finalize (GObject *object)
 {
-  ChamplainViewEmbed *embed = CHAMPLAIN_VIEW_EMBED (object);
-  ChamplainViewEmbedPrivate *priv = embed->priv;
+  GtkChamplainEmbed *embed = GTK_CHAMPLAIN_EMBED (object);
+  GtkChamplainEmbedPrivate *priv = embed->priv;
 
   g_object_unref (priv->view);
-  G_OBJECT_CLASS (champlain_view_embed_parent_class)->finalize (object);
+  G_OBJECT_CLASS (gtk_champlain_embed_parent_class)->finalize (object);
 }
 
 static void
-champlain_view_embed_class_init (ChamplainViewEmbedClass *klass)
+gtk_champlain_embed_class_init (GtkChamplainEmbedClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (ChamplainViewEmbedPrivate));
+  g_type_class_add_private (klass, sizeof (GtkChamplainEmbedPrivate));
 
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  object_class->finalize = champlain_view_embed_finalize;
-  object_class->get_property = champlain_view_embed_get_property;
-  object_class->set_property = champlain_view_embed_set_property;
+  object_class->finalize = gtk_champlain_embed_finalize;
+  object_class->get_property = gtk_champlain_embed_get_property;
+  object_class->set_property = gtk_champlain_embed_set_property;
 
   /**
-  * ChamplainViewEmbed:champlain-view:
+  * GtkChamplainEmbed:champlain-view:
   *
   * The #ChamplainView to embed in the Gtk+ widget.
   *
@@ -148,16 +150,36 @@ champlain_view_embed_class_init (ChamplainViewEmbedClass *klass)
          "Champlain view",
          "The ChamplainView to embed into the Gtk+ widget",
          CHAMPLAIN_TYPE_VIEW,
-         CHAMPLAIN_PARAM_READWRITE));
+         G_PARAM_READABLE));
+}
+
+void
+set_view (GtkChamplainEmbed* embed,
+    ChamplainView *view)
+{
+  GtkChamplainEmbedPrivate *priv = embed->priv;
+  ClutterActor *stage;
+
+  if (priv->view != NULL)
+    {
+      g_object_unref (priv->view);
+      clutter_container_remove_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
+    }
+
+  priv->view = g_object_ref (view);
+  champlain_view_set_size (priv->view, priv->width, priv->height);
+
+  stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
 }
 
 static void
-champlain_view_embed_init (ChamplainViewEmbed *embed)
+gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 {
   ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
   ClutterActor *stage;
 
-  ChamplainViewEmbedPrivate *priv = CHAMPLAIN_VIEW_EMBED_GET_PRIVATE (embed);
+  GtkChamplainEmbedPrivate *priv = GTK_CHAMPLAIN_EMBED_GET_PRIVATE (embed);
   embed->priv = priv;
 
   priv->clutter_embed = gtk_clutter_embed_new ();
@@ -183,7 +205,8 @@ champlain_view_embed_init (ChamplainViewEmbed *embed)
   priv->cursor_hand_closed = gdk_cursor_new(GDK_FLEUR);
 
   priv->view = NULL;
-  champlain_view_embed_set_view (embed, champlain_view_new ());
+  set_view (embed, CHAMPLAIN_VIEW (champlain_view_new ()));
+
   // Setup stage
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
   clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
@@ -193,9 +216,9 @@ champlain_view_embed_init (ChamplainViewEmbed *embed)
 
 static void
 view_realize_cb (GtkWidget *widget,
-    ChamplainViewEmbed *view)
+    GtkChamplainEmbed *view)
 {
-  ChamplainViewEmbedPrivate *priv = view->priv;
+  GtkChamplainEmbedPrivate *priv = view->priv;
 
   // Setup mouse cursor to a hand
   gdk_window_set_cursor (priv->clutter_embed->window, priv->cursor_hand_open);
@@ -204,9 +227,9 @@ view_realize_cb (GtkWidget *widget,
 static void
 view_size_allocated_cb (GtkWidget *widget,
                         GtkAllocation *allocation,
-                        ChamplainViewEmbed *view)
+                        GtkChamplainEmbed *view)
 {
-  ChamplainViewEmbedPrivate *priv = view->priv;
+  GtkChamplainEmbedPrivate *priv = view->priv;
 
   if (priv->view != NULL)
     champlain_view_set_size (priv->view, allocation->width, allocation->height);
@@ -218,9 +241,9 @@ view_size_allocated_cb (GtkWidget *widget,
 static gboolean
 mouse_button_cb (GtkWidget *widget,
                  GdkEventButton *event,
-                 ChamplainViewEmbed *view)
+                 GtkChamplainEmbed *view)
 {
-  ChamplainViewEmbedPrivate *priv = view->priv;
+  GtkChamplainEmbedPrivate *priv = view->priv;
 
   if (event->type == GDK_BUTTON_PRESS)
     gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_closed);
@@ -231,46 +254,31 @@ mouse_button_cb (GtkWidget *widget,
 }
 
 /**
- * champlain_view_embed_new:
- * @mode: a #ChamplainView, the map view to embed
- * Returns a new #ChamplainViewEmbed ready to be used as a #GtkWidget.
+ * gtk_champlain_embed_new:
  *
- * Since: 0.2.1
+ * Return value: a new #GtkChamplainEmbed ready to be used as a #GtkWidget.
+ *
+ * Since: 0.4
  */
 GtkWidget *
-champlain_view_embed_new ()
+gtk_champlain_embed_new ()
 {
-  return g_object_new (CHAMPLAIN_TYPE_VIEW_EMBED, NULL);
+  return g_object_new (GTK_CHAMPLAIN_TYPE_EMBED, NULL);
 }
 
+/**
+ * gtk_champlain_embed_get_view:
+ * @mode: a #ChamplainView, the map view to embed
+ *
+ * Return value: a #ChamplainView ready to be used
+ *
+ * Since: 0.4
+ */
 ChamplainView *
-champlain_view_embed_get_view (ChamplainViewEmbed* embed)
+gtk_champlain_embed_get_view (GtkChamplainEmbed* embed)
 {
-  g_return_val_if_fail(CHAMPLAIN_IS_VIEW_EMBED(embed), NULL);
+  g_return_val_if_fail (GTK_CHAMPLAIN_IS_EMBED(embed), NULL);
 
-  ChamplainViewEmbedPrivate *priv = embed->priv;
+  GtkChamplainEmbedPrivate *priv = embed->priv;
   return priv->view;
-}
-
-void
-champlain_view_embed_set_view (ChamplainViewEmbed* embed,
-    ChamplainView *view)
-{
-  g_return_if_fail (CHAMPLAIN_IS_VIEW_EMBED(embed));
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  ChamplainViewEmbedPrivate *priv = embed->priv;
-  ClutterActor *stage;
-
-  if (priv->view != NULL)
-    {
-      g_object_unref (priv->view);
-      clutter_container_remove_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
-    }
-
-  priv->view = g_object_ref (view);
-  champlain_view_set_size (priv->view, priv->width, priv->height);
-
-  stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
 }
