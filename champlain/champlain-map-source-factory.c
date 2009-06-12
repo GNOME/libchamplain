@@ -28,7 +28,7 @@
  * will return a ready to use #ChamplainMapSource.
  *
  * To get the list of registered map sources, use
- * #champlain_map_source_factory_get_list.
+ * #champlain_map_source_factory_dup_list.
  *
  */
 #include "config.h"
@@ -254,7 +254,7 @@ champlain_map_source_factory_dup_default (void)
 }
 
 /**
- * champlain_map_source_factory_get_list:
+ * champlain_map_source_factory_dup_list:
  *
  * Returns the list of registered map sources, the items should not be freed,
  * the list should be freed with #g_slist_free.
@@ -262,7 +262,7 @@ champlain_map_source_factory_dup_default (void)
  * Since: 0.4
  */
 GSList *
-champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
+champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *factory)
 {
   return g_slist_copy (factory->priv->registered_sources);
 }

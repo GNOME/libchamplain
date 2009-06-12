@@ -150,7 +150,7 @@ build_combo_box (GtkComboBox *box)
       -1);
 
   factory = champlain_map_source_factory_dup_default ();
-  sources = champlain_map_source_factory_get_list (factory);
+  sources = champlain_map_source_factory_dup_list (factory);
 
   iter = sources;
   while (iter != NULL)
