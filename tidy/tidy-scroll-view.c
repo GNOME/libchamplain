@@ -110,9 +110,9 @@ tidy_scroll_view_pick (ClutterActor *actor, const ClutterColor *color)
 
 static void
 tidy_scroll_view_get_preferred_width (ClutterActor *actor,
-                                      ClutterUnit   for_height,
-                                      ClutterUnit  *min_width_p,
-                                      ClutterUnit  *natural_width_p)
+                                      gfloat   for_height,
+                                      gfloat  *min_width_p,
+                                      gfloat  *natural_width_p)
 {
 
   TidyScrollViewPrivate *priv = TIDY_SCROLL_VIEW (actor)->priv;
@@ -131,9 +131,9 @@ tidy_scroll_view_get_preferred_width (ClutterActor *actor,
 
 static void
 tidy_scroll_view_get_preferred_height (ClutterActor *actor,
-                                       ClutterUnit   for_width,
-                                       ClutterUnit  *min_height_p,
-                                       ClutterUnit  *natural_height_p)
+                                       gfloat   for_width,
+                                       gfloat  *min_height_p,
+                                       gfloat  *natural_height_p)
 {
 
   TidyScrollViewPrivate *priv = TIDY_SCROLL_VIEW (actor)->priv;
@@ -152,36 +152,32 @@ tidy_scroll_view_get_preferred_height (ClutterActor *actor,
 static void
 tidy_scroll_view_allocate (ClutterActor          *actor,
                            const ClutterActorBox *box,
-                           gboolean               absolute_origin_changed)
+                           ClutterAllocationFlags flags)
 {
   ClutterActorBox child_box;
-  
+
   TidyScrollViewPrivate *priv = TIDY_SCROLL_VIEW (actor)->priv;
-  
+
   /* Chain up */
   CLUTTER_ACTOR_CLASS (tidy_scroll_view_parent_class)->
-    allocate (actor, box, absolute_origin_changed);
-  
-  
+    allocate (actor, box, flags);
 
-  
   /* Child */
   child_box.x1 = 0;
   child_box.x2 = box->x2 - box->x1;
   child_box.y1 = 0;
   child_box.y2 = box->y2 - box->y1;
-  
-  
+
   if (priv->child)
     {
-      clutter_actor_allocate (priv->child, &child_box, absolute_origin_changed);
-      clutter_actor_set_clipu (priv->child,
-                               child_box.x1,
-                               child_box.y1,
-                               child_box.x2 - child_box.x1,
-                               child_box.y2 - child_box.y1);
+      clutter_actor_allocate (priv->child, &child_box, flags);
+      clutter_actor_set_clip (priv->child,
+                              child_box.x1,
+                              child_box.y1,
+                              child_box.x2 - child_box.x1,
+                              child_box.y2 - child_box.y1);
     }
-  
+
 }
 
 static void

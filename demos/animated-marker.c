@@ -80,7 +80,7 @@ create_marker ()
   clutter_actor_set_anchor_point_from_gravity (bg, CLUTTER_GRAVITY_CENTER);
 
   /* Animate the echo circle */
-  timeline = clutter_timeline_new_for_duration (1000);
+  timeline = clutter_timeline_new (1000);
   clutter_timeline_set_loop (timeline, TRUE);
   alpha = clutter_alpha_new_full (timeline, CLUTTER_EASE_OUT_SINE);
 

@@ -62,7 +62,7 @@ make_button (char *text)
   ClutterActor *button, *button_bg, *button_text;
   ClutterColor white = { 0xff, 0xff, 0xff, 0xff };
   ClutterColor black = { 0x00, 0x00, 0x00, 0xff };
-  guint width, height;
+  gfloat width, height;
 
   button = clutter_group_new ();
 
@@ -87,7 +87,7 @@ main (int argc,
 {
   ClutterActor* actor, *stage, *buttons, *button;
   ChamplainLayer *layer;
-  guint width, total_width = 0;;
+  gfloat width, total_width = 0;;
 
   g_thread_init (NULL);
   clutter_init (&argc, &argv);

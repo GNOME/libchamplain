@@ -315,7 +315,7 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
                                        &hadjust,
                                        &vadjust);
 
-      for (i = 0; i < clutter_timeline_get_delta (timeline, NULL); i++)
+      for (i = 0; i < clutter_timeline_get_delta (timeline) / 15; i++)
         {
           tidy_adjustment_set_value (hadjust,
                                       priv->dx +
@@ -328,7 +328,7 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
         }
 
       /* Check if we've hit the upper or lower bounds and stop the timeline */
-      tidy_adjustment_get_valuesx (hadjust, &value, &lower, &upper,
+      tidy_adjustment_get_values (hadjust, &value, &lower, &upper,
                                    NULL, NULL, &page_size);
       if (((priv->dx > 0) && (value < upper - page_size)) ||
           ((priv->dx < 0) && (value > lower)))
@@ -336,7 +336,7 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
 
       if (stop)
         {
-          tidy_adjustment_get_valuesx (vadjust, &value, &lower, &upper,
+          tidy_adjustment_get_values (vadjust, &value, &lower, &upper,
                                        NULL, NULL, &page_size);
           if (((priv->dy > 0) && (value < upper - page_size)) ||
               ((priv->dy < 0) && (value > lower)))
@@ -404,13 +404,14 @@ button_release_event_cb (ClutterActor *actor,
                *        either fix that, or calculate the correct maximum
                *        value for the buffer size
                */
+
               x_origin += motion->x;
               y_origin += motion->y;
               motion_time.tv_sec += motion->time.tv_sec;
               motion_time.tv_usec += motion->time.tv_usec;
             }
-          x_origin = x_origin / priv->last_motion;
-          y_origin = y_origin / priv->last_motion;
+          x_origin /= priv->last_motion;
+          y_origin /= priv->last_motion;
           motion_time.tv_sec /= priv->last_motion;
           motion_time.tv_usec /= priv->last_motion;
 
@@ -499,7 +500,7 @@ button_release_event_cb (ClutterActor *actor,
                         step_increment) + lower) - value;
                   priv->dy = (d / a);
                   
-                  priv->deceleration_timeline = clutter_timeline_new ((gint)n, 60);
+                  priv->deceleration_timeline = clutter_timeline_new ((n / 60) * 1000.0);
                 }
               else
                 {
@@ -523,7 +524,7 @@ button_release_event_cb (ClutterActor *actor,
                         step_increment) + lower) - value;
                   priv->dy = (d / a);
                   
-                  priv->deceleration_timeline = clutter_timeline_new (4, 60);
+                  priv->deceleration_timeline = clutter_timeline_new (250);
                 }
 
               g_signal_connect (priv->deceleration_timeline, "new_frame",

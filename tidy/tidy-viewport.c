@@ -51,9 +51,9 @@ G_DEFINE_TYPE_WITH_CODE (TidyViewport, tidy_viewport, CLUTTER_TYPE_GROUP,
 
 struct _TidyViewportPrivate
 {
-  ClutterUnit x;
-  ClutterUnit y;
-  ClutterUnit z;
+  gfloat x;
+  gfloat y;
+  gfloat z;
 
   TidyAdjustment *hadjustment;
   TidyAdjustment *vadjustment;
@@ -228,7 +228,7 @@ tidy_viewport_pick (ClutterActor       *self,
 static void
 tidy_viewport_allocate (ClutterActor          *self,
                         const ClutterActorBox *box,
-                        gboolean               absolute_origin_changed)
+                        ClutterAllocationFlags flags)
 {
   CoglFixed prev_value;
 
@@ -236,7 +236,7 @@ tidy_viewport_allocate (ClutterActor          *self,
 
   /* Chain up */
   CLUTTER_ACTOR_CLASS (tidy_viewport_parent_class)->
-    allocate (self, box, absolute_origin_changed);
+    allocate (self, box, flags);
 
   /* Refresh adjustments */
   if (priv->sync_adjustments)
@@ -487,7 +487,7 @@ clip_notify_cb (ClutterActor *actor,
                 GParamSpec   *pspec,
                 TidyViewport *self)
 {
-  gint width, height;
+  gfloat width, height;
   TidyViewportPrivate *priv = self->priv;
 
   if (!priv->sync_adjustments)

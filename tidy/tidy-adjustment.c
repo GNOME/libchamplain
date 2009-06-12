@@ -472,110 +472,6 @@ tidy_adjustment_set_page_size (TidyAdjustment *adjustment,
 }
 
 void
-tidy_adjustment_set_valuesx (TidyAdjustment *adjustment,
-                             gdouble    value,
-                             gdouble    lower,
-                             gdouble    upper,
-                             gdouble    step_increment,
-                             gdouble    page_increment,
-                             gdouble    page_size)
-{
-  TidyAdjustmentPrivate *priv;
-  gboolean emit_changed = FALSE;
-
-  g_return_if_fail (TIDY_IS_ADJUSTMENT (adjustment));
-
-  priv = adjustment->priv;
-
-  stop_interpolation (adjustment);
-
-  emit_changed = FALSE;
-
-  g_object_freeze_notify (G_OBJECT (adjustment));
-
-  if (priv->lower != lower)
-    {
-      priv->lower = lower;
-      emit_changed = TRUE;
-
-      g_object_notify (G_OBJECT (adjustment), "lower");
-    }
-
-  if (priv->upper != upper)
-    {
-      priv->upper = upper;
-      emit_changed = TRUE;
-
-      g_object_notify (G_OBJECT (adjustment), "upper");
-    }
-
-  if (priv->step_increment != step_increment)
-    {
-      priv->step_increment = step_increment;
-      emit_changed = TRUE;
-
-      g_object_notify (G_OBJECT (adjustment), "step-increment");
-    }
-
-  if (priv->page_increment != page_increment)
-    {
-      priv->page_increment = page_increment;
-      emit_changed = TRUE;
-
-      g_object_notify (G_OBJECT (adjustment), "page-increment");
-    }
-
-  if (priv->page_size != page_size)
-    {
-      priv->page_size = page_size;
-      emit_changed = TRUE;
-
-      g_object_notify (G_OBJECT (adjustment), "page-size");
-    }
-
-  tidy_adjustment_set_value (adjustment, value);
-
-  if (emit_changed)
-    g_signal_emit (G_OBJECT (adjustment), signals[CHANGED], 0);
-
-  g_object_thaw_notify (G_OBJECT (adjustment));
-}
-
-void
-tidy_adjustment_get_valuesx (TidyAdjustment *adjustment,
-                             gdouble   *value,
-                             gdouble   *lower,
-                             gdouble   *upper,
-                             gdouble   *step_increment,
-                             gdouble   *page_increment,
-                             gdouble   *page_size)
-{
-  TidyAdjustmentPrivate *priv;
-
-  g_return_if_fail (TIDY_IS_ADJUSTMENT (adjustment));
-
-  priv = adjustment->priv;
-
-  if (lower)
-    *lower = priv->lower;
-
-  if (upper)
-    *upper = priv->upper;
-
-  if (value)
-    *value = tidy_adjustment_get_value (adjustment);
-
-  if (step_increment)
-    *step_increment = priv->step_increment;
-
-  if (page_increment)
-    *page_increment = priv->page_increment;
-
-  if (page_size)
-    *page_size = priv->page_size;
-}
-
-void
 tidy_adjustment_get_values (TidyAdjustment *adjustment,
                             gdouble        *value,
                             gdouble        *lower,
@@ -685,7 +581,7 @@ tidy_adjustment_interpolate (TidyAdjustment *adjustment,
   priv->new_position = value;
 
   priv->dx = (priv->new_position - priv->old_position) * n_frames;
-  priv->interpolation = clutter_timeline_new (n_frames, fps);
+  priv->interpolation = clutter_timeline_new (((float)n_frames / fps) * 1000);
 
   if (priv->elastic)
     priv->bounce_alpha = clutter_alpha_new_full (priv->interpolation,

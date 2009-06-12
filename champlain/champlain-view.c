@@ -349,7 +349,7 @@ static void
 license_set_position (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
-  guint width, height;
+  gfloat width, height;
 
   if (!priv->license_actor)
     return;
@@ -1264,7 +1264,7 @@ champlain_view_go_to (ChamplainView *view,
    * is higher and if the points are far away
    */
   duration = 500 * priv->zoom_level / 2.0;
-  ctx->timeline = clutter_timeline_new_for_duration (duration);
+  ctx->timeline = clutter_timeline_new (duration);
   ctx->alpha = clutter_alpha_new_full (ctx->timeline, CLUTTER_EASE_IN_OUT_CIRC);
 
   g_signal_connect (ctx->timeline, "new-frame", G_CALLBACK (timeline_new_frame),
@@ -1529,8 +1529,8 @@ gboolean champlain_view_get_coords_at (ChamplainView *view,
 {
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
   ChamplainViewPrivate *priv = view->priv;
-  gint actor_x, actor_y;
-  gint rel_x, rel_y;
+  gfloat actor_x, actor_y;
+  gdouble rel_x, rel_y;
 
   clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
 
@@ -2008,9 +2008,9 @@ view_set_zoom_level_at (ChamplainView *view,
   ClutterActor *group, *new_group;
   gdouble lon, lat;
   gint x_diff, y_diff;
-  gint actor_x, actor_y;
-  gint rel_x, rel_y;
-  gint x2, y2;
+  gfloat actor_x, actor_y;
+  gdouble rel_x, rel_y;
+  gfloat x2, y2;
   gdouble lat2, lon2;
 
   if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE(priv, zoom_level))
