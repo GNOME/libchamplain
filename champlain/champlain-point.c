@@ -19,6 +19,11 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-point
+ * @short_description: A base struct to store a latitude and longitude
+ */
+
 #include "champlain-point.h"
 
 GType
@@ -74,9 +79,10 @@ champlain_point_free (ChamplainPoint *point)
 
 /**
  * champlain_point_new:
- * @point: a #ChamplainPoint
+ * @lat: the latitude
+ * @lon: the longitude
  *
- * Frees a point structure created with champlain_point_copy().
+ * Return value: a newly allocated #ChamplainPoint to be freed with #champlain_point_free
  *
  * Since: 0.4
  */

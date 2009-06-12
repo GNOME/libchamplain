@@ -45,6 +45,7 @@
     <xi:include href="xml/champlain-base-marker.xml"/>
     <xi:include href="xml/champlain-marker.xml"/>
     <xi:include href="xml/champlain-polygon.xml"/>
+    <xi:include href="xml/champlain-point.xml"/>
   </chapter>
   <chapter>
     <title>II. Map Source API Reference</title>

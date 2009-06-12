@@ -25,14 +25,17 @@
 
 #include <glib-object.h>
 
-typedef struct
+typedef struct _ChamplainPoint ChamplainPoint;
+
+struct _ChamplainPoint
 {
   double lat;
   double lon;
-} ChamplainPoint;
+};
 
 GType champlain_point_get_type (void) G_GNUC_CONST;
 #define CHAMPLAIN_TYPE_POINT (champlain_point_get_type ())
+#define CHAMPLAIN_POINT(x) ((ChamplainPoint *) (x))
 
 ChamplainPoint * champlain_point_copy (const ChamplainPoint *point);
 

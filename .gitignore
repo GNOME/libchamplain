@@ -35,7 +35,13 @@ demos/launcher-gtk
 depcomp
 compile
 docs/reference-gtk/version.xml
+docs/reference-gtk/html/*.*
+docs/reference-gtk/tmpl/*.*
+docs/reference-gtk/xml/*.*
 docs/reference/version.xml
+docs/reference/html/*.*
+docs/reference/tmpl/*.*
+docs/reference/xml/*.*
 gtk-doc.make
 install-sh
 libtool

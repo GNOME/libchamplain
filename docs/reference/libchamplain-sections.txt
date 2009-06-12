@@ -322,6 +322,19 @@ ChamplainState
 </SECTION>
 
 <SECTION>
+<FILE>champlain-point</FILE>
+<TITLE>ChamplainPoint</TITLE>
+ChamplainPoint
+champlain_point_new
+champlain_point_copy
+champlain_point_free
+<SUBSECTION Standard>
+CHAMPLAIN_POINT
+CHAMPLAIN_TYPE_POINT
+champlain_point_get_type
+</SECTION>
+
+<SECTION>
 <FILE>champlain-cache</FILE>
 <TITLE>ChamplainCache</TITLE>
 ChamplainCache
