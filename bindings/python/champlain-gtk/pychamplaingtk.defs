@@ -1,10 +1,10 @@
 ;; -*- scheme -*-
 ; object definitions ...
-(define-object ViewEmbed
-  (in-module "Champlain")
+(define-object ChamplainEmbed
+  (in-module "Gtk")
   (parent "GtkAlignment")
-  (c-name "ChamplainViewEmbed")
-  (gtype-id "CHAMPLAIN_TYPE_VIEW_EMBED")
+  (c-name "GtkChamplainEmbed")
+  (gtype-id "GTK_TYPE_CHAMPLAIN_EMBED")
 )
 
 ;; Enumerations and flags ...
@@ -14,11 +14,25 @@
 
 
 
-;; From champlain-view-embed.h
+;; From gtk-champlain-embed.h
 
-(define-function view_embed_get_type
-  (c-name "champlain_view_embed_get_type")
+(define-function gtk_champlain_embed_get_type
+  (c-name "gtk_champlain_embed_get_type")
   (return-type "GType")
+)
+
+(define-function gtk_champlain_embed_new
+  (c-name "gtk_champlain_embed_new")
+  (is-constructor-of "GtkChamplainEmbed")
+  (return-type "GtkWidget*")
+  (parameters
+  )
+)
+
+(define-method get_view
+  (of-object "GtkChamplainEmbed")
+  (c-name "gtk_champlain_embed_get_view")
+  (return-type "ChamplainView*")
 )
 
 (define-method embed_new
@@ -27,10 +41,21 @@
   (return-type "GtkWidget*")
 )
 
-(define-method get_view
-  (of-object "ChamplainViewEmbed")
+(define-function view_embed_get_view
   (c-name "champlain_view_embed_get_view")
   (return-type "ChamplainView*")
+  (parameters
+    '("GtkChamplainEmbed*" "embed")
+  )
+)
+
+(define-function view_embed_set_view
+  (c-name "champlain_view_embed_set_view")
+  (return-type "none")
+  (parameters
+    '("GtkChamplainEmbed*" "embed")
+    '("ChamplainView*" "view")
+  )
 )
 
 

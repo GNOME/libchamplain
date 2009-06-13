@@ -19,14 +19,20 @@ ignore-glob
 %%
 ignore
 	champlain_zoom_level_set_actor
+	// deprecated methods
+	champlain_cache_get_default
+	champlain_map_source_factory_get_default
+	champlain_map_source_factory_get_list
+	champlain_network_map_source_fill_tile
+
 %%
-override champlain_map_source_factory_get_list kwargs
+override champlain_map_source_factory_dup_list kwargs
 static PyObject *
-_wrap_champlain_map_source_factory_get_list(PyGObject *self) {
+_wrap_champlain_map_source_factory_dup_list(PyGObject *self) {
 	GSList *iter, *list;
 	PyObject *ret;
 
-	list = champlain_map_source_factory_get_list(CHAMPLAIN_MAP_SOURCE_FACTORY(self->obj));
+	list = champlain_map_source_factory_dup_list(CHAMPLAIN_MAP_SOURCE_FACTORY(self->obj));
 	
 	ret = PyList_New(0);
 	for(iter = list; iter != NULL; iter = iter->next) {

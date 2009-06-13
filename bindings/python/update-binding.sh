@@ -9,6 +9,8 @@ python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	champlain-cache.h			\
 	champlain-view.h			\
 	champlain-defines.h			\
+	champlain-polygon.h			\
+	champlain-point.h			\
 	champlain-layer.h			\
 	champlain-map-source.h			\
 	champlain-map-source-desc.h		\
@@ -25,7 +27,7 @@ cd ../champlain-gtk
 python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	-m champlain				\
 	champlain-gtk.h				\
-	champlain-view-embed.h			\
+	gtk-champlain-embed.h			\
  > ../bindings/python/champlain-gtk/pychamplaingtk.defs
 
 # Keep original version
