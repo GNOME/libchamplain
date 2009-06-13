@@ -1,14 +1,13 @@
 #include "champlain-perl.h"
 
 
-MODULE = Gtk2::Champlain::ViewEmbed  PACKAGE = Gtk2::Champlain::ViewEmbed  PREFIX = champlain_view_embed_
+MODULE = Gtk2::ChamplainEmbed  PACKAGE = Gtk2::ChamplainEmbed  PREFIX = gtk_champlain_embed_
 
 
 GtkWidget*
-champlain_view_embed_new (class, ChamplainView *view)
-	C_ARGS: view
+gtk_champlain_embed_new (class)
+	C_ARGS: /* No args */
 
 
-ChamplainView*
-champlain_view_embed_get_view (ChamplainViewEmbed *embed)
-
+ChamplainView *
+gtk_champlain_embed_get_view (GtkChamplainEmbed* embed)

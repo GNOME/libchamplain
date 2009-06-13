@@ -19,7 +19,7 @@ xs/ChamplainNetworkMapSource.xs
 xs/ChamplainTile.xs
 xs/ChamplainView.xs
 xs/ChamplainZoomLevel.xs
-xs/Gtk2ChamplainViewEmbed.xs
+xs/Gtk2ChamplainEmbed.xs
 t/Champlain.t
 t/ChamplainBaseMarker.t
 t/ChamplainLayer.t
