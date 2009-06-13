@@ -6,6 +6,10 @@ champlain-0.3.pc
 champlain-gtk-0.3.pc
 champlain.pc
 champlain-gtk.pc
+champlain-0.3-uninstalled.pc
+champlain-gtk-0.3-uninstalled.pc
+champlain-uninstalled.pc
+champlain-gtk-uninstalled.pc
 .deps
 .libs
 *.o
@@ -32,6 +36,7 @@ configure
 demos/animated-marker
 demos/launcher
 demos/launcher-gtk
+demos/polygons
 depcomp
 compile
 docs/reference-gtk/version.xml
