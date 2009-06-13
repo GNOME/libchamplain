@@ -108,7 +108,6 @@ champlain_zoom_level_set_property (GObject *object,
 static void
 champlain_zoom_level_dispose (GObject *object)
 {
-  //FIXME: Get rid of tiles here?
   guint k;
   ChamplainZoomLevel *level = CHAMPLAIN_ZOOM_LEVEL (object);
   ChamplainZoomLevelPrivate *priv = level->priv;
@@ -124,8 +123,9 @@ champlain_zoom_level_dispose (GObject *object)
       int count = champlain_zoom_level_tile_count (level);
       for (k = 0; k < count; k++)
         {
-          ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
-          champlain_zoom_level_remove_tile (level, tile);
+          ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, 0);
+          if (tile != NULL)
+              champlain_zoom_level_remove_tile (level, tile);
         }
       g_ptr_array_free (priv->tiles, TRUE);
       priv->tiles = NULL;
@@ -260,6 +260,8 @@ champlain_zoom_level_get_nth_tile (ChamplainZoomLevel *self,
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), NULL);
 
   ChamplainZoomLevelPrivate *priv = self->priv;
+  g_return_val_if_fail (index < priv->tiles->len, NULL);
+  g_return_val_if_fail (index >= 0, NULL);
 
   return g_ptr_array_index (priv->tiles, index);
 }

@@ -1638,14 +1638,23 @@ view_load_visible_tiles (ChamplainView *view)
   DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_count, y_count);
 
   int i, j;
-  guint k;
+  guint k = 0;
 
   // Get rid of old tiles first
-  for (k = 0; k < champlain_zoom_level_tile_count (level); k++)
+  int count = champlain_zoom_level_tile_count (level);
+  while (k < count)
     {
       ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
+
+      if (tile == NULL)
+        {
+          k++;
+          continue;
+        }
+
       gint tile_x = champlain_tile_get_x (tile);
       gint tile_y = champlain_tile_get_y (tile);
+
       if (tile_x < x_first || tile_x > x_count ||
           tile_y < y_first || tile_y > y_count)
       {
@@ -1657,7 +1666,10 @@ view_load_visible_tiles (ChamplainView *view)
             clutter_container_remove_actor (CLUTTER_CONTAINER (group), actor);
           }
         champlain_zoom_level_remove_tile (level, tile);
+        count = champlain_zoom_level_tile_count (level);
       }
+      else
+        k++;
     }
 
   //Load new tiles if needed
@@ -1669,6 +1681,10 @@ view_load_visible_tiles (ChamplainView *view)
           for (k = 0; k < champlain_zoom_level_tile_count (level) && !exist; k++)
             {
               ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
+
+              if (tile == NULL)
+                continue;
+
               gint tile_x = champlain_tile_get_x (tile);
               gint tile_y = champlain_tile_get_y (tile);
 
@@ -1726,6 +1742,10 @@ view_tiles_reposition (ChamplainView* view)
   for (i = 0; i < champlain_zoom_level_tile_count (priv->map->current_level); i++)
     {
       ChamplainTile *tile = champlain_zoom_level_get_nth_tile (priv->map->current_level, i);
+
+      if (tile == NULL)
+        continue;
+
       if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
         view_position_tile (view, tile);
     }
@@ -1750,6 +1770,10 @@ view_update_state (ChamplainView *view)
   for (i = 0; i < champlain_zoom_level_tile_count (priv->map->current_level); i++)
     {
       ChamplainTile *tile = champlain_zoom_level_get_nth_tile (priv->map->current_level, i);
+
+      if (tile == NULL)
+        continue;
+
       if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING)
         new_state = CHAMPLAIN_STATE_LOADING;
     }
