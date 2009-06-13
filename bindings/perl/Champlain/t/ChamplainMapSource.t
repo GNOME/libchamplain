@@ -28,7 +28,7 @@ sub test_osm_mapnik {
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
-	is($map->get_id, 'osm::mapnik', "$label id");
+	is($map->get_id, 'osm-mapnik', "$label id");
 	is($map->get_name, 'OpenStreetMap Mapnik', "$label name");
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 18, "$label max zoom");
@@ -48,7 +48,7 @@ sub test_osm_cyclemap {
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
-	is($map->get_id, 'osm::cyclemap', "$label id");
+	is($map->get_id, 'osm-cyclemap', "$label id");
 	is($map->get_name, 'OpenStreetMap Cycle Map', "$label name");
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 18, "$label max zoom");
@@ -68,7 +68,7 @@ sub test_osm_osmarender {
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
-	is($map->get_id, 'osm::osmarender', "$label id");
+	is($map->get_id, 'osm-osmarender', "$label id");
 	is($map->get_name, 'OpenStreetMap Osmarender', "$label name");
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 18, "$label max zoom");
@@ -108,7 +108,7 @@ sub test_mff_relief {
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
-	is($map->get_id, 'mff::relief', "$label id");
+	is($map->get_id, 'mff-relief', "$label id");
 	is($map->get_name, 'Maps for Free Relief', "$label name");
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 11, "$label max zoom");
@@ -133,8 +133,8 @@ sub generic_map_operations {
 	# Rename of the map
 	$map->set_name("No name");
 	is($map->get_name, "No name", "Rename the map");
-	$map->set_id('test::map');
-	is($map->get_id, 'test::map', "Change the map id");
+	$map->set_id('test-map');
+	is($map->get_id, 'test-map', "Change the map id");
 	
 	
 	# Relicense the map
