@@ -11,3 +11,4 @@ CHAMPLAIN_TYPE_MAP_PROJECTION      ChamplainMapProjection     GEnum    Champlain
 CHAMPLAIN_TYPE_STATE               ChamplainState             GEnum    Champlain::State
 CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY  ChamplainMapSourceFactory  GObject  Champlain::MapSourceFactory
 CHAMPLAIN_TYPE_CACHE               ChamplainCache             GObject  Champlain::Cache
+CHAMPLAIN_TYPE_MAP_SOURCE_DESC     ChamplainMapSourceDesc     GBoxed   Champlain::MapSourceDesc

@@ -11,16 +11,6 @@
 #endif
 
 
-/* Custom definitions for the bindings of Champlain::MapSourceDesc */
-typedef ChamplainMapSourceDesc ChamplainMapSourceDesc_ornull;
-
-SV* newSVChamplainMapSourceDesc (ChamplainMapSourceDesc *desc);
-ChamplainMapSourceDesc* SvChamplainMapSourceDesc (SV *data);
-
-#define SvChamplainMapSourceDesc_ornull(sv)  (gperl_sv_is_defined (sv) ? SvChamplainMapSourceDesc(sv) : NULL)
-#define newSVChamplainMapSourceDesc_ornull(val)  (((val) == NULL) ? &PL_sv_undef : newSVChamplainMapSourceDesc(val))
-
-
 #include "champlain-autogen.h"
 
 #endif /* _CHAMPLAIN_PERL_H_ */

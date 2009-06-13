@@ -12,6 +12,7 @@ xs/ChamplainBaseMarker.xs
 xs/ChamplainCache.xs
 xs/ChamplainLayer.xs
 xs/ChamplainMapSource.xs
+xs/ChamplainMapSourceDesc.xs
 xs/ChamplainMapSourceFactory.xs
 xs/ChamplainMarker.xs
 xs/ChamplainNetworkMapSource.xs
