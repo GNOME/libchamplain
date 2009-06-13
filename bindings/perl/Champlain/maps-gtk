@@ -1,1 +1,1 @@
-GTK_CHAMPLAIN_TYPE_EMBED  GtkChamplainEmbed  GtkObject  Gtk2::ChamplainEmbed
+GTK_TYPE_CHAMPLAIN_EMBED  GtkChamplainEmbed  GtkObject  Gtk2::ChamplainEmbed
