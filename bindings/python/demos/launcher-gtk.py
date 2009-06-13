@@ -42,9 +42,9 @@ class LauncherGTK:
 		bbox.add(button)
 
 		combo = gtk.combo_box_new_text()
-		self.map_source_factory = champlain.map_source_factory_get_default()
+		self.map_source_factory = champlain.map_source_factory_dup_default()
 		liststore = gtk.ListStore(str, str)
-		for source in self.map_source_factory.get_list():
+		for source in self.map_source_factory.dup_list():
 			liststore.append([source["id"], source["name"]])
 			combo.append_text(source["name"])
 		combo.set_model(liststore)
