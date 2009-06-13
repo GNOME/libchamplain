@@ -177,6 +177,14 @@ build_combo_box (GtkComboBox *box)
       "text", COL_NAME, NULL );
 }
 
+static gboolean
+delete_window (GtkWidget *widget,
+    GdkEvent  *event,
+    gpointer   user_data)
+{
+  gtk_main_quit ();
+}
+
 int
 main (int argc,
       char *argv[])

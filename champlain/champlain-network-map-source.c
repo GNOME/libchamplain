@@ -152,6 +152,16 @@ champlain_network_map_source_set_property (GObject *object,
 }
 
 static void
+champlain_network_map_source_dispose (GObject *object)
+{
+  //ChamplainNetworkMapSource *source = CHAMPLAIN_NETWORK_MAP_SOURCE (object);
+  //ChamplainNetworkMapSourcePrivate *priv = source->priv;
+
+  if (soup_session != NULL)
+      soup_session_abort (soup_session);
+}
+
+static void
 champlain_network_map_source_finalize (GObject *object)
 {
   ChamplainNetworkMapSource *source = CHAMPLAIN_NETWORK_MAP_SOURCE (object);
@@ -172,6 +182,7 @@ champlain_network_map_source_class_init (ChamplainNetworkMapSourceClass *klass)
 
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   object_class->finalize = champlain_network_map_source_finalize;
+  object_class->dispose = champlain_network_map_source_dispose;
   object_class->get_property = champlain_network_map_source_get_property;
   object_class->set_property = champlain_network_map_source_set_property;
 
@@ -426,7 +437,16 @@ file_loaded_cb (SoupSession *session,
   filename = champlain_tile_get_filename (tile);
 
   DEBUG ("Got reply %d", msg->status_code);
-  if (msg->status_code == 304)
+  if (msg->status_code == SOUP_STATUS_CANCELLED)
+    {
+        DEBUG ("Download of tile %d, %d got cancelled",
+            champlain_tile_get_x (tile), champlain_tile_get_y (tile));
+        //champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+        g_object_unref (tile);
+        return;
+    }
+
+  if (msg->status_code == SOUP_STATUS_NOT_MODIFIED)
     {
       /* Since we are updating the cache, we can assume that the directories
        * exists */
@@ -586,7 +606,6 @@ fill_tile (ChamplainMapSource *map_source,
       DEBUG ("Tile loaded from cache");
     }
 
-
   if ((in_cache == FALSE || (in_cache == TRUE && validate_cache == TRUE)) &&
       priv->offline == FALSE)
     {
@@ -608,6 +627,8 @@ fill_tile (ChamplainMapSource *map_source,
               NULL);
           g_object_set (G_OBJECT (soup_session), "user-agent", "libchamplain/"
               CHAMPLAIN_VERSION_S, NULL);
+          g_object_add_weak_pointer (G_OBJECT (soup_session),
+              (gpointer *) &soup_session);
         }
 
       uri = champlain_network_map_source_get_tile_uri (source,
