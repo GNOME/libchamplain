@@ -333,6 +333,8 @@ champlain_map_source_init (ChamplainMapSource *champlainMapSource)
 gint
 champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
   return priv->max_zoom_level;
 }
@@ -348,6 +350,8 @@ champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source)
 gint
 champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
   return priv->min_zoom_level;
 }
@@ -363,6 +367,8 @@ champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source)
 guint
 champlain_map_source_get_tile_size (ChamplainMapSource *map_source)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
   return priv->tile_size;
 }
@@ -383,6 +389,8 @@ champlain_map_source_get_x (ChamplainMapSource *map_source,
     gint zoom_level,
     gdouble longitude)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
   return ((longitude + 180.0) / 360.0 * pow(2.0, zoom_level)) * priv->tile_size;
@@ -404,6 +412,8 @@ champlain_map_source_get_y (ChamplainMapSource *map_source,
     gint zoom_level,
     gdouble latitude)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
   return ((1.0 - log (tan (latitude * M_PI / 180.0) + 1.0 /
@@ -424,6 +434,8 @@ guint
 champlain_map_source_get_row_count (ChamplainMapSource *map_source,
     gint zoom_level)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   //ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
   return pow (2, zoom_level);
@@ -443,6 +455,8 @@ guint
 champlain_map_source_get_column_count (ChamplainMapSource *map_source,
     gint zoom_level)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   //ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
   return pow (2, zoom_level);
@@ -490,6 +504,7 @@ champlain_map_source_get_longitude (ChamplainMapSource *map_source,
     gint zoom_level,
     guint x)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
   //ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
   gdouble dx = (float)x / champlain_map_source_get_tile_size (map_source);
@@ -512,6 +527,7 @@ champlain_map_source_get_latitude (ChamplainMapSource *map_source,
     gint zoom_level,
     guint y)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
   //ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
   gdouble dy = (float)y / champlain_map_source_get_tile_size (map_source);
@@ -530,6 +546,8 @@ champlain_map_source_get_latitude (ChamplainMapSource *map_source,
 const gchar *
 champlain_map_source_get_name (ChamplainMapSource *map_source)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
   return priv->name;
 }
@@ -547,6 +565,8 @@ void
 champlain_map_source_set_name (ChamplainMapSource *map_source,
     const gchar *name)
 {
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
   g_free (priv->name);
@@ -565,6 +585,8 @@ champlain_map_source_set_name (ChamplainMapSource *map_source,
 const gchar *
 champlain_map_source_get_license (ChamplainMapSource *map_source)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
   return priv->license;
 }
@@ -582,6 +604,8 @@ void
 champlain_map_source_set_license (ChamplainMapSource *map_source,
     const gchar *license)
 {
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
   g_free (priv->license);
@@ -600,6 +624,8 @@ champlain_map_source_set_license (ChamplainMapSource *map_source,
 const gchar *
 champlain_map_source_get_license_uri (ChamplainMapSource *map_source)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
   return priv->license_uri;
@@ -618,6 +644,8 @@ void
 champlain_map_source_set_license_uri (ChamplainMapSource *map_source,
     const gchar *license_uri)
 {
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
   g_free (priv->license_uri);
@@ -654,6 +682,8 @@ void
 champlain_map_source_set_projection (ChamplainMapSource *map_source,
     ChamplainMapProjection projection)
 {
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
   priv->map_projection = projection;
@@ -671,6 +701,8 @@ champlain_map_source_set_projection (ChamplainMapSource *map_source,
 const gchar *
 champlain_map_source_get_id (ChamplainMapSource *map_source)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
   return priv->id;
 }
@@ -688,6 +720,8 @@ void
 champlain_map_source_set_id (ChamplainMapSource *map_source,
     const gchar *id)
 {
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
+
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
   g_free (priv->id);
