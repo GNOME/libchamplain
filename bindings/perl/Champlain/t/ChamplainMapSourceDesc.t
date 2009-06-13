@@ -20,7 +20,7 @@ sub test_get_set {
 	isa_ok($factory, 'Champlain::MapSourceFactory');
 	
 	# Get the maps available
-	my @maps = $factory->get_list();
+	my @maps = $factory->dup_list();
 	ok(@maps >= 5, "Maps factory has the default maps");
 	
 	# Find the OAM map and check that the it's properly described
