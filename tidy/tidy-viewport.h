@@ -74,6 +74,7 @@ void           tidy_viewport_get_origin  (TidyViewport *viewport,
                                           gint         *x,
                                           gint         *y,
                                           gint         *z);
+void           tidy_viewport_stop        (TidyViewport *viewport);
 
 G_END_DECLS
 

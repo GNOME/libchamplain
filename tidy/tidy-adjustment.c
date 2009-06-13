@@ -197,6 +197,12 @@ stop_interpolation (TidyAdjustment *adjustment)
     }
 }
 
+void
+tidy_adjustment_interpolate_stop (TidyAdjustment *adjustment)
+{
+  stop_interpolation (adjustment);
+}
+
 static void
 tidy_adjustment_dispose (GObject *object)
 {
@@ -754,7 +760,7 @@ tidy_adjustment_interpolatex (TidyAdjustment *adjustment,
   TidyAdjustmentPrivate *priv = adjustment->priv;
 
   stop_interpolation (adjustment);
-  
+
   if (n_frames <= 1)
     {
       tidy_adjustment_set_valuex (adjustment, value);
@@ -763,7 +769,7 @@ tidy_adjustment_interpolatex (TidyAdjustment *adjustment,
 
   priv->old_position = priv->value;
   priv->new_position = value;
-  
+
   priv->dx = clutter_qdivx (priv->new_position - priv->old_position,
                             CLUTTER_INT_TO_FIXED (n_frames));
   priv->interpolation = clutter_timeline_new (n_frames, fps);

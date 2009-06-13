@@ -160,7 +160,7 @@ tidy_viewport_set_property (GObject      *object,
                                   priv->hadjustment,
                                   g_value_get_object (value));
       break;
-    
+
     case PROP_SYNC_ADJUST :
       priv->sync_adjustments = g_value_get_boolean (value);
       break;
@@ -171,19 +171,30 @@ tidy_viewport_set_property (GObject      *object,
     }
 }
 
+void
+tidy_viewport_stop (TidyViewport *viewport)
+{
+  TidyViewportPrivate *priv = TIDY_VIEWPORT (viewport)->priv;
+
+  tidy_adjustment_interpolate_stop (priv->hadjustment);
+  tidy_adjustment_interpolate_stop (priv->vadjustment);
+}
+
 static void
 tidy_viewport_dispose (GObject *gobject)
 {
   TidyViewportPrivate *priv = TIDY_VIEWPORT (gobject)->priv;
-  
+
   if (priv->hadjustment)
     {
+      tidy_adjustment_interpolate_stop (priv->hadjustment);
       g_object_unref (priv->hadjustment);
       priv->hadjustment = NULL;
     }
 
   if (priv->vadjustment)
     {
+      tidy_adjustment_interpolate_stop (priv->vadjustment);
       g_object_unref (priv->vadjustment);
       priv->vadjustment = NULL;
     }

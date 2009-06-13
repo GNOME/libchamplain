@@ -649,12 +649,14 @@ champlain_view_dispose (GObject *object)
 
   if (priv->finger_scroll != NULL)
     {
+      tidy_finger_scroll_stop (TIDY_FINGER_SCROLL (priv->finger_scroll));
       g_object_unref (priv->finger_scroll);
       priv->finger_scroll = NULL;
     }
 
   if (priv->viewport != NULL)
     {
+      tidy_viewport_stop (TIDY_VIEWPORT (priv->viewport));
       g_object_unref (priv->viewport);
       priv->viewport = NULL;
     }

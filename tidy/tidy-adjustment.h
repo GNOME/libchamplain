@@ -141,6 +141,7 @@ gboolean        tidy_adjustment_clamp        (TidyAdjustment *adjustment,
                                               gboolean        interpolate,
                                               guint           n_frames,
                                               guint           fps);
+void            tidy_adjustment_interpolate_stop (TidyAdjustment *adjustment);
 
 G_END_DECLS
 
