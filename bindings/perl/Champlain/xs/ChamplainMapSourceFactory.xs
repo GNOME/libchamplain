@@ -88,6 +88,36 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory, SV *s
 	OUTPUT:
 		RETVAL
 
+/**
+ * Provide nice accessors to the data members of the struct.
+ */
+SV*
+id (ChamplainMapSourceDesc *desc)
+	ALIAS:
+		Champlain::MapSourceDesc::name = 1
+		Champlain::MapSourceDesc::license = 2
+		Champlain::MapSourceDesc::license_uri = 3
+		Champlain::MapSourceDesc::min_zoom_level = 4
+		Champlain::MapSourceDesc::max_zoom_level = 5
+		Champlain::MapSourceDesc::projection = 6
+
+	CODE:
+		switch (ix) {
+			case 0: RETVAL = newSVGChar(desc->id); break;
+			case 1: RETVAL = newSVGChar(desc->name); break;
+			case 2: RETVAL = newSVGChar(desc->license); break;
+			case 3: RETVAL = newSVGChar(desc->license_uri); break;
+			case 4: RETVAL = newSViv(desc->min_zoom_level); break;
+			case 5: RETVAL = newSViv(desc->max_zoom_level); break;
+			case 6: RETVAL = newSVChamplainMapProjection(desc->projection); break;
+			default:
+				RETVAL = &PL_sv_undef;
+				g_assert_not_reached ();
+		}
+
+	OUTPUT:
+		RETVAL
+
 
 const gchar*
 OSM_MAPNIK (class)
