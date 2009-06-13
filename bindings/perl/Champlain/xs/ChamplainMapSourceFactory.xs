@@ -53,13 +53,13 @@ champlain_map_source_factory_dup_default (class)
 
 
 void
-champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
+champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *factory)
 	PREINIT:
 		GSList *list = NULL;
 		GSList *item = NULL;
 	
 	PPCODE:
-		list = champlain_map_source_factory_get_list(factory);
+		list = champlain_map_source_factory_dup_list(factory);
 		
 		for (item = list; item != NULL; item = item->next) {
 			ChamplainMapSourceDesc *desc = CHAMPLAIN_MAP_SOURCE_DESC(item->data);
