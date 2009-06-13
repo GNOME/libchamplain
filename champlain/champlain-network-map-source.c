@@ -625,8 +625,9 @@ fill_tile (ChamplainMapSource *map_source,
               SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
 #endif
               NULL);
-          g_object_set (G_OBJECT (soup_session), "user-agent", "libchamplain/"
-              CHAMPLAIN_VERSION_S, NULL);
+          g_object_set (G_OBJECT (soup_session),
+              "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
+              "max-conns-per-host", 8, NULL); // This is the same has Firefox
           g_object_add_weak_pointer (G_OBJECT (soup_session),
               (gpointer *) &soup_session);
         }
