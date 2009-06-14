@@ -188,7 +188,7 @@ sub generic_test {
 
 
 #
-# Assert that two colors are unique.
+# Assert that two colors are identical.
 #
 sub is_color {
 	my ($got, $expected, $message) = @_;
