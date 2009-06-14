@@ -4,9 +4,8 @@ use strict;
 use warnings;
 
 use Clutter::TestHelper tests => 10;
-use Test::Exception;
 
-use Champlain ':maps';
+use Champlain;
 
 exit tests();
 
