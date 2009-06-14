@@ -56,6 +56,9 @@ struct _ChamplainLayerPrivate {
 static void layer_add_cb (ClutterGroup *layer,
     ClutterActor *marker,
     gpointer data);
+static void layer_remove_cb (ClutterGroup *layer,
+    ClutterActor *marker,
+    gpointer data);
 
 static void
 champlain_layer_get_property (GObject *object,
@@ -99,7 +102,10 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
 static void
 champlain_layer_init (ChamplainLayer *self)
 {
-  g_signal_connect_after(G_OBJECT(self), "actor-added", G_CALLBACK(layer_add_cb), NULL);
+  g_signal_connect_after(G_OBJECT(self), "actor-added",
+      G_CALLBACK(layer_add_cb), NULL);
+  g_signal_connect_after(G_OBJECT(self), "actor-removed",
+      G_CALLBACK(layer_remove_cb), NULL);
 }
 
 /* This callback serves to keep the markers ordered by their latitude.
@@ -108,9 +114,8 @@ champlain_layer_init (ChamplainLayer *self)
  * where the most north you are, the farther you are.
  */
 static void
-layer_add_cb (ClutterGroup *layer,
-    ClutterActor *marker,
-    gpointer data)
+reorder_marker (ClutterGroup *layer,
+    ChamplainBaseMarker *marker)
 {
   GList* markers = clutter_container_get_children (CLUTTER_CONTAINER(layer));
   gint size, i;
@@ -118,7 +123,7 @@ layer_add_cb (ClutterGroup *layer,
   ChamplainBaseMarker *lowest = NULL;
 
   size = g_list_length (markers);
-  g_object_get(G_OBJECT(marker), "latitude", &y, NULL);
+  g_object_get (G_OBJECT (marker), "latitude", &y, NULL);
   y = 90 - y;
   low_y = G_MAXDOUBLE;
 
@@ -139,8 +144,37 @@ layer_add_cb (ClutterGroup *layer,
     }
 
   if (lowest)
-    clutter_container_lower_child(CLUTTER_CONTAINER(layer),
-        CLUTTER_ACTOR(marker), CLUTTER_ACTOR(lowest));
+    clutter_container_lower_child (CLUTTER_CONTAINER(layer),
+        CLUTTER_ACTOR (marker), CLUTTER_ACTOR (lowest));
+}
+
+static void
+marker_position_notify (GObject *gobject,
+    GParamSpec *pspec,
+    gpointer user_data)
+{
+  reorder_marker (CLUTTER_GROUP (user_data), CHAMPLAIN_BASE_MARKER (gobject));
+}
+
+static void
+layer_add_cb (ClutterGroup *layer,
+    ClutterActor *actor,
+    gpointer data)
+{
+  ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+  reorder_marker (layer, marker);
+
+  g_signal_connect (G_OBJECT (marker), "notify::latitude",
+      G_CALLBACK (marker_position_notify), layer);
+}
+
+static void
+layer_remove_cb (ClutterGroup *layer,
+    ClutterActor *actor,
+    gpointer data)
+{
+  g_signal_handlers_disconnect_by_func (G_OBJECT (actor),
+      G_CALLBACK (marker_position_notify), layer);
 }
 
 /**
