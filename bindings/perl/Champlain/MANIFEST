@@ -41,4 +41,5 @@ examples/capitals.pl
 examples/image.pl
 examples/launcher.pl
 examples/gtk2.pl
+examples/polygons.pl
 examples/images/who.png
