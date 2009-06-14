@@ -17,6 +17,7 @@ xs/ChamplainMapSourceFactory.xs
 xs/ChamplainMarker.xs
 xs/ChamplainNetworkMapSource.xs
 xs/ChamplainPoint.xs
+xs/ChamplainPolygon.xs
 xs/ChamplainTile.xs
 xs/ChamplainView.xs
 xs/ChamplainZoomLevel.xs
@@ -30,6 +31,7 @@ t/ChamplainMapSourceFactory.t
 t/ChamplainMarker.t
 t/ChamplainNetworkMapSource.t
 t/ChamplainPoint.t
+t/ChamplainPolygon.t
 t/ChamplainTile.t
 t/ChamplainView.t
 t/ChamplainZoomLevel.t

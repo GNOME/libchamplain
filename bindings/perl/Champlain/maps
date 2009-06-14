@@ -13,3 +13,4 @@ CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY  ChamplainMapSourceFactory  GObject  Champlain
 CHAMPLAIN_TYPE_CACHE               ChamplainCache             GObject  Champlain::Cache
 CHAMPLAIN_TYPE_MAP_SOURCE_DESC     ChamplainMapSourceDesc     GBoxed   Champlain::MapSourceDesc
 CHAMPLAIN_TYPE_POINT               ChamplainPoint             GBoxed   Champlain::Point
+CHAMPLAIN_TYPE_POLYGON             ChamplainPolygon           GObject  Champlain::Polygon
