@@ -138,3 +138,11 @@ champlain_view_get_show_license (ChamplainView *view)
 
 gboolean
 champlain_view_get_zoom_on_double_click (ChamplainView *view)
+
+
+void
+champlain_view_add_polygon (ChamplainView *view, ChamplainPolygon *polygon)
+
+
+void
+champlain_view_remove_polygon (ChamplainView *view, ChamplainPolygon *polygon)

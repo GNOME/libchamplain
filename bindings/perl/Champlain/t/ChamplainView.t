@@ -18,6 +18,7 @@ sub tests {
 	test_generic();
 	test_zoom();
 	test_event();
+	test_polygons();
 	return 0;
 }
 
@@ -288,6 +289,27 @@ sub test_go_to {
 
 	is($view->get('latitude'), 0, "stop_go_to() at latitude 0");
 	is($view->get('longitude'), 0, "stop_go_to() at longitude 0");
+}
+
+
+#
+# Test the polygons
+#
+sub test_polygons {
+	my $view = Champlain::View->new();
+	isa_ok($view, 'Champlain::View');
+
+	my $line = Champlain::Polygon->new();
+	my $triangle = Champlain::Polygon->new();
+	my $square = Champlain::Polygon->new();
+	
+	# Note these can't be tested as the API provides no way for querying the polygons
+	$view->add_polygon($line);
+	$view->add_polygon($triangle);
+	$view->add_polygon($square);
+	
+	$view->remove_polygon($line);
+	$view->remove_polygon($square);
 }
 
 
