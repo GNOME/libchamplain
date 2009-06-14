@@ -70,6 +70,7 @@ sub main {
 	$toolbox->add(create_combo_box($map));
 
 	my $spin = Gtk2::SpinButton->new_with_range(0, 20, 1);
+	$spin->set_value($map->get_zoom_level);
 	$spin->signal_connect('changed', sub {
 		$map->set_zoom_level($spin->get_value_as_int);
 	});
