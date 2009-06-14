@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 34;
+use Clutter::TestHelper tests => 42;
 
 use Champlain;
 
@@ -15,7 +15,7 @@ exit tests();
 sub tests {
 	test_empty();
 	test_setters();
-#	test_points();
+	test_points();
 	return 0;
 }
 
@@ -75,6 +75,114 @@ sub test_setters {
 		$polygon->set_stroke_width($old_stroke_width + 2);
 		is($polygon->get_stroke_width, $old_stroke_width + 2, "set_stroke_width()");
 	}
+}
+
+
+sub test_points {
+	my $polygon = Champlain::Polygon->new();
+	isa_ok($polygon, 'Champlain::Polygon');
+
+	$polygon->append_point(8, 4);
+	is_polygon(
+		$polygon,
+		[
+			8, 4,
+		],
+		"append_point()"
+	);
+
+	$polygon->append_point(4, 9);
+	is_polygon(
+		$polygon,
+		[
+			8, 4,
+			4, 9,
+		],
+		"append_point()"
+	);
+
+	$polygon->insert_point(7, 10, 1);
+	is_polygon(
+		$polygon,
+		[
+			8, 4,
+			7, 10,
+			4, 9,
+		],
+		"insert_point() in the middle"
+	);
+
+	$polygon->append_point(5, 3);
+	is_polygon(
+		$polygon,
+		[
+			8, 4,
+			7, 10,
+			4, 9,
+			5, 3,
+		],
+		"polygon: 4 points"
+	);
+
+	$polygon->insert_point(1, 2, 0);
+	is_polygon(
+		$polygon,
+		[
+			1, 2,
+			8, 4,
+			7, 10,
+			4, 9,
+			5, 3,
+		],
+		"insert_point() at the beginning"
+	);
+
+	$polygon->insert_point(10, 20, 5);
+	is_polygon(
+		$polygon,
+		[
+			1, 2,
+			8, 4,
+			7, 10,
+			4, 9,
+			5, 3,
+			10, 20,
+		],
+		"insert_point() at the end"
+	);
+
+	$polygon->insert_point(30, 240, 17);
+	is_polygon(
+		$polygon,
+		[
+			1, 2,
+			8, 4,
+			7, 10,
+			4, 9,
+			5, 3,
+			10, 20,
+			30, 240,
+		],
+		"insert_point() past the end"
+	);
+
+	# Clear the polygon (it should be empty after)
+	$polygon->clear_points();
+	is_polygon($polygon, [], "clear_points()");
+	
+	$polygon->append_point(100, 200);
+	is_polygon($polygon, [100, 200], "add_point on a cleared polygon");
+}
+
+
+#
+# Assert that two colors are identical.
+#
+sub is_polygon {
+	my ($polygon, $expected, $message) = @_;
+
+	my @points = map { ($_->lat, $_->lon) } $polygon->get_points;
+	is_deeply(\@points, $expected, $message);
 }
 
 
