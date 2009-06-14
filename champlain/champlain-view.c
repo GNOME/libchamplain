@@ -724,7 +724,7 @@ champlain_view_dispose (GObject *object)
     }
 
   if (priv->goto_context != NULL)
-    g_free (priv->goto_context);
+    champlain_view_stop_go_to (view);
 
   G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
 }
