@@ -221,7 +221,7 @@ view_realize_cb (GtkWidget *widget,
   GtkChamplainEmbedPrivate *priv = view->priv;
 
   // Setup mouse cursor to a hand
-  gdk_window_set_cursor (priv->clutter_embed->window, priv->cursor_hand_open);
+  gdk_window_set_cursor (gtk_widget_get_window (priv->clutter_embed), priv->cursor_hand_open);
 }
 
 static void
@@ -246,9 +246,11 @@ mouse_button_cb (GtkWidget *widget,
   GtkChamplainEmbedPrivate *priv = view->priv;
 
   if (event->type == GDK_BUTTON_PRESS)
-    gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_closed);
+    gdk_window_set_cursor (gtk_widget_get_window (priv->clutter_embed),
+                           priv->cursor_hand_closed);
   else
-    gdk_window_set_cursor( priv->clutter_embed->window, priv->cursor_hand_open);
+    gdk_window_set_cursor (gtk_widget_get_window (priv->clutter_embed),
+                           priv->cursor_hand_open);
 
   return FALSE;
 }
