@@ -80,7 +80,8 @@ sub main {
 
 	my $image = Gtk2::Image->new_from_stock('gtk-network', 'button');
 	$map->signal_connect('notify::state', sub {
-		if ($map->get_state eq 'loading') {
+		my $state = $map->get('state');
+		if ($state eq 'loading') {
 			$image->show();
 		}
 		else {
