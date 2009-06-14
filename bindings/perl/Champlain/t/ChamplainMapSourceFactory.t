@@ -82,6 +82,8 @@ sub test_map_register {
 		min_zoom_level => 0,
 		max_zoom_level => 11,
 		projection => 'mercator',
+		# This is a copy of OAM
+		uri_format => 'http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg',
 	};
 	
 	my $constructor = sub {
@@ -94,13 +96,12 @@ sub test_map_register {
 			$description->{max_zoom_level},
 			256,
 			$description->{projection},
-			# This is a copy of OAM
-			"http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg",
+			$description->{uri_format},
 		);
 	};
 	$factory->register($description, $constructor);
 
-	my @new_maps = $factory->get_list();
+	my @new_maps = $factory->dup_list();
 	ok(@new_maps == @maps + 1, "Maps factory has an extra map");
 	
 	my $map = $factory->create('perl');
@@ -113,7 +114,7 @@ sub test_map_register {
 	is($map->get_max_zoom_level, $description->{max_zoom_level}, "Created map has the right max_zoom_level");
 	is($map->get_projection, $description->{projection}, "Created map has the right projection");
 	is($map->get_tile_size, 256, "Created map has the right tile_size");
-	is($map->get_tile_uri(1, 2, 3), "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/3/1/2.jpg", "Created map has the right tile_uri");
+	is($map->get_tile_uri(1, 2, 3), 'http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/3/1/2.jpg', "Created map has the right tile_uri");
 }
 
 
