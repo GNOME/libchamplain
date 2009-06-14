@@ -73,5 +73,5 @@ sub test_get_set {
 	
 	# The constructor is not yet available in the perl bindings
 	throws_ok { $oam->get_constructor } qr/\Qdesc->get_constructor() isn't implemented yet/, "get_constructor() isn't implemented";
-	throws_ok { $oam->set_constructor(sub{}) } qr/\Qdesc->set_constructor(&code_ref)/, "set_constructor() isn't implemented";
+	throws_ok { $oam->set_constructor(sub{}) } qr/\Qdesc->set_constructor(\&code_ref)/, "set_constructor() isn't implemented";
 }
