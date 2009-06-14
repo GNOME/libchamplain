@@ -33,8 +33,8 @@ sub main {
 	
 	
 	# Create the map stuff
-	my $map = Champlain::View->new();
-	my $gtk2_map = Gtk2::Champlain::ViewEmbed->new($map);
+	my $gtk2_map = Gtk2::ChamplainEmbed->new();
+	my $map = $gtk2_map->get_view();
 	$gtk2_map->set_size_request(640, 480);
 	$map->center_on(0, 0);
 	$map->set_scroll_mode('kinetic');

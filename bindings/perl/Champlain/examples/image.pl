@@ -32,11 +32,11 @@ sub main {
 	my $vbox = Gtk2::VBox->new(FALSE, 10);	
 
 	# Create the map view
-	my $map = Champlain::View->new();
+	my $gtk2_map = Gtk2::ChamplainEmbed->new();
+	my $map = $gtk2_map->get_view();
 	$map->center_on(47.130885, -70.764141);
 	$map->set_scroll_mode('kinetic');
 	$map->set_zoom_level(5);
-	my $gtk2_map = Gtk2::Champlain::ViewEmbed->new($map);
 	$gtk2_map->set_size_request(640, 480);
 	
 	# Create the markers and marker layer

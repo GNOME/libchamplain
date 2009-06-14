@@ -23,8 +23,8 @@ sub main {
 	my $vbox = Gtk2::VBox->new(FALSE, 10);	
 
 	# Create the map view
-	my $map = Champlain::View->new();
-	my $gtk2_map = Gtk2::Champlain::ViewEmbed->new($map);
+	my $gtk2_map = Gtk2::ChamplainEmbed->new();
+	my $map = $gtk2_map->get_view();
 	$map->set_scroll_mode('kinetic');
 	$map->set_zoom_level(5);
 	$gtk2_map->set_size_request(640, 480);
@@ -74,14 +74,13 @@ sub main {
 		$map->set_zoom_level($spin->get_value_as_int);
 	});
 	$map->signal_connect('notify::zoom-level', sub {
-		$spin->set_value($map->get('zoom-level'));
+		$spin->set_value($map->get_zoom_level);
 	});
 	$toolbox->add($spin);
 
 	my $image = Gtk2::Image->new_from_stock('gtk-network', 'button');
 	$map->signal_connect('notify::state', sub {
-		my $state = $map->get('state');
-		if ($state eq 'loading') {
+		if ($map->get_state eq 'loading') {
 			$image->show();
 		}
 		else {
@@ -120,20 +119,19 @@ sub create_combo_box {
 	my $model = Gtk2::ListStore->new(
 		'Glib::String',
 		'Glib::String',
-		#'Champlain::MapSourceDesc', doesn't work as it's not are registered type
 	);
 	my $active = 0; # Tells which map source is active
 	my $index = 0;
-	my $current_source = $map->get('map-source')->get_id;
+	my $current_source = $map->get_map_source->get_id;
 	my $factory = Champlain::MapSourceFactory->dup_default;
-	foreach my $desc (sort { $a->{name} cmp $b->{name} } $factory->get_list) {
+	foreach my $desc (sort { $a->get_name cmp $b->get_name } $factory->dup_list) {
 		my $iter = $model->append();
 		$model->set($iter, 
-			0, $desc->{name},
-			1, $desc->{id},
+			0, $desc->get_name,
+			1, $desc->get_id,
 		);
 		
-		if ($current_source eq $desc->{id}) {
+		if ($current_source eq $desc->get_id) {
 			$active = $index;
 		}
 		
