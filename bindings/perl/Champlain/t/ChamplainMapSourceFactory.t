@@ -21,11 +21,11 @@ sub tests {
 
 sub test_map_source_names {
 	# Map identification
-	is(Champlain::MapSourceFactory->OSM_MAPNIK, 'osm::mapnik');
-	is(Champlain::MapSourceFactory->OSM_OSMARENDER, 'osm::osmarender');
-	is(Champlain::MapSourceFactory->OSM_CYCLE_MAP, 'osm::cyclemap');
+	is(Champlain::MapSourceFactory->OSM_MAPNIK, 'osm-mapnik');
+	is(Champlain::MapSourceFactory->OSM_OSMARENDER, 'osm-osmarender');
+	is(Champlain::MapSourceFactory->OSM_CYCLE_MAP, 'osm-cyclemap');
 	is(Champlain::MapSourceFactory->OAM, 'oam');
-	is(Champlain::MapSourceFactory->MFF_RELIEF, 'mff::relief');
+	is(Champlain::MapSourceFactory->MFF_RELIEF, 'mff-relief');
 }
 
 
@@ -60,17 +60,17 @@ sub test_map_factory {
 	);
 	
 	# Get the maps available
-	my @maps = $factory->get_list();
+	my @maps = $factory->dup_list();
 	ok(@maps >= 5, "Maps factory has the default maps");
 }
 
 
 sub test_map_register {
-	my $factory = Champlain::MapSourceFactory->get_default();
+	my $factory = Champlain::MapSourceFactory->dup_default();
 	isa_ok($factory, 'Champlain::MapSourceFactory');
 	
 	# Get the maps available
-	my @maps = $factory->get_list();
+	my @maps = $factory->dup_list();
 	ok(@maps >= 5, "Maps factory has the default maps");
 	
 	# Add a new map
@@ -84,7 +84,7 @@ sub test_map_register {
 		projection => 'mercator',
 	};
 	
-	$factory->register($description, sub {
+	my $constructor = sub {
 		return Champlain::NetworkMapSource->new_full(
 			$description->{id},
 			$description->{name},
@@ -97,7 +97,8 @@ sub test_map_register {
 			# This is a copy of OAM
 			"http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg",
 		);
-	});
+	};
+	$factory->register($description, $constructor);
 
 	my @new_maps = $factory->get_list();
 	ok(@new_maps == @maps + 1, "Maps factory has an extra map");
