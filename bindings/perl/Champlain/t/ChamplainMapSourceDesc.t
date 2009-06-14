@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 25;
+use Clutter::TestHelper tests => 18;
 
 use Champlain ':maps';
 
@@ -24,31 +24,23 @@ sub test_get_set {
 	ok(@maps >= 5, "Maps factory has the default maps");
 	
 	# Find the OAM map and check that the it's properly described
-	my @found = grep { $_->{id} eq Champlain::MapSourceFactory->OAM } @maps;
-	is(scalar(@found), 1);
+	my @found = grep { $_->get_id eq Champlain::MapSourceFactory->OAM } @maps;
+	is(scalar(@found), 1, "Found a single map matching OAM");
 	if (! @found) {
 		fail("Can't test a Champlain::MapSourceDesc without a map description") for 1 .. 22;
 		return;
 	}
 
+	# Getters
 	my ($oam) = @found;
 	isa_ok($oam, 'Champlain::MapSourceDesc');
-	is($oam->id, Champlain::MapSourceFactory->OAM);
-	is($oam->name, 'OpenAerialMap');
-	is($oam->license, "(CC) BY 3.0 OpenAerialMap contributors");
-	is($oam->license_uri, 'http://creativecommons.org/licenses/by/3.0/');
-	is($oam->min_zoom_level, 0);
-	is($oam->max_zoom_level, 17);
-	is($oam->projection, 'mercator');
-
-	# Getters
-	is($oam->get_id, $oam->{id}, "get_id()");
-	is($oam->get_name, $oam->{name}, "get_name()");
-	is($oam->get_license, $oam->{license}, "get_license()");
-	is($oam->get_license_uri, $oam->{license_uri}, "get_license_uri()");
-	is($oam->get_min_zoom_level, $oam->{min_zoom_level}, "get_min_zoom_level()");
-	is($oam->get_max_zoom_level, $oam->{max_zoom_level}, "get_max_zoom_level()");
-	is($oam->get_projection, $oam->{projection}, "get_projection()");
+	is($oam->get_id, Champlain::MapSourceFactory->OAM, "get_id()");
+	is($oam->get_name, 'OpenAerialMap', "get_name()");
+	is($oam->get_license, "(CC) BY 3.0 OpenAerialMap contributors", "get_license()");
+	is($oam->get_license_uri, 'http://creativecommons.org/licenses/by/3.0/', "get_license_uri()");
+	is($oam->get_min_zoom_level, 0, "get_min_zoom_level()");
+	is($oam->get_max_zoom_level, 17, "get_max_zoom_level()");
+	is($oam->get_projection, 'mercator', "get_projection()");
 	
 	
 	# Setters
