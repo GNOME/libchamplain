@@ -126,14 +126,14 @@ sub create_combo_box {
 	my $index = 0;
 	my $current_source = $map->get_map_source->get_id;
 	my $factory = Champlain::MapSourceFactory->dup_default;
-	foreach my $desc (sort { $a->get_name cmp $b->get_name } $factory->dup_list) {
+	foreach my $desc (sort { $a->name cmp $b->name } $factory->dup_list) {
 		my $iter = $model->append();
 		$model->set($iter, 
-			0, $desc->get_name,
-			1, $desc->get_id,
+			0, $desc->name,
+			1, $desc->id,
 		);
 		
-		if ($current_source eq $desc->get_id) {
+		if ($current_source eq $desc->id) {
 			$active = $index;
 		}
 		
