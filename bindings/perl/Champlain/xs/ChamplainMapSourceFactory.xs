@@ -33,7 +33,7 @@ champlainperl_constructor (ChamplainMapSourceDesc *desc, gpointer data) {
  * Returns the value of the given key or croaks if there's no such key.
  */
 static SV*
-fetch_or_croak (HV* hash , const char* key , I32 klen) {
+champlainperl_fetch_or_croak (HV* hash , const char* key , I32 klen) {
 
 	SV **s = hv_fetch(hash, key, klen, 0);
 	if (s != NULL && SvOK(*s)) {
@@ -41,6 +41,55 @@ fetch_or_croak (HV* hash , const char* key , I32 klen) {
 	}
 	
 	croak("Hashref requires the key: '%s'", key);
+}
+
+
+static ChamplainMapSourceDesc*
+champlainperl_SvChamplainMapSourceDesc (SV *data) {
+	HV *hash;
+	SV *value;
+	ChamplainMapSourceDesc desc = {0,};
+
+	if ((!data) || (!SvOK(data)) || (!SvRV(data)) || (SvTYPE(SvRV(data)) != SVt_PVHV)) {
+		croak("SvChamplainMapSourceDesc: value must be an hashref");
+	}
+
+	hash = (HV *) SvRV(data);
+	
+	/* All keys are mandatory */
+	if (value = champlainperl_fetch_or_croak(hash, "id", 2)) {
+		desc.id = g_strdup(SvGChar(value));
+	}
+	
+	if (value = champlainperl_fetch_or_croak(hash, "name", 4)) {
+		desc.name = g_strdup(SvGChar(value));
+	}
+	
+	if (value = champlainperl_fetch_or_croak(hash, "license", 7)) {
+		desc.license = g_strdup(SvGChar(value));
+	}
+	
+	if (value = champlainperl_fetch_or_croak(hash, "license_uri", 11)) {
+		desc.license_uri = g_strdup(SvGChar(value));
+	}
+	
+	if (value = champlainperl_fetch_or_croak(hash, "min_zoom_level", 14)) {
+		desc.min_zoom_level = (gint)SvIV(value);
+	}
+	
+	if (value = champlainperl_fetch_or_croak(hash, "max_zoom_level", 14)) {
+		desc.max_zoom_level = (gint)SvIV(value);
+	}
+	
+	if (value = champlainperl_fetch_or_croak(hash, "projection", 10)) {
+		desc.projection = SvChamplainMapProjection(value);
+	}
+	
+	if (value = champlainperl_fetch_or_croak(hash, "uri_format", 10)) {
+		desc.uri_format = g_strdup(SvGChar(value));
+	}
+
+	return g_memdup(&desc, sizeof(desc));
 }
 
 
@@ -81,7 +130,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory, SV *s
 		GPerlCallback *callback = NULL;
 	
 	CODE:
-		desc = SvChamplainMapSourceDesc(sv_desc);
+		desc = champlainperl_SvChamplainMapSourceDesc(sv_desc);
 		callback = champlainperl_constructor_create(sv_constructor, NULL);
 		RETVAL = champlain_map_source_factory_register(factory, desc, champlainperl_constructor, callback);
 
