@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 42;
+use Clutter::TestHelper tests => 48;
 
 use Champlain;
 
@@ -33,13 +33,13 @@ sub test_empty {
 	is_color($polygon->get_fill_color, $DEFAULT_FILL_COLOR, "fill_color is set on a new polygon");
 	is_color($polygon->get_stroke_color, $DEFAULT_STROKE_NAME, "stroke_color is set on a new polygon");
 	
-	ok(!$polygon->get_fill, "fill is set on a new polygon");
+	ok(!$polygon->get_fill, "fill is unset on a new polygon");
 	ok($polygon->get_stroke, "stroke is set on a new polygon");
 	is($polygon->get_stroke_width, 2, "stroke_width is set on a new polygon");
 	
-	# Call these methods hopping that they won't crash.
-	$polygon->show();
-	$polygon->hide();
+	# These fields have no accessor yet
+	ok(!$polygon->get('closed-path'), "closed-path is unset on a new polygon");
+	ok($polygon->get('visible'), "closed-path is set on a new polygon");
 }
 
 
@@ -75,6 +75,12 @@ sub test_setters {
 		$polygon->set_stroke_width($old_stroke_width + 2);
 		is($polygon->get_stroke_width, $old_stroke_width + 2, "set_stroke_width()");
 	}
+
+
+	$polygon->hide();
+	ok(!$polygon->get('visible'), "hide()");
+	$polygon->show();
+	ok($polygon->get('visible'), "show()");
 }
 
 
