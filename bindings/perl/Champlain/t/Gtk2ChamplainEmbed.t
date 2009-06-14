@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 3, sub_module => 'gtk';
+use Clutter::TestHelper tests => 2, sub_module => 'gtk';
 use Gtk2 '-init';
 
 use Champlain ':coords';
@@ -19,11 +19,9 @@ sub tests {
 
 sub test_all {
 
-	my $view = Champlain::View->new();
-	isa_ok($view, 'Champlain::View');
-
-	my $embed = Gtk2::Champlain::ViewEmbed->new($view);
-	isa_ok($embed, 'Gtk2::Champlain::ViewEmbed');
+	my $embed = Gtk2::ChamplainEmbed->new();
+	isa_ok($embed, 'Gtk2::ChamplainEmbed');
 	
-	is($embed->get_view, $view, "get_view()");
+	my $view = $embed->get_view;
+	isa_ok($view, 'Champlain::View');
 }
