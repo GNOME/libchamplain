@@ -2396,7 +2396,10 @@ champlain_view_add_polygon (ChamplainView *view,
 
   if (view->priv->viewport_size.width == 0 ||
       view->priv->viewport_size.height == 0)
+  {
+    polygon->priv->actor = NULL;
     return;
+  }
 
   polygon->priv->actor = g_object_ref (clutter_cairo_new (
       view->priv->viewport_size.width,
@@ -2425,7 +2428,10 @@ champlain_view_remove_polygon (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
   view->priv->polygons = g_list_remove (view->priv->polygons, polygon);
-  clutter_container_remove_actor (CLUTTER_CONTAINER (view->priv->polygon_layer),
-      polygon->priv->actor);
+
+  if (polygon->priv->actor != NULL)
+    clutter_container_remove_actor (CLUTTER_CONTAINER (view->priv->polygon_layer),
+        polygon->priv->actor);
+
   g_object_unref (polygon);
 }
