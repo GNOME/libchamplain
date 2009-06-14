@@ -320,6 +320,7 @@ champlain_polygon_append_point (ChamplainPolygon *self,
   ChamplainPoint *point = champlain_point_new (lat, lon);
 
   self->priv->points = g_list_append (self->priv->points, point);
+  g_object_notify (G_OBJECT (self), "visible");
   return point;
 }
 
@@ -347,6 +348,7 @@ champlain_polygon_insert_point (ChamplainPolygon *self,
   ChamplainPoint *point = champlain_point_new (lat, lon);
 
   self->priv->points = g_list_insert (self->priv->points, point, pos);
+  g_object_notify (G_OBJECT (self), "visible");
   return point;
 }
 
@@ -370,6 +372,7 @@ champlain_polygon_clear_points (ChamplainPolygon *self)
     next = g_list_next (next);
   }
   g_list_free (self->priv->points);
+  g_object_notify (G_OBJECT (self), "visible");
 }
 
 /**

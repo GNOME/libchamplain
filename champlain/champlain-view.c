@@ -115,6 +115,11 @@ typedef struct {
   gdouble from_longitude;
 } GoToContext;
 
+typedef struct {
+  ChamplainView *view;
+  ChamplainPolygon *polygon;
+} PolygonRedrawContext;
+
 struct _ChamplainViewPrivate
 {
   ClutterActor *stage;
@@ -155,6 +160,9 @@ struct _ChamplainViewPrivate
 
   /* champlain_view_go_to's context, kept for stop_go_to */
   GoToContext *goto_context;
+
+  /* notify_polygon_cb's context, kept for idle cb */
+  guint polygon_redraw_id;
 
   /* Lines and shapes */
   GList *polygons;
@@ -427,12 +435,31 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
   cairo_destroy (cr);
 }
 
+static gboolean
+redraw_polygon_on_idle (PolygonRedrawContext *ctx)
+{
+  draw_polygon (ctx->view, ctx->polygon);
+  ctx->view->priv->polygon_redraw_id = 0;
+  // ctx is freed by g_idle_add_full
+  return FALSE;
+}
+
 static void
-notify_polygon_visible_cb (ChamplainPolygon *polygon,
+notify_polygon_cb (ChamplainPolygon *polygon,
     GParamSpec *arg1,
     ChamplainView *view)
 {
-  draw_polygon (view, polygon);
+  PolygonRedrawContext *ctx;
+
+  if (view->priv->polygon_redraw_id != 0)
+    return;
+
+  ctx = g_new0 (PolygonRedrawContext, 1);
+  ctx->view = view;
+  ctx->polygon = polygon;
+
+  view->priv->polygon_redraw_id = g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+      (GSourceFunc) redraw_polygon_on_idle, ctx, g_free);
 }
 
 static void
@@ -939,6 +966,7 @@ champlain_view_init (ChamplainView *view)
   priv->longitude = 0.0f;
   priv->goto_context = NULL;
   priv->map = NULL;
+  priv->polygon_redraw_id = 0;
 
   /* Setup viewport */
   priv->viewport = g_object_ref (tidy_viewport_new ());
@@ -2363,8 +2391,8 @@ champlain_view_add_polygon (ChamplainView *view,
 
   view->priv->polygons = g_list_append (view->priv->polygons, g_object_ref (polygon));
 
-  g_signal_connect (polygon, "notify::visible",
-      G_CALLBACK (notify_polygon_visible_cb), view);
+  g_signal_connect (polygon, "notify",
+      G_CALLBACK (notify_polygon_cb), view);
 
   if (view->priv->viewport_size.width == 0 ||
       view->priv->viewport_size.height == 0)
