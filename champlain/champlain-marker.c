@@ -448,7 +448,7 @@ draw_shadow (ChamplainMarker *marker,
   else
     x = -58 * slope;
 
-  shadow = clutter_cairo_new (width * 1.5, (height + point));
+  shadow = clutter_cairo_new (width + x, (height + point));
   cr = clutter_cairo_create (CLUTTER_CAIRO (shadow));
 
   cairo_matrix_init (&matrix,
