@@ -4,7 +4,6 @@ static GPerlCallback*
 champlainperl_constructor_create (SV *func, SV *data) {
 	GType param_types [] = {
 		CHAMPLAIN_TYPE_MAP_SOURCE_DESC,
-		G_TYPE_POINTER,
 	};
 	return gperl_callback_new(
 		func, data,
@@ -26,7 +25,7 @@ champlainperl_constructor (ChamplainMapSourceDesc *desc, gpointer data) {
 	
 	g_value_init(&return_value, callback->return_type);
 	/* FIXME desc is not passed as a Champlain::MapSourceDesc to the perl callback */
-	gperl_callback_invoke(callback, &return_value, desc);
+	gperl_callback_invoke(callback, &return_value, desc, callback->data);
 	
 	retval = g_value_get_object(&return_value);
 	g_value_unset(&return_value);
@@ -137,7 +136,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory, SV *s
 	
 	CODE:
 		desc = champlainperl_SvChamplainMapSourceDesc(sv_desc);
-		callback = champlainperl_constructor_create(sv_constructor, NULL);
+		callback = champlainperl_constructor_create(sv_constructor, sv_data);
 		RETVAL = champlain_map_source_factory_register(factory, desc, champlainperl_constructor, callback);
 
 	OUTPUT:
