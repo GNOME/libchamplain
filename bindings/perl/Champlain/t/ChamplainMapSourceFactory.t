@@ -89,11 +89,7 @@ sub test_map_register {
 	my $constructor = sub {
 		my ($desc, $data) = @_;
 
-		TODO: {
-			local $TODO = "Can't pass the data parameter";
-			isa_ok($data, 'Champlain::MapSourceFactory');
-		}
-
+		# Check that the arguments are passed properly
 		isa_ok($desc, 'Champlain::MapSourceDesc');
 		is($desc->id, $description->{id}, "MapSourceDesc has the right id");
 		is($desc->name, $description->{name}, "MapSourceDesc has the right name");
@@ -103,6 +99,7 @@ sub test_map_register {
 		is($desc->max_zoom_level, $description->{max_zoom_level}, "MapSourceDesc has the right max_zoom_level");
 		is($desc->projection, $description->{projection}, "MapSourceDesc has the right projection");
 		is($desc->uri_format, $description->{uri_format}, "MapSourceDesc has the right uri_format");
+		isa_ok($data, 'Champlain::MapSourceFactory');
 
 		return Champlain::NetworkMapSource->new_full(
 			$desc->id,
