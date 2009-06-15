@@ -1,10 +1,11 @@
 Revision history for Champlain
 
 
-0.04 Mon Jun 15 22:38:17 CEST 2009
+0.04 Mon Jun 15 23:48:13 CEST 2009
 	Bindings for libchamplain 0.3.3.
 	More complete unit tests coverage.
 	New examples: capitals.pl, image.pl, animated-marker.pl and polygons.pl.
+	Champlain::MapSourceFactory and the factory's constructor accept arguments.
 
 
 0.03 Sun Mar 22 22:32:44 CET 2009
