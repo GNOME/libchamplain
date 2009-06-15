@@ -3,7 +3,7 @@
 static GPerlCallback*
 champlainperl_constructor_create (SV *func, SV *data) {
 	GType param_types[2] = { G_TYPE_POINTER, G_TYPE_POINTER, };
-	return gperl_callback_new (func, data, 2, param_types, CHAMPLAIN_TYPE_MAP_SOURCE);
+	return gperl_callback_new(func, data, 2, param_types, CHAMPLAIN_TYPE_MAP_SOURCE);
 }
 
 
@@ -14,7 +14,6 @@ champlainperl_constructor (ChamplainMapSourceDesc *desc, gpointer data) {
 	ChamplainMapSource *retval;
 	
 	if (callback == NULL) {
-		g_print ("Data is null!\n");
 		croak("Chammplain::MapSourceFactory constructor callback is missing the data parameter");
 	}
 	
@@ -22,7 +21,7 @@ champlainperl_constructor (ChamplainMapSourceDesc *desc, gpointer data) {
 	/* FIXME desc is not passed as a Champlain::MapSourceDesc to the perl callback */
 	gperl_callback_invoke(callback, &return_value, desc);
 	
-	retval = g_value_get_object (&return_value);
+	retval = g_value_get_object(&return_value);
 	g_value_unset(&return_value);
 	
 	return retval;
@@ -74,11 +73,11 @@ champlainperl_SvChamplainMapSourceDesc (SV *data) {
 	}
 	
 	if (value = champlainperl_fetch_or_croak(hash, "min_zoom_level", 14)) {
-		desc.min_zoom_level = (gint)SvIV(value);
+		desc.min_zoom_level = (gint) SvIV(value);
 	}
 	
 	if (value = champlainperl_fetch_or_croak(hash, "max_zoom_level", 14)) {
-		desc.max_zoom_level = (gint)SvIV(value);
+		desc.max_zoom_level = (gint) SvIV(value);
 	}
 	
 	if (value = champlainperl_fetch_or_croak(hash, "projection", 10)) {
