@@ -1,3 +1,27 @@
+libchamplain 0.3.3 (2009-06-14)
+===============================
+
+Second development release leading to 0.4
+(Note: there was no 0.3.1 and no 0.3.2 to match Gnome's Schedule)
+
+Enhancements:
+
+* Widget responsiveness improvements
+* Now opens more connections to server, lowers loading time
+* 572377: Draw routes/lines
+* 582448: Provide uninstalled.pc files
+* 584149: libchamplain should set the user agent on libsoup
+
+Fixes:
+ * 582786: champlain_network_map_source_fill_tile should be private
+ * 584365: "longitude" and "latitude" properties are reversed
+ * 584390: Cache doesn't work on first run
+ * 584368: Implement singleton using Gobject constructors
+ * 583502: Center_on can be wrong
+ * 584775: build system installs "uninstalled" version of the packages
+ * 585698: Use accessor functions instead direct access
+ * And numerous other fixes
+
 libchamplain 0.3 (2009-05-04)
 ===============================
 
