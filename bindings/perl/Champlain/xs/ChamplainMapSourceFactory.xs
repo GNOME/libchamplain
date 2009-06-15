@@ -2,11 +2,15 @@
 
 static GPerlCallback*
 champlainperl_constructor_create (SV *func, SV *data) {
-	GType param_types[2] = {
+	GType param_types [] = {
 		CHAMPLAIN_TYPE_MAP_SOURCE_DESC,
 		G_TYPE_POINTER,
 	};
-	return gperl_callback_new(func, data, 2, param_types, CHAMPLAIN_TYPE_MAP_SOURCE);
+	return gperl_callback_new(
+		func, data,
+		G_N_ELEMENTS(param_types), param_types,
+		CHAMPLAIN_TYPE_MAP_SOURCE
+	);
 }
 
 
