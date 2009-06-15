@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 35;
+use Clutter::TestHelper tests => 45;
 
 use Champlain ':maps';
 
@@ -87,19 +87,36 @@ sub test_map_register {
 	};
 	
 	my $constructor = sub {
+		my ($desc, $data) = @_;
+
+		TODO: {
+			local $TODO = "Can't pass the data parameter";
+			isa_ok($data, 'Champlain::MapSourceFactory');
+		}
+
+		isa_ok($desc, 'Champlain::MapSourceDesc');
+		is($desc->id, $description->{id}, "MapSourceDesc has the right id");
+		is($desc->name, $description->{name}, "MapSourceDesc has the right name");
+		is($desc->license, $description->{license}, "MapSourceDesc has the right license");
+		is($desc->license_uri, $description->{license_uri}, "MapSourceDesc has the right license_uri");
+		is($desc->min_zoom_level, $description->{min_zoom_level}, "MapSourceDesc has the right min_zoom_level");
+		is($desc->max_zoom_level, $description->{max_zoom_level}, "MapSourceDesc has the right max_zoom_level");
+		is($desc->projection, $description->{projection}, "MapSourceDesc has the right projection");
+		is($desc->uri_format, $description->{uri_format}, "MapSourceDesc has the right uri_format");
+
 		return Champlain::NetworkMapSource->new_full(
-			$description->{id},
-			$description->{name},
-			$description->{license},
-			$description->{license_uri},
-			$description->{min_zoom_level},
-			$description->{max_zoom_level},
+			$desc->id,
+			$desc->name,
+			$desc->license,
+			$desc->license_uri,
+			$desc->min_zoom_level,
+			$desc->max_zoom_level,
 			256,
-			$description->{projection},
-			$description->{uri_format},
+			$desc->projection,
+			$desc->uri_format,
 		);
 	};
-	$factory->register($description, $constructor);
+	$factory->register($description, $constructor, $factory);
 
 	my @new_maps = $factory->dup_list();
 	ok(@new_maps == @maps + 1, "Maps factory has an extra map");
