@@ -1,10 +1,10 @@
 Revision history for Champlain
 
 
-0.04 Sun May 10 23:35:30 CEST 2009
-	Bindings for libchamplain 0.3.
-	More complete unit tests.
-	New examples: capitals.pl, image.pl and animated-marker.pl.
+0.04 Mon Jun 15 22:38:17 CEST 2009
+	Bindings for libchamplain 0.3.3.
+	More complete unit tests coverage.
+	New examples: capitals.pl, image.pl, animated-marker.pl and polygons.pl.
 
 
 0.03 Sun Mar 22 22:32:44 CET 2009
