@@ -2,7 +2,10 @@
 
 static GPerlCallback*
 champlainperl_constructor_create (SV *func, SV *data) {
-	GType param_types[2] = { G_TYPE_POINTER, G_TYPE_POINTER, };
+	GType param_types[2] = {
+		CHAMPLAIN_TYPE_MAP_SOURCE_DESC,
+		G_TYPE_POINTER,
+	};
 	return gperl_callback_new(func, data, 2, param_types, CHAMPLAIN_TYPE_MAP_SOURCE);
 }
 
