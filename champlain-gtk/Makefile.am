@@ -17,7 +17,8 @@ libchamplain_gtk_0_3_la_SOURCES = \
 
 noinst_HEADERS = gtk-champlain-embed.h
 
-libchamplain_gtk_0_3_la_LIBADD = $(GTK_DEPS_LIBS)
+libchamplain_gtk_0_3_la_LIBADD = $(GTK_DEPS_LIBS) 	\
+	$(top_builddir)/champlain/libchamplain-0.3.la
 
 champlain-gtk-marshal.h: $(CHAMPLAIN_GTK_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --header --prefix=champlain_gtk_marshal $< > $(CHAMPLAIN_GTK_MARSHAL).h
