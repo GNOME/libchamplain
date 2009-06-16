@@ -361,13 +361,12 @@ champlain_cache_fill_tile (ChamplainCache *self,
   GError *error = NULL;
   ClutterActor *actor = NULL;
   const gchar *filename = NULL;
-  GTimeVal *modified_time = NULL;
+  GTimeVal modified_time = {0,};
   int sql_rc = SQLITE_OK;
   gboolean cache_hit = FALSE;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
 
-  modified_time = g_new0 (GTimeVal, 1);
   filename = champlain_tile_get_filename (tile);
 
   if (!g_file_test (filename, G_FILE_TEST_EXISTS))
@@ -377,8 +376,8 @@ champlain_cache_fill_tile (ChamplainCache *self,
   info = g_file_query_info (file,
       G_FILE_ATTRIBUTE_TIME_MODIFIED "," G_FILE_ATTRIBUTE_ETAG_VALUE,
       G_FILE_QUERY_INFO_NONE, NULL, NULL);
-  g_file_info_get_modification_time (info, modified_time);
-  champlain_tile_set_modified_time (tile, modified_time);
+  g_file_info_get_modification_time (info, &modified_time);
+  champlain_tile_set_modified_time (tile, &modified_time);
 
   g_object_unref (file);
   g_object_unref (info);
@@ -455,18 +454,17 @@ gboolean
 champlain_cache_tile_is_expired (ChamplainCache *self,
     ChamplainTile *tile)
 {
+  GTimeVal now = {0, };
   g_return_val_if_fail(CHAMPLAIN_CACHE (self), FALSE);
   g_return_val_if_fail(CHAMPLAIN_TILE (tile), FALSE);
 
-  GTimeVal *now = g_new0 (GTimeVal, 1);
   const GTimeVal *modified_time = champlain_tile_get_modified_time (tile);
   gboolean validate_cache = FALSE;
 
-  g_get_current_time (now);
-  g_time_val_add (now, (-24ul * 60ul * 60ul * 1000ul * 1000ul)); // Cache expires 1 day
-  validate_cache = modified_time->tv_sec < now->tv_sec;
+  g_get_current_time (&now);
+  g_time_val_add (&now, (-24ul * 60ul * 60ul * 1000ul * 1000ul)); // Cache expires 1 day
+  validate_cache = modified_time->tv_sec < now.tv_sec;
 
-  g_free (now);
   return validate_cache;
 }
 
