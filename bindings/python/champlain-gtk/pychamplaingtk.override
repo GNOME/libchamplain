@@ -13,3 +13,7 @@ import gtk.Alignment as PyGtkAlignment_Type
 import clutter.Actor as PyClutterActor_Type
 import clutter.Group as PyClutterGroup_Type
 %%
+ignore
+    champlain_view_embed_get_view
+    champlain_view_embed_set_view
+%%
