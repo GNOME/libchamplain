@@ -186,6 +186,8 @@ champlain_tile_finalize (GObject *object)
 
   g_free (priv->uri);
   g_free (priv->filename);
+  g_free (priv->modified_time);
+  g_free (priv->etag);
 
   G_OBJECT_CLASS (champlain_tile_parent_class)->finalize (object);
 }
@@ -739,7 +741,7 @@ champlain_tile_get_modified_time (ChamplainTile *self)
 /**
  * champlain_tile_set_modified_time:
  * @self: the #ChamplainTile
- * @time: a #GTimeVal
+ * @time_: a #GTimeVal, the value will be copied
  *
  * Sets the tile's modified time
  *
@@ -747,14 +749,15 @@ champlain_tile_get_modified_time (ChamplainTile *self)
  */
 void
 champlain_tile_set_modified_time (ChamplainTile *self,
-    GTimeVal *time)
+    const GTimeVal *time_)
 {
   g_return_if_fail (CHAMPLAIN_TILE(self));
   g_return_if_fail (time != NULL);
 
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
-  priv->modified_time = time;
+  g_free (priv->modified_time);
+  priv->modified_time = g_memdup(time_, sizeof (GTimeVal));
 }
 
 /**
@@ -816,6 +819,7 @@ champlain_tile_set_etag (ChamplainTile *self,
 
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
+  g_free (priv->etag);
   priv->etag = g_strdup (etag);
   g_object_notify (G_OBJECT (self), "etag");
 }
