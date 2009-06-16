@@ -136,7 +136,7 @@ main (int argc,
   g_object_unref (G_OBJECT (polygon));
 
   /* Finish initialising the map view */
-  g_object_set (G_OBJECT (actor), "zoom-level", 9,
+  g_object_set (G_OBJECT (actor), "zoom-level", 8,
       "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC, NULL);
   champlain_view_center_on (CHAMPLAIN_VIEW (actor), 45.466, -73.75);
 
