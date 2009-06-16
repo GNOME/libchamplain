@@ -44,6 +44,7 @@ _wrap_champlain_map_source_factory_dup_list(PyGObject *self) {
 		PyDict_SetItemString(item, "license_uri", PyString_FromString(desc->license_uri));
 		PyDict_SetItemString(item, "min_zoom_level", PyInt_FromLong(desc->min_zoom_level));
 		PyDict_SetItemString(item, "max_zoom_level", PyInt_FromLong(desc->max_zoom_level));
+		PyDict_SetItemString(item, "uri_format", PyString_FromString(desc->uri_format));
 		PyList_Append(ret, item);
 		Py_DECREF(item);
 	}
@@ -51,5 +52,110 @@ _wrap_champlain_map_source_factory_dup_list(PyGObject *self) {
 	g_slist_free(list);
 
 	return ret;
+}
+%%
+override champlain_map_source_factory_register kwargs
+static PyObject *_pycallback = NULL;
+
+static ChamplainMapSource *
+champlain_map_source_constructor (ChamplainMapSourceDesc *desc, gpointer data)
+{
+    PyObject *pymap_source = NULL;
+    PyObject *pydesc = PyDict_New();
+
+    PyDict_SetItemString(pydesc, "id", PyString_FromString(desc->id));
+    PyDict_SetItemString(pydesc, "name", PyString_FromString(desc->name));
+    PyDict_SetItemString(pydesc, "license", PyString_FromString(desc->license));
+    PyDict_SetItemString(pydesc, "license_uri", PyString_FromString(desc->license_uri));
+    PyDict_SetItemString(pydesc, "min_zoom_level", PyInt_FromLong(desc->min_zoom_level));
+    PyDict_SetItemString(pydesc, "max_zoom_level", PyInt_FromLong(desc->max_zoom_level));
+    PyDict_SetItemString(pydesc, "uri_format", PyString_FromString(desc->uri_format));
+    pymap_source = PyObject_CallFunction(_pycallback, "(OO)", pydesc, data);
+    if (!pymap_source)
+        return NULL;
+    return CHAMPLAIN_MAP_SOURCE(((PyGObject *)pymap_source)->obj);
+}
+
+static PyObject *
+_wrap_champlain_map_source_factory_register(PyGObject *self, PyObject *args, PyObject *kargs) 
+{
+    ChamplainMapSourceDesc *desc;
+    PyObject *pydesc = NULL, *pyconstructor = NULL, *pyuser_data = NULL;
+    static char *kwlist[] = {"desc", "constructor", "user_data", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kargs, "OO|O:ChamplainMapSourceFactory.register", 
+        kwlist, &pydesc, &pyconstructor, &pyuser_data))
+        return NULL;
+   
+    if (!pydesc || !PyMapping_Check(pydesc)){
+        PyErr_SetString(PyExc_TypeError, "desc parameter must be a dict object");
+        return NULL;
+    }
+
+    desc = champlain_map_source_desc_new(); 
+    desc->id = PyString_AsString(PyDict_GetItemString(pydesc, "id"));
+    desc->name = PyString_AsString(PyDict_GetItemString(pydesc, "name"));
+    desc->license = PyString_AsString(PyDict_GetItemString(pydesc, "license"));
+    desc->license_uri = PyString_AsString(PyDict_GetItemString(pydesc, "license_uri"));
+    desc->min_zoom_level = PyInt_AsLong(PyDict_GetItemString(pydesc, "min_zoom_level"));
+    desc->max_zoom_level = PyInt_AsLong(PyDict_GetItemString(pydesc, "max_zoom_level"));
+    desc->uri_format = PyString_AsString(PyDict_GetItemString(pydesc, "uri_format"));
+    if (pyg_enum_get_value(CHAMPLAIN_TYPE_MAP_PROJECTION, PyDict_GetItemString(pydesc, 
+        "projection"), (gpointer)&desc->projection) != 0)
+        return NULL;
+
+    if (!pyconstructor || !PyCallable_Check(pyconstructor)) {
+        PyErr_SetString(PyExc_TypeError, "constructor parameter must be callable");
+        return NULL;
+    }
+    Py_XINCREF(pyconstructor);  /* Add a reference to new callback */
+    Py_XDECREF(_pycallback); /* Dispose of previous callback */
+    _pycallback = pyconstructor;
+    return PyBool_FromLong(champlain_map_source_factory_register(
+        CHAMPLAIN_MAP_SOURCE_FACTORY(self->obj), desc, champlain_map_source_constructor, 
+        (gpointer)pyuser_data));
+}
+%%
+override champlain_polygon_append_point kwargs
+static PyObject *
+_wrap_champlain_polygon_append_point(PyGObject *self, PyObject *args) 
+{
+    double lat, lon; 
+    
+    if (!PyArg_ParseTuple(args, "dd:ChamplainPolygon.append_point", &lat, &lon))
+        return NULL;
+    champlain_polygon_append_point(CHAMPLAIN_POLYGON(self->obj), lat, lon);
+    return Py_BuildValue("(dd)", lat, lon);
+}
+%%
+%%
+override champlain_polygon_insert_point kwargs
+static PyObject *
+_wrap_champlain_polygon_insert_point(PyGObject *self, PyObject *args) 
+{
+    double lat, lon; 
+    int pos;
+    
+    if (!PyArg_ParseTuple(args, "ddi:ChamplainPolygon.insert_point", &lat, &lon, &pos))
+        return NULL;
+    champlain_polygon_insert_point(CHAMPLAIN_POLYGON(self->obj), lat, lon, pos);
+    return Py_BuildValue("(dd)", lat, lon);
+}
+%%
+%%
+override champlain_polygon_get_points kwargs
+static PyObject *
+_wrap_champlain_polygon_get_points(PyGObject *self, PyObject *args) 
+{
+    GList *iter, *list = champlain_polygon_get_points(CHAMPLAIN_POLYGON(self->obj));
+    PyObject *ret = PyList_New(0);
+
+	for(iter = list; iter != NULL; iter = iter->next) {
+		ChamplainPoint *point = (ChamplainPoint *) iter->data;
+		PyObject *item = Py_BuildValue("(dd)", point->lat, point->lon);
+		PyList_Append(ret, item);
+		Py_DECREF(item);
+    }
+    return ret;
 }
 %%
