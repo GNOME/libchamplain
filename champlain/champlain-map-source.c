@@ -175,6 +175,7 @@ champlain_map_source_finalize (GObject *object)
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE (object);
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
+  g_free (priv->id);
   g_free (priv->name);
   g_free (priv->license);
   g_free (priv->license_uri);
