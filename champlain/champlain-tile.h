@@ -91,7 +91,7 @@ void champlain_tile_set_content (ChamplainTile *self,
 void champlain_tile_set_etag (ChamplainTile *self,
     const gchar *etag);
 void champlain_tile_set_modified_time (ChamplainTile *self,
-    GTimeVal *time);
+    const GTimeVal *time);
 
 G_END_DECLS
 
