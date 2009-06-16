@@ -67,7 +67,6 @@ noinst_HEADERS = \
 	champlain-network-map-source.h	\
 	champlain-map-source-factory.h	\
 	champlain-map-source-desc.h	\
-	champlain-version.h		\
 	champlain-cache.h		\
 	champlain-polygon.h		\
 	champlain-version.h
@@ -87,7 +86,6 @@ libchamplain_include_HEADERS = \
 	champlain-zoom-level.h		\
 	champlain-base-marker.h		\
 	champlain-marker.h		\
-	champlain-version.h		\
 	champlain-cache.h		\
 	champlain-polygon.h		\
 	champlain-version.h
