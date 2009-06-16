@@ -1,4 +1,5 @@
 PYCLUTTERDEFS=`pkg-config --variable=defsdir pyclutter-0.8`
+PYGTKDEFS=`pkg-config --variable=defsdir pygtk-2.0`
 
 AM_CPPFLAGS =						\
 	-I.						\
@@ -29,6 +30,7 @@ champlain_la_LDFLAGS =					\
 pychamplain.c: pychamplain.override pychamplain.defs
 	$(PYGOBJECTCODEGEN)				\
 		--prefix champlain 			\
+		--register $(PYGTKDEFS)/pango-types.defs \
 		--register $(PYCLUTTERDEFS)/clutter-types.defs \
 		--register $(PYCLUTTERDEFS)/cogl-types.defs \
 		--override pychamplain.override 	\
