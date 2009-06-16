@@ -715,13 +715,10 @@ champlain_view_dispose (GObject *object)
   polygons = priv->polygons;
   while (polygons != NULL)
     {
-      ChamplainPolygon *polygon;
-
-      polygon = CHAMPLAIN_POLYGON (polygons->data);
+      g_object_unref (G_OBJECT (polygons->data));
       polygons = polygons->next;
-      g_object_unref (polygon);
-      priv->polygons = g_list_remove (polygons, polygon);
     }
+  g_list_free (priv->polygons);
 
   if (priv->goto_context != NULL)
     champlain_view_stop_go_to (view);
