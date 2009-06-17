@@ -719,6 +719,7 @@ champlain_view_dispose (GObject *object)
       polygons = polygons->next;
     }
   g_list_free (priv->polygons);
+  priv->polygons = NULL;
 
   if (priv->goto_context != NULL)
     champlain_view_stop_go_to (view);
