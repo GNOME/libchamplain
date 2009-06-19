@@ -110,6 +110,17 @@ AM_CPPFLAGS = 				\
 	-DCHAMPLAIN_COMPILATION 	\
 	$(WARN_CFLAGS)
 
+if ENABLE_MEMPHIS
+libchamplain_headers += champlain-memphis-map-source.h  \
+	champlain-map-data-source.h
+libchamplain_0_3_la_SOURCES += champlain-memphis-map-source.c  \
+	champlain-map-data-source.c
+libchamplain_include_HEADERS += champlain-memphis-map-source.h  \
+	champlain-map-data-source.h
+libchamplain_0_3_la_LIBADD += ../memphis/libmemphis-1.0.la
+AM_CPPFLAGS += -I$(top_srcdir)/memphis -DMEMPHIS_ENABLED
+endif
+
 EXTRA_DIST = $(CHAMPLAIN_MARSHAL_LIST)
 
 champlain-marshal.h: $(CHAMPLAIN_MARSHAL_LIST)
