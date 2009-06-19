@@ -19,8 +19,8 @@
 #ifndef _CHAMPLAIN_MEMPHIS_MAP_SOURCE
 #define _CHAMPLAIN_MEMPHIS_MAP_SOURCE
 
-#include "champlain-map-data-source.h"
-#include "champlain-map-source.h"
+#include <champlain/champlain-map-data-source.h>
+#include <champlain/champlain-map-source.h>
 
 #include <glib-object.h>
 
@@ -57,16 +57,15 @@ ChamplainMemphisMapSource* champlain_memphis_map_source_new_full (
     ChamplainMapDataSource *data_source);
 
 void champlain_memphis_map_source_set_tile_size (
-    ChamplainMemphisMapSource *map_source);
+    ChamplainMemphisMapSource *map_source, guint size);
 
-void champlain_memphis_map_source_set_rules_path (
+void champlain_memphis_map_source_load_rules (
     ChamplainMemphisMapSource *map_source,
-    gchar *path);
+    gchar *rules_path);
 
 void champlain_memphis_map_source_set_map_source (
     ChamplainMemphisMapSource *map_source,
     ChamplainMapDataSource *data_source);
-
 
 G_END_DECLS
 
