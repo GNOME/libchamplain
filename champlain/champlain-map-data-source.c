@@ -23,6 +23,12 @@ G_DEFINE_TYPE (ChamplainMapDataSource, champlain_map_data_source, G_TYPE_OBJECT)
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_MAP_DATA_SOURCE, ChamplainMapDataSourcePrivate))
 
+enum
+{
+  PROP_0,
+  PROP_MAP_DATA
+};
+
 typedef struct _ChamplainMapDataSourcePrivate ChamplainMapDataSourcePrivate;
 
 struct _ChamplainMapDataSourcePrivate {
@@ -52,6 +58,12 @@ champlain_map_data_source_set_property (GObject *object, guint property_id,
 static void
 champlain_map_data_source_dispose (GObject *object)
 {
+  ChamplainMapDataSource *self = (ChamplainMapDataSource *) object;
+  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
+
+  if (priv->map_data)
+    memphis_map_free (priv->map_data);
+
   G_OBJECT_CLASS (champlain_map_data_source_parent_class)->dispose (object);
 }
 
@@ -61,9 +73,8 @@ champlain_map_data_source_finalize (GObject *object)
   G_OBJECT_CLASS (champlain_map_data_source_parent_class)->finalize (object);
 }
 
-static void
-champlain_map_data_source_real_get_map_data (ChamplainMapDataSource *data_source,
-      osmFile *map_data)
+static MemphisMap*
+champlain_map_data_source_real_get_map_data (ChamplainMapDataSource *self)
 {
   g_error ("Should not be reached");
 }
@@ -86,7 +97,9 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
 static void
 champlain_map_data_source_init (ChamplainMapDataSource *self)
 {
+  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
 
+  priv->map_data = NULL;
 }
 
 ChamplainMapDataSource*
@@ -96,8 +109,12 @@ champlain_map_data_source_new (void)
 }
 
 MemphisMap*
-champlain_map_data_get_map_data (ChamplainMapDataSource *data_source)
+champlain_map_data_get_map_data (ChamplainMapDataSource *self)
 {
+  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
 
-  return NULL;
+  priv->map_data = CHAMPLAIN_MAP_DATA_SOURCE_GET_CLASS (self)
+      ->get_map_data (self);
+
+  return priv->map_data;
 }

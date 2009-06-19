@@ -47,8 +47,7 @@ typedef struct {
 
 typedef struct {
   GObjectClass parent_class;
-  void (*get_map_data) (ChamplainMapDataSource *data_source,
-      osmFile *map_data);
+  MemphisMap* (*get_map_data) (ChamplainMapDataSource *data_source);
 } ChamplainMapDataSourceClass;
 
 GType champlain_map_data_source_get_type (void);
