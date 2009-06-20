@@ -54,8 +54,15 @@ GType champlain_map_data_source_get_type (void);
 
 ChamplainMapDataSource* champlain_map_data_source_new (void);
 
-MemphisMap* champlain_map_data_get_map_data (
-    ChamplainMapDataSource *data_source);
+MemphisMap* champlain_map_data_source_get_map_data (ChamplainMapDataSource *data_source);
+
+const gchar * champlain_map_data_source_get_id (ChamplainMapDataSource *data_source);
+const gchar * champlain_map_data_source_get_name (ChamplainMapDataSource *data_source);
+const gchar * champlain_map_data_source_get_license (ChamplainMapDataSource *data_source);
+const gchar * champlain_map_data_source_get_license_uri (ChamplainMapDataSource *data_source);
+
+guint champlain_map_data_source_get_min_zoom_level (ChamplainMapDataSource *data_source);
+guint champlain_map_data_source_get_max_zoom_level (ChamplainMapDataSource *data_source);
 
 G_END_DECLS
 

@@ -26,13 +26,19 @@ G_DEFINE_TYPE (ChamplainMapDataSource, champlain_map_data_source, G_TYPE_OBJECT)
 enum
 {
   PROP_0,
-  PROP_MAP_DATA
+  PROP_ID
+  // TODO
 };
 
 typedef struct _ChamplainMapDataSourcePrivate ChamplainMapDataSourcePrivate;
 
 struct _ChamplainMapDataSourcePrivate {
-  MemphisMap *map_data;
+  const char *id;
+  const char *name;
+  const char *license;
+  const char *license_uri;
+  guint min_zoom_level;
+  guint max_zoom_level;
 };
 
 static void
@@ -58,11 +64,8 @@ champlain_map_data_source_set_property (GObject *object, guint property_id,
 static void
 champlain_map_data_source_dispose (GObject *object)
 {
-  ChamplainMapDataSource *self = (ChamplainMapDataSource *) object;
-  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
-
-  if (priv->map_data)
-    memphis_map_free (priv->map_data);
+  //ChamplainMapDataSource *self = (ChamplainMapDataSource *) object;
+  //ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
 
   G_OBJECT_CLASS (champlain_map_data_source_parent_class)->dispose (object);
 }
@@ -99,7 +102,12 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
 {
   ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
 
-  priv->map_data = NULL;
+  priv->id = NULL;
+  priv->name = NULL;
+  priv->license = NULL;
+  priv->license_uri = NULL;
+  priv->min_zoom_level = 12;
+  priv->max_zoom_level = 18;
 }
 
 ChamplainMapDataSource*
@@ -109,12 +117,63 @@ champlain_map_data_source_new (void)
 }
 
 MemphisMap*
-champlain_map_data_get_map_data (ChamplainMapDataSource *self)
+champlain_map_data_source_get_map_data (ChamplainMapDataSource *self)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), NULL);
+
+  return CHAMPLAIN_MAP_DATA_SOURCE_GET_CLASS (self)->get_map_data (self);
+}
+
+const gchar*
+champlain_map_data_source_get_id (ChamplainMapDataSource *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), NULL);
+
   ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
+  return priv->id;
+}
 
-  priv->map_data = CHAMPLAIN_MAP_DATA_SOURCE_GET_CLASS (self)
-      ->get_map_data (self);
+const gchar*
+champlain_map_data_source_get_name (ChamplainMapDataSource *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), NULL);
 
-  return priv->map_data;
+  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
+  return priv->name;
+}
+
+const gchar*
+champlain_map_data_source_get_license (ChamplainMapDataSource *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), NULL);
+
+  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
+  return priv->license;
+}
+
+const gchar*
+champlain_map_data_source_get_license_uri (ChamplainMapDataSource *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), NULL);
+
+  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
+  return priv->license_uri;
+}
+
+guint
+champlain_map_data_source_get_min_zoom_level (ChamplainMapDataSource *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), 0);
+
+  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
+  return priv->min_zoom_level;
+}
+
+guint
+champlain_map_data_source_get_max_zoom_level (ChamplainMapDataSource *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), 0);
+
+  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
+  return priv->max_zoom_level;
 }

@@ -213,20 +213,20 @@ champlain_memphis_map_source_new_full (ChamplainMapDataSource *data_source)
   MemphisMap *map;
 
   source = g_object_new (CHAMPLAIN_TYPE_MEMPHIS_MAP_SOURCE,
-      //"id", id,
-      //"name", name,
-      //"license", license,
-      //"license-uri", license_uri,
-      //"projection", projection,
-      "min-zoom-level", 12, // TODO: read from data source
-      "max-zoom-level", 18, // TODO: read from data source
+      "id", champlain_map_data_source_get_id (data_source),
+      "name", champlain_map_data_source_get_name (data_source),
+      "license", champlain_map_data_source_get_license (data_source),
+      "license-uri", champlain_map_data_source_get_license_uri (data_source),
+      "projection", CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "min-zoom-level", champlain_map_data_source_get_min_zoom_level (data_source),
+      "max-zoom-level", champlain_map_data_source_get_max_zoom_level (data_source),
       "tile-size", DEFAULT_TILE_SIZE,
       NULL);
 
   priv = GET_PRIVATE(source);
   priv->data_source = g_object_ref (data_source);
 
-  map = champlain_map_data_get_map_data (priv->data_source);
+  map = champlain_map_data_source_get_map_data (priv->data_source);
 
   priv->rules = memphis_rule_set_new ();
   //memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
@@ -277,6 +277,6 @@ void champlain_memphis_map_source_set_map_source (
 
   priv->data_source = data_source;
 
-  map = champlain_map_data_get_map_data (priv->data_source);
+  map = champlain_map_data_source_get_map_data (priv->data_source);
   memphis_renderer_set_map (priv->renderer, map);
 }
