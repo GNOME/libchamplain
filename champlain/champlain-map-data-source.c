@@ -26,8 +26,12 @@ G_DEFINE_TYPE (ChamplainMapDataSource, champlain_map_data_source, G_TYPE_OBJECT)
 enum
 {
   PROP_0,
-  PROP_ID
-  // TODO
+  PROP_ID,
+  PROP_NAME,
+  PROP_LICENSE,
+  PROP_LICENSE_URI,
+  PROP_MIN_ZOOM_LEVEL,
+  PROP_MAX_ZOOM_LEVEL
 };
 
 typedef struct _ChamplainMapDataSourcePrivate ChamplainMapDataSourcePrivate;
@@ -46,6 +50,7 @@ champlain_map_data_source_get_property (GObject *object, guint property_id,
                               GValue *value, GParamSpec *pspec)
 {
   switch (property_id) {
+  // TODO
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
   }
@@ -56,6 +61,7 @@ champlain_map_data_source_set_property (GObject *object, guint property_id,
                               const GValue *value, GParamSpec *pspec)
 {
   switch (property_id) {
+  // TODO
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
   }
@@ -64,9 +70,6 @@ champlain_map_data_source_set_property (GObject *object, guint property_id,
 static void
 champlain_map_data_source_dispose (GObject *object)
 {
-  //ChamplainMapDataSource *self = (ChamplainMapDataSource *) object;
-  //ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
-
   G_OBJECT_CLASS (champlain_map_data_source_parent_class)->dispose (object);
 }
 
@@ -106,8 +109,8 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
   priv->name = NULL;
   priv->license = NULL;
   priv->license_uri = NULL;
-  priv->min_zoom_level = 12;
-  priv->max_zoom_level = 18;
+  priv->min_zoom_level = 0;
+  priv->max_zoom_level = 0;
 }
 
 ChamplainMapDataSource*
