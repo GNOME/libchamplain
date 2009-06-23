@@ -44,6 +44,7 @@
 #ifdef MEMPHIS_ENABLED
 #include "champlain/champlain-memphis-map-source.h"
 #include "champlain/champlain-map-data-source.h"
+#include "champlain/champlain-local-map-data-source.h"
 #endif
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__

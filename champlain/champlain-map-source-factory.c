@@ -76,6 +76,10 @@ struct _ChamplainMapSourceFactoryPrivate
 static ChamplainMapSource * champlain_map_source_new_generic (
      ChamplainMapSourceDesc *desc, gpointer data);
 
+#ifdef MEMPHIS_ENABLED
+static ChamplainMapSource * champlain_map_source_new_memphis (
+    ChamplainMapSourceDesc *desc, gpointer user_data);
+#endif
 
 static void
 champlain_map_source_factory_get_property (GObject *object,
@@ -248,6 +252,23 @@ ChamplainMapSourceDesc MFF_RELIEF_DESC =
     NULL
   };
 
+#ifdef MEMPHIS_ENABLED
+static
+ChamplainMapSourceDesc MEMPHIS_LOCAL_DESC =
+  {
+    CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL,
+    "OpenStreetMap Memphis Local Map",
+    "(CC) BY 2.0 OpenStreetMap contributors",
+    "http://creativecommons.org/licenses/by/2.0/",
+    12,
+    18,
+    CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+    champlain_map_source_new_memphis,
+    "",
+    NULL
+  };
+#endif
+
 static void
 champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 {
@@ -271,6 +292,10 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 #endif
   champlain_map_source_factory_register (factory, &MFF_RELIEF_DESC,
       MFF_RELIEF_DESC.constructor, MFF_RELIEF_DESC.data);
+#ifdef MEMPHIS_ENABLED
+  champlain_map_source_factory_register (factory, &MEMPHIS_LOCAL_DESC,
+      MEMPHIS_LOCAL_DESC.constructor, MEMPHIS_LOCAL_DESC.data);
+#endif
 }
 
 /**
@@ -377,3 +402,20 @@ champlain_map_source_new_generic (
       desc->projection,
       desc->uri_format));
 }
+
+#ifdef MEMPHIS_ENABLED
+static ChamplainMapSource *
+champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
+    gpointer user_data)
+{
+  ChamplainMapDataSource *map_data_source;
+
+  if (strcmp (desc->id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL) == 0)
+    map_data_source = CHAMPLAIN_MAP_DATA_SOURCE (champlain_local_map_data_source_new ());
+  else
+    return NULL;
+
+  return CHAMPLAIN_MAP_SOURCE (champlain_memphis_map_source_new_full (
+      desc, map_data_source));
+}
+#endif
