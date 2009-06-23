@@ -21,6 +21,7 @@
 
 #include <champlain/champlain-map-data-source.h>
 #include <champlain/champlain-map-source.h>
+#include <champlain/champlain-map-source-desc.h>
 
 #include <glib-object.h>
 
@@ -54,6 +55,7 @@ typedef struct {
 GType champlain_memphis_map_source_get_type (void);
 
 ChamplainMemphisMapSource* champlain_memphis_map_source_new_full (
+    ChamplainMapSourceDesc *desc,
     ChamplainMapDataSource *data_source);
 
 void champlain_memphis_map_source_set_tile_size (

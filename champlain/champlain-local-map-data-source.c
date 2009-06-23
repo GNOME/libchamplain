@@ -67,7 +67,7 @@ static MemphisMap*
 get_map_data (ChamplainMapDataSource *self)
 {
   ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
-  
+
   return priv->map;
 }
 
@@ -92,7 +92,8 @@ champlain_local_map_data_source_init (ChamplainLocalMapDataSource *self)
 {
   ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
   
-  priv->map = NULL;
+  priv->map = memphis_map_new ();
+  //memphis_map_load_from_file (priv->map, "sherbrooke_small.osm"); // REMOVE ME
 }
 
 ChamplainLocalMapDataSource*

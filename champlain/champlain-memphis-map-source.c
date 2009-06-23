@@ -30,7 +30,7 @@
 
 /* Tuning parameters */
 #define MAX_THREADS 4
-#define DEFAULT_TILE_SIZE 512
+#define DEFAULT_TILE_SIZE 256
 #define DEFAULT_RULES_PATH "rule.xml"
 
 G_DEFINE_TYPE (ChamplainMemphisMapSource, champlain_memphis_map_source, CHAMPLAIN_TYPE_MAP_SOURCE)
@@ -99,14 +99,15 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
 
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
 
+  /* So we don't loose a tile if it is in the thread pool queue for a long time */
+  tile = g_object_ref (tile);
+
   g_thread_pool_push (priv->thpool, tile, &error);
   if (error)
     {
       g_error ("Thread pool error: %s", error->message);
       g_error_free (error);
     }
-
-  tile = g_object_ref (tile);
 }
 
 typedef struct _TileData TileData;
@@ -140,6 +141,8 @@ set_tile_content (gpointer data)
   g_object_unref (tile);
   g_object_unref (tile);
 
+  g_free (tdata);
+  //g_print ("Rendering done: %i %i %i\n", x, y, z);
   return FALSE;
 }
 
@@ -170,9 +173,6 @@ memphis_worker_thread (gpointer data, gpointer user_data)
   tdata->cst = cst;
 
   clutter_threads_add_idle (set_tile_content, tdata);
-
-  g_free (tdata);
-  //g_print ("Rendering done: %i %i %i\n", x, y, z);
 }
 
 static void
@@ -199,12 +199,12 @@ champlain_memphis_map_source_init (ChamplainMemphisMapSource *self)
   priv->data_source = NULL;
   priv->rules = NULL;
   priv->renderer = NULL;
-  priv->thpool = g_thread_pool_new (memphis_worker_thread, priv->renderer,
-      MAX_THREADS, FALSE, NULL);
+  priv->thpool = NULL;
 }
 
-ChamplainMemphisMapSource*
-champlain_memphis_map_source_new_full (ChamplainMapDataSource *data_source)
+ChamplainMemphisMapSource *
+champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
+    ChamplainMapDataSource *data_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (data_source), NULL);
 
@@ -213,27 +213,30 @@ champlain_memphis_map_source_new_full (ChamplainMapDataSource *data_source)
   MemphisMap *map;
 
   source = g_object_new (CHAMPLAIN_TYPE_MEMPHIS_MAP_SOURCE,
-      "id", champlain_map_data_source_get_id (data_source),
-      "name", champlain_map_data_source_get_name (data_source),
-      "license", champlain_map_data_source_get_license (data_source),
-      "license-uri", champlain_map_data_source_get_license_uri (data_source),
+      "id", desc->id,
+      "name", desc->name,
+      "license", desc->license,
+      "license-uri", desc->license_uri,
       "projection", CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      "min-zoom-level", champlain_map_data_source_get_min_zoom_level (data_source),
-      "max-zoom-level", champlain_map_data_source_get_max_zoom_level (data_source),
+      "min-zoom-level", desc->min_zoom_level,
+      "max-zoom-level", desc->max_zoom_level,
       "tile-size", DEFAULT_TILE_SIZE,
       NULL);
 
   priv = GET_PRIVATE(source);
   priv->data_source = g_object_ref (data_source);
 
-  map = champlain_map_data_source_get_map_data (priv->data_source);
-
   priv->rules = memphis_rule_set_new ();
-  //memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
+  memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH); //???
+
+  map = champlain_map_data_source_get_map_data (priv->data_source);
 
   priv->renderer = memphis_renderer_new_full (priv->rules, map);
   memphis_renderer_set_resolution (priv->renderer, DEFAULT_TILE_SIZE);
   memphis_renderer_set_debug_level (priv->renderer, 1);
+
+  priv->thpool = g_thread_pool_new (memphis_worker_thread, priv->renderer,
+      MAX_THREADS, FALSE, NULL);
 
   return source;
 }
@@ -265,7 +268,8 @@ champlain_memphis_map_source_load_rules (
     memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
 }
 
-void champlain_memphis_map_source_set_map_source (
+void
+champlain_memphis_map_source_set_map_source (
     ChamplainMemphisMapSource *self,
     ChamplainMapDataSource *data_source)
 {
