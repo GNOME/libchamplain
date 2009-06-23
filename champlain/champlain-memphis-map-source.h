@@ -54,9 +54,9 @@ typedef struct {
 
 GType champlain_memphis_map_source_get_type (void);
 
-ChamplainMemphisMapSource* champlain_memphis_map_source_new_full (
+ChamplainMemphisMapSource * champlain_memphis_map_source_new_full (
     ChamplainMapSourceDesc *desc,
-    ChamplainMapDataSource *data_source);
+    ChamplainMapDataSource *map_data_source);
 
 void champlain_memphis_map_source_set_tile_size (
     ChamplainMemphisMapSource *map_source, guint size);
@@ -65,9 +65,12 @@ void champlain_memphis_map_source_load_rules (
     ChamplainMemphisMapSource *map_source,
     gchar *rules_path);
 
-void champlain_memphis_map_source_set_map_source (
+void champlain_memphis_map_source_set_map_data_source (
     ChamplainMemphisMapSource *map_source,
-    ChamplainMapDataSource *data_source);
+    ChamplainMapDataSource *map_data_source);
+
+ChamplainMapDataSource * champlain_memphis_map_source_get_map_data_source (
+    ChamplainMemphisMapSource *map_source);
 
 G_END_DECLS
 

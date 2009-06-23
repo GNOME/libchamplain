@@ -54,6 +54,11 @@ champlain_local_map_data_source_set_property (GObject *object, guint property_id
 static void
 champlain_local_map_data_source_dispose (GObject *object)
 {
+  ChamplainLocalMapDataSource *self = (ChamplainLocalMapDataSource *) object;
+  ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
+
+  memphis_map_free (priv->map);
+
   G_OBJECT_CLASS (champlain_local_map_data_source_parent_class)->dispose (object);
 }
 
