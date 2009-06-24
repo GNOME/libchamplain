@@ -101,7 +101,6 @@ champlain_local_map_data_source_init (ChamplainLocalMapDataSource *self)
   ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
   
   priv->map = memphis_map_new ();
-  //memphis_map_load_from_file (priv->map, "sherbrooke_small.osm"); // REMOVE ME
 }
 
 ChamplainLocalMapDataSource*

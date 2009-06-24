@@ -410,10 +410,16 @@ champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
 {
   ChamplainMapDataSource *map_data_source;
 
-  if (strcmp (desc->id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL) == 0)
+  if (g_strcmp0 (desc->id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL) == 0)
     map_data_source = CHAMPLAIN_MAP_DATA_SOURCE (champlain_local_map_data_source_new ());
   else
     return NULL;
+
+  /* Abuse the uri_format field to store an initial data path (optional) */
+  if (desc->uri_format && g_strcmp0 (desc->uri_format, "") != 0)
+    champlain_local_map_data_source_load_map_data (
+        CHAMPLAIN_LOCAL_MAP_DATA_SOURCE (map_data_source),
+        desc->uri_format);
 
   return CHAMPLAIN_MAP_SOURCE (champlain_memphis_map_source_new_full (
       desc, map_data_source));
