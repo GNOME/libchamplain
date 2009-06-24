@@ -38,6 +38,12 @@
 /* 0: Be quiet, 1: Normal output, 2: Be verbose */
 #define MEMPHIS_INTERNAL_DEBUG_LEVEL 0
 
+enum
+{
+  PROP_0,
+  PROP_MAP_DATA_SOURCE
+};
+
 G_DEFINE_TYPE (ChamplainMemphisMapSource, champlain_memphis_map_source, CHAMPLAIN_TYPE_MAP_SOURCE)
 
 #define GET_PRIVATE(o) \
@@ -57,8 +63,13 @@ static void
 champlain_memphis_map_source_get_property (GObject *object, guint property_id,
                               GValue *value, GParamSpec *pspec)
 {
+  ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE (object);
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+
   switch (property_id) {
-  // TODO
+  case PROP_MAP_DATA_SOURCE:
+    g_value_set_object (value, priv->map_data_source);
+    break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
   }
@@ -68,8 +79,12 @@ static void
 champlain_memphis_map_source_set_property (GObject *object, guint property_id,
                               const GValue *value, GParamSpec *pspec)
 {
+  ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE (object);
+
   switch (property_id) {
-  // TODO
+  case PROP_MAP_DATA_SOURCE:
+    champlain_memphis_map_source_set_map_data_source (self,
+        g_value_get_object (value));
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
   }
@@ -204,6 +219,21 @@ champlain_memphis_map_source_class_init (ChamplainMemphisMapSourceClass *klass)
 
   ChamplainMapSourceClass *map_source_class = CHAMPLAIN_MAP_SOURCE_CLASS (klass);
   map_source_class->fill_tile = fill_tile;
+
+  /**
+  * ChamplainMemphisMapSource:MapDataSource:
+  *
+  * The data source of the renderer
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+      PROP_MAP_DATA_SOURCE,
+      g_param_spec_string ("map-data-source",
+        "Map data source",
+        "The data source of the renderer",
+        NULL,
+        G_PARAM_READWRITE));
 }
 
 static void
