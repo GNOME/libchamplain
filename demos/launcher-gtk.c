@@ -275,6 +275,7 @@ main (int argc,
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
   button = gtk_spin_button_new_with_range(0, 20, 1);
+  gtk_spin_button_set_value (button, champlain_view_get_zoom_level (view));
   g_signal_connect (button, "changed", G_CALLBACK (zoom_changed), view);
   g_signal_connect (view, "notify::zoom-level", G_CALLBACK (map_zoom_changed),
       button);
