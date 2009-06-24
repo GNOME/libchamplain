@@ -18,6 +18,9 @@
 
 #include "champlain-map-data-source.h"
 
+#define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
+#include "champlain-debug.h"
+
 G_DEFINE_TYPE (ChamplainMapDataSource, champlain_map_data_source, G_TYPE_OBJECT)
 
 #define GET_PRIVATE(o) \

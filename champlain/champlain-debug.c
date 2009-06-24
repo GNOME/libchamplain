@@ -41,6 +41,7 @@ static GDebugKey keys[] = {
   { "Network", CHAMPLAIN_DEBUG_NETWORK },
   { "Cache", CHAMPLAIN_DEBUG_CACHE },
   { "Selection", CHAMPLAIN_DEBUG_SELECTION },
+  { "Memphis", CHAMPLAIN_DEBUG_MEMPHIS },
   { "Other", CHAMPLAIN_DEBUG_OTHER },
   { 0, }
 };

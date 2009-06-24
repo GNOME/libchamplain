@@ -18,7 +18,10 @@
 
 #include "champlain-memphis-map-source.h"
 #include "champlain.h"
+
+#define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
 #include "champlain-debug.h"
+
 #include "champlain-cache.h"
 #include "champlain-defines.h"
 #include "champlain-enum-types.h"
@@ -30,9 +33,10 @@
 
 /* Tuning parameters */
 #define MAX_THREADS 4
-#define DEFAULT_TILE_SIZE 256
-#define DEFAULT_RULES_PATH "rule.xml"
-#define MEMPHIS_DEBUG_LEVEL 1
+#define DEFAULT_TILE_SIZE 256 // FIXME find the bug
+#define DEFAULT_RULES_PATH "default-rules.xml"
+/* 0: Be quiet, 1: Normal output, 2: Be verbose */
+#define MEMPHIS_INTERNAL_DEBUG_LEVEL 0
 
 G_DEFINE_TYPE (ChamplainMemphisMapSource, champlain_memphis_map_source, CHAMPLAIN_TYPE_MAP_SOURCE)
 
@@ -173,6 +177,8 @@ memphis_worker_thread (gpointer data, gpointer user_data)
   cst = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, size, size);
   cr = cairo_create (cst);
 
+  DEBUG ("Draw Tile (%d, %d, %d)", x, y, z);
+
   memphis_renderer_draw_tile (renderer, cr, x, y, z);
   cairo_destroy (cr);
 
@@ -237,13 +243,15 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
   priv->map_data_source = g_object_ref (map_data_source);
 
   priv->rules = memphis_rule_set_new ();
-  memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH); //???
+  memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
+  // TODO: Do we want to ship a default rule-set?
 
   map = champlain_map_data_source_get_map_data (priv->map_data_source);
 
   priv->renderer = memphis_renderer_new_full (priv->rules, map);
   memphis_renderer_set_resolution (priv->renderer, DEFAULT_TILE_SIZE);
-  memphis_renderer_set_debug_level (priv->renderer, MEMPHIS_DEBUG_LEVEL);
+  memphis_renderer_set_debug_level (priv->renderer,
+      MEMPHIS_INTERNAL_DEBUG_LEVEL);
 
   priv->thpool = g_thread_pool_new (memphis_worker_thread, priv->renderer,
       MAX_THREADS, FALSE, NULL);

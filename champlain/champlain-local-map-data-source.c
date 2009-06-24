@@ -18,6 +18,9 @@
 
 #include "champlain-local-map-data-source.h"
 
+#define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
+#include "champlain-debug.h"
+
 #include <memphis/memphis.h>
 
 G_DEFINE_TYPE (ChamplainLocalMapDataSource, champlain_local_map_data_source, CHAMPLAIN_TYPE_MAP_DATA_SOURCE)
