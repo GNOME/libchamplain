@@ -96,6 +96,9 @@ champlain_memphis_map_source_dispose (GObject *object)
   ChamplainMemphisMapSource *self = (ChamplainMemphisMapSource *) object;
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
 
+  if (priv->thpool)
+    g_thread_pool_free (priv->thpool, FALSE, TRUE);
+
   if (priv->map_data_source)
     g_object_unref (priv->map_data_source);
   memphis_renderer_free (priv->renderer);
@@ -107,10 +110,8 @@ champlain_memphis_map_source_dispose (GObject *object)
 static void
 champlain_memphis_map_source_finalize (GObject *object)
 {
-  ChamplainMemphisMapSource *self = (ChamplainMemphisMapSource *) object;
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
-
-  g_thread_pool_free (priv->thpool, TRUE, TRUE);
+  //ChamplainMemphisMapSource *self = (ChamplainMemphisMapSource *) object;
+  //ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
 
   G_OBJECT_CLASS (champlain_memphis_map_source_parent_class)->finalize (object);
 }
