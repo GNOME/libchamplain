@@ -25,6 +25,13 @@ launcher_gtk_CPPFLAGS = $(GTK_DEPS_CFLAGS)
 launcher_gtk_LDADD = $(GTK_DEPS_LIBS) $(DEPS_LIBS) \
 		../champlain-gtk/libchamplain-gtk-0.5.la \
 		../champlain/libchamplain-0.5.la
+
+noinst_PROGRAMS += local-rendering
+local_rendering_SOURCES = local-rendering.c
+local_rendering_CPPFLAGS = $(GTK_DEPS_CFLAGS)
+local_rendering_LDADD = $(GTK_DEPS_LIBS) $(DEPS_LIBS) \
+		../champlain-gtk/libchamplain-gtk-0.4.la \
+		../champlain/libchamplain-0.4.la
 endif
 
 EXTRA_DIST= markers.h
