@@ -56,8 +56,10 @@ struct _ChamplainMemphisMapSourcePrivate {
   MemphisRuleSet *rules;
   MemphisRenderer *renderer;
   GThreadPool *thpool;
-  //GStaticRWLock rwlock;
 };
+
+/* lock to protect the renderer state while rendering */
+GStaticRWLock MemphisLock = G_STATIC_RW_LOCK_INIT;
 
 static void
 champlain_memphis_map_source_get_property (GObject *object, guint property_id,
@@ -195,7 +197,9 @@ memphis_worker_thread (gpointer data, gpointer user_data)
 
   DEBUG ("Draw Tile (%d, %d, %d)", x, y, z);
 
+  g_static_rw_lock_reader_lock (&MemphisLock);
   memphis_renderer_draw_tile (renderer, cr, x, y, z);
+  g_static_rw_lock_reader_unlock (&MemphisLock);
   cairo_destroy (cr);
 
   tdata = g_new (TileData, 1);
@@ -311,10 +315,12 @@ champlain_memphis_map_source_load_rules (
 
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
 
+  g_static_rw_lock_writer_lock (&MemphisLock);
   if (rules_path)
     memphis_rule_set_load_from_file (priv->rules, rules_path);
   else
     memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
+  g_static_rw_lock_writer_unlock (&MemphisLock);
 }
 
 void
@@ -329,9 +335,11 @@ champlain_memphis_map_source_set_map_data_source (
   MemphisMap *map;
 
   priv->map_data_source = map_data_source;
-
   map = champlain_map_data_source_get_map_data (priv->map_data_source);
+
+  g_static_rw_lock_writer_lock (&MemphisLock);
   memphis_renderer_set_map (priv->renderer, map);
+  g_static_rw_lock_writer_unlock (&MemphisLock);
 }
 
 ChamplainMapDataSource *
