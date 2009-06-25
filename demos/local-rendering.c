@@ -31,8 +31,7 @@ static const char *maps[] = { "schaffhausen.osm", "las_palmas.osm" };
 static const double coords[][3] = { {47.696303, 8.634481, 14},
                                     {28.13476, -15.43814, 15} };
 
-guint rules_index = 0;
-static const char *rules[] = { "default-rules.xml" };
+static const char *rules[] = { "default-rules.xml", "high-contrast.xml" };
 
 /*
  * Terminate the main loop.
@@ -56,6 +55,11 @@ load_map_data (ChamplainMapSource *source, ChamplainView *view)
   champlain_local_map_data_source_load_map_data (data, tmp);
   g_free (tmp);
   g_object_set (G_OBJECT (view), "map-source", source, NULL);
+}
+
+static void
+zoom_to_map_data (GtkWidget *widget, ChamplainView *view)
+{
   champlain_view_center_on (CHAMPLAIN_VIEW(view), coords[map_index][0],
       coords[map_index][1]);
   champlain_view_set_zoom_level (CHAMPLAIN_VIEW(view), coords[map_index][2]);
@@ -112,6 +116,27 @@ map_data_changed (GtkWidget *widget, ChamplainView *view)
   g_object_get (G_OBJECT (view), "map-source", &source, NULL);
   if (g_strcmp0 (champlain_map_source_get_id (source), "memphis-local") == 0)
     load_map_data (source, view);
+}
+
+static void
+rules_changed (GtkWidget *widget, ChamplainView *view)
+{
+  gchar* file;
+  ChamplainMapSource *source;
+  GtkTreeIter iter;
+  GtkTreeModel *model;
+
+  if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (widget), &iter))
+    return;
+
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (widget));
+  gtk_tree_model_get (model, &iter, 0, &file, -1);
+
+  g_object_get (G_OBJECT (view), "map-source", &source, NULL);
+  if (g_strcmp0 (champlain_map_source_get_id (source), "memphis-local") == 0)
+    champlain_memphis_map_source_load_rules (
+        CHAMPLAIN_MEMPHIS_MAP_SOURCE(source),
+        file);
 }
 
 static void
@@ -223,10 +248,10 @@ build_rules_combo_box (GtkComboBox *box)
 
   store = gtk_tree_store_new (1, G_TYPE_STRING, /* file name */ -1);
   gtk_tree_store_append (store, &parent, NULL);
-  gtk_tree_store_set (store, &parent, 0, "default-rules.xml", -1);
+  gtk_tree_store_set (store, &parent, 0, rules[0], -1);
 
-  //gtk_tree_store_append (store, &parent, NULL);
-  //gtk_tree_store_set (store, &parent, 0, "low-contrast.xml", -1);
+  gtk_tree_store_append (store, &parent, NULL);
+  gtk_tree_store_set (store, &parent, 0, rules[1], -1);
 
   gtk_combo_box_set_model (box, GTK_TREE_MODEL (store));
 
@@ -313,16 +338,24 @@ main (int argc,
   gtk_label_set_markup (GTK_LABEL (label), "<b>Memphis Rendering Options</b>");
   gtk_box_pack_start (GTK_BOX (menubox), label, FALSE, FALSE, 0);
 
+  bbox =  gtk_hbox_new (FALSE, 10);
+
   button = gtk_combo_box_new ();
   build_data_combo_box (GTK_COMBO_BOX (button));
   gtk_combo_box_set_active (GTK_COMBO_BOX (button), 0);
   g_signal_connect (button, "changed", G_CALLBACK (map_data_changed), view);
-  gtk_box_pack_start (GTK_BOX (menubox), button, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (bbox), button, FALSE, FALSE, 0);
+
+  button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_FIT);
+  g_signal_connect (button, "clicked", G_CALLBACK (zoom_to_map_data), view);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+
+  gtk_box_pack_start (GTK_BOX (menubox), bbox, FALSE, FALSE, 0);
 
   button = gtk_combo_box_new ();
   build_rules_combo_box (GTK_COMBO_BOX (button));
   gtk_combo_box_set_active (GTK_COMBO_BOX (button), 0);
-  //g_signal_connect (button, "changed", G_CALLBACK (rules_changed), view);
+  g_signal_connect (button, "changed", G_CALLBACK (rules_changed), view);
   gtk_box_pack_start (GTK_BOX (menubox), button, FALSE, FALSE, 0);
   
   /* viewport */
