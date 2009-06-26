@@ -297,15 +297,15 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
   priv->map_data_source = g_object_ref (map_data_source);
 
   priv->rules = memphis_rule_set_new ();
-  memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
-  // TODO: Do we want to ship a default rule-set?
-
   map = champlain_map_data_source_get_map_data (priv->map_data_source);
 
   priv->renderer = memphis_renderer_new_full (priv->rules, map);
   memphis_renderer_set_resolution (priv->renderer, DEFAULT_TILE_SIZE);
   memphis_renderer_set_debug_level (priv->renderer,
       MEMPHIS_INTERNAL_DEBUG_LEVEL);
+
+  memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
+  // TODO: Do we want to ship a default rule-set?
 
   priv->thpool = g_thread_pool_new (memphis_worker_thread, priv->renderer,
       MAX_THREADS, FALSE, NULL);
