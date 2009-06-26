@@ -28,7 +28,7 @@
 
 guint map_index = 0;
 static const char *maps[] = { "schaffhausen.osm", "las_palmas.osm" };
-static const double coords[][3] = { {47.696303, 8.634481, 14},
+static const double coords[][3] = { {47.696303, 8.634481, 16},
                                     {28.13476, -15.43814, 15} };
 
 static const char *rules[] = { "default-rules.xml", "high-contrast.xml" };
@@ -43,18 +43,17 @@ on_destroy (GtkWidget *widget, gpointer data)
 }
 
 static void
-load_map_data (ChamplainMapSource *source, ChamplainView *view)
+load_map_data (ChamplainMapSource *source)
 {
-  ChamplainLocalMapDataSource *data;
+  ChamplainLocalMapDataSource *map_data_source;
 
-  data = CHAMPLAIN_LOCAL_MAP_DATA_SOURCE (
+  map_data_source = CHAMPLAIN_LOCAL_MAP_DATA_SOURCE (
     champlain_memphis_map_source_get_map_data_source (
     CHAMPLAIN_MEMPHIS_MAP_SOURCE (source)));
 
   gchar * tmp = g_strdup (maps[map_index]); // FIXME
-  champlain_local_map_data_source_load_map_data (data, tmp);
+  champlain_local_map_data_source_load_map_data (map_data_source, tmp);
   g_free (tmp);
-  g_object_set (G_OBJECT (view), "map-source", source, NULL);
 }
 
 static void
@@ -87,10 +86,9 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
   if (source != NULL)
     {
       if (g_strcmp0 (id, "memphis-local") == 0)
-        load_map_data (source, view);
-      else
-        g_object_set (G_OBJECT (view), "map-source", source, NULL);
+        load_map_data (source);
 
+      g_object_set (G_OBJECT (view), "map-source", source, NULL);
       g_object_unref (source);
     }
 
@@ -115,7 +113,7 @@ map_data_changed (GtkWidget *widget, ChamplainView *view)
 
   g_object_get (G_OBJECT (view), "map-source", &source, NULL);
   if (g_strcmp0 (champlain_map_source_get_id (source), "memphis-local") == 0)
-    load_map_data (source, view);
+    load_map_data (source);
 }
 
 static void
