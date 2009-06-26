@@ -343,6 +343,9 @@ champlain_memphis_map_source_load_rules (
   else
     memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
   g_static_rw_lock_writer_unlock (&MemphisLock);
+
+  g_signal_emit_by_name (CHAMPLAIN_MAP_SOURCE (self),
+      "reload-tiles", NULL);
 }
 
 void

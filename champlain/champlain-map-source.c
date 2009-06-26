@@ -54,6 +54,7 @@ void champlain_map_source_real_fill_tile (ChamplainMapSource *map_source,
 enum
 {
   /* normal signals */
+  RELOAD_TILES,
   LAST_SIGNAL
 };
 
@@ -70,7 +71,7 @@ enum
   PROP_MAP_PROJECTION,
 };
 
-/* static guint champlain_map_source_signals[LAST_SIGNAL] = { 0, }; */
+static guint champlain_map_source_signals[LAST_SIGNAL] = { 0, };
 
 G_DEFINE_TYPE (ChamplainMapSource, champlain_map_source, G_TYPE_INITIALLY_UNOWNED);
 
@@ -321,6 +322,21 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
                              CHAMPLAIN_MAP_PROJECTION_MERCATOR,
                              (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_MAP_PROJECTION, pspec);
+
+  /**
+  * ChamplainMapSource::reload-tiles:
+  * @map_source: the #ChamplainMapSource that received the signal
+  *
+  * The ::reload-tiles signal is emitted when the map source changed
+  * its style or data
+  *
+  * Since: 0.6
+  */
+  champlain_map_source_signals[RELOAD_TILES] =
+      g_signal_new ("reload-tiles", G_OBJECT_CLASS_TYPE (object_class),
+          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+          g_cclosure_marshal_VOID__VOID, G_TYPE_NONE,
+          0, NULL);
 }
 
 static void

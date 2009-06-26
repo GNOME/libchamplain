@@ -215,6 +215,8 @@ static void license_set_position (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
 static void view_position_tile (ChamplainView* view, ChamplainTile* tile);
 static void view_tiles_reposition (ChamplainView* view);
+static void view_reload_tiles_cb (ChamplainMapSource *map_source,
+    ChamplainView* view);
 static void view_update_state (ChamplainView *view);
 static void view_update_anchor (ChamplainView *view, gint x, gint y);
 static gboolean view_set_zoom_level_at (ChamplainView *view,
@@ -1382,6 +1384,9 @@ champlain_view_init (ChamplainView *view)
 
   priv->state = CHAMPLAIN_STATE_DONE;
   g_object_notify (G_OBJECT (view), "state");
+
+  g_signal_connect (priv->map_source, "reload-tiles",
+    G_CALLBACK (view_reload_tiles_cb), view);
 }
 
 static void
@@ -2352,6 +2357,62 @@ view_tiles_reposition (ChamplainView* view)
 }
 
 static void
+view_reload_tiles_cb (ChamplainMapSource *map_source,
+    ChamplainView* view)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  ChamplainRectangle viewport = priv->viewport_size;
+  gint size;
+  ChamplainZoomLevel *level;
+
+  viewport.x += priv->anchor.x;
+  viewport.y += priv->anchor.y;
+
+  size = champlain_map_source_get_tile_size (priv->map_source);
+  level = priv->map->current_level;
+
+  if (viewport.x < 0)
+    viewport.x = 0;
+  if (viewport.y < 0)
+    viewport.y = 0;
+
+  gint x_count = ceil((float)viewport.width / size) + 1;
+  gint y_count = ceil((float)viewport.height / size) + 1;
+
+  gint x_first = viewport.x / size;
+  gint y_first = viewport.y / size;
+
+  x_count += x_first;
+  y_count += y_first;
+
+  if(x_count > champlain_zoom_level_get_width (level))
+    x_count = champlain_zoom_level_get_width (level);
+  if(y_count > champlain_zoom_level_get_height (level))
+    y_count = champlain_zoom_level_get_height (level);
+
+  gint i;
+  gint tile_count = champlain_zoom_level_tile_count (priv->map->current_level);
+
+  for (i = 0; i < tile_count; i++)
+    {
+      ChamplainTile *tile = champlain_zoom_level_get_nth_tile (priv->map->current_level, i);
+
+      if (tile == NULL)
+        continue;
+
+      gint tile_x = champlain_tile_get_x (tile);
+      gint tile_y = champlain_tile_get_y (tile);
+
+      if (tile_x < x_first || tile_x > x_count ||
+          tile_y < y_first || tile_y > y_count)
+        continue;
+
+      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+        champlain_map_source_fill_tile (priv->map_source, tile);
+    }
+}
+
+static void
 tile_state_notify (GObject *gobject,
     GParamSpec *pspec,
     gpointer data)
@@ -2449,6 +2510,9 @@ champlain_view_set_map_source (ChamplainView *view,
   g_idle_add (marker_reposition, view);
   view_tiles_reposition (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
+
+  g_signal_connect (priv->map_source, "reload-tiles",
+    G_CALLBACK (view_reload_tiles_cb), view);
 }
 
 /**
