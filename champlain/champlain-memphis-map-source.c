@@ -25,7 +25,6 @@
 #include "champlain-cache.h"
 #include "champlain-defines.h"
 #include "champlain-enum-types.h"
-#include "champlain-marshal.h"
 #include "champlain-private.h"
 
 #include <clutter-cairo.h>
@@ -116,6 +115,26 @@ champlain_memphis_map_source_finalize (GObject *object)
   //ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
 
   G_OBJECT_CLASS (champlain_memphis_map_source_parent_class)->finalize (object);
+}
+
+static void
+map_data_changed_cb (ChamplainMapDataSource *map_data_source,
+    GParamSpec *arg1,
+    ChamplainMemphisMapSource *map_source)
+{
+  g_assert (CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source) &&
+      CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (map_source));
+
+  MemphisMap *map;
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(map_source);
+
+  map = champlain_map_data_source_get_map_data (map_data_source);
+
+  DEBUG ("DataSource has been changed!");
+
+  g_static_rw_lock_writer_lock (&MemphisLock);
+  memphis_renderer_set_map (priv->renderer, map);
+  g_static_rw_lock_writer_unlock (&MemphisLock);
 }
 
 static void
@@ -291,10 +310,13 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
   priv->thpool = g_thread_pool_new (memphis_worker_thread, priv->renderer,
       MAX_THREADS, FALSE, NULL);
 
+  g_signal_connect (priv->map_data_source, "map-data-changed",
+      G_CALLBACK (map_data_changed_cb), source);
+
   return source;
 }
 
-void
+void // TODO: this is a dangerous function! Remove it?
 champlain_memphis_map_source_set_tile_size (ChamplainMemphisMapSource *self,
     guint size)
 {

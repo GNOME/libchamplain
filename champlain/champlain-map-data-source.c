@@ -28,6 +28,12 @@ G_DEFINE_TYPE (ChamplainMapDataSource, champlain_map_data_source, G_TYPE_OBJECT)
 
 enum
 {
+  MAP_DATA_CHANGED,
+  LAST_SIGNAL
+};
+
+enum
+{
   PROP_0,
   PROP_ID,
   PROP_NAME,
@@ -36,6 +42,8 @@ enum
   PROP_MIN_ZOOM_LEVEL,
   PROP_MAX_ZOOM_LEVEL
 };
+
+static guint signals[LAST_SIGNAL] = { 0, };
 
 typedef struct _ChamplainMapDataSourcePrivate ChamplainMapDataSourcePrivate;
 
@@ -101,6 +109,21 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
   object_class->finalize = champlain_map_data_source_finalize;
 
   klass->get_map_data = champlain_map_data_source_real_get_map_data;
+
+  /**
+  * ChamplainView::map-data-changed:
+  * @map_data_source: the #ChamplainMapDataSource that received the signal
+  *
+  * The ::map-data-changed signal is emitted when the map data was
+  * replaced or modified
+  *
+  * Since: 0.6
+  */
+  signals[MAP_DATA_CHANGED] =
+      g_signal_new ("map-data-changed", G_OBJECT_CLASS_TYPE (object_class),
+          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+          g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE,
+          1, CHAMPLAIN_TYPE_MAP_DATA_SOURCE);
 }
 
 static void

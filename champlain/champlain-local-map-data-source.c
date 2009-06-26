@@ -119,4 +119,7 @@ champlain_local_map_data_source_load_map_data (ChamplainLocalMapDataSource *self
   ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
 
   memphis_map_load_from_file (priv->map, map_path);
+
+  g_signal_emit_by_name (CHAMPLAIN_MAP_DATA_SOURCE (self),
+      "map-data-changed", NULL);
 }
