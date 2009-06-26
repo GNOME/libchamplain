@@ -63,7 +63,7 @@ void champlain_memphis_map_source_set_tile_size (
 
 void champlain_memphis_map_source_load_rules (
     ChamplainMemphisMapSource *map_source,
-    gchar *rules_path);
+    const gchar *rules_path);
 
 void champlain_memphis_map_source_set_map_data_source (
     ChamplainMemphisMapSource *map_source,

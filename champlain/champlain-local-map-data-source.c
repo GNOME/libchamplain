@@ -111,7 +111,7 @@ champlain_local_map_data_source_new (void)
 
 void
 champlain_local_map_data_source_load_map_data (ChamplainLocalMapDataSource *self,
-    gchar *map_path)
+    const gchar *map_path)
 {
   g_return_if_fail (CHAMPLAIN_IS_LOCAL_MAP_DATA_SOURCE (self)
       && map_path);

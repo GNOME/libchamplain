@@ -56,7 +56,7 @@ ChamplainLocalMapDataSource* champlain_local_map_data_source_new (void);
 
 void champlain_local_map_data_source_load_map_data (
     ChamplainLocalMapDataSource *map_data_source,
-    gchar *map_path);
+    const gchar *map_path);
 
 G_END_DECLS
 

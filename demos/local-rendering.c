@@ -51,9 +51,8 @@ load_map_data (ChamplainMapSource *source)
     champlain_memphis_map_source_get_map_data_source (
     CHAMPLAIN_MEMPHIS_MAP_SOURCE (source)));
 
-  gchar * tmp = g_strdup (maps[map_index]); // FIXME
-  champlain_local_map_data_source_load_map_data (map_data_source, tmp);
-  g_free (tmp);
+  champlain_local_map_data_source_load_map_data (map_data_source,
+      maps[map_index]);
 }
 
 static void
