@@ -119,7 +119,6 @@ champlain_memphis_map_source_finalize (GObject *object)
 
 static void
 map_data_changed_cb (ChamplainMapDataSource *map_data_source,
-    GParamSpec *arg1,
     ChamplainMemphisMapSource *map_source)
 {
   g_assert (CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source) &&

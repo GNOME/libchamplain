@@ -122,8 +122,8 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
   signals[MAP_DATA_CHANGED] =
       g_signal_new ("map-data-changed", G_OBJECT_CLASS_TYPE (object_class),
           G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-          g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE,
-          1, CHAMPLAIN_TYPE_MAP_DATA_SOURCE);
+          g_cclosure_marshal_VOID__VOID, G_TYPE_NONE,
+          0, NULL);
 }
 
 static void
