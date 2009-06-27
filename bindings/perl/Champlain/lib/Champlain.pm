@@ -92,7 +92,7 @@ at your option, any later version of Perl 5 you may have available.
 use warnings;
 use strict;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use base 'DynaLoader';
 use Exporter 'import';
