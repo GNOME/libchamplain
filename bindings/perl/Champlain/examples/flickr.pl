@@ -32,6 +32,8 @@ use Carp;
 use URI;
 use URI::QueryParam;
 use Data::Dumper;
+use FindBin;
+use File::Spec;
 
 exit main();
 
@@ -71,11 +73,16 @@ sub main {
 	$window->add($vbox);
 	$window->show_all();
 
+	my $icon = Clutter::Texture->new(
+		File::Spec->catfile($FindBin::Bin, 'images', 'flickr.png')
+	);
+
 	# Middle click on a location to trigger the Flickr interaction
 	$map->set_reactive(TRUE);
 	my $data = {
 		layer => $layer,
 		soup  => My::Soup->new('http://www.flickr.com', $key),
+		icon  => $icon,
 	};
 	$map->signal_connect_after("button-release-event", \&flickr_search, $data);
 
@@ -93,6 +100,7 @@ sub flickr_search {
 	return FALSE unless $event->button == 2 && $event->click_count == 1;
 
 	my ($latitude, $longitude) = $map->get_coords_from_event($event);
+	print "Lookup for ($latitude, $longitude)\n";
 
 	my $args = {
 		lat    => $latitude,
@@ -111,7 +119,6 @@ sub flickr_search {
 
 sub flickr_photos_search_callback {
 	my ($soup, $uri, $response, $data) = @_;
-	my %data = %{ $data };
 
 	my $xml = $response->decoded_content;
 	my $parser = XML::LibXML->new();
@@ -122,22 +129,26 @@ sub flickr_photos_search_callback {
 	my @photos = ();
 	foreach my $photo_node (@nodes) {
 		my $id = $photo_node->getAttribute('id');
-		my $secret = $photo_node->getAttribute('secret');
 		my $latitude = $photo_node->getAttribute('latitude');
 		my $longitude = $photo_node->getAttribute('longitude');
-		my $accuracy = $photo_node->getAttribute('accuracy'); # In which zoom level was the photo tagged
+
+		# Add a marker for the image
+		my $icon = Clutter::Texture::Clone->new($data->{icon});
+		my $marker = Champlain::Marker->new_with_image($icon);
+		$marker->set_position($latitude, $longitude);
+		$data->{layer}->add($marker);
+		$marker->show();
+
 		my $photo = {
-			id        => $id,
-			secret    => $secret,
-			latitude  => $latitude,
-			longitude => $longitude,
-			accuracy  => $accuracy,
+			id     => $id,
+			marker => $marker,
 		};
+
 		push @photos, $photo;
 	}
 
-	$data{photos} = \@photos;
-	flickr_photos_getSizes($soup, \%data);
+	$data->{photos} = \@photos;
+	flickr_photos_getSizes($soup, $data);
 }
 
 
@@ -146,17 +157,16 @@ sub flickr_photos_getSizes {
 	if (@{ $data->{photos} } == 0) {
 		return FALSE;
 	}
-	my %data = %{ $data };
 
-	my $photo = pop @{ $data{photos} };
-	$data{photo} = $photo;
+	my $photo = pop @{ $data->{photos} };
+	$data->{photo} = $photo;
 
 	my $args = {
 		photo_id => $photo->{id},
 	};
 	$soup->do_flickr_request(
 		'flickr.photos.getSizes' => $args,
-		\&flickr_photos_getSizes_callback, \%data,
+		\&flickr_photos_getSizes_callback, $data,
 	);
 
 	return TRUE;
@@ -172,10 +182,6 @@ sub flickr_photos_getSizes_callback {
 	# Display only the thumbnails ("Square" images)
 	my ($node) = $doc->findnodes('/rsp/sizes/size[@label = "Square"]');
 	if ($node) {
-		my $url = $node->getAttribute('source');
-
-		my $latitude  = $data->{photo}{latitude};
-		my $longitude = $data->{photo}{longitude};
 		my $uri = $node->getAttribute('source');
 
 		# The image download is made from a different server than the RPC calls
@@ -183,11 +189,7 @@ sub flickr_photos_getSizes_callback {
 		$static_soup->do_get(
 			$uri,
 			\&flickr_download_photo_callback,
-			{
-				latitude  => $latitude,
-				longitude => $longitude,
-				layer     => $data->{layer},
-			},
+			$data->{photo}{marker},
 		);
 	}
 
@@ -198,7 +200,7 @@ sub flickr_photos_getSizes_callback {
 
 
 sub flickr_download_photo_callback {
-	my ($self, $uri, $response, $data) = @_;
+	my ($self, $uri, $response, $marker) = @_;
 
 	if (! $response->is_success) {
 		warn $response->status_line;
@@ -225,10 +227,7 @@ sub flickr_download_photo_callback {
 	);
 
 	# Add a marker for the image
-	my $marker = Champlain::Marker->new_with_image($texture);
-	$marker->set_position($data->{latitude}, $data->{longitude});
-	$data->{layer}->add($marker);
-	$marker->show();
+	$marker->set_image($texture);
 }
 
 
@@ -331,6 +330,7 @@ sub do_get {
 
 	# Note that this is not asynchronous!
 	$self->http->write_request(GET => $uri->path_query);
+	print $uri->path_query, "\n";
 
 
 	my ($code, $message, %headers);
