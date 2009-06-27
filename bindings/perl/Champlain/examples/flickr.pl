@@ -135,7 +135,7 @@ sub flickr_photos_search_callback {
 	my $doc = $parser->parse_string($xml);
 
 
-	my @nodes = $doc->findnodes('/rsp/photos/photo[position()]');
+	my @nodes = $doc->findnodes('/rsp/photos/photo[position() < 10]');
 	my @photos = ();
 	foreach my $photo_node (@nodes) {
 		my $id = $photo_node->getAttribute('id');
