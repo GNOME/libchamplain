@@ -42,4 +42,6 @@ examples/image.pl
 examples/launcher.pl
 examples/gtk2.pl
 examples/polygons.pl
+examples/flickr.pl
 examples/images/who.png
+examples/images/flickr.png
