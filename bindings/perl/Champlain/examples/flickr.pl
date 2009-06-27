@@ -117,6 +117,16 @@ sub flickr_search {
 }
 
 
+#
+# This callback gets called when a flickr search returns results. The reponse is
+# going to contain the id, latitude and longitude of the pictures close to the
+# geographical location requested.
+#
+# Once the pictures information is available this callback will create a new
+# marker with a pending image and will schedule a flickr query for each picture
+# in order to have the real URI where the picture can be downloaded. Each
+# picture has to be queried individually.
+#
 sub flickr_photos_search_callback {
 	my ($soup, $uri, $response, $data) = @_;
 
@@ -125,7 +135,7 @@ sub flickr_photos_search_callback {
 	my $doc = $parser->parse_string($xml);
 
 
-	my @nodes = $doc->findnodes('/rsp/photos/photo[position() <= 5]');
+	my @nodes = $doc->findnodes('/rsp/photos/photo[position()]');
 	my @photos = ();
 	foreach my $photo_node (@nodes) {
 		my $id = $photo_node->getAttribute('id');
@@ -152,6 +162,10 @@ sub flickr_photos_search_callback {
 }
 
 
+#
+# Request the "size" of a single flickr picture. The size is not soo important,
+# what matters here is that the answer will return the URI of the picture.
+#
 sub flickr_photos_getSizes {
 	my ($soup, $data) = @_;
 	if (@{ $data->{photos} } == 0) {
@@ -173,6 +187,13 @@ sub flickr_photos_getSizes {
 }
 
 
+#
+# This callback gets called each time that flikr answers to a 'size' query. Here
+# the square size is the only one that gets inspected all other sizes are
+# silently ignored.
+#
+# This function will trigger the download of the square image.
+#
 sub flickr_photos_getSizes_callback {
 	my ($soup, $uri, $response, $data) = @_;
 	my $xml = $response->decoded_content;
@@ -198,7 +219,11 @@ sub flickr_photos_getSizes_callback {
 }
 
 
-
+#
+# This callback gets called each time that a flikr image is downloaded. Once a
+# picture is successfully downloaded it will replace the one in the current
+# marker.
+#
 sub flickr_download_photo_callback {
 	my ($self, $uri, $response, $marker) = @_;
 
@@ -344,6 +369,7 @@ sub do_get {
 				($code, $message, %headers) = $self->http->read_response_headers();
 			};
 			if (my $error = $@) {
+				print "Disconnected\n";
 				# The server closed the socket reconnect and resume the HTTP GET
 				$self->connect();
 				$self->do_get($uri, $callback, $data);
