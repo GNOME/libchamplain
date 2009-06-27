@@ -4,10 +4,17 @@
 
 flickr.pl - Display geo tagged photos from Flickr
 
+=head1 SYNOPSIS
+
+flickr.pl key
+
+Where I<key> is a valid Flickr key.
+
 =head1 DESCRIPTION
 
 This sample scripts shows how to interact with the Flickr API and to display
-thumbnails for pictures near a location.
+thumbnails for pictures near a location. The Flickr API interaction is triggered
+when a middle-click in done in a location  on the map.
 
 =cut
 
@@ -29,7 +36,7 @@ use Data::Dumper;
 exit main();
 
 sub main {
-	
+
 	die "Usage: flickr-key\n" unless @ARGV;
 	my ($key) = @ARGV;
 
@@ -39,8 +46,8 @@ sub main {
 	$window->set_border_width(10);
 	$window->set_title("Champlain + Flickr - Demo");
 	$window->signal_connect('destroy' => sub { Gtk2->main_quit() });
-	
-	my $vbox = Gtk2::VBox->new(FALSE, 10);	
+
+	my $vbox = Gtk2::VBox->new(FALSE, 10);
 
 	# Create the map view
 	my $gtk2_map = Gtk2::ChamplainEmbed->new();
@@ -49,12 +56,12 @@ sub main {
 	$map->set_scroll_mode('kinetic');
 	$map->set_zoom_level(5);
 	$gtk2_map->set_size_request(640, 480);
-	
+
 	# Create the markers and marker layer
 	my $layer = Champlain::Layer->new();
 	$layer->show();
 	$map->add_layer($layer);
-	
+
 	my $viewport = Gtk2::Viewport->new();
 	$viewport->set_shadow_type('etched-in');
 	$viewport->add($gtk2_map);
@@ -64,18 +71,16 @@ sub main {
 	$window->add($vbox);
 	$window->show_all();
 
-	# Middle click to get the location in the map
+	# Middle click on a location to trigger the Flickr interaction
 	$map->set_reactive(TRUE);
-
 	my $data = {
 		layer => $layer,
 		soup  => My::Soup->new('http://www.flickr.com', $key),
 	};
-
 	$map->signal_connect_after("button-release-event", \&flickr_search, $data);
-	
+
 	Gtk2->main();
-	
+
 	return 0;
 }
 
@@ -86,10 +91,8 @@ sub main {
 sub flickr_search {
 	my ($map, $event, $data) = @_;
 	return FALSE unless $event->button == 2 && $event->click_count == 1;
-	
-	my ($latitude, $longitude) = $map->get_coords_from_event($event);
 
-#	$data->{soup} = $soup;
+	my ($latitude, $longitude) = $map->get_coords_from_event($event);
 
 	my $args = {
 		lat    => $latitude,
@@ -101,8 +104,7 @@ sub flickr_search {
 		'flickr.photos.search' => $args,
 		\&flickr_photos_search_callback, $data,
 	);
-	
-	
+
 	return TRUE;
 }
 
@@ -110,12 +112,12 @@ sub flickr_search {
 sub flickr_photos_search_callback {
 	my ($soup, $uri, $response, $data) = @_;
 	my %data = %{ $data };
-	
+
 	my $xml = $response->decoded_content;
 	my $parser = XML::LibXML->new();
 	my $doc = $parser->parse_string($xml);
-	
-	
+
+
 	my @nodes = $doc->findnodes('/rsp/photos/photo[position() <= 5]');
 	my @photos = ();
 	foreach my $photo_node (@nodes) {
@@ -133,7 +135,7 @@ sub flickr_photos_search_callback {
 		};
 		push @photos, $photo;
 	}
-	
+
 	$data{photos} = \@photos;
 	flickr_photos_getSizes($soup, \%data);
 }
@@ -156,7 +158,7 @@ sub flickr_photos_getSizes {
 		'flickr.photos.getSizes' => $args,
 		\&flickr_photos_getSizes_callback, \%data,
 	);
-	
+
 	return TRUE;
 }
 
@@ -166,21 +168,20 @@ sub flickr_photos_getSizes_callback {
 	my $xml = $response->decoded_content;
 	my $parser = XML::LibXML->new();
 	my $doc = $parser->parse_string($xml);
-	
-	
+
+	# Display only the thumbnails ("Square" images)
 	my ($node) = $doc->findnodes('/rsp/sizes/size[@label = "Square"]');
 	if ($node) {
 		my $url = $node->getAttribute('source');
-		
+
 		my $latitude  = $data->{photo}{latitude};
 		my $longitude = $data->{photo}{longitude};
 		my $uri = $node->getAttribute('source');
-		
 
 		# The image download is made from a different server than the RPC calls
 		my $static_soup = My::Soup->new($uri);
 		$static_soup->do_get(
-			$uri, 
+			$uri,
 			\&flickr_download_photo_callback,
 			{
 				latitude  => $latitude,
@@ -189,7 +190,8 @@ sub flickr_photos_getSizes_callback {
 			},
 		);
 	}
-	
+
+	# Go on to the next photo
 	flickr_photos_getSizes($soup, $data);
 }
 
@@ -199,7 +201,8 @@ sub flickr_download_photo_callback {
 	my ($self, $uri, $response, $data) = @_;
 
 	if (! $response->is_success) {
-		die $response->status_line;
+		warn $response->status_line;
+		return;
 	}
 
 	# Load the image with a Pixbuf Loader
@@ -221,6 +224,7 @@ sub flickr_download_photo_callback {
 		[]
 	);
 
+	# Add a marker for the image
 	my $marker = Champlain::Marker->new_with_image($texture);
 	$marker->set_position($data->{latitude}, $data->{longitude});
 	$data->{layer}->add($marker);
@@ -258,16 +262,16 @@ use URI;
 sub new {
 	my $class = shift;
 	my ($uri, $key) = @_;
-	
+
 	my $self = bless {}, ref $class || $class;
 
 	$uri = to_uri($uri);
 	$self->{port} = $uri->port;
 	$self->{host} = $uri->host;
 	$self->{key} = $key;
-	
+
 	$self->connect();
-	
+
 	return $self;
 }
 
@@ -324,16 +328,16 @@ sub do_get {
 	my $self = shift;
 	my ($uri, $callback, $data) = @_;
 	$uri = to_uri($uri);
-	
+
 	# Note that this is not asynchronous!
 	$self->http->write_request(GET => $uri->path_query);
-	
-	
+
+
 	my ($code, $message, %headers);
 	my $content = "";
 	Glib::IO->add_watch($self->http->fileno, ['in'], sub {
 		my (undef, $condition) = @_;
-		
+
 		# Read the headers
 		if (!$code) {
 			eval {
@@ -346,17 +350,17 @@ sub do_get {
 				# We abort this I/O watch since another download will be started
 				return FALSE;
 			}
-			
+
 			# We return and continue when the server will have more data
 			return TRUE;
 		}
-		
-		
-		# Read the content		
+
+
+		# Read the content
 		my $line;
 		my $n = $self->http->read_entity_body($line, 1024);
 		$content .= $line;
-		
+
 		if ($self->http->keep_alive) {
 			# In the case where the HTTP request has keep-alive we need to see if the
 			# content has all arrived as read_entity_body() will not tell when the end
@@ -367,7 +371,7 @@ sub do_get {
 			# There's still data to read
 			return TRUE;
 		}
-		
+
 		# End of the document
 		my $response = HTTP::Response->new($code, $message, [%headers], $content);
 		$callback->($self, $uri, $response, $data);
