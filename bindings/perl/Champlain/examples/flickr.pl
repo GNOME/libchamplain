@@ -26,7 +26,6 @@ use Glib qw(TRUE FALSE);
 use Clutter qw(-gtk-init);
 use Gtk2 qw(-init);
 use Champlain;
-use LWP::UserAgent;
 use XML::LibXML;
 use Carp;
 use URI;
@@ -81,7 +80,7 @@ sub main {
 	$map->set_reactive(TRUE);
 	my $data = {
 		layer => $layer,
-		soup  => My::Soup->new('http://www.flickr.com', $key),
+		soup  => My::Soup::Flickr->new($key),
 		icon  => $icon,
 	};
 	$map->signal_connect_after("button-release-event", \&flickr_search, $data);
@@ -128,9 +127,7 @@ sub flickr_search {
 # picture has to be queried individually.
 #
 sub flickr_photos_search_callback {
-	my ($soup, $uri, $response, $data) = @_;
-
-	my $xml = $response->decoded_content;
+	my ($soup, $xml, $headers, $data) = @_;
 	my $parser = XML::LibXML->new();
 	my $doc = $parser->parse_string($xml);
 
@@ -195,8 +192,7 @@ sub flickr_photos_getSizes {
 # This function will trigger the download of the square image.
 #
 sub flickr_photos_getSizes_callback {
-	my ($soup, $uri, $response, $data) = @_;
-	my $xml = $response->decoded_content;
+	my ($soup, $xml, $headers, $data) = @_;
 	my $parser = XML::LibXML->new();
 	my $doc = $parser->parse_string($xml);
 
@@ -206,8 +202,7 @@ sub flickr_photos_getSizes_callback {
 		my $uri = $node->getAttribute('source');
 
 		# The image download is made from a different server than the RPC calls
-		my $static_soup = My::Soup->new($uri);
-		$static_soup->do_get(
+		$data->{soup}->do_get(
 			$uri,
 			\&flickr_download_photo_callback,
 			$data->{photo}{marker},
@@ -225,17 +220,18 @@ sub flickr_photos_getSizes_callback {
 # marker.
 #
 sub flickr_download_photo_callback {
-	my ($self, $uri, $response, $marker) = @_;
+	my ($soup, $content, $headers, $marker) = @_;
 
-	if (! $response->is_success) {
-		warn $response->status_line;
+	if ($headers->{Status} !~ /^2\d\d/) {
+		warn "$headers->{Status} $headers->{Reason}";
 		return;
 	}
 
 	# Load the image with a Pixbuf Loader
-	my $mime = $response->header('content-type');
+	my ($mime) = split(/\s*;/, $headers->{'content-type'}, 1);
+
 	my $loader = Gtk2::Gdk::PixbufLoader->new_with_mime_type($mime);
-	$loader->write($response->content);
+	$loader->write($content);
 	$loader->close;
 	my $pixbuf = $loader->get_pixbuf;
 
@@ -259,81 +255,41 @@ sub flickr_download_photo_callback {
 
 
 #
-# A very cheap implementation of an asynchronous HTTP client that integrates
-# with Glib's main loop. This client implements a rudimentary version of
-# 'Keep-Alive'.
-#
-# Each instance of this class can only make HTTP GET requests and only to a
-# single HTTP server.
-#
+# A very simple implementation of an asynchronous HTTP client that integrates
+# with Glib's main loop.
 #
 # Usage:
 #
-#   my $soup = My::Soup->new('http://en.wikipedia.com/');
-#   $soup->do_get('http://en.wikipedia.com/Bratislava', sub {
-#     my ($soup, $uri, $response, $data) = @_;
-#     print $response->content;
+#   my $soup = My::Soup::Flickr->new($key); # The key is for web service calls
+#   $soup->do_flickr_request(
+#     'flickr.photos.getSizes' => {photo_id => $id},
+#     \&flickr_photos_getSizes_callback, $data,
 #   });
 #
-package My::Soup;
+package My::Soup::Flickr;
 
 use Glib qw(TRUE FALSE);
-use Net::HTTP::NB;
-use HTTP::Response;
+use AnyEvent::HTTP;
 use URI;
 
 
 sub new {
 	my $class = shift;
-	my ($uri, $key) = @_;
+	my ($key) = @_;
 
 	my $self = bless {}, ref $class || $class;
-
-	$uri = to_uri($uri);
-	$self->{port} = $uri->port;
-	$self->{host} = $uri->host;
 	$self->{key} = $key;
-
-	$self->connect();
 
 	return $self;
 }
 
 
 #
-# Connects to the remote HTTP server.
+# Calls a Flickr web service asynchronously.
 #
-sub connect {
-	my $self = shift;
-	my $http = Net::HTTP::NB->new(
-		Host      => $self->{host},
-		PeerPort  => $self->{port},
-		KeepAlive => 1,
-	);
-	$self->http($http);
-}
-
-
-sub http {
-	my $self = shift;
-	if (@_) {
-		$self->{http} = $_[0];
-	}
-	return $self->{http};
-}
-
-
-sub to_uri {
-	my ($uri) = @_;
-	return $uri if ref($uri) && $uri->isa('URI');
-	return URI->new($uri);
-}
-
-
 sub do_flickr_request {
 	my $self = shift;
 	my ($method, $args, $callback, $data) = @_;
-
 
 	# Construct the flickr request
 	my $uri = URI->new('http://www.flickr.com/services/rest/');
@@ -351,58 +307,20 @@ sub do_flickr_request {
 sub do_get {
 	my $self = shift;
 	my ($uri, $callback, $data) = @_;
-	$uri = to_uri($uri);
+	$uri = URI->new($uri) unless ref($uri) && $uri->isa('URI');
 
 	# Note that this is not asynchronous!
-	$self->http->write_request(GET => $uri->path_query);
-	print $uri->path_query, "\n";
-
-
-	my ($code, $message, %headers);
-	my $content = "";
-	Glib::IO->add_watch($self->http->fileno, ['in'], sub {
-		my (undef, $condition) = @_;
-
-		# Read the headers
-		if (!$code) {
-			eval {
-				($code, $message, %headers) = $self->http->read_response_headers();
-			};
-			if (my $error = $@) {
-				print "Disconnected\n";
-				# The server closed the socket reconnect and resume the HTTP GET
-				$self->connect();
-				$self->do_get($uri, $callback, $data);
-				# We abort this I/O watch since another download will be started
-				return FALSE;
-			}
-
-			# We return and continue when the server will have more data
-			return TRUE;
+	print $uri, "\n";
+	http_request(
+		GET     => $uri,
+		timeout => 10,
+		sub {
+			my ($content, $headers) = @_;
+			$callback->($self, $content, $headers, $data);
 		}
+	);
 
-
-		# Read the content
-		my $line;
-		my $n = $self->http->read_entity_body($line, 1024);
-		$content .= $line;
-
-		if ($self->http->keep_alive) {
-			# In the case where the HTTP request has keep-alive we need to see if the
-			# content has all arrived as read_entity_body() will not tell when the end
-			# of the content has been reached.
-			return TRUE unless length($content) == $headers{'Content-Length'};
-		}
-		elsif ($n) {
-			# There's still data to read
-			return TRUE;
-		}
-
-		# End of the document
-		my $response = HTTP::Response->new($code, $message, [%headers], $content);
-		$callback->($self, $uri, $response, $data);
-		return FALSE;
-	});
+	return FALSE;
 }
 
 # A true value
