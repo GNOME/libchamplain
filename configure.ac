@@ -193,6 +193,7 @@ if test "x$enable_python" = "xyes" -a "x$have_python" != "xyes"; then
 fi
 
 AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
+GOBJECT_INTROSPECTION_CHECK([0.6.3])
 
 # -----------------------------------------------------------
 AC_CONFIG_FILES([Makefile
@@ -232,6 +233,8 @@ echo "   libsoup-gnome: ${have_soup_gnome}"
 echo "       Gtk+ View: ${enable_gtk}"
 echo ""
 echo "Bindings:"
-echo " champlain-sharp: ${enable_managed}"
-echo " Python bindings: ${enable_python}"
+echo "       champlain-sharp: ${enable_managed}"
+echo "       Python bindings: ${enable_python}"
+echo " gobject-introspection: ${enable_introspection}"
+echo ""
 

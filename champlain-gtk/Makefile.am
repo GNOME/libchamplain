@@ -35,3 +35,37 @@ AM_CPPFLAGS = $(GTK_DEPS_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_GTK_COMPILATION
 AM_LDFLAGS = $(GTK_DEPS_LIBS) -export-symbols-regex ^gtk_champlain_.*
 
 EXTRA_DIST = $(CHAMPLAIN_GTK_MARSHAL_LIST)
+
+if HAVE_INTROSPECTION
+BUILT_GIRSOURCES =
+
+GtkChamplain-0.3.gir: $(INTROSPECTION_SCANNER) libchamplain-gtk-0.3.la
+	$(QUIET_GEN)$(INTROSPECTION_SCANNER) -v \
+	--namespace GtkChamplain --nsversion=0.3 \
+	--strip-prefix=GtkChamplain \
+	$(INCLUDES) \
+	--add-include-path=$(srcdir) --add-include=path=. \
+	--c-include="$(libchamplain_include_HEADERS)" \
+	--include=Clutter-0.8 \
+	--include=Gtk-2.0 \
+	--library=champlain-gtk-0.3 \
+	--output $@ \
+	--pkg gobject-2.0 \
+	--pkg gtk+-2.0 \
+	$(libchamplain_gtk_0_3_la_SOURCES) $(libchamplain_include_HEADERS)
+
+BUILT_GIRSOURCES += GtkChamplain-0.3.gir
+
+# INTROSPECTION_GIRDIR/INTROSPECTION_TYPELIBDIR aren't the right place to
+# install anything - we need to install inside our prefix.
+girdir = $(datadir)/gir-1.0
+gir_DATA = $(BUILT_GIRSOURCES)
+
+typelibsdir = $(libdir)/girepository-1.0/
+typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
+
+%.typelib: %.gir $(INTROSPECTION_COMPILER)
+	$(QUIET_GEN)$(DEBUG) $(INTROSPECTION_COMPILER) --includedir=$(srcdir) --includedir=. $(INTROSPECTION_COMPILER_OPTS) $< -o $(builddir)/$(@F)
+
+CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
+endif

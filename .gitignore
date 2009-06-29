@@ -16,6 +16,8 @@ champlain-gtk-uninstalled.pc
 *.lo
 *.la
 *.stamp
+*.gir
+*.typelib
 champlain-gtk/champlain-gtk-marshal.c
 champlain-gtk/champlain-gtk-marshal.h
 champlain/champlain-marshal.c
