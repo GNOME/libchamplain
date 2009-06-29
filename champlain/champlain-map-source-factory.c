@@ -201,6 +201,21 @@ ChamplainMapSourceDesc OSM_CYCLEMAP_DESC =
   };
 
 static
+ChamplainMapSourceDesc OSM_TRANSPORTMAP_DESC =
+  {
+    CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP,
+    "OpenStreetMap Transport Map",
+    "(CC) BY 2.0 OpenStreetMap contributors",
+    "http://creativecommons.org/licenses/by/2.0/",
+    0,
+    18,
+    CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+    champlain_map_source_new_generic,
+       "http://tile.xn--pnvkarte-m4a.de/tilegen/#Z#/#X#/#Y#.png",
+    NULL
+  };
+
+static
 ChamplainMapSourceDesc OAM_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OAM,
@@ -243,6 +258,8 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
       OSM_MAPNIK_DESC.constructor, OSM_MAPNIK_DESC.data);
   champlain_map_source_factory_register (factory, &OSM_CYCLEMAP_DESC,
       OSM_CYCLEMAP_DESC.constructor, OSM_CYCLEMAP_DESC.data);
+  champlain_map_source_factory_register (factory, &OSM_TRANSPORTMAP_DESC,
+      OSM_TRANSPORTMAP_DESC.constructor, OSM_TRANSPORTMAP_DESC.data);
   champlain_map_source_factory_register (factory, &OSM_OSMARENDER_DESC,
       OSM_OSMARENDER_DESC.constructor, OSM_OSMARENDER_DESC.data);
   champlain_map_source_factory_register (factory, &OAM_DESC,
