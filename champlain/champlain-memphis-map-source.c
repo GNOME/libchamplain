@@ -328,7 +328,9 @@ champlain_memphis_map_source_set_tile_size (ChamplainMemphisMapSource *self,
 
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
 
+  g_static_rw_lock_writer_lock (&MemphisLock);
   memphis_renderer_set_resolution (priv->renderer, size);
+  g_static_rw_lock_writer_unlock (&MemphisLock);
   g_object_set (G_OBJECT (self), "tile-size", size, NULL);
 }
 
