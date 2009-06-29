@@ -61,9 +61,6 @@ const gchar * champlain_map_data_source_get_name (ChamplainMapDataSource *data_s
 const gchar * champlain_map_data_source_get_license (ChamplainMapDataSource *data_source);
 const gchar * champlain_map_data_source_get_license_uri (ChamplainMapDataSource *data_source);
 
-guint champlain_map_data_source_get_min_zoom_level (ChamplainMapDataSource *data_source);
-guint champlain_map_data_source_get_max_zoom_level (ChamplainMapDataSource *data_source);
-
 G_END_DECLS
 
 #endif /* _CHAMPLAIN_MAP_DATA_SOURCE */

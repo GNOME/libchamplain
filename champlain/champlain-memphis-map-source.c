@@ -57,12 +57,21 @@ struct _ChamplainMemphisMapSourcePrivate {
   GThreadPool *thpool;
 };
 
+typedef struct _TileData TileData;
+
+struct _TileData {
+  ChamplainTile *tile;
+  cairo_surface_t *cst;
+};
+
 /* lock to protect the renderer state while rendering */
 GStaticRWLock MemphisLock = G_STATIC_RW_LOCK_INIT;
 
 static void
-champlain_memphis_map_source_get_property (GObject *object, guint property_id,
-                              GValue *value, GParamSpec *pspec)
+champlain_memphis_map_source_get_property (GObject *object,
+    guint property_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE (object);
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
@@ -77,8 +86,10 @@ champlain_memphis_map_source_get_property (GObject *object, guint property_id,
 }
 
 static void
-champlain_memphis_map_source_set_property (GObject *object, guint property_id,
-                              const GValue *value, GParamSpec *pspec)
+champlain_memphis_map_source_set_property (GObject *object,
+    guint property_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE (object);
 
@@ -158,12 +169,6 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
       g_error_free (error);
     }
 }
-
-typedef struct _TileData TileData;
-struct _TileData {
-  ChamplainTile *tile;
-  cairo_surface_t *cst;
-};
 
 static gboolean
 set_tile_content (gpointer data)
@@ -286,7 +291,7 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
       "name", desc->name,
       "license", desc->license,
       "license-uri", desc->license_uri,
-      "projection", CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "projection", desc->projection,
       "min-zoom-level", desc->min_zoom_level,
       "max-zoom-level", desc->max_zoom_level,
       "tile-size", DEFAULT_TILE_SIZE,

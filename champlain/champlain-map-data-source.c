@@ -38,9 +38,7 @@ enum
   PROP_ID,
   PROP_NAME,
   PROP_LICENSE,
-  PROP_LICENSE_URI,
-  PROP_MIN_ZOOM_LEVEL,
-  PROP_MAX_ZOOM_LEVEL
+  PROP_LICENSE_URI
 };
 
 static guint signals[LAST_SIGNAL] = { 0, };
@@ -52,13 +50,13 @@ struct _ChamplainMapDataSourcePrivate {
   const char *name;
   const char *license;
   const char *license_uri;
-  guint min_zoom_level;
-  guint max_zoom_level;
 };
 
 static void
-champlain_map_data_source_get_property (GObject *object, guint property_id,
-                              GValue *value, GParamSpec *pspec)
+champlain_map_data_source_get_property (GObject *object,
+    guint property_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   switch (property_id) {
   // TODO
@@ -68,8 +66,10 @@ champlain_map_data_source_get_property (GObject *object, guint property_id,
 }
 
 static void
-champlain_map_data_source_set_property (GObject *object, guint property_id,
-                              const GValue *value, GParamSpec *pspec)
+champlain_map_data_source_set_property (GObject *object,
+    guint property_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   switch (property_id) {
   // TODO
@@ -135,8 +135,6 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
   priv->name = NULL;
   priv->license = NULL;
   priv->license_uri = NULL;
-  priv->min_zoom_level = 0;
-  priv->max_zoom_level = 0;
 }
 
 ChamplainMapDataSource*
@@ -187,22 +185,4 @@ champlain_map_data_source_get_license_uri (ChamplainMapDataSource *self)
 
   ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
   return priv->license_uri;
-}
-
-guint
-champlain_map_data_source_get_min_zoom_level (ChamplainMapDataSource *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), 0);
-
-  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
-  return priv->min_zoom_level;
-}
-
-guint
-champlain_map_data_source_get_max_zoom_level (ChamplainMapDataSource *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), 0);
-
-  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
-  return priv->max_zoom_level;
 }
