@@ -75,6 +75,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
 #define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "mff-relief"
 #ifdef MEMPHIS_ENABLED
 #define CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL "memphis-local"
+#define CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK "memphis-network"
 #endif
 
 G_END_DECLS
