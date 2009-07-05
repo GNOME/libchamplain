@@ -39,7 +39,7 @@ create_marker_layer (ChamplainView *view)
   ChamplainLayer *layer;
   ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
 
-  layer = champlain_layer_new ();
+  layer = champlain_selection_layer_new ();
 
   marker = champlain_marker_new_with_text ("Montréal\n<span size=\"xx-small\">Québec</span>",
       "Serif 14", NULL, NULL);

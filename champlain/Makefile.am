@@ -20,6 +20,7 @@ libchamplain_headers = \
 	champlain-point.h		\
 	champlain-view.h		\
 	champlain-layer.h 		\
+	champlain-selection-layer.h 	\
 	champlain-base-marker.h		\
 	champlain-marker.h		\
 	champlain-map.h			\
@@ -39,6 +40,7 @@ libchamplain_0_3_la_SOURCES = \
 	champlain-debug.c 		\
 	champlain-view.c 		\
 	champlain-layer.c 		\
+	champlain-selection-layer.c 	\
 	champlain-base-marker.c 	\
 	champlain-marker.c 		\
 	champlain-map.c  		\
@@ -78,6 +80,7 @@ libchamplain_include_HEADERS = \
 	champlain-point.h 		\
 	champlain-enum-types.h		\
 	champlain-layer.h 		\
+	champlain-selection-layer.h 	\
 	champlain-map-source.h		\
 	champlain-network-map-source.h	\
 	champlain-map-source-factory.h	\
