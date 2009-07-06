@@ -22,6 +22,7 @@
 #include "champlain-debug.h"
 
 #include <memphis/memphis.h>
+#include <libsoup/soup.h>
 
 G_DEFINE_TYPE (ChamplainNetworkMapDataSource, champlain_network_map_data_source, CHAMPLAIN_TYPE_MAP_DATA_SOURCE)
 
@@ -136,6 +137,24 @@ champlain_network_map_data_source_new (void)
   return g_object_new (CHAMPLAIN_TYPE_NETWORK_MAP_DATA_SOURCE, NULL);
 }
 
+static void
+load_map_data_cb (SoupSession *session, SoupMessage *msg,
+    gpointer user_data)
+{
+  ChamplainNetworkMapDataSource *self = 
+      (ChamplainNetworkMapDataSource *) user_data;
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
+
+  g_message ("Data received");
+  memphis_map_load_from_data (priv->map,
+      msg->response_body->data,
+      msg->response_body->length);
+
+  g_signal_emit_by_name (CHAMPLAIN_MAP_DATA_SOURCE (self),
+       "map-data-changed", NULL);
+}
+
+
 void
 champlain_network_map_data_source_load_map_data (
     ChamplainNetworkMapDataSource *self,
@@ -144,7 +163,19 @@ champlain_network_map_data_source_load_map_data (
     gdouble bound_right,
     gdouble bound_top)
 {
-  // TODO
+  g_return_if_fail (CHAMPLAIN_IS_NETWORK_MAP_DATA_SOURCE (self));
+
+  SoupMessage *msg;
+  SoupSession *sess = soup_session_sync_new ();
+  
+  gchar *url = g_strdup_printf (
+      "http://api.openstreetmap.org/api/0.6/map?bbox=%f,%f,%f,%f",
+      bound_left, bound_bottom, bound_right, bound_top);
+  msg = soup_message_new ("GET", url);
+  g_free (url);
+
+  g_message ("REQ bbox data");
+  soup_session_queue_message (sess, msg, load_map_data_cb, self);
 }
 
 gchar *
