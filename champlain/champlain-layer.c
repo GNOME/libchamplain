@@ -102,10 +102,10 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
 static void
 champlain_layer_init (ChamplainLayer *self)
 {
-  g_signal_connect_after(G_OBJECT(self), "actor-added",
-      G_CALLBACK(layer_add_cb), NULL);
-  g_signal_connect_after(G_OBJECT(self), "actor-removed",
-      G_CALLBACK(layer_remove_cb), NULL);
+  g_signal_connect_after (G_OBJECT (self), "actor-added",
+      G_CALLBACK (layer_add_cb), NULL);
+  g_signal_connect_after (G_OBJECT (self), "actor-removed",
+      G_CALLBACK (layer_remove_cb), NULL);
 }
 
 /* This callback serves to keep the markers ordered by their latitude.
