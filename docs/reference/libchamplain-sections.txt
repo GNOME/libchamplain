@@ -407,3 +407,27 @@ CHAMPLAIN_POLYGON_CLASS
 CHAMPLAIN_IS_POLYGON_CLASS
 CHAMPLAIN_POLYGON_GET_CLASS
 </SECTION>
+
+<SECTION>
+<FILE>champlain-selection-layer</FILE>
+<TITLE>ChamplainSelectionLayer</TITLE>
+ChamplainSelectionMode
+ChamplainSelectionLayer
+champlain_selection_layer_new
+champlain_selection_layer_get_selected
+champlain_selection_layer_get_selected_markers
+champlain_selection_layer_count_selected_markers
+champlain_selection_layer_select
+champlain_selection_layer_unselect
+champlain_selection_layer_marker_is_selected
+champlain_selection_layer_select_all
+champlain_selection_layer_unselect_all
+<SUBSECTION Standard>
+CHAMPLAIN_IS_SELECTION_LAYER
+CHAMPLAIN_IS_SELECTION_LAYER_CLASS
+CHAMPLAIN_SELECTION_LAYER
+CHAMPLAIN_SELECTION_LAYER_CLASS
+CHAMPLAIN_SELECTION_LAYER_GET_CLASS
+CHAMPLAIN_TYPE_SELECTION_LAYER
+champlain_selection_layer_get_type
+</SECTION>

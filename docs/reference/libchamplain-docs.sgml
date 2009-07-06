@@ -42,6 +42,7 @@
     <title>I. View API Reference</title>
     <xi:include href="xml/champlain-view.xml"/>
     <xi:include href="xml/champlain-layer.xml"/>
+    <xi:include href="xml/champlain-selection-layer.xml"/>
     <xi:include href="xml/champlain-base-marker.xml"/>
     <xi:include href="xml/champlain-marker.xml"/>
     <xi:include href="xml/champlain-polygon.xml"/>

@@ -47,10 +47,9 @@ enum
   PROP_0
 };
 
-typedef struct _ChamplainSelectionLayerPrivate ChamplainSelectionLayerPrivate;
-
 struct _ChamplainSelectionLayerPrivate {
-  gpointer spacer;
+  ChamplainSelectionMode mode;
+  GList *selection;
 };
 
 static void
@@ -93,9 +92,78 @@ champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
 }
 
 static void
-champlain_selection_layer_init (ChamplainSelectionLayer *self)
+real_select (ChamplainSelectionLayer *layer,
+    ChamplainBaseMarker *marker,
+    gboolean append)
+{
+  g_print ("Select %p\n", marker);
+
+  if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
+    {
+      /* Clear previous selection */
+      champlain_selection_layer_unselect (layer, marker);
+
+      /* Add selection */
+      g_object_ref (marker);
+      layer->priv->selection = g_list_prepend (layer->priv->selection, marker);
+    }
+  else if (layer->priv->mode == CHAMPLAIN_SELECTION_MULTIPLE)
+    {
+      /* Clear previous selection */
+      if (!append)
+        champlain_selection_layer_unselect_all (layer);
+
+      /* Add selection */
+      g_object_ref (marker);
+      layer->priv->selection = g_list_append (layer->priv->selection, marker);
+    }
+}
+
+static gboolean
+marker_clicked_cb (ClutterActor *actor,
+    ClutterButtonEvent *event,
+    gpointer user_data)
 {
 
+  real_select (CHAMPLAIN_SELECTION_LAYER (user_data),
+      CHAMPLAIN_BASE_MARKER (actor), (event->modifier_state & CLUTTER_CONTROL_MASK));
+
+  return FALSE;
+}
+
+static void
+layer_add_cb (ClutterGroup *layer,
+    ClutterActor *actor,
+    gpointer data)
+{
+  ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+
+  clutter_actor_set_reactive (actor, TRUE);
+
+  g_signal_connect (G_OBJECT (marker), "button-release-event",
+      G_CALLBACK (marker_clicked_cb), layer);
+}
+
+static void
+layer_remove_cb (ClutterGroup *layer,
+    ClutterActor *actor,
+    gpointer data)
+{
+  g_signal_handlers_disconnect_by_func (G_OBJECT (actor),
+      G_CALLBACK (marker_clicked_cb), layer);
+}
+
+static void
+champlain_selection_layer_init (ChamplainSelectionLayer *self)
+{
+  self->priv = GET_PRIVATE (self);
+  self->priv->mode = CHAMPLAIN_SELECTION_SINGLE;
+  self->priv->selection = NULL;
+
+  g_signal_connect_after (G_OBJECT (self), "actor-added",
+      G_CALLBACK (layer_add_cb), NULL);
+  g_signal_connect_after (G_OBJECT (self), "actor-removed",
+      G_CALLBACK (layer_remove_cb), NULL);
 }
 
 /**
@@ -109,4 +177,86 @@ ChamplainLayer *
 champlain_selection_layer_new ()
 {
   return g_object_new (CHAMPLAIN_TYPE_SELECTION_LAYER, NULL);
+}
+
+/**
+ * champlain_selection_get_selected:
+ *
+ * This function will return NULL if in CHAMPLAIN_SELETION_MULTIPLE.
+ *
+ * Returns the selected #ChamplainBaseMarker or NULL if none is selected.
+ *
+ * Since: 0.4
+ */
+ChamplainBaseMarker *
+champlain_selection_layer_get_selected (ChamplainSelectionLayer *layer)
+{
+  if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE &&
+      layer->priv->selection != NULL)
+    {
+      return layer->priv->selection->data;
+    }
+
+  return NULL;
+}
+
+/**
+ * champlain_selection_get_selected_markers:
+ *
+ * Returns the list of selected #ChamplainBaseMarker or NULL if none is selected.
+ * You shouldn't free that list.
+ *
+ * Since: 0.4
+ */
+const GList *
+champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer)
+{
+  return layer->priv->selection;
+}
+
+/**
+ * champlain_selection_count_selected_markers:
+ *
+ * Returns the number of selected #ChamplainBaseMarker
+ *
+ * Since: 0.4
+ */
+guint
+champlain_selection_layer_count_selected_markers (ChamplainSelectionLayer *layer)
+{
+  return g_list_length (layer->priv->selection);
+}
+
+void 
+champlain_selection_layer_select (ChamplainSelectionLayer *layer,
+    ChamplainBaseMarker *marker)
+{
+  real_select (layer, marker, TRUE);
+}
+
+void
+champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
+{
+  GList *selection = layer->priv->selection;
+
+  while (selection != NULL)
+    {
+      g_object_unref (selection->data);
+      selection = g_list_delete_link (selection, selection);
+    }
+  layer->priv->selection = selection;
+}
+
+void
+champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
+    ChamplainBaseMarker *marker)
+{
+  GList *selection;
+
+  selection = g_list_find (layer->priv->selection, marker);
+  if (selection != NULL)
+    {
+      g_object_unref (selection->data);
+      layer->priv->selection = g_list_delete_link (layer->priv->selection, selection);
+    }
 }

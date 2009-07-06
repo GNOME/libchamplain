@@ -24,6 +24,7 @@
 #define CHAMPLAIN_SELECTION_LAYER_H
 
 #include <champlain/champlain-defines.h>
+#include <champlain/champlain-base-marker.h>
 #include <champlain/champlain-layer.h>
 
 #include <glib-object.h>
@@ -48,8 +49,26 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_SELECTION_LAYER_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_SELECTION_LAYER, ChamplainSelectionLayerClass))
 
+typedef struct _ChamplainSelectionLayerPrivate ChamplainSelectionLayerPrivate;
+
+/**
+ * ChamplainSelectionMode:
+ * @CHAMPLAIN_SELECTION_NONE: No marker can be selected.
+ * @CHAMPLAIN_SELECTION_SINGLE: Only one marker can be selected.
+ * @CHAMPLAIN_SELECTION_MULTIPLE: Multiple marker can be selected.
+ *
+ * Selection mode
+ */
+typedef enum {
+  CHAMPLAIN_SELECTION_NONE,
+  CHAMPLAIN_SELECTION_SINGLE,
+  CHAMPLAIN_SELECTION_MULTIPLE
+} ChamplainSelectionMode;
+
 typedef struct {
   ChamplainLayer parent;
+
+  ChamplainSelectionLayerPrivate *priv;
 } ChamplainSelectionLayer;
 
 typedef struct {
@@ -59,6 +78,19 @@ typedef struct {
 GType champlain_selection_layer_get_type (void);
 
 ChamplainLayer * champlain_selection_layer_new (void);
+
+ChamplainBaseMarker * champlain_selection_layer_get_selected (ChamplainSelectionLayer *layer);
+const GList *champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer);
+guint champlain_selection_layer_count_selected_markers (ChamplainSelectionLayer *layer);
+
+void champlain_selection_layer_select (ChamplainSelectionLayer *layer,
+    ChamplainBaseMarker *marker);
+void champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
+    ChamplainBaseMarker *marker);
+gboolean champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer,
+    ChamplainBaseMarker *marker);
+void champlain_selection_layer_select_all (ChamplainSelectionLayer *layer);
+void champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer);
 
 G_END_DECLS
 
