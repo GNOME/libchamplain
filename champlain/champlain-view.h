@@ -46,9 +46,9 @@ G_BEGIN_DECLS
 typedef struct _ChamplainViewPrivate ChamplainViewPrivate;
 
 /**
- * ChamplainViewMode:
- * @CHAMPLAIN_VIEW_MODE_PUSH: Non-kinetic scrolling
- * @CHAMPLAIN_VIEW_MODE_KINETIC: Kinetic scrolling
+ * ChamplainScrollMode:
+ * @CHAMPLAIN_SCROLL_MODE_PUSH: Non-kinetic scrolling
+ * @CHAMPLAIN_SCROLL_MODE_KINETIC: Kinetic scrolling
  *
  * Type of scrolling.
  */
