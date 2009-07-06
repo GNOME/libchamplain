@@ -29,6 +29,9 @@
 
 #include "config.h"
 
+#define DEBUG_FLAG CHAMPLAIN_DEBUG_SELECTION
+#include "champlain-debug.h"
+
 #include "champlain-selection-layer.h"
 
 #include "champlain-defines.h"
@@ -96,26 +99,41 @@ real_select (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker,
     gboolean append)
 {
-  g_print ("Select %p\n", marker);
+  DEBUG ("Select %p", marker);
 
   if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
     {
+      return;
+    }
+  else if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
+    {
       /* Clear previous selection */
-      champlain_selection_layer_unselect (layer, marker);
+      champlain_selection_layer_unselect_all (layer);
 
       /* Add selection */
       g_object_ref (marker);
+      g_object_set (marker, "highlighted", TRUE, NULL);
       layer->priv->selection = g_list_prepend (layer->priv->selection, marker);
     }
   else if (layer->priv->mode == CHAMPLAIN_SELECTION_MULTIPLE)
     {
       /* Clear previous selection */
+      gboolean was_selected =
+        champlain_selection_layer_marker_is_selected (layer, marker);
+
       if (!append)
         champlain_selection_layer_unselect_all (layer);
 
-      /* Add selection */
-      g_object_ref (marker);
-      layer->priv->selection = g_list_append (layer->priv->selection, marker);
+      if (was_selected)
+        {
+          champlain_selection_layer_unselect (layer, marker);
+        }
+      else
+        {
+          g_object_ref (marker);
+          g_object_set (marker, "highlighted", TRUE, NULL);
+          layer->priv->selection = g_list_append (layer->priv->selection, marker);
+        }
     }
 }
 
@@ -157,7 +175,7 @@ static void
 champlain_selection_layer_init (ChamplainSelectionLayer *self)
 {
   self->priv = GET_PRIVATE (self);
-  self->priv->mode = CHAMPLAIN_SELECTION_SINGLE;
+  self->priv->mode = CHAMPLAIN_SELECTION_MULTIPLE;
   self->priv->selection = NULL;
 
   g_signal_connect_after (G_OBJECT (self), "actor-added",
@@ -215,7 +233,7 @@ champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer)
 }
 
 /**
- * champlain_selection_count_selected_markers:
+ * champlain_selection_layer_count_selected_markers:
  *
  * Returns the number of selected #ChamplainBaseMarker
  *
@@ -239,8 +257,10 @@ champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
 {
   GList *selection = layer->priv->selection;
 
+  DEBUG ("Deselect all");
   while (selection != NULL)
     {
+      g_object_set (selection->data, "highlighted", FALSE, NULL);
       g_object_unref (selection->data);
       selection = g_list_delete_link (selection, selection);
     }
@@ -253,10 +273,22 @@ champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
 {
   GList *selection;
 
+  DEBUG ("Deselect %p", marker);
   selection = g_list_find (layer->priv->selection, marker);
   if (selection != NULL)
     {
+      g_object_set (selection->data, "highlighted", FALSE, NULL);
       g_object_unref (selection->data);
       layer->priv->selection = g_list_delete_link (layer->priv->selection, selection);
     }
+}
+
+gboolean
+champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer,
+    ChamplainBaseMarker *marker)
+{
+  GList *selection;
+
+  selection = g_list_find (layer->priv->selection, marker);
+  return selection != NULL;
 }
