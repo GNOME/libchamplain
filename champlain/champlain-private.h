@@ -35,6 +35,7 @@ struct _ChamplainBaseMarkerPrivate
 {
   gdouble lon;
   gdouble lat;
+  gboolean highlighted;
 };
 
 struct _ChamplainPolygonPrivate {

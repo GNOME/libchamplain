@@ -63,6 +63,7 @@ enum
   PROP_0,
   PROP_LONGITUDE,
   PROP_LATITUDE,
+  PROP_HIGHLIGHTED,
 };
 
 //static guint champlain_base_marker_signals[LAST_SIGNAL] = { 0, };
@@ -87,6 +88,9 @@ champlain_base_marker_get_property (GObject *object,
           break;
         case PROP_LATITUDE:
           g_value_set_double (value, priv->lat);
+          break;
+        case PROP_HIGHLIGHTED:
+          g_value_set_boolean (value, priv->highlighted);
           break;
         default:
           G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -114,6 +118,12 @@ champlain_base_marker_set_property (GObject *object,
         {
           gdouble lat = g_value_get_double (value);
           champlain_base_marker_set_position (base_marker, lat, priv->lon);
+          break;
+        }
+      case PROP_HIGHLIGHTED:
+        {
+          gboolean bvalue = g_value_get_boolean (value);
+          champlain_base_marker_set_highlighted (base_marker, bvalue);
           break;
         }
       default:
@@ -164,6 +174,17 @@ champlain_base_marker_class_init (ChamplainBaseMarkerClass *champlainBaseMarkerC
           "The latitude coordonate of the base_marker",
           -90.0f, 90.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
 
+  /**
+  * ChamplainBaseMarker:highlighted:
+  *
+  * The highlighted state of the marker
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class, PROP_HIGHLIGHTED,
+      g_param_spec_boolean ("highlighted", "Highlighted",
+          "The highlighted stated of the marker",
+          FALSE, CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
@@ -171,6 +192,9 @@ champlain_base_marker_init (ChamplainBaseMarker *marker)
 {
   ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (marker);
   marker->priv = priv;
+  priv->lat = 0;
+  priv->lon = 0;
+  priv->highlighted = FALSE;
 }
 
 
@@ -203,7 +227,9 @@ champlain_base_marker_new (void)
  * Since: 0.4
  */
 void
-champlain_base_marker_set_position (ChamplainBaseMarker *champlainBaseMarker, gdouble latitude, gdouble longitude)
+champlain_base_marker_set_position (ChamplainBaseMarker *champlainBaseMarker,
+    gdouble latitude,
+    gdouble longitude)
 {
   g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (champlainBaseMarker));
 
@@ -214,4 +240,45 @@ champlain_base_marker_set_position (ChamplainBaseMarker *champlainBaseMarker, gd
 
   g_object_notify (G_OBJECT (champlainBaseMarker), "latitude");
   g_object_notify (G_OBJECT (champlainBaseMarker), "longitude");
+}
+
+/**
+ * champlain_base_marker_set_highlighted:
+ * @base_marker: a #ChamplainBaseMarker
+ * @value: the highlighted state
+ *
+ * Sets the marker as highlighted or not. This will affect the "Selected" look
+ * of the marker.
+ *
+ * Since: 0.4
+ */
+void
+champlain_base_marker_set_highlighted (ChamplainBaseMarker *champlainBaseMarker,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (champlainBaseMarker));
+
+  ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (champlainBaseMarker);
+
+  priv->highlighted = value;
+
+  g_object_notify (G_OBJECT (champlainBaseMarker), "highlighted");
+}
+
+/**
+ * champlain_base_marker_get_highlighted:
+ * @base_marker: a #ChamplainBaseMarker
+ *
+ * Returns the highlighted or not state of the marker.
+ *
+ * Since: 0.4
+ */
+gboolean
+champlain_base_marker_get_highlighted (ChamplainBaseMarker *champlainBaseMarker)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (champlainBaseMarker), FALSE);
+
+  ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (champlainBaseMarker);
+
+  return priv->highlighted;
 }

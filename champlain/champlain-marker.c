@@ -55,6 +55,8 @@
 
 #define DEFAULT_FONT_NAME "Sans 11"
 
+static ClutterColor SELECTED_COLOR = {0x00, 0x00, 0xff, 0xff};
+
 static ClutterColor DEFAULT_COLOR = {0x33, 0x33, 0x33, 0xff};
 static ClutterColor DEFAULT_TEXT_COLOR = {0xee, 0xee, 0xee, 0xff};
 
@@ -486,22 +488,31 @@ draw_background (ChamplainMarker *marker,
     gint point)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainBaseMarkerPrivate *base_priv = CHAMPLAIN_BASE_MARKER (marker)->priv;
   ClutterActor *bg = NULL;
+  ClutterColor *color;
   ClutterColor darker_color;
   cairo_t *cr;
 
   bg = clutter_cairo_new (width, height + point);
   cr = clutter_cairo_create (CLUTTER_CAIRO (bg));
 
+  /* If selected, add the selection color to the marker's color */
+  if (base_priv->highlighted)
+    color = &SELECTED_COLOR;
+  else
+    color = priv->color;
+
+
   draw_box (cr, width, height, point, priv->alignment == PANGO_ALIGN_LEFT);
 
-  clutter_color_darken (priv->color, &darker_color);
+  clutter_color_darken (color, &darker_color);
 
   cairo_set_source_rgba (cr,
-      priv->color->red / 255.0,
-      priv->color->green / 255.0,
-      priv->color->blue / 255.0,
-      priv->color->alpha / 255.0);
+      color->red / 255.0,
+      color->green / 255.0,
+      color->blue / 255.0,
+      color->alpha / 255.0);
   cairo_fill_preserve (cr);
 
   cairo_set_line_width (cr, 1.0);
@@ -650,6 +661,14 @@ queue_redraw (ChamplainMarker *marker)
 }
 
 static void
+notify_highlighted (GObject *gobject,
+    GParamSpec *pspec,
+    gpointer user_data)
+{
+  queue_redraw (CHAMPLAIN_MARKER (gobject));
+}
+
+static void
 champlain_marker_init (ChamplainMarker *marker)
 {
   ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker) ;
@@ -670,6 +689,8 @@ champlain_marker_init (ChamplainMarker *marker)
   priv->ellipsize = PANGO_ELLIPSIZE_NONE;
   priv->draw_background = TRUE;
   priv->redraw_id = 0;
+
+  g_signal_connect (marker, "notify::highlighted", G_CALLBACK (notify_highlighted), NULL);
 }
 
 /**
