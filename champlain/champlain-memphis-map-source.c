@@ -145,6 +145,9 @@ map_data_changed_cb (ChamplainMapDataSource *map_data_source,
   g_static_rw_lock_writer_lock (&MemphisLock);
   memphis_renderer_set_map (priv->renderer, map);
   g_static_rw_lock_writer_unlock (&MemphisLock);
+
+  g_signal_emit_by_name (CHAMPLAIN_MAP_SOURCE (map_source),
+      "reload-tiles", NULL);
 }
 
 static void
