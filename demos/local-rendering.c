@@ -43,7 +43,7 @@ on_destroy (GtkWidget *widget, gpointer data)
 }
 
 static void
-load_map_data (ChamplainMapSource *source)
+load_local_map_data (ChamplainMapSource *source)
 {
   ChamplainLocalMapDataSource *map_data_source;
 
@@ -56,11 +56,43 @@ load_map_data (ChamplainMapSource *source)
 }
 
 static void
+load_network_map_data (ChamplainMapSource *source)
+{
+  ChamplainNetworkMapDataSource *map_data_source;
+
+  map_data_source = CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (
+    champlain_memphis_map_source_get_map_data_source (
+    CHAMPLAIN_MEMPHIS_MAP_SOURCE (source)));
+
+  champlain_network_map_data_source_load_map_data (map_data_source,
+      coords[map_index][1] - 0.008, coords[map_index][0] - 0.008,
+      coords[map_index][1] + 0.008, coords[map_index][0] + 0.008);
+}
+
+static void
 zoom_to_map_data (GtkWidget *widget, ChamplainView *view)
 {
   champlain_view_center_on (CHAMPLAIN_VIEW(view), coords[map_index][0],
       coords[map_index][1]);
   champlain_view_set_zoom_level (CHAMPLAIN_VIEW(view), coords[map_index][2]);
+}
+
+static void
+request_osm_data_cb (GtkWidget *widget, ChamplainView *view)
+{
+  gdouble lat, lon;
+  ChamplainMapSource *source;
+  g_object_get (G_OBJECT (view), "latitude", &lat, "longitude", &lon, NULL);
+  g_object_get (G_OBJECT (view), "map-source", &source, NULL);
+
+  if (g_strcmp0 (champlain_map_source_get_id (source), "memphis-network") == 0)
+    {
+      ChamplainNetworkMapDataSource *data_source =
+          champlain_memphis_map_source_get_map_data_source (
+          CHAMPLAIN_MEMPHIS_MAP_SOURCE(source));
+      champlain_network_map_data_source_load_map_data (data_source,
+          lon - 0.008, lat - 0.008, lon + 0.008, lat + 0.008);
+    }
 }
 
 static void
@@ -85,7 +117,9 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
   if (source != NULL)
     {
       if (g_strcmp0 (id, "memphis-local") == 0)
-        load_map_data (source);
+        load_local_map_data (source);
+      else if (g_strcmp0 (id, "memphis-network") == 0)
+        load_network_map_data (source);
 
       g_object_set (G_OBJECT (view), "map-source", source, NULL);
       g_object_unref (source);
@@ -112,7 +146,9 @@ map_data_changed (GtkWidget *widget, ChamplainView *view)
 
   g_object_get (G_OBJECT (view), "map-source", &source, NULL);
   if (g_strcmp0 (champlain_map_source_get_id (source), "memphis-local") == 0)
-    load_map_data (source);
+    load_local_map_data (source);
+  else if (g_strcmp0 (champlain_map_source_get_id (source), "memphis-network") == 0)
+    load_network_map_data (source);
 }
 
 static void
@@ -130,7 +166,7 @@ rules_changed (GtkWidget *widget, ChamplainView *view)
   gtk_tree_model_get (model, &iter, 0, &file, -1);
 
   g_object_get (G_OBJECT (view), "map-source", &source, NULL);
-  if (g_strcmp0 (champlain_map_source_get_id (source), "memphis-local") == 0)
+  if (strncmp (champlain_map_source_get_id (source), "memphis", 7) == 0)
     champlain_memphis_map_source_load_rules (
         CHAMPLAIN_MEMPHIS_MAP_SOURCE(source),
         file);
@@ -355,6 +391,10 @@ main (int argc,
   g_signal_connect (button, "changed", G_CALLBACK (rules_changed), view);
   gtk_box_pack_start (GTK_BOX (menubox), button, FALSE, FALSE, 0);
   
+  button = gtk_button_new_with_label ("Request OSM data");
+  g_signal_connect (button, "clicked", G_CALLBACK (request_osm_data_cb), view);
+  gtk_box_pack_start (GTK_BOX (menubox), button, FALSE, FALSE, 0);
+
   /* viewport */
   viewport = gtk_viewport_new (NULL, NULL);
   gtk_viewport_set_shadow_type (GTK_VIEWPORT(viewport), GTK_SHADOW_ETCHED_IN);
