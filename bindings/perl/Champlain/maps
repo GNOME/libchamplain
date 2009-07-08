@@ -14,3 +14,5 @@ CHAMPLAIN_TYPE_CACHE               ChamplainCache             GObject  Champlain
 CHAMPLAIN_TYPE_MAP_SOURCE_DESC     ChamplainMapSourceDesc     GBoxed   Champlain::MapSourceDesc
 CHAMPLAIN_TYPE_POINT               ChamplainPoint             GBoxed   Champlain::Point
 CHAMPLAIN_TYPE_POLYGON             ChamplainPolygon           GObject  Champlain::Polygon
+CHAMPLAIN_TYPE_SELECTION_LAYER     ChamplainSelectionLayer    GObject  Champlain::SelectionLayer
+CHAMPLAIN_TYPE_SELECTION_LAYER     ChamplainSelectionMode     GEnum    Champlain::SelectionMode
