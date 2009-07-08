@@ -28,7 +28,11 @@ champlain_polygon_get_points (ChamplainPolygon *polygon)
 	
 	PPCODE:
 		item = champlain_polygon_get_points(polygon);
-		
+
+		if (!item) {
+			XSRETURN_EMPTY;
+		}
+
 		for (; item != NULL; item = item->next) {
 			ChamplainPoint *point = CHAMPLAIN_POINT(item->data);
 			XPUSHs(sv_2mortal(newSVChamplainPoint(point)));
