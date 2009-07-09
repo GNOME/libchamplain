@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 24;
+use Clutter::TestHelper tests => 39;
 
 use Champlain;
 use Data::Dumper;
@@ -11,24 +11,27 @@ use Data::Dumper;
 exit tests();
 
 sub tests {
-	test_empty();
-#	test_markers_single();
+	test_empty_multiple();
+	test_empty_single();
 
 	test_markers_multiple();
 	return 0;
 }
 
 
-sub test_empty {
+sub test_empty_multiple {
 	my $layer = Champlain::SelectionLayer->new();
 	isa_ok($layer, 'Champlain::Layer');
+
+	is($layer->get_selection_mode, 'multiple');
+	is($layer->get('selection_mode'), 'multiple');
 
 	is($layer->get_selected, undef, "[empty] get_selected()");
 
 	# In single mode get_selected_markers doesn't work
 	is_deeply(
 		[$layer->get_selected_markers],
-		[], 
+		[],
 		"[empty] get_selected_markers()"
 	);
 
@@ -43,6 +46,55 @@ sub test_empty {
 	$layer->unselect($marker);
 #	$layer->select_all();
 	$layer->unselect_all();
+
+	# Change the selection mode
+	$layer->set_selection_mode('single');
+	is($layer->get_selection_mode, 'single');
+
+	$layer->set('selection_mode', 'multiple');
+	is($layer->get('selection_mode'), 'multiple');
+
+	return 0;
+}
+
+
+sub test_empty_single {
+	my $layer = Champlain::SelectionLayer->new();
+	isa_ok($layer, 'Champlain::Layer');
+
+	is($layer->get_selection_mode, 'multiple');
+	is($layer->get('selection_mode'), 'multiple');
+	$layer->set_selection_mode('single');
+	is($layer->get_selection_mode, 'single');
+	is($layer->get('selection_mode'), 'single');
+
+	is($layer->get_selected, undef, "[empty] get_selected()");
+
+	# In single mode get_selected_markers doesn't work
+	is_deeply(
+		[$layer->get_selected_markers],
+		[],
+		"[empty] get_selected_markers()"
+	);
+
+	my $count = $layer->count_selected_markers;
+	is($count, 0, "[empty] count_selected_markers()");
+
+	my $marker = Champlain::BaseMarker->new();
+	ok(!$layer->marker_is_selected($marker), "[empty] marker_is_selected()");
+
+	# Can't be tested but at least they are invoked
+	$layer->select($marker);
+	$layer->unselect($marker);
+#	$layer->select_all();
+	$layer->unselect_all();
+
+	# Change the selection mode
+	$layer->set_selection_mode('multiple');
+	is($layer->get_selection_mode, 'multiple');
+
+	$layer->set('selection_mode', 'single');
+	is($layer->get('selection_mode'), 'single');
 
 	return 0;
 }

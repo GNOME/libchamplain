@@ -54,3 +54,11 @@ champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer, Ch
 
 void
 champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
+
+
+void
+champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer, ChamplainSelectionMode mode);
+
+
+ChamplainSelectionMode
+champlain_selection_layer_get_selection_mode (ChamplainSelectionLayer *layer);
