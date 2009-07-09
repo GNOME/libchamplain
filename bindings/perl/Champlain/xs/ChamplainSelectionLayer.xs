@@ -22,6 +22,10 @@ champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer)
 		item = champlain_selection_layer_get_selected_markers(layer);
 
 		if (!item) {
+			if (GIMME == G_SCALAR) {
+				XPUSHs(sv_2mortal(newSViv(0)));
+				return;
+			}
 			XSRETURN_EMPTY;
 		}
 
