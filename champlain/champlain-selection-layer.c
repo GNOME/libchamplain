@@ -36,6 +36,7 @@
 
 #include "champlain-defines.h"
 #include "champlain-base-marker.h"
+#include "champlain-enum-types.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
@@ -47,7 +48,8 @@ G_DEFINE_TYPE (ChamplainSelectionLayer, champlain_selection_layer, CHAMPLAIN_TYP
 
 enum
 {
-  PROP_0
+  PROP_0,
+  PROP_SELECTION_MODE
 };
 
 struct _ChamplainSelectionLayerPrivate {
@@ -61,9 +63,14 @@ champlain_selection_layer_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  //ChamplainSelectionLayer *self = CHAMPLAIN_SELECTION_LAYER (object);
+  ChamplainSelectionLayer *self = CHAMPLAIN_SELECTION_LAYER (object);
+  ChamplainSelectionLayerPrivate *priv = self->priv;
+
   switch (property_id)
     {
+      case PROP_SELECTION_MODE:
+        g_value_set_enum (value, priv->mode);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -75,9 +82,13 @@ champlain_selection_layer_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-  //ChamplainSelectionLayer *self = CHAMPLAIN_SELECTION_LAYER (object);
+  ChamplainSelectionLayer *self = CHAMPLAIN_SELECTION_LAYER (object);
+
   switch (property_id)
     {
+      case PROP_SELECTION_MODE:
+        champlain_selection_layer_set_selection_mode (self, g_value_get_enum (value));
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -92,6 +103,22 @@ champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
 
   object_class->get_property = champlain_selection_layer_get_property;
   object_class->set_property = champlain_selection_layer_set_property;
+
+  /**
+  * ChamplainView:selection-mode:
+  *
+  * Determines the type of selection that will be performed.
+  *
+  * Since: 0.4
+  */
+  g_object_class_install_property (object_class,
+      PROP_SELECTION_MODE,
+      g_param_spec_enum ("selection-mode",
+           "Selection Mode",
+           "Determines the type of selection that will be performed.",
+           CHAMPLAIN_TYPE_SELECTION_MODE,
+           CHAMPLAIN_SELECTION_MULTIPLE,
+           CHAMPLAIN_PARAM_READWRITE));
 }
 
 static void
@@ -291,4 +318,38 @@ champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer,
 
   selection = g_list_find (layer->priv->selection, marker);
   return selection != NULL;
+}
+
+/**
+* champlain_selection_layer_set_selection_mode:
+* @layer: a #ChamplainSelectionLayer
+* @mode: a #ChamplainSelectionMode value
+*
+* Sets the selection mode of the layer.
+*
+* Since: 0.4
+*/
+void
+champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer,
+    ChamplainSelectionMode mode)
+{
+  g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
+  layer->priv->mode = mode;
+}
+
+/**
+* champlain_selection_layer_get_selection_mode:
+* @layer: a #ChamplainSelectionLayer
+*
+* REturns the selection mode of the layer.
+*
+* Since: 0.4
+*/
+ChamplainSelectionMode
+champlain_selection_layer_get_selection_mode (ChamplainSelectionLayer *layer)
+{
+  g_return_val_if_fail (
+      CHAMPLAIN_IS_SELECTION_LAYER (layer),
+      CHAMPLAIN_SELECTION_MULTIPLE);
+  return layer->priv->mode;
 }
