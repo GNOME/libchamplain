@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 25;
+use Clutter::TestHelper tests => 24;
 
 use Champlain;
 use Data::Dumper;
@@ -23,18 +23,16 @@ sub test_empty {
 	my $layer = Champlain::SelectionLayer->new();
 	isa_ok($layer, 'Champlain::Layer');
 
-	my $count;
-	my @markers;
-
 	is($layer->get_selected, undef, "[empty] get_selected()");
 
 	# In single mode get_selected_markers doesn't work
-	@markers = $layer->get_selected_markers;
-	is_deeply(\@markers, [], "[empty] get_selected_markers() list context");
-	$count = $layer->get_selected_markers;
-	is($count, 0, "[empty] get_selected_markers() scalar context");
+	is_deeply(
+		[$layer->get_selected_markers],
+		[], 
+		"[empty] get_selected_markers()"
+	);
 
-	$count = $layer->count_selected_markers;
+	my $count = $layer->count_selected_markers;
 	is($count, 0, "[empty] count_selected_markers()");
 
 	my $marker = Champlain::BaseMarker->new();
