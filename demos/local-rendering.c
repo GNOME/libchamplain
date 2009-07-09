@@ -147,8 +147,6 @@ map_data_changed (GtkWidget *widget, ChamplainView *view)
   g_object_get (G_OBJECT (view), "map-source", &source, NULL);
   if (g_strcmp0 (champlain_map_source_get_id (source), "memphis-local") == 0)
     load_local_map_data (source);
-  else if (g_strcmp0 (champlain_map_source_get_id (source), "memphis-network") == 0)
-    load_network_map_data (source);
 }
 
 static void
