@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 39;
+use Clutter::TestHelper tests => 48;
 
 use Champlain;
 use Data::Dumper;
@@ -15,6 +15,7 @@ sub tests {
 	test_empty_single();
 
 	test_markers_multiple();
+	test_markers_single();
 	return 0;
 }
 
@@ -126,7 +127,7 @@ sub test_markers_multiple {
 
 	my @markers;
 	@markers = $layer->get_selected_markers;
-	is_deeply(\@markers, [$layer_markers[1], $layer_markers[3]], "[multiple] get_selected_markers() list context");
+	is_deeply(\@markers, [$layer_markers[1], $layer_markers[3]], "[multiple] get_selected_markers()");
 
 	my $count = $layer->count_selected_markers;
 	is($count, 2, "[multiple] count_selected_markers()");
@@ -149,7 +150,7 @@ sub test_markers_multiple {
 	is_deeply(
 		[ $layer->get_selected_markers ],
 		[$layer_markers[1], $layer_markers[3], $marker],
-		"[multiple] get_selected_markers() list context"
+		"[multiple] get_selected_markers()"
 	);
 
 
@@ -161,7 +162,7 @@ sub test_markers_multiple {
 	is_deeply(
 		[ $layer->get_selected_markers ],
 		[$layer_markers[1], $layer_markers[3]],
-		"[multiple] get_selected_markers() list context"
+		"[multiple] get_selected_markers()"
 	);
 
 
@@ -172,7 +173,7 @@ sub test_markers_multiple {
 	is_deeply(
 		[ $layer->get_selected_markers ],
 		[$layer_markers[3]],
-		"[multiple] get_selected_markers() list context"
+		"[multiple] get_selected_markers()"
 	);
 
 	# Remove all markers
@@ -182,7 +183,50 @@ sub test_markers_multiple {
 	is_deeply(
 		[ $layer->get_selected_markers ],
 		[],
-		"[multiple] get_selected_markers() list context"
+		"[multiple] get_selected_markers()"
+	);
+
+	return 0;
+}
+
+
+sub test_markers_single {
+	my $layer = Champlain::SelectionLayer->new();
+	isa_ok($layer, 'Champlain::Layer');
+	$layer->set_selection_mode('single');
+
+
+	my @layer_markers = (
+		Champlain::BaseMarker->new(),
+		Champlain::BaseMarker->new(),
+		Champlain::BaseMarker->new(),
+		Champlain::BaseMarker->new(),
+	);
+
+	# Add the markers
+	foreach my $marker (@layer_markers) {
+		$layer->add($marker);
+	}
+
+	is($layer->count_selected_markers, 0, "[single] count_selected_markers() empty");
+
+	# Select the first marker
+	$layer->select($layer_markers[1]);
+	is($layer->get_selected, $layer_markers[1], "[single] get_selected()");
+	ok($layer->marker_is_selected($layer_markers[1]), "[single] marker_is_selected() selected");
+
+	# Select another marker
+	$layer->select($layer_markers[3]);
+	is($layer->get_selected, $layer_markers[3], "[single] get_selected() after change");
+	ok(!$layer->marker_is_selected($layer_markers[1]), "[single] marker_is_selected() selected");
+	ok($layer->marker_is_selected($layer_markers[3]), "[single] marker_is_selected() selected");
+
+	is($layer->count_selected_markers, 1, "[single] count_selected_markers()");
+
+	is_deeply(
+		[ $layer->get_selected_markers ],
+		[$layer_markers[3]],
+		"[single] get_selected_markers()"
 	);
 
 	return 0;
