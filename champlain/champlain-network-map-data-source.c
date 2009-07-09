@@ -40,10 +40,6 @@ typedef struct _ChamplainNetworkMapDataSourcePrivate ChamplainNetworkMapDataSour
 struct _ChamplainNetworkMapDataSourcePrivate {
   MemphisMap *map;
   gchar *api_uri;
-  gdouble bound_left;
-  gdouble bound_bottom;
-  gdouble bound_right;
-  gdouble bound_top;
 };
 
 static void
@@ -125,10 +121,6 @@ champlain_network_map_data_source_init (ChamplainNetworkMapDataSource *self)
 
   priv->map = memphis_map_new ();
   priv->api_uri = g_strdup ("http://www.informationfreeway.org/api/0.6");
-  priv->bound_left = 0.0;
-  priv->bound_bottom = 0.0;
-  priv->bound_right = 0.0;
-  priv->bound_top = 0.0;
 }
 
 ChamplainNetworkMapDataSource*
@@ -146,9 +138,13 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
 
   g_message ("Data received");
-  memphis_map_load_from_data (priv->map,
+  // TODO: error handling, error tile?
+  MemphisMap *map = memphis_map_new ();
+  memphis_map_load_from_data (map,
       msg->response_body->data,
       msg->response_body->length);
+
+  priv->map = map;
 
   g_signal_emit_by_name (CHAMPLAIN_MAP_DATA_SOURCE (self),
        "map-data-changed", NULL);
@@ -165,9 +161,11 @@ champlain_network_map_data_source_load_map_data (
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_MAP_DATA_SOURCE (self));
 
+  // TODO: check bbox size
+
   SoupMessage *msg;
   SoupSession *sess = soup_session_sync_new ();
-  
+
   gchar *url = g_strdup_printf (
       "http://api.openstreetmap.org/api/0.6/map?bbox=%f,%f,%f,%f",
       bound_left, bound_bottom, bound_right, bound_top);
