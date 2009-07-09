@@ -130,10 +130,6 @@ real_select (ChamplainSelectionLayer *layer,
 
   if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
     {
-      return;
-    }
-  else if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
-    {
       /* Clear previous selection */
       champlain_selection_layer_unselect_all (layer);
 
