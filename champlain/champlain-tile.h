@@ -69,8 +69,8 @@ G_CONST_RETURN gchar * champlain_tile_get_filename (ChamplainTile *self);
 ClutterActor * champlain_tile_get_actor (ChamplainTile *self);
 ClutterActor * champlain_tile_get_content (ChamplainTile *self);
 const GTimeVal * champlain_tile_get_modified_time (ChamplainTile *self);
-char * champlain_tile_get_modified_time_string (ChamplainTile *self);
-const char * champlain_tile_get_etag (ChamplainTile *self);
+gchar * champlain_tile_get_modified_time_string (ChamplainTile *self);
+const gchar * champlain_tile_get_etag (ChamplainTile *self);
 
 void champlain_tile_set_x (ChamplainTile *self,
     gint x);

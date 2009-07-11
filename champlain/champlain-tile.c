@@ -768,7 +768,7 @@ champlain_tile_set_modified_time (ChamplainTile *self,
  *
  * Since: 0.4
  */
-char *
+gchar *
 champlain_tile_get_modified_time_string (ChamplainTile *self)
 {
   g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
@@ -793,7 +793,7 @@ champlain_tile_get_modified_time_string (ChamplainTile *self)
  *
  * Since: 0.4
  */
-const char *
+const gchar *
 champlain_tile_get_etag (ChamplainTile *self)
 {
   g_return_val_if_fail(CHAMPLAIN_TILE(self), "");
