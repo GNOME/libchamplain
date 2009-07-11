@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 54;
+use Clutter::TestHelper tests => 76;
 
 use Champlain;
 use Data::Dumper;
@@ -16,6 +16,8 @@ sub tests {
 
 	test_markers_multiple();
 	test_markers_single();
+
+	test_selection_mode_change();
 	return 0;
 }
 
@@ -54,8 +56,6 @@ sub test_empty_multiple {
 
 	$layer->set('selection_mode', 'multiple');
 	is($layer->get('selection_mode'), 'multiple');
-
-	return 0;
 }
 
 
@@ -63,15 +63,9 @@ sub test_empty_single {
 	my $layer = Champlain::SelectionLayer->new();
 	isa_ok($layer, 'Champlain::Layer');
 
-	my $notify = 0;
-	$layer->signal_connect('notify::selection-mode', sub {
-		++$notify;
-	});
-
 	is($layer->get_selection_mode, 'multiple');
 	is($layer->get('selection_mode'), 'multiple');
 	$layer->set_selection_mode('single');
-	is($notify, 1, "signal notify::selection-mode emitted");
 	is($layer->get_selection_mode, 'single');
 	is($layer->get('selection_mode'), 'single');
 
@@ -98,14 +92,10 @@ sub test_empty_single {
 
 	# Change the selection mode
 	$layer->set_selection_mode('multiple');
-	is($notify, 2, "signal notify::selection-mode emitted");
 	is($layer->get_selection_mode, 'multiple');
 
 	$layer->set('selection_mode', 'single');
-	is($notify, 3, "signal notify::selection-mode emitted");
 	is($layer->get('selection_mode'), 'single');
-
-	return 0;
 }
 
 
@@ -202,8 +192,6 @@ sub test_markers_multiple {
 	$layer->select_all();
 	$count = $layer->count_selected_markers;
 	is($count, 4, "[multiple] select_all()");
-
-	return 0;
 }
 
 
@@ -249,6 +237,71 @@ sub test_markers_single {
 		[$layer_markers[3]],
 		"[single] get_selected_markers()"
 	);
+}
 
-	return 0;
+
+sub test_selection_mode_change {
+	my $layer = Champlain::SelectionLayer->new();
+	isa_ok($layer, 'Champlain::Layer');
+
+	my $notify = 0;
+	$layer->signal_connect('notify::selection-mode', sub {
+		++$notify;
+	});
+
+	is($layer->get_selection_mode, 'multiple');
+	is($layer->get('selection_mode'), 'multiple');
+	$layer->set_selection_mode('single');
+	is($notify, 1, "signal notify::selection-mode emitted");
+	is($layer->get_selection_mode, 'single');
+	is($layer->get('selection_mode'), 'single');
+
+
+	my @markers = (
+		Champlain::BaseMarker->new(),
+		Champlain::BaseMarker->new(),
+		Champlain::BaseMarker->new(),
+	);
+
+	# We're now in single mode, lets add a marker and select it
+	my $marker = Champlain::BaseMarker->new();
+	$layer->select($markers[1]);
+	ok($layer->marker_is_selected($markers[1]));
+	is($layer->count_selected_markers, 1);
+	
+
+	# Change the selection mode to multiple, the marker is still selected
+	$layer->set_selection_mode('multiple');
+	is($notify, 2, "signal notify::selection-mode emitted");
+	ok($layer->marker_is_selected($markers[1]));
+	is($layer->count_selected_markers, 1);
+
+
+	# Go back to single selection mode, the marker is no longer selected
+	$layer->set_selection_mode('single');
+	is($notify, 3, "signal notify::selection-mode emitted");
+	ok(!$layer->marker_is_selected($markers[1]));
+	is($layer->count_selected_markers, 0);
+
+	
+	# Once more to mutiple selection mode
+	$layer->set_selection_mode('multiple');
+	is($notify, 4, "signal notify::selection-mode emitted");
+	is($layer->count_selected_markers, 0);
+	
+	# Select a few markers
+	$layer->select($markers[0]);
+	$layer->select($markers[2]);
+	ok($layer->marker_is_selected($markers[0]));
+	ok(!$layer->marker_is_selected($markers[1]));
+	ok($layer->marker_is_selected($markers[2]));
+	is($layer->count_selected_markers, 2);
+	
+	# Switch to single mode (the markers should be unselected
+	$layer->set_selection_mode('single');
+	is($notify, 5, "signal notify::selection-mode emitted");
+	ok(!$layer->marker_is_selected($markers[0]));
+	ok(!$layer->marker_is_selected($markers[1]));
+	ok(!$layer->marker_is_selected($markers[2]));
+	is($layer->count_selected_markers, 0);
 }
