@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 48;
+use Clutter::TestHelper tests => 51;
 
 use Champlain;
 use Data::Dumper;
@@ -63,9 +63,15 @@ sub test_empty_single {
 	my $layer = Champlain::SelectionLayer->new();
 	isa_ok($layer, 'Champlain::Layer');
 
+	my $notify = 0;
+	$layer->signal_connect('notify::selection-mode', sub {
+		++$notify;
+	});
+
 	is($layer->get_selection_mode, 'multiple');
 	is($layer->get('selection_mode'), 'multiple');
 	$layer->set_selection_mode('single');
+	is($notify, 1, "signal notify::selection-mode emitted");
 	is($layer->get_selection_mode, 'single');
 	is($layer->get('selection_mode'), 'single');
 
@@ -92,9 +98,11 @@ sub test_empty_single {
 
 	# Change the selection mode
 	$layer->set_selection_mode('multiple');
+	is($notify, 2, "signal notify::selection-mode emitted");
 	is($layer->get_selection_mode, 'multiple');
 
 	$layer->set('selection_mode', 'single');
+	is($notify, 3, "signal notify::selection-mode emitted");
 	is($layer->get('selection_mode'), 'single');
 
 	return 0;
