@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 51;
+use Clutter::TestHelper tests => 54;
 
 use Champlain;
 use Data::Dumper;
@@ -240,6 +240,10 @@ sub test_markers_single {
 	ok($layer->marker_is_selected($layer_markers[3]), "[single] marker_is_selected() selected");
 
 	is($layer->count_selected_markers, 1, "[single] count_selected_markers()");
+
+	# Reselect the marker once more
+	$layer->select($layer_markers[3]);
+	is($layer->get_selected, $layer_markers[3], "[single] reselected the selected marker");
 
 	is_deeply(
 		[ $layer->get_selected_markers ],
