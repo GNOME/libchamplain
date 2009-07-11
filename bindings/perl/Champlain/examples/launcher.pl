@@ -50,7 +50,7 @@ sub main {
 	$map->add_layer($layer);
 	
 	# Finish initializing the map view
-	$map->set_property("zoom-level", 7);
+	$map->set_property("zoom-level", 5);
 	$map->center_on(45.466, -73.75);
 	
 	# Middle click to get the location in the map
@@ -98,7 +98,7 @@ sub make_button {
 
 sub create_marker_layer {
 	my ($map) = @_;
-	my $layer = Champlain::Layer->new();
+	my $layer = Champlain::SelectionLayer->new();
 
 	my $orange = Clutter::Color->new(0xf3, 0x94, 0x07, 0xbb);
 	my $white = Clutter::Color->new(0xff, 0xff, 0xff, 0xff);
