@@ -352,6 +352,8 @@ champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer,
  * @mode: a #ChamplainSelectionMode value
  *
  * Sets the selection mode of the layer.
+ * NOTE: changing selection mode to CHAMPLAIN_SELECTION_SINGLE will clear all
+ *       previously selected markers.
  *
  * Since: 0.4
  */
@@ -360,7 +362,14 @@ champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer,
     ChamplainSelectionMode mode)
 {
   g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
+
+  if (layer->priv->mode == mode)
+    return;
   layer->priv->mode = mode;
+
+  /* Switching to single mode shouldn't keep the selection */
+  if (mode == CHAMPLAIN_SELECTION_SINGLE)
+    champlain_selection_layer_unselect_all (layer);
 
   g_object_notify (G_OBJECT (layer), "selection-mode");
 }
