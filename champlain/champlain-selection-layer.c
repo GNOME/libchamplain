@@ -331,6 +331,8 @@ champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer,
 {
   g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
   layer->priv->mode = mode;
+
+  g_object_notify (G_OBJECT (layer), "selection-mode");
 }
 
 /**
