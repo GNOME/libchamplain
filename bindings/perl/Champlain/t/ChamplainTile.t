@@ -3,10 +3,10 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 30;
+use Clutter::TestHelper tests => 50;
 
 use Champlain ':coords';
-
+use Data::Dumper;
 
 exit tests();
 
@@ -30,7 +30,15 @@ sub test_new_full {
 	is($tile->get_uri(), '', "get_uri() full tile");
 	is($tile->get_filename(), '', "get_filename() full tile");
 	isa_ok($tile->get_actor(), 'Clutter::Actor', "get_actor() full tile");
-	
+	is($tile->get_content(), undef, "get_content() full tile");
+	is($tile->get_etag(), undef, "get_etag() full tile");
+	is_deeply(
+		[$tile->get_modified_time],
+		[undef, undef],
+		"get_modified_time() full tile"
+	);
+	is($tile->get_modified_time_string(), undef, "get_modified_time_string() full tile");
+
 	test_all_setters($tile);
 }
 
@@ -47,6 +55,14 @@ sub test_new_empty {
 	is($tile->get_uri(), '', "get_uri() default tile");
 	is($tile->get_filename(), '', "get_filename() default tile");
 	isa_ok($tile->get_actor(), 'Clutter::Actor', "get_actor() default tile");
+	is($tile->get_content(), undef, "get_content() full tile");
+	is($tile->get_etag(), undef, "get_etag() full tile");
+	is_deeply(
+		[$tile->get_modified_time],
+		[undef, undef],
+		"get_modified_time() full tile"
+	);
+	is($tile->get_modified_time_string(), undef, "get_modified_time_string() full tile");
 	
 	test_all_setters($tile);
 }
@@ -72,4 +88,38 @@ sub test_all_setters {
 	
 	$tile->set_uri('http://localhost/tile/2/100-250.png');
 	is($tile->get_uri(), 'http://localhost/tile/2/100-250.png', "set_uri()");
+	
+	$tile->set_filename('x-100-250.png');
+	is($tile->get_filename(), 'x-100-250.png', "set_filename()");
+
+	my $actor = Clutter::Group->new();
+	$tile->set_content($actor, TRUE);
+	is($tile->get_content(), $actor, "set_content()");
+	
+	$tile->set_etag('http://localhost/tile/2/100-250.png');
+	is($tile->get_etag(), 'http://localhost/tile/2/100-250.png', "set_uri()");
+
+	# Set the time to now
+	$tile->set_modified_time();
+	is_deeply(
+		[$tile->get_modified_time()],
+		[],
+		"set_modified_time()"
+	);
+	
+	# The epoch
+	$tile->set_modified_time(0, 0);
+	is_deeply(
+		[$tile->get_modified_time()],
+		[0, 0],
+		"set_modified_time(0, 0)"
+	);
+	
+	# 2009-07-11 20:10:23
+	$tile->set_modified_time(1247335783, 20);
+	is_deeply(
+		[$tile->get_modified_time()],
+		[1247335783, 20],
+		"set_modified_time(0, 0)"
+	);
 }
