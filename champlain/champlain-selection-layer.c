@@ -317,14 +317,14 @@ champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer,
 }
 
 /**
-* champlain_selection_layer_set_selection_mode:
-* @layer: a #ChamplainSelectionLayer
-* @mode: a #ChamplainSelectionMode value
-*
-* Sets the selection mode of the layer.
-*
-* Since: 0.4
-*/
+ * champlain_selection_layer_set_selection_mode:
+ * @layer: a #ChamplainSelectionLayer
+ * @mode: a #ChamplainSelectionMode value
+ *
+ * Sets the selection mode of the layer.
+ *
+ * Since: 0.4
+ */
 void
 champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer,
     ChamplainSelectionMode mode)
@@ -336,13 +336,13 @@ champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer,
 }
 
 /**
-* champlain_selection_layer_get_selection_mode:
-* @layer: a #ChamplainSelectionLayer
-*
-* Returns the selection mode of the layer.
-*
-* Since: 0.4
-*/
+ * champlain_selection_layer_get_selection_mode:
+ * @layer: a #ChamplainSelectionLayer
+ *
+ * Returns the selection mode of the layer.
+ *
+ * Since: 0.4
+ */
 ChamplainSelectionMode
 champlain_selection_layer_get_selection_mode (ChamplainSelectionLayer *layer)
 {
