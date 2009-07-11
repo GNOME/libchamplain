@@ -339,7 +339,7 @@ champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer,
 * champlain_selection_layer_get_selection_mode:
 * @layer: a #ChamplainSelectionLayer
 *
-* REturns the selection mode of the layer.
+* Returns the selection mode of the layer.
 *
 * Since: 0.4
 */
