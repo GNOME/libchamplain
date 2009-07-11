@@ -111,11 +111,9 @@ champlain_tile_get_modified_time_string (ChamplainTile *self)
 		string = champlain_tile_get_modified_time_string(self);
 		if (string) {
 			RETVAL = newSVpvn(string, 0);
-			g_print("--time : %s\n", string);
 			g_free(string);
 		}
 		else {
-			g_print("--Undef time\n");
 			RETVAL = &PL_sv_undef;
 		}
 
@@ -133,17 +131,33 @@ champlain_tile_set_etag (ChamplainTile *self, const gchar *etag)
 
 
 void
-champlain_tile_set_modified_time (ChamplainTile *self, guint seconds = 0, guint microseconds = 0)
+champlain_tile_set_modified_time (ChamplainTile *self, ...)
 	PREINIT:
 		GTimeVal modified_time = {0, };
 
 	CODE:
-		if (microseconds || seconds) {
-			modified_time.tv_sec = seconds;
-			modified_time.tv_usec = microseconds;
+
+		if (items == 1) {
+			/* Use the current time */
+			g_get_current_time(&modified_time);
+		}
+		else if (items == 3) {
+			SV *sv_seconds = ST(1);
+			SV *sv_microseconds = ST(2);
+
+			if (! (sv_seconds && SvOK(sv_seconds))) {
+				croak("$tile->set_modified_time() called with invalid seconds");
+			}
+
+			if (! (sv_microseconds && SvOK(sv_microseconds))) {
+				croak("$tile->set_modified_time() called with invalid microseconds");
+			}
+
+			modified_time.tv_sec = SvIV(sv_seconds);
+			modified_time.tv_usec = SvIV(sv_microseconds);
 		}
 		else {
-			g_get_current_time(&modified_time);
+			croak("Usage: $tile->set_modified_time() or $tile->set_modified_time($seconds, $microseconds)");
 		}
 
 		champlain_tile_set_modified_time(self, &modified_time);
