@@ -45,7 +45,7 @@ sub test_empty_multiple {
 	# Can't be tested but at least they are invoked
 	$layer->select($marker);
 	$layer->unselect($marker);
-#	$layer->select_all();
+	$layer->select_all();
 	$layer->unselect_all();
 
 	# Change the selection mode
@@ -93,7 +93,7 @@ sub test_empty_single {
 	# Can't be tested but at least they are invoked
 	$layer->select($marker);
 	$layer->unselect($marker);
-#	$layer->select_all();
+	$layer->select_all();
 	$layer->unselect_all();
 
 	# Change the selection mode
@@ -193,6 +193,16 @@ sub test_markers_multiple {
 		[],
 		"[multiple] get_selected_markers()"
 	);
+
+
+	# Select all markers
+	$layer->select_all();
+	$count = $layer->count_selected_markers;
+	is($count, 4, "[multiple] select_all()");
+
+	$layer->select_all();
+	$count = $layer->count_selected_markers;
+	is($count, 4, "[multiple] select_all()");
 
 	return 0;
 }

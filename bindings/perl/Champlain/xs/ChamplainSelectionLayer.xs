@@ -48,8 +48,8 @@ gboolean
 champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer, ChamplainBaseMarker *marker)
 
 
-#void
-#champlain_selection_layer_select_all (ChamplainSelectionLayer *layer)
+void
+champlain_selection_layer_select_all (ChamplainSelectionLayer *layer)
 
 
 void
