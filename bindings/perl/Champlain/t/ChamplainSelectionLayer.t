@@ -162,25 +162,24 @@ sub test_markers_multiple {
 	);
 
 
-	# Select again one of the selected markers, this unselects it
+	# Select again one of the selected markers, should still be selected
 	$layer->select($marker);
-	ok(!$layer->marker_is_selected($marker), "[multiple] select() deselects an already selected marker");
+	ok($layer->marker_is_selected($marker), "[multiple] select() an already selected marker");
 	$count = $layer->count_selected_markers;
-	is($count, 2, "[multiple] count_selected_markers() with a deselected marker");
+	is($count, 3, "[multiple] count_selected_markers() with an already selected marker");
 	is_deeply(
 		[ $layer->get_selected_markers ],
-		[$layer_markers[1], $layer_markers[3]],
+		[$layer_markers[1], $layer_markers[3], $marker],
 		"[multiple] get_selected_markers()"
 	);
-
 
 	# Remove a marker
 	$layer->unselect($layer_markers[1]);
 	$count = $layer->count_selected_markers;
-	is($count, 1, "[multiple] count_selected_markers() after unselect()");
+	is($count, 2, "[multiple] count_selected_markers() after unselect()");
 	is_deeply(
 		[ $layer->get_selected_markers ],
-		[$layer_markers[3]],
+		[$layer_markers[3], $marker],
 		"[multiple] get_selected_markers()"
 	);
 
