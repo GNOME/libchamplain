@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 50;
+use Clutter::TestHelper tests => 54;
 
 use Champlain ':coords';
 use Data::Dumper;
@@ -101,11 +101,10 @@ sub test_all_setters {
 
 	# Set the time to now
 	$tile->set_modified_time();
-	is_deeply(
-		[$tile->get_modified_time()],
-		[],
-		"set_modified_time()"
-	);
+	my @time = $tile->get_modified_time();
+	is(scalar(@time), 2, "Got seconds and microseconds");
+	ok(defined $time[0], "Seconds are defined");
+	ok(defined $time[1], "Microseconds are defined");
 	
 	# The epoch
 	$tile->set_modified_time(0, 0);
