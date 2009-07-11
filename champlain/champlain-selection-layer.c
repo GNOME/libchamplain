@@ -290,6 +290,36 @@ champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
   layer->priv->selection = selection;
 }
 
+/**
+ * champlain_selection_layer_select_all:
+ *
+ * Selects all markers in the layer. This call will only work if the selection
+ * mode is set CHAMPLAIN_SELETION_MULTIPLE.
+ *
+ * Since: 0.4
+ */
+void
+champlain_selection_layer_select_all (ChamplainSelectionLayer *layer)
+{
+  gint n_children = 0;
+  gint i = 0;
+
+  if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
+    return;
+
+  n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer) );
+  for (; i < n_children; ++i)
+    {
+      ClutterActor *actor = clutter_group_get_nth_child (
+          CLUTTER_GROUP (layer), i);
+      if (CHAMPLAIN_IS_BASE_MARKER (actor) )
+        {
+          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+          real_select (layer, marker, TRUE);
+        }
+    }
+}
+
 void
 champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
