@@ -89,6 +89,13 @@ struct _ChamplainMapSourcePrivate
 };
 
 static void
+real_fill_tile (ChamplainMapSource *map_source,
+    ChamplainTile *tile)
+{
+  g_error ("Should not be reached");
+}
+
+static void
 champlain_map_source_get_property (GObject *object,
     guint prop_id,
     GValue *value,
@@ -194,7 +201,7 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
   object_class->get_property = champlain_map_source_get_property;
   object_class->set_property = champlain_map_source_set_property;
 
-  klass->fill_tile = champlain_map_source_real_fill_tile;
+  klass->fill_tile = real_fill_tile;
 
   /**
   * ChamplainMapSource:id:
@@ -480,13 +487,6 @@ champlain_map_source_fill_tile (ChamplainMapSource *map_source,
   g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
 
   CHAMPLAIN_MAP_SOURCE_GET_CLASS (map_source)->fill_tile (map_source, tile);
-}
-
-void
-champlain_map_source_real_fill_tile (ChamplainMapSource *map_source,
-    ChamplainTile *tile)
-{
-  g_error ("Should not be reached");
 }
 
 /**
