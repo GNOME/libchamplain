@@ -252,6 +252,7 @@ champlain_cache_init (ChamplainCache *self)
       "CREATE TABLE IF NOT EXISTS tiles ("
       "filename TEXT PRIMARY KEY, "
       "etag TEXT, "
+      "session TEXT, "
       "popularity INT DEFAULT 1, "
       "size INT DEFAULT 0)",
       NULL, NULL, &error_msg);
@@ -592,6 +593,31 @@ champlain_cache_update_tile (ChamplainCache *self,
   sqlite3_free (query);
 }
 
+void
+champlain_cache_update_tile_with_session (ChamplainCache *self,
+    ChamplainTile *tile,
+    guint filesize,
+    const gchar *session_id)
+{
+  g_return_if_fail (CHAMPLAIN_CACHE (self));
+  gchar *query, *error = NULL;
+
+  ChamplainCachePrivate *priv = GET_PRIVATE (self);
+
+  query = sqlite3_mprintf ("REPLACE INTO tiles (filename, etag, session, size) VALUES (%Q, %Q, %Q, %d)",
+      champlain_tile_get_filename (tile),
+      champlain_tile_get_etag (tile),
+      session_id,
+      filesize);
+  sqlite3_exec (priv->data, query, NULL, NULL, &error);
+  if (error != NULL)
+    {
+      DEBUG ("Saving Etag and size failed: %s", error);
+      sqlite3_free (error);
+    }
+  sqlite3_free (query);
+}
+
 static gboolean
 purge_on_idle (gpointer data)
 {
@@ -699,6 +725,52 @@ champlain_cache_purge (ChamplainCache *self)
       DEBUG ("Updating popularity failed: %s", error);
       sqlite3_free (error);
     }
+  sqlite3_free (query);
+}
+
+/**
+ * champlain_cache_delete:
+ * @self: the #ChamplainCache
+ *
+ * Deletes all tiles of a map source session.
+ *
+ * Since: 0.6
+ */
+void
+champlain_cache_delete_session (ChamplainCache *self, const gchar *session_id)
+{
+  g_return_if_fail (CHAMPLAIN_CACHE (self) && session_id != NULL);
+
+  ChamplainCachePrivate *priv = GET_PRIVATE (self);
+  gchar *query;
+  sqlite3_stmt *stmt;
+  int rc = 0;
+
+  query = sqlite3_mprintf ("SELECT filename, size FROM tiles WHERE session = %Q",
+        session_id);
+  rc = sqlite3_prepare (priv->data, query, strlen (query), &stmt, NULL);
+  if (rc != SQLITE_OK)
+    {
+      DEBUG ("Can't fetch tiles to delete: %s", sqlite3_errmsg(priv->data));
+    }
+
+  rc = sqlite3_step (stmt);
+  while (rc == SQLITE_ROW)
+    {
+      const char *filename = sqlite3_column_text (stmt, 0);
+      guint size;
+
+      filename = sqlite3_column_text (stmt, 0);
+      size = sqlite3_column_int (stmt, 1);
+      DEBUG ("Deleting %s of size %d", filename, size);
+
+      delete_tile (self, filename);
+
+      rc = sqlite3_step (stmt);
+    }
+
+  sqlite3_finalize (stmt);
+
   sqlite3_free (query);
 }
 

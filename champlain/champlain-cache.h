@@ -62,6 +62,10 @@ ChamplainCache* champlain_cache_dup_default (void);
 void champlain_cache_update_tile (ChamplainCache *self,
     ChamplainTile *tile,
     guint filesize);
+void champlain_cache_update_tile_with_session (ChamplainCache *self,
+    ChamplainTile *tile,
+    guint filesize,
+    const gchar *session_id);
 gboolean champlain_cache_fill_tile (ChamplainCache *self,
     ChamplainTile *tile);
 gboolean champlain_cache_tile_is_expired (ChamplainCache *self,
@@ -73,6 +77,9 @@ guint champlain_cache_get_size_limit (ChamplainCache *self);
 
 void champlain_cache_purge (ChamplainCache *self);
 void champlain_cache_purge_on_idle (ChamplainCache *self);
+
+void champlain_cache_delete_session (ChamplainCache *self,
+    const gchar *session_id);
 
 G_END_DECLS
 
