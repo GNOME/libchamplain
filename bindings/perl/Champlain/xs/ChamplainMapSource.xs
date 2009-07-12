@@ -78,3 +78,7 @@ champlain_map_source_set_license_uri (ChamplainMapSource *map_source, const gcha
 
 const gchar*
 champlain_map_source_get_license_uri (ChamplainMapSource *map_source)
+
+
+void
+champlain_map_source_fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
