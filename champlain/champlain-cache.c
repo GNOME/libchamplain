@@ -49,6 +49,8 @@ G_DEFINE_TYPE (ChamplainCache, champlain_cache, G_TYPE_OBJECT)
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_CACHE, ChamplainCachePrivate))
 
+#define CACHE_SUBDIR "champlain"
+
 enum
 {
   PROP_0,
@@ -774,3 +776,29 @@ champlain_cache_delete_session (ChamplainCache *self, const gchar *session_id)
   sqlite3_free (query);
 }
 
+gchar *
+champlain_cache_get_filename (ChamplainCache *self,
+    ChamplainMapSource *source,
+    ChamplainTile *tile,
+    const gchar *session_id)
+{
+  g_return_val_if_fail (CHAMPLAIN_CACHE (self) &&
+      CHAMPLAIN_IS_MAP_SOURCE (source) &&
+      CHAMPLAIN_IS_TILE (tile), NULL);
+
+  if (session_id == NULL)
+      return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
+             "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
+             "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
+             CACHE_SUBDIR, champlain_map_source_get_id (CHAMPLAIN_MAP_SOURCE (source)),
+             champlain_tile_get_zoom_level (tile),
+             champlain_tile_get_x (tile), champlain_tile_get_y (tile));
+
+  return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
+             "%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
+             "%d" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
+             "%d.png", g_get_user_cache_dir (),
+             CACHE_SUBDIR, champlain_map_source_get_id (CHAMPLAIN_MAP_SOURCE (source)),
+             session_id, champlain_tile_get_zoom_level (tile),
+             champlain_tile_get_x (tile), champlain_tile_get_y (tile));
+}

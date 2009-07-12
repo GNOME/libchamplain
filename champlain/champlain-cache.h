@@ -22,6 +22,7 @@
 #include <champlain/champlain-defines.h>
 
 #include "champlain-tile.h"
+#include "champlain-map-source.h"
 
 #include <glib.h>
 
@@ -79,6 +80,11 @@ void champlain_cache_purge (ChamplainCache *self);
 void champlain_cache_purge_on_idle (ChamplainCache *self);
 
 void champlain_cache_delete_session (ChamplainCache *self,
+    const gchar *session_id);
+
+gchar * champlain_cache_get_filename (ChamplainCache *self,
+    ChamplainMapSource *source,
+    ChamplainTile *tile,
     const gchar *session_id);
 
 G_END_DECLS
