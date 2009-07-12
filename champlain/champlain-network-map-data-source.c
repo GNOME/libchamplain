@@ -137,12 +137,14 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
       (ChamplainNetworkMapDataSource *) user_data;
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
 
-  g_message ("Data received");
   // TODO: error handling, error tile?
   MemphisMap *map = memphis_map_new ();
+  memphis_map_set_debug_level (map, 0);
   memphis_map_load_from_data (map,
       msg->response_body->data,
       msg->response_body->length);
+
+  DEBUG ("BBox data received");
 
   priv->map = map;
 
@@ -161,7 +163,7 @@ champlain_network_map_data_source_load_map_data (
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_MAP_DATA_SOURCE (self));
 
-  // TODO: check bbox size
+  // TODO: check valid bbox size
 
   SoupMessage *msg;
   SoupSession *sess = soup_session_sync_new ();
@@ -172,7 +174,7 @@ champlain_network_map_data_source_load_map_data (
   msg = soup_message_new ("GET", url);
   g_free (url);
 
-  g_message ("REQ bbox data");
+  DEBUG ("Request BBox data");
   soup_session_queue_message (sess, msg, load_map_data_cb, self);
 }
 
