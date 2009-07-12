@@ -153,7 +153,7 @@ gtk_champlain_embed_class_init (GtkChamplainEmbedClass *klass)
          G_PARAM_READABLE));
 }
 
-void
+static void
 set_view (GtkChamplainEmbed* embed,
     ChamplainView *view)
 {
