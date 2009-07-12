@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 125;
+use Clutter::TestHelper tests => 165;
 
 use Champlain qw(:coords :maps);
 
@@ -228,6 +228,17 @@ sub generic_map_operations {
 		1,
 		"$label column count at min zoom"
 	);
+
+	my $tile = Champlain::Tile->new();
+	is($tile->get_size(), 0, "get_size() default tile");
+	is($tile->get_state(), 'init', "get_state() default tile");
+	is($tile->get_uri(), '', "get_uri() default tile");
+	is($tile->get_filename(), '', "get_filename() default tile");
+	$map->fill_tile($tile);
+	is($tile->get_size(), $map->get_tile_size, "size is filled");
+	is($tile->get_state(), 'loading', "state changed");
+	ok($tile->get_uri(), "uri is filled");
+	ok($tile->get_filename(),  "filename is filled");
 }
 
 
