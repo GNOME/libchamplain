@@ -73,6 +73,9 @@ void champlain_memphis_map_source_set_map_data_source (
 ChamplainMapDataSource * champlain_memphis_map_source_get_map_data_source (
     ChamplainMemphisMapSource *map_source);
 
+void champlain_memphis_map_source_delete_session_cache (
+    ChamplainMemphisMapSource *map_source);
+
 G_END_DECLS
 
 #endif /* _CHAMPLAIN_MEMPHIS_MAP_SOURCE */
