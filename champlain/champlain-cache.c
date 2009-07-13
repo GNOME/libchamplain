@@ -75,6 +75,7 @@ struct _ChamplainCachePrivate {
 static gboolean inc_popularity (gpointer data);
 static void delete_tile (ChamplainCache *self,
     const gchar *filename);
+static void delete_dir_recursive (GFile *parent, GFile *root);
 
 static void
 champlain_cache_get_property (GObject *object,
@@ -739,41 +740,36 @@ champlain_cache_purge (ChamplainCache *self)
  * Since: 0.6
  */
 void
-champlain_cache_delete_session (ChamplainCache *self, const gchar *session_id)
+champlain_cache_delete_session (ChamplainCache *self,
+    ChamplainMapSource *source,
+    const gchar *session_id)
 {
   g_return_if_fail (CHAMPLAIN_CACHE (self) && session_id != NULL);
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
-  gchar *query;
-  sqlite3_stmt *stmt;
-  int rc = 0;
+  gchar *query, *error = NULL;
+  GFile *file;
+  gchar *path;
 
-  query = sqlite3_mprintf ("SELECT filename, size FROM tiles WHERE session = %Q",
-        session_id);
-  rc = sqlite3_prepare (priv->data, query, strlen (query), &stmt, NULL);
-  if (rc != SQLITE_OK)
+  query = sqlite3_mprintf ("DELETE FROM tiles WHERE session = %Q", session_id);
+  sqlite3_exec (priv->data, query, NULL, NULL, &error);
+  if (error != NULL)
     {
-      DEBUG ("Can't fetch tiles to delete: %s", sqlite3_errmsg(priv->data));
+      DEBUG ("Deleting tiles from db failed: %s", error);
+      sqlite3_free (error);
     }
-
-  rc = sqlite3_step (stmt);
-  while (rc == SQLITE_ROW)
-    {
-      const char *filename = sqlite3_column_text (stmt, 0);
-      guint size;
-
-      filename = sqlite3_column_text (stmt, 0);
-      size = sqlite3_column_int (stmt, 1);
-      DEBUG ("Deleting %s of size %d", filename, size);
-
-      delete_tile (self, filename);
-
-      rc = sqlite3_step (stmt);
-    }
-
-  sqlite3_finalize (stmt);
 
   sqlite3_free (query);
+
+  path = g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
+             "%s" G_DIR_SEPARATOR_S "%s",
+             g_get_user_cache_dir (), CACHE_SUBDIR,
+             champlain_map_source_get_id (source),
+             session_id);
+  file = g_file_new_for_path (path);
+  delete_dir_recursive (file, file);
+  g_object_unref (file);
+  g_free (path);
 }
 
 gchar *
@@ -790,7 +786,7 @@ champlain_cache_get_filename (ChamplainCache *self,
       return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
              "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
              "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
-             CACHE_SUBDIR, champlain_map_source_get_id (CHAMPLAIN_MAP_SOURCE (source)),
+             CACHE_SUBDIR, champlain_map_source_get_id (source),
              champlain_tile_get_zoom_level (tile),
              champlain_tile_get_x (tile), champlain_tile_get_y (tile));
 
@@ -798,7 +794,45 @@ champlain_cache_get_filename (ChamplainCache *self,
              "%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
              "%d" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
              "%d.png", g_get_user_cache_dir (),
-             CACHE_SUBDIR, champlain_map_source_get_id (CHAMPLAIN_MAP_SOURCE (source)),
+             CACHE_SUBDIR, champlain_map_source_get_id (source),
              session_id, champlain_tile_get_zoom_level (tile),
              champlain_tile_get_x (tile), champlain_tile_get_y (tile));
+}
+
+static void
+delete_dir_recursive (GFile *parent, GFile *root)
+{
+  GError *error = NULL;
+  GFileEnumerator *enumerator;
+  GFileInfo *info;
+  GFile *child;
+
+  g_assert (parent != NULL && root != NULL);
+
+  enumerator = g_file_enumerate_children (parent, "*",
+      G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, NULL);
+
+  if (!enumerator)
+    return;
+
+  info = g_file_enumerator_next_file (enumerator, NULL, NULL);
+  while ((info) && (!error))
+    {
+      child = g_file_get_child (parent, g_file_info_get_name (info));
+
+      if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+        delete_dir_recursive (child, root);
+
+      error = NULL;
+      if (!g_file_delete (child, NULL, &error))
+        {
+          DEBUG ("Deleting tile from disk failed: %s", error->message);
+          g_error_free (error);
+        }
+
+      g_object_unref (child);
+      info = g_file_enumerator_next_file (enumerator, NULL, NULL);
+    }
+
+  g_file_enumerator_close (enumerator, NULL, NULL);
 }

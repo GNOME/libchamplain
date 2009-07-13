@@ -244,7 +244,8 @@ delete_session_cache (gpointer data)
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
   ChamplainCache* cache = champlain_cache_dup_default ();
 
-  champlain_cache_delete_session (cache, priv->session);
+  champlain_cache_delete_session (cache, CHAMPLAIN_MAP_SOURCE (self),
+      priv->session);
 
   DEBUG ("Delete '%s' session cache", priv->session);
 

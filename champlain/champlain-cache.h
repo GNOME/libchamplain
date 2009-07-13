@@ -80,6 +80,7 @@ void champlain_cache_purge (ChamplainCache *self);
 void champlain_cache_purge_on_idle (ChamplainCache *self);
 
 void champlain_cache_delete_session (ChamplainCache *self,
+    ChamplainMapSource *source,
     const gchar *session_id);
 
 gchar * champlain_cache_get_filename (ChamplainCache *self,
