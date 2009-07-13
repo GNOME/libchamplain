@@ -71,8 +71,6 @@ struct _TileData {
 
 /* lock to protect the renderer state while rendering */
 GStaticRWLock MemphisLock = G_STATIC_RW_LOCK_INIT;
-/* lock to protect the cache */
-GStaticMutex CacheLock = G_STATIC_MUTEX_INIT;
 
 static void
 champlain_memphis_map_source_get_property (GObject *object,
@@ -215,9 +213,7 @@ set_tile_content (gpointer data)
   ChamplainCache *cache = champlain_cache_dup_default ();
 
   /* update the cache */
-  g_static_mutex_lock (&CacheLock);
   champlain_cache_update_tile_with_session (cache, tile, 20, session);
-  g_static_mutex_unlock (&CacheLock);
 
   g_object_unref (cache);
 
@@ -241,11 +237,30 @@ set_tile_content (gpointer data)
   return FALSE;
 }
 
+static gboolean
+delete_session_cache (gpointer data)
+{
+  ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE (data);
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainCache* cache = champlain_cache_dup_default ();
+
+  champlain_cache_delete_session (cache, priv->session);
+
+  DEBUG ("Delete '%s' session cache", priv->session);
+
+  g_object_unref (cache);
+
+  g_signal_emit_by_name (CHAMPLAIN_MAP_SOURCE (self),
+      "reload-tiles", NULL);
+
+  return FALSE;
+}
+
 static void
 memphis_worker_thread (gpointer data, gpointer user_data)
 {
-  ChamplainTile *tile = (ChamplainTile *) data;
-  ChamplainMemphisMapSource *map_source = (ChamplainMemphisMapSource *) user_data;
+  ChamplainTile *tile = CHAMPLAIN_TILE (data);
+  ChamplainMemphisMapSource *map_source = CHAMPLAIN_MEMPHIS_MAP_SOURCE (user_data);
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(map_source);
   cairo_t *cr;
   cairo_surface_t *cst;
@@ -414,9 +429,6 @@ champlain_memphis_map_source_load_rules (
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
   champlain_memphis_map_source_delete_session_cache (self);
-
-  g_signal_emit_by_name (CHAMPLAIN_MAP_SOURCE (self),
-      "reload-tiles", NULL);
 }
 
 void
@@ -453,14 +465,6 @@ champlain_memphis_map_source_delete_session_cache (ChamplainMemphisMapSource *se
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
-  ChamplainCache* cache = champlain_cache_dup_default ();
-
-  g_static_mutex_lock (&CacheLock);
-  champlain_cache_delete_session (cache, priv->session);
-  g_static_mutex_unlock (&CacheLock);
-
-  DEBUG ("Delete '%s' session cache", priv->session);
-
-  g_object_unref (cache);
+  clutter_threads_add_idle_full (G_PRIORITY_DEFAULT, delete_session_cache,
+      self, NULL);
 }
