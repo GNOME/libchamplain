@@ -66,6 +66,7 @@ typedef struct _TileData TileData;
 struct _TileData {
   ChamplainTile *tile;
   cairo_surface_t *cst;
+  gchar *session_id;
 };
 
 /* lock to protect the renderer state while rendering */
@@ -166,7 +167,7 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
   guint size;
   GError *error = NULL;
   gchar *filename;
-  gboolean in_cache;
+  gboolean in_cache = FALSE;
 
   size = champlain_map_source_get_tile_size (map_source);
   champlain_tile_set_size (tile, size);
@@ -207,10 +208,20 @@ set_tile_content (gpointer data)
   TileData *tdata = (TileData *) data;
   ChamplainTile *tile = tdata->tile;
   cairo_surface_t *cst = tdata->cst;
+  gchar *session = tdata->session_id;
   cairo_t *cr_clutter;
   ClutterActor *actor;
   guint size;
+  ChamplainCache *cache = champlain_cache_dup_default ();
 
+  /* update the cache */
+  g_static_mutex_lock (&CacheLock);
+  champlain_cache_update_tile_with_session (cache, tile, 20, session);
+  g_static_mutex_unlock (&CacheLock);
+
+  g_object_unref (cache);
+
+  /* draw the clutter texture */
   size = champlain_tile_get_size (tile);
   actor = clutter_cairo_new (size, size);
 
@@ -236,7 +247,6 @@ memphis_worker_thread (gpointer data, gpointer user_data)
   ChamplainTile *tile = (ChamplainTile *) data;
   ChamplainMemphisMapSource *map_source = (ChamplainMemphisMapSource *) user_data;
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(map_source);
-  ChamplainCache* cache = champlain_cache_dup_default ();
   cairo_t *cr;
   cairo_surface_t *cst;
   guint x, y, z, size;
@@ -272,18 +282,14 @@ memphis_worker_thread (gpointer data, gpointer user_data)
     }
   g_free (path);
 
-  /* Write the cache */
+  /* Write png image for caching */
   cairo_surface_write_to_png (cst, filename); // TODO error handling: CAIRO_STATUS_SUCCESS
-  g_static_mutex_lock (&CacheLock);
-  champlain_cache_update_tile_with_session (cache, tile, 20, priv->session);
-  g_static_mutex_unlock (&CacheLock);
 
-  g_object_unref (cache);
-
-  /* Write the tile content */
+  /* Write the tile content and cache entry */
   tdata = g_new (TileData, 1);
   tdata->tile = tile;
   tdata->cst = cst;
+  tdata->session_id = priv->session;
 
   clutter_threads_add_idle_full (G_PRIORITY_DEFAULT, set_tile_content,
       tdata, NULL);
