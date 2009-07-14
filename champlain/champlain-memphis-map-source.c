@@ -185,12 +185,16 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
   /* check for cached version */
   if (in_cache == TRUE)
     {
-      DEBUG ("Tile was cached: %u %u", champlain_tile_get_x (tile), champlain_tile_get_y (tile));
+      DEBUG ("Tile was cached (%u, %u, %u)", champlain_tile_get_x (tile),
+          champlain_tile_get_y (tile),
+          champlain_tile_get_zoom_level (tile));
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
     }
   else
     {
-      DEBUG ("Render tile: %u %u", champlain_tile_get_x (tile), champlain_tile_get_y (tile));
+      DEBUG ("Render tile (%u, %u, %u)", champlain_tile_get_x (tile),
+          champlain_tile_get_y (tile),
+          champlain_tile_get_zoom_level (tile));
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
 
       /* So we don't loose a tile if it is in the thread pool queue for a long time */
@@ -305,7 +309,10 @@ memphis_worker_thread (gpointer data, gpointer user_data)
   g_free (path);
 
   /* Write png image for caching */
-  cairo_surface_write_to_png (cst, filename); // TODO error handling: CAIRO_STATUS_SUCCESS
+  if (cairo_surface_write_to_png (cst, filename) != CAIRO_STATUS_SUCCESS)
+    {
+      g_warning ("Unable to write image '%s' to the cache", filename);
+    }
 
   /* Write the tile content and cache entry */
   tdata = g_new (TileData, 1);
