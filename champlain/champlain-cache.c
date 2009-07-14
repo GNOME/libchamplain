@@ -75,7 +75,7 @@ struct _ChamplainCachePrivate {
 static gboolean inc_popularity (gpointer data);
 static void delete_tile (ChamplainCache *self,
     const gchar *filename);
-static void delete_dir_recursive (GFile *parent, GFile *root);
+static void delete_dir_recursive (GFile *parent);
 
 static void
 champlain_cache_get_property (GObject *object,
@@ -596,6 +596,18 @@ champlain_cache_update_tile (ChamplainCache *self,
   sqlite3_free (query);
 }
 
+/**
+ * champlain_cache_update_tile_with_session:
+ * @self: the #ChamplainCache
+ * @tile: the #ChamplainTile to fill
+ * @filesize: the filesize on the disk
+ * @session_id: the name of the session
+ *
+ * Update the tile's information in the cache such as Etag and filesize.
+ * Also increase the tile's popularity.
+ *
+ * Since: 0.6
+ */
 void
 champlain_cache_update_tile_with_session (ChamplainCache *self,
     ChamplainTile *tile,
@@ -734,6 +746,8 @@ champlain_cache_purge (ChamplainCache *self)
 /**
  * champlain_cache_delete:
  * @self: the #ChamplainCache
+ * @source: a #ChamplainMapSource
+ * @session_id: the name of the session
  *
  * Deletes all tiles of a map source session.
  *
@@ -767,11 +781,23 @@ champlain_cache_delete_session (ChamplainCache *self,
              champlain_map_source_get_id (source),
              session_id);
   file = g_file_new_for_path (path);
-  delete_dir_recursive (file, file);
+  delete_dir_recursive (file);
   g_object_unref (file);
   g_free (path);
 }
 
+/**
+ * champlain_cache_get_filename:
+ * @self: the #ChamplainCache
+ * @source: the #ChamplainMapSource of the tile
+ * @tile: the #ChamplainTile to cache
+ * @session_id: the name of the session or NULL
+ *
+ * Returns the path and filename of the cached tile image.
+ * The session parameter is optional.
+ *
+ * Since: 0.6
+ */
 gchar *
 champlain_cache_get_filename (ChamplainCache *self,
     ChamplainMapSource *source,
@@ -800,14 +826,14 @@ champlain_cache_get_filename (ChamplainCache *self,
 }
 
 static void
-delete_dir_recursive (GFile *parent, GFile *root)
+delete_dir_recursive (GFile *parent)
 {
   GError *error = NULL;
   GFileEnumerator *enumerator;
   GFileInfo *info;
   GFile *child;
 
-  g_assert (parent != NULL && root != NULL);
+  g_assert (parent != NULL);
 
   enumerator = g_file_enumerate_children (parent, "*",
       G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, NULL);
@@ -821,7 +847,7 @@ delete_dir_recursive (GFile *parent, GFile *root)
       child = g_file_get_child (parent, g_file_info_get_name (info));
 
       if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
-        delete_dir_recursive (child, root);
+        delete_dir_recursive (child);
 
       error = NULL;
       if (!g_file_delete (child, NULL, &error))
