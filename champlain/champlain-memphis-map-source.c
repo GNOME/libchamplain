@@ -43,7 +43,7 @@ enum
 {
   PROP_0,
   PROP_MAP_DATA_SOURCE,
-  PROP_SESSION
+  PROP_SESSION_ID
 };
 
 G_DEFINE_TYPE (ChamplainMemphisMapSource, champlain_memphis_map_source, CHAMPLAIN_TYPE_MAP_SOURCE)
@@ -55,7 +55,7 @@ typedef struct _ChamplainMemphisMapSourcePrivate ChamplainMemphisMapSourcePrivat
 
 struct _ChamplainMemphisMapSourcePrivate {
   ChamplainMapDataSource *map_data_source;
-  gchar *session;
+  gchar *session_id;
   MemphisRuleSet *rules;
   MemphisRenderer *renderer;
   GThreadPool *thpool;
@@ -85,6 +85,9 @@ champlain_memphis_map_source_get_property (GObject *object,
   case PROP_MAP_DATA_SOURCE:
     g_value_set_object (value, priv->map_data_source);
     break;
+  case PROP_SESSION_ID:
+    g_value_set_string (value, priv->session_id);
+    break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
   }
@@ -102,6 +105,9 @@ champlain_memphis_map_source_set_property (GObject *object,
   case PROP_MAP_DATA_SOURCE:
     champlain_memphis_map_source_set_map_data_source (self,
         g_value_get_object (value));
+  case PROP_SESSION_ID:
+    champlain_memphis_map_source_set_session_id (self,
+        g_value_get_string (value));
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
   }
@@ -130,7 +136,7 @@ champlain_memphis_map_source_finalize (GObject *object)
   ChamplainMemphisMapSource *self = (ChamplainMemphisMapSource *) object;
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
 
-  g_free (priv->session);
+  g_free (priv->session_id);
 
   G_OBJECT_CLASS (champlain_memphis_map_source_parent_class)->finalize (object);
 }
@@ -171,7 +177,7 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
   champlain_tile_set_size (tile, size);
 
   filename = champlain_cache_get_filename (cache, map_source, tile,
-      priv->session);
+      priv->session_id);
   champlain_tile_set_filename (tile, filename);
 
   in_cache = champlain_cache_fill_tile (cache, tile);
@@ -245,9 +251,9 @@ delete_session_cache (gpointer data)
   ChamplainCache* cache = champlain_cache_dup_default ();
 
   champlain_cache_delete_session (cache, CHAMPLAIN_MAP_SOURCE (self),
-      priv->session);
+      priv->session_id);
 
-  DEBUG ("Delete '%s' session cache", priv->session);
+  DEBUG ("Delete '%s' session cache", priv->session_id);
 
   g_object_unref (cache);
 
@@ -305,7 +311,7 @@ memphis_worker_thread (gpointer data, gpointer user_data)
   tdata = g_new (TileData, 1);
   tdata->tile = tile;
   tdata->cst = cst;
-  tdata->session_id = priv->session;
+  tdata->session_id = priv->session_id;
 
   clutter_threads_add_idle_full (G_PRIORITY_DEFAULT, set_tile_content,
       tdata, NULL);
@@ -335,10 +341,25 @@ champlain_memphis_map_source_class_init (ChamplainMemphisMapSourceClass *klass)
   */
   g_object_class_install_property (object_class,
       PROP_MAP_DATA_SOURCE,
-      g_param_spec_string ("map-data-source",
+      g_param_spec_object ("map-data-source",
         "Map data source",
         "The data source of the renderer",
-        NULL,
+        CHAMPLAIN_TYPE_MAP_DATA_SOURCE,
+        G_PARAM_READWRITE));
+
+  /**
+  * ChamplainMemphisMapSource:Session:
+  *
+  * The session id of the tile cache
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+      PROP_SESSION_ID,
+      g_param_spec_string ("session-id",
+        "Cache session id",
+        "The session id of the cache",
+        "default",
         G_PARAM_READWRITE));
 }
 
@@ -351,7 +372,7 @@ champlain_memphis_map_source_init (ChamplainMemphisMapSource *self)
   priv->rules = NULL;
   priv->renderer = NULL;
   priv->thpool = NULL;
-  priv->session = g_strdup ("default");
+  priv->session_id = g_strdup ("default");
 }
 
 ChamplainMemphisMapSource *
@@ -468,4 +489,28 @@ champlain_memphis_map_source_delete_session_cache (ChamplainMemphisMapSource *se
 
   clutter_threads_add_idle_full (G_PRIORITY_DEFAULT, delete_session_cache,
       self, NULL);
+}
+
+void
+champlain_memphis_map_source_set_session_id (ChamplainMemphisMapSource *self,
+    const gchar *session_id)
+{
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self)
+      && session_id != NULL);
+
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
+
+  if (priv->session_id)
+    g_free (priv->session_id);
+
+  priv->session_id = g_strdup (session_id);
+}
+
+const gchar *
+champlain_memphis_map_source_get_session_id (ChamplainMemphisMapSource *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self), NULL);
+
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
+  return priv->session_id;
 }

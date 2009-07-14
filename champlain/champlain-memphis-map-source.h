@@ -76,6 +76,13 @@ ChamplainMapDataSource * champlain_memphis_map_source_get_map_data_source (
 void champlain_memphis_map_source_delete_session_cache (
     ChamplainMemphisMapSource *map_source);
 
+void champlain_memphis_map_source_set_session_id (
+    ChamplainMemphisMapSource *self,
+    const gchar *session_id);
+
+const gchar * champlain_memphis_map_source_get_session_id (
+    ChamplainMemphisMapSource *self);
+
 G_END_DECLS
 
 #endif /* _CHAMPLAIN_MEMPHIS_MAP_SOURCE */
