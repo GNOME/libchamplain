@@ -61,12 +61,12 @@ void champlain_network_map_data_source_load_map_data (
     gdouble bound_right,
     gdouble bound_top);
 
-gchar * champlain_network_map_data_source_get_api_uri (
+const gchar * champlain_network_map_data_source_get_api_uri (
     ChamplainNetworkMapDataSource *map_data_source);
 
 void champlain_network_map_data_source_set_api_uri (
     ChamplainNetworkMapDataSource *map_data_source,
-    gchar *api_uri);
+    const gchar *api_uri);
 
 G_END_DECLS
 

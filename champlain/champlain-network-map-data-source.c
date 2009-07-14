@@ -48,11 +48,18 @@ champlain_network_map_data_source_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  switch (property_id) {
-    // TODO
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-  }
+  ChamplainNetworkMapDataSource *self =
+      CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (object);
+
+  switch (property_id)
+    {
+      case PROP_API_URI:
+        g_value_set_string (value,
+            champlain_network_map_data_source_get_api_uri (self));
+        break;
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    }
 }
 
 static void
@@ -61,17 +68,25 @@ champlain_network_map_data_source_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-  switch (property_id) {
-    // TODO
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-  }
+  ChamplainNetworkMapDataSource *self =
+      CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (object);
+
+  switch (property_id)
+    {
+      case PROP_API_URI:
+        champlain_network_map_data_source_set_api_uri (self,
+            g_value_get_string (value));
+        break;
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    }
 }
 
 static void
 champlain_network_map_data_source_dispose (GObject *object)
 {
-  ChamplainNetworkMapDataSource *self = (ChamplainNetworkMapDataSource *) object;
+  ChamplainNetworkMapDataSource *self =
+      CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (object);
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
 
   memphis_map_free (priv->map);
@@ -82,7 +97,8 @@ champlain_network_map_data_source_dispose (GObject *object)
 static void
 champlain_network_map_data_source_finalize (GObject *object)
 {
-  ChamplainNetworkMapDataSource *self = (ChamplainNetworkMapDataSource *) object;
+  ChamplainNetworkMapDataSource *self =
+      CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (object);
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
 
   g_free (priv->api_uri);
@@ -112,6 +128,21 @@ champlain_network_map_data_source_class_init (ChamplainNetworkMapDataSourceClass
 
   ChamplainMapDataSourceClass *map_data_source_class = CHAMPLAIN_MAP_DATA_SOURCE_CLASS (klass);
   map_data_source_class->get_map_data = get_map_data;
+
+  /**
+  * ChamplainNetworkMapDataSource:api_uri:
+  *
+  * The uri of an Open Street Map API server
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+      PROP_API_URI,
+      g_param_spec_string ("api_uri",
+        "API URI",
+        "The API URI of an Open Street Map server",
+        "http://www.informationfreeway.org/api/0.6",
+        G_PARAM_READWRITE));
 }
 
 static void
@@ -134,7 +165,7 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
     gpointer user_data)
 {
   ChamplainNetworkMapDataSource *self = 
-      (ChamplainNetworkMapDataSource *) user_data;
+      CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (user_data);
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
 
   // TODO: error handling, error tile?
@@ -178,7 +209,7 @@ champlain_network_map_data_source_load_map_data (
   soup_session_queue_message (sess, msg, load_map_data_cb, self);
 }
 
-gchar *
+const gchar *
 champlain_network_map_data_source_get_api_uri (
     ChamplainNetworkMapDataSource *self)
 {
@@ -192,14 +223,15 @@ champlain_network_map_data_source_get_api_uri (
 void
 champlain_network_map_data_source_set_api_uri (
     ChamplainNetworkMapDataSource *self,
-    gchar *api_uri)
+    const gchar *api_uri)
 {
-  g_return_if_fail (CHAMPLAIN_IS_NETWORK_MAP_DATA_SOURCE (self));
+  g_return_if_fail (CHAMPLAIN_IS_NETWORK_MAP_DATA_SOURCE (self)
+      && api_uri != NULL);
 
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
 
-  if (api_uri != NULL)
+  if (priv->api_uri != NULL)
     g_free (priv->api_uri);
 
-  priv->api_uri = api_uri;
+  priv->api_uri = g_strdup (api_uri);
 }
