@@ -714,7 +714,7 @@ champlain_cache_purge (ChamplainCache *self)
   rc = sqlite3_step (stmt);
   while (rc == SQLITE_ROW && current_size > priv->size_limit)
     {
-      const char *filename = sqlite3_column_text (stmt, 0);
+      const char *filename;
       guint size;
 
       filename = sqlite3_column_text (stmt, 0);
