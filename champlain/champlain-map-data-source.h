@@ -52,9 +52,9 @@ typedef struct {
 
 GType champlain_map_data_source_get_type (void);
 
-ChamplainMapDataSource* champlain_map_data_source_new (void);
+ChamplainMapDataSource * champlain_map_data_source_new (void);
 
-MemphisMap* champlain_map_data_source_get_map_data (ChamplainMapDataSource *data_source);
+MemphisMap * champlain_map_data_source_get_map_data (ChamplainMapDataSource *data_source);
 
 const gchar * champlain_map_data_source_get_id (ChamplainMapDataSource *data_source);
 const gchar * champlain_map_data_source_get_name (ChamplainMapDataSource *data_source);

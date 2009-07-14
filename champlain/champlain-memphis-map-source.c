@@ -81,16 +81,17 @@ champlain_memphis_map_source_get_property (GObject *object,
   ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE (object);
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
 
-  switch (property_id) {
-  case PROP_MAP_DATA_SOURCE:
-    g_value_set_object (value, priv->map_data_source);
-    break;
-  case PROP_SESSION_ID:
-    g_value_set_string (value, priv->session_id);
-    break;
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-  }
+  switch (property_id)
+    {
+      case PROP_MAP_DATA_SOURCE:
+        g_value_set_object (value, priv->map_data_source);
+        break;
+      case PROP_SESSION_ID:
+        g_value_set_string (value, priv->session_id);
+        break;
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    }
 }
 
 static void
@@ -101,16 +102,17 @@ champlain_memphis_map_source_set_property (GObject *object,
 {
   ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE (object);
 
-  switch (property_id) {
-  case PROP_MAP_DATA_SOURCE:
-    champlain_memphis_map_source_set_map_data_source (self,
-        g_value_get_object (value));
-  case PROP_SESSION_ID:
-    champlain_memphis_map_source_set_session_id (self,
-        g_value_get_string (value));
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-  }
+  switch (property_id)
+    {
+      case PROP_MAP_DATA_SOURCE:
+        champlain_memphis_map_source_set_map_data_source (self,
+            g_value_get_object (value));
+      case PROP_SESSION_ID:
+        champlain_memphis_map_source_set_session_id (self,
+            g_value_get_string (value));
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    }
 }
 
 static void

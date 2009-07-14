@@ -106,7 +106,7 @@ champlain_network_map_data_source_finalize (GObject *object)
   G_OBJECT_CLASS (champlain_network_map_data_source_parent_class)->finalize (object);
 }
 
-static MemphisMap*
+static MemphisMap *
 get_map_data (ChamplainMapDataSource *self)
 {
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
@@ -154,7 +154,7 @@ champlain_network_map_data_source_init (ChamplainNetworkMapDataSource *self)
   priv->api_uri = g_strdup ("http://www.informationfreeway.org/api/0.6");
 }
 
-ChamplainNetworkMapDataSource*
+ChamplainNetworkMapDataSource *
 champlain_network_map_data_source_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_NETWORK_MAP_DATA_SOURCE, NULL);

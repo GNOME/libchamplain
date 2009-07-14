@@ -58,11 +58,12 @@ champlain_map_data_source_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  switch (property_id) {
-  // TODO
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-  }
+  switch (property_id)
+    {
+      // TODO
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    }
 }
 
 static void
@@ -71,11 +72,12 @@ champlain_map_data_source_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-  switch (property_id) {
-  // TODO
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-  }
+  switch (property_id)
+    {
+      // TODO
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    }
 }
 
 static void

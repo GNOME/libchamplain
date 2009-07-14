@@ -40,10 +40,11 @@ champlain_local_map_data_source_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  switch (property_id) {
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-  }
+  switch (property_id)
+    {
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    }
 }
 
 static void
@@ -52,10 +53,11 @@ champlain_local_map_data_source_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-  switch (property_id) {
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-  }
+  switch (property_id)
+    {
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    }
 }
 
 static void
@@ -75,7 +77,7 @@ champlain_local_map_data_source_finalize (GObject *object)
   G_OBJECT_CLASS (champlain_local_map_data_source_parent_class)->finalize (object);
 }
 
-static MemphisMap*
+static MemphisMap *
 get_map_data (ChamplainMapDataSource *self)
 {
   ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
@@ -107,7 +109,7 @@ champlain_local_map_data_source_init (ChamplainLocalMapDataSource *self)
   priv->map = memphis_map_new ();
 }
 
-ChamplainLocalMapDataSource*
+ChamplainLocalMapDataSource *
 champlain_local_map_data_source_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_LOCAL_MAP_DATA_SOURCE, NULL);
