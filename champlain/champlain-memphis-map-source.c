@@ -16,6 +16,14 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-memphis-map-source
+ * @short_description: A map source that draws tiles locally
+ *
+ * TODO
+ *
+ */
+
 #include "champlain-memphis-map-source.h"
 #include "champlain.h"
 
@@ -454,20 +462,6 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
       MAX_THREADS, FALSE, NULL);
 
   return source;
-}
-
-void // TODO: this is a dangerous function! Remove it?
-champlain_memphis_map_source_set_tile_size (ChamplainMemphisMapSource *self,
-    guint size)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
-
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
-
-  g_static_rw_lock_writer_lock (&MemphisLock);
-  memphis_renderer_set_resolution (priv->renderer, size);
-  g_static_rw_lock_writer_unlock (&MemphisLock);
-  g_object_set (G_OBJECT (self), "tile-size", size, NULL);
 }
 
 void

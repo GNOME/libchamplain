@@ -58,10 +58,6 @@ ChamplainMemphisMapSource * champlain_memphis_map_source_new_full (
     ChamplainMapSourceDesc *desc,
     ChamplainMapDataSource *map_data_source);
 
-void champlain_memphis_map_source_set_tile_size (
-    ChamplainMemphisMapSource *map_source,
-    guint size);
-
 void champlain_memphis_map_source_load_rules (
     ChamplainMemphisMapSource *map_source,
     const gchar *rules_path);
