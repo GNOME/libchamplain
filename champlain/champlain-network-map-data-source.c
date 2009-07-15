@@ -87,9 +87,10 @@ champlain_network_map_data_source_dispose (GObject *object)
 {
   ChamplainNetworkMapDataSource *self =
       CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (object);
-  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
-  memphis_map_free (priv->map);
+  if (priv->map)
+    memphis_map_free (priv->map);
 
   G_OBJECT_CLASS (champlain_network_map_data_source_parent_class)->dispose (object);
 }
@@ -99,7 +100,7 @@ champlain_network_map_data_source_finalize (GObject *object)
 {
   ChamplainNetworkMapDataSource *self =
       CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (object);
-  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
   g_free (priv->api_uri);
 
@@ -109,7 +110,7 @@ champlain_network_map_data_source_finalize (GObject *object)
 static MemphisMap *
 get_map_data (ChamplainMapDataSource *self)
 {
-  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
   return priv->map;
 }
@@ -148,9 +149,9 @@ champlain_network_map_data_source_class_init (ChamplainNetworkMapDataSourceClass
 static void
 champlain_network_map_data_source_init (ChamplainNetworkMapDataSource *self)
 {
-  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
-  priv->map = memphis_map_new ();
+  priv->map = NULL;
   priv->api_uri = g_strdup ("http://www.informationfreeway.org/api/0.6");
 }
 
@@ -166,9 +167,9 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
 {
   ChamplainNetworkMapDataSource *self = 
       CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (user_data);
-  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
-  // TODO: error handling, error tile?
+  // TODO: network error handling
   MemphisMap *map = memphis_map_new ();
   memphis_map_set_debug_level (map, 0);
   memphis_map_load_from_data (map,
@@ -176,6 +177,9 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
       msg->response_body->length);
 
   DEBUG ("BBox data received");
+
+  if (priv->map)
+    memphis_map_free (priv->map);
 
   priv->map = map;
 
@@ -215,7 +219,7 @@ champlain_network_map_data_source_get_api_uri (
 {
   g_return_val_if_fail (CHAMPLAIN_IS_NETWORK_MAP_DATA_SOURCE (self), NULL);
 
-  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
   return priv->api_uri;
 }
@@ -228,7 +232,7 @@ champlain_network_map_data_source_set_api_uri (
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_MAP_DATA_SOURCE (self)
       && api_uri != NULL);
 
-  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
   if (priv->api_uri != NULL)
     g_free (priv->api_uri);

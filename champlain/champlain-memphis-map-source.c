@@ -59,6 +59,7 @@ struct _ChamplainMemphisMapSourcePrivate {
   MemphisRuleSet *rules;
   MemphisRenderer *renderer;
   GThreadPool *thpool;
+  gboolean no_map_data;
 };
 
 typedef struct _TileData TileData;
@@ -154,6 +155,15 @@ map_data_changed_cb (ChamplainMapDataSource *map_data_source,
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(map_source);
 
   map = champlain_map_data_source_get_map_data (map_data_source);
+  if (map == NULL)
+    {
+      map = memphis_map_new ();
+      priv->no_map_data = TRUE;
+    }
+  else
+    {
+      priv->no_map_data = FALSE;
+    }
 
   DEBUG ("DataSource has been changed!");
 
@@ -161,8 +171,7 @@ map_data_changed_cb (ChamplainMapDataSource *map_data_source,
   memphis_renderer_set_map (priv->renderer, map);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
-  g_signal_emit_by_name (CHAMPLAIN_MAP_SOURCE (map_source),
-      "reload-tiles", NULL);
+  champlain_memphis_map_source_delete_session_cache (map_source);
 }
 
 static void
@@ -191,6 +200,14 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
           champlain_tile_get_y (tile),
           champlain_tile_get_zoom_level (tile));
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+    }
+  else if (priv->no_map_data)
+    {
+      DEBUG ("No tile data (%u, %u, %u)",
+          champlain_tile_get_x (tile),
+          champlain_tile_get_y (tile),
+          champlain_tile_get_zoom_level (tile));
+      // TODO: draw an error tile
     }
   else
     {
@@ -382,6 +399,7 @@ champlain_memphis_map_source_init (ChamplainMemphisMapSource *self)
   priv->renderer = NULL;
   priv->thpool = NULL;
   priv->session_id = g_strdup ("default");
+  priv->no_map_data = TRUE;
 }
 
 ChamplainMemphisMapSource *
@@ -409,8 +427,20 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
   priv = GET_PRIVATE(source);
   priv->map_data_source = g_object_ref (map_data_source);
 
+  g_signal_connect (priv->map_data_source, "map-data-changed",
+      G_CALLBACK (map_data_changed_cb), source);
+
   priv->rules = memphis_rule_set_new ();
   map = champlain_map_data_source_get_map_data (priv->map_data_source);
+  if (map == NULL)
+    {
+      map = memphis_map_new ();
+      priv->no_map_data = TRUE;
+    }
+  else
+    {
+      priv->no_map_data = FALSE;
+    }
 
   priv->renderer = memphis_renderer_new_full (priv->rules, map);
   memphis_renderer_set_resolution (priv->renderer, DEFAULT_TILE_SIZE);
@@ -422,9 +452,6 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
 
   priv->thpool = g_thread_pool_new (memphis_worker_thread, source,
       MAX_THREADS, FALSE, NULL);
-
-  g_signal_connect (priv->map_data_source, "map-data-changed",
-      G_CALLBACK (map_data_changed_cb), source);
 
   return source;
 }

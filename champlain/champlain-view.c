@@ -2407,7 +2407,8 @@ view_reload_tiles_cb (ChamplainMapSource *map_source,
           tile_y < y_first || tile_y > y_count)
         continue;
 
-      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+      if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADING &&
+          champlain_tile_get_state (tile) != CHAMPLAIN_STATE_VALIDATING_CACHE)
         champlain_map_source_fill_tile (priv->map_source, tile);
     }
 }
