@@ -17,22 +17,30 @@
  */
 
 #include "champlain-network-map-data-source.h"
+#include "champlain-version.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
 #include "champlain-debug.h"
 
 #include <memphis/memphis.h>
+#ifdef HAVE_LIBSOUP_GNOME
+#include <libsoup/soup-gnome.h>
+#else
 #include <libsoup/soup.h>
+#endif
 
 G_DEFINE_TYPE (ChamplainNetworkMapDataSource, champlain_network_map_data_source, CHAMPLAIN_TYPE_MAP_DATA_SOURCE)
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_NETWORK_MAP_DATA_SOURCE, ChamplainNetworkMapDataSourcePrivate))
 
+static SoupSession * soup_session = NULL;
+
 enum
 {
   PROP_0,
-  PROP_API_URI
+  PROP_API_URI,
+  PROP_PROXY_URI
 };
 
 typedef struct _ChamplainNetworkMapDataSourcePrivate ChamplainNetworkMapDataSourcePrivate;
@@ -40,6 +48,7 @@ typedef struct _ChamplainNetworkMapDataSourcePrivate ChamplainNetworkMapDataSour
 struct _ChamplainNetworkMapDataSourcePrivate {
   MemphisMap *map;
   gchar *api_uri;
+  gchar *proxy_uri;
 };
 
 static void
@@ -50,12 +59,16 @@ champlain_network_map_data_source_get_property (GObject *object,
 {
   ChamplainNetworkMapDataSource *self =
       CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (object);
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
   switch (property_id)
     {
       case PROP_API_URI:
         g_value_set_string (value,
             champlain_network_map_data_source_get_api_uri (self));
+        break;
+      case PROP_PROXY_URI:
+        g_value_set_string (value, priv->proxy_uri);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -70,12 +83,21 @@ champlain_network_map_data_source_set_property (GObject *object,
 {
   ChamplainNetworkMapDataSource *self =
       CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (object);
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
   switch (property_id)
     {
       case PROP_API_URI:
         champlain_network_map_data_source_set_api_uri (self,
             g_value_get_string (value));
+        break;
+      case PROP_PROXY_URI:
+        g_free (priv->proxy_uri);
+
+        priv->proxy_uri = g_value_dup_string (value);
+        if (soup_session)
+          g_object_set (G_OBJECT (soup_session), "proxy-uri",
+              soup_uri_new (priv->proxy_uri), NULL);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -92,6 +114,9 @@ champlain_network_map_data_source_dispose (GObject *object)
   if (priv->map)
     memphis_map_free (priv->map);
 
+  if (soup_session != NULL)
+    soup_session_abort (soup_session);
+
   G_OBJECT_CLASS (champlain_network_map_data_source_parent_class)->dispose (object);
 }
 
@@ -103,6 +128,7 @@ champlain_network_map_data_source_finalize (GObject *object)
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
   g_free (priv->api_uri);
+  g_free (priv->proxy_uri);
 
   G_OBJECT_CLASS (champlain_network_map_data_source_parent_class)->finalize (object);
 }
@@ -131,7 +157,7 @@ champlain_network_map_data_source_class_init (ChamplainNetworkMapDataSourceClass
   map_data_source_class->get_map_data = get_map_data;
 
   /**
-  * ChamplainNetworkMapDataSource:api_uri:
+  * ChamplainNetworkMapDataSource:api-uri:
   *
   * The uri of an Open Street Map API server
   *
@@ -144,6 +170,21 @@ champlain_network_map_data_source_class_init (ChamplainNetworkMapDataSourceClass
         "The API URI of an Open Street Map server",
         "http://www.informationfreeway.org/api/0.6",
         G_PARAM_READWRITE));
+
+  /**
+  * ChamplainNetworkMapDataSource:proxy-uri
+  *
+  * The proxy uri to use to access network
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+      PROP_PROXY_URI,
+      g_param_spec_string ("proxy-uri",
+        "Proxy URI",
+        "The proxy URI to use to access network",
+        "",
+        G_PARAM_READWRITE));
 }
 
 static void
@@ -153,6 +194,8 @@ champlain_network_map_data_source_init (ChamplainNetworkMapDataSource *self)
 
   priv->map = NULL;
   priv->api_uri = g_strdup ("http://www.informationfreeway.org/api/0.6");
+  /* informationfreeway.org is a load-balancer for different api server */
+  priv->proxy_uri = g_strdup ("");
 }
 
 ChamplainNetworkMapDataSource *
@@ -169,7 +212,17 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
       CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (user_data);
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
-  // TODO: network error handling
+  if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
+    {
+      DEBUG ("Unable to download file: %s",
+          soup_status_get_phrase (msg->status_code));
+
+      if (priv->map)
+        memphis_map_free (priv->map);
+      priv->map = NULL;
+      return;
+    }
+
   MemphisMap *map = memphis_map_new ();
   memphis_map_set_debug_level (map, 0);
   memphis_map_load_from_data (map,
@@ -200,17 +253,35 @@ champlain_network_map_data_source_load_map_data (
 
   // TODO: check valid bbox size
 
+  ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
   SoupMessage *msg;
-  SoupSession *sess = soup_session_sync_new ();
+  gchar *url;
 
-  gchar *url = g_strdup_printf (
+  if (!soup_session)
+    {
+      soup_session = soup_session_async_new_with_options (
+          "proxy-uri", soup_uri_new (priv->proxy_uri),
+#ifdef HAVE_LIBSOUP_GNOME
+          SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
+#endif
+          NULL);
+      g_object_set (G_OBJECT (soup_session),
+          "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
+          "max-conns-per-host", 8, NULL);
+      g_object_add_weak_pointer (G_OBJECT (soup_session),
+          (gpointer *) &soup_session);
+    }
+
+  url = g_strdup_printf (
       "http://api.openstreetmap.org/api/0.6/map?bbox=%f,%f,%f,%f",
       bound_left, bound_bottom, bound_right, bound_top);
   msg = soup_message_new ("GET", url);
+
+  DEBUG ("Request BBox data: '%s'", url);
+
   g_free (url);
 
-  DEBUG ("Request BBox data");
-  soup_session_queue_message (sess, msg, load_map_data_cb, self);
+  soup_session_queue_message (soup_session, msg, load_map_data_cb, self);
 }
 
 const gchar *
@@ -234,8 +305,6 @@ champlain_network_map_data_source_set_api_uri (
 
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
-  if (priv->api_uri != NULL)
-    g_free (priv->api_uri);
-
+  g_free (priv->api_uri);
   priv->api_uri = g_strdup (api_uri);
 }
