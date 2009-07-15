@@ -45,6 +45,14 @@ typedef struct {
   GObject parent;
 } ChamplainMapDataSource;
 
+// TODO: Maybe it should be an object
+typedef struct {
+  gdouble left;
+  gdouble bottom;
+  gdouble right;
+  gdouble top;
+} ChamplainBoundingBox;
+
 typedef struct {
   GObjectClass parent_class;
   MemphisMap* (*get_map_data) (ChamplainMapDataSource *data_source);
@@ -55,11 +63,6 @@ GType champlain_map_data_source_get_type (void);
 ChamplainMapDataSource * champlain_map_data_source_new (void);
 
 MemphisMap * champlain_map_data_source_get_map_data (ChamplainMapDataSource *data_source);
-
-const gchar * champlain_map_data_source_get_id (ChamplainMapDataSource *data_source);
-const gchar * champlain_map_data_source_get_name (ChamplainMapDataSource *data_source);
-const gchar * champlain_map_data_source_get_license (ChamplainMapDataSource *data_source);
-const gchar * champlain_map_data_source_get_license_uri (ChamplainMapDataSource *data_source);
 
 G_END_DECLS
 

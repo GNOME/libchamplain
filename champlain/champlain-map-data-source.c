@@ -35,10 +35,7 @@ enum
 enum
 {
   PROP_0,
-  PROP_ID,
-  PROP_NAME,
-  PROP_LICENSE,
-  PROP_LICENSE_URI
+  PROP_BOUNDING_BOX
 };
 
 static guint signals[LAST_SIGNAL] = { 0, };
@@ -46,10 +43,8 @@ static guint signals[LAST_SIGNAL] = { 0, };
 typedef struct _ChamplainMapDataSourcePrivate ChamplainMapDataSourcePrivate;
 
 struct _ChamplainMapDataSourcePrivate {
-  const char *id;
-  const char *name;
-  const char *license;
-  const char *license_uri;
+  ChamplainBoundingBox *bounding_box;
+  /* the area that is covered by this source */
 };
 
 static void
@@ -89,6 +84,11 @@ champlain_map_data_source_dispose (GObject *object)
 static void
 champlain_map_data_source_finalize (GObject *object)
 {
+  ChamplainMapDataSource *self = CHAMPLAIN_MAP_DATA_SOURCE (object);
+  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE (self);
+
+  g_free (priv->bounding_box);
+
   G_OBJECT_CLASS (champlain_map_data_source_parent_class)->finalize (object);
 }
 
@@ -113,7 +113,7 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
   klass->get_map_data = champlain_map_data_source_real_get_map_data;
 
   /**
-  * ChamplainView::map-data-changed:
+  * ChamplainMapDataSource::map-data-changed:
   * @map_data_source: the #ChamplainMapDataSource that received the signal
   *
   * The ::map-data-changed signal is emitted when the map data was
@@ -131,60 +131,25 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
 static void
 champlain_map_data_source_init (ChamplainMapDataSource *self)
 {
-  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
+  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE (self);
 
-  priv->id = NULL;
-  priv->name = NULL;
-  priv->license = NULL;
-  priv->license_uri = NULL;
+  priv->bounding_box = g_new (ChamplainBoundingBox, 1);
+  priv->bounding_box->left = 0.0;
+  priv->bounding_box->bottom = 0.0;
+  priv->bounding_box->right = 0.0;
+  priv->bounding_box->top = 0.0;
 }
 
-ChamplainMapDataSource*
+ChamplainMapDataSource *
 champlain_map_data_source_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_MAP_DATA_SOURCE, NULL);
 }
 
-MemphisMap*
+MemphisMap *
 champlain_map_data_source_get_map_data (ChamplainMapDataSource *self)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), NULL);
 
   return CHAMPLAIN_MAP_DATA_SOURCE_GET_CLASS (self)->get_map_data (self);
-}
-
-const gchar*
-champlain_map_data_source_get_id (ChamplainMapDataSource *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), NULL);
-
-  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
-  return priv->id;
-}
-
-const gchar*
-champlain_map_data_source_get_name (ChamplainMapDataSource *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), NULL);
-
-  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
-  return priv->name;
-}
-
-const gchar*
-champlain_map_data_source_get_license (ChamplainMapDataSource *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), NULL);
-
-  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
-  return priv->license;
-}
-
-const gchar*
-champlain_map_data_source_get_license_uri (ChamplainMapDataSource *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (self), NULL);
-
-  ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE(self);
-  return priv->license_uri;
 }
