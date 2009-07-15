@@ -90,9 +90,9 @@ request_osm_data_cb (GtkWidget *widget, ChamplainView *view)
       ChamplainNetworkMapDataSource *data_source =
           champlain_memphis_map_source_get_map_data_source (
           CHAMPLAIN_MEMPHIS_MAP_SOURCE(source));
+
       champlain_network_map_data_source_load_map_data (data_source,
           lon - 0.008, lat - 0.008, lon + 0.008, lat + 0.008);
-      champlain_memphis_map_source_delete_session_cache (CHAMPLAIN_MEMPHIS_MAP_SOURCE(source));
     }
 }
 
