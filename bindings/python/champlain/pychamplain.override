@@ -225,3 +225,48 @@ _wrap_champlain_view_ensure_markers_visible(PyGObject *self, PyObject *args)
     return Py_None;
 }
 %%
+override champlain_tile_set_modified_time kwargs
+static PyObject *
+_wrap_champlain_tile_set_modified_time(PyGObject *self, PyObject *args, PyObject *kwargs) 
+{
+    static char *kwlist[] = {"modified_time", NULL};
+    double pymodified_time = 0.0;
+    GTimeVal modified_time = {0,};
+
+    if (!PyArg_ParseTupleAndKeywords(
+            args, kwargs, "d:ChamplainTile.set_modified_time",
+            kwlist, &pymodified_time))
+        return NULL;
+
+    if (pymodified_time < 0.0) {
+        PyErr_SetString(PyExc_ValueError, "modified_time must be >= 0.0");
+        return NULL;
+    }
+
+    if (pymodified_time > 0.0) {
+        modified_time.tv_sec = (glong) pymodified_time;
+        modified_time.tv_usec = (glong)((pymodified_time - modified_time.tv_sec)
+                                    * G_USEC_PER_SEC);
+    } 
+    champlain_tile_set_modified_time(CHAMPLAIN_TILE(self->obj), &modified_time);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+%%
+override champlain_tile_get_modified_time kwargs
+static PyObject *
+_wrap_champlain_tile_get_modified_time(PyGObject *self, PyObject *args) 
+{
+    const GTimeVal *modified_time = NULL;
+
+    modified_time = champlain_tile_get_modified_time(CHAMPLAIN_TILE(self->obj));
+    if (modified_time == NULL){
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    return PyFloat_FromDouble((double)modified_time->tv_sec + \
+        (double)modified_time->tv_usec * 0.000001);
+}
+%%
