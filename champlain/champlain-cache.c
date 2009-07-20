@@ -857,6 +857,7 @@ delete_dir_recursive (GFile *parent)
         }
 
       g_object_unref (child);
+      g_object_unref (info);
       info = g_file_enumerator_next_file (enumerator, NULL, NULL);
     }
 
