@@ -159,3 +159,32 @@ _wrap_champlain_polygon_get_points(PyGObject *self, PyObject *args)
     return ret;
 }
 %%
+override champlain_view_get_coords_from_event kwargs
+static PyObject *
+_wrap_champlain_view_get_coords_from_event(PyGObject *self, PyObject *args) 
+{
+    double lat, lon;
+    PyObject *pyevent;
+
+    if (!PyArg_ParseTuple(args, "O:ChamplainView.get_coords_from_event", &pyevent))
+        return NULL;
+
+    ClutterEvent *event = pyg_boxed_get (pyevent, ClutterEvent);
+    champlain_view_get_coords_from_event(CHAMPLAIN_VIEW(self->obj), event, &lat, &lon);
+    return Py_BuildValue("(dd)", lat, lon);
+}
+%%
+override champlain_view_get_coords_at kwargs
+static PyObject *
+_wrap_champlain_view_get_coords_at(PyGObject *self, PyObject *args) 
+{
+    guint x, y;
+    double lat, lon;
+
+    if (!PyArg_ParseTuple(args, "ii:ChamplainView.get_coords_at", &x, &y))
+        return NULL;
+
+    champlain_view_get_coords_at(CHAMPLAIN_VIEW(self->obj), x, y, &lat, &lon);
+    return Py_BuildValue("(dd)", lat, lon);
+}
+%%
