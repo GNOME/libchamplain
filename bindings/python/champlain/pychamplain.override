@@ -188,3 +188,40 @@ _wrap_champlain_view_get_coords_at(PyGObject *self, PyObject *args)
     return Py_BuildValue("(dd)", lat, lon);
 }
 %%
+override champlain_view_ensure_markers_visible kwargs
+static PyObject *
+_wrap_champlain_view_ensure_markers_visible(PyGObject *self, PyObject *args) 
+{
+    PyObject *pymarkers, *pyanimate=0;
+    gboolean animate = 1; 
+    long i = 0;
+    ChamplainBaseMarker **markers = NULL;
+
+    if (!PyArg_ParseTuple(args, "O|O:ChamplainView.ensure_markers_visible", 
+        &pymarkers, &pyanimate)){
+        return NULL;
+    }
+
+    if (!PySequence_Check(pymarkers)){
+        PyErr_SetString(PyExc_TypeError, "must be called with a list of markers as first argument");
+        return NULL;
+    }
+
+    if (pyanimate){
+        if (!PyObject_IsTrue(pyanimate))
+            animate = 0;
+    }
+
+    markers = g_new0(ChamplainBaseMarker*, PyList_Size(pymarkers)+2);
+    for (i=0; i < PyList_Size(pymarkers); i++){
+        ChamplainBaseMarker *marker = pyg_boxed_get(PyList_GetItem(pymarkers, i), ChamplainBaseMarker);
+        markers[i] = marker;
+    }
+
+    champlain_view_ensure_markers_visible(CHAMPLAIN_VIEW(self->obj), markers, animate);
+    g_free(markers);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+%%
