@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-
-import clutter, cluttergtk
+import cluttergtk
+import clutter
 import champlain
 import gtk, gobject
 from twisted.internet import gtk2reactor
