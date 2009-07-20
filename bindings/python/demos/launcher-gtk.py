@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import clutter
 import cluttergtk
+import clutter
 import gobject
 import gtk
 import champlain
