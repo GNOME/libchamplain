@@ -189,7 +189,7 @@ if test x$enable_python = xyes; then
 fi
 
 if test "x$enable_python" = "xyes" -a "x$have_python" != "xyes"; then
-   AC_MSG_ERROR([Couldn't find python.])
+   AC_MSG_ERROR([Couldn't find python. Check config.log])
 fi
 
 AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
