@@ -33,6 +33,9 @@ static const double coords[][3] = { {47.696303, 8.634481, 16},
 
 static const char *rules[] = { "default-rules.xml", "high-contrast.xml" };
 
+static GtkWidget *memphis_box, *memphis_net_box, *memphis_local_box;
+static GtkWidget *rules_tree_view, *bg_button;
+
 /*
  * Terminate the main loop.
  */
@@ -56,17 +59,52 @@ load_local_map_data (ChamplainMapSource *source)
 }
 
 static void
-load_network_map_data (ChamplainMapSource *source)
+load_network_map_data (ChamplainMapSource *source, ChamplainView *view)
 {
   ChamplainNetworkMapDataSource *map_data_source;
+  gdouble lat, lon;
 
   map_data_source = CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (
-    champlain_memphis_map_source_get_map_data_source (
-    CHAMPLAIN_MEMPHIS_MAP_SOURCE (source)));
+      champlain_memphis_map_source_get_map_data_source (
+      CHAMPLAIN_MEMPHIS_MAP_SOURCE (source)));
+
+  g_object_get (G_OBJECT (view), "latitude", &lat, "longitude", &lon, NULL);
 
   champlain_network_map_data_source_load_map_data (map_data_source,
-      coords[map_index][1] - 0.008, coords[map_index][0] - 0.008,
-      coords[map_index][1] + 0.008, coords[map_index][0] + 0.008);
+      lon - 0.008, lat - 0.008, lon + 0.008, lat + 0.008);
+}
+
+static void
+load_rules_into_gui (ChamplainView *view)
+{
+  ChamplainMapSource *source;
+  GList* ids, *ptr;
+  GtkTreeModel *store;
+  GtkTreeIter iter;
+  GdkColor color;
+
+  g_object_get (G_OBJECT (view), "map-source", &source, NULL);
+  ids = champlain_memphis_map_source_get_rule_ids (
+      CHAMPLAIN_MEMPHIS_MAP_SOURCE (source));
+
+  gchar *colorstr = champlain_memphis_map_source_get_background_color (
+      CHAMPLAIN_MEMPHIS_MAP_SOURCE (source));
+  gdk_color_parse (colorstr, &color);
+  g_free (colorstr);
+  gtk_color_button_set_color (GTK_COLOR_BUTTON (bg_button), &color);
+
+  store = gtk_tree_view_get_model (GTK_TREE_VIEW (rules_tree_view));
+  gtk_list_store_clear (GTK_LIST_STORE (store));
+
+  ptr = ids;
+  while (ptr != NULL)
+    {
+      gtk_list_store_append (GTK_LIST_STORE (store), &iter);
+      gtk_list_store_set (GTK_LIST_STORE (store), &iter, 0, ptr->data, -1);
+      ptr = ptr->next;
+    }
+
+  g_list_free (ids);
 }
 
 static void
@@ -88,11 +126,33 @@ request_osm_data_cb (GtkWidget *widget, ChamplainView *view)
   if (g_strcmp0 (champlain_map_source_get_id (source), "memphis-network") == 0)
     {
       ChamplainNetworkMapDataSource *data_source =
+          CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (
           champlain_memphis_map_source_get_map_data_source (
-          CHAMPLAIN_MEMPHIS_MAP_SOURCE(source));
+          CHAMPLAIN_MEMPHIS_MAP_SOURCE(source)));
 
       champlain_network_map_data_source_load_map_data (data_source,
           lon - 0.008, lat - 0.008, lon + 0.008, lat + 0.008);
+    }
+}
+
+void
+bg_color_set_cb (GtkColorButton *widget, ChamplainView *view)
+{
+  GdkColor color;
+  ChamplainMapSource *source;
+
+  gtk_color_button_get_color (widget, &color);
+
+  g_object_get (G_OBJECT (view), "map-source", &source, NULL);
+  if (strncmp (champlain_map_source_get_id (source), "memphis", 7) == 0)
+    {
+      char *str = gdk_color_to_string (&color);
+      champlain_memphis_map_source_set_background_color (
+          CHAMPLAIN_MEMPHIS_MAP_SOURCE (source),
+          str);
+      g_free (str);
+      champlain_memphis_map_source_delete_session_cache (
+          CHAMPLAIN_MEMPHIS_MAP_SOURCE (source));
     }
 }
 
@@ -118,12 +178,33 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
   if (source != NULL)
     {
       if (g_strcmp0 (id, "memphis-local") == 0)
-        load_local_map_data (source);
+        {
+          load_local_map_data (source);
+          gtk_widget_hide_all (memphis_box);
+          gtk_widget_set_no_show_all (memphis_box, FALSE);
+          gtk_widget_set_no_show_all (memphis_local_box, FALSE);
+          gtk_widget_set_no_show_all (memphis_net_box, TRUE);
+          gtk_widget_show_all (memphis_box);
+        }
       else if (g_strcmp0 (id, "memphis-network") == 0)
-        load_network_map_data (source);
+        {
+          load_network_map_data (source, view);
+          gtk_widget_hide_all (memphis_box);
+          gtk_widget_set_no_show_all (memphis_box, FALSE);
+          gtk_widget_set_no_show_all (memphis_local_box, TRUE);
+          gtk_widget_set_no_show_all (memphis_net_box, FALSE);
+          gtk_widget_show_all (memphis_box);
+        }
+      else
+        {
+          gtk_widget_hide_all (memphis_box);
+          gtk_widget_set_no_show_all (memphis_box, TRUE);
+        }
 
       g_object_set (G_OBJECT (view), "map-source", source, NULL);
       g_object_unref (source);
+      if (strncmp (id, "memphis", 7) == 0)
+        load_rules_into_gui (view);
     }
 
   g_object_unref (factory);
@@ -166,9 +247,12 @@ rules_changed (GtkWidget *widget, ChamplainView *view)
 
   g_object_get (G_OBJECT (view), "map-source", &source, NULL);
   if (strncmp (champlain_map_source_get_id (source), "memphis", 7) == 0)
-    champlain_memphis_map_source_load_rules (
-        CHAMPLAIN_MEMPHIS_MAP_SOURCE(source),
-        file);
+    {
+      champlain_memphis_map_source_load_rules (
+          CHAMPLAIN_MEMPHIS_MAP_SOURCE(source),
+          file);
+      load_rules_into_gui (view);
+    }
 }
 
 static void
@@ -330,6 +414,12 @@ main (int argc,
 
   hbox = gtk_hbox_new (FALSE, 10);
   menubox = gtk_vbox_new (FALSE, 10);
+  memphis_box = gtk_vbox_new (FALSE, 10);
+  gtk_widget_set_no_show_all (memphis_box, TRUE);
+  memphis_net_box = gtk_hbox_new (FALSE, 10);
+  gtk_widget_set_no_show_all (memphis_net_box, TRUE);
+  memphis_local_box = gtk_hbox_new (FALSE, 10);
+  gtk_widget_set_no_show_all (memphis_local_box, TRUE);
 
   widget = gtk_champlain_embed_new ();
   view = gtk_champlain_embed_get_view (GTK_CHAMPLAIN_EMBED (widget));
@@ -366,33 +456,91 @@ main (int argc,
   g_signal_connect (button, "changed", G_CALLBACK (map_source_changed), view);
   gtk_box_pack_start (GTK_BOX (menubox), button, FALSE, FALSE, 0);
 
+  /* Memphis options */
   label = gtk_label_new (NULL);
   gtk_label_set_markup (GTK_LABEL (label), "<b>Memphis Rendering Options</b>");
-  gtk_box_pack_start (GTK_BOX (menubox), label, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (memphis_box), label, FALSE, FALSE, 0);
 
-  bbox =  gtk_hbox_new (FALSE, 10);
-
+  /* local source panel */
   button = gtk_combo_box_new ();
   build_data_combo_box (GTK_COMBO_BOX (button));
   gtk_combo_box_set_active (GTK_COMBO_BOX (button), 0);
   g_signal_connect (button, "changed", G_CALLBACK (map_data_changed), view);
-  gtk_box_pack_start (GTK_BOX (bbox), button, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (memphis_local_box), button, FALSE, FALSE, 0);
 
   button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_FIT);
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_to_map_data), view);
-  gtk_container_add (GTK_CONTAINER (bbox), button);
+  gtk_container_add (GTK_CONTAINER (memphis_local_box), button);
 
-  gtk_box_pack_start (GTK_BOX (menubox), bbox, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (memphis_box), memphis_local_box, FALSE, FALSE, 0);
 
+  /* network source panel */
+  button = gtk_button_new_with_label ("Request OSM data");
+  g_signal_connect (button, "clicked", G_CALLBACK (request_osm_data_cb), view);
+  gtk_box_pack_start (GTK_BOX (memphis_net_box), button, FALSE, FALSE, 0);
+
+  gtk_box_pack_start (GTK_BOX (memphis_box), memphis_net_box, FALSE, FALSE, 0);
+
+  /* rules chooser */
   button = gtk_combo_box_new ();
   build_rules_combo_box (GTK_COMBO_BOX (button));
   gtk_combo_box_set_active (GTK_COMBO_BOX (button), 0);
   g_signal_connect (button, "changed", G_CALLBACK (rules_changed), view);
-  gtk_box_pack_start (GTK_BOX (menubox), button, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (memphis_box), button, FALSE, FALSE, 0);
+
+  /* bg chooser */
+  bbox =  gtk_hbox_new (FALSE, 10);
+
+  label = gtk_label_new (NULL);
+  gtk_label_set_markup (GTK_LABEL (label), "Background color");
+  gtk_box_pack_start (GTK_BOX (bbox), label, FALSE, FALSE, 0);
   
-  button = gtk_button_new_with_label ("Request OSM data");
-  g_signal_connect (button, "clicked", G_CALLBACK (request_osm_data_cb), view);
-  gtk_box_pack_start (GTK_BOX (menubox), button, FALSE, FALSE, 0);
+  bg_button = gtk_color_button_new ();
+  gtk_color_button_set_title (GTK_COLOR_BUTTON (bg_button), "Background");
+  g_signal_connect (bg_button, "color-set", G_CALLBACK (bg_color_set_cb), view);
+  gtk_box_pack_start (GTK_BOX (bbox), bg_button, FALSE, FALSE, 0);
+
+  gtk_box_pack_start (GTK_BOX (memphis_box), bbox, FALSE, FALSE, 0);
+
+  /* rules list */
+  label = gtk_label_new ("Rules");
+  bbox =  gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (bbox), label, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (memphis_box), bbox, FALSE, FALSE, 0);
+
+  GtkListStore *store;
+  GtkWidget *tree_view, *scrolled;
+  GtkCellRenderer *renderer;
+  GtkTreeViewColumn *column;
+
+  store = gtk_list_store_new (1, G_TYPE_STRING);
+
+  tree_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL(store));
+  rules_tree_view = tree_view;
+  g_object_unref (store);
+  renderer = gtk_cell_renderer_text_new ();
+
+  column = gtk_tree_view_column_new_with_attributes (NULL, renderer, "text", 0, NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (tree_view), column);
+  gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (tree_view), FALSE);
+
+  scrolled = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled),
+      GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW(scrolled), tree_view);
+
+  //scroller = gtk_vscrollbar_new (NULL);
+  //gtk_tree_view_set_vadjustment(GTK_TREE_VIEW(tree_view),
+  //    gtk_range_get_adjustment(GTK_RANGE(scroller)));
+  //gtk_widget_set_size_request(tree_view, -1, 200);
+
+  //bbox =  gtk_hbox_new (FALSE, 10);
+  //gtk_box_pack_start (GTK_BOX (bbox), tree_view, TRUE, TRUE, 0);
+  //gtk_box_pack_start(GTK_BOX (bbox), scroller, FALSE, FALSE, 0);
+
+  gtk_box_pack_start (GTK_BOX (memphis_box), scrolled, TRUE, TRUE, 0);
+
+  gtk_box_pack_start (GTK_BOX (menubox), memphis_box, TRUE, TRUE, 0);
 
   /* viewport */
   viewport = gtk_viewport_new (NULL, NULL);
