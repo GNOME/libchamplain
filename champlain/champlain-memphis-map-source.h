@@ -22,6 +22,7 @@
 #include <champlain/champlain-map-data-source.h>
 #include <champlain/champlain-map-source.h>
 #include <champlain/champlain-map-source-desc.h>
+#include <memphis/memphis.h>
 
 #include <glib-object.h>
 
@@ -73,11 +74,28 @@ void champlain_memphis_map_source_delete_session_cache (
     ChamplainMemphisMapSource *map_source);
 
 void champlain_memphis_map_source_set_session_id (
-    ChamplainMemphisMapSource *self,
+    ChamplainMemphisMapSource *map_source,
     const gchar *session_id);
-
 const gchar * champlain_memphis_map_source_get_session_id (
-    ChamplainMemphisMapSource *self);
+    ChamplainMemphisMapSource *map_source);
+
+gchar * champlain_memphis_map_source_get_background_color (
+    ChamplainMemphisMapSource *map_source);
+
+void champlain_memphis_map_source_set_background_color (
+    ChamplainMemphisMapSource *map_source,
+    const gchar *color_spec);
+
+GList * champlain_memphis_map_source_get_rule_ids (
+    ChamplainMemphisMapSource *map_source);
+
+void champlain_memphis_map_source_set_rule (
+    ChamplainMemphisMapSource *map_source,
+    MemphisRule *rule);
+
+MemphisRule * champlain_memphis_map_source_get_rule (
+    ChamplainMemphisMapSource *map_source,
+    const gchar *id);
 
 G_END_DECLS
 

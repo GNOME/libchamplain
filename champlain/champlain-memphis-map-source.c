@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <glib/gstdio.h>
 #include <clutter-cairo.h>
+#include <gdk/gdk.h>
 #include <memphis/memphis.h>
 
 /* Tuning parameters */
@@ -514,7 +515,7 @@ champlain_memphis_map_source_load_rules (
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
 
   g_static_rw_lock_writer_lock (&MemphisLock);
   if (rules_path)
@@ -534,7 +535,7 @@ champlain_memphis_map_source_set_map_data_source (
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self) &&
       CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source));
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
   MemphisMap *map;
 
   priv->map_data_source = map_data_source;
@@ -551,7 +552,7 @@ champlain_memphis_map_source_get_map_data_source (
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self), NULL);
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
   return priv->map_data_source;
 }
 
@@ -571,7 +572,7 @@ champlain_memphis_map_source_set_session_id (ChamplainMemphisMapSource *self,
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self)
       && session_id != NULL);
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
 
   if (priv->session_id)
     g_free (priv->session_id);
@@ -584,6 +585,87 @@ champlain_memphis_map_source_get_session_id (ChamplainMemphisMapSource *self)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self), NULL);
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
   return priv->session_id;
+}
+
+gchar * champlain_memphis_map_source_get_background_color (
+    ChamplainMemphisMapSource *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self), NULL);
+
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  gchar *color;
+  gint16 r, b, g;
+
+  g_static_rw_lock_reader_lock (&MemphisLock);
+  memphis_rule_set_get_bg_color (priv->rules, &r, &g, &b);
+  g_static_rw_lock_reader_unlock (&MemphisLock);
+
+  color = g_strdup_printf ("#%02x%02x%02x", r, g, b);
+  return color;
+}
+
+void
+champlain_memphis_map_source_set_background_color (
+    ChamplainMemphisMapSource *self,
+    const gchar *color_spec)
+{
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
+
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  GdkColor color;
+
+  gdk_color_parse (color_spec, &color);
+
+  g_static_rw_lock_writer_lock (&MemphisLock);
+  memphis_rule_set_set_bg_color (priv->rules, (gint16) (color.red >> 8),
+      (gint16) (color.green >> 8), (gint16) (color.blue >> 8));
+  g_static_rw_lock_writer_unlock (&MemphisLock);
+}
+
+void
+champlain_memphis_map_source_set_rule (ChamplainMemphisMapSource *self,
+    MemphisRule *rule)
+{
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self) &&
+      MEMPHIS_IS_RULE (rule));
+
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+
+  g_static_rw_lock_writer_lock (&MemphisLock);
+  memphis_rule_set_set_rule (priv->rules, rule);
+  g_static_rw_lock_writer_unlock (&MemphisLock);
+}
+
+MemphisRule *
+champlain_memphis_map_source_get_rule (ChamplainMemphisMapSource *self,
+    const gchar *id)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self) &&
+      id != NULL, NULL);
+
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  MemphisRule *rule;
+
+  g_static_rw_lock_reader_lock (&MemphisLock);
+  rule = memphis_rule_set_get_rule (priv->rules, id);
+  g_static_rw_lock_reader_unlock (&MemphisLock);
+
+  return rule;
+}
+
+GList *
+champlain_memphis_map_source_get_rule_ids (ChamplainMemphisMapSource *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self), NULL);
+
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  GList *list;
+
+  g_static_rw_lock_reader_lock (&MemphisLock);
+  list = memphis_rule_set_get_rule_ids (priv->rules);
+  g_static_rw_lock_reader_unlock (&MemphisLock);
+
+  return list;
 }
