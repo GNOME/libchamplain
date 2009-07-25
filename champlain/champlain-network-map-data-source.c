@@ -251,7 +251,11 @@ champlain_network_map_data_source_load_map_data (
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_MAP_DATA_SOURCE (self));
 
-  // TODO: check valid bbox size
+  g_return_if_fail (bound_right - bound_left < 0.25 &&
+      bound_top - bound_bottom < 0.25);
+
+  /* Note: there are also limitations on the maximum number of nodes
+   * that can be returned. See: http://api.openstreetmap.org/api/capabilities */
 
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
   SoupMessage *msg;
