@@ -373,18 +373,6 @@ champlain_network_map_source_set_uri_format (ChamplainNetworkMapSource *source,
   priv->uri_format = g_strdup (uri_format);
 }
 
-static gchar *
-get_filename (ChamplainNetworkMapSource *source,
-    ChamplainTile *tile)
-{
-  return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
-             "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
-             "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
-             CACHE_SUBDIR, champlain_map_source_get_id (CHAMPLAIN_MAP_SOURCE (source)),
-             champlain_tile_get_zoom_level (tile),
-             champlain_tile_get_x (tile), champlain_tile_get_y (tile));
-}
-
 static void
 file_loaded_cb (SoupSession *session,
     SoupMessage *msg,
@@ -552,7 +540,7 @@ fill_tile (ChamplainMapSource *map_source,
   ChamplainCache *cache = champlain_cache_dup_default ();
 
   /* Try the cached version first */
-  filename = get_filename (source, tile);
+  filename = champlain_cache_get_filename (cache, map_source, tile, NULL);
   champlain_tile_set_filename (tile, filename);
   champlain_tile_set_size (tile, champlain_map_source_get_tile_size (map_source));
 
