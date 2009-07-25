@@ -21,6 +21,7 @@
 
 #include <glib.h>
 #include <clutter/clutter.h>
+#include "champlain-tile.h"
 
 typedef struct _Map Map;
 
@@ -58,5 +59,7 @@ typedef struct
   gint width;
   gint height;
 } ChamplainRectangle;
+
+void create_error_tile (ChamplainTile* tile);
 
 #endif

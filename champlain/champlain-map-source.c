@@ -47,6 +47,7 @@
 #include <glib-object.h>
 #include <math.h>
 #include <string.h>
+#include <clutter-cairo.h>
 
 void champlain_map_source_real_fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile);
@@ -777,4 +778,57 @@ champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source,
   // FIXME: support other projections
   return 2 * M_PI * EARTH_RADIUS * sin (M_PI/2 - M_PI / 180 * latitude) /
     (priv->tile_size * champlain_map_source_get_row_count (map_source, zoom_level));
+}
+
+/* protected function */
+static ClutterActor *error_actor = NULL;
+
+void
+create_error_tile (ChamplainTile* tile)
+{
+  ClutterActor *clone;
+
+  if (!error_actor)
+    {
+      guint size;
+      ClutterActor *actor;
+      cairo_t *cr;
+      cairo_pattern_t *pat;
+      ClutterActor *stage;
+
+      size = champlain_tile_get_size (tile);
+      actor = clutter_cairo_texture_new (size, size);
+      cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (actor));
+      stage = clutter_stage_get_default ();
+
+      /* draw a linear gray to white pattern */
+      pat = cairo_pattern_create_linear (size / 2.0, 0.0,  size, size / 2.0);
+      cairo_pattern_add_color_stop_rgb (pat, 0, 0.686, 0.686, 0.686);
+      cairo_pattern_add_color_stop_rgb (pat, 1, 0.925, 0.925, 0.925);
+      cairo_set_source (cr, pat);
+      cairo_rectangle (cr, 0, 0, size, size);
+      cairo_fill (cr);
+
+      cairo_pattern_destroy (pat);
+
+      /* draw the red cross */
+      cairo_set_source_rgb (cr, 0.424, 0.078, 0.078);
+      cairo_set_line_width (cr, 14.0);
+      cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+      cairo_move_to (cr, 24, 24);
+      cairo_line_to (cr, 50, 50);
+      cairo_move_to (cr, 50, 24);
+      cairo_line_to (cr, 24, 50);
+      cairo_stroke (cr);
+
+      cairo_destroy (cr);
+
+      clutter_actor_show (actor);
+      clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
+      error_actor = actor;
+    }
+
+  clone = clutter_clone_new (error_actor);
+  champlain_tile_set_content (tile, clone, TRUE);
+  champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 }
