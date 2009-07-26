@@ -28,9 +28,6 @@
 
 guint map_index = 0;
 static const char *maps[] = { "schaffhausen.osm", "las_palmas.osm" };
-static const double coords[][3] = { {47.696303, 8.634481, 16},
-                                    {28.13476, -15.43814, 15} };
-
 static const char *rules[] = { "default-rules.xml", "high-contrast.xml" };
 
 static GtkWidget *memphis_box, *memphis_net_box, *memphis_local_box;
@@ -110,9 +107,18 @@ load_rules_into_gui (ChamplainView *view)
 static void
 zoom_to_map_data (GtkWidget *widget, ChamplainView *view)
 {
-  champlain_view_center_on (CHAMPLAIN_VIEW(view), coords[map_index][0],
-      coords[map_index][1]);
-  champlain_view_set_zoom_level (CHAMPLAIN_VIEW(view), coords[map_index][2]);
+  ChamplainMemphisMapSource *source;
+  ChamplainMapDataSource *data_source;
+  ChamplainBoundingBox *bbox;
+  gdouble lat, lon;
+
+  g_object_get (G_OBJECT (view), "map-source", &source, NULL);
+  data_source = champlain_memphis_map_source_get_map_data_source (source);
+  g_object_get (G_OBJECT (data_source), "bounding-box", &bbox, NULL);
+  champlain_bounding_box_get_center (bbox, &lat, &lon);
+
+  champlain_view_center_on (CHAMPLAIN_VIEW(view), lat, lon);
+  champlain_view_set_zoom_level (CHAMPLAIN_VIEW(view), 15);
 }
 
 static void
@@ -529,17 +535,7 @@ main (int argc,
       GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW(scrolled), tree_view);
 
-  //scroller = gtk_vscrollbar_new (NULL);
-  //gtk_tree_view_set_vadjustment(GTK_TREE_VIEW(tree_view),
-  //    gtk_range_get_adjustment(GTK_RANGE(scroller)));
-  //gtk_widget_set_size_request(tree_view, -1, 200);
-
-  //bbox =  gtk_hbox_new (FALSE, 10);
-  //gtk_box_pack_start (GTK_BOX (bbox), tree_view, TRUE, TRUE, 0);
-  //gtk_box_pack_start(GTK_BOX (bbox), scroller, FALSE, FALSE, 0);
-
   gtk_box_pack_start (GTK_BOX (memphis_box), scrolled, TRUE, TRUE, 0);
-
   gtk_box_pack_start (GTK_BOX (menubox), memphis_box, TRUE, TRUE, 0);
 
   /* viewport */
