@@ -45,14 +45,6 @@ typedef struct {
   GObject parent;
 } ChamplainMapDataSource;
 
-// TODO: Maybe it should be an object
-typedef struct {
-  gdouble left;
-  gdouble bottom;
-  gdouble right;
-  gdouble top;
-} ChamplainBoundingBox;
-
 typedef struct {
   GObjectClass parent_class;
   MemphisMap* (*get_map_data) (ChamplainMapDataSource *data_source);

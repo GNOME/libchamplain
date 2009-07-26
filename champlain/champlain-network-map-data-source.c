@@ -21,6 +21,7 @@
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
 #include "champlain-debug.h"
+#include "champlain-bounding-box.h"
 
 #include <memphis/memphis.h>
 #ifdef HAVE_LIBSOUP_GNOME
@@ -211,6 +212,7 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
   ChamplainNetworkMapDataSource *self = 
       CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (user_data);
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainBoundingBox *bbox;
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
@@ -235,6 +237,15 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
     memphis_map_free (priv->map);
 
   priv->map = map;
+
+  // TODO: memphis needs a function to get the bbox
+  bbox = champlain_bounding_box_new ();
+  bbox->left = priv->map->map->minlat;
+  bbox->top = priv->map->map->minlon;
+  bbox->right = priv->map->map->maxlat;
+  bbox->bottom = priv->map->map->maxlon;
+  g_object_set (G_OBJECT (self), "bounding-box", bbox, NULL);
+  champlain_bounding_box_free (bbox);
 
   g_signal_emit_by_name (CHAMPLAIN_MAP_DATA_SOURCE (self),
        "map-data-changed", NULL);

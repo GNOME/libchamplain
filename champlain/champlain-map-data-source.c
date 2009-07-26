@@ -20,6 +20,7 @@
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
 #include "champlain-debug.h"
+#include "champlain-bounding-box.h"
 
 G_DEFINE_TYPE (ChamplainMapDataSource, champlain_map_data_source, G_TYPE_OBJECT)
 
@@ -44,7 +45,7 @@ typedef struct _ChamplainMapDataSourcePrivate ChamplainMapDataSourcePrivate;
 
 struct _ChamplainMapDataSourcePrivate {
   ChamplainBoundingBox *bounding_box;
-  /* the area that is covered by this source */
+  /* the area that is covered by this data source */
 };
 
 static void
@@ -53,9 +54,14 @@ champlain_map_data_source_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
+  ChamplainMapDataSource *self = CHAMPLAIN_MAP_DATA_SOURCE (object);
+  ChamplainMapDataSourcePrivate *priv = GET_PRIVATE (self);
+
   switch (property_id)
     {
-      // TODO
+      case PROP_BOUNDING_BOX:
+        g_value_set_boxed (value, priv->bounding_box);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -67,9 +73,15 @@ champlain_map_data_source_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
+  ChamplainMapDataSource *self = CHAMPLAIN_MAP_DATA_SOURCE (object);
+  ChamplainMapDataSourcePrivate *priv = GET_PRIVATE (self);
+
   switch (property_id)
     {
-      // TODO
+      case PROP_BOUNDING_BOX:
+        champlain_bounding_box_free (priv->bounding_box);
+        priv->bounding_box = g_value_dup_boxed (value);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -87,7 +99,7 @@ champlain_map_data_source_finalize (GObject *object)
   ChamplainMapDataSource *self = CHAMPLAIN_MAP_DATA_SOURCE (object);
   ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE (self);
 
-  g_free (priv->bounding_box);
+  champlain_bounding_box_free (priv->bounding_box);
 
   G_OBJECT_CLASS (champlain_map_data_source_parent_class)->finalize (object);
 }
@@ -113,6 +125,21 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
   klass->get_map_data = champlain_map_data_source_real_get_map_data;
 
   /**
+  * ChamplainMapDataSource:Bounding-box:
+  *
+  * The bounding box of the area that contains map data.
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+      PROP_BOUNDING_BOX,
+      g_param_spec_boxed ("bounding-box",
+        "Bounding Box",
+        "The bounding box of the map data source",
+        CHAMPLAIN_TYPE_BOUNDING_BOX,
+        G_PARAM_READWRITE));
+
+  /**
   * ChamplainMapDataSource::map-data-changed:
   * @map_data_source: the #ChamplainMapDataSource that received the signal
   *
@@ -133,7 +160,7 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
 {
   ChamplainMapDataSourcePrivate *priv =  GET_PRIVATE (self);
 
-  priv->bounding_box = g_new (ChamplainBoundingBox, 1);
+  priv->bounding_box = champlain_bounding_box_new ();
   priv->bounding_box->left = 0.0;
   priv->bounding_box->bottom = 0.0;
   priv->bounding_box->right = 0.0;
