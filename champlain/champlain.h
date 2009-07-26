@@ -46,6 +46,7 @@
 #include "champlain/champlain-map-data-source.h"
 #include "champlain/champlain-local-map-data-source.h"
 #include "champlain/champlain-network-map-data-source.h"
+#include "champlain/champlain-bounding-box.h"
 #endif
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
