@@ -54,6 +54,10 @@ void champlain_bounding_box_free (ChamplainBoundingBox *bbox);
 
 ChamplainBoundingBox * champlain_bounding_box_new (void);
 
+void champlain_bounding_box_get_center (ChamplainBoundingBox *bbox,
+    gdouble *lat,
+    gdouble *lon);
+
 G_END_DECLS
 
 #endif

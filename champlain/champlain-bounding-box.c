@@ -93,3 +93,22 @@ champlain_bounding_box_new ()
 {
   return g_slice_new (ChamplainBoundingBox);
 }
+
+/**
+ * champlain_bounding_box_get_center:
+ * @bbox: a #ChamplainBoundingBox
+ * @lat: the latitude of the box center
+ * @lon: the longitude of the box center
+ *
+ * Since: 0.6
+ */
+void
+champlain_bounding_box_get_center (ChamplainBoundingBox *bbox,
+    gdouble *lat,
+    gdouble *lon)
+{
+  g_return_if_fail (CHAMPLAIN_BOUNDING_BOX (bbox));
+
+  *lat = (bbox->right + bbox->left) / 2.0;
+  *lon = (bbox->top + bbox->bottom) / 2.0;
+}
