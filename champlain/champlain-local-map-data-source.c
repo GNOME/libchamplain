@@ -21,6 +21,7 @@
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
 #include "champlain-debug.h"
 #include "champlain-bounding-box.h"
+#include "champlain-enum-types.h"
 
 #include <memphis/memphis.h>
 
@@ -143,6 +144,8 @@ champlain_local_map_data_source_load_map_data (ChamplainLocalMapDataSource *self
   bbox->bottom = priv->map->map->maxlon;
   g_object_set (G_OBJECT (self), "bounding-box", bbox, NULL);
   champlain_bounding_box_free (bbox);
+
+  g_object_set (G_OBJECT (self), "state", CHAMPLAIN_STATE_DONE, NULL);
 
   g_signal_emit_by_name (CHAMPLAIN_MAP_DATA_SOURCE (self),
       "map-data-changed", NULL);

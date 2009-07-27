@@ -21,6 +21,7 @@
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
 #include "champlain-debug.h"
 #include "champlain-bounding-box.h"
+#include "champlain-enum-types.h"
 
 G_DEFINE_TYPE (ChamplainMapDataSource, champlain_map_data_source, G_TYPE_OBJECT)
 
@@ -36,7 +37,8 @@ enum
 enum
 {
   PROP_0,
-  PROP_BOUNDING_BOX
+  PROP_BOUNDING_BOX,
+  PROP_STATE
 };
 
 static guint signals[LAST_SIGNAL] = { 0, };
@@ -46,6 +48,7 @@ typedef struct _ChamplainMapDataSourcePrivate ChamplainMapDataSourcePrivate;
 struct _ChamplainMapDataSourcePrivate {
   ChamplainBoundingBox *bounding_box;
   /* the area that is covered by this data source */
+  ChamplainState state;
 };
 
 static void
@@ -61,6 +64,9 @@ champlain_map_data_source_get_property (GObject *object,
     {
       case PROP_BOUNDING_BOX:
         g_value_set_boxed (value, priv->bounding_box);
+        break;
+      case PROP_STATE:
+        g_value_set_enum (value, priv->state);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -81,6 +87,10 @@ champlain_map_data_source_set_property (GObject *object,
       case PROP_BOUNDING_BOX:
         champlain_bounding_box_free (priv->bounding_box);
         priv->bounding_box = g_value_dup_boxed (value);
+        break;
+      case PROP_STATE:
+        priv->state = g_value_get_enum (value);
+        g_object_notify (G_OBJECT (self), "state");
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -140,6 +150,23 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
         G_PARAM_READWRITE));
 
   /**
+  * ChamplainMapDataSource:state
+  *
+  * The map data source's state. Useful to know if the data source is loading
+  * or not.
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+       PROP_STATE,
+       g_param_spec_enum ("state",
+           "map data source's state",
+           "The state of the map data source",
+           CHAMPLAIN_TYPE_STATE,
+           CHAMPLAIN_STATE_INIT,
+           G_PARAM_READWRITE));
+
+  /**
   * ChamplainMapDataSource::map-data-changed:
   * @map_data_source: the #ChamplainMapDataSource that received the signal
   *
@@ -165,6 +192,8 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
   priv->bounding_box->bottom = 0.0;
   priv->bounding_box->right = 0.0;
   priv->bounding_box->top = 0.0;
+
+  priv->state = CHAMPLAIN_STATE_INIT;
 }
 
 ChamplainMapDataSource *
