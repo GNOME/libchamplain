@@ -31,7 +31,7 @@ static const char *maps[] = { "schaffhausen.osm", "las_palmas.osm" };
 static const char *rules[] = { "default-rules.xml", "high-contrast.xml" };
 
 static GtkWidget *memphis_box, *memphis_net_box, *memphis_local_box;
-static GtkWidget *rules_tree_view, *bg_button;
+static GtkWidget *rules_tree_view, *bg_button, *map_data_state_img;
 
 /*
  * Terminate the main loop.
@@ -40,6 +40,26 @@ static void
 on_destroy (GtkWidget *widget, gpointer data)
 {
   gtk_main_quit ();
+}
+
+static void
+data_source_state_changed (ChamplainView *view,
+                    GParamSpec *gobject,
+                    GtkImage *image)
+{
+  ChamplainState state;
+
+  g_object_get (G_OBJECT (view), "state", &state, NULL);
+  if (state == CHAMPLAIN_STATE_LOADING)
+    {
+      gtk_image_set_from_stock (image, GTK_STOCK_NETWORK, GTK_ICON_SIZE_BUTTON);
+      g_print("NET DATA SOURCE STATE: loading\n");
+    }
+  else
+    {
+      gtk_image_clear (image);
+      g_print("NET DATA SOURCE STATE: done\n");
+    }
 }
 
 static void
@@ -64,6 +84,9 @@ load_network_map_data (ChamplainMapSource *source, ChamplainView *view)
   map_data_source = CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (
       champlain_memphis_map_source_get_map_data_source (
       CHAMPLAIN_MEMPHIS_MAP_SOURCE (source)));
+
+  g_signal_connect (map_data_source, "notify::state", G_CALLBACK (data_source_state_changed),
+      map_data_state_img);
 
   g_object_get (G_OBJECT (view), "latitude", &lat, "longitude", &lon, NULL);
 
@@ -484,6 +507,9 @@ main (int argc,
   button = gtk_button_new_with_label ("Request OSM data");
   g_signal_connect (button, "clicked", G_CALLBACK (request_osm_data_cb), view);
   gtk_box_pack_start (GTK_BOX (memphis_net_box), button, FALSE, FALSE, 0);
+
+  map_data_state_img = gtk_image_new ();
+  gtk_box_pack_start (GTK_BOX (memphis_net_box), map_data_state_img, FALSE, FALSE, 0);
 
   gtk_box_pack_start (GTK_BOX (memphis_box), memphis_net_box, FALSE, FALSE, 0);
 
