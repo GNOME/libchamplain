@@ -123,17 +123,12 @@ champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
 
 static void
 marker_select (ChamplainSelectionLayer *layer,
-    ChamplainBaseMarker *marker,
-    gboolean prepend)
+    ChamplainBaseMarker *marker)
 {
-
   /* Add selection */
   g_object_ref (marker);
   g_object_set (marker, "highlighted", TRUE, NULL);
-  if (prepend)
-    layer->priv->selection = g_list_prepend (layer->priv->selection, marker);
-  else
-    layer->priv->selection = g_list_append (layer->priv->selection, marker);
+  layer->priv->selection = g_list_prepend (layer->priv->selection, marker);
 }
 
 static void
@@ -149,10 +144,10 @@ api_select (ChamplainSelectionLayer *layer,
     {
       /* Clear previous selection */
       champlain_selection_layer_unselect_all (layer);
-      marker_select (layer, marker, TRUE);
+      marker_select (layer, marker);
     }
   else if (layer->priv->mode == CHAMPLAIN_SELECTION_MULTIPLE)
-    marker_select (layer, marker, FALSE);
+    marker_select (layer, marker);
 }
 
 static void
@@ -166,7 +161,7 @@ mouse_select (ChamplainSelectionLayer *layer,
     {
       /* Clear previous selection */
       champlain_selection_layer_unselect_all (layer);
-      marker_select (layer, marker, TRUE);
+      marker_select (layer, marker);
     }
   else if (layer->priv->mode == CHAMPLAIN_SELECTION_MULTIPLE)
     {
@@ -179,7 +174,7 @@ mouse_select (ChamplainSelectionLayer *layer,
           return;
         }
 
-      marker_select (layer, marker, FALSE);
+      marker_select (layer, marker);
     }
 }
 
