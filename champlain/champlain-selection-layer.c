@@ -146,17 +146,15 @@ real_select (ChamplainSelectionLayer *layer,
 
       if (!append)
         champlain_selection_layer_unselect_all (layer);
-
-      if (was_selected)
+      else if (was_selected)
         {
           champlain_selection_layer_unselect (layer, marker);
+          return;
         }
-      else
-        {
-          g_object_ref (marker);
-          g_object_set (marker, "highlighted", TRUE, NULL);
-          layer->priv->selection = g_list_append (layer->priv->selection, marker);
-        }
+
+      g_object_ref (marker);
+      g_object_set (marker, "highlighted", TRUE, NULL);
+      layer->priv->selection = g_list_append (layer->priv->selection, marker);
     }
 }
 
@@ -167,7 +165,8 @@ marker_clicked_cb (ClutterActor *actor,
 {
 
   real_select (CHAMPLAIN_SELECTION_LAYER (user_data),
-      CHAMPLAIN_BASE_MARKER (actor), (event->modifier_state & CLUTTER_CONTROL_MASK));
+      CHAMPLAIN_BASE_MARKER (actor),
+      (event->modifier_state & CLUTTER_CONTROL_MASK));
 
   return TRUE;
 }
