@@ -169,7 +169,7 @@ marker_clicked_cb (ClutterActor *actor,
   real_select (CHAMPLAIN_SELECTION_LAYER (user_data),
       CHAMPLAIN_BASE_MARKER (actor), (event->modifier_state & CLUTTER_CONTROL_MASK));
 
-  return FALSE;
+  return TRUE;
 }
 
 static void
