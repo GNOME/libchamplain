@@ -111,6 +111,8 @@ PangoEllipsizeMode champlain_marker_get_ellipsize (ChamplainMarker *marker);
 gboolean champlain_marker_get_single_line_mode (ChamplainMarker *marker);
 gboolean champlain_marker_get_draw_background (ChamplainMarker *marker);
 
+void champlain_marker_set_highlight_color (ClutterColor *color);
+
 G_END_DECLS
 
 #endif

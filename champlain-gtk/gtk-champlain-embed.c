@@ -178,6 +178,7 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 {
   ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
   ClutterActor *stage;
+  GtkStyle *style;
 
   GtkChamplainEmbedPrivate *priv = GTK_CHAMPLAIN_EMBED_GET_PRIVATE (embed);
   embed->priv = priv;
@@ -212,6 +213,13 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
   clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
 
   gtk_container_add (GTK_CONTAINER (embed), priv->clutter_embed);
+
+  /* Set selection color */
+  style = gtk_widget_get_style (GTK_WIDGET (embed));
+  ClutterColor color = {0, 0, 0, };
+  gtk_clutter_get_bg_color (GTK_WIDGET (embed), GTK_STATE_SELECTED, &color);
+  champlain_marker_set_highlight_color (&color);
+
 }
 
 static void

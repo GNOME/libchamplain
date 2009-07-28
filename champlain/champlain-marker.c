@@ -55,7 +55,7 @@
 
 #define DEFAULT_FONT_NAME "Sans 11"
 
-static ClutterColor SELECTED_COLOR = {0x00, 0x00, 0xff, 0xff};
+static ClutterColor SELECTED_COLOR = {0x00, 0x33, 0xcc, 0xff};
 
 static ClutterColor DEFAULT_COLOR = {0x33, 0x33, 0x33, 0xff};
 static ClutterColor DEFAULT_TEXT_COLOR = {0xee, 0xee, 0xee, 0xff};
@@ -114,6 +114,24 @@ G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CHAMPLAIN_TYPE_BASE_MARKER);
 
 static void draw_marker (ChamplainMarker *marker);
 static void queue_redraw (ChamplainMarker *marker);
+
+/**
+ * champlain_marker_set_hightlight_color:
+ * @color: a #ClutterColor
+ *
+ * Changes the highlight color, this is to ensure a better integration with
+ * the desktop, this is automatically done by GtkChamplainEmbed.
+ *
+ * Since: 0.2
+ */
+void
+champlain_marker_set_highlight_color (ClutterColor *color)
+{
+  SELECTED_COLOR.red = color->red;
+  SELECTED_COLOR.green = color->green;
+  SELECTED_COLOR.blue = color->blue;
+  SELECTED_COLOR.alpha = color->alpha;
+}
 
 static void
 champlain_marker_get_property (GObject *object,
