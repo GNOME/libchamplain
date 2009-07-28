@@ -122,39 +122,64 @@ champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
 }
 
 static void
-real_select (ChamplainSelectionLayer *layer,
+marker_select (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker,
-    gboolean append)
+    gboolean prepend)
 {
-  DEBUG ("Select %p", marker);
+
+  /* Add selection */
+  g_object_ref (marker);
+  g_object_set (marker, "highlighted", TRUE, NULL);
+  if (prepend)
+    layer->priv->selection = g_list_prepend (layer->priv->selection, marker);
+  else
+    layer->priv->selection = g_list_append (layer->priv->selection, marker);
+}
+
+static void
+api_select (ChamplainSelectionLayer *layer,
+    ChamplainBaseMarker *marker)
+{
+  DEBUG ("API select %p", marker);
+
+  if (champlain_selection_layer_marker_is_selected (layer, marker))
+    return;
 
   if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
     {
       /* Clear previous selection */
       champlain_selection_layer_unselect_all (layer);
+      marker_select (layer, marker, TRUE);
+    }
+  else if (layer->priv->mode == CHAMPLAIN_SELECTION_MULTIPLE)
+    marker_select (layer, marker, FALSE);
+}
 
-      /* Add selection */
-      g_object_ref (marker);
-      g_object_set (marker, "highlighted", TRUE, NULL);
-      layer->priv->selection = g_list_prepend (layer->priv->selection, marker);
+static void
+mouse_select (ChamplainSelectionLayer *layer,
+    ChamplainBaseMarker *marker,
+    gboolean append)
+{
+  DEBUG ("Mouse select %p", marker);
+
+  if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
+    {
+      /* Clear previous selection */
+      champlain_selection_layer_unselect_all (layer);
+      marker_select (layer, marker, TRUE);
     }
   else if (layer->priv->mode == CHAMPLAIN_SELECTION_MULTIPLE)
     {
       /* Clear previous selection */
-      gboolean was_selected =
-        champlain_selection_layer_marker_is_selected (layer, marker);
-
       if (!append)
         champlain_selection_layer_unselect_all (layer);
-      else if (was_selected)
+      else if (champlain_selection_layer_marker_is_selected (layer, marker))
         {
           champlain_selection_layer_unselect (layer, marker);
           return;
         }
 
-      g_object_ref (marker);
-      g_object_set (marker, "highlighted", TRUE, NULL);
-      layer->priv->selection = g_list_append (layer->priv->selection, marker);
+      marker_select (layer, marker, FALSE);
     }
 }
 
@@ -164,7 +189,7 @@ marker_clicked_cb (ClutterActor *actor,
     gpointer user_data)
 {
 
-  real_select (CHAMPLAIN_SELECTION_LAYER (user_data),
+  mouse_select (CHAMPLAIN_SELECTION_LAYER (user_data),
       CHAMPLAIN_BASE_MARKER (actor),
       (event->modifier_state & CLUTTER_CONTROL_MASK));
 
@@ -271,7 +296,7 @@ void
 champlain_selection_layer_select (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
 {
-  real_select (layer, marker, TRUE);
+  api_select (layer, marker);
 }
 
 void
@@ -314,7 +339,7 @@ champlain_selection_layer_select_all (ChamplainSelectionLayer *layer)
       if (CHAMPLAIN_IS_BASE_MARKER (actor) )
         {
           ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
-          real_select (layer, marker, TRUE);
+          api_select (layer, marker);
         }
     }
 }
