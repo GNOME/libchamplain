@@ -932,6 +932,27 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
 }
 
+static gboolean
+button_release_cb (ClutterActor *actor,
+                ClutterEvent *event,
+                ChamplainView *view)
+{
+  GList *children = NULL;
+  ChamplainViewPrivate *priv = view->priv;
+
+  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->user_layers));
+  for (;children != NULL; children = g_list_next (children))
+    {
+      if (CHAMPLAIN_IS_SELECTION_LAYER (children->data))
+        champlain_selection_layer_unselect_all (CHAMPLAIN_SELECTION_LAYER (children->data));
+    }
+
+  g_list_free (children);
+
+  return FALSE;
+}
+
+
 static void
 champlain_view_init (ChamplainView *view)
 {
@@ -990,6 +1011,10 @@ champlain_view_init (ChamplainView *view)
   clutter_actor_show (priv->map_layer);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->map_layer);
+
+  clutter_actor_set_reactive (CLUTTER_ACTOR (priv->stage), TRUE);
+  g_signal_connect_after (G_OBJECT (priv->stage), "button-release-event",
+      G_CALLBACK (button_release_cb), view);
 
   g_signal_connect (priv->finger_scroll, "button-press-event",
       G_CALLBACK (finger_scroll_button_press_cb), view);
