@@ -31,7 +31,6 @@ map_view_button_release_cb (ClutterActor *actor,
   if (event->button != 1 || event->click_count > 1)
     return FALSE;
 
-  g_print("Map was clicked at ");
   if (champlain_view_get_coords_from_event (view, (ClutterEvent*)event, &lat,
          &lon))
     g_print("Map clicked at %f, %f \n", lat, lon);
