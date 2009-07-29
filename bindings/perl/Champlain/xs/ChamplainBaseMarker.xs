@@ -14,8 +14,8 @@ champlain_base_marker_set_position (ChamplainBaseMarker *marker, gdouble longitu
 
 
 void
-champlain_base_marker_set_highlighted (ChamplainBaseMarker *champlainBaseMarker, gboolean value);
+champlain_base_marker_set_highlighted (ChamplainBaseMarker *champlainBaseMarker, gboolean value)
 
 
 gboolean
-champlain_base_marker_get_highlighted (ChamplainBaseMarker *champlainBaseMarker);
+champlain_base_marker_get_highlighted (ChamplainBaseMarker *champlainBaseMarker)

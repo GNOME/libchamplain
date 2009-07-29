@@ -10,16 +10,16 @@ champlain_layer_new (class)
 
 
 void
-champlain_layer_add_marker (ChamplainLayer *layer, ChamplainBaseMarker *marker);
+champlain_layer_add_marker (ChamplainLayer *layer, ChamplainBaseMarker *marker)
 
 
 void
-champlain_layer_hide (ChamplainLayer *layer);
+champlain_layer_hide (ChamplainLayer *layer)
 
 
 void
-champlain_layer_show (ChamplainLayer *layer);
+champlain_layer_show (ChamplainLayer *layer)
 
 
 void
-champlain_layer_remove_marker (ChamplainLayer *layer, ChamplainBaseMarker *marker);
+champlain_layer_remove_marker (ChamplainLayer *layer, ChamplainBaseMarker *marker)
