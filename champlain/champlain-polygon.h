@@ -69,6 +69,8 @@ ChamplainPoint * champlain_polygon_insert_point (ChamplainPolygon *polygon,
     gdouble lat,
     gdouble lon,
     gint pos);
+void champlain_polygon_remove_point (ChamplainPolygon *self,
+    ChamplainPoint *point);
 void champlain_polygon_clear_points (ChamplainPolygon *polygon);
 GList *champlain_polygon_get_points (ChamplainPolygon *polygon);
 

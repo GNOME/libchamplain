@@ -353,6 +353,25 @@ champlain_polygon_insert_point (ChamplainPolygon *self,
 }
 
 /**
+ * champlain_polygon_remove_point:
+ * @polygon: The polygon
+ * @point: the #ChamplainPoint to remove
+ *
+ * Removes the point from the polygon.
+ *
+ * Since: 0.4
+ */
+void
+champlain_polygon_remove_point (ChamplainPolygon *self,
+    ChamplainPoint *point)
+{
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (self));
+
+  self->priv->points = g_list_remove (self->priv->points, point);
+  g_object_notify (G_OBJECT (self), "visible");
+}
+
+/**
  * champlain_polygon_clear_points:
  * @polygon: The polygon
  *
