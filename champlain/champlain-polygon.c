@@ -145,6 +145,8 @@ champlain_polygon_dispose (GObject *object)
       priv->actor = NULL;
     }
 
+  champlain_polygon_clear_points (CHAMPLAIN_POLYGON (object));
+
   G_OBJECT_CLASS (champlain_polygon_parent_class)->dispose (object);
 }
 
