@@ -87,3 +87,7 @@ champlain_polygon_show (ChamplainPolygon *polygon)
 
 void
 champlain_polygon_hide (ChamplainPolygon *polygon)
+
+
+void
+champlain_polygon_remove_point (ChamplainPolygon *self, ChamplainPoint *point)
