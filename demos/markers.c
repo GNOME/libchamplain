@@ -49,7 +49,7 @@ create_marker_layer (ChamplainView *view)
 
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker),
       45.528178, -73.563788);
-  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
+  champlain_layer_add_marker (layer, CHAMPLAIN_BASE_MARKER (marker));
   clutter_actor_set_reactive (marker, TRUE);
   g_signal_connect_after (marker, "button-release-event",
       G_CALLBACK (marker_button_release_cb), view);
@@ -57,19 +57,19 @@ create_marker_layer (ChamplainView *view)
   marker = champlain_marker_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-generic.png", NULL);
   champlain_marker_set_text (CHAMPLAIN_MARKER (marker), "New York");
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 40.77, -73.98);
-  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
+  champlain_layer_add_marker (layer, CHAMPLAIN_BASE_MARKER (marker));
 
   marker = champlain_marker_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-important.png", NULL);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 47.130885,
       -70.764141);
-  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
+  champlain_layer_add_marker (layer, CHAMPLAIN_BASE_MARKER (marker));
 
   marker = champlain_marker_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-favorite.png", NULL);
   champlain_marker_set_draw_background (CHAMPLAIN_MARKER (marker), FALSE);
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker), 45.41484,
       -71.918907);
-  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
+  champlain_layer_add_marker (layer, CHAMPLAIN_BASE_MARKER (marker));
 
-  clutter_actor_show (CLUTTER_ACTOR (layer));
+  champlain_layer_show (layer);
   return layer;
 }

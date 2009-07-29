@@ -24,6 +24,7 @@
 #define CHAMPLAIN_LAYER_H
 
 #include <champlain/champlain-defines.h>
+#include <champlain/champlain-base-marker.h>
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
@@ -58,6 +59,14 @@ typedef struct {
 GType champlain_layer_get_type (void);
 
 ChamplainLayer* champlain_layer_new (void);
+
+void champlain_layer_show (ChamplainLayer *layer);
+void champlain_layer_hide (ChamplainLayer *layer);
+
+void champlain_layer_add_marker (ChamplainLayer *layer,
+    ChamplainBaseMarker *marker);
+void champlain_layer_remove_marker (ChamplainLayer *layer,
+    ChamplainBaseMarker *marker);
 
 G_END_DECLS
 

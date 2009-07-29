@@ -189,3 +189,73 @@ champlain_layer_new ()
 {
   return g_object_new (CHAMPLAIN_TYPE_LAYER, NULL);
 }
+
+/**
+ * champlain_layer_add_marker:
+ * @layer: a #ChamplainLayer
+ * @marker: a #ChamplainBaseMarker
+ *
+ * Adds the marker to the layer.
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_add_marker (ChamplainLayer *layer,
+    ChamplainBaseMarker *marker)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+
+  clutter_container_add (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker), NULL);
+}
+
+/**
+ * champlain_layer_remove_marker:
+ * @layer: a #ChamplainLayer
+ * @marker: a #ChamplainBaseMarker
+ *
+ * Removes the marker from the layer.
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_remove_marker (ChamplainLayer *layer,
+    ChamplainBaseMarker *marker)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+
+  clutter_container_remove (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker), NULL);
+}
+
+/**
+ * champlain_layer_show:
+ * @layer: a #ChamplainLayer
+ *
+ * Makes the layer and its markers visible.
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_show (ChamplainLayer *layer)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  clutter_actor_show (CLUTTER_ACTOR (layer));
+}
+
+/**
+ * champlain_layer_hide:
+ * @layer: a #ChamplainLayer
+ *
+ * Makes the layer and its markers invisible.
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_hide (ChamplainLayer *layer)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  clutter_actor_hide (CLUTTER_ACTOR (layer));
+}
