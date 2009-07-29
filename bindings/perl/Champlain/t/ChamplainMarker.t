@@ -26,6 +26,10 @@ sub tests {
 	test_new_from_file();
 	test_new_full();
 	test_new_with_image();
+
+	# Can't be tested but at least we call it
+	Champlain::Marker->set_highlight_color(Clutter::Color->new(0xff, 0xff, 0x00));
+
 	return 0;
 }
 

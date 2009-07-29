@@ -137,3 +137,8 @@ champlain_marker_get_single_line_mode (ChamplainMarker *marker)
 
 gboolean
 champlain_marker_get_draw_background (ChamplainMarker *marker)
+
+
+void
+champlain_marker_set_highlight_color (class, ClutterColor *color);
+	C_ARGS: color
