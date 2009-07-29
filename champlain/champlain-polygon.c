@@ -391,6 +391,7 @@ champlain_polygon_clear_points (ChamplainPolygon *self)
     next = g_list_next (next);
   }
   g_list_free (self->priv->points);
+  self->priv->points = NULL;
   g_object_notify (G_OBJECT (self), "visible");
 }
 
