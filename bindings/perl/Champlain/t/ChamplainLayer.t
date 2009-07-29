@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 3;
+use Clutter::TestHelper tests => 6;
 
 use Champlain;
 
@@ -25,6 +25,12 @@ sub tests {
 		[$marker],
 		"Layer has a marker after add_marker"
 	);
+
+	ok(!$layer->get('visible'), "Layer is not visible at start");
+	$layer->show();
+	ok($layer->get('visible'), "show()");
+	$layer->hide();
+	ok(!$layer->get('visible'), "hide()");
 
 	return 0;
 }
