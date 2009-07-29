@@ -1,7 +1,8 @@
 Revision history for Champlain
 
-0.06 Thu Jul  9 20:48:21 CEST 2009
+0.06 Wed Jul 29 22:35:16 CEST 2009
 	Bindings for ChamplainSelectionLayer.
+	Coverage for libchamplain 0.3.4
 
 
 0.05 Sat Jun 27 23:05:56 CEST 2009
