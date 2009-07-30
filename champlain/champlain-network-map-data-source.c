@@ -16,6 +16,18 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-network-map-data-source
+ * @short_description: ChamplainNetworkMapDataSource downloads data for
+ *  ChamplainMemphisMapSource.
+ *
+ * This map data source downloads the map data from an OpenStreetMap API
+ * server. It support protocol version 0.5 and 0.6.
+ *
+ * http://wiki.openstreetmap.org/wiki/API
+ *
+ */
+
 #include "champlain-network-map-data-source.h"
 #include "champlain-version.h"
 
@@ -161,7 +173,7 @@ champlain_network_map_data_source_class_init (ChamplainNetworkMapDataSourceClass
   /**
   * ChamplainNetworkMapDataSource:api-uri:
   *
-  * The uri of an Open Street Map API server
+  * The URI of an OpenStreetMap API server
   *
   * Since: 0.6
   */
@@ -169,14 +181,14 @@ champlain_network_map_data_source_class_init (ChamplainNetworkMapDataSourceClass
       PROP_API_URI,
       g_param_spec_string ("api_uri",
         "API URI",
-        "The API URI of an Open Street Map server",
+        "The API URI of an OpenStreetMap server",
         "http://www.informationfreeway.org/api/0.6",
         G_PARAM_READWRITE));
 
   /**
   * ChamplainNetworkMapDataSource:proxy-uri
   *
-  * The proxy uri to use to access network
+  * The proxy URI to use to access network
   *
   * Since: 0.6
   */
@@ -200,6 +212,13 @@ champlain_network_map_data_source_init (ChamplainNetworkMapDataSource *self)
   priv->proxy_uri = g_strdup ("");
 }
 
+/**
+ * champlain_network_map_data_source_new:
+ *
+ * Returns a new #ChamplainNetworkMapDataSource
+ *
+ * Since: 0.6
+ */
 ChamplainNetworkMapDataSource *
 champlain_network_map_data_source_new (void)
 {
@@ -251,7 +270,22 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
   g_object_set (G_OBJECT (self), "state", CHAMPLAIN_STATE_DONE, NULL);
 }
 
-
+/**
+ * champlain_network_map_data_source_load_map_data:
+ * @source: the #ChamplainNetworkMapDataSource
+ * @bound_left: the left bound in degree
+ * @bound_buttom: the lower bound in degree
+ * @bound_right: the right bound in degree
+ * @bound_top: the upper bound in degree
+ *
+ * Asynchronously loads map data within a bounding box from the server.
+ * The box must not exceed an edge size of 0.25 degree. There are also
+ * limitations on the maximum number of nodes that can be requested.
+ *
+ * For details, see: http://api.openstreetmap.org/api/capabilities
+ *
+ * Since: 0.6
+ */
 void
 champlain_network_map_data_source_load_map_data (
     ChamplainNetworkMapDataSource *self,
@@ -264,9 +298,6 @@ champlain_network_map_data_source_load_map_data (
 
   g_return_if_fail (bound_right - bound_left < 0.25 &&
       bound_top - bound_bottom < 0.25);
-
-  /* Note: there are also limitations on the maximum number of nodes
-   * that can be returned. See: http://api.openstreetmap.org/api/capabilities */
 
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
   SoupMessage *msg;
@@ -301,6 +332,14 @@ champlain_network_map_data_source_load_map_data (
   soup_session_queue_message (soup_session, msg, load_map_data_cb, self);
 }
 
+/**
+ * champlain_network_map_data_source_get_api_uri:
+ * @source: the #ChamplainNetworkMapDataSource
+ *
+ * Returns the URI of the API server.
+ *
+ * Since: 0.6
+ */
 const gchar *
 champlain_network_map_data_source_get_api_uri (
     ChamplainNetworkMapDataSource *self)
@@ -312,6 +351,15 @@ champlain_network_map_data_source_get_api_uri (
   return priv->api_uri;
 }
 
+/**
+ * champlain_network_map_data_source_set_api_uri:
+ * @source: the #ChamplainNetworkMapDataSource
+ * @api_uri: the URI of the API server
+ *
+ * Sets the URI of the API server.
+ *
+ * Since: 0.6
+ */
 void
 champlain_network_map_data_source_set_api_uri (
     ChamplainNetworkMapDataSource *self,
