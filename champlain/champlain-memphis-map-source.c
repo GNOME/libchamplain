@@ -52,7 +52,8 @@ enum
 {
   PROP_0,
   PROP_MAP_DATA_SOURCE,
-  PROP_SESSION_ID
+  PROP_SESSION_ID,
+  PROP_PERSISTENT_CACHE
 };
 
 G_DEFINE_TYPE (ChamplainMemphisMapSource, champlain_memphis_map_source, CHAMPLAIN_TYPE_MAP_SOURCE)
@@ -69,6 +70,7 @@ struct _ChamplainMemphisMapSourcePrivate {
   MemphisRenderer *renderer;
   GThreadPool *thpool;
   gboolean no_map_data;
+  gboolean persistent_cache;
 };
 
 typedef struct _TileData TileData;
@@ -99,6 +101,9 @@ champlain_memphis_map_source_get_property (GObject *object,
       case PROP_SESSION_ID:
         g_value_set_string (value, priv->session_id);
         break;
+      case PROP_PERSISTENT_CACHE:
+        g_value_set_boolean (value, priv->persistent_cache);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -111,15 +116,21 @@ champlain_memphis_map_source_set_property (GObject *object,
     GParamSpec *pspec)
 {
   ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE (object);
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
 
   switch (property_id)
     {
       case PROP_MAP_DATA_SOURCE:
         champlain_memphis_map_source_set_map_data_source (self,
             g_value_get_object (value));
+        break;
       case PROP_SESSION_ID:
         champlain_memphis_map_source_set_session_id (self,
             g_value_get_string (value));
+        break;
+      case PROP_PERSISTENT_CACHE:
+        priv->persistent_cache = g_value_get_boolean (value);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -186,7 +197,8 @@ map_data_changed_cb (ChamplainMapDataSource *map_data_source,
   memphis_renderer_set_map (priv->renderer, map);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
-  champlain_memphis_map_source_delete_session_cache (map_source);
+  if (!priv->persistent_cache)
+    champlain_memphis_map_source_delete_session_cache (map_source);
 }
 
 static void
@@ -404,6 +416,23 @@ champlain_memphis_map_source_class_init (ChamplainMemphisMapSourceClass *klass)
         "The session id of the cache",
         "default",
         G_PARAM_READWRITE));
+
+  /**
+  * ChamplainMemphisMapSource:persistent-cache:
+  *
+  * If the session cache should be deleted if data or rules are changed.
+  * If enabled the client has to manage the cache explicitly with
+  * champlain_memphis_map_source_delete_session_cache.
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+      PROP_PERSISTENT_CACHE,
+      g_param_spec_boolean ("persistent-cache",
+        "Persistent cache",
+        "If the cache is persistent",
+        FALSE,
+        G_PARAM_READWRITE));
 }
 
 static void
@@ -417,6 +446,7 @@ champlain_memphis_map_source_init (ChamplainMemphisMapSource *self)
   priv->thpool = NULL;
   priv->session_id = g_strdup ("default");
   priv->no_map_data = TRUE;
+  priv->persistent_cache = FALSE;
 }
 
 ChamplainMemphisMapSource *
@@ -489,7 +519,8 @@ champlain_memphis_map_source_load_rules (
     memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
-  champlain_memphis_map_source_delete_session_cache (self);
+  if (!priv->persistent_cache)
+    champlain_memphis_map_source_delete_session_cache (self);
 }
 
 void
@@ -587,6 +618,9 @@ champlain_memphis_map_source_set_background_color (
   memphis_rule_set_set_bg_color (priv->rules, (gint16) (color.red >> 8),
       (gint16) (color.green >> 8), (gint16) (color.blue >> 8));
   g_static_rw_lock_writer_unlock (&MemphisLock);
+
+  if (!priv->persistent_cache)
+    champlain_memphis_map_source_delete_session_cache (self);
 }
 
 void
@@ -601,6 +635,9 @@ champlain_memphis_map_source_set_rule (ChamplainMemphisMapSource *self,
   g_static_rw_lock_writer_lock (&MemphisLock);
   memphis_rule_set_set_rule (priv->rules, rule);
   g_static_rw_lock_writer_unlock (&MemphisLock);
+
+  if (!priv->persistent_cache)
+    champlain_memphis_map_source_delete_session_cache (self);
 }
 
 MemphisRule *
