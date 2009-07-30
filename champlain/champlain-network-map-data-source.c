@@ -258,12 +258,9 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
 
   priv->map = map;
 
-  // TODO: memphis needs a function to get the bbox
   bbox = champlain_bounding_box_new ();
-  bbox->left = priv->map->map->minlat;
-  bbox->top = priv->map->map->minlon;
-  bbox->right = priv->map->map->maxlat;
-  bbox->bottom = priv->map->map->maxlon;
+  memhis_map_get_bounding_box (priv->map, &bbox->left, &bbox->top,
+      &bbox->right, &bbox->bottom);
   g_object_set (G_OBJECT (self), "bounding-box", bbox, NULL);
   champlain_bounding_box_free (bbox);
 
