@@ -155,6 +155,7 @@ champlain_memphis_map_source_finalize (GObject *object)
 
 static void
 map_data_changed_cb (ChamplainMapDataSource *map_data_source,
+    GParamSpec *gobject,
     ChamplainMemphisMapSource *map_source)
 {
   g_assert (CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source) &&
@@ -162,6 +163,11 @@ map_data_changed_cb (ChamplainMapDataSource *map_data_source,
 
   MemphisMap *map;
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(map_source);
+  ChamplainState state;
+
+  g_object_get (G_OBJECT (map_data_source), "state", &state, NULL);
+  if (state != CHAMPLAIN_STATE_DONE)
+    return;
 
   map = champlain_map_data_source_get_map_data (map_data_source);
   if (map == NULL)
@@ -438,7 +444,7 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
   priv = GET_PRIVATE(source);
   priv->map_data_source = g_object_ref (map_data_source);
 
-  g_signal_connect (priv->map_data_source, "map-data-changed",
+  g_signal_connect (priv->map_data_source, "notify::state",
       G_CALLBACK (map_data_changed_cb), source);
 
   priv->rules = memphis_rule_set_new ();
