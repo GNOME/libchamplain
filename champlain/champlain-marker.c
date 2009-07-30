@@ -579,7 +579,6 @@ draw_marker (ChamplainMarker *marker)
       }
 
       label = CLUTTER_TEXT (priv->text_actor);
-      clutter_text_set_use_markup (label, priv->use_markup);
       clutter_text_set_font_name (label, priv->font_name);
       clutter_text_set_text (label, priv->text);
       clutter_text_set_line_alignment (label, priv->alignment);
@@ -587,6 +586,7 @@ draw_marker (ChamplainMarker *marker)
       clutter_text_set_line_wrap_mode (label, priv->wrap_mode);
       clutter_text_set_ellipsize (label, priv->ellipsize);
       clutter_text_set_attributes (label, priv->attributes);
+      clutter_text_set_use_markup (label, priv->use_markup);
 
       height = clutter_actor_get_height (priv->text_actor);
       if (priv->image != NULL)
