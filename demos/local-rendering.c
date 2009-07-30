@@ -189,7 +189,6 @@ rule_apply_cb (GtkWidget *widget, ChamplainMemphisMapSource *source)
     }
 
   champlain_memphis_map_source_set_rule (source, rule);
-  champlain_memphis_map_source_delete_session_cache (source);
 }
 
 GtkWidget *
@@ -396,8 +395,6 @@ bg_color_set_cb (GtkColorButton *widget, ChamplainView *view)
           CHAMPLAIN_MEMPHIS_MAP_SOURCE (source),
           str);
       g_free (str);
-      champlain_memphis_map_source_delete_session_cache (
-          CHAMPLAIN_MEMPHIS_MAP_SOURCE (source));
     }
 }
 
