@@ -22,7 +22,7 @@
  *  ChamplainMemphisMapSource.
  *
  * This map data source downloads the map data from an OpenStreetMap API
- * server. It support protocol version 0.5 and 0.6.
+ * server. It supports protocol version 0.5 and 0.6.
  *
  * http://wiki.openstreetmap.org/wiki/API
  *
