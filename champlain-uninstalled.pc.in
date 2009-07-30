@@ -8,4 +8,4 @@ Description: Map View for Clutter
 Version: @VERSION@
 Libs: ${abs_top_builddir}/champlain/libchamplain-@API_VERSION@.la
 Cflags: -I${abs_top_srcdir} -I${abs_top_builddir}
-Requires: gobject-2.0 clutter-0.9
+Requires: gobject-2.0 clutter-1.0
