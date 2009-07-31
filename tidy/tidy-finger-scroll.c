@@ -424,22 +424,23 @@ button_release_event_cb (ClutterActor *actor,
             time_diff = release_time.tv_usec +
                         (G_USEC_PER_SEC - motion_time.tv_usec);
           
-          /* Work out the fraction of 1/60th of a second that has elapsed */
-          frac = clutter_qdivx (CLUTTER_FLOAT_TO_FIXED (time_diff/1000.0),
-                                CLUTTER_FLOAT_TO_FIXED (1000.0/60.0));
-          
-          /* On a macbook that's running Ubuntu 9.04 sometimes frac is 0 and
-             this causes a division by 0. Here we try to avoid that.
+          /* On a macbook that's running Ubuntu 9.04 sometimes 'time_diff' is 0
+             and this causes a division by 0 when computing 'frac'. This check
+             avoids this error.
            */
-          if (frac == 0)
+          if (time_diff == 0)
             {
-                g_print ("Caught a division by 0 (%d / %d).\n",
+                g_print ("Preventing a division by 0 (%d / %d).\n",
                     CLUTTER_FLOAT_TO_FIXED (time_diff/1000.0),
                     CLUTTER_FLOAT_TO_FIXED (1000.0/60.0)
                 );
                 clutter_event_put ((ClutterEvent *)event);
                 return TRUE;
             }
+
+          /* Work out the fraction of 1/60th of a second that has elapsed */
+          frac = clutter_qdivx (CLUTTER_FLOAT_TO_FIXED (time_diff/1000.0),
+                                CLUTTER_FLOAT_TO_FIXED (1000.0/60.0));
           /* See how many units to move in 1/60th of a second */
           priv->dx = CLUTTER_UNITS_FROM_FIXED(clutter_qdivx (
                      CLUTTER_UNITS_TO_FIXED(x_origin - x), frac));
