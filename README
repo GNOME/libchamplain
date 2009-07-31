@@ -1,0 +1,48 @@
+libchamplain 0.3.4 README
+=========================
+
+libchamplain is a Clutter based widget to display rich, eye-candy and
+interactive maps.
+
+libchamplain requires:
+
+  * Clutter >= 0.8
+  * Clutter-cairo >= 0.8
+  * Glib >= 2.10
+  * Cairo >= 1.4
+  * Gio >= 2.16
+  * Gdk >= 2.10
+  * Sqlite >= 3.0
+
+If you are building libchamplain-gtk, you will also need:
+
+  * Gtk >= 2.14
+  * Clutter-Gtk >= 0.8
+
+If you are building the Python bindings, you will also need:
+
+  * PyGtk >= 2.0
+  * PyGobject >= 2.0
+  * PyClutter >= 0.8
+
+If you are building the C# bindings, you will also need:
+
+  * gacutil
+  * GAPI >= 2.12
+  * GAPI-codegen
+  * GAPI-fixup
+  * Gtk-sharp >= 2.12
+  * Clutter-sharp >= 0.8
+  * Clutter-Gtk-sharp >= 0.8
+
+The official website is:
+   http://projects.gnome.org/libchamplain
+
+The official mailing list archive is:
+   http://mail.gnome.org/mailman/listinfo/libchamplain-list
+
+New bug page on Bugzilla:
+   http://bugzilla.gnome.org/simple-bug-guide.cgi?product=libchamplain
+
+libchamplain is licensed under the terms of the GNU Lesser General Public
+License, version 2.1 or (at your option) later.
