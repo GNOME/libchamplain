@@ -16,6 +16,17 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-local-map-data-source
+ * @short_description: ChamplainLocalMapDataSource loads local data for
+ *  ChamplainMemphisMapSource.
+ *
+ * This map data source loads local <ulink role="online-location"
+ *  url="http://wiki.openstreetmap.org/wiki/.osm">
+ * OpenStreetMap XML data files</ulink> (*.osm).
+ *
+ */
+
 #include "champlain-local-map-data-source.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
@@ -117,6 +128,15 @@ champlain_local_map_data_source_new (void)
   return g_object_new (CHAMPLAIN_TYPE_LOCAL_MAP_DATA_SOURCE, NULL);
 }
 
+/**
+ * champlain_local_map_data_source_load_map_data:
+ * @data_source: a #ChamplainLocalMapDataSource
+ * @map_path: a path to a map data file
+ *
+ * Loads the OpenStreetMap XML file at the given path.
+ *
+ * Since: 0.6
+ */
 void
 champlain_local_map_data_source_load_map_data (ChamplainLocalMapDataSource *self,
     const gchar *map_path)

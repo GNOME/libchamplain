@@ -16,6 +16,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-map-data-source
+ * @short_description: Base class for map data sources.
+ *
+ * ChamplainMapDataSource provides the interface for
+ *  #ChamplainMemphisMapSource to aquire map data.
+ *
+ */
+
 #include "champlain-map-data-source.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
@@ -133,7 +142,7 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
   klass->get_map_data = champlain_map_data_source_real_get_map_data;
 
   /**
-  * ChamplainMapDataSource:Bounding-box:
+  * ChamplainMapDataSource:bounding-box:
   *
   * The bounding box of the area that contains map data.
   *
@@ -148,7 +157,7 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
         G_PARAM_READWRITE));
 
   /**
-  * ChamplainMapDataSource:state
+  * ChamplainMapDataSource:state:
   *
   * The map data source's state. Useful to know if the data source is loading
   * or not.
@@ -179,12 +188,21 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
   priv->state = CHAMPLAIN_STATE_INIT;
 }
 
+// TODO: should this class be instantiable?
 ChamplainMapDataSource *
 champlain_map_data_source_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_MAP_DATA_SOURCE, NULL);
 }
 
+/**
+ * champlain_map_data_source_get_map_data:
+ * @data_source: a #ChamplainMapDataSource
+ *
+ * Returns the #MemphisMap of the data source.
+ *
+ * Since: 0.6
+ */
 MemphisMap *
 champlain_map_data_source_get_map_data (ChamplainMapDataSource *self)
 {
