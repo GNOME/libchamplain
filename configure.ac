@@ -104,7 +104,7 @@ if test x$enable_gtk = xyes; then
   AC_SUBST(GTK_DEPS_CFLAGS)
   AC_SUBST(GTK_DEPS_LIBS)
   PKG_CHECK_MODULES(GTK_DEPS,
-    [   gtk+-2.0 >= 2.2
+    [   gtk+-2.0 >= 2.14
         clutter-gtk-0.8 >= 0.8
     ]
   )
