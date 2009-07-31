@@ -38,7 +38,8 @@ pychamplain.c: pychamplain.override pychamplain.defs
 
 EXTRA_DIST =			\
 	pychamplain.override	\
-	pychamplain.defs
+	pychamplain.defs	\
+	pychamplain.h
 
 CLEANFILES = $(BUILT_SOURCES)
 
