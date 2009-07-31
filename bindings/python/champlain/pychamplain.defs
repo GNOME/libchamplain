@@ -77,6 +77,16 @@
   (gtype-id "CHAMPLAIN_TYPE_ZOOM_LEVEL")
 )
 
+(define-boxed Point
+  (in-module "Champlain")
+  (c-name "ChamplainPoint")
+  (gtype-id "CHAMPLAIN_TYPE_POINT")
+  (fields
+    '("double" "lat")
+    '("double" "lon")
+  )   
+)
+
 ;; Enumerations and flags ...
 
 (define-enum ScrollMode
@@ -499,6 +509,15 @@
   )
 )
 
+(define-method remove_point
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_remove_point")
+  (return-type "none")
+  (parameters
+    '("ChamplainPoint*" "point")
+  )
+)
+
 (define-method clear_points
   (of-object "ChamplainPolygon")
   (c-name "champlain_polygon_clear_points")
@@ -642,6 +661,36 @@
   (c-name "champlain_layer_new")
   (is-constructor-of "ChamplainLayer")
   (return-type "ChamplainLayer*")
+)
+
+(define-method show
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_show")
+  (return-type "none")
+)
+
+(define-method hide
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_hide")
+  (return-type "none")
+)
+
+(define-method add_marker
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_add_marker")
+  (return-type "none")
+  (parameters
+    '("ChamplainBaseMarker*" "marker")
+  )
+)
+
+(define-method remove_marker
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_remove_marker")
+  (return-type "none")
+  (parameters
+    '("ChamplainBaseMarker*" "marker")
+  )
 )
 
 
@@ -1186,6 +1235,14 @@
   (return-type "gboolean")
 )
 
+(define-function marker_set_highlight_color
+  (c-name "champlain_marker_set_highlight_color")
+  (return-type "none")
+  (parameters
+    '("ClutterColor*" "color")
+  )
+)
+
 
 
 ;; From champlain-base-marker.h
@@ -1209,6 +1266,21 @@
     '("gdouble" "longitude")
     '("gdouble" "latitude")
   )
+)
+
+(define-method set_highlighted
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_set_highlighted")
+  (return-type "none")
+  (parameters
+    '("gboolean" "value")
+  )
+)
+
+(define-method get_highlighted
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_get_highlighted")
+  (return-type "gboolean")
 )
 
 
@@ -1300,13 +1372,13 @@
 (define-method get_modified_time_string
   (of-object "ChamplainTile")
   (c-name "champlain_tile_get_modified_time_string")
-  (return-type "char*")
+  (return-type "gchar*")
 )
 
 (define-method get_etag
   (of-object "ChamplainTile")
   (c-name "champlain_tile_get_etag")
-  (return-type "const-char*")
+  (return-type "const-gchar*")
 )
 
 (define-method set_x
@@ -1396,7 +1468,7 @@
   (c-name "champlain_tile_set_modified_time")
   (return-type "none")
   (parameters
-    '("GTimeVal*" "time")
+    '("const-GTimeVal*" "time")
   )
 )
 

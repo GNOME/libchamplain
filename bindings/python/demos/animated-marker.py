@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 #This is a demonstration of the libchamplain python binding.
 #It will display a blue "pulsating" dot on a given position on the map

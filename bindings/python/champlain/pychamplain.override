@@ -116,60 +116,42 @@ _wrap_champlain_map_source_factory_register(PyGObject *self, PyObject *args, PyO
         (gpointer)pyuser_data));
 }
 %%
-override champlain_polygon_append_point kwargs
-static PyObject *
-_wrap_champlain_polygon_append_point(PyGObject *self, PyObject *args) 
-{
-    double lat, lon; 
-    
-    if (!PyArg_ParseTuple(args, "dd:ChamplainPolygon.append_point", &lat, &lon))
-        return NULL;
-    champlain_polygon_append_point(CHAMPLAIN_POLYGON(self->obj), lat, lon);
-    return Py_BuildValue("(dd)", lat, lon);
-}
-%%
-%%
-override champlain_polygon_insert_point kwargs
-static PyObject *
-_wrap_champlain_polygon_insert_point(PyGObject *self, PyObject *args) 
-{
-    double lat, lon; 
-    int pos;
-    
-    if (!PyArg_ParseTuple(args, "ddi:ChamplainPolygon.insert_point", &lat, &lon, &pos))
-        return NULL;
-    champlain_polygon_insert_point(CHAMPLAIN_POLYGON(self->obj), lat, lon, pos);
-    return Py_BuildValue("(dd)", lat, lon);
-}
-%%
-%%
 override champlain_polygon_get_points kwargs
 static PyObject *
 _wrap_champlain_polygon_get_points(PyGObject *self, PyObject *args) 
 {
     GList *iter, *list = champlain_polygon_get_points(CHAMPLAIN_POLYGON(self->obj));
     PyObject *ret = PyList_New(0);
+    PyObject *pypoint;
 
 	for(iter = list; iter != NULL; iter = iter->next) {
 		ChamplainPoint *point = (ChamplainPoint *) iter->data;
-		PyObject *item = Py_BuildValue("(dd)", point->lat, point->lon);
-		PyList_Append(ret, item);
-		Py_DECREF(item);
+        pypoint = pyg_boxed_new(CHAMPLAIN_TYPE_POINT, point, TRUE, TRUE);
+		PyList_Append(ret, pypoint);
+		Py_DECREF(pypoint);
     }
     return ret;
 }
 %%
 override champlain_view_get_coords_from_event kwargs
 static PyObject *
-_wrap_champlain_view_get_coords_from_event(PyGObject *self, PyObject *args) 
+_wrap_champlain_view_get_coords_from_event(PyGObject *self, PyObject *args, PyObject *kargs) 
 {
-    double lat, lon;
+    static char *kwlist[] = {"event", NULL};
+    gdouble lat, lon;
     PyObject *pyevent;
+    ClutterEvent *event;
 
-    if (!PyArg_ParseTuple(args, "O:ChamplainView.get_coords_from_event", &pyevent))
+    if (!PyArg_ParseTupleAndKeywords(args, kargs, "O:ChamplainView.get_coords_from_event", kwlist, &pyevent))
         return NULL;
 
-    ClutterEvent *event = pyg_boxed_get (pyevent, ClutterEvent);
+    if (pyg_boxed_check(pyevent, CLUTTER_TYPE_EVENT))
+        event = pyg_boxed_get(pyevent, ClutterEvent);
+    else {
+        PyErr_SetString(PyExc_TypeError, "event should be a ClutterEvent");
+        return NULL;
+    }
+ 
     champlain_view_get_coords_from_event(CHAMPLAIN_VIEW(self->obj), event, &lat, &lon);
     return Py_BuildValue("(dd)", lat, lon);
 }
@@ -179,7 +161,7 @@ static PyObject *
 _wrap_champlain_view_get_coords_at(PyGObject *self, PyObject *args) 
 {
     guint x, y;
-    double lat, lon;
+    gdouble lat, lon;
 
     if (!PyArg_ParseTuple(args, "ii:ChamplainView.get_coords_at", &x, &y))
         return NULL;

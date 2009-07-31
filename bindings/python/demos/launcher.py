@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import gobject
 import clutter
 import champlain
+
+from markers import create_marker_layer
 
 PADDING = 10
 
@@ -43,8 +47,8 @@ def main():
     actor = champlain.View()
     actor.set_size(800, 600)
     actor.set_property('scroll-mode', champlain.SCROLL_MODE_KINETIC)
-    actor.set_property('zoom-level', 12)
     actor.center_on(45.466, -73.75)
+    actor.set_property('zoom-level', 12)
 
     # Create the buttons
     buttons = clutter.Group()
@@ -65,6 +69,10 @@ def main():
     button.connect('button-release-event', zoom_out, actor)
     buttons.add(button)
     
+    # Create the markers and marker layer
+    layer = create_marker_layer(actor)
+    actor.add_layer(layer)
+ 
     stage = clutter.stage_get_default()
     stage.set_size(800, 600)
     stage.add(actor)
