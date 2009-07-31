@@ -434,118 +434,118 @@ button_release_event_cb (ClutterActor *actor,
                     CLUTTER_FLOAT_TO_FIXED (time_diff/1000.0),
                     CLUTTER_FLOAT_TO_FIXED (1000.0/60.0)
                 );
-                clutter_event_put ((ClutterEvent *)event);
-                return TRUE;
-            }
-
-          /* Work out the fraction of 1/60th of a second that has elapsed */
-          frac = clutter_qdivx (CLUTTER_FLOAT_TO_FIXED (time_diff/1000.0),
-                                CLUTTER_FLOAT_TO_FIXED (1000.0/60.0));
-          /* See how many units to move in 1/60th of a second */
-          priv->dx = CLUTTER_UNITS_FROM_FIXED(clutter_qdivx (
-                     CLUTTER_UNITS_TO_FIXED(x_origin - x), frac));
-          priv->dy = CLUTTER_UNITS_FROM_FIXED(clutter_qdivx (
-                     CLUTTER_UNITS_TO_FIXED(y_origin - y), frac));
-          
-          /* Get adjustments to do step-increment snapping */
-          tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (child),
-                                           &hadjust,
-                                           &vadjust);
-
-          if (ABS(CLUTTER_UNITS_TO_INT(priv->dx)) > 1 ||
-              ABS(CLUTTER_UNITS_TO_INT(priv->dy)) > 1)
-            {
-              gdouble value, lower, step_increment, d, a, x, y, n;
-              
-              /* TODO: Convert this all to fixed point? */
-              
-              /* We want n, where x / y^n < z,
-               * x = Distance to move per frame
-               * y = Deceleration rate
-               * z = maximum distance from target
-               *
-               * Rearrange to n = log (x / z) / log (y)
-               * To simplify, z = 1, so n = log (x) / log (y)
-               *
-               * As z = 1, this will cause stops to be slightly abrupt - 
-               * add a constant 15 frames to compensate.
-               */
-              x = CLUTTER_FIXED_TO_FLOAT (MAX(ABS(priv->dx), ABS(priv->dy)));
-              y = CLUTTER_FIXED_TO_FLOAT (priv->decel_rate);
-              n = logf (x) / logf (y) + 15.0;
-
-              /* Now we have n, adjust dx/dy so that we finish on a step
-               * boundary.
-               *
-               * Distance moved, using the above variable names:
-               *
-               * d = x + x/y + x/y^2 + ... + x/y^n
-               *
-               * Using geometric series,
-               *
-               * d = (1 - 1/y^(n+1))/(1 - 1/y)*x
-               * 
-               * Let a = (1 - 1/y^(n+1))/(1 - 1/y),
-               *
-               * d = a * x
-               *
-               * Find d and find its nearest page boundary, then solve for x
-               *
-               * x = d / a
-               */
-              
-              /* Get adjustments, work out y^n */
-              a = (1.0 - 1.0 / pow (y, n + 1)) / (1.0 - 1.0 / y);
-
-              /* Solving for dx */
-              d = a * CLUTTER_UNITS_TO_FLOAT (priv->dx);
-              tidy_adjustment_get_values (hadjust, &value, &lower, NULL,
-                                          &step_increment, NULL, NULL);
-              d = ((rint (((value + d) - lower) / step_increment) *
-                    step_increment) + lower) - value;
-              priv->dx = CLUTTER_UNITS_FROM_FLOAT (d / a);
-
-              /* Solving for dy */
-              d = a * CLUTTER_UNITS_TO_FLOAT (priv->dy);
-              tidy_adjustment_get_values (vadjust, &value, &lower, NULL,
-                                          &step_increment, NULL, NULL);
-              d = ((rint (((value + d) - lower) / step_increment) *
-                    step_increment) + lower) - value;
-              priv->dy = CLUTTER_UNITS_FROM_FLOAT (d / a);
-              
-              priv->deceleration_timeline = clutter_timeline_new ((gint)n, 60);
             }
           else
             {
-              gdouble value, lower, step_increment, d, a, y;
+              /* Work out the fraction of 1/60th of a second that has elapsed */
+              frac = clutter_qdivx (CLUTTER_FLOAT_TO_FIXED (time_diff/1000.0),
+                                    CLUTTER_FLOAT_TO_FIXED (1000.0/60.0));
+              /* See how many units to move in 1/60th of a second */
+              priv->dx = CLUTTER_UNITS_FROM_FIXED(clutter_qdivx (
+                         CLUTTER_UNITS_TO_FIXED(x_origin - x), frac));
+              priv->dy = CLUTTER_UNITS_FROM_FIXED(clutter_qdivx (
+                         CLUTTER_UNITS_TO_FIXED(y_origin - y), frac));
               
-              /* Start a short effects timeline to snap to the nearest step 
-               * boundary (see equations above)
-               */
-              y = CLUTTER_FIXED_TO_FLOAT (priv->decel_rate);
-              a = (1.0 - 1.0 / pow (y, 4 + 1)) / (1.0 - 1.0 / y);
-              
-              tidy_adjustment_get_values (hadjust, &value, &lower, NULL,
-                                          &step_increment, NULL, NULL);
-              d = ((rint ((value - lower) / step_increment) *
-                    step_increment) + lower) - value;
-              priv->dx = CLUTTER_UNITS_FROM_FLOAT (d / a);
-              
-              tidy_adjustment_get_values (vadjust, &value, &lower, NULL,
-                                          &step_increment, NULL, NULL);
-              d = ((rint ((value - lower) / step_increment) *
-                    step_increment) + lower) - value;
-              priv->dy = CLUTTER_UNITS_FROM_FLOAT (d / a);
-              
-              priv->deceleration_timeline = clutter_timeline_new (4, 60);
-            }
+              /* Get adjustments to do step-increment snapping */
+              tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (child),
+                                               &hadjust,
+                                               &vadjust);
 
-          g_signal_connect (priv->deceleration_timeline, "new_frame",
-                            G_CALLBACK (deceleration_new_frame_cb), scroll);
-          g_signal_connect (priv->deceleration_timeline, "completed",
-                            G_CALLBACK (deceleration_completed_cb), scroll);
-          clutter_timeline_start (priv->deceleration_timeline);
-          decelerating = TRUE;
+              if (ABS(CLUTTER_UNITS_TO_INT(priv->dx)) > 1 ||
+                  ABS(CLUTTER_UNITS_TO_INT(priv->dy)) > 1)
+                {
+                  gdouble value, lower, step_increment, d, a, x, y, n;
+                  
+                  /* TODO: Convert this all to fixed point? */
+                  
+                  /* We want n, where x / y    n < z,
+                   * x = Distance to move per frame
+                   * y = Deceleration rate
+                   * z = maximum distance from target
+                   *
+                   * Rearrange to n = log (x / z) / log (y)
+                   * To simplify, z = 1, so n = log (x) / log (y)
+                   *
+                   * As z = 1, this will cause stops to be slightly abrupt - 
+                   * add a constant 15 frames to compensate.
+                   */
+                  x = CLUTTER_FIXED_TO_FLOAT (MAX(ABS(priv->dx), ABS(priv->dy)));
+                  y = CLUTTER_FIXED_TO_FLOAT (priv->decel_rate);
+                  n = logf (x) / logf (y) + 15.0;
+
+                  /* Now we have n, adjust dx/dy so that we finish on a step
+                   * boundary.
+                   *
+                   * Distance moved, using the above variable names:
+                   *
+                   * d = x + x/y + x/y    2 + ... + x/y    n
+                   *
+                   * Using geometric series,
+                   *
+                   * d = (1 - 1/y    (n+1))/(1 - 1/y)*x
+                   * 
+                   * Let a = (1 - 1/y    (n+1))/(1 - 1/y),
+                   *
+                   * d = a * x
+                   *
+                   * Find d and find its nearest page boundary, then solve for x
+                   *
+                   * x = d / a
+                   */
+                  
+                  /* Get adjustments, work out y    n */
+                  a = (1.0 - 1.0 / pow (y, n + 1)) / (1.0 - 1.0 / y);
+
+                  /* Solving for dx */
+                  d = a * CLUTTER_UNITS_TO_FLOAT (priv->dx);
+                  tidy_adjustment_get_values (hadjust, &value, &lower, NULL,
+                                              &step_increment, NULL, NULL);
+                  d = ((rint (((value + d) - lower) / step_increment) *
+                        step_increment) + lower) - value;
+                  priv->dx = CLUTTER_UNITS_FROM_FLOAT (d / a);
+
+                  /* Solving for dy */
+                  d = a * CLUTTER_UNITS_TO_FLOAT (priv->dy);
+                  tidy_adjustment_get_values (vadjust, &value, &lower, NULL,
+                                              &step_increment, NULL, NULL);
+                  d = ((rint (((value + d) - lower) / step_increment) *
+                        step_increment) + lower) - value;
+                  priv->dy = CLUTTER_UNITS_FROM_FLOAT (d / a);
+                  
+                  priv->deceleration_timeline = clutter_timeline_new ((gint)n, 60);
+                }
+              else
+                {
+                  gdouble value, lower, step_increment, d, a, y;
+                  
+                  /* Start a short effects timeline to snap to the nearest step 
+                   * boundary (see equations above)
+                   */
+                  y = CLUTTER_FIXED_TO_FLOAT (priv->decel_rate);
+                  a = (1.0 - 1.0 / pow (y, 4 + 1)) / (1.0 - 1.0 / y);
+                  
+                  tidy_adjustment_get_values (hadjust, &value, &lower, NULL,
+                                              &step_increment, NULL, NULL);
+                  d = ((rint ((value - lower) / step_increment) *
+                        step_increment) + lower) - value;
+                  priv->dx = CLUTTER_UNITS_FROM_FLOAT (d / a);
+                  
+                  tidy_adjustment_get_values (vadjust, &value, &lower, NULL,
+                                              &step_increment, NULL, NULL);
+                  d = ((rint ((value - lower) / step_increment) *
+                        step_increment) + lower) - value;
+                  priv->dy = CLUTTER_UNITS_FROM_FLOAT (d / a);
+                  
+                  priv->deceleration_timeline = clutter_timeline_new (4, 60);
+                }
+
+              g_signal_connect (priv->deceleration_timeline, "new_frame",
+                                G_CALLBACK (deceleration_new_frame_cb), scroll);
+              g_signal_connect (priv->deceleration_timeline, "completed",
+                                G_CALLBACK (deceleration_completed_cb), scroll);
+              clutter_timeline_start (priv->deceleration_timeline);
+              decelerating = TRUE;
+            }
         }
     }
 
