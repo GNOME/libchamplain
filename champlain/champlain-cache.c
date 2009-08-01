@@ -27,6 +27,9 @@
  * Tiles most frequently asked gain in "popularity".  This popularity will be taken
  * into account when purging the cache.
  *
+ * The use of a session name is optional. It allows you to manage a set of
+ * cached tiles explicit. I.e. delete them on demand.
+ *
  * Unless you are implementing your own ChamplainMapSource, the only function you
  * should need are #champlain_cache_purge and #champlain_cache_purge_on_idle.
  */
@@ -744,12 +747,12 @@ champlain_cache_purge (ChamplainCache *self)
 }
 
 /**
- * champlain_cache_delete:
+ * champlain_cache_delete_session:
  * @self: the #ChamplainCache
- * @source: a #ChamplainMapSource
+ * @source: the #ChamplainMapSource
  * @session_id: the name of the session
  *
- * Deletes all tiles of a map source session.
+ * Deletes all tiles of the session @session_id in the cache.
  *
  * Since: 0.6
  */
@@ -793,8 +796,10 @@ champlain_cache_delete_session (ChamplainCache *self,
  * @tile: the #ChamplainTile to cache
  * @session_id: the name of the session or NULL
  *
- * Returns the path and filename of the cached tile image.
- * The session parameter is optional.
+ * Allocates a new string of the tile's path. Use g_free() if you no
+ * longer need it. The parameter @session_id is optional.
+ *
+ * Returns the path of the cached tile image in the cache.
  *
  * Since: 0.6
  */
