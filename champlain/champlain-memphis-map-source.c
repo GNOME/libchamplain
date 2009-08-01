@@ -20,8 +20,23 @@
  * SECTION:champlain-memphis-map-source
  * @short_description: A map source that draws tiles locally
  *
- * TODO
+ * The #ChamplainMemphisMapSource uses the rendering library
+ * <ulink role="online-location" url="https://trac.openstreetmap.ch/trac/memphis/">
+ * LibMemphis</ulink> to draw <ulink role="online-location" url="http://www.openstreetmap.org/">
+ * OpenStreetMap</ulink> data. Tiles are rendered in separate threads.
  *
+ * The map data is supplied by a #ChamplainMapDataSource.
+ * #ChamplainLocalMapDataSource loads data from a local OSM file.
+ * #ChamplainNetworkMapDataSource uses the OSM API to download data chunks.
+ *
+ * The output of the renderer can be configured with a Memphis rules XML file.
+ * (TODO: link to the specification)
+ * Once loaded, rules can be queried and edited.
+ *
+ * Rendered tiles are cached. The cache is deleted if the map data or rules
+ * are changed. This is the default behaviour, but it can be disabled with the
+ * #ChamplainMemphisMapSource:persistent-cache property. A persistent cache
+ * has to be managed by the client application.
  */
 
 #include "champlain-memphis-map-source.h"
@@ -388,7 +403,7 @@ champlain_memphis_map_source_class_init (ChamplainMemphisMapSourceClass *klass)
   map_source_class->fill_tile = fill_tile;
 
   /**
-  * ChamplainMemphisMapSource:MapDataSource:
+  * ChamplainMemphisMapSource:map-data-source:
   *
   * The data source of the renderer
   *
@@ -403,7 +418,7 @@ champlain_memphis_map_source_class_init (ChamplainMemphisMapSourceClass *klass)
         G_PARAM_READWRITE));
 
   /**
-  * ChamplainMemphisMapSource:Session:
+  * ChamplainMemphisMapSource:session:
   *
   * The session id of the tile cache
   *
@@ -422,7 +437,7 @@ champlain_memphis_map_source_class_init (ChamplainMemphisMapSourceClass *klass)
   *
   * If the session cache should be deleted if data or rules are changed.
   * If enabled the client has to manage the cache explicitly with
-  * champlain_memphis_map_source_delete_session_cache.
+  * champlain_memphis_map_source_delete_session_cache().
   *
   * Since: 0.6
   */
@@ -449,6 +464,15 @@ champlain_memphis_map_source_init (ChamplainMemphisMapSource *self)
   priv->persistent_cache = FALSE;
 }
 
+/**
+ * champlain_memphis_map_source_new_full:
+ * @desc: a #ChamplainMapSourceDesc
+ * @map_data_source: a #ChamplainMapDataSource
+ *
+ * Returns: a new ChamplainMemphisMapSource.
+ *
+ * Since: 0.6
+ */
 ChamplainMemphisMapSource *
 champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
     ChamplainMapDataSource *map_data_source)
@@ -503,6 +527,15 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
   return source;
 }
 
+/**
+ * champlain_memphis_map_source_load_rules:
+ * @map_source: a #ChamplainMemphisMapSource
+ * @rules_path: a path to a rules file
+ *
+ * Loads a Memphis rules file.
+ *
+ * Since: 0.6
+ */
 void
 champlain_memphis_map_source_load_rules (
     ChamplainMemphisMapSource *self,
@@ -523,6 +556,15 @@ champlain_memphis_map_source_load_rules (
     champlain_memphis_map_source_delete_session_cache (self);
 }
 
+/**
+ * champlain_memphis_map_source_set_map_data_source:
+ * @map_source: a #ChamplainMemphisMapSource
+ * @map_data_source: a #ChamplainMapDataSource
+ *
+ * Sets the map data source.
+ *
+ * Since: 0.6
+ */
 void
 champlain_memphis_map_source_set_map_data_source (
     ChamplainMemphisMapSource *self,
@@ -542,6 +584,14 @@ champlain_memphis_map_source_set_map_data_source (
   g_static_rw_lock_writer_unlock (&MemphisLock);
 }
 
+/**
+ * champlain_memphis_map_source_get_map_data_source:
+ * @map_source: a #ChamplainMemphisMapSource
+ *
+ * Returns the #ChamplainMapDataSource.
+ *
+ * Since: 0.6
+ */
 ChamplainMapDataSource *
 champlain_memphis_map_source_get_map_data_source (
     ChamplainMemphisMapSource *self)
@@ -552,6 +602,14 @@ champlain_memphis_map_source_get_map_data_source (
   return priv->map_data_source;
 }
 
+/**
+ * champlain_memphis_map_source_delete_session_cache:
+ * @map_source: a #ChamplainMemphisMapSource
+ *
+ * Deletes all cached tiles of the current session.
+ *
+ * Since: 0.6
+ */
 void
 champlain_memphis_map_source_delete_session_cache (ChamplainMemphisMapSource *self)
 {
@@ -561,6 +619,15 @@ champlain_memphis_map_source_delete_session_cache (ChamplainMemphisMapSource *se
       self, NULL);
 }
 
+/**
+ * champlain_memphis_map_source_set_session_id:
+ * @map_source: a #ChamplainMemphisMapSource
+ * @session_id: a session id string
+ *
+ * Sets the session id of the cache.
+ *
+ * Since: 0.6
+ */
 void
 champlain_memphis_map_source_set_session_id (ChamplainMemphisMapSource *self,
     const gchar *session_id)
@@ -576,6 +643,14 @@ champlain_memphis_map_source_set_session_id (ChamplainMemphisMapSource *self,
   priv->session_id = g_strdup (session_id);
 }
 
+/**
+ * champlain_memphis_map_source_get_session_id:
+ * @map_source: a #ChamplainMemphisMapSource
+ *
+ * Returns the session id string.
+ *
+ * Since: 0.6
+ */
 const gchar *
 champlain_memphis_map_source_get_session_id (ChamplainMemphisMapSource *self)
 {
@@ -585,6 +660,18 @@ champlain_memphis_map_source_get_session_id (ChamplainMemphisMapSource *self)
   return priv->session_id;
 }
 
+/**
+ * champlain_memphis_map_source_get_background_color:
+ * @map_source: a #ChamplainMemphisMapSource
+ *
+ * Returns the background color of the map as a textual specification of
+ * the color in the hexadecimal form &num;rrggbb, where r, g and b are hex
+ * digits representing the red, green and blue components respectively.
+ *
+ * Returns a newly-allocated text string.
+ *
+ * Since: 0.6
+ */
 gchar * champlain_memphis_map_source_get_background_color (
     ChamplainMemphisMapSource *self)
 {
@@ -602,6 +689,17 @@ gchar * champlain_memphis_map_source_get_background_color (
   return color;
 }
 
+/**
+ * champlain_memphis_map_source_set_background_color:
+ * @map_source: a #ChamplainMemphisMapSource
+ * @color_spec: a color string
+ *
+ * Sets the background color of the map as a textual specification of
+ * the color in the hexadecimal form &num;rrggbb, where r, g and b are hex
+ * digits representing the red, green and blue components respectively.
+ *
+ * Since: 0.6
+ */
 void
 champlain_memphis_map_source_set_background_color (
     ChamplainMemphisMapSource *self,
@@ -623,6 +721,16 @@ champlain_memphis_map_source_set_background_color (
     champlain_memphis_map_source_delete_session_cache (self);
 }
 
+/**
+ * champlain_memphis_map_source_set_rule:
+ * @map_source: a #ChamplainMemphisMapSource
+ * @rule: a #MemphisRule
+ *
+ * Edits or adds a #MemphisRule to the rules-set. New rules are appended
+ *  to the list.
+ *
+ * Since: 0.6
+ */
 void
 champlain_memphis_map_source_set_rule (ChamplainMemphisMapSource *self,
     MemphisRule *rule)
@@ -640,6 +748,15 @@ champlain_memphis_map_source_set_rule (ChamplainMemphisMapSource *self,
     champlain_memphis_map_source_delete_session_cache (self);
 }
 
+/**
+ * champlain_memphis_map_source_get_rule:
+ * @map_source: a #ChamplainMemphisMapSource
+ * @id: an id string
+ *
+ * Returns the requested #MemphisRule or NULL if none is found.
+ *
+ * Since: 0.6
+ */
 MemphisRule *
 champlain_memphis_map_source_get_rule (ChamplainMemphisMapSource *self,
     const gchar *id)
@@ -657,6 +774,17 @@ champlain_memphis_map_source_get_rule (ChamplainMemphisMapSource *self,
   return rule;
 }
 
+/**
+ * champlain_memphis_map_source_get_rule_ids:
+ * @map_source: a #ChamplainMemphisMapSource
+ *
+ * Returns a #GList if id strings of the form:
+ * key1|key2|...|keyN:value1|value2|...|valueM
+ *
+ * Example: "waterway:river|stream|canal"
+ *
+ * Since: 0.6
+ */
 GList *
 champlain_memphis_map_source_get_rule_ids (ChamplainMemphisMapSource *self)
 {
