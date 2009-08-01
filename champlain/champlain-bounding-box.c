@@ -33,12 +33,29 @@ champlain_bounding_box_get_type (void)
 
   if (G_UNLIKELY (type == 0))
     {
-      type = g_boxed_type_register_static (g_intern_static_string ("ChamplainBoundingBox"),
+      type = g_boxed_type_register_static (
+          g_intern_static_string ("ChamplainBoundingBox"),
           (GBoxedCopyFunc) champlain_bounding_box_copy,
           (GBoxedFreeFunc) champlain_bounding_box_free);
     }
 
   return type;
+}
+
+/**
+ * champlain_bounding_box_new:
+ *
+ * Creates a newly allocated #ChamplainBoundingBox to be freed
+ * with champlain_bounding_box_free().
+ *
+ * Returns: a #ChamplainBoundingBox
+ *
+ * Since: 0.6
+ */
+ChamplainBoundingBox *
+champlain_bounding_box_new (void)
+{
+  return g_slice_new (ChamplainBoundingBox);
 }
 
 /**
@@ -48,7 +65,7 @@ champlain_bounding_box_get_type (void)
  * Makes a copy of the bounding box structure. The result must be
  * freed using champlain_bounding_box_free().
  *
- * Return value: an allocated copy of @bbox.
+ * Returns: an allocated copy of @bbox.
  *
  * Since: 0.6
  */
@@ -65,8 +82,8 @@ champlain_bounding_box_copy (const ChamplainBoundingBox *bbox)
  * champlain_bounding_box_free:
  * @bbox: a #ChamplainBoundingBox
  *
- * Frees a bounding box structure created with #champlain_bounding_box_new or
- * #champlain_bounding_box_copy
+ * Frees a bounding box structure created with champlain_bounding_box_new() or
+ * champlain_bounding_box_copy().
  *
  * Since: 0.6
  */
@@ -81,24 +98,12 @@ champlain_bounding_box_free (ChamplainBoundingBox *bbox)
 }
 
 /**
- * champlain_bounding_box_new:
- *
- * Return value: a newly allocated #ChamplainBoundingBox to be freed
- * with #champlain_bounding_box_free
- *
- * Since: 0.6
- */
-ChamplainBoundingBox *
-champlain_bounding_box_new ()
-{
-  return g_slice_new (ChamplainBoundingBox);
-}
-
-/**
  * champlain_bounding_box_get_center:
  * @bbox: a #ChamplainBoundingBox
  * @lat: the latitude of the box center
  * @lon: the longitude of the box center
+ *
+ * Sets the latitude and longitude of the box to @lat and @lon.
  *
  * Since: 0.6
  */

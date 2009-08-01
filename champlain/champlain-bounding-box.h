@@ -48,11 +48,11 @@ struct _ChamplainBoundingBox {
 GType champlain_bounding_box_get_type (void) G_GNUC_CONST;
 #define CHAMPLAIN_TYPE_BOUNDING_BOX (champlain_bounding_box_get_type ())
 
+ChamplainBoundingBox * champlain_bounding_box_new (void);
+
 ChamplainBoundingBox * champlain_bounding_box_copy (const ChamplainBoundingBox *bbox);
 
 void champlain_bounding_box_free (ChamplainBoundingBox *bbox);
-
-ChamplainBoundingBox * champlain_bounding_box_new (void);
 
 void champlain_bounding_box_get_center (ChamplainBoundingBox *bbox,
     gdouble *lat,
