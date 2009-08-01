@@ -199,7 +199,7 @@ champlain_map_data_source_new (void)
  * champlain_map_data_source_get_map_data:
  * @data_source: a #ChamplainMapDataSource
  *
- * Returns the #MemphisMap of the data source.
+ * Returns the #MemphisMap of the data source or NULL.
  *
  * Since: 0.6
  */

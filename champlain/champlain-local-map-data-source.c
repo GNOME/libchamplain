@@ -18,11 +18,10 @@
 
 /**
  * SECTION:champlain-local-map-data-source
- * @short_description: ChamplainLocalMapDataSource loads local data for
- *  ChamplainMemphisMapSource.
+ * @short_description: Loads local map data for #ChamplainMemphisMapSource.
  *
  * This map data source loads local <ulink role="online-location"
- *  url="http://wiki.openstreetmap.org/wiki/.osm">
+ * url="http://wiki.openstreetmap.org/wiki/.osm">
  * OpenStreetMap XML data files</ulink> (*.osm).
  *
  */
@@ -122,6 +121,13 @@ champlain_local_map_data_source_init (ChamplainLocalMapDataSource *self)
   priv->map = memphis_map_new ();
 }
 
+/**
+ * champlain_local_map_data_source_new:
+ *
+ * Returns: a new ChamplainLocalMapDataSource.
+ *
+ * Since: 0.6
+ */
 ChamplainLocalMapDataSource *
 champlain_local_map_data_source_new (void)
 {
@@ -130,7 +136,7 @@ champlain_local_map_data_source_new (void)
 
 /**
  * champlain_local_map_data_source_load_map_data:
- * @data_source: a #ChamplainLocalMapDataSource
+ * @map_data_source: a #ChamplainLocalMapDataSource
  * @map_path: a path to a map data file
  *
  * Loads the OpenStreetMap XML file at the given path.

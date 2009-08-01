@@ -18,8 +18,7 @@
 
 /**
  * SECTION:champlain-network-map-data-source
- * @short_description: ChamplainNetworkMapDataSource downloads data for
- *  ChamplainMemphisMapSource.
+ * @short_description: Downloads map data for #ChamplainMemphisMapSource.
  *
  * This map data source downloads the map data from an OpenStreetMap API
  * server. It supports protocol version 0.5 and 0.6.
@@ -270,9 +269,9 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
 
 /**
  * champlain_network_map_data_source_load_map_data:
- * @source: a #ChamplainNetworkMapDataSource
+ * @map_data_source: a #ChamplainNetworkMapDataSource
  * @bound_left: the left bound in degree
- * @bound_buttom: the lower bound in degree
+ * @bound_bottom: the lower bound in degree
  * @bound_right: the right bound in degree
  * @bound_top: the upper bound in degree
  *
@@ -281,7 +280,7 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
  * limitations on the maximum number of nodes that can be requested.
  *
  * For details, see: <ulink role="online-location"
- *  url="http://api.openstreetmap.org/api/capabilities">
+ * url="http://api.openstreetmap.org/api/capabilities">
  * http://api.openstreetmap.org/api/capabilities</ulink>
  *
  * Since: 0.6
@@ -334,7 +333,7 @@ champlain_network_map_data_source_load_map_data (
 
 /**
  * champlain_network_map_data_source_get_api_uri:
- * @source: a #ChamplainNetworkMapDataSource
+ * @map_data_source: a #ChamplainNetworkMapDataSource
  *
  * Returns the URI of the API server.
  *
@@ -353,7 +352,7 @@ champlain_network_map_data_source_get_api_uri (
 
 /**
  * champlain_network_map_data_source_set_api_uri:
- * @source: a #ChamplainNetworkMapDataSource
+ * @map_data_source: a #ChamplainNetworkMapDataSource
  * @api_uri: an URI of an API server
  *
  * Sets the URI of the API server.
