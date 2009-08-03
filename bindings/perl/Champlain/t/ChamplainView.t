@@ -432,7 +432,8 @@ sub run_animation_loop {
 	$view->signal_connect('animation-completed' => sub {
 		Clutter->main_quit();
 	});
-	Glib::Timeout->add(3000, sub {
+	Glib::Timeout->add(10_000, sub {
+		diag("Event loop timeout, perhaps the animation needs more time?");
 		Clutter->main_quit();
 		return FALSE;
 	});
