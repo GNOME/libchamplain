@@ -259,3 +259,101 @@ champlain_layer_hide (ChamplainLayer *layer)
 
   clutter_actor_hide (CLUTTER_ACTOR (layer));
 }
+
+/**
+ * champlain_layer_animate_in_all_markers:
+ * @layer: a #ChamplainLayer
+ *
+ * Fade in all markers with an animation
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_animate_in_all_markers (ChamplainLayer *layer)
+{
+  GList *children;
+  guint delay = 0;
+
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
+
+  for (; children != NULL; children = g_list_next (children))
+    {
+      champlain_base_marker_animate_in_with_delay (CHAMPLAIN_BASE_MARKER (children->data),
+          delay);
+      delay += 50;
+    }
+}
+
+/**
+ * champlain_layer_animate_out_all_markers:
+ * @layer: a #ChamplainLayer
+ *
+ * Fade out all markers with an animation
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
+{
+  GList *children;
+  guint delay = 0;
+
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
+
+  for (; children != NULL; children = g_list_next (children))
+    {
+      champlain_base_marker_animate_out_with_delay (CHAMPLAIN_BASE_MARKER (children->data),
+          delay);
+      delay += 50;
+    }
+}
+
+/**
+ * champlain_layer_show_all_markers:
+ * @layer: a #ChamplainLayer
+ *
+ * Calls clutter_actor_show on all markers
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_show_all_markers (ChamplainLayer *layer)
+{
+  GList *children;
+
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
+
+  for (; children != NULL; children = g_list_next (children))
+    {
+      clutter_actor_show (CLUTTER_ACTOR (children->data));
+    }
+}
+
+/**
+ * champlain_layer_hide_all_markers:
+ * @layer: a #ChamplainLayer
+ *
+ * Calls clutter_actor_hide on all markers
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_hide_all_markers (ChamplainLayer *layer)
+{
+  GList *children;
+
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
+
+  for (; children != NULL; children = g_list_next (children))
+    {
+      clutter_actor_hide (CLUTTER_ACTOR (children->data));
+    }
+}

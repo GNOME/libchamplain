@@ -45,13 +45,14 @@ toggle_layer (GtkToggleButton *widget,
 {
   if(gtk_toggle_button_get_active(widget))
     {
+
       champlain_polygon_show (polygon);
-      clutter_actor_show_all (layer);
+      champlain_layer_animate_in_all_markers (layer);
     }
   else
     {
       champlain_polygon_hide (polygon);
-      clutter_actor_hide (layer);
+      champlain_layer_animate_out_all_markers (layer);
     }
 }
 
@@ -214,7 +215,7 @@ main (int argc,
       "zoom-level", 5, NULL);
   layer = create_marker_layer (view);
   champlain_view_add_layer(view, layer);
-  clutter_actor_hide (CLUTTER_ACTOR (layer));
+  champlain_layer_hide_all_markers (CLUTTER_ACTOR (layer));
 
   polygon = champlain_polygon_new ();
   /* Cheap approx of Highway 10 */

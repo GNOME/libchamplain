@@ -66,6 +66,13 @@ void champlain_base_marker_set_highlighted (ChamplainBaseMarker *marker,
     gboolean value);
 gboolean champlain_base_marker_get_highlighted (ChamplainBaseMarker *marker);
 
+void champlain_base_marker_animate_in (ChamplainBaseMarker *marker);
+void champlain_base_marker_animate_in_with_delay (ChamplainBaseMarker *marker,
+    guint delay);
+void champlain_base_marker_animate_out (ChamplainBaseMarker *marker);
+void champlain_base_marker_animate_out_with_delay (ChamplainBaseMarker *marker,
+    guint delay);
+
 G_END_DECLS
 
 #endif

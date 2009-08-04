@@ -281,3 +281,118 @@ champlain_base_marker_get_highlighted (ChamplainBaseMarker *champlainBaseMarker)
 
   return priv->highlighted;
 }
+
+/**
+ * champlain_base_marker_animate_in:
+ * @marker: The marker
+ *
+ * Animates the marker as if it were falling from the sky onto the map.
+ *
+ * Since: 0.4
+ */
+void
+champlain_base_marker_animate_in (ChamplainBaseMarker *marker)
+{
+  champlain_base_marker_animate_in_with_delay (marker, 0);
+}
+
+/**
+ * champlain_base_marker_animate_in_with_delay :
+ * @marker: The marker
+ * @delay: The delay in milliseconds
+ *
+ * Animates the marker as if it were falling from the sky onto the map after
+ * delay.
+ *
+ * Since: 0.4
+ */
+void
+champlain_base_marker_animate_in_with_delay (ChamplainBaseMarker *marker,
+    guint delay)
+{
+  ClutterAnimation *animation;
+  ClutterTimeline *timeline;
+  gfloat y;
+
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+
+  clutter_actor_show (CLUTTER_ACTOR (marker));
+  clutter_actor_set_opacity (CLUTTER_ACTOR (marker), 0);
+  clutter_actor_set_scale (CLUTTER_ACTOR (marker), 1.5, 1.5);
+  clutter_actor_get_position (CLUTTER_ACTOR (marker), NULL, &y);
+  clutter_actor_move_by (CLUTTER_ACTOR (marker), 0, -100);
+
+  timeline = clutter_timeline_new (1000);
+  clutter_timeline_set_delay (timeline, delay);
+  animation = clutter_actor_animate_with_timeline (CLUTTER_ACTOR (marker),
+      CLUTTER_EASE_OUT_BOUNCE, timeline, "opacity", 255, "y", y,
+      "scale-x", 1.0, "scale-y", 1.0, NULL);
+  timeline = clutter_animation_get_timeline (animation);
+}
+
+/**
+ * champlain_base_marker_animate_out:
+ * @marker: The marker
+ *
+ * Animates the marker as if it were drawn through the sky.
+ *
+ * Since: 0.4
+ */
+void
+champlain_base_marker_animate_out (ChamplainBaseMarker *marker)
+{
+  champlain_base_marker_animate_in_with_delay (marker, 0);
+}
+
+static gboolean
+on_idle (ChamplainBaseMarker* marker)
+{
+  /* Notify the view that the position changed so that the marker's
+   * position is reset, it has to happen on idle as Clutter seems to
+   * set actors position after calling animation_completed */
+  clutter_actor_hide (CLUTTER_ACTOR (marker));
+
+  g_object_notify (G_OBJECT (marker), "latitude");
+  g_object_notify (G_OBJECT (marker), "longitude");
+  return FALSE;
+}
+
+static void
+on_animation_completed (ClutterAnimation* animation,
+    ChamplainBaseMarker *marker)
+{
+  g_idle_add ((GSourceFunc) on_idle, marker);
+}
+
+/**
+ * champlain_base_marker_animate_out_with_delay :
+ * @marker: The marker
+ * @delay: The delay in milliseconds
+ *
+ * Animates the marker as if it were drawn through the sky after
+ * delay.
+ *
+ * Since: 0.4
+ */
+void
+champlain_base_marker_animate_out_with_delay (ChamplainBaseMarker *marker,
+    guint delay)
+{
+  ClutterAnimation *animation;
+  ClutterTimeline *timeline;
+  gfloat y;
+
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+
+  clutter_actor_get_position (CLUTTER_ACTOR (marker), NULL, &y);
+  clutter_actor_set_opacity (CLUTTER_ACTOR (marker), 200);
+
+  timeline = clutter_timeline_new (750);
+  clutter_timeline_set_delay (timeline, delay);
+  animation = clutter_actor_animate_with_timeline (CLUTTER_ACTOR (marker),
+      CLUTTER_EASE_IN_BACK, timeline, "opacity", 0, "y", y - 100,
+      "scale-x", 2.0, "scale-y", 2.0, NULL);
+  timeline = clutter_animation_get_timeline (animation);
+  g_signal_connect (animation, "completed",
+      G_CALLBACK (on_animation_completed), marker);
+}
