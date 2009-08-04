@@ -37,6 +37,7 @@ CHAMPLAIN_MAP_SOURCE_GET_CLASS
 <FILE>champlain-marker</FILE>
 <TITLE>ChamplainMarker</TITLE>
 ChamplainMarker
+champlain_marker_set_highlight_color
 champlain_marker_new
 champlain_marker_new_with_text
 champlain_marker_new_with_image
@@ -83,6 +84,12 @@ CHAMPLAIN_MARKER_GET_CLASS
 ChamplainBaseMarker
 champlain_base_marker_new
 champlain_base_marker_set_position
+champlain_base_marker_animate_in
+champlain_base_marker_animate_in_with_delay
+champlain_base_marker_animate_out
+champlain_base_marker_animate_out_with_delay
+champlain_base_marker_get_highlighted
+champlain_base_marker_set_highlighted
 <SUBSECTION Standard>
 CHAMPLAIN_BASE_MARKER
 CHAMPLAIN_IS_BASE_MARKER
@@ -233,6 +240,14 @@ CHAMPLAIN_TILE_GET_CLASS
 <TITLE>ChamplainLayer</TITLE>
 ChamplainLayer
 champlain_layer_new
+champlain_layer_add_marker
+champlain_layer_remove_marker
+champlain_layer_animate_in_all_markers
+champlain_layer_animate_out_all_markers
+champlain_layer_show
+champlain_layer_hide
+champlain_layer_show_all_markers
+champlain_layer_hide_all_markers
 <SUBSECTION Standard>
 CHAMPLAIN_LAYER
 CHAMPLAIN_IS_LAYER
@@ -339,6 +354,7 @@ champlain_point_get_type
 <TITLE>ChamplainCache</TITLE>
 ChamplainCache
 ChamplainCacheClass
+champlain_cache_get_default
 champlain_cache_fill_tile
 champlain_cache_dup_default
 champlain_cache_get_size_limit
@@ -367,6 +383,12 @@ champlain_map_source_factory_dup_default
 champlain_map_source_factory_dup_list
 champlain_map_source_factory_create
 champlain_map_source_factory_register
+champlain_map_source_desc_copy
+champlain_map_source_desc_free
+champlain_map_source_desc_get_type
+champlain_map_source_desc_new
+champlain_map_source_factory_get_default
+champlain_map_source_factory_get_list
 <SUBSECTION Standard>
 CHAMPLAIN_MAP_SOURCE_FACTORY
 CHAMPLAIN_IS_MAP_SOURCE_FACTORY
@@ -382,7 +404,9 @@ CHAMPLAIN_MAP_SOURCE_FACTORY_GET_CLASS
 <TITLE>ChamplainPolygon</TITLE>
 ChamplainPolygon
 champlain_polygon_new
+champlain_polygon_insert_point
 champlain_polygon_append_point
+champlain_polygon_remove_point
 champlain_polygon_clear_points
 champlain_polygon_get_fill
 champlain_polygon_get_fill_color
@@ -390,14 +414,13 @@ champlain_polygon_get_points
 champlain_polygon_get_stroke
 champlain_polygon_get_stroke_color
 champlain_polygon_get_stroke_width
-champlain_polygon_hide
-champlain_polygon_insert_point
 champlain_polygon_set_fill
 champlain_polygon_set_fill_color
 champlain_polygon_set_stroke
 champlain_polygon_set_stroke_color
 champlain_polygon_set_stroke_width
 champlain_polygon_show
+champlain_polygon_hide
 <SUBSECTION Standard>
 CHAMPLAIN_POLYGON_FACTORY
 CHAMPLAIN_IS_POLYGON
@@ -422,6 +445,9 @@ champlain_selection_layer_unselect
 champlain_selection_layer_marker_is_selected
 champlain_selection_layer_select_all
 champlain_selection_layer_unselect_all
+champlain_selection_layer_get_selection_mode
+champlain_selection_layer_set_selection_mode
+champlain_selection_mode_get_type
 <SUBSECTION Standard>
 CHAMPLAIN_IS_SELECTION_LAYER
 CHAMPLAIN_IS_SELECTION_LAYER_CLASS
