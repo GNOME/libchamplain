@@ -34,6 +34,8 @@ use Data::Dumper;
 use FindBin;
 use File::Spec;
 
+my $LABEL;
+
 exit main();
 
 sub main {
@@ -62,6 +64,10 @@ sub main {
 	my $layer = Champlain::Layer->new();
 	$layer->show();
 	$map->add_layer($layer);
+	
+	$LABEL = make_label();
+	$LABEL->hide();
+	$map->add($LABEL);
 
 	my $viewport = Gtk2::Viewport->new();
 	$viewport->set_shadow_type('etched-in');
@@ -100,6 +106,8 @@ sub flickr_search {
 
 	my ($latitude, $longitude) = $map->get_coords_from_event($event);
 	print "Lookup for ($latitude, $longitude)\n";
+	$LABEL->set_text("Querying flickr...");
+	$LABEL->show();
 
 	my $args = {
 		lat    => $latitude,
@@ -154,6 +162,12 @@ sub flickr_photos_search_callback {
 		push @photos, $photo;
 	}
 
+	if (! @photos) {
+		$LABEL->set_text("No pictures found!");
+		$LABEL->show();
+		return;
+	}
+
 	$data->{photos} = \@photos;
 	flickr_photos_getSizes($soup, $data);
 }
@@ -166,8 +180,12 @@ sub flickr_photos_search_callback {
 sub flickr_photos_getSizes {
 	my ($soup, $data) = @_;
 	if (@{ $data->{photos} } == 0) {
+		$LABEL->hide();
 		return FALSE;
 	}
+
+	$LABEL->set_text("Photos to load: " . @{ $data->{photos} });
+	$LABEL->show();
 
 	my $photo = pop @{ $data->{photos} };
 	$data->{photo} = $photo;
@@ -249,6 +267,31 @@ sub flickr_download_photo_callback {
 
 	# Add a marker for the image
 	$marker->set_image($texture);
+}
+
+
+#
+# Creates a label that shows what's going on.
+#
+sub make_label {
+	my $PADDING = 5;
+	my $button = Clutter::Group->new();
+
+	my $white = Clutter::Color->new(0xff, 0xff, 0xff, 0xff);
+	my $button_bg = Clutter::Rectangle->new($white);
+	$button->add($button_bg);
+	$button_bg->set_opacity(0xcc);
+
+	my $black = Clutter::Color->new(0x00, 0x00, 0x00, 0xff);
+	my $button_text = Clutter::Label->new("Sans 10", '', $black);
+	$button->add($button_text);
+	my ($width, $height) = $button_text->get_size();
+
+	$button_bg->set_size($width + $PADDING * 2, $height + $PADDING * 2);
+	$button_bg->set_position(0, 0);
+	$button_text->set_position($PADDING, $PADDING);
+
+	return $button_text;
 }
 
 
