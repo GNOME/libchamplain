@@ -1,6 +1,25 @@
 libchamplain 0.3.5 (2009-08-01)
 ===============================
 
+Fifth development release leading to 0.4
+This is the first release depending on Clutter 1.0
+This release has no working bindings until Clutter gets some.
+This release should have the last API changes before 0.4 release.
+
+Enhancements:
+
+* New marker animation API (Pierre-Luc Beaudoin)
+
+Fixes:
+
+* 576391: Port to Clutter 1.0 (Pierre-Luc Beaudoin)
+* 586029: ChamplainPolygon should inherit from GInitiallyUnowned
+  (Pierre-Luc Beaudoin)
+* Make buildable with Gtk 2.12 instead of 2.14 (Emmanuel Rodriguez)
+
+libchamplain 0.3.5 (2009-08-01)
+===============================
+
 Fourth development release leading to 0.4
 This is really the last release depending on Clutter 0.8
 

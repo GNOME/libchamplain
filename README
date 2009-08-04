@@ -1,4 +1,4 @@
-libchamplain 0.3.5 README
+libchamplain 0.3.6 README
 =========================
 
 libchamplain is a Clutter based widget to display rich, eye-candy and
@@ -6,8 +6,7 @@ interactive maps.
 
 libchamplain requires:
 
-  * Clutter >= 0.8
-  * Clutter-cairo >= 0.8
+  * Clutter >= 1.0
   * Glib >= 2.10
   * Cairo >= 1.4
   * Gio >= 2.16
@@ -16,8 +15,8 @@ libchamplain requires:
 
 If you are building libchamplain-gtk, you will also need:
 
-  * Gtk >= 2.14
-  * Clutter-Gtk >= 0.8
+  * Gtk >= 2.12
+  * Clutter-Gtk >= 0.10
 
 If you are building the Python bindings, you will also need:
 
@@ -32,8 +31,8 @@ If you are building the C# bindings, you will also need:
   * GAPI-codegen
   * GAPI-fixup
   * Gtk-sharp >= 2.12
-  * Clutter-sharp >= 0.8
-  * Clutter-Gtk-sharp >= 0.8
+  * Clutter-sharp >= 1.0
+  * Clutter-Gtk-sharp >= 0.10
 
 The official website is:
    http://projects.gnome.org/libchamplain
