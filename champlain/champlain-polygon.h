@@ -50,12 +50,12 @@ G_BEGIN_DECLS
 typedef struct _ChamplainPolygonPrivate ChamplainPolygonPrivate;
 
 typedef struct {
-  GObject parent;
+  GInitiallyUnowned parent;
   ChamplainPolygonPrivate *priv;
 } ChamplainPolygon;
 
 typedef struct {
-  GObjectClass parent_class;
+  GInitiallyUnownedClass parent_class;
 } ChamplainPolygonClass;
 
 GType champlain_polygon_get_type (void);

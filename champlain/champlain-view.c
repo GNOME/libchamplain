@@ -2263,7 +2263,7 @@ champlain_view_add_polygon (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  view->priv->polygons = g_list_append (view->priv->polygons, g_object_ref (polygon));
+  view->priv->polygons = g_list_append (view->priv->polygons, g_object_ref_sink (polygon));
 
   g_signal_connect (polygon, "notify",
       G_CALLBACK (notify_polygon_cb), view);
