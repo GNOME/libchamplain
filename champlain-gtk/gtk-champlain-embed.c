@@ -73,6 +73,7 @@ static void gtk_champlain_embed_get_property (GObject *object, guint prop_id,
 static void gtk_champlain_embed_set_property (GObject *object, guint prop_id,
     const GValue *value, GParamSpec *pspec);
 static void gtk_champlain_embed_finalize (GObject *object);
+static void gtk_champlain_embed_dispose (GObject *object);
 static void gtk_champlain_embed_class_init (GtkChamplainEmbedClass *klass);
 static void gtk_champlain_embed_init (GtkChamplainEmbed *view);
 static void view_size_allocated_cb (GtkWidget *widget,
@@ -122,12 +123,36 @@ gtk_champlain_embed_set_property (GObject *object,
 }
 
 static void
+gtk_champlain_embed_dispose (GObject *object)
+{
+  GtkChamplainEmbed *embed = GTK_CHAMPLAIN_EMBED (object);
+  GtkChamplainEmbedPrivate *priv = embed->priv;
+
+  if (priv->view != NULL)
+    {
+      g_object_unref (priv->view);
+      priv->view = NULL;
+    }
+
+  if (priv->cursor_hand_open != NULL)
+    {
+      gdk_cursor_unref (priv->cursor_hand_open);
+      priv->cursor_hand_open = NULL;
+    }
+
+  if (priv->cursor_hand_closed != NULL)
+    {
+      gdk_cursor_unref (priv->cursor_hand_closed);
+      priv->cursor_hand_closed = NULL;
+    }
+}
+
+static void
 gtk_champlain_embed_finalize (GObject *object)
 {
   GtkChamplainEmbed *embed = GTK_CHAMPLAIN_EMBED (object);
   GtkChamplainEmbedPrivate *priv = embed->priv;
 
-  g_object_unref (priv->view);
   G_OBJECT_CLASS (gtk_champlain_embed_parent_class)->finalize (object);
 }
 
@@ -138,6 +163,7 @@ gtk_champlain_embed_class_init (GtkChamplainEmbedClass *klass)
 
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   object_class->finalize = gtk_champlain_embed_finalize;
+  object_class->dispose = gtk_champlain_embed_dispose;
   object_class->get_property = gtk_champlain_embed_get_property;
   object_class->set_property = gtk_champlain_embed_set_property;
 
@@ -164,6 +190,8 @@ set_view (GtkChamplainEmbed* embed,
   GtkChamplainEmbedPrivate *priv = embed->priv;
   ClutterActor *stage;
 
+  stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
+
   if (priv->view != NULL)
     {
       g_object_unref (priv->view);
@@ -173,7 +201,6 @@ set_view (GtkChamplainEmbed* embed,
   priv->view = g_object_ref (view);
   champlain_view_set_size (priv->view, priv->width, priv->height);
 
-  stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
 }
 
@@ -206,8 +233,8 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
                     G_CALLBACK (mouse_button_cb),
                     embed);
   // Setup cursors
-  priv->cursor_hand_open = gdk_cursor_new(GDK_HAND1);
-  priv->cursor_hand_closed = gdk_cursor_new(GDK_FLEUR);
+  priv->cursor_hand_open = gdk_cursor_new (GDK_HAND1);
+  priv->cursor_hand_closed = gdk_cursor_new (GDK_FLEUR);
 
   priv->view = NULL;
   set_view (embed, CHAMPLAIN_VIEW (champlain_view_new ()));
