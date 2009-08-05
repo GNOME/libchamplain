@@ -46,7 +46,7 @@ GtkChamplain-0.3.gir: $(INTROSPECTION_SCANNER) libchamplain-gtk-0.3.la
 	$(INCLUDES) \
 	--add-include-path=$(srcdir) --add-include=path=. \
 	--c-include="$(libchamplain_include_HEADERS)" \
-	--include=Clutter-0.8 \
+	--include=Clutter-1.0 \
 	--include=Gtk-2.0 \
 	--library=champlain-gtk-0.3 \
 	--output $@ \
