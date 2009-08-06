@@ -7,7 +7,6 @@
 
 import champlain
 import clutter
-import cluttercairo
 import cairo
 import math
 import gobject
@@ -29,7 +28,7 @@ class AnimatedMarker(champlain.Marker) :
             color = MARKER_COLOR
         
         #Cairo definition of the inner marker
-        bg_in = cluttercairo.CairoTexture(MARKER_SIZE, MARKER_SIZE)
+        bg_in = clutter.CairoTexture(MARKER_SIZE, MARKER_SIZE)
         cr_in = bg_in.cairo_create()
         cr_in.set_source_rgb(0, 0, 0)
         cr_in.arc(MARKER_SIZE / 2.0, MARKER_SIZE / 2.0, MARKER_SIZE / 2.0, 0, 2 * math.pi)
@@ -41,7 +40,7 @@ class AnimatedMarker(champlain.Marker) :
         bg_in.set_position(0, 0)
         
         #Cairo definition of the outside circle (that will be animated)
-        bg_out = cluttercairo.CairoTexture(2 * MARKER_SIZE, 2 * MARKER_SIZE)
+        bg_out = clutter.CairoTexture(2 * MARKER_SIZE, 2 * MARKER_SIZE)
         cr_out = bg_out.cairo_create()
         cr_out.set_source_rgb(0, 0, 0)
         cr_out.arc(MARKER_SIZE, MARKER_SIZE, 0.9 * MARKER_SIZE, 0, 2 * math.pi)
@@ -59,9 +58,7 @@ class AnimatedMarker(champlain.Marker) :
         self.timeline.set_duration(1000)
         self.timeline.set_loop(True)
 
-        self.alpha = clutter.Alpha()
-        self.alpha.set_timeline(self.timeline)
-        self.alpha.set_func(clutter.sine_inc_func)
+        self.alpha = clutter.Alpha(self.timeline, clutter.EASE_OUT_SINE)
         
         #The "growing" behaviour
         self.grow_behaviour = clutter.BehaviourScale(0.5, 0.5, 2.0, 2.0)

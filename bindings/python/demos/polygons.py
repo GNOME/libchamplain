@@ -23,12 +23,12 @@ def zoom_out(actor, event, view):
 def make_button(text):
     button = clutter.Group()
     button_bg = clutter.Rectangle()
-    button_bg.set_color(clutter.color_parse('white'))
+    button_bg.set_color(clutter.color_from_string('white'))
     button_bg.set_opacity(0xcc)
     button.add(button_bg)
 
-    button_text = clutter.label_new_full('Sans 10', text, \
-        clutter.color_parse('black'))
+    button_text = clutter.Text('Sans 10', text, \
+        clutter.color_from_string('black'))
     button.add(button_text)
 
     width, height = button_text.get_size()

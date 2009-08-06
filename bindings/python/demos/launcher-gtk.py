@@ -6,7 +6,8 @@ import gobject
 import gtk
 import champlain
 import champlaingtk
-from demomarkers import DemoMarkerLayer
+
+from markers import create_marker_layer
 
 class LauncherGTK:
 
@@ -22,7 +23,7 @@ class LauncherGTK:
 		self.view = champlain.View()
 		self.view.set_property("scroll-mode", champlain.SCROLL_MODE_KINETIC)
 	
-		self.layer = DemoMarkerLayer()
+		self.layer = create_marker_layer(self.view)
 		self.view.add_layer(self.layer)
 
 		embed = cluttergtk.Embed()
@@ -82,9 +83,11 @@ class LauncherGTK:
 
 	def toggle_layer(self, widget):
 		if widget.get_active():
-			self.layer.show_all()
+			self.layer.animate_in_all_markers()
+            #self.layer.show_all()
 		else:
-			self.layer.hide()
+			self.layer.animate_out_all_markers()
+            #self.layer.hide()
 
 	def zoom_changed(self, widget):
 		self.view.set_property("zoom-level", self.spinbutton.get_value_as_int())
