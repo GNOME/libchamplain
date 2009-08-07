@@ -177,8 +177,8 @@ if test x$enable_python = xyes; then
       pygobject-2.0,
       glib-2.0,
       gobject-2.0,
-      clutter-0.8,
-      pyclutter-0.8,
+      clutter-1.0,
+      pyclutter-0.9,
       gconf-2.0,
       gtk+-2.0
    ], have_python="yes", have_python="no")
