@@ -54,7 +54,6 @@
 #include <glib/gstdio.h>
 #include <clutter-cairo.h>
 #include <gdk/gdk.h>
-#include <memphis/memphis.h>
 
 /* Tuning parameters */
 #define MAX_THREADS 4
@@ -798,4 +797,29 @@ champlain_memphis_map_source_get_rule_ids (ChamplainMemphisMapSource *self)
   g_static_rw_lock_reader_unlock (&MemphisLock);
 
   return list;
+}
+
+/**
+ * champlain_memphis_map_source_remove_rule:
+ * @map_source: a #ChamplainMemphisMapSource
+ * @id: an id string
+ *
+ * Removes the rule with the given id.
+ *
+ * Since: 0.6
+ */
+void champlain_memphis_map_source_remove_rule (
+    ChamplainMemphisMapSource *self,
+    const gchar *id)
+{
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
+
+  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+
+  g_static_rw_lock_writer_lock (&MemphisLock);
+  memphis_rule_set_remove_rule (priv->rules, id);
+  g_static_rw_lock_writer_unlock (&MemphisLock);
+
+  if (!priv->persistent_cache)
+    champlain_memphis_map_source_delete_session_cache (self);
 }

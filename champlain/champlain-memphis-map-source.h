@@ -97,6 +97,10 @@ MemphisRule * champlain_memphis_map_source_get_rule (
     ChamplainMemphisMapSource *map_source,
     const gchar *id);
 
+void champlain_memphis_map_source_remove_rule (
+    ChamplainMemphisMapSource *map_source,
+    const gchar *id);
+
 G_END_DECLS
 
 #endif /* _CHAMPLAIN_MEMPHIS_MAP_SOURCE */
