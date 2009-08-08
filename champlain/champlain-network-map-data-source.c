@@ -259,7 +259,7 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
   priv->map = map;
 
   bbox = champlain_bounding_box_new ();
-  memhis_map_get_bounding_box (priv->map, &bbox->left, &bbox->top,
+  memphis_map_get_bounding_box (priv->map, &bbox->left, &bbox->top,
       &bbox->right, &bbox->bottom);
   g_object_set (G_OBJECT (self), "bounding-box", bbox, NULL);
   champlain_bounding_box_free (bbox);
