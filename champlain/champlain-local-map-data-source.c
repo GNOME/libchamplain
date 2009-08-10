@@ -78,7 +78,11 @@ champlain_local_map_data_source_dispose (GObject *object)
   ChamplainLocalMapDataSource *self = (ChamplainLocalMapDataSource *) object;
   ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
 
-  memphis_map_free (priv->map);
+  if (priv->map)
+    {
+      memphis_map_free (priv->map);
+      priv->map = NULL;
+    }
 
   G_OBJECT_CLASS (champlain_local_map_data_source_parent_class)->dispose (object);
 }

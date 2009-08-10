@@ -126,10 +126,16 @@ champlain_network_map_data_source_dispose (GObject *object)
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
 
   if (priv->map)
-    memphis_map_free (priv->map);
+    {
+      memphis_map_free (priv->map);
+      priv->map = NULL;
+    }
 
   if (soup_session != NULL)
-    soup_session_abort (soup_session);
+    {
+      soup_session_abort (soup_session);
+      soup_session = NULL;
+    }
 
   G_OBJECT_CLASS (champlain_network_map_data_source_parent_class)->dispose (object);
 }

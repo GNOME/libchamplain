@@ -157,12 +157,25 @@ champlain_memphis_map_source_dispose (GObject *object)
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
 
   if (priv->thpool)
-    g_thread_pool_free (priv->thpool, FALSE, TRUE);
-
+    {
+      g_thread_pool_free (priv->thpool, FALSE, TRUE);
+      priv->thpool = NULL;
+    }
   if (priv->map_data_source)
-    g_object_unref (priv->map_data_source);
-  memphis_renderer_free (priv->renderer);
-  memphis_rule_set_free (priv->rules);
+    {
+      g_object_unref (priv->map_data_source);
+      priv->map_data_source = NULL;
+    }
+  if (priv->renderer)
+    {
+      memphis_renderer_free (priv->renderer);
+      priv->renderer = NULL;
+    }
+  if (priv->rules)
+    {
+      memphis_rule_set_free (priv->rules);
+      priv->rules = NULL;
+    }
 
   G_OBJECT_CLASS (champlain_memphis_map_source_parent_class)->dispose (object);
 }
@@ -777,7 +790,7 @@ champlain_memphis_map_source_get_rule (ChamplainMemphisMapSource *self,
  * champlain_memphis_map_source_get_rule_ids:
  * @map_source: a #ChamplainMemphisMapSource
  *
- * Returns a #GList if id strings of the form:
+ * Returns a #GList of id strings of the form:
  * key1|key2|...|keyN:value1|value2|...|valueM
  *
  * Example: "waterway:river|stream|canal"
