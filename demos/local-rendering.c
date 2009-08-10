@@ -109,17 +109,21 @@ load_rules_into_gui (ChamplainView *view)
   GList* ids, *ptr;
   GtkTreeModel *store;
   GtkTreeIter iter;
-  GdkColor color;
+  GdkColor gdk_color;
+  ClutterColor *clutter_color;
 
   g_object_get (G_OBJECT (view), "map-source", &source, NULL);
   ids = champlain_memphis_map_source_get_rule_ids (
       CHAMPLAIN_MEMPHIS_MAP_SOURCE (source));
 
-  gchar *colorstr = champlain_memphis_map_source_get_background_color (
+  clutter_color = champlain_memphis_map_source_get_background_color (
       CHAMPLAIN_MEMPHIS_MAP_SOURCE (source));
-  gdk_color_parse (colorstr, &color);
-  g_free (colorstr);
-  gtk_color_button_set_color (GTK_COLOR_BUTTON (bg_button), &color);
+  gdk_color.red = ((guint16) clutter_color->red) << 8;
+  gdk_color.green = ((guint16) clutter_color->green) << 8;
+  gdk_color.blue = ((guint16) clutter_color->blue) << 8;
+  clutter_color_free (clutter_color);
+
+  gtk_color_button_set_color (GTK_COLOR_BUTTON (bg_button), &gdk_color);
 
   store = gtk_tree_view_get_model (GTK_TREE_VIEW (rules_tree_view));
   gtk_list_store_clear (GTK_LIST_STORE (store));
@@ -382,19 +386,22 @@ request_osm_data_cb (GtkWidget *widget, ChamplainView *view)
 void
 bg_color_set_cb (GtkColorButton *widget, ChamplainView *view)
 {
-  GdkColor color;
+  GdkColor gdk_color;
   ChamplainMapSource *source;
 
-  gtk_color_button_get_color (widget, &color);
+  gtk_color_button_get_color (widget, &gdk_color);
 
   g_object_get (G_OBJECT (view), "map-source", &source, NULL);
   if (strncmp (champlain_map_source_get_id (source), "memphis", 7) == 0)
     {
-      char *str = gdk_color_to_string (&color);
+      ClutterColor clutter_color;
+      clutter_color.red = CLAMP (((gdk_color.red / 65535.0) * 255), 0, 255);
+      clutter_color.green = CLAMP (((gdk_color.green / 65535.0) * 255), 0, 255);
+      clutter_color.blue = CLAMP (((gdk_color.blue / 65535.0) * 255), 0, 255);
+      clutter_color.alpha = 255;
+
       champlain_memphis_map_source_set_background_color (
-          CHAMPLAIN_MEMPHIS_MAP_SOURCE (source),
-          str);
-      g_free (str);
+          CHAMPLAIN_MEMPHIS_MAP_SOURCE (source), &clutter_color);
     }
 }
 

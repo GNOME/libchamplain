@@ -676,57 +676,52 @@ champlain_memphis_map_source_get_session_id (ChamplainMemphisMapSource *self)
  * champlain_memphis_map_source_get_background_color:
  * @map_source: a #ChamplainMemphisMapSource
  *
- * Returns the background color of the map as a textual specification of
- * the color in the hexadecimal form &num;rrggbb, where r, g and b are hex
- * digits representing the red, green and blue components respectively.
- *
- * Returns a newly-allocated text string.
+ * Returns the background color of the map as a newly-allocated
+ * #ClutterColor.
  *
  * Since: 0.6
  */
-gchar * champlain_memphis_map_source_get_background_color (
+ClutterColor * champlain_memphis_map_source_get_background_color (
     ChamplainMemphisMapSource *self)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self), NULL);
 
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
-  gchar *color;
+  ClutterColor color;
   gint16 r, b, g;
 
   g_static_rw_lock_reader_lock (&MemphisLock);
   memphis_rule_set_get_bg_color (priv->rules, &r, &g, &b);
   g_static_rw_lock_reader_unlock (&MemphisLock);
 
-  color = g_strdup_printf ("#%02x%02x%02x", r, g, b);
-  return color;
+  color.red = (guint8) r;
+  color.green = (guint8) g;
+  color.blue = (guint8) b;
+  color.alpha = 255;
+  return clutter_color_copy (&color);
 }
 
 /**
  * champlain_memphis_map_source_set_background_color:
  * @map_source: a #ChamplainMemphisMapSource
- * @color_spec: a color string
+ * @color: a #ClutterColor
  *
- * Sets the background color of the map as a textual specification of
- * the color in the hexadecimal form &num;rrggbb, where r, g and b are hex
- * digits representing the red, green and blue components respectively.
+ * Sets the background color of the map from a #ClutterColor.
  *
  * Since: 0.6
  */
 void
 champlain_memphis_map_source_set_background_color (
     ChamplainMemphisMapSource *self,
-    const gchar *color_spec)
+    const ClutterColor *color)
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
 
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
-  GdkColor color;
-
-  gdk_color_parse (color_spec, &color);
 
   g_static_rw_lock_writer_lock (&MemphisLock);
-  memphis_rule_set_set_bg_color (priv->rules, (gint16) (color.red >> 8),
-      (gint16) (color.green >> 8), (gint16) (color.blue >> 8));
+  memphis_rule_set_set_bg_color (priv->rules, (gint16) color->red,
+      (gint16) color->green, (gint16) color->blue);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
   if (!priv->persistent_cache)
