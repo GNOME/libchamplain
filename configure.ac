@@ -204,6 +204,7 @@ AC_CONFIG_FILES([Makefile
                  docs/reference/version.xml
                  champlain.pc
                  champlain-uninstalled.pc
+                 bindings/perl/Champlain/Makefile
                  bindings/python/Makefile
                  bindings/python/champlain/Makefile
                  bindings/python/champlain-gtk/Makefile
