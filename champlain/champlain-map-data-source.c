@@ -188,13 +188,6 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
   priv->state = CHAMPLAIN_STATE_INIT;
 }
 
-// TODO: should this class be instantiable?
-ChamplainMapDataSource *
-champlain_map_data_source_new (void)
-{
-  return g_object_new (CHAMPLAIN_TYPE_MAP_DATA_SOURCE, NULL);
-}
-
 /**
  * champlain_map_data_source_get_map_data:
  * @data_source: a #ChamplainMapDataSource

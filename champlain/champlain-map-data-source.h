@@ -52,8 +52,6 @@ typedef struct {
 
 GType champlain_map_data_source_get_type (void);
 
-ChamplainMapDataSource * champlain_map_data_source_new (void);
-
 MemphisMap * champlain_map_data_source_get_map_data (ChamplainMapDataSource *data_source);
 
 G_END_DECLS
