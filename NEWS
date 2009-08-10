@@ -1,3 +1,14 @@
+libchamplain 0.3.90 (2009-08-10)
+===============================
+
+Sixth development release leading to 0.4
+This release has no working bindings until Clutter gets some.
+
+Fixes:
+
+* Fix Bug 591128: Perl bindings are not provided in the tar.gz
+  (Pierre-Luc Beaudoin)
+
 libchamplain 0.3.6 (2009-08-03)
 ===============================
 
