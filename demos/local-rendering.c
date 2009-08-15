@@ -27,6 +27,7 @@
 #define COL_NAME 1
 
 guint map_index = 0;
+guint rules_index = 0;
 static const char *maps[] = { "schaffhausen.osm", "las_palmas.osm" };
 static const char *rules[] = { "default-rules.xml", "high-contrast.xml" };
 
@@ -428,6 +429,8 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
     {
       if (g_strcmp0 (id, "memphis-local") == 0)
         {
+          champlain_memphis_map_source_load_rules (
+              CHAMPLAIN_MEMPHIS_MAP_SOURCE (source), rules[rules_index]);
           load_local_map_data (source);
           gtk_widget_hide_all (memphis_box);
           gtk_widget_set_no_show_all (memphis_box, FALSE);
@@ -437,6 +440,8 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
         }
       else if (g_strcmp0 (id, "memphis-network") == 0)
         {
+          champlain_memphis_map_source_load_rules (
+              CHAMPLAIN_MEMPHIS_MAP_SOURCE (source), rules[rules_index]);
           load_network_map_data (source, view);
           gtk_widget_hide_all (memphis_box);
           gtk_widget_set_no_show_all (memphis_box, FALSE);

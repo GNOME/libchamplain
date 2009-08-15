@@ -51,16 +51,25 @@
 #include "champlain-private.h"
 
 #include <errno.h>
+#include <string.h>
 #include <glib/gstdio.h>
 #include <clutter-cairo.h>
 #include <gdk/gdk.h>
 
 /* Tuning parameters */
 #define MAX_THREADS 4
-#define DEFAULT_TILE_SIZE 256 // FIXME find the bug
-#define DEFAULT_RULES_PATH "default-rules.xml"
+#define DEFAULT_TILE_SIZE 256 // FIXME: switching between map sources
+                              // with different tile size crashes champlain.
 /* 0: Be quiet, 1: Normal output, 2: Be verbose */
 #define MEMPHIS_INTERNAL_DEBUG_LEVEL 0
+
+const gchar default_rules[] =
+  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
+  <rules version=\"0.1\" background=\"#ffffff\">\
+    <rule e=\"way\" k=\"highway\" v=\"*\">\
+      <line color=\"#000000\" width=\"1.0\"/>\
+    </rule>\
+  </rules>";
 
 enum
 {
@@ -530,8 +539,8 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
   memphis_renderer_set_debug_level (priv->renderer,
       MEMPHIS_INTERNAL_DEBUG_LEVEL);
 
-  memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
-  // TODO: Do we want to ship a default rule-set?
+  memphis_rule_set_load_from_data (priv->rules, default_rules,
+      strlen (default_rules));
 
   priv->thpool = g_thread_pool_new (memphis_worker_thread, source,
       MAX_THREADS, FALSE, NULL);
@@ -561,7 +570,8 @@ champlain_memphis_map_source_load_rules (
   if (rules_path)
     memphis_rule_set_load_from_file (priv->rules, rules_path);
   else
-    memphis_rule_set_load_from_file (priv->rules, DEFAULT_RULES_PATH);
+    memphis_rule_set_load_from_data (priv->rules, default_rules,
+        strlen (default_rules));
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
   if (!priv->persistent_cache)
