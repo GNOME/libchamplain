@@ -24,13 +24,15 @@
  * <ulink role="online-location" url="https://trac.openstreetmap.ch/trac/memphis/">
  * LibMemphis</ulink> to draw <ulink role="online-location" url="http://www.openstreetmap.org/">
  * OpenStreetMap</ulink> data. Tiles are rendered in separate threads.
+ * It supports zoom levels 12 to 18.
  *
  * The map data is supplied by a #ChamplainMapDataSource.
  * #ChamplainLocalMapDataSource loads data from a local OSM file.
  * #ChamplainNetworkMapDataSource uses the OSM API to download data chunks.
  *
  * The output of the renderer can be configured with a Memphis rules XML file.
- * (TODO: link to the specification)
+ * (TODO: link to the specification) The default rules only show
+ * highways as thin black lines.
  * Once loaded, rules can be queried and edited.
  *
  * Rendered tiles are cached. The cache is deleted if the map data or rules
