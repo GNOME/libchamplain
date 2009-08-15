@@ -29,12 +29,12 @@
  */
 
 #include "champlain-network-map-data-source.h"
-#include "champlain-version.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
 #include "champlain-debug.h"
 #include "champlain-bounding-box.h"
 #include "champlain-enum-types.h"
+#include "champlain-version.h"
 
 #include <memphis/memphis.h>
 #ifdef HAVE_LIBSOUP_GNOME

@@ -42,11 +42,9 @@
  */
 
 #include "champlain-memphis-map-source.h"
-#include "champlain.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
 #include "champlain-debug.h"
-
 #include "champlain-cache.h"
 #include "champlain-defines.h"
 #include "champlain-enum-types.h"
@@ -54,9 +52,7 @@
 
 #include <errno.h>
 #include <string.h>
-#include <glib/gstdio.h>
 #include <clutter-cairo.h>
-#include <gdk/gdk.h>
 
 /* Tuning parameters */
 #define MAX_THREADS 4
