@@ -20,7 +20,8 @@ python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	champlain-base-marker.h			\
 	champlain-tile.h			\
 	champlain-zoom-level.h			\
- > ../bindings/python/champlain/pychamplain.defs
+> ../bindings/python/champlain/pychamplain-base.defs
+
 
 # Update the list of headers from Makefile.am
 cd ../champlain-gtk

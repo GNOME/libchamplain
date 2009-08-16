@@ -1,0 +1,28 @@
+;; -*- scheme -*-
+; object definitions ...
+
+(define-boxed Point
+  (in-module "Champlain")
+  (c-name "ChamplainPoint")
+  (gtype-id "CHAMPLAIN_TYPE_POINT")
+  (fields
+    '("double" "lat")
+    '("double" "lon")
+  )   
+)
+
+(define-boxed MapSourceDesc
+  (in-module "Champlain")
+  (c-name "ChamplainMapSourceDesc")
+  (gtype-id "CHAMPLAIN_TYPE_MAP_SOURCE_DESC")
+  (fields
+    '("gchar *" "id")
+    '("gchar *" "name")
+    '("gchar *" "license")
+    '("gchar *" "license_uri")
+    '("gint" "min_zoom_level")
+    '("gint" "max_zoom_level")
+    '("ChamplainMapProjection" "projection")
+    '("gchar*" "uri_format")
+  )   
+)
