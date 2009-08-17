@@ -15,7 +15,7 @@ MARKER_SIZE = 10
 MARKER_COLOR = [0.1,0.1,0.9,1.0]
 
 POSITION = [45.528178, -73.563788]
-SCREEN_SIZE = [800,600]
+SCREEN_SIZE = [640, 480]
 
 #The AnimatedMarker will extend the champlain.Marker class
 class AnimatedMarker(champlain.Marker) :

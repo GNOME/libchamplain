@@ -40,7 +40,7 @@ def make_button(text):
 def main():
     # Create the map view
     actor = champlain.View()
-    actor.set_size(800, 600)
+    actor.set_size(640, 480)
     actor.set_property('scroll-mode', champlain.SCROLL_MODE_KINETIC)
     actor.set_property('zoom-level', 9)
     actor.center_on(45.466, -73.75)
@@ -65,7 +65,7 @@ def main():
     buttons.add(button)
     
     stage = clutter.stage_get_default()
-    stage.set_size(800, 600)
+    stage.set_size(640, 480)
     stage.add(actor)
     stage.add(buttons)
     stage.show()
