@@ -31,25 +31,19 @@ static PyObject *
 _wrap_champlain_map_source_factory_dup_list(PyGObject *self) {
 	GSList *iter, *list;
 	PyObject *ret;
+	PyObject *pydesc; 
 
 	list = champlain_map_source_factory_dup_list(CHAMPLAIN_MAP_SOURCE_FACTORY(self->obj));
 	
 	ret = PyList_New(0);
 	for(iter = list; iter != NULL; iter = iter->next) {
-		PyObject *item = PyDict_New();
 		ChamplainMapSourceDesc *desc = (ChamplainMapSourceDesc *) iter->data;
-		PyDict_SetItemString(item, "id", PyString_FromString(desc->id));
-		PyDict_SetItemString(item, "name", PyString_FromString(desc->name));
-		PyDict_SetItemString(item, "license", PyString_FromString(desc->license));
-		PyDict_SetItemString(item, "license_uri", PyString_FromString(desc->license_uri));
-		PyDict_SetItemString(item, "min_zoom_level", PyInt_FromLong(desc->min_zoom_level));
-		PyDict_SetItemString(item, "max_zoom_level", PyInt_FromLong(desc->max_zoom_level));
-		PyDict_SetItemString(item, "uri_format", PyString_FromString(desc->uri_format));
-		PyList_Append(ret, item);
-		Py_DECREF(item);
+        pydesc = pyg_boxed_new(CHAMPLAIN_TYPE_MAP_SOURCE_DESC, desc, TRUE, TRUE);
+		PyList_Append(ret, pydesc);
 	}
 
 	g_slist_free(list);
+	g_slist_free(iter);
 
 	return ret;
 }
@@ -61,15 +55,9 @@ static ChamplainMapSource *
 champlain_map_source_constructor (ChamplainMapSourceDesc *desc, gpointer data)
 {
     PyObject *pymap_source = NULL;
-    PyObject *pydesc = PyDict_New();
+    PyObject *pydesc;
 
-    PyDict_SetItemString(pydesc, "id", PyString_FromString(desc->id));
-    PyDict_SetItemString(pydesc, "name", PyString_FromString(desc->name));
-    PyDict_SetItemString(pydesc, "license", PyString_FromString(desc->license));
-    PyDict_SetItemString(pydesc, "license_uri", PyString_FromString(desc->license_uri));
-    PyDict_SetItemString(pydesc, "min_zoom_level", PyInt_FromLong(desc->min_zoom_level));
-    PyDict_SetItemString(pydesc, "max_zoom_level", PyInt_FromLong(desc->max_zoom_level));
-    PyDict_SetItemString(pydesc, "uri_format", PyString_FromString(desc->uri_format));
+    pydesc = pyg_boxed_new(CHAMPLAIN_TYPE_MAP_SOURCE_DESC, desc, TRUE, TRUE);
     pymap_source = PyObject_CallFunction(_pycallback, "(OO)", pydesc, data);
     if (!pymap_source)
         return NULL;
@@ -87,22 +75,12 @@ _wrap_champlain_map_source_factory_register(PyGObject *self, PyObject *args, PyO
         kwlist, &pydesc, &pyconstructor, &pyuser_data))
         return NULL;
    
-    if (!pydesc || !PyMapping_Check(pydesc)){
-        PyErr_SetString(PyExc_TypeError, "desc parameter must be a dict object");
+    if (pyg_boxed_check(pydesc, CHAMPLAIN_TYPE_MAP_SOURCE_DESC))
+        desc = pyg_boxed_get(pydesc, ChamplainMapSourceDesc);
+    else {
+        PyErr_SetString(PyExc_TypeError, "desc must be a MapSourceDesc");
         return NULL;
     }
-
-    desc = champlain_map_source_desc_new(); 
-    desc->id = PyString_AsString(PyDict_GetItemString(pydesc, "id"));
-    desc->name = PyString_AsString(PyDict_GetItemString(pydesc, "name"));
-    desc->license = PyString_AsString(PyDict_GetItemString(pydesc, "license"));
-    desc->license_uri = PyString_AsString(PyDict_GetItemString(pydesc, "license_uri"));
-    desc->min_zoom_level = PyInt_AsLong(PyDict_GetItemString(pydesc, "min_zoom_level"));
-    desc->max_zoom_level = PyInt_AsLong(PyDict_GetItemString(pydesc, "max_zoom_level"));
-    desc->uri_format = PyString_AsString(PyDict_GetItemString(pydesc, "uri_format"));
-    if (pyg_enum_get_value(CHAMPLAIN_TYPE_MAP_PROJECTION, PyDict_GetItemString(pydesc, 
-        "projection"), (gpointer)&desc->projection) != 0)
-        return NULL;
 
     if (!pyconstructor || !PyCallable_Check(pyconstructor)) {
         PyErr_SetString(PyExc_TypeError, "constructor parameter must be callable");
@@ -148,7 +126,7 @@ _wrap_champlain_view_get_coords_from_event(PyGObject *self, PyObject *args, PyOb
     if (pyg_boxed_check(pyevent, CLUTTER_TYPE_EVENT))
         event = pyg_boxed_get(pyevent, ClutterEvent);
     else {
-        PyErr_SetString(PyExc_TypeError, "event should be a ClutterEvent");
+        PyErr_SetString(PyExc_TypeError, "event must be a ClutterEvent");
         return NULL;
     }
  
@@ -250,5 +228,178 @@ _wrap_champlain_tile_get_modified_time(PyGObject *self, PyObject *args)
 
     return PyFloat_FromDouble((double)modified_time->tv_sec + \
         (double)modified_time->tv_usec * 0.000001);
+}
+%%
+override-attr ChamplainMapSourceDesc.id
+static int
+_wrap_champlain_map_source_desc__set_id (PyGBoxed *self, PyObject *value, void *closure)
+{
+    gchar *val;
+
+	val = PyString_AsString (value);
+	if (PyErr_Occurred ())
+		return -1;
+
+	pyg_boxed_get (self, ChamplainMapSourceDesc)->id = val;
+	return 0;
+}
+static PyObject *
+_wrap_champlain_map_source_desc__get_id (PyGBoxed *self, void *closure)
+{
+    gchar *id = pyg_boxed_get(self, ChamplainMapSourceDesc)->id;
+    return PyString_FromString (id);
+}
+%%
+%%
+override-attr ChamplainMapSourceDesc.name
+static int
+_wrap_champlain_map_source_desc__set_name (PyGBoxed *self, PyObject *value, void *closure)
+{
+    gchar *val;
+
+	val = PyString_AsString (value);
+	if (PyErr_Occurred ())
+		return -1;
+
+	pyg_boxed_get (self, ChamplainMapSourceDesc)->name = val;
+	return 0;
+}
+static PyObject *
+_wrap_champlain_map_source_desc__get_name (PyGBoxed *self, void *closure)
+{
+    gchar *name = pyg_boxed_get(self, ChamplainMapSourceDesc)->name;
+    return PyString_FromString (name);
+}
+%%
+%%
+override-attr ChamplainMapSourceDesc.license
+static int
+_wrap_champlain_map_source_desc__set_license (PyGBoxed *self, PyObject *value, void *closure)
+{
+    gchar *val;
+
+	val = PyString_AsString (value);
+	if (PyErr_Occurred ())
+		return -1;
+
+	pyg_boxed_get (self, ChamplainMapSourceDesc)->license = val;
+	return 0;
+}
+static PyObject *
+_wrap_champlain_map_source_desc__get_license (PyGBoxed *self, void *closure)
+{
+    gchar *license = pyg_boxed_get(self, ChamplainMapSourceDesc)->license;
+    return PyString_FromString (license);
+}
+%%
+override-attr ChamplainMapSourceDesc.license_uri
+static int
+_wrap_champlain_map_source_desc__set_license_uri (PyGBoxed *self, PyObject *value, void *closure)
+{
+    gchar *val;
+
+	val = PyString_AsString (value);
+	if (PyErr_Occurred ())
+		return -1;
+
+	pyg_boxed_get (self, ChamplainMapSourceDesc)->license_uri = val;
+	return 0;
+}
+static PyObject *
+_wrap_champlain_map_source_desc__get_license_uri (PyGBoxed *self, void *closure)
+{
+    gchar *license_uri = pyg_boxed_get(self, ChamplainMapSourceDesc)->license_uri;
+    return PyString_FromString (license_uri);
+}
+%%
+%%
+override-attr ChamplainMapSourceDesc.uri_format
+static int
+_wrap_champlain_map_source_desc__set_uri_format (PyGBoxed *self, PyObject *value, void *closure)
+{
+    gchar *val;
+
+	val = PyString_AsString (value);
+	if (PyErr_Occurred ())
+		return -1;
+
+	pyg_boxed_get (self, ChamplainMapSourceDesc)->uri_format = val;
+	return 0;
+}
+static PyObject *
+_wrap_champlain_map_source_desc__get_uri_format (PyGBoxed *self, void *closure)
+{
+    gchar *uri_format = pyg_boxed_get(self, ChamplainMapSourceDesc)->uri_format;
+    return PyString_FromString (uri_format);
+}
+%%
+override-attr ChamplainMapSourceDesc.max_zoom_level
+static int
+_wrap_champlain_map_source_desc__set_max_zoom_level (PyGBoxed *self, PyObject *value, void *closure)
+{
+    glong val;
+
+	val = PyLong_AsLong (value);
+	if (PyErr_Occurred ())
+		return -1;
+
+	pyg_boxed_get (self, ChamplainMapSourceDesc)->max_zoom_level = val;
+	return 0;
+}
+%%
+override-attr ChamplainMapSourceDesc.min_zoom_level
+static int
+_wrap_champlain_map_source_desc__set_min_zoom_level (PyGBoxed *self, PyObject *value, void *closure)
+{
+    glong val;
+
+	val = PyLong_AsLong (value);
+	if (PyErr_Occurred ())
+		return -1;
+
+	pyg_boxed_get (self, ChamplainMapSourceDesc)->min_zoom_level = val;
+	return 0;
+}
+%%
+override-attr ChamplainMapSourceDesc.projection
+static int
+_wrap_champlain_map_source_desc__set_projection (PyGBoxed *self, PyObject *value, void *closure)
+{
+    ChamplainMapProjection val;
+
+    if (pyg_enum_get_value(CHAMPLAIN_TYPE_MAP_PROJECTION, value, (gpointer)&val) != 0)
+        return -1;
+
+	pyg_boxed_get (self, ChamplainMapSourceDesc)->projection = val;
+	return 0;
+}
+%%
+override champlain_map_source_desc_new kwargs
+static int
+_wrap_champlain_map_source_desc_new(PyGBoxed *self, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = {"id", "name", "license", "license_uri", 
+        "min_zoom_level", "max_zoom_level", "projection", "uri_format", NULL };
+    ChamplainMapSourceDesc *desc = champlain_map_source_desc_new();
+    PyObject *py_projection;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs,"ssssddOs:ChamplainMapSourceDesc.__init__", kwlist,
+        &desc->id, &desc->name, &desc->license, &desc->license_uri, &desc->min_zoom_level, 
+        &desc->max_zoom_level, &py_projection, &desc->uri_format))
+        return -1;
+
+    if (pyg_enum_get_value(CHAMPLAIN_TYPE_MAP_PROJECTION, py_projection, (gpointer)&desc->projection) != 0)
+        return -1;
+
+    self->gtype = CHAMPLAIN_TYPE_MAP_SOURCE_DESC;
+    self->free_on_dealloc = FALSE;
+    self->boxed = desc;
+
+    if (!self->boxed) {
+        PyErr_SetString(PyExc_RuntimeError, "could not create ChamplainMapSourceDesc object");
+        return -1;
+    }
+    self->free_on_dealloc = TRUE;
+    return 0;
 }
 %%
