@@ -341,7 +341,7 @@ champlain_base_marker_animate_in_with_delay (ChamplainBaseMarker *marker,
 void
 champlain_base_marker_animate_out (ChamplainBaseMarker *marker)
 {
-  champlain_base_marker_animate_in_with_delay (marker, 0);
+  champlain_base_marker_animate_out_with_delay (marker, 0);
 }
 
 static gboolean
