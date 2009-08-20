@@ -269,7 +269,6 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
           champlain_tile_get_zoom_level (tile));
 
       create_error_tile (tile);
-      g_object_unref (tile);
     }
   else
     {
@@ -321,7 +320,6 @@ set_tile_content (gpointer data)
   champlain_tile_set_content (tile, actor, TRUE);
 
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-  g_object_unref (tile);
   g_object_unref (tile);
 
   g_free (tdata);
