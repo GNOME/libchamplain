@@ -888,7 +888,7 @@ champlain_marker_set_image (ChamplainMarker *marker,
 /**
  * champlain_marker_set_use_markup:
  * @marker: The marker
- * @markup: The value
+ * @use_markup: The value
  *
  * Sets if the marker's text uses markup.
  *
@@ -1041,7 +1041,7 @@ champlain_marker_set_wrap (ChamplainMarker *marker,
 /**
  * champlain_marker_set_wrap_mode:
  * @marker: The marker
- * @wrap: The marker's wrap.
+ * @wrap_mode: The marker's wrap.
  *
  * Set the marker's text color.
  *
@@ -1063,7 +1063,7 @@ champlain_marker_set_wrap_mode (ChamplainMarker *marker,
 /**
  * champlain_marker_set_attributes:
  * @marker: The marker
- * @attributes: The marker's text attributes.
+ * @list: The marker's text attributes.
  *
  * Set the marker's text attribute.
  *
@@ -1092,7 +1092,7 @@ champlain_marker_set_attributes (ChamplainMarker *marker,
 /**
  * champlain_marker_set_ellipsize:
  * @marker: The marker
- * @ellipsize: The marker's ellipsize mode.
+ * @mode: The marker's ellipsize mode.
  *
  * Set the marker's text ellipsize mode.
  *

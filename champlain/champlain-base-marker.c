@@ -20,17 +20,17 @@
  * SECTION:champlain-base-marker
  * @short_description: A base marker to identify points of interest on a map
  *
- * Base markers reprensent points of interest on a map. base markers need to be
- * placed on a layer (a #ChamplainLayer).  layers have to be added to a
+ * Base markers reprensent points of interest on a map. Base markers need to be
+ * placed on a layer (a #ChamplainLayer). Layers have to be added to a
  * #champlainview for the base_markers to show on the map.
  *
- * a basemarker is nothing more than a regular #clutteractor.  you can draw on
- * it what ever you want.  don't forget to set the anchor position in the base
- * marker using #clutter_actor_set_anchor_point. set the base_markers position
+ * A basemarker is nothing more than a regular #clutteractor. You can draw on
+ * it what ever you want. Don't forget to set the anchor position in the base
+ * marker using #clutter_actor_set_anchor_point. Set the base_markers position
  * on the map using #champlain_base_marker_set_position.
  *
  * champlain has a more evoluted type of markers with text and image support.
- * see #champlainmarker.
+ * See #champlainmarker.
  */
 
 #include "config.h"
@@ -217,7 +217,7 @@ champlain_base_marker_new (void)
 
 /**
  * champlain_base_marker_set_position:
- * @base_marker: a #ChamplainBaseMarker
+ * @marker: a #ChamplainBaseMarker
  * @longitude: the longitude to center the map at
  * @latitude: the longitude to center the map at
  *
@@ -243,7 +243,7 @@ champlain_base_marker_set_position (ChamplainBaseMarker *champlainBaseMarker,
 
 /**
  * champlain_base_marker_set_highlighted:
- * @base_marker: a #ChamplainBaseMarker
+ * @marker: a #ChamplainBaseMarker
  * @value: the highlighted state
  *
  * Sets the marker as highlighted or not. This will affect the "Selected" look
@@ -266,7 +266,7 @@ champlain_base_marker_set_highlighted (ChamplainBaseMarker *champlainBaseMarker,
 
 /**
  * champlain_base_marker_get_highlighted:
- * @base_marker: a #ChamplainBaseMarker
+ * @marker: a #ChamplainBaseMarker
  *
  * Returns the highlighted or not state of the marker.
  *

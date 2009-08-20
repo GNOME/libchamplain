@@ -31,6 +31,9 @@ champlain_map_source_get_type
 CHAMPLAIN_MAP_SOURCE_CLASS
 CHAMPLAIN_IS_MAP_SOURCE_CLASS
 CHAMPLAIN_MAP_SOURCE_GET_CLASS
+<SUBSECTION Private>
+ChamplainMapSourceClass
+ChamplainMapSourcePrivate
 </SECTION>
 
 <SECTION>
@@ -44,30 +47,30 @@ champlain_marker_new_with_image
 champlain_marker_new_full
 champlain_marker_new_from_file
 champlain_marker_set_text
+champlain_marker_get_text
 champlain_marker_set_image
+champlain_marker_get_image
 champlain_marker_set_use_markup
+champlain_marker_get_use_markup
 champlain_marker_set_alignment
+champlain_marker_get_alignment
 champlain_marker_set_color
+champlain_marker_get_color
 champlain_marker_set_text_color
+champlain_marker_get_text_color
 champlain_marker_set_font_name
+champlain_marker_get_font_name
 champlain_marker_set_wrap
+champlain_marker_get_wrap
 champlain_marker_set_wrap_mode
+champlain_marker_get_wrap_mode
 champlain_marker_set_attributes
 champlain_marker_set_single_line_mode
-champlain_marker_set_ellipsize
-champlain_marker_get_use_markup
-champlain_marker_get_text
-champlain_marker_get_image
-champlain_marker_get_alignment
-champlain_marker_get_color
-champlain_marker_get_text_color
-champlain_marker_get_font_name
-champlain_marker_get_wrap
-champlain_marker_get_wrap_mode
-champlain_marker_get_ellipsize
 champlain_marker_get_single_line_mode
-champlain_marker_get_draw_background
+champlain_marker_set_ellipsize
+champlain_marker_get_ellipsize
 champlain_marker_set_draw_background
+champlain_marker_get_draw_background
 <SUBSECTION Standard>
 CHAMPLAIN_MARKER
 CHAMPLAIN_IS_MARKER
@@ -76,6 +79,9 @@ champlain_marker_get_type
 CHAMPLAIN_MARKER_CLASS
 CHAMPLAIN_IS_MARKER_CLASS
 CHAMPLAIN_MARKER_GET_CLASS
+<SUBSECTION Private>
+ChamplainMarkerClass
+ChamplainMarkerPrivate
 </SECTION>
 
 <SECTION>
@@ -88,8 +94,8 @@ champlain_base_marker_animate_in
 champlain_base_marker_animate_in_with_delay
 champlain_base_marker_animate_out
 champlain_base_marker_animate_out_with_delay
-champlain_base_marker_get_highlighted
 champlain_base_marker_set_highlighted
+champlain_base_marker_get_highlighted
 <SUBSECTION Standard>
 CHAMPLAIN_BASE_MARKER
 CHAMPLAIN_IS_BASE_MARKER
@@ -98,6 +104,9 @@ champlain_base_marker_get_type
 CHAMPLAIN_BASE_MARKER_CLASS
 CHAMPLAIN_IS_BASE_MARKER_CLASS
 CHAMPLAIN_BASE_MARKER_GET_CLASS
+<SUBSECTION Private>
+ChamplainBaseMarkerClass
+ChamplainBaseMarkerPrivate
 </SECTION>
 
 <SECTION>
@@ -105,13 +114,13 @@ CHAMPLAIN_BASE_MARKER_GET_CLASS
 <TITLE>ChamplainZoomLevel</TITLE>
 ChamplainZoomLevel
 champlain_zoom_level_new
+champlain_zoom_level_set_width
 champlain_zoom_level_get_width
+champlain_zoom_level_set_height
 champlain_zoom_level_get_height
+champlain_zoom_level_set_zoom_level
 champlain_zoom_level_get_zoom_level
 champlain_zoom_level_get_actor
-champlain_zoom_level_set_width
-champlain_zoom_level_set_height
-champlain_zoom_level_set_zoom_level
 champlain_zoom_level_add_tile
 champlain_zoom_level_remove_tile
 champlain_zoom_level_tile_count
@@ -124,6 +133,9 @@ champlain_zoom_level_get_type
 CHAMPLAIN_ZOOM_LEVEL_CLASS
 CHAMPLAIN_IS_ZOOM_LEVEL_CLASS
 CHAMPLAIN_ZOOM_LEVEL_GET_CLASS
+<SUBSECTION Private>
+ChamplainZoomLevelClass
+ChamplainZoomLevelPrivate
 </SECTION>
 
 <SECTION>
