@@ -229,7 +229,6 @@ champlain_tile_set_size
 champlain_tile_set_state
 champlain_tile_set_uri
 champlain_tile_set_filename
-champlain_tile_set_actor
 champlain_tile_get_content
 champlain_tile_get_etag
 champlain_tile_get_modified_time
