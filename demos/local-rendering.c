@@ -20,7 +20,7 @@
 #include <gtk/gtk.h>
 #include <champlain/champlain.h>
 #include <champlain-gtk/champlain-gtk.h>
-#include <clutter-gtk/gtk-clutter-embed.h>
+#include <clutter-gtk/clutter-gtk.h>
 
 #define N_COLS 2
 #define COL_ID 0

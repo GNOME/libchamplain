@@ -47,7 +47,6 @@
 #include <glib-object.h>
 #include <math.h>
 #include <string.h>
-#include <clutter-cairo.h>
 
 void champlain_map_source_real_fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile);

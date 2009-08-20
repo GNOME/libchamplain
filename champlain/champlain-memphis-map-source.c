@@ -52,7 +52,6 @@
 
 #include <errno.h>
 #include <string.h>
-#include <clutter-cairo.h>
 
 /* Tuning parameters */
 #define MAX_THREADS 4
@@ -311,9 +310,9 @@ set_tile_content (gpointer data)
 
   /* draw the clutter texture */
   size = champlain_tile_get_size (tile);
-  actor = clutter_cairo_new (size, size);
+  actor = clutter_cairo_texture_new (size, size);
 
-  cr_clutter = clutter_cairo_create (CLUTTER_CAIRO(actor));
+  cr_clutter = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (actor));
   cairo_set_source_surface (cr_clutter, cst, 0, 0);
   cairo_paint (cr_clutter);
   cairo_destroy (cr_clutter);
