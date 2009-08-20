@@ -1111,6 +1111,7 @@ finger_scroll_button_press_cb (ClutterActor *actor,
 
 /**
  * champlain_view_new:
+ *
  * Returns a new #ChamplainView ready to be used as a #ClutterActor.
  *
  * Since: 0.4
@@ -1362,7 +1363,7 @@ champlain_view_set_zoom_level (ChamplainView *view,
 /**
  * champlain_view_set_min_zoom_level:
  * @view: a #ChamplainView
- * @min_zoom_level: a gint
+ * @zoom_level: a gint
  *
  * Changes the lowest allowed zoom level
  *
@@ -1390,7 +1391,7 @@ champlain_view_set_min_zoom_level (ChamplainView *view,
 /**
  * champlain_view_set_max_zoom_level:
  * @view: a #ChamplainView
- * @max_zoom_level: a gint
+ * @zoom_level: a gint
  *
  * Changes the highest allowed zoom level
  *
@@ -1450,8 +1451,8 @@ champlain_view_add_layer (ChamplainView *view,
  * champlain_view_get_coords_from_event:
  * @view: a #ChamplainView
  * @event: a #ClutterEvent
- * @latitude: a variable where to put the latitude of the event
- * @longitude: a variable where to put the longitude of the event
+ * @lat: a variable where to put the latitude of the event
+ * @lon: a variable where to put the longitude of the event
  *
  * Returns the latitude, longitude coordinates for the given ClutterEvent.
  *
@@ -1513,8 +1514,8 @@ champlain_view_get_coords_from_event (ChamplainView *view,
  * @view: a #ChamplainView
  * @x: the x position in the view
  * @y: the y position in the view
- * @latitude: a variable where to put the latitude of the event
- * @longitude: a variable where to put the longitude of the event
+ * @lat: a variable where to put the latitude of the event
+ * @lon: a variable where to put the longitude of the event
  *
  * Returns the latitude, longitude coordinates for the given x, y position in
  * the view.  Use if you get coordinates from GtkEvents for example.
@@ -1691,7 +1692,7 @@ view_update_state (ChamplainView *view)
 /**
  * champlain_view_set_map_source:
  * @view: a #ChamplainView
- * @source: a #ChamplainMapSource
+ * @map_source: a #ChamplainMapSource
  *
  * Changes the currently used map source.  #g_object_unref will be called on
  * the previous one.
@@ -1865,6 +1866,7 @@ champlain_view_set_zoom_on_double_click (ChamplainView *view,
  * @lon1: the longitude of position 1
  * @lat2: the latitude of position 2
  * @lon2: the longitude of position 2
+ * @animate: a #gboolean
  *
  * Changes the map's zoom level and center to make sure the two given
  * positions are visible
@@ -1952,6 +1954,7 @@ champlain_view_ensure_visible (ChamplainView *view,
  * champlain_view_ensure_markers_visible:
  * @view: a #ChamplainView
  * @markers: a NULL terminated array of #ChamplainMarkers
+ * @animate: a #gboolean
  *
  * Changes the map's zoom level and center to make sure those markers are
  * visible.
@@ -2187,7 +2190,7 @@ champlain_view_get_keep_center_on_resize (ChamplainView *view)
 }
 
 /**
- * champlain_view_get_keep_center_on_resize:
+ * champlain_view_get_show_license:
  * @view: The view
  *
  * Returns TRUE if the view displays the license.

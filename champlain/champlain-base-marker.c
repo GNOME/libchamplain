@@ -30,7 +30,7 @@
  * on the map using #champlain_base_marker_set_position.
  *
  * champlain has a more evoluted type of markers with text and image support.
- * See #champlainmarker.
+ * See #ChamplainMarker.
  */
 
 #include "config.h"
