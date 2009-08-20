@@ -309,7 +309,7 @@ gtk_champlain_embed_new ()
 
 /**
  * gtk_champlain_embed_get_view:
- * @mode: a #ChamplainView, the map view to embed
+ * @embed: a #ChamplainView, the map view to embed
  *
  * Return value: a #ChamplainView ready to be used
  *
