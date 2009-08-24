@@ -1,3 +1,15 @@
+libchamplain 0.3.91 (2009-08-24)
+===============================
+
+Seventh development release leading to 0.4
+This release has no working bindings until Clutter gets some.
+
+Fixes:
+
+* Improved documentation (Simon Wenner)
+* Fix in animation being an out animation (Pierre-Luc Beaudoin)
+* Simplified flickr Perl demo (Emmanuel Rodriguez)
+
 libchamplain 0.3.90 (2009-08-10)
 ===============================
 
