@@ -59,7 +59,7 @@ champlain_polygon_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (object);
+  ChamplainPolygonPrivate *priv = CHAMPLAIN_POLYGON (object)->priv;
 
   switch (property_id)
     {
@@ -95,7 +95,7 @@ champlain_polygon_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (object);
+  ChamplainPolygonPrivate *priv = CHAMPLAIN_POLYGON (object)->priv;
 
   switch (property_id)
     {

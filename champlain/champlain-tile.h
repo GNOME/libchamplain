@@ -43,8 +43,12 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_TILE_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_TILE, ChamplainTileClass))
 
+typedef struct _ChamplainTilePrivate ChamplainTilePrivate;
+
 typedef struct {
   GObject parent;
+
+  ChamplainTilePrivate *priv;
 } ChamplainTile;
 
 typedef struct {

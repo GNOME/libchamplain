@@ -53,7 +53,7 @@ enum
 
 //static guint gtk_champlain_embed_embed_signals[LAST_SIGNAL] = { 0, };
 
-#define GTK_CHAMPLAIN_EMBED_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbedPrivate))
+#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbedPrivate))
 
 struct _GtkChamplainEmbedPrivate
 {
@@ -211,7 +211,7 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
   ClutterActor *stage;
   GtkStyle *style;
 
-  GtkChamplainEmbedPrivate *priv = GTK_CHAMPLAIN_EMBED_GET_PRIVATE (embed);
+  GtkChamplainEmbedPrivate *priv = GET_PRIVATE (embed);
   embed->priv = priv;
 
   priv->clutter_embed = gtk_clutter_embed_new ();
