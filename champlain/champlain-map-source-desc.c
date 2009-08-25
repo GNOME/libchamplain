@@ -46,7 +46,8 @@ champlain_map_source_desc_get_type (void)
  * @desc: a #ChamplainMapSourceDesc
  *
  * Makes a copy of the map source desc structure.  The result must be
- * freed using champlain_map_source_desc_free().
+ * freed using #champlain_map_source_desc_free.  All string fields will
+ * be duplicated with #g_strdup.
  *
  * Return value: an allocated copy of @desc.
  *
@@ -55,10 +56,30 @@ champlain_map_source_desc_get_type (void)
 ChamplainMapSourceDesc *
 champlain_map_source_desc_copy (const ChamplainMapSourceDesc *desc)
 {
-  if (G_LIKELY (desc != NULL))
-    return g_slice_dup (ChamplainMapSourceDesc, desc);
+  ChamplainMapSourceDesc *dest = NULL;
+  if (G_UNLIKELY (desc == NULL))
+    return NULL;
 
-  return NULL;
+  dest = g_slice_dup (ChamplainMapSourceDesc, desc);
+  if (G_LIKELY (desc->id != NULL))
+    dest->id = g_strdup (desc->id);
+
+  if (G_LIKELY (desc->name != NULL))
+    dest->name = g_strdup (desc->name);
+
+  if (G_LIKELY (desc->license != NULL))
+    dest->license = g_strdup (desc->license);
+
+  if (G_LIKELY (desc->license_uri != NULL))
+    dest->license_uri = g_strdup (desc->license_uri);
+
+  if (G_LIKELY (desc->uri_format != NULL))
+    dest->uri_format = g_strdup (desc->uri_format);
+
+  // Can't make a copy of obscure pointer data
+  dest->data = desc->data;
+
+  return dest;
 }
 
 /**
@@ -66,7 +87,8 @@ champlain_map_source_desc_copy (const ChamplainMapSourceDesc *desc)
  * @desc: a #ChamplainMapSourceDesc
  *
  * Frees a desc structure created with #champlain_map_source_desc_new or
- * #champlain_map_source_desc_copy
+ * #champlain_map_source_desc_copy. All strings will be freed with #g_free.
+ * The data pointer will not be freed.
  *
  * Since: 0.4
  */
@@ -79,6 +101,18 @@ champlain_map_source_desc_free (ChamplainMapSourceDesc *desc)
 
   if (G_LIKELY (desc->id != NULL))
     g_free (desc->id);
+
+  if (G_LIKELY (desc->name != NULL))
+    g_free (desc->name);
+
+  if (G_LIKELY (desc->license != NULL))
+    g_free (desc->license);
+
+  if (G_LIKELY (desc->license_uri != NULL))
+    g_free (desc->license_uri);
+
+  if (G_LIKELY (desc->uri_format != NULL))
+    g_free (desc->uri_format);
 
   g_slice_free (ChamplainMapSourceDesc, desc);
 }
