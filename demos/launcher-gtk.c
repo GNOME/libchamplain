@@ -264,8 +264,7 @@ main (int argc,
       button);
   gtk_box_pack_end (GTK_BOX (bbox), button, FALSE, FALSE, 0);
 
-  viewport = gtk_viewport_new (NULL, NULL);
-  gtk_viewport_set_shadow_type (GTK_VIEWPORT(viewport), GTK_SHADOW_ETCHED_IN);
+  viewport = gtk_frame_new (NULL);
   gtk_container_add (GTK_CONTAINER (viewport), widget);
 
   gtk_box_pack_start (GTK_BOX (vbox), bbox, FALSE, FALSE, 0);
