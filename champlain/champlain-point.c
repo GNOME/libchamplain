@@ -87,7 +87,8 @@ champlain_point_free (ChamplainPoint *point)
  * Since: 0.4
  */
 ChamplainPoint *
-champlain_point_new (gdouble lat, gdouble lon)
+champlain_point_new (gdouble lat,
+    gdouble lon)
 {
   ChamplainPoint *point;
 

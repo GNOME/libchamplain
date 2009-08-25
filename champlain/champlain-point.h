@@ -41,6 +41,7 @@ ChamplainPoint * champlain_point_copy (const ChamplainPoint *point);
 
 void champlain_point_free (ChamplainPoint *point);
 
-ChamplainPoint * champlain_point_new (gdouble lat, gdouble lon);
+ChamplainPoint * champlain_point_new (gdouble lat,
+    gdouble lon);
 
 #endif

@@ -905,8 +905,8 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
 static gboolean
 button_release_cb (ClutterActor *actor,
-                ClutterEvent *event,
-                ChamplainView *view)
+    ClutterEvent *event,
+    ChamplainView *view)
 {
   GList *children = NULL;
   gboolean found = FALSE;

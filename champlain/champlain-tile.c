@@ -717,7 +717,7 @@ champlain_tile_set_uri (ChamplainTile *self,
  */
 void
 champlain_tile_set_filename (ChamplainTile *self,
-                             const gchar *filename)
+    const gchar *filename)
 {
   g_return_if_fail(CHAMPLAIN_TILE(self));
   g_return_if_fail(filename != NULL);

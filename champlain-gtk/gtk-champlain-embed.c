@@ -89,9 +89,9 @@ G_DEFINE_TYPE (GtkChamplainEmbed, gtk_champlain_embed, GTK_TYPE_ALIGNMENT);
 
 static void
 gtk_champlain_embed_get_property (GObject *object,
-                                   guint prop_id,
-                                   GValue *value,
-                                   GParamSpec *pspec)
+    guint prop_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   GtkChamplainEmbed *embed = GTK_CHAMPLAIN_EMBED (object);
   GtkChamplainEmbedPrivate *priv = embed->priv;
@@ -108,9 +108,9 @@ gtk_champlain_embed_get_property (GObject *object,
 
 static void
 gtk_champlain_embed_set_property (GObject *object,
-                                   guint prop_id,
-                                   const GValue *value,
-                                   GParamSpec *pspec)
+    guint prop_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   //GtkChamplainEmbed *embed = GTK_CHAMPLAIN_EMBED (object);
   //GtkChamplainEmbedPrivate *priv = embed->priv;
@@ -265,8 +265,8 @@ view_realize_cb (GtkWidget *widget,
 
 static void
 view_size_allocated_cb (GtkWidget *widget,
-                        GtkAllocation *allocation,
-                        GtkChamplainEmbed *view)
+    GtkAllocation *allocation,
+    GtkChamplainEmbed *view)
 {
   GtkChamplainEmbedPrivate *priv = view->priv;
 
@@ -279,8 +279,8 @@ view_size_allocated_cb (GtkWidget *widget,
 
 static gboolean
 mouse_button_cb (GtkWidget *widget,
-                 GdkEventButton *event,
-                 GtkChamplainEmbed *view)
+    GdkEventButton *event,
+    GtkChamplainEmbed *view)
 {
   GtkChamplainEmbedPrivate *priv = view->priv;
 
