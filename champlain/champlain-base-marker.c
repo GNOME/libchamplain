@@ -218,8 +218,8 @@ champlain_base_marker_new (void)
 /**
  * champlain_base_marker_set_position:
  * @marker: a #ChamplainBaseMarker
- * @longitude: the longitude to center the map at
  * @latitude: the longitude to center the map at
+ * @longitude: the longitude to center the map at
  *
  * Positions the base_marker on the map at the coordinates
  *
