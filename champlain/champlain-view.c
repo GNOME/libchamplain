@@ -184,7 +184,7 @@ static void champlain_view_set_property (GObject *object, guint prop_id,
 static void champlain_view_dispose (GObject *object);
 static void champlain_view_class_init (ChamplainViewClass *champlainViewClass);
 static void champlain_view_init (ChamplainView *view);
-static void viewport_x_changed_cb (GObject *gobject, GParamSpec *arg1,
+static void viewport_pos_changed_cb (GObject *gobject, GParamSpec *arg1,
     ChamplainView *view);
 static void notify_marker_reposition_cb (ChamplainMarker *marker,
     GParamSpec *arg1, ChamplainView *view);
@@ -964,7 +964,9 @@ champlain_view_init (ChamplainView *view)
   g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
 
   g_signal_connect (priv->viewport, "notify::x-origin",
-      G_CALLBACK (viewport_x_changed_cb), view);
+      G_CALLBACK (viewport_pos_changed_cb), view);
+  g_signal_connect (priv->viewport, "notify::y-origin",
+      G_CALLBACK (viewport_pos_changed_cb), view);
 
   /* Setup finger scroll */
   priv->finger_scroll = g_object_ref (tidy_finger_scroll_new (priv->scroll_mode));
@@ -1017,7 +1019,7 @@ champlain_view_init (ChamplainView *view)
 }
 
 static void
-viewport_x_changed_cb (GObject *gobject,
+viewport_pos_changed_cb (GObject *gobject,
     GParamSpec *arg1,
     ChamplainView *view)
 {
