@@ -94,7 +94,8 @@ enum
   PROP_KEEP_CENTER_ON_RESIZE,
   PROP_SHOW_LICENSE,
   PROP_ZOOM_ON_DOUBLE_CLICK,
-  PROP_STATE
+  PROP_STATE,
+  PROP_DISPLAY_SCALE,
 };
 
 #define PADDING 10
@@ -155,6 +156,9 @@ struct _ChamplainViewPrivate
 
   gboolean show_license;
   ClutterActor *license_actor; /* Contains the license info */
+
+  ClutterActor *scale_actor;
+  gboolean display_scale;
 
   ChamplainState state; /* View's global state */
 
@@ -222,6 +226,11 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble latitude,
     gdouble longitude,
     guint duration);
+
+#define SCALE_HEIGHT  20
+#define SCALE_WIDTH   100
+#define SCALE_PADDING 10
+#define SCALE_LINE_WIDTH 4.0
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -587,6 +596,9 @@ champlain_view_get_property (GObject *object,
       case PROP_SCROLL_MODE:
         g_value_set_enum (value, priv->scroll_mode);
         break;
+      case PROP_DISPLAY_SCALE:
+        g_value_set_boolean (value, priv->display_scale);
+        break;
       case PROP_DECEL_RATE:
         {
           gdouble decel = 0.0;
@@ -644,6 +656,9 @@ champlain_view_set_property (GObject *object,
       break;
     case PROP_SCROLL_MODE:
       champlain_view_set_scroll_mode (view, g_value_get_enum (value));
+      break;
+    case PROP_DISPLAY_SCALE:
+      priv->display_scale = g_value_get_boolean (value);
       break;
     case PROP_DECEL_RATE:
       champlain_view_set_decel_rate (view, g_value_get_double (value));
@@ -928,6 +943,22 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            G_PARAM_READABLE));
 
   /**
+  * ChamplainView:display-scale:
+  *
+  * Display the map scale.
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+       PROP_DISPLAY_SCALE,
+       g_param_spec_boolean ("display-scale",
+           "Display the map scale",
+           "Display the map scale "
+           "on the screen",
+           TRUE,
+           G_PARAM_READWRITE));
+
+  /**
   * ChamplainView::animation-completed:
   *
   * The ::animation-completed signal is emitted when any animation in the view
@@ -968,6 +999,40 @@ button_release_cb (ClutterActor *actor,
   return found;
 }
 
+static void
+create_scale (ChamplainView *view)
+{
+  ClutterActor *scale, *text;
+  cairo_t *cr;
+  gfloat width, height;
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->scale_actor = g_object_ref (clutter_group_new());
+
+  scale = clutter_cairo_texture_new (SCALE_WIDTH, SCALE_HEIGHT);
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (scale));
+
+  cairo_set_source_rgb (cr, 0, 0, 0);
+  cairo_move_to (cr, 0, SCALE_HEIGHT / 2);
+  cairo_line_to (cr, 0, SCALE_HEIGHT);
+  cairo_line_to (cr, SCALE_WIDTH, SCALE_HEIGHT);
+  cairo_line_to (cr, SCALE_WIDTH, SCALE_HEIGHT / 2);
+
+  cairo_set_line_width (cr, SCALE_LINE_WIDTH);
+  cairo_stroke (cr);
+  cairo_destroy (cr);
+
+  text = clutter_text_new_with_text ("Sans 9", "100 km");
+  clutter_actor_get_size (text, &width, &height);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
+  clutter_actor_set_position (text, (SCALE_WIDTH - width) / 2, SCALE_HEIGHT - height - SCALE_LINE_WIDTH);
+
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), scale);
+  clutter_actor_set_position (priv->scale_actor, SCALE_PADDING,
+    priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING);
+
+  clutter_actor_set_opacity (priv->scale_actor, 150);
+}
 
 static void
 champlain_view_init (ChamplainView *view)
@@ -1002,6 +1067,7 @@ champlain_view_init (ChamplainView *view)
   priv->goto_context = NULL;
   priv->map = NULL;
   priv->polygon_redraw_id = 0;
+  priv->display_scale = TRUE;
 
   /* Setup viewport */
   priv->viewport = g_object_ref (tidy_viewport_new ());
@@ -1011,6 +1077,10 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (viewport_pos_changed_cb), view);
   g_signal_connect (priv->viewport, "notify::y-origin",
       G_CALLBACK (viewport_pos_changed_cb), view);
+
+  /* Setup scale */
+  create_scale (view);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->scale_actor);
 
   /* Setup finger scroll */
   priv->finger_scroll = g_object_ref (tidy_finger_scroll_new (priv->scroll_mode));
@@ -1059,6 +1129,7 @@ champlain_view_init (ChamplainView *view)
   champlain_view_set_size (view, priv->viewport_size.width,
       priv->viewport_size.height);
 
+  clutter_actor_raise_top (priv->scale_actor);
   resize_viewport (view);
 
   priv->state = CHAMPLAIN_STATE_DONE;
@@ -1143,6 +1214,8 @@ champlain_view_set_size (ChamplainView *view,
   priv->viewport_size.height = height;
 
   license_set_position (view);
+  clutter_actor_set_position (priv->scale_actor, SCALE_PADDING,
+      priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING);
   resize_viewport (view);
 
   if (priv->keep_center_on_resize)
