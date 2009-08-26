@@ -206,6 +206,13 @@ static void tile_state_notify (GObject *gobject,
     GParamSpec *pspec,
     gpointer data);
 static void view_update_polygons (ChamplainView *view);
+static gboolean finger_scroll_key_press_cb (ClutterActor *actor,
+    ClutterKeyEvent *event,
+    ChamplainView *view);
+static void champlain_view_go_to_with_duration (ChamplainView *view,
+    gdouble latitude,
+    gdouble longitude,
+    guint duration);
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -993,6 +1000,11 @@ champlain_view_init (ChamplainView *view)
   g_signal_connect (priv->finger_scroll, "button-press-event",
       G_CALLBACK (finger_scroll_button_press_cb), view);
 
+  clutter_stage_set_key_focus (CLUTTER_STAGE (clutter_stage_get_default()),
+      priv->finger_scroll);
+  g_signal_connect (priv->finger_scroll, "key-press-event",
+      G_CALLBACK (finger_scroll_key_press_cb), view);
+
   /* Setup user_layers */
   priv->user_layers = g_object_ref (clutter_group_new ());
   clutter_actor_show (priv->user_layers);
@@ -1108,6 +1120,134 @@ finger_scroll_button_press_cb (ClutterActor *actor,
     {
       return view_set_zoom_level_at (view, priv->zoom_level + 1, event->x, event->y);
     }
+  return FALSE; /* Propagate the event */
+}
+
+static void
+scroll_to (ChamplainView *view,
+    gint x,
+    gint y)
+{
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  if (priv->scroll_mode == CHAMPLAIN_SCROLL_MODE_KINETIC)
+    {
+      gfloat lat, lon;
+
+      lat = champlain_map_source_get_latitude (priv->map_source, priv->zoom_level, y);
+      lon = champlain_map_source_get_longitude (priv->map_source, priv->zoom_level, x);
+
+      champlain_view_go_to_with_duration (view, lat, lon, 300);
+    }
+  else if (priv->scroll_mode == CHAMPLAIN_SCROLL_MODE_PUSH)
+    {
+      tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
+        x - priv->viewport_size.width / 2.0,
+        y - priv->viewport_size.height / 2.0,
+        0);
+    }
+}
+
+/* These functions should be exposed in the next API break */
+static void
+champlain_view_scroll_left (ChamplainView* view)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  gint x, y;
+  ChamplainViewPrivate *priv = view->priv;
+
+  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, priv->longitude);
+  y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->latitude);
+
+  x -= priv->viewport_size.width / 4.0;
+
+  scroll_to (view, x, y);
+}
+
+static void
+champlain_view_scroll_right (ChamplainView* view)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  gint x, y;
+  ChamplainViewPrivate *priv = view->priv;
+
+  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, priv->longitude);
+  y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->latitude);
+
+  x += priv->viewport_size.width / 4.0;
+
+  scroll_to (view, x, y);
+}
+
+static void
+champlain_view_scroll_up (ChamplainView* view)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  gint x, y;
+  ChamplainViewPrivate *priv = view->priv;
+
+  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, priv->longitude);
+  y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->latitude);
+
+  y -= priv->viewport_size.width / 4.0;
+
+  scroll_to (view, x, y);
+}
+
+static void
+champlain_view_scroll_down (ChamplainView* view)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  gint x, y;
+  ChamplainViewPrivate *priv = view->priv;
+
+  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, priv->longitude);
+  y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->latitude);
+
+  y += priv->viewport_size.width / 4.0;
+
+  scroll_to (view, x, y);
+}
+
+
+static gboolean
+finger_scroll_key_press_cb (ClutterActor *actor,
+    ClutterKeyEvent *event,
+    ChamplainView *view)
+{
+
+  switch (event->keyval)
+  {
+    case 65361: // Left
+      champlain_view_scroll_left (view);
+      return TRUE;
+      break;
+    case 65362: // Up
+      if (event->modifier_state & CLUTTER_CONTROL_MASK)
+        champlain_view_zoom_in (view);
+      else
+        champlain_view_scroll_up (view);
+      return TRUE;
+      break;
+    case 65363: // Right
+      champlain_view_scroll_right (view);
+      return TRUE;
+      break;
+    case 65364: // Down
+      if (event->modifier_state & CLUTTER_CONTROL_MASK)
+        champlain_view_zoom_out (view);
+      else
+        champlain_view_scroll_down (view);
+      return TRUE;
+      break;
+    default:
+      return FALSE; /* Propagate the event */
+  }
   return FALSE; /* Propagate the event */
 }
 
@@ -1239,9 +1379,27 @@ champlain_view_go_to (ChamplainView *view,
     gdouble latitude,
     gdouble longitude)
 {
+  guint duration;
+
+  duration = 500 * view->priv->zoom_level / 2.0;
+  champlain_view_go_to_with_duration (view, latitude, longitude, duration);
+}
+
+/* FIXME: make public after API freeze */
+static void
+champlain_view_go_to_with_duration (ChamplainView *view,
+    gdouble latitude,
+    gdouble longitude,
+    guint duration) /* In ms */
+{
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
-  gint duration;
+  if (duration == 0)
+    {
+      champlain_view_center_on (view, latitude, longitude);
+      return;
+    }
+
   GoToContext *ctx;
 
   ChamplainViewPrivate *priv = view->priv;
@@ -1266,7 +1424,6 @@ champlain_view_go_to (ChamplainView *view,
    * To have a nice animation, the duration should be longer if the zoom level
    * is higher and if the points are far away
    */
-  duration = 500 * priv->zoom_level / 2.0;
   ctx->timeline = clutter_timeline_new (duration);
   ctx->alpha = clutter_alpha_new_full (ctx->timeline, CLUTTER_EASE_IN_OUT_CIRC);
 
