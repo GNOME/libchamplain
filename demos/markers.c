@@ -19,6 +19,13 @@
 #include <champlain/champlain.h>
 #include <markers.h>
 
+/* This event callback will never be called if you use
+ * ChamplainSelectionLayer.  The selection layer uses this
+ * event for the selection and do not pass the event forward.
+ * For this event to be fired, you should use a simple
+ * ChamplainLayer.
+ */
+/*
 static gboolean
 marker_button_release_cb (ClutterActor *actor,
                           ClutterButtonEvent *event,
@@ -31,6 +38,7 @@ marker_button_release_cb (ClutterActor *actor,
 
   return TRUE;
 }
+*/
 
 ChamplainLayer *
 create_marker_layer (ChamplainView *view)
@@ -50,9 +58,15 @@ create_marker_layer (ChamplainView *view)
   champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker),
       45.528178, -73.563788);
   champlain_layer_add_marker (layer, CHAMPLAIN_BASE_MARKER (marker));
+  /*
+   * This event handler will never be called anyway because this demo is using
+   * a ChamplainSelectionLayer but we leave it here in the demo so that you know
+   * how to have reactive markers
+
   clutter_actor_set_reactive (marker, TRUE);
   g_signal_connect_after (marker, "button-release-event",
       G_CALLBACK (marker_button_release_cb), view);
+  */
 
   marker = champlain_marker_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-generic.png", NULL);
   champlain_marker_set_text (CHAMPLAIN_MARKER (marker), "New York");
