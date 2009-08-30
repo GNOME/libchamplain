@@ -67,6 +67,7 @@ struct _ChamplainTilePrivate {
   gchar *filename;
   ClutterActor *actor;
   ClutterActor *content_actor;
+  ClutterAnimation *animation;
 
   GTimeVal *modified_time;
   gchar* etag;
@@ -161,6 +162,14 @@ static void
 champlain_tile_dispose (GObject *object)
 {
   ChamplainTilePrivate *priv = CHAMPLAIN_TILE (object)->priv;
+
+  /* Force the animation to finish */
+  if (priv->animation != NULL)
+    {
+      clutter_animation_completed (priv->animation);
+      /* this will call the animation complete callback and free the context,
+       * the animation object will be unreffed too */
+    }
 
   if (priv->actor != NULL)
     {
@@ -385,7 +394,10 @@ champlain_tile_init (ChamplainTile *self)
   priv->etag = NULL;
 
   priv->actor = g_object_ref (clutter_group_new ());
+  g_object_add_weak_pointer (G_OBJECT (priv->actor), (gpointer*)&priv->actor);
+
   priv->content_actor = NULL;
+  priv->animation = NULL;
 }
 
 /**
@@ -844,9 +856,12 @@ fade_in_completed (ClutterAnimation *animation,
   AnimationContext* ctx = (AnimationContext*) data;
   ChamplainTilePrivate *priv = ctx->tile->priv;
 
+  priv->animation = NULL;
+
   if (ctx->old_actor != NULL)
     {
-      clutter_container_remove (CLUTTER_CONTAINER (priv->actor), ctx->old_actor, NULL);
+      if (priv->actor != NULL)
+        clutter_container_remove (CLUTTER_CONTAINER (priv->actor), ctx->old_actor, NULL);
       g_object_unref (ctx->old_actor);
     }
 
@@ -876,6 +891,10 @@ champlain_tile_set_content (ChamplainTile *self,
   ChamplainTilePrivate *priv = self->priv;
   ClutterActor *old_actor = NULL;
 
+  /* Don't start another animation if there's already one going on */
+  if (priv->animation != NULL)
+    clutter_animation_completed (priv->animation);
+
   if (priv->content_actor != NULL)
     {
       /* it sometimes happen that the priv->content_actor has been destroyed,
@@ -889,20 +908,20 @@ champlain_tile_set_content (ChamplainTile *self,
       g_object_unref (priv->content_actor);
     }
 
-  clutter_container_add (CLUTTER_CONTAINER (priv->actor), actor, NULL);
+  if (priv->actor != NULL)
+    clutter_container_add (CLUTTER_CONTAINER (priv->actor), actor, NULL);
 
-  if (fade_in == TRUE)
+  if (fade_in == TRUE && priv->actor !=  NULL)
     {
-      ClutterAnimation *animation;
       clutter_actor_set_opacity (actor, 0);
 
       AnimationContext *ctx = g_new0 (AnimationContext, 1);
       ctx->tile = g_object_ref (self);
-      animation = clutter_actor_animate (actor, CLUTTER_EASE_IN_CUBIC,
+      priv->animation = clutter_actor_animate (actor, CLUTTER_EASE_IN_CUBIC,
           500, "opacity", 255, NULL);
       ctx->old_actor = old_actor;
 
-      g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), ctx);
+      g_signal_connect (priv->animation, "completed", G_CALLBACK (fade_in_completed), ctx);
     }
 
   priv->content_actor = g_object_ref (actor);
