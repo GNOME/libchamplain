@@ -993,12 +993,11 @@ champlain_view_init (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->map_layer);
 
-  clutter_actor_set_reactive (CLUTTER_ACTOR (priv->stage), TRUE);
-  g_signal_connect_after (G_OBJECT (priv->stage), "button-release-event",
-      G_CALLBACK (button_release_cb), view);
 
   g_signal_connect (priv->finger_scroll, "button-press-event",
       G_CALLBACK (finger_scroll_button_press_cb), view);
+  g_signal_connect_after (priv->finger_scroll, "button-release-event",
+      G_CALLBACK (button_release_cb), view);
 
   clutter_stage_set_key_focus (CLUTTER_STAGE (clutter_stage_get_default()),
       priv->finger_scroll);

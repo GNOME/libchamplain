@@ -553,7 +553,7 @@ button_release_event_cb (ClutterActor *actor,
   if (moved == FALSE)
     clutter_event_put ((ClutterEvent *)event);
 
-  return TRUE;
+  return moved;
 }
 
 static gboolean
@@ -586,6 +586,9 @@ captured_event_cb (ClutterActor     *actor,
     {
       TidyFingerScrollMotion *motion;
       ClutterButtonEvent *bevent = (ClutterButtonEvent *)event;
+
+      if (bevent->source != actor)
+        return FALSE;
 
       /* Reset motion buffer */
       priv->last_motion = 0;
