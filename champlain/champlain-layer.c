@@ -118,23 +118,23 @@ reorder_marker (ClutterGroup *layer,
     ChamplainBaseMarker *marker)
 {
   GList* markers = clutter_container_get_children (CLUTTER_CONTAINER(layer));
-  gint size, i;
+  GList* it;
   gdouble y, tmp_y, low_y;
   ChamplainBaseMarker *lowest = NULL;
 
-  size = g_list_length (markers);
   g_object_get (G_OBJECT (marker), "latitude", &y, NULL);
   y = 90 - y;
   low_y = G_MAXDOUBLE;
 
-  for (i = 0; i < size; i++)
+  for (it = markers; it != NULL; it = it->next)
     {
-      ChamplainBaseMarker *prev_marker = (ChamplainBaseMarker*) g_list_nth_data (markers, i);
-      g_object_get(G_OBJECT(prev_marker), "latitude", &tmp_y, NULL);
-      tmp_y = 90 - tmp_y;
+      ChamplainBaseMarker *prev_marker = (ChamplainBaseMarker*) it->data;
 
       if (prev_marker == (ChamplainBaseMarker*) marker)
         continue;
+
+      g_object_get(G_OBJECT(prev_marker), "latitude", &tmp_y, NULL);
+      tmp_y = 90 - tmp_y;
 
       if (y < tmp_y && tmp_y < low_y)
         {
@@ -146,6 +146,8 @@ reorder_marker (ClutterGroup *layer,
   if (lowest)
     clutter_container_lower_child (CLUTTER_CONTAINER(layer),
         CLUTTER_ACTOR (marker), CLUTTER_ACTOR (lowest));
+
+  g_list_free (markers);
 }
 
 static void
