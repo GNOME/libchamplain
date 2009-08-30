@@ -1,3 +1,35 @@
+libchamplain 0.3.92 (2009-09-07)
+===============================
+
+Eigth development release leading to 0.4
+This release has no working bindings until Clutter gets some.
+Starting with this release, the 0.3 series will not be parallel
+installable with the 0.4 series (the pc files will have the same name).
+
+Enhancements:
+
+* New marker downloading demo: url-marker (Emmanuel Rodriguez)
+* ChamplainView now has keyboard shortcuts (but not when used with
+  GtkChamplainEmbed) (Pierre-Luc Beaudoin)
+
+Fixes:
+
+* 577592: Use _priv instead of the GET_PRIVATE macro (many contributors)
+* 590692: Workaround for X error when using GtkChamplainEmbed
+  (Pierre-Luc Beaudoin)
+* 592096: champlain_map_source_desc_copy and _free are incomplete
+  (Pierre-Luc Beaudoin)
+* 585754: Nicer compilation output with AM_SILENT_RULES automake option
+  (Javier Jardón)
+* Tiles are now loaded if view is resized vertically only
+  (Pierre-Luc Beaudoin)
+* Comment misleading event on markers in demos (Pierre-Luc Beaudoin)
+* 591132: Attempting to remove actor when zooming in/out (Pierre-Luc Beaudoin)
+* Respect OSM tile usage policy (Pierre-Luc Beaudoin)
+* 593505: Memory leak in ChamplainLayer (Felix Freimann)
+* 590727: Events are not send until the mouse move (Pierre-Luc Beaudoin)
+* Use 0.4 pc files and include path (Pierre-Luc Beaudoin)
+
 libchamplain 0.3.91 (2009-08-24)
 ===============================
 
