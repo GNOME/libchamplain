@@ -42,7 +42,6 @@ def make_button(text):
     return button
 
 def main():
-
     # Create the map view
     actor = champlain.View()
     actor.set_size(640, 480)
@@ -73,7 +72,7 @@ def main():
     layer = create_marker_layer(actor)
     actor.add_layer(layer)
  
-    stage = clutter.stage_get_default()
+    stage = clutter.Stage(default=True)
     stage.set_size(640, 480)
     stage.add(actor)
     stage.add(buttons)

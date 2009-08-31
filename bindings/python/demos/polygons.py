@@ -43,7 +43,6 @@ def main():
     actor.set_size(640, 480)
     actor.set_property('scroll-mode', champlain.SCROLL_MODE_KINETIC)
     actor.set_property('zoom-level', 9)
-    actor.center_on(45.466, -73.75)
 
     # Create the buttons
     buttons = clutter.Group()
@@ -64,7 +63,7 @@ def main():
     button.connect('button-release-event', zoom_out, actor)
     buttons.add(button)
     
-    stage = clutter.stage_get_default()
+    stage = clutter.Stage(default=True)
     stage.set_size(640, 480)
     stage.add(actor)
     stage.add(buttons)
@@ -99,6 +98,7 @@ def main():
     # Connect to the click event
     actor.set_reactive(True)
     actor.connect('button-release-event', map_view_button_release_cb, actor)
+    actor.center_on(45.466, -73.75)
 
 
 if __name__ == "__main__":

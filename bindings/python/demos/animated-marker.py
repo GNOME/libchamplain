@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-#This is a demonstration of the libchamplain python binding.
-#It will display a blue "pulsating" dot on a given position on the map
-#A old legend that this position is the bed of Pierlux. You will have to find out...
-
+"""This is a demonstration of the libchamplain python binding.
+It will display a blue "pulsating" dot on a given position on the map
+A old legend that this position is the bed of Pierlux. You will have 
+to find out..."""
 import champlain
 import clutter
 import cairo
@@ -17,8 +16,8 @@ MARKER_COLOR = [0.1,0.1,0.9,1.0]
 POSITION = [45.528178, -73.563788]
 SCREEN_SIZE = [640, 480]
 
-#The AnimatedMarker will extend the champlain.Marker class
 class AnimatedMarker(champlain.Marker) :
+    """The AnimatedMarker will extend the champlain.Marker class"""
     def __init__(self,color=None) :
         champlain.Marker.__init__(self)
         
@@ -27,11 +26,12 @@ class AnimatedMarker(champlain.Marker) :
         if not color :
             color = MARKER_COLOR
         
-        #Cairo definition of the inner marker
+        # Cairo definition of the inner marker
         bg_in = clutter.CairoTexture(MARKER_SIZE, MARKER_SIZE)
         cr_in = bg_in.cairo_create()
         cr_in.set_source_rgb(0, 0, 0)
-        cr_in.arc(MARKER_SIZE / 2.0, MARKER_SIZE / 2.0, MARKER_SIZE / 2.0, 0, 2 * math.pi)
+        cr_in.arc(MARKER_SIZE / 2.0, MARKER_SIZE / 2.0, MARKER_SIZE / 2.0,
+             0, 2 * math.pi)
         cr_in.close_path()
         cr_in.set_source_rgba(*color)
         cr_in.fill()
@@ -39,7 +39,7 @@ class AnimatedMarker(champlain.Marker) :
         bg_in.set_anchor_point_from_gravity(clutter.GRAVITY_CENTER)
         bg_in.set_position(0, 0)
         
-        #Cairo definition of the outside circle (that will be animated)
+        # Cairo definition of the outside circle (that will be animated)
         bg_out = clutter.CairoTexture(2 * MARKER_SIZE, 2 * MARKER_SIZE)
         cr_out = bg_out.cairo_create()
         cr_out.set_source_rgb(0, 0, 0)
@@ -53,25 +53,25 @@ class AnimatedMarker(champlain.Marker) :
         bg_out.set_position(0, 0)
         bg_out.set_anchor_point_from_gravity(clutter.GRAVITY_CENTER)
 
-        #The timeline of our animation
+        # The timeline of our animation
         self.timeline = clutter.Timeline()
         self.timeline.set_duration(1000)
         self.timeline.set_loop(True)
 
         self.alpha = clutter.Alpha(self.timeline, clutter.EASE_OUT_SINE)
         
-        #The "growing" behaviour
+        # The "growing" behaviour
         self.grow_behaviour = clutter.BehaviourScale(0.5, 0.5, 2.0, 2.0)
         self.grow_behaviour.set_alpha(self.alpha)
         self.grow_behaviour.apply(bg_out)
 
-        #The fade out behaviour
+        # The fade out behaviour
         self.fade_behaviour = clutter.BehaviourOpacity(255, 0)
         self.fade_behaviour.set_alpha(self.alpha)
         self.fade_behaviour.apply(bg_out)
 
-        #If you want the marked to be animated without calling start_animation
-        #Uncomment the following line
+        # If you want the marked to be animated without calling start_animation
+        # Uncomment the following line
         #self.timeline.start()
         
     def stop_animation(self) :
@@ -84,7 +84,7 @@ class AnimatedMarker(champlain.Marker) :
 def main() :
     gobject.threads_init()
     clutter.init()
-    stage = clutter.stage_get_default()
+    stage = clutter.Stage(default=True)
     actor = champlain.View()
     layer = champlain.Layer()
     marker = AnimatedMarker()
