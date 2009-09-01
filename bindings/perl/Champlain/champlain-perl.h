@@ -1,6 +1,6 @@
 #ifndef _CHAMPLAIN_PERL_H_
 
-#include <clutterperl.h>
+#include <clutter-perl.h>
 
 
 #include <champlain/champlain.h>
