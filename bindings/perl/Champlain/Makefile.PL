@@ -90,7 +90,7 @@ sub main {
 		LICENSE       => 'perl, lgpl',
 
 		PREREQ_PM     => {
-			'Clutter' => '0.8000',
+			'Clutter' => '1.0000',
 		},
 		PREREQ_FATAL  => 1, # Clutter is mandatory otherwise the Makefile can't be created
 		
