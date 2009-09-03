@@ -286,6 +286,8 @@ champlain_layer_animate_in_all_markers (ChamplainLayer *layer)
           delay);
       delay += 50;
     }
+
+  g_list_free (children);
 }
 
 /**
@@ -312,6 +314,8 @@ champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
           delay);
       delay += 50;
     }
+
+  g_list_free (children);
 }
 
 /**
@@ -335,6 +339,8 @@ champlain_layer_show_all_markers (ChamplainLayer *layer)
     {
       clutter_actor_show (CLUTTER_ACTOR (children->data));
     }
+
+  g_list_free (children);
 }
 
 /**
@@ -358,4 +364,6 @@ champlain_layer_hide_all_markers (ChamplainLayer *layer)
     {
       clutter_actor_hide (CLUTTER_ACTOR (children->data));
     }
+
+  g_list_free (children);
 }
