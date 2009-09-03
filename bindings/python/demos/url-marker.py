@@ -49,9 +49,14 @@ def image_download_cb(data, layer, latitude, longitude, url):
     marker.show_all()
 
 
+def image_download_errcb(error):
+    print error
+
+
 def create_marker_from_url(layer, latitude, longitude, url):
     d = httpclient.getPage(url)
     d.addCallback(image_download_cb, layer, latitude, longitude, url)
+    d.addErrback(image_download_errcb)
 
 
 def event_cb(stage, event):
