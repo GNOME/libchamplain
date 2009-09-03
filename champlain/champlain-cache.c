@@ -431,7 +431,9 @@ champlain_cache_fill_tile (ChamplainCache *self,
   if (priv->popularity_id == 0)
   {
     g_object_ref (self);
-    priv->popularity_id = g_idle_add (inc_popularity, self);
+    priv->popularity_id = g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+                                           inc_popularity, self,
+                                           g_object_unref);
   }
 
 cleanup:
@@ -479,7 +481,6 @@ inc_popularity (gpointer data)
 
   if (priv->popularity_queue == NULL)
     {
-      g_object_unref (cache);
       priv->popularity_id = 0;
       return FALSE;
     }
