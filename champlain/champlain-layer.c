@@ -273,16 +273,16 @@ champlain_layer_hide (ChamplainLayer *layer)
 void
 champlain_layer_animate_in_all_markers (ChamplainLayer *layer)
 {
-  GList *children;
+  GList *children, *child;
   guint delay = 0;
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
   children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
 
-  for (; children != NULL; children = g_list_next (children))
+  for (child = children; child != NULL; child = g_list_next (child))
     {
-      champlain_base_marker_animate_in_with_delay (CHAMPLAIN_BASE_MARKER (children->data),
+      champlain_base_marker_animate_in_with_delay (CHAMPLAIN_BASE_MARKER (child->data),
           delay);
       delay += 50;
     }
@@ -301,16 +301,16 @@ champlain_layer_animate_in_all_markers (ChamplainLayer *layer)
 void
 champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
 {
-  GList *children;
+  GList *children, *child;
   guint delay = 0;
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
   children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
 
-  for (; children != NULL; children = g_list_next (children))
+  for (child = children; child != NULL; child = g_list_next (child))
     {
-      champlain_base_marker_animate_out_with_delay (CHAMPLAIN_BASE_MARKER (children->data),
+      champlain_base_marker_animate_out_with_delay (CHAMPLAIN_BASE_MARKER (child->data),
           delay);
       delay += 50;
     }
@@ -329,15 +329,15 @@ champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
 void
 champlain_layer_show_all_markers (ChamplainLayer *layer)
 {
-  GList *children;
+  GList *children, *child;
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
   children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
 
-  for (; children != NULL; children = g_list_next (children))
+  for (child = children; child != NULL; child = g_list_next (child))
     {
-      clutter_actor_show (CLUTTER_ACTOR (children->data));
+      clutter_actor_show (CLUTTER_ACTOR (child->data));
     }
 
   g_list_free (children);
@@ -354,15 +354,15 @@ champlain_layer_show_all_markers (ChamplainLayer *layer)
 void
 champlain_layer_hide_all_markers (ChamplainLayer *layer)
 {
-  GList *children;
+  GList *children, *child;
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
   children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
 
-  for (; children != NULL; children = g_list_next (children))
+  for (child = children; child != NULL; child = g_list_next (child))
     {
-      clutter_actor_hide (CLUTTER_ACTOR (children->data));
+      clutter_actor_hide (CLUTTER_ACTOR (child->data));
     }
 
   g_list_free (children);
