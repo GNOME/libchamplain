@@ -2,9 +2,7 @@ libchamplain 0.3.92 (2009-09-07)
 ===============================
 
 Eigth development release leading to 0.4
-This release has no working bindings until Clutter gets some.
-Starting with this release, the 0.3 series will not be parallel
-installable with the 0.4 series (the pc files will have the same name).
+Only the Python bindings work at this stage.
 
 Enhancements:
 
