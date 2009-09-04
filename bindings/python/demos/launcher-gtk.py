@@ -17,10 +17,10 @@ class LauncherGTK:
         self.window.connect("destroy", gtk.main_quit)
 
         vbox = gtk.VBox(False, 12)
-		
+
         self.view = champlain.View()
         self.view.set_property("scroll-mode", champlain.SCROLL_MODE_KINETIC)
-        
+
         self.layer = create_marker_layer(self.view)
         self.view.add_layer(self.layer)
 
@@ -72,19 +72,19 @@ class LauncherGTK:
 
         self.window.show_all()
         self.view.center_on(45.466, -73.75)
-    
+
     def zoom_in(self, widget):
         self.view.zoom_in()
 
     def zoom_out(self, widget):
         self.view.zoom_out()
-	
+
     def toggle_layer(self, widget):
         if widget.get_active():
             self.layer.animate_in_all_markers()
         else:
             self.layer.animate_out_all_markers()
-	
+
     def zoom_changed(self, widget):
         self.view.set_property("zoom-level", self.spinbutton.get_value_as_int())
 

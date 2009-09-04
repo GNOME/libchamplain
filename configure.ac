@@ -178,7 +178,7 @@ if test x$enable_python = xyes; then
       glib-2.0,
       gobject-2.0,
       clutter-1.0,
-      pyclutter-0.9,
+      pyclutter-1.0,
       pyclutter-gtk-0.9,
       gconf-2.0,
       gtk+-2.0

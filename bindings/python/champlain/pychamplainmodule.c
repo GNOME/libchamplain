@@ -3,11 +3,11 @@
 #include <pygobject.h>
 #include "pychamplain.h"
 
-DL_EXPORT(void) initchamplain(void);
+DL_EXPORT(void) initchamplain (void);
 extern PyMethodDef champlain_functions[];
 
 DL_EXPORT(void)
-initchamplain(void)
+initchamplain (void)
 {
 	PyObject *m, *d;
 

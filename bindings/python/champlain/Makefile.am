@@ -1,4 +1,4 @@
-PYCLUTTERDEFS=`pkg-config --variable=defsdir pyclutter-0.9`
+PYCLUTTERDEFS=`pkg-config --variable=defsdir pyclutter-1.0`
 PYGTKDEFS=`pkg-config --variable=defsdir pygtk-2.0`
 
 AM_CPPFLAGS =						\
