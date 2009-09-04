@@ -11,9 +11,12 @@ Enhancements:
 * New marker downloading demo: url-marker (Emmanuel Rodriguez)
 * ChamplainView now has keyboard shortcuts (but not when used with
   GtkChamplainEmbed) (Pierre-Luc Beaudoin)
+* Updated to PyClutter 1.0 Python bindings (Victor Godoy Poluceno)
 
 Fixes:
 
+* 594003: invalid write of size 4 (Felix Freimann)
+* Memory leaks in ChamplainLayer (Pierre-Luc Beaudoin)
 * 577592: Use _priv instead of the GET_PRIVATE macro (many contributors)
 * 590692: Workaround for X error when using GtkChamplainEmbed
   (Pierre-Luc Beaudoin)

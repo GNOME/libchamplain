@@ -1,4 +1,4 @@
-libchamplain 0.3.91 README
+libchamplain 0.3.92 README
 =========================
 
 libchamplain is a Clutter based widget to display rich, eye-candy and
@@ -22,7 +22,15 @@ If you are building the Python bindings, you will also need:
 
   * PyGtk >= 2.0
   * PyGobject >= 2.0
-  * PyClutter >= 0.8
+  * PyClutter >= 1.0
+  * PyClutterGtk >= 0.9
+
+If you are building the C# bindings, you will also need:
+
+  * gacutil
+  * GAPI >= 2.12
+  * GAPI-codegen
+  * GAPI-fixup
 
 If you are building the C# bindings, you will also need:
 
