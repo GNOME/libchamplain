@@ -146,7 +146,4 @@ sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
 __PACKAGE__->bootstrap($VERSION);
 
-
-package Champlain::MapSourceDesc;
-
 1;
