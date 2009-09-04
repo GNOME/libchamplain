@@ -117,7 +117,7 @@ sub make_button {
 	$button_bg->set_opacity(0xcc);
 
 	my $black = Clutter::Color->new(0x00, 0x00, 0x00, 0xff);
-	my $button_text = Clutter::Label->new("Sans 10", $text, $black);
+	my $button_text = Clutter::Text->new("Sans 10", $text, $black);
 	$button->add($button_text);
 	my ($width, $height) = $button_text->get_size();
 
