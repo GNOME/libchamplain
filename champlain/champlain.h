@@ -41,13 +41,11 @@
 #include "champlain/champlain-map-source-factory.h"
 #include "champlain/champlain-network-map-source.h"
 #include "champlain/champlain-version.h"
-#ifdef MEMPHIS_ENABLED
 #include "champlain/champlain-memphis-map-source.h"
 #include "champlain/champlain-map-data-source.h"
 #include "champlain/champlain-local-map-data-source.h"
 #include "champlain/champlain-network-map-data-source.h"
 #include "champlain/champlain-bounding-box.h"
-#endif
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 

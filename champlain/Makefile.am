@@ -31,8 +31,12 @@ libchamplain_headers = \
 	champlain-map-source-factory.h	\
 	champlain-map-source-desc.h	\
 	champlain-polygon.h		\
-	champlain-version.h
-
+	champlain-version.h		\
+	champlain-memphis-map-source.h  \
+	champlain-map-data-source.h	\
+	champlain-local-map-data-source.h \
+	champlain-network-map-data-source.h \
+	champlain-bounding-box.h
 
 libchamplain_0_5_la_SOURCES = \
 	$(CHAMPLAIN_MARSHAL_LIST) 	\
@@ -52,7 +56,12 @@ libchamplain_0_5_la_SOURCES = \
 	champlain-map-source-desc.c	\
 	champlain-point.c		\
 	champlain-cache.c		\
-	champlain-polygon.c
+	champlain-polygon.c	\
+	champlain-memphis-map-source.c  \
+	champlain-map-data-source.c \
+	champlain-local-map-data-source.c \
+	champlain-network-map-data-source.c \
+	champlain-bounding-box.c
 
 noinst_HEADERS = \
 	champlain-debug.h  		\
@@ -91,7 +100,12 @@ libchamplain_include_HEADERS = \
 	champlain-marker.h		\
 	champlain-cache.h		\
 	champlain-polygon.h		\
-	champlain-version.h
+	champlain-version.h		\
+	champlain-memphis-map-source.h  \
+	champlain-map-data-source.h \
+	champlain-local-map-data-source.h \
+	champlain-network-map-data-source.h \
+	champlain-bounding-box.h
 
 libchamplain_0_5_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) ../tidy/libtidy-1.0.la
 
@@ -109,29 +123,6 @@ AM_CPPFLAGS = 				\
 	-I$(top_srcdir)			\
 	-DCHAMPLAIN_COMPILATION 	\
 	$(WARN_CFLAGS)
-
-if ENABLE_MEMPHIS
-libchamplain_headers += \
-	champlain-memphis-map-source.h  \
-	champlain-map-data-source.h	\
-	champlain-local-map-data-source.h \
-	champlain-network-map-data-source.h \
-	champlain-bounding-box.h
-libchamplain_0_3_la_SOURCES += \
-	champlain-memphis-map-source.c  \
-	champlain-map-data-source.c \
-	champlain-local-map-data-source.c \
-	champlain-network-map-data-source.c \
-	champlain-bounding-box.c
-libchamplain_include_HEADERS += \
-	champlain-memphis-map-source.h  \
-	champlain-map-data-source.h \
-	champlain-local-map-data-source.h \
-	champlain-network-map-data-source.h \
-	champlain-bounding-box.h
-libchamplain_0_3_la_LIBADD += ../memphis/libmemphis-1.0.la
-AM_CPPFLAGS += -I$(top_srcdir)/memphis -DMEMPHIS_ENABLED
-endif
 
 EXTRA_DIST = $(CHAMPLAIN_MARSHAL_LIST)
 
