@@ -54,7 +54,8 @@ PKG_CHECK_MODULES(DEPS,
       clutter-1.0 >= 1.0
       cairo >= 1.4,
       gio-2.0 >= 2.16,
-      sqlite3 >= 3.0
+      sqlite3 >= 3.0,
+      memphis-0.1 >= 0.1
   ]
 )
 # check for gtk-doc
