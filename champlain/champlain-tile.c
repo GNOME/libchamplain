@@ -56,21 +56,20 @@ enum
 };
 
 struct _ChamplainTilePrivate {
-  gint x;
-  gint y;
-  gint size;
-  gint zoom_level;
+  gint x; /* The x position on the map (in pixels) */
+  gint y; /* The y position on the map (in pixels) */
+  gint size; /* The tile's width and height (only support square tiles */
+  gint zoom_level; /* The tile's zoom level */
 
-  gchar * uri;
-  gpointer data;
-  ChamplainState state;
-  gchar *filename;
-  ClutterActor *actor;
-  ClutterActor *content_actor;
-  ClutterAnimation *animation;
+  gchar *uri; /* The URI where to find the tile */
+  ChamplainState state; /* The tile state: loading, validation, done */
+  gchar *filename; /* The tile's cache filename */
+  ClutterActor *actor; /* An actor grouping all content actors */
+  ClutterActor *content_actor; /* The actual tile actor */
+  ClutterAnimation *animation; /* The fade in animation */
 
-  GTimeVal *modified_time;
-  gchar* etag;
+  GTimeVal *modified_time; /* The last modified time of the cache */
+  gchar* etag; /* The HTTP ETag sent by the server */
 };
 
 static void
@@ -211,7 +210,6 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   object_class->dispose = champlain_tile_dispose;
   object_class->finalize = champlain_tile_finalize;
 
-
   /**
   * ChamplainTile:x:
   *
@@ -222,12 +220,12 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   g_object_class_install_property (object_class,
       PROP_X,
       g_param_spec_int ("x",
-        "x",
-        "The X position of the tile",
-        G_MININT,
-        G_MAXINT,
-        0,
-        G_PARAM_READWRITE));
+          "x",
+          "The X position of the tile",
+          G_MININT,
+          G_MAXINT,
+          0,
+          G_PARAM_READWRITE));
 
   /**
   * ChamplainTile:y:
@@ -239,12 +237,12 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   g_object_class_install_property (object_class,
       PROP_Y,
       g_param_spec_int ("y",
-        "y",
-        "The Y position of the tile",
-        G_MININT,
-        G_MAXINT,
-        0,
-        G_PARAM_READWRITE));
+          "y",
+          "The Y position of the tile",
+          G_MININT,
+          G_MAXINT,
+          0,
+          G_PARAM_READWRITE));
 
   /**
   * ChamplainTile:zoom-level:
@@ -256,12 +254,12 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   g_object_class_install_property (object_class,
       PROP_ZOOM_LEVEL,
       g_param_spec_int ("zoom-level",
-        "Zoom Level",
-        "The zoom level of the tile",
-        G_MININT,
-        G_MAXINT,
-        0,
-        G_PARAM_READWRITE));
+          "Zoom Level",
+          "The zoom level of the tile",
+          G_MININT,
+          G_MAXINT,
+          0,
+          G_PARAM_READWRITE));
 
   /**
   * ChamplainTile:size:
@@ -273,12 +271,12 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   g_object_class_install_property (object_class,
       PROP_SIZE,
       g_param_spec_uint ("size",
-        "Size",
-        "The size of the tile",
-        0,
-        G_MAXINT,
-        256,
-        G_PARAM_READWRITE));
+          "Size",
+          "The size of the tile",
+          0,
+          G_MAXINT,
+          256,
+          G_PARAM_READWRITE));
 
   /**
   * ChamplainTile:state:
@@ -290,11 +288,11 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   g_object_class_install_property (object_class,
       PROP_STATE,
       g_param_spec_enum ("state",
-        "State",
-        "The state of the tile",
-        CHAMPLAIN_TYPE_STATE,
-        CHAMPLAIN_STATE_NONE,
-        G_PARAM_READWRITE));
+          "State",
+          "The state of the tile",
+          CHAMPLAIN_TYPE_STATE,
+          CHAMPLAIN_STATE_NONE,
+          G_PARAM_READWRITE));
 
   /**
   * ChamplainTile:uri:
@@ -306,10 +304,10 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   g_object_class_install_property (object_class,
       PROP_URI,
       g_param_spec_string ("uri",
-        "URI",
-        "The URI of the tile",
-        "",
-        G_PARAM_READWRITE));
+          "URI",
+          "The URI of the tile",
+          "",
+          G_PARAM_READWRITE));
 
   /**
   * ChamplainTile:filename:
@@ -321,10 +319,10 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   g_object_class_install_property (object_class,
       PROP_FILENAME,
       g_param_spec_string ("filename",
-        "Filename",
-        "The filename of the tile",
-        "",
-        G_PARAM_READWRITE));
+          "Filename",
+          "The filename of the tile",
+          "",
+          G_PARAM_READWRITE));
 
   /**
   * ChamplainTile:actor:
@@ -337,10 +335,10 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   g_object_class_install_property (object_class,
       PROP_ACTOR,
       g_param_spec_object ("actor",
-        "Actor",
-        "The tile's actor",
-        CLUTTER_TYPE_ACTOR,
-        G_PARAM_READABLE));
+          "Actor",
+          "The tile's actor",
+          CLUTTER_TYPE_ACTOR,
+          G_PARAM_READABLE));
 
   /**
   * ChamplainTile:content:
@@ -353,10 +351,10 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   g_object_class_install_property (object_class,
       PROP_CONTENT,
       g_param_spec_object ("content",
-        "Content",
-        "The tile's content",
-        CLUTTER_TYPE_ACTOR,
-        G_PARAM_READWRITE));
+          "Content",
+          "The tile's content",
+          CLUTTER_TYPE_ACTOR,
+          G_PARAM_READWRITE));
 
   /**
   * ChamplainTile:etag:
@@ -370,10 +368,10 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   g_object_class_install_property (object_class,
       PROP_ETAG,
       g_param_spec_string ("etag",
-        "Entity Tag",
-        "The entity tag of the tile",
-        NULL,
-        G_PARAM_READWRITE));
+          "Entity Tag",
+          "The entity tag of the tile",
+          NULL,
+          G_PARAM_READWRITE));
 
 }
 
@@ -388,8 +386,8 @@ champlain_tile_init (ChamplainTile *self)
   priv->y = 0;
   priv->zoom_level = 0;
   priv->size = 0;
-  priv->uri = g_strdup ("");
-  priv->filename = g_strdup ("");
+  priv->uri = NULL;
+  priv->filename = NULL;
   priv->modified_time = NULL;
   priv->etag = NULL;
 
@@ -424,11 +422,9 @@ champlain_tile_new (void)
 gint
 champlain_tile_get_x (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), 0);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  ChamplainTilePrivate *priv = self->priv;
-
-  return priv->x;
+  return self->priv->x;
 }
 
 /**
@@ -442,11 +438,9 @@ champlain_tile_get_x (ChamplainTile *self)
 gint
 champlain_tile_get_y (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), 0);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  ChamplainTilePrivate *priv = self->priv;
-
-  return priv->y;
+  return self->priv->y;
 }
 
 /**
@@ -460,11 +454,9 @@ champlain_tile_get_y (ChamplainTile *self)
 gint
 champlain_tile_get_zoom_level (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), 0);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  ChamplainTilePrivate *priv = self->priv;
-
-  return priv->zoom_level;
+  return self->priv->zoom_level;
 }
 
 /**
@@ -478,11 +470,9 @@ champlain_tile_get_zoom_level (ChamplainTile *self)
 guint
 champlain_tile_get_size (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), 0);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  ChamplainTilePrivate *priv = self->priv;
-
-  return priv->size;
+  return self->priv->size;
 }
 
 /**
@@ -496,11 +486,9 @@ champlain_tile_get_size (ChamplainTile *self)
 ChamplainState
 champlain_tile_get_state (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), CHAMPLAIN_STATE_NONE);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), CHAMPLAIN_STATE_NONE);
 
-  ChamplainTilePrivate *priv = self->priv;
-
-  return priv->state;
+  return self->priv->state;
 }
 
 /**
@@ -514,11 +502,9 @@ champlain_tile_get_state (ChamplainTile *self)
 G_CONST_RETURN gchar *
 champlain_tile_get_uri (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
-  ChamplainTilePrivate *priv = self->priv;
-
-  return priv->uri;
+  return self->priv->uri;
 }
 
 /**
@@ -532,11 +518,9 @@ champlain_tile_get_uri (ChamplainTile *self)
 G_CONST_RETURN gchar *
 champlain_tile_get_filename (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
-  ChamplainTilePrivate *priv = self->priv;
-
-  return priv->filename;
+  return self->priv->filename;
 }
 
 /**
@@ -544,14 +528,14 @@ champlain_tile_get_filename (ChamplainTile *self)
  * @self: the #ChamplainTile
  *
  * Returns the tile's actor.  This actor should not change during the tile's
- * lifetime.
+ * lifetime. You should not unref this actor, it is owned by the tile.
  *
  * Since: 0.4
  */
 ClutterActor *
 champlain_tile_get_actor (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
   return self->priv->actor;
 }
@@ -569,14 +553,15 @@ void
 champlain_tile_set_x (ChamplainTile *self,
     gint x)
 {
-  g_return_if_fail(CHAMPLAIN_TILE(self));
+  g_return_if_fail (CHAMPLAIN_TILE (self));
 
   ChamplainTilePrivate *priv = self->priv;
 
   priv->x = x;
 
   if (priv->actor != NULL)
-    clutter_actor_set_position (priv->actor, priv->x * priv->size,
+    clutter_actor_set_position (priv->actor,
+        priv->x * priv->size,
         priv->y * priv->size);
 
   g_object_notify (G_OBJECT (self), "x");
@@ -595,14 +580,16 @@ void
 champlain_tile_set_y (ChamplainTile *self,
     gint y)
 {
-  g_return_if_fail(CHAMPLAIN_TILE(self));
+  g_return_if_fail (CHAMPLAIN_TILE (self));
 
   ChamplainTilePrivate *priv = self->priv;
 
   priv->y = y;
   if (priv->actor != NULL)
-    clutter_actor_set_position (priv->actor, priv->x * priv->size,
+    clutter_actor_set_position (priv->actor,
+        priv->x * priv->size,
         priv->y * priv->size);
+
   g_object_notify (G_OBJECT (self), "y");
 }
 
@@ -619,11 +606,10 @@ void
 champlain_tile_set_zoom_level (ChamplainTile *self,
     gint zoom_level)
 {
-  g_return_if_fail(CHAMPLAIN_TILE(self));
+  g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  ChamplainTilePrivate *priv = self->priv;
+  self->priv->zoom_level = zoom_level;
 
-  priv->zoom_level = zoom_level;
   g_object_notify (G_OBJECT (self), "zoom-level");
 }
 
@@ -632,7 +618,7 @@ champlain_tile_set_zoom_level (ChamplainTile *self,
  * @self: the #ChamplainTile
  * @size: the size in pixels
  *
- * Sets the tile's zoom level
+ * Sets the tile's size
  *
  * Since: 0.4
  */
@@ -640,15 +626,17 @@ void
 champlain_tile_set_size (ChamplainTile *self,
     guint size)
 {
-  g_return_if_fail(CHAMPLAIN_TILE(self));
+  g_return_if_fail (CHAMPLAIN_TILE (self));
 
   ChamplainTilePrivate *priv = self->priv;
 
   priv->size = size;
 
   if (priv->actor != NULL)
-    clutter_actor_set_position (priv->actor, priv->x * priv->size,
+    clutter_actor_set_position (priv->actor,
+        priv->x * priv->size,
         priv->y * priv->size);
+
   g_object_notify (G_OBJECT (self), "size");
 }
 
@@ -665,11 +653,10 @@ void
 champlain_tile_set_state (ChamplainTile *self,
     ChamplainState state)
 {
-  g_return_if_fail(CHAMPLAIN_TILE(self));
+  g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  ChamplainTilePrivate *priv = self->priv;
+  self->priv->state = state;
 
-  priv->state = state;
   g_object_notify (G_OBJECT (self), "state");
 }
 
@@ -708,13 +695,14 @@ void
 champlain_tile_set_uri (ChamplainTile *self,
     const gchar *uri)
 {
-  g_return_if_fail(CHAMPLAIN_TILE(self));
-  g_return_if_fail(uri != NULL);
+  g_return_if_fail (CHAMPLAIN_TILE (self));
+  g_return_if_fail (uri != NULL);
 
   ChamplainTilePrivate *priv = self->priv;
 
   g_free (priv->uri);
   priv->uri = g_strdup (uri);
+
   g_object_notify (G_OBJECT (self), "uri");
 }
 
@@ -731,13 +719,14 @@ void
 champlain_tile_set_filename (ChamplainTile *self,
     const gchar *filename)
 {
-  g_return_if_fail(CHAMPLAIN_TILE(self));
-  g_return_if_fail(filename != NULL);
+  g_return_if_fail (CHAMPLAIN_TILE (self));
+  g_return_if_fail (filename != NULL);
 
   ChamplainTilePrivate *priv = self->priv;
 
   g_free (priv->filename);
   priv->filename = g_strdup (filename);
+
   g_object_notify (G_OBJECT (self), "filename");
 }
 
@@ -749,14 +738,12 @@ champlain_tile_set_filename (ChamplainTile *self,
  *
  * Since: 0.4
  */
-const GTimeVal *
+G_CONST_RETURN GTimeVal *
 champlain_tile_get_modified_time (ChamplainTile *self)
 {
-  g_return_val_if_fail (CHAMPLAIN_TILE(self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
-  ChamplainTilePrivate *priv = self->priv;
-
-  return priv->modified_time;
+  return self->priv->modified_time;
 }
 
 /**
@@ -772,7 +759,7 @@ void
 champlain_tile_set_modified_time (ChamplainTile *self,
     const GTimeVal *time_)
 {
-  g_return_if_fail (CHAMPLAIN_TILE(self));
+  g_return_if_fail (CHAMPLAIN_TILE (self));
   g_return_if_fail (time != NULL);
 
   ChamplainTilePrivate *priv = self->priv;
@@ -785,14 +772,15 @@ champlain_tile_set_modified_time (ChamplainTile *self,
  * champlain_tile_get_modified_time_string:
  * @self: the #ChamplainTile
  *
- * Returns the tile's modified time as a string
+ * Returns the tile's modified time as a string (formated as per RFC 1123)
  *
  * Since: 0.4
  */
 gchar *
 champlain_tile_get_modified_time_string (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
+
   ChamplainTilePrivate *priv = self->priv;
 
   if (priv->modified_time == NULL)
@@ -814,10 +802,10 @@ champlain_tile_get_modified_time_string (ChamplainTile *self)
  *
  * Since: 0.4
  */
-const gchar *
+G_CONST_RETURN gchar *
 champlain_tile_get_etag (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), "");
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), "");
 
   return self->priv->etag;
 }
@@ -835,7 +823,7 @@ void
 champlain_tile_set_etag (ChamplainTile *self,
     const gchar *etag)
 {
-  g_return_if_fail(CHAMPLAIN_TILE(self));
+  g_return_if_fail (CHAMPLAIN_TILE (self));
 
   ChamplainTilePrivate *priv = self->priv;
 
@@ -862,6 +850,7 @@ fade_in_completed (ClutterAnimation *animation,
     {
       if (priv->actor != NULL)
         clutter_container_remove (CLUTTER_CONTAINER (priv->actor), ctx->old_actor, NULL);
+
       g_object_unref (ctx->old_actor);
     }
 
@@ -869,14 +858,13 @@ fade_in_completed (ClutterAnimation *animation,
   g_free (ctx);
 }
 
-
 /**
  * champlain_tile_set_content:
  * @self: the #ChamplainTile
  * @actor: the new content
  * @fade_in: if the new content should be faded in
  *
- * Returns the tile's content
+ * Sets the tile's content
  *
  * Since: 0.4
  */
@@ -885,8 +873,8 @@ champlain_tile_set_content (ChamplainTile *self,
     ClutterActor *actor,
     gboolean fade_in)
 {
-  g_return_if_fail(CHAMPLAIN_TILE(self));
-  g_return_if_fail(actor != NULL);
+  g_return_if_fail (CHAMPLAIN_TILE (self));
+  g_return_if_fail (actor != NULL);
 
   ChamplainTilePrivate *priv = self->priv;
   ClutterActor *old_actor = NULL;
@@ -905,13 +893,14 @@ champlain_tile_set_content (ChamplainTile *self,
         old_actor = g_object_ref (priv->content_actor);
       else
         clutter_container_remove (CLUTTER_CONTAINER (priv->actor), priv->content_actor, NULL);
+
       g_object_unref (priv->content_actor);
     }
 
   if (priv->actor != NULL)
     clutter_container_add (CLUTTER_CONTAINER (priv->actor), actor, NULL);
 
-  if (fade_in == TRUE && priv->actor !=  NULL)
+  if (fade_in == TRUE && priv->actor != NULL)
     {
       clutter_actor_set_opacity (actor, 0);
 
@@ -925,20 +914,22 @@ champlain_tile_set_content (ChamplainTile *self,
     }
 
   priv->content_actor = g_object_ref (actor);
+
   g_object_notify (G_OBJECT (self), "content");
 }
 
 /**
  * champlain_tile_get_content:
  *
- * Returns the tile's content
+ * Returns the tile's content, this actor will change each time the tile's content changes.
+ * You should not unref this content, it is owned by the tile.
  *
  * Since: 0.4
  */
 ClutterActor *
 champlain_tile_get_content (ChamplainTile *self)
 {
-  g_return_val_if_fail(CHAMPLAIN_TILE(self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
   return self->priv->content_actor;
 }
