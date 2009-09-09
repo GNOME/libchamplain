@@ -27,7 +27,7 @@
 Map*
 map_new (void)
 {
-  Map *map = g_new0(Map, 1);
+  Map *map = g_new0 (Map, 1);
 
   map->previous_level = NULL;
   map->current_level = NULL;
@@ -36,12 +36,26 @@ map_new (void)
 }
 
 void
-map_load_level(Map *map,
+map_load_level (Map *map,
     ChamplainMapSource *map_source,
     gint zoom_level)
 {
-  if (map->previous_level)
-    g_object_unref (map->previous_level);
+  if (map->previous_level != NULL)
+    {
+      if (champlain_zoom_level_get_zoom_level (map->previous_level) == zoom_level)
+        {
+          /* Swap current and previous, instead of reloading it */
+          ChamplainZoomLevel *tmp = map->previous_level;
+
+          map->previous_level = map->current_level;
+          map->current_level = tmp;
+
+          return;
+        }
+      else
+        g_object_unref (map->previous_level);
+    }
+
   map->previous_level = map->current_level;
 
   guint row_count = champlain_map_source_get_row_count (map_source, zoom_level);
@@ -60,11 +74,13 @@ map_zoom_in (Map *map,
     ChamplainMapSource *source)
 {
   guint new_level = champlain_zoom_level_get_zoom_level (map->current_level) + 1;
+
   if(new_level <= champlain_map_source_get_max_zoom_level (source))
     {
-      map_load_level(map, source, new_level);
+      map_load_level (map, source, new_level);
       return TRUE;
     }
+
   return FALSE;
 }
 
@@ -73,11 +89,13 @@ map_zoom_out (Map *map,
     ChamplainMapSource *source)
 {
   gint new_level = champlain_zoom_level_get_zoom_level (map->current_level) - 1;
+
   if(new_level >= champlain_map_source_get_min_zoom_level (source))
     {
-      map_load_level(map, source, new_level);
+      map_load_level (map, source, new_level);
       return TRUE;
     }
+
   return FALSE;
 }
 
@@ -86,8 +104,10 @@ map_free (Map *map)
 {
   if (map->previous_level != NULL)
     g_object_unref (map->previous_level);
+
   if (map->current_level != NULL)
     g_object_unref (map->current_level);
+
   g_free (map);
 }
 
@@ -96,10 +116,11 @@ map_zoom_to (Map *map,
     ChamplainMapSource *source,
     guint zoomLevel)
 {
-  if (zoomLevel<= champlain_map_source_get_max_zoom_level (source))
+  if (zoomLevel <= champlain_map_source_get_max_zoom_level (source))
     {
-      map_load_level(map, source, zoomLevel);
+      map_load_level (map, source, zoomLevel);
       return TRUE;
     }
+
   return FALSE;
 }
