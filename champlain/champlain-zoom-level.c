@@ -48,11 +48,11 @@ enum
 };
 
 struct _ChamplainZoomLevelPrivate {
-  guint width;
-  guint height;
+  guint width; /* The absolute width of the zoom level in tiles */
+  guint height; /* The absolute height of the zoom level in tiles */
   gint zoom_level;
-  GPtrArray *tiles;
-  ClutterActor *actor;
+  GPtrArray *tiles; /* Contains the tiles of this level */
+  ClutterActor *actor;  /* The actor on which tile actors are added */
 };
 
 static void
@@ -108,6 +108,7 @@ champlain_zoom_level_set_property (GObject *object,
 static void
 champlain_zoom_level_dispose (GObject *object)
 {
+
   guint k;
   ChamplainZoomLevel *level = CHAMPLAIN_ZOOM_LEVEL (object);
   ChamplainZoomLevelPrivate *priv = level->priv;
@@ -162,6 +163,13 @@ champlain_zoom_level_class_init (ChamplainZoomLevelClass *klass)
       G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__OBJECT,
       G_TYPE_NONE, 1, CHAMPLAIN_TYPE_TILE);
 
+  /**
+  * ChamplainZoomLevel:width:
+  *
+  * The absolute width of the zoom level in tiles
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_WIDTH,
       g_param_spec_uint ("width",
@@ -172,6 +180,13 @@ champlain_zoom_level_class_init (ChamplainZoomLevelClass *klass)
           0,
           G_PARAM_READWRITE));
 
+  /**
+  * ChamplainZoomLevel:height:
+  *
+  * The absolute height of the zoom level in tiles
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_HEIGHT,
       g_param_spec_uint ("height",
@@ -182,6 +197,13 @@ champlain_zoom_level_class_init (ChamplainZoomLevelClass *klass)
           0,
           G_PARAM_READWRITE));
 
+  /**
+  * ChamplainZoomLevel:zoom-level:
+  *
+  * The zoom level
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_ZOOM_LEVEL,
       g_param_spec_int ("zoom-level",
@@ -192,6 +214,13 @@ champlain_zoom_level_class_init (ChamplainZoomLevelClass *klass)
           0,
           G_PARAM_READWRITE));
 
+  /**
+  * ChamplainZoomLevel:actor:
+  *
+  * The #ClutterActor containing all the tiles
+  *
+  * Since: 0.4
+  */
   g_object_class_install_property (object_class,
       PROP_ACTOR,
       g_param_spec_object ("actor",
@@ -205,18 +234,34 @@ static void
 champlain_zoom_level_init (ChamplainZoomLevel *self)
 {
   ChamplainZoomLevelPrivate *priv = GET_PRIVATE (self);
+  self->priv = priv;
 
   priv->tiles = g_ptr_array_sized_new (64);
   priv->actor = g_object_ref (clutter_group_new ());
-  self->priv = priv;
 }
 
+/**
+ * champlain_zoom_level_new:
+ *
+ * Returns a new ChamplainZoomLevel
+ *
+ * Since: 0.4
+ */
 ChamplainZoomLevel*
 champlain_zoom_level_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_ZOOM_LEVEL, NULL);
 }
 
+/**
+ * champlain_zoom_level_add_tile:
+ * @self: a #ChamplainZoomLevel
+ * @tile: a #ChamplainTile
+ *
+ * Adds a #ChamplainTile to a #ChamplainZoomLevel.
+ *
+ * Since: 0.4
+ */
 void
 champlain_zoom_level_add_tile (ChamplainZoomLevel *self,
     ChamplainTile *tile)
@@ -227,9 +272,19 @@ champlain_zoom_level_add_tile (ChamplainZoomLevel *self,
 
   g_object_ref (tile);
   g_ptr_array_add (priv->tiles, tile);
+
   g_signal_emit (self, signals[SIGNAL_TILE_ADDED], 0, tile);
 }
 
+/**
+ * champlain_zoom_level_remove_tile:
+ * @self: a #ChamplainZoomLevel
+ * @tile: a #ChamplainTile
+ *
+ * Removes a #ChamplainTile to a #ChamplainZoomLevel.
+ *
+ * Since: 0.4
+ */
 void
 champlain_zoom_level_remove_tile (ChamplainZoomLevel *self,
     ChamplainTile *tile)
@@ -239,108 +294,168 @@ champlain_zoom_level_remove_tile (ChamplainZoomLevel *self,
   ChamplainZoomLevelPrivate *priv = self->priv;
 
   g_signal_emit (self, signals[SIGNAL_TILE_REMOVED], 0, tile);
+
   g_ptr_array_remove_fast (priv->tiles, tile);
   g_object_unref (tile);
 }
 
+/**
+ * champlain_zoom_level_tile_count:
+ * @self: a #ChamplainZoomLevel
+ *
+ * Returns the number of tiles in a #ChamplainZoomLevel.
+ *
+ * Since: 0.4
+ */
 guint
 champlain_zoom_level_tile_count (ChamplainZoomLevel *self)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), 0);
 
-  ChamplainZoomLevelPrivate *priv = self->priv;
-
-  return priv->tiles->len;
+  return self->priv->tiles->len;
 }
 
+/**
+ * champlain_zoom_level_get_nth_tile:
+ * @self: a #ChamplainZoomLevel
+ * @index: an index
+ *
+ * Returns the #ChamplainTile at given index
+ *
+ * Since: 0.4
+ */
 ChamplainTile *
 champlain_zoom_level_get_nth_tile (ChamplainZoomLevel *self,
     guint index)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), NULL);
-
-  ChamplainZoomLevelPrivate *priv = self->priv;
-  g_return_val_if_fail (index < priv->tiles->len, NULL);
+  g_return_val_if_fail (index < self->priv->tiles->len, NULL);
   g_return_val_if_fail (index >= 0, NULL);
 
-  return g_ptr_array_index (priv->tiles, index);
+  return g_ptr_array_index (self->priv->tiles, index);
 }
 
+/**
+ * champlain_zoom_level_get_width:
+ * @self: a #ChamplainZoomLevel
+ *
+ * Returns the absolute width of a #ChamplainZoomLevel in tiles
+ *
+ * Since: 0.4
+ */
 guint
 champlain_zoom_level_get_width (ChamplainZoomLevel *self)
 {
-
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), 0);
 
-  ChamplainZoomLevelPrivate *priv = self->priv;
-
-  return priv->width;
+  return self->priv->width;
 }
 
+/**
+ * champlain_zoom_level_get_height:
+ * @self: a #ChamplainZoomLevel
+ *
+ * Returns the absolute height of a #ChamplainZoomLevel in tiles
+ *
+ * Since: 0.4
+ */
 guint
 champlain_zoom_level_get_height (ChamplainZoomLevel *self)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), 0);
 
-  ChamplainZoomLevelPrivate *priv = self->priv;
-
-  return priv->height;
+  return self->priv->height;
 }
 
+/**
+ * champlain_zoom_level_get_zoom_level:
+ * @self: a #ChamplainZoomLevel
+ *
+ * Returns the zoom level of a #ChamplainZoomLevel
+ *
+ * Since: 0.4
+ */
 gint
 champlain_zoom_level_get_zoom_level (ChamplainZoomLevel *self)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), 0);
 
-  ChamplainZoomLevelPrivate *priv = self->priv;
-
-  return priv->zoom_level;
+  return self->priv->zoom_level;
 }
 
+/**
+ * champlain_zoom_level_set_width:
+ * @self: a #ChamplainZoomLevel
+ * @width: a width
+ *
+ * Sets the absolute width of a #ChamplainZoomLevel in tiles
+ *
+ * Since: 0.4
+ */
 void
 champlain_zoom_level_set_width (ChamplainZoomLevel *self,
     guint width)
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
-  ChamplainZoomLevelPrivate *priv = self->priv;
+  self->priv->width = width;
 
-  priv->width = width;
   g_object_notify (G_OBJECT (self), "width");
 }
 
+/**
+ * champlain_zoom_level_set_height:
+ * @self: a #ChamplainZoomLevel
+ * @height: a height
+ *
+ * Sets the absolute height of a #ChamplainZoomLevel in tiles
+ *
+ * Since: 0.4
+ */
 void
 champlain_zoom_level_set_height (ChamplainZoomLevel *self,
     guint height)
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
-  ChamplainZoomLevelPrivate *priv = self->priv;
+  self->priv->height = height;
 
-  priv->height = height;
   g_object_notify (G_OBJECT (self), "height");
-
 }
 
+/**
+ * champlain_zoom_level_set_zoom_level:
+ * @self: a #ChamplainZoomLevel
+ * @zoom_level: a zoom_level
+ *
+ * Sets the zoom_level of a #ChamplainZoomLevel
+ *
+ * Since: 0.4
+ */
 void
 champlain_zoom_level_set_zoom_level (ChamplainZoomLevel *self,
     gint zoom_level)
 {
   g_return_if_fail (CHAMPLAIN_ZOOM_LEVEL (self));
 
-  ChamplainZoomLevelPrivate *priv = self->priv;
+  self->priv->zoom_level = zoom_level;
 
-  priv->zoom_level = zoom_level;
   g_object_notify (G_OBJECT (self), "zoom-level");
-
 }
 
+/**
+ * champlain_zoom_level_get_actor:
+ * @self: a #ChamplainZoomLevel
+ *
+ * Returns the #ClutterActor containing all the tiles of a #ChamplainZoomLevel,
+ * it should not be unref.
+ *
+ * Since: 0.4
+ */
 ClutterActor *
 champlain_zoom_level_get_actor (ChamplainZoomLevel *self)
 {
   g_return_val_if_fail (CHAMPLAIN_ZOOM_LEVEL (self), NULL);
 
-  ChamplainZoomLevelPrivate *priv = self->priv;
-
-  return priv->actor;
+  return self->priv->actor;
 }
