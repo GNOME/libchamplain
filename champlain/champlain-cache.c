@@ -192,12 +192,12 @@ champlain_cache_class_init (ChamplainCacheClass *klass)
   g_object_class_install_property (object_class,
       PROP_SIZE_LIMIT,
       g_param_spec_uint ("size-limit",
-        "Size Limit",
-        "The cache's size limit (Mb)",
-        1,
-        G_MAXINT,
-        100000000,
-        G_PARAM_READWRITE));
+          "Size Limit",
+          "The cache's size limit (Mb)",
+          1,
+          G_MAXINT,
+          100000000,
+          G_PARAM_READWRITE));
 }
 
 static void

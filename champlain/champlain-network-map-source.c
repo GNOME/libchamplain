@@ -153,9 +153,6 @@ champlain_network_map_source_set_property (GObject *object,
 static void
 champlain_network_map_source_dispose (GObject *object)
 {
-  //ChamplainNetworkMapSource *source = CHAMPLAIN_NETWORK_MAP_SOURCE (object);
-  //ChamplainNetworkMapSourcePrivate *priv = source->priv;
-
   if (soup_session != NULL)
       soup_session_abort (soup_session);
 }
@@ -238,7 +235,7 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
 
   champlainMapSource->priv = priv;
 
-  priv->proxy_uri = g_strdup ("");
+  priv->proxy_uri = NULL;
   priv->uri_format = NULL;
   priv->offline = FALSE;
 }
@@ -331,6 +328,7 @@ champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *source,
 
       token = tokens[++i];
     }
+
   token = ret->str;
   g_string_free (ret, FALSE);
   g_strfreev (tokens);
@@ -351,7 +349,6 @@ champlain_network_map_source_get_tile_uri (ChamplainNetworkMapSource *source,
  * For example, this is the OpenStreetMap URI format:
  * "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png"
  *
- *
  * Since: 0.4
  */
 void
@@ -368,7 +365,6 @@ static gchar *
 get_filename (ChamplainNetworkMapSource *source,
     ChamplainTile *tile)
 {
-  //ChamplainNetworkMapSourcePrivate *priv = source->priv;
   return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
              "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
              "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
@@ -387,7 +383,7 @@ create_error_tile (ChamplainTile* tile)
 
   size = champlain_tile_get_size (tile);
   actor = clutter_cairo_texture_new (size, size);
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE(actor));
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (actor));
 
   /* draw a linear gray to white pattern */
   pat = cairo_pattern_create_linear (size / 2.0, 0.0,  size, size / 2.0);
@@ -491,11 +487,10 @@ file_loaded_cb (SoupSession *session,
         {
           g_warning ("Unable to load the pixbuf: %s", error->message);
           g_error_free (error);
-          create_error_tile (tile);
-          goto cleanup;
         }
 
-      g_object_unref (loader);
+      create_error_tile (tile);
+      goto cleanup;
     }
 
   gdk_pixbuf_loader_close (loader, &error);
@@ -532,14 +527,13 @@ file_loaded_cb (SoupSession *session,
   DEBUG ("Received ETag %s", etag);
 
   if (etag != NULL)
-    {
-      champlain_tile_set_etag (tile, etag);
-    }
-  champlain_cache_update_tile (cache, tile, filesize); //XXX
+    champlain_tile_set_etag (tile, etag);
+
+  champlain_cache_update_tile (cache, tile, filesize);
 
   /* Load the image into clutter */
-  GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
-  actor = clutter_texture_new();
+  GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+  actor = clutter_texture_new ();
   if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
       gdk_pixbuf_get_pixels (pixbuf),
       gdk_pixbuf_get_has_alpha (pixbuf),
@@ -618,7 +612,7 @@ fill_tile (ChamplainMapSource *map_source,
       if (!soup_session)
         {
           soup_session = soup_session_async_new_with_options ("proxy-uri",
-                soup_uri_new (priv->proxy_uri),
+              soup_uri_new (priv->proxy_uri),
 #ifdef HAVE_LIBSOUP_GNOME
               SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
 #endif
