@@ -125,6 +125,7 @@ static MemphisMap*
 champlain_map_data_source_real_get_map_data (ChamplainMapDataSource *self)
 {
   g_error ("Should not be reached");
+  return NULL;
 }
 
 static void
