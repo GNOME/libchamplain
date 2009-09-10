@@ -1764,7 +1764,8 @@ view_load_visible_tiles (ChamplainView *view)
           {
             actor = champlain_tile_get_actor (tile);
             group = champlain_zoom_level_get_actor (level);
-            clutter_container_remove_actor (CLUTTER_CONTAINER (group), actor);
+            if (actor != NULL)
+              clutter_container_remove_actor (CLUTTER_CONTAINER (group), actor);
           }
         champlain_zoom_level_remove_tile (level, tile);
         count = champlain_zoom_level_tile_count (level);
