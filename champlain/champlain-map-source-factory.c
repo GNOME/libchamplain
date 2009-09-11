@@ -215,6 +215,8 @@ ChamplainMapSourceDesc OSM_TRANSPORTMAP_DESC =
     NULL
   };
 
+#if 0
+/* Disabling until OpenArealMap works again */
 static
 ChamplainMapSourceDesc OAM_DESC =
   {
@@ -229,6 +231,7 @@ ChamplainMapSourceDesc OAM_DESC =
     "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg",
     NULL
   };
+#endif
 
 static
 ChamplainMapSourceDesc MFF_RELIEF_DESC =
@@ -262,8 +265,10 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
       OSM_TRANSPORTMAP_DESC.constructor, OSM_TRANSPORTMAP_DESC.data);
   champlain_map_source_factory_register (factory, &OSM_OSMARENDER_DESC,
       OSM_OSMARENDER_DESC.constructor, OSM_OSMARENDER_DESC.data);
+#if 0
   champlain_map_source_factory_register (factory, &OAM_DESC,
       OAM_DESC.constructor, OAM_DESC.data);
+#endif
   champlain_map_source_factory_register (factory, &MFF_RELIEF_DESC,
       MFF_RELIEF_DESC.constructor, MFF_RELIEF_DESC.data);
 }
