@@ -693,16 +693,16 @@ ClutterColor * champlain_memphis_map_source_get_background_color (
 
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
   ClutterColor color;
-  gint16 r, b, g;
+  guint8 r, b, g, a;
 
   g_static_rw_lock_reader_lock (&MemphisLock);
-  memphis_rule_set_get_bg_color (priv->rules, &r, &g, &b);
+  memphis_rule_set_get_bg_color (priv->rules, &r, &g, &b, &a);
   g_static_rw_lock_reader_unlock (&MemphisLock);
 
-  color.red = (guint8) r;
-  color.green = (guint8) g;
-  color.blue = (guint8) b;
-  color.alpha = 255;
+  color.red = r;
+  color.green = g;
+  color.blue = b;
+  color.alpha = a;
   return clutter_color_copy (&color);
 }
 
@@ -725,8 +725,8 @@ champlain_memphis_map_source_set_background_color (
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
 
   g_static_rw_lock_writer_lock (&MemphisLock);
-  memphis_rule_set_set_bg_color (priv->rules, (gint16) color->red,
-      (gint16) color->green, (gint16) color->blue);
+  memphis_rule_set_set_bg_color (priv->rules, color->red,
+      color->green, color->blue, color->alpha);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
   if (!priv->persistent_cache)
