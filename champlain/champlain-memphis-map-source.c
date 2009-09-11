@@ -748,7 +748,7 @@ champlain_memphis_map_source_set_rule (ChamplainMemphisMapSource *self,
     MemphisRule *rule)
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self) &&
-      MEMPHIS_IS_RULE (rule));
+      MEMPHIS_RULE (rule));
 
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
 
