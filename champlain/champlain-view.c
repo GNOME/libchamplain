@@ -197,6 +197,8 @@ static gboolean finger_scroll_button_press_cb (ClutterActor *actor,
 static void update_license (ChamplainView *view);
 static void license_set_position (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
+static void view_position_tile (ChamplainView* view, ChamplainTile* tile);
+static void view_tiles_reposition (ChamplainView* view);
 static void view_update_state (ChamplainView *view);
 static gboolean view_set_zoom_level_at (ChamplainView *view,
     gint zoom_level,
@@ -346,6 +348,7 @@ create_initial_map (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), group);
 
   g_idle_add (marker_reposition, view);
+  view_tiles_reposition (view);
   update_license (view);
 
   g_object_notify (G_OBJECT (view), "zoom-level");
@@ -1049,6 +1052,7 @@ viewport_pos_changed_cb (GObject *gobject,
   priv->viewport_size.y = rect.y;
 
   view_load_visible_tiles (view);
+  view_tiles_reposition (view);
   marker_reposition (view);
   view_update_polygons (view);
 
@@ -1303,6 +1307,7 @@ champlain_view_center_on (ChamplainView *view,
   g_object_notify (G_OBJECT (view), "latitude");
 
   view_load_visible_tiles (view);
+  view_tiles_reposition (view);
   view_update_polygons (view);
   marker_reposition (view);
 }
@@ -1816,10 +1821,47 @@ view_load_visible_tiles (ChamplainView *view)
 }
 
 static void
+view_position_tile (ChamplainView* view,
+    ChamplainTile* tile)
+{
+  ClutterActor *actor;
+  gint x;
+  gint y;
+  guint size;
+
+  actor = champlain_tile_get_actor (tile);
+  x = champlain_tile_get_x (tile);
+  y = champlain_tile_get_y (tile);
+  size = champlain_tile_get_size (tile);
+
+  clutter_actor_set_position (actor, (x * size), (y * size));
+}
+
+static void
+view_tiles_reposition (ChamplainView* view)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  gint i;
+  return;
+
+  for (i = 0; i < champlain_zoom_level_tile_count (priv->map->current_level); i++)
+    {
+      ChamplainTile *tile = champlain_zoom_level_get_nth_tile (priv->map->current_level, i);
+
+      if (tile == NULL)
+        continue;
+
+      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+        view_position_tile (view, tile);
+    }
+}
+
+static void
 tile_state_notify (GObject *gobject,
     GParamSpec *pspec,
     gpointer data)
 {
+  view_position_tile (CHAMPLAIN_VIEW (data), CHAMPLAIN_TILE (gobject));
   view_update_state (CHAMPLAIN_VIEW (data));
 }
 
@@ -1907,6 +1949,7 @@ champlain_view_set_map_source (ChamplainView *view,
 
   update_license (view);
   g_idle_add (marker_reposition, view);
+  view_tiles_reposition (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
 }
 
