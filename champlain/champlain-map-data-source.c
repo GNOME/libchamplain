@@ -121,7 +121,7 @@ champlain_map_data_source_finalize (GObject *object)
   G_OBJECT_CLASS (champlain_map_data_source_parent_class)->finalize (object);
 }
 
-static MemphisMap*
+static MemphisMap *
 champlain_map_data_source_real_get_map_data (ChamplainMapDataSource *self)
 {
   g_error ("Should not be reached");
