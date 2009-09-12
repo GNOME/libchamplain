@@ -402,15 +402,15 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
   while (list != NULL)
     {
       ChamplainPoint *point = (ChamplainPoint*) list->data;
-      gint x, y;
+      gfloat x, y;
 
       x = champlain_map_source_get_x (priv->map_source, priv->zoom_level,
           point->lon);
       y = champlain_map_source_get_y (priv->map_source, priv->zoom_level,
           point->lat);
 
-      x -= priv->viewport_size.x;
-      y -= priv->viewport_size.y;
+      x -= priv->viewport_size.x + priv->anchor.x;
+      y -= priv->viewport_size.y + priv->anchor.y;
 
       cairo_line_to (cr, x, y);
       list = list->next;
@@ -2543,7 +2543,7 @@ view_update_polygons (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
   GList *polygons;
-  gint x, y;
+  gfloat x, y;
 
   if (priv->polygons == NULL)
     return;
