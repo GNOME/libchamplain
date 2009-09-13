@@ -2,14 +2,7 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
-champlain-0.3.pc
-champlain-gtk-0.3.pc
-champlain.pc
-champlain-gtk.pc
-champlain-0.3-uninstalled.pc
-champlain-gtk-0.3-uninstalled.pc
-champlain-uninstalled.pc
-champlain-gtk-uninstalled.pc
+*.pc
 .deps
 .libs
 *.o

@@ -12,7 +12,7 @@ CLEANFILES = $(BUILT_SOURCES)
 CHAMPLAIN_MARSHAL = champlain-marshal
 CHAMPLAIN_MARSHAL_LIST = champlain-marshal.list
 
-lib_LTLIBRARIES = libchamplain-0.3.la
+lib_LTLIBRARIES = libchamplain-0.4.la
 
 libchamplain_headers = \
 	champlain.h 			\
@@ -34,7 +34,7 @@ libchamplain_headers = \
 	champlain-version.h
 
 
-libchamplain_0_3_la_SOURCES = \
+libchamplain_0_4_la_SOURCES = \
 	$(CHAMPLAIN_MARSHAL_LIST) 	\
 	$(BUILT_SOURCES) 		\
 	champlain-debug.c 		\
@@ -93,11 +93,11 @@ libchamplain_include_HEADERS = \
 	champlain-polygon.h		\
 	champlain-version.h
 
-libchamplain_0_3_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) ../tidy/libtidy-1.0.la
+libchamplain_0_4_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) ../tidy/libtidy-1.0.la
 
-libchamplain_includedir = $(includedir)/libchamplain-0.3/champlain
+libchamplain_includedir = $(includedir)/libchamplain-0.4/champlain
 
-libchamplain_0_3_la_LDFLAGS = -version-info $(LIBRARY_VERSION) \
+libchamplain_0_4_la_LDFLAGS = -version-info $(LIBRARY_VERSION) \
 	-export-symbols-regex		\
 	^champlain_.*
 
@@ -160,22 +160,22 @@ champlain-enum-types.c: $(libchamplain_headers) Makefile
 if HAVE_INTROSPECTION
 BUILT_GIRSOURCES =
 
-Champlain-0.3.gir: $(INTROSPECTION_SCANNER) libchamplain-0.3.la
+Champlain-0.4.gir: $(INTROSPECTION_SCANNER) libchamplain-0.4.la
 	$(QUIET_GEN)$(INTROSPECTION_SCANNER) -v \
-	--namespace Champlain --nsversion=0.3 \
+	--namespace Champlain --nsversion=0.4 \
 	--strip-prefix=Champlain \
 	$(INCLUDES) \
 	--add-include-path=$(srcdir) --add-include=path=. \
 	--c-include="$(libchamplain_include_HEADERS)" \
 	--include=Clutter-1.0 \
 	--include=Gtk-2.0 \
-	--library=champlain-0.3 \
+	--library=champlain-0.4 \
 	--output $@ \
 	--pkg gobject-2.0 \
 	--pkg gtk+-2.0 \
-	$(libchamplain_0_3_la_SOURCES) $(libchamplain_include_HEADERS)
+	$(libchamplain_0_4_la_SOURCES) $(libchamplain_include_HEADERS)
 
-BUILT_GIRSOURCES += Champlain-0.3.gir
+BUILT_GIRSOURCES += Champlain-0.4.gir
 
 # INTROSPECTION_GIRDIR/INTROSPECTION_TYPELIBDIR aren't the right place to
 # install anything - we need to install inside our prefix.

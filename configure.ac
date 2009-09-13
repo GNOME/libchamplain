@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 m4_define([champlain_major_version], [0])
-m4_define([champlain_minor_version], [3])
-m4_define([champlain_micro_version], [92])
+m4_define([champlain_minor_version], [4])
+m4_define([champlain_micro_version], [0])
 m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
 m4_define([api_version],
@@ -28,7 +28,7 @@ AM_PROG_CC_C_O
 AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
 # Checks for libraries.
-LIBRARY_VERSION=3:3:0
+LIBRARY_VERSION=0:0:0
 # API_VERSION is used to generate pc files only
 API_VERSION=api_version
 CHAMPLAIN_MAJOR_VERSION=champlain_major_version
