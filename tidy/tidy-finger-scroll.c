@@ -131,7 +131,7 @@ tidy_finger_scroll_finalize (GObject *object)
   TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (object)->priv;
 
   g_array_free (priv->motion_buffer, TRUE);
- 
+
   G_OBJECT_CLASS (tidy_finger_scroll_parent_class)->finalize (object);
 }
 
@@ -420,7 +420,7 @@ button_release_event_cb (ClutterActor *actor,
           else
             time_diff = release_time.tv_usec +
                         (G_USEC_PER_SEC - motion_time.tv_usec);
-          
+
           /* On a macbook that's running Ubuntu 9.04 sometimes 'time_diff' is 0
              and this causes a division by 0 when computing 'frac'. This check
              avoids this error.
@@ -433,7 +433,7 @@ button_release_event_cb (ClutterActor *actor,
               /* See how many units to move in 1/60th of a second */
               priv->dx = (x_origin - x) / frac;
               priv->dy = (y_origin - y) / frac;
-              
+
               /* Get adjustments to do step-increment snapping */
               tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (child),
                                                &hadjust,
@@ -443,9 +443,9 @@ button_release_event_cb (ClutterActor *actor,
                   ABS(priv->dy) > 1)
                 {
                   gdouble value, lower, step_increment, d, a, x, y, n;
-                  
+
                   /* TODO: Convert this all to fixed point? */
-                  
+
                   /* We want n, where x / y    n < z,
                    * x = Distance to move per frame
                    * y = Deceleration rate
@@ -454,7 +454,7 @@ button_release_event_cb (ClutterActor *actor,
                    * Rearrange to n = log (x / z) / log (y)
                    * To simplify, z = 1, so n = log (x) / log (y)
                    *
-                   * As z = 1, this will cause stops to be slightly abrupt - 
+                   * As z = 1, this will cause stops to be slightly abrupt -
                    * add a constant 15 frames to compensate.
                    */
                   x = MAX(ABS(priv->dx), ABS(priv->dy));
@@ -471,7 +471,7 @@ button_release_event_cb (ClutterActor *actor,
                    * Using geometric series,
                    *
                    * d = (1 - 1/y    (n+1))/(1 - 1/y)*x
-                   * 
+                   *
                    * Let a = (1 - 1/y    (n+1))/(1 - 1/y),
                    *
                    * d = a * x
@@ -480,7 +480,7 @@ button_release_event_cb (ClutterActor *actor,
                    *
                    * x = d / a
                    */
-                  
+
                   /* Get adjustments, work out y    n */
                   a = (1.0 - 1.0 / pow (y, n + 1)) / (1.0 - 1.0 / y);
 
@@ -499,31 +499,31 @@ button_release_event_cb (ClutterActor *actor,
                   d = ((rint (((value + d) - lower) / step_increment) *
                         step_increment) + lower) - value;
                   priv->dy = (d / a);
-                  
+
                   priv->deceleration_timeline = clutter_timeline_new ((n / 60) * 1000.0);
                 }
               else
                 {
                   gdouble value, lower, step_increment, d, a, y;
-                  
-                  /* Start a short effects timeline to snap to the nearest step 
+
+                  /* Start a short effects timeline to snap to the nearest step
                    * boundary (see equations above)
                    */
                   y = priv->decel_rate;
                   a = (1.0 - 1.0 / pow (y, 4 + 1)) / (1.0 - 1.0 / y);
-                  
+
                   tidy_adjustment_get_values (hadjust, &value, &lower, NULL,
                                               &step_increment, NULL, NULL);
                   d = ((rint ((value - lower) / step_increment) *
                         step_increment) + lower) - value;
                   priv->dx = (d / a);
-                  
+
                   tidy_adjustment_get_values (vadjust, &value, &lower, NULL,
                                               &step_increment, NULL, NULL);
                   d = ((rint ((value - lower) / step_increment) *
                         step_increment) + lower) - value;
                   priv->dy = (d / a);
-                  
+
                   priv->deceleration_timeline = clutter_timeline_new (250);
                 }
 
