@@ -1,3 +1,23 @@
+libchamplain 0.4 (2009-09-13)
+===============================
+
+Stable release
+Only the Python bindings are in a working state.
+
+Enhancements:
+
+* Updated documentation (Pierre-Luc Beaudoin)
+* Down reload tiles if we are zooming at a level we just left
+  (Pierre-Luc Beaudoin)
+
+Fixes:
+
+* Remove OpenAerialMap from available sources (Pierre-Luc Beaudoin)
+* Get rid of black lines between tiles at high zoom levels
+  (Pierre-Luc Beaudoin)
+* Fix polygon not visible at higher zoom levels (Pierre-Luc Beaudoin)
+* 594963: Initial scrolling results in map being in Antarctica (Pierre-Luc Beaudoin)
+
 libchamplain 0.3.92 (2009-09-03)
 ===============================
 
