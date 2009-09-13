@@ -65,7 +65,7 @@ expand_content_files=
 # e.g. INCLUDES=-I$(top_srcdir) -I$(top_builddir) $(GTK_DEBUG_FLAGS)
 # e.g. GTKDOC_LIBS=$(top_builddir)/gtk/$(gtktargetlib)
 INCLUDES=-I$(top_srcdir)/champlain -I$(top_srcdir) -I$(top_builddir) $(DEPS_CFLAGS)
-GTKDOC_LIBS=$(DEPS_LIBS) $(top_builddir)/champlain/libchamplain-0.3.la
+GTKDOC_LIBS=$(DEPS_LIBS) $(top_builddir)/champlain/libchamplain-0.4.la
 
 # This includes the standard gtk-doc make rules, copied by gtkdocize.
 include $(top_srcdir)/gtk-doc.make

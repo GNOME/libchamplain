@@ -23,8 +23,8 @@ champlaingtk_la_SOURCES =			\
 
 champlaingtk_la_LIBADD =					\
 	$(PYTHON_BINDING_LIBS)				\
-	$(top_builddir)/champlain/libchamplain-0.3.la	\
-	$(top_builddir)/champlain-gtk/libchamplain-gtk-0.3.la
+	$(top_builddir)/champlain/libchamplain-0.4.la	\
+	$(top_builddir)/champlain-gtk/libchamplain-gtk-0.4.la
 
 champlaingtk_la_LDFLAGS =					\
 	-module -avoid-version
