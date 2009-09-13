@@ -1319,8 +1319,8 @@ champlain_view_new (void)
 
 static void
 view_update_anchor (ChamplainView *view,
-    gint x,
-    gint y)
+    gint x,  /* Absolute x */
+    gint y)  /* Absolute y */
 {
   ChamplainViewPrivate *priv = view->priv;
   gboolean need_anchor = FALSE;
@@ -1331,7 +1331,9 @@ view_update_anchor (ChamplainView *view,
 
   if (priv->anchor_zoom_level != priv->zoom_level ||
       x - priv->anchor.x + priv->viewport_size.width >= G_MAXINT16 ||
-      y - priv->anchor.y + priv->viewport_size.height >= G_MAXINT16)
+      y - priv->anchor.y + priv->viewport_size.height >= G_MAXINT16 ||
+      x - priv->anchor.x + priv->viewport_size.width <= 0 ||
+      y - priv->anchor.y + priv->viewport_size.height <= 0 )
     need_update = TRUE;
 
   if (need_anchor && need_update)
@@ -1355,6 +1357,7 @@ view_update_anchor (ChamplainView *view,
         priv->anchor.y = max;
 
       priv->anchor_zoom_level = priv->zoom_level;
+      DEBUG ("New Anchor (%f, %f) at (%d, %d)", priv->anchor.x, priv->anchor.y, x, y);
     }
 
   if (need_anchor == FALSE)
@@ -1362,8 +1365,8 @@ view_update_anchor (ChamplainView *view,
       priv->anchor.x = 0;
       priv->anchor.y = 0;
       priv->anchor_zoom_level = priv->zoom_level;
+      DEBUG ("Clear Anchor at (%d, %d)", x, y);
     }
-  DEBUG ("New Anchor (%f, %f) for (%d, %d)", priv->anchor.x, priv->anchor.y, x, y);
 }
 
 /**
@@ -1396,6 +1399,8 @@ champlain_view_center_on (ChamplainView *view,
 
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
+
+  DEBUG ("Centering on %f, %f (%d, %d)", latitude, longitude, x, y);
 
   view_update_anchor (view, x, y);
 
@@ -1609,6 +1614,8 @@ champlain_view_set_zoom_level (ChamplainView *view,
   ClutterActor *group = champlain_zoom_level_get_actor (priv->map->current_level);
   if (!map_zoom_to (priv->map, priv->map_source, zoom_level))
     return;
+
+  DEBUG ("Zooming to %d", zoom_level);
 
   priv->zoom_level = zoom_level;
   /* Fix to bug 575133: keep the lat,lon as it gets set to a wrong value
