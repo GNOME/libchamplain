@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 m4_define([champlain_major_version], [0])
-m4_define([champlain_minor_version], [4])
+m4_define([champlain_minor_version], [5])
 m4_define([champlain_micro_version], [0])
 m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
