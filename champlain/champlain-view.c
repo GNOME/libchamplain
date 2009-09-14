@@ -2361,56 +2361,55 @@ view_reload_tiles_cb (ChamplainMapSource *map_source,
     ChamplainView* view)
 {
   ChamplainViewPrivate *priv = view->priv;
-  ChamplainRectangle viewport = priv->viewport_size;
-  gint size;
   ChamplainZoomLevel *level;
+  gint i, tile_count;
 
-  viewport.x += priv->anchor.x;
-  viewport.y += priv->anchor.y;
+  // flush previous_level
+  if (priv->map->previous_level != NULL)
+    {
+      level = priv->map->previous_level;
+      i = 0;
+      while (i < champlain_zoom_level_tile_count (level))
+        {
+          ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, i);
 
-  size = champlain_map_source_get_tile_size (priv->map_source);
+          if (tile == NULL)
+            {
+              i++;
+              continue;
+            }
+
+          ClutterActor *group, *actor;
+          if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+            {
+              actor = champlain_tile_get_actor (tile);
+              group = champlain_zoom_level_get_actor (level);
+              if (actor != NULL)
+                clutter_container_remove_actor (CLUTTER_CONTAINER (group), actor);
+            }
+          champlain_zoom_level_remove_tile (level, tile);
+        }
+    }
+
+  // update current_level
   level = priv->map->current_level;
-
-  if (viewport.x < 0)
-    viewport.x = 0;
-  if (viewport.y < 0)
-    viewport.y = 0;
-
-  gint x_count = ceil((float)viewport.width / size) + 1;
-  gint y_count = ceil((float)viewport.height / size) + 1;
-
-  gint x_first = viewport.x / size;
-  gint y_first = viewport.y / size;
-
-  x_count += x_first;
-  y_count += y_first;
-
-  if(x_count > champlain_zoom_level_get_width (level))
-    x_count = champlain_zoom_level_get_width (level);
-  if(y_count > champlain_zoom_level_get_height (level))
-    y_count = champlain_zoom_level_get_height (level);
-
-  gint i;
-  gint tile_count = champlain_zoom_level_tile_count (priv->map->current_level);
+  tile_count = champlain_zoom_level_tile_count (level);
 
   for (i = 0; i < tile_count; i++)
     {
-      ChamplainTile *tile = champlain_zoom_level_get_nth_tile (priv->map->current_level, i);
+      ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, i);
+
+      DEBUG("Reload tile: %d, %d\n", champlain_tile_get_x (tile),
+          champlain_tile_get_y (tile));
 
       if (tile == NULL)
-        continue;
-
-      gint tile_x = champlain_tile_get_x (tile);
-      gint tile_y = champlain_tile_get_y (tile);
-
-      if (tile_x < x_first || tile_x > x_count ||
-          tile_y < y_first || tile_y > y_count)
         continue;
 
       if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADING &&
           champlain_tile_get_state (tile) != CHAMPLAIN_STATE_VALIDATING_CACHE)
         champlain_map_source_fill_tile (priv->map_source, tile);
     }
+  view_update_state (view);
 }
 
 static void
