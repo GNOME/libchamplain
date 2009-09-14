@@ -17,6 +17,8 @@ Fixes:
   (Pierre-Luc Beaudoin)
 * Fix polygon not visible at higher zoom levels (Pierre-Luc Beaudoin)
 * 594963: Initial scrolling results in map being in Antarctica (Pierre-Luc Beaudoin)
+* Make default selection mode in ChamplainSelectionMode single to match Gtk+
+  (Pierre-Luc Beaudoin)
 
 libchamplain 0.3.92 (2009-09-03)
 ===============================

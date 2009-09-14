@@ -22,9 +22,6 @@
  *
  * A ChamplainSelectionLayer is little more than a #ChamplainLayer. The markers
  * can be selected.
- *
- * Use #clutter_container_add to add markers to the layer and
- * #clutter_container_remove to remove them.
  */
 
 #include "config.h"
@@ -117,7 +114,7 @@ champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
            "Selection Mode",
            "Determines the type of selection that will be performed.",
            CHAMPLAIN_TYPE_SELECTION_MODE,
-           CHAMPLAIN_SELECTION_MULTIPLE,
+           CHAMPLAIN_SELECTION_SINGLE,
            CHAMPLAIN_PARAM_READWRITE));
 }
 
@@ -217,7 +214,7 @@ static void
 champlain_selection_layer_init (ChamplainSelectionLayer *self)
 {
   self->priv = GET_PRIVATE (self);
-  self->priv->mode = CHAMPLAIN_SELECTION_MULTIPLE;
+  self->priv->mode = CHAMPLAIN_SELECTION_SINGLE;
   self->priv->selection = NULL;
 
   g_signal_connect_after (G_OBJECT (self), "actor-added",
@@ -406,6 +403,6 @@ champlain_selection_layer_get_selection_mode (ChamplainSelectionLayer *layer)
 {
   g_return_val_if_fail (
       CHAMPLAIN_IS_SELECTION_LAYER (layer),
-      CHAMPLAIN_SELECTION_MULTIPLE);
+      CHAMPLAIN_SELECTION_SINGLE);
   return layer->priv->mode;
 }
