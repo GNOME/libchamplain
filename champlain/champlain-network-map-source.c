@@ -252,7 +252,7 @@ champlain_network_map_source_init (ChamplainNetworkMapSource *champlainMapSource
  * @projection: the map source's projection
  * @uri_format: the URI to fetch the tiles from, see #champlain_network_map_source_set_uri_format
  *
- * Returns a constructed #ChamplainNetworkMapSource
+ * Returns: a constructed #ChamplainNetworkMapSource
  *
  * Since: 0.4
  */
@@ -283,7 +283,7 @@ champlain_network_map_source_new_full (const gchar *id,
  * @y: the y position of the tile
  * @z: the zool level of the tile
  *
- * Returns a contruscted URI with the given parameters based on the map
+ * Returns: a contruscted URI with the given parameters based on the map
  * source's URI format.
  *
  * Since: 0.4
@@ -671,11 +671,4 @@ fill_tile (ChamplainMapSource *map_source,
    * as empty
    */
   g_object_unref (cache);
-}
-
-void
-champlain_network_map_source_fill_tile (ChamplainMapSource *map_source,
-    ChamplainTile *tile)
-{
-  fill_tile (map_source, tile);
 }

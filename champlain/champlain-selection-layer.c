@@ -137,6 +137,9 @@ api_select (ChamplainSelectionLayer *layer,
   if (champlain_selection_layer_marker_is_selected (layer, marker))
     return;
 
+  if (layer->priv->mode == CHAMPLAIN_SELECTION_NONE)
+    return;
+
   if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
     {
       /* Clear previous selection */
@@ -153,6 +156,9 @@ mouse_select (ChamplainSelectionLayer *layer,
     gboolean append)
 {
   DEBUG ("Mouse select %p", marker);
+
+  if (layer->priv->mode == CHAMPLAIN_SELECTION_NONE)
+    return;
 
   if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
     {
@@ -226,7 +232,7 @@ champlain_selection_layer_init (ChamplainSelectionLayer *self)
 /**
  * champlain_selection_layer_new:
  *
- * Returns a new #ChamplainSelectionLayer ready to be used as a #ClutterContainer for the markers.
+ * Returns: a new #ChamplainSelectionLayer ready to be used as a #ClutterContainer for the markers.
  *
  * Since: 0.4
  */
@@ -241,7 +247,7 @@ champlain_selection_layer_new ()
  *
  * This function will return NULL if in CHAMPLAIN_SELETION_MULTIPLE.
  *
- * Returns the selected #ChamplainBaseMarker or NULL if none is selected.
+ * Returns: the selected #ChamplainBaseMarker or NULL if none is selected.
  *
  * Since: 0.4
  */
@@ -260,7 +266,7 @@ champlain_selection_layer_get_selected (ChamplainSelectionLayer *layer)
 /**
  * champlain_selection_get_selected_markers:
  *
- * Returns the list of selected #ChamplainBaseMarker or NULL if none is selected.
+ * Returns: the list of selected #ChamplainBaseMarker or NULL if none is selected.
  * You shouldn't free that list.
  *
  * Since: 0.4
@@ -274,7 +280,7 @@ champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer)
 /**
  * champlain_selection_layer_count_selected_markers:
  *
- * Returns the number of selected #ChamplainBaseMarker
+ * Returns: the number of selected #ChamplainBaseMarker
  *
  * Since: 0.4
  */
@@ -284,13 +290,30 @@ champlain_selection_layer_count_selected_markers (ChamplainSelectionLayer *layer
   return g_list_length (layer->priv->selection);
 }
 
-void 
+/**
+ * champlain_selection_layer_select:
+ * @layer: a #ChamplainSelectionLayer
+ * @marker: a #ChamplainBaseMarker
+ *
+ * Selects the marker.
+ *
+ * Since: 0.4
+ */
+void
 champlain_selection_layer_select (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
 {
   api_select (layer, marker);
 }
 
+/**
+ * champlain_selection_layer_unselect_all:
+ * @layer: a #ChamplainSelectionLayer
+ *
+ * Unselects all markers.
+ *
+ * Since: 0.4
+ */
 void
 champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
 {
@@ -308,6 +331,7 @@ champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
 
 /**
  * champlain_selection_layer_select_all:
+ * @layer: a #ChamplainSelectionLayer
  *
  * Selects all markers in the layer. This call will only work if the selection
  * mode is set CHAMPLAIN_SELETION_MULTIPLE.
@@ -319,6 +343,9 @@ champlain_selection_layer_select_all (ChamplainSelectionLayer *layer)
 {
   gint n_children = 0;
   gint i = 0;
+
+  if (layer->priv->mode == CHAMPLAIN_SELECTION_NONE)
+    return;
 
   if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
     return;
@@ -336,6 +363,15 @@ champlain_selection_layer_select_all (ChamplainSelectionLayer *layer)
     }
 }
 
+/**
+ * champlain_selection_layer_unselect:
+ * @layer: a #ChamplainSelectionLayer
+ * @marker: a #ChamplainBaseMarker
+ *
+ * Unselect the marker.
+ *
+ * Since: 0.4
+ */
 void
 champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
@@ -352,6 +388,15 @@ champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
     }
 }
 
+/**
+ * champlain_selection_layer_marker_is_selected:
+ * @layer: a #ChamplainSelectionLayer
+ * @marker: a #ChamplainBaseMarker
+ *
+ * Returns: whether the marker is selected or not.
+ *
+ * Since: 0.4
+ */
 gboolean
 champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
@@ -368,8 +413,9 @@ champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer,
  * @mode: a #ChamplainSelectionMode value
  *
  * Sets the selection mode of the layer.
- * NOTE: changing selection mode to CHAMPLAIN_SELECTION_SINGLE will clear all
- *       previously selected markers.
+ *
+ * NOTE: changing selection mode to CHAMPLAIN_SELECTION_NONE or
+ * CHAMPLAIN_SELECTION_SINGLE will clear all previously selected markers.
  *
  * Since: 0.4
  */
@@ -384,7 +430,8 @@ champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer,
   layer->priv->mode = mode;
 
   /* Switching to single mode shouldn't keep the selection */
-  if (mode == CHAMPLAIN_SELECTION_SINGLE)
+  if (mode == CHAMPLAIN_SELECTION_NONE ||
+      mode == CHAMPLAIN_SELECTION_SINGLE)
     champlain_selection_layer_unselect_all (layer);
 
   g_object_notify (G_OBJECT (layer), "selection-mode");
@@ -394,7 +441,7 @@ champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer,
  * champlain_selection_layer_get_selection_mode:
  * @layer: a #ChamplainSelectionLayer
  *
- * Returns the selection mode of the layer.
+ * Returns: the selection mode of the layer.
  *
  * Since: 0.4
  */

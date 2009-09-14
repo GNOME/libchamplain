@@ -280,7 +280,7 @@ cleanup:
 /**
  * champlain_cache_dup_default:
  *
- * Returns the #ChamplainCache singleton, use #g_object_unref when not neeeded
+ * Returns: the #ChamplainCache singleton, use #g_object_unref when not neeeded
  * anymore.
  *
  *
@@ -292,17 +292,11 @@ champlain_cache_dup_default (void)
   return g_object_new (CHAMPLAIN_TYPE_CACHE, NULL);
 }
 
-ChamplainCache*
-champlain_cache_get_default (void)
-{
-  return champlain_cache_dup_default ();
-}
-
 /**
  * champlain_cache_get_size_limit:
  * @self: the #ChamplainCache
  *
- * Returns the cache size limit in bytes
+ * Returns: the cache size limit in bytes
  *
  * Since: 0.4
  */
@@ -344,7 +338,7 @@ champlain_cache_set_size_limit (ChamplainCache *self,
  *
  * Loads data from disk for the given tile
  *
- * Returns TRUE if the tile was in cache, false if it needs to be
+ * Returns: TRUE if the tile was in cache, false if it needs to be
  * loaded from network
  *
  * Since: 0.4
@@ -447,8 +441,7 @@ cleanup:
  * @self: the #ChamplainCache
  * @tile: the #ChamplainTile to fill
  *
- * Returns TRUE if the tile should be
- * reloaded from network
+ * Returns: TRUE if the tile should be reloaded from network, FALSE otherwize.
  *
  * Since: 0.4
  */

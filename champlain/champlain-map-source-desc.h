@@ -34,9 +34,13 @@ typedef struct _ChamplainMapSourceDesc ChamplainMapSourceDesc;
 
 /**
  * ChamplainMapSourceConstructor:
+ * @desc: a #ChamplainMapSourceDesc
+ * @data: User data
  *
  * A #ChamplainMapSource constructor.  It should return a ready to use
  * #ChamplainMapSource.
+ *
+ * Returns: A fully constructed #ChamplainMapSource ready to be used.
  *
  * Since: 0.4
  */
@@ -48,6 +52,16 @@ typedef ChamplainMapSource * (*ChamplainMapSourceConstructor) (
 
 /**
  * ChamplainMapSourceDesc:
+ * @id: A unique identifier, should contain only characters found in filenames
+ * @name: A display name
+ * @license: A display name for the licence of the data
+ * @license_uri: A URI for the licence of the data
+ * @min_zoom_level: the minimum supported zoom level
+ * @max_zoom_level: the maximum supported zoom level
+ * @projection: the projection used by the data
+ * @uri_format: the URI to use to fetch network map data
+ * @constructor: a function that returns a fully constructed #ChamplainMapSource
+ * @data: user data passed to the constructor
  *
  * Describes a #ChamplainMapSource.  This is returned by #champlain_map_source_factory_get_list.
  *

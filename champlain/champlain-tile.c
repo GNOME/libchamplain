@@ -401,7 +401,7 @@ champlain_tile_init (ChamplainTile *self)
 /**
  * champlain_tile_new:
  *
- * Returns a new #ChamplainTile
+ * Returns: a new #ChamplainTile
  *
  * Since: 0.4
  */
@@ -415,7 +415,7 @@ champlain_tile_new (void)
  * champlain_tile_get_x:
  * @self: the #ChamplainTile
  *
- * Returns the tile's x position
+ * Returns: the tile's x position
  *
  * Since: 0.4
  */
@@ -431,7 +431,7 @@ champlain_tile_get_x (ChamplainTile *self)
  * champlain_tile_get_y:
  * @self: the #ChamplainTile
  *
- * Returns the tile's y position
+ * Returns: the tile's y position
  *
  * Since: 0.4
  */
@@ -447,7 +447,7 @@ champlain_tile_get_y (ChamplainTile *self)
  * champlain_tile_get_zoom_level:
  * @self: the #ChamplainTile
  *
- * Returns the tile's zoom level
+ * Returns: the tile's zoom level
  *
  * Since: 0.4
  */
@@ -463,7 +463,7 @@ champlain_tile_get_zoom_level (ChamplainTile *self)
  * champlain_tile_get_size:
  * @self: the #ChamplainTile
  *
- * Returns the tile's size in pixels
+ * Returns: the tile's size in pixels
  *
  * Since: 0.4
  */
@@ -479,7 +479,7 @@ champlain_tile_get_size (ChamplainTile *self)
  * champlain_tile_get_state:
  * @self: the #ChamplainTile
  *
- * Returns the tile's #ChamplainState
+ * Returns: the tile's #ChamplainState
  *
  * Since: 0.4
  */
@@ -495,7 +495,7 @@ champlain_tile_get_state (ChamplainTile *self)
  * champlain_tile_get_uri:
  * @self: the #ChamplainTile
  *
- * Returns the tile's remote uri
+ * Returns: the tile's remote uri
  *
  * Since: 0.4
  */
@@ -511,7 +511,7 @@ champlain_tile_get_uri (ChamplainTile *self)
  * champlain_tile_get_filename:
  * @self: the #ChamplainTile
  *
- * Returns the tile's local filename
+ * Returns: the tile's local filename
  *
  * Since: 0.4
  */
@@ -527,7 +527,7 @@ champlain_tile_get_filename (ChamplainTile *self)
  * champlain_tile_get_actor:
  * @self: the #ChamplainTile
  *
- * Returns the tile's actor.  This actor should not change during the tile's
+ * Returns: the tile's actor.  This actor should not change during the tile's
  * lifetime. You should not unref this actor, it is owned by the tile.
  *
  * Since: 0.4
@@ -642,13 +642,12 @@ champlain_tile_set_state (ChamplainTile *self,
 
 /**
  * champlain_tile_new_full:
- * @self: the #ChamplainTile
  * @x: the x position
  * @y: the y position
  * @size: the size in pixels
  * @zoom_level: the zoom level
  *
- * Returns a #ChamplainTile
+ * Returns: a #ChamplainTile
  *
  * Since: 0.4
  */
@@ -714,7 +713,7 @@ champlain_tile_set_filename (ChamplainTile *self,
  * champlain_tile_get_modified_time:
  * @self: the #ChamplainTile
  *
- * Returns the tile's last modified time
+ * Returns: the tile's last modified time
  *
  * Since: 0.4
  */
@@ -729,7 +728,7 @@ champlain_tile_get_modified_time (ChamplainTile *self)
 /**
  * champlain_tile_set_modified_time:
  * @self: the #ChamplainTile
- * @time_: a #GTimeVal, the value will be copied
+ * @time: a #GTimeVal, the value will be copied
  *
  * Sets the tile's modified time
  *
@@ -752,7 +751,7 @@ champlain_tile_set_modified_time (ChamplainTile *self,
  * champlain_tile_get_modified_time_string:
  * @self: the #ChamplainTile
  *
- * Returns the tile's modified time as a string (formated as per RFC 1123)
+ * Returns: the tile's modified time as a string (formated as per RFC 1123)
  *
  * Since: 0.4
  */
@@ -778,7 +777,7 @@ champlain_tile_get_modified_time_string (ChamplainTile *self)
  * champlain_tile_get_etag:
  * @self: the #ChamplainTile
  *
- * Returns the tile's ETag
+ * Returns: the tile's ETag
  *
  * Since: 0.4
  */
@@ -901,7 +900,7 @@ champlain_tile_set_content (ChamplainTile *self,
 /**
  * champlain_tile_get_content:
  *
- * Returns the tile's content, this actor will change each time the tile's content changes.
+ * Returns: the tile's content, this actor will change each time the tile's content changes.
  * You should not unref this content, it is owned by the tile.
  *
  * Since: 0.4

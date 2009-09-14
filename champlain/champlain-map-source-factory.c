@@ -276,7 +276,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 /**
  * champlain_map_source_factory_dup_default:
  *
- * Returns the singleton #ChamplainMapSourceFactory, it should be freed
+ * Returns: the singleton #ChamplainMapSourceFactory, it should be freed
  * using #g_object_unref when not needed.
  *
  * Since: 0.4
@@ -287,16 +287,10 @@ champlain_map_source_factory_dup_default (void)
   return g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, NULL);
 }
 
-ChamplainMapSourceFactory *
-champlain_map_source_factory_get_default (void)
-{
-  return champlain_map_source_factory_dup_default ();
-}
-
 /**
  * champlain_map_source_factory_dup_list:
  *
- * Returns the list of registered map sources, the items should not be freed,
+ * Returns: the list of registered map sources, the items should not be freed,
  * the list should be freed with #g_slist_free.
  *
  * Since: 0.4
@@ -307,18 +301,12 @@ champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *factory)
   return g_slist_copy (factory->priv->registered_sources);
 }
 
-GSList *
-champlain_map_source_factory_get_list (ChamplainMapSourceFactory *factory)
-{
-  return champlain_map_source_factory_dup_list (factory);
-}
-
 /**
  * champlain_map_source_factory_create:
  * @factory: the Factory
  * @id: the wanted map source id
  *
- * Returns a ready to use #ChamplainMapSource matching the given name, returns
+ * Returns: a ready to use #ChamplainMapSource matching the given name, returns
  * NULL is none match.
  *
  * The id should not contain any character that can't be in a filename as it
@@ -346,6 +334,7 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
 
 /**
  * champlain_map_source_factory_register:
+ * @factory: A #ChamplainMapSourceFactory
  * @desc: the description of the map source
  * @constructor: the new map source constructor function
  * @data: data to be passed to the constructor function, or NULL
@@ -356,7 +345,7 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  * #ChamplainMapSourceDesc, so don't free it. They will not be freed either so
  * you can use static structs here.
  *
- * Returns TRUE if the registration suceeded.
+ * Returns: TRUE if the registration suceeded.
  *
  * Since: 0.4
  */

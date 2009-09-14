@@ -272,24 +272,24 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
 }
 
 static void
-champlain_polygon_init (ChamplainPolygon *self)
+champlain_polygon_init (ChamplainPolygon *polygon)
 {
-  self->priv = GET_PRIVATE (self);
+  polygon->priv = GET_PRIVATE (polygon);
 
-  self->priv->visible = TRUE;
-  self->priv->points = NULL;
-  self->priv->fill = FALSE;
-  self->priv->stroke = TRUE;
-  self->priv->stroke_width = 2.0;
+  polygon->priv->visible = TRUE;
+  polygon->priv->points = NULL;
+  polygon->priv->fill = FALSE;
+  polygon->priv->stroke = TRUE;
+  polygon->priv->stroke_width = 2.0;
 
-  self->priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
-  self->priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
+  polygon->priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
+  polygon->priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
 }
 
 /**
  * champlain_polygon_new:
  *
- * Returns a new empty #ChamplainPolygon
+ * Returns: a new empty #ChamplainPolygon
  *
  * Since: 0.4
  */
@@ -307,21 +307,21 @@ champlain_polygon_new ()
  *
  * Adds point at the end of the list of points in the polygon
  *
- * Returns the added point, should not be freed.
+ * Returns: the added point, should not be freed.
  *
  * Since: 0.4
  */
 ChamplainPoint *
-champlain_polygon_append_point (ChamplainPolygon *self,
+champlain_polygon_append_point (ChamplainPolygon *polygon,
     gdouble lat,
     gdouble lon)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
   ChamplainPoint *point = champlain_point_new (lat, lon);
 
-  self->priv->points = g_list_append (self->priv->points, point);
-  g_object_notify (G_OBJECT (self), "visible");
+  polygon->priv->points = g_list_append (polygon->priv->points, point);
+  g_object_notify (G_OBJECT (polygon), "visible");
   return point;
 }
 
@@ -334,28 +334,28 @@ champlain_polygon_append_point (ChamplainPolygon *self,
  *
  * Adds point at the given position in the list of points in the polygon
  *
- * Returns the added point, should not be freed.
+ * Returns: the added point, should not be freed.
  *
  * Since: 0.4
  */
 ChamplainPoint *
-champlain_polygon_insert_point (ChamplainPolygon *self,
+champlain_polygon_insert_point (ChamplainPolygon *polygon,
     gdouble lat,
     gdouble lon,
     gint pos)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
   ChamplainPoint *point = champlain_point_new (lat, lon);
 
-  self->priv->points = g_list_insert (self->priv->points, point, pos);
-  g_object_notify (G_OBJECT (self), "visible");
+  polygon->priv->points = g_list_insert (polygon->priv->points, point, pos);
+  g_object_notify (G_OBJECT (polygon), "visible");
   return point;
 }
 
 /**
  * champlain_polygon_remove_point:
- * @polygon: The polygon
+ * @polygon: a #ChamplainPolygon
  * @point: the #ChamplainPoint to remove
  *
  * Removes the point from the polygon.
@@ -363,13 +363,13 @@ champlain_polygon_insert_point (ChamplainPolygon *self,
  * Since: 0.4
  */
 void
-champlain_polygon_remove_point (ChamplainPolygon *self,
+champlain_polygon_remove_point (ChamplainPolygon *polygon,
     ChamplainPoint *point)
 {
-  g_return_if_fail (CHAMPLAIN_IS_POLYGON (self));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  self->priv->points = g_list_remove (self->priv->points, point);
-  g_object_notify (G_OBJECT (self), "visible");
+  polygon->priv->points = g_list_remove (polygon->priv->points, point);
+  g_object_notify (G_OBJECT (polygon), "visible");
 }
 
 /**
@@ -381,35 +381,35 @@ champlain_polygon_remove_point (ChamplainPolygon *self,
  * Since: 0.4
  */
 void
-champlain_polygon_clear_points (ChamplainPolygon *self)
+champlain_polygon_clear_points (ChamplainPolygon *polygon)
 {
-  g_return_if_fail (CHAMPLAIN_IS_POLYGON (self));
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  GList *next = self->priv->points;
+  GList *next = polygon->priv->points;
   while (next != NULL)
   {
     champlain_point_free (next->data);
     next = g_list_next (next);
   }
-  g_list_free (self->priv->points);
-  self->priv->points = NULL;
-  g_object_notify (G_OBJECT (self), "visible");
+  g_list_free (polygon->priv->points);
+  polygon->priv->points = NULL;
+  g_object_notify (G_OBJECT (polygon), "visible");
 }
 
 /**
  * champlain_polygon_get_points:
  * @polygon: The polygon
  *
- * Returns a list of all points from the polygon, it shouldn't be freed.
+ * Returns: a list of all points from the polygon, it shouldn't be freed.
  *
  * Since: 0.4
  */
 GList *
-champlain_polygon_get_points (ChamplainPolygon *self)
+champlain_polygon_get_points (ChamplainPolygon *polygon)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
-  return self->priv->points;
+  return polygon->priv->points;
 }
 
 /**
@@ -472,7 +472,7 @@ champlain_polygon_set_stroke_color (ChamplainPolygon *polygon,
  * champlain_polygon_get_color:
  * @polygon: The polygon
  *
- * Returns the polygon's fill color.
+ * Returns: the polygon's fill color.
  *
  * Since: 0.4
  */
@@ -488,7 +488,7 @@ champlain_polygon_get_fill_color (ChamplainPolygon *polygon)
  * champlain_polygon_get_stroke_color:
  * @polygon: The polygon
  *
- * Returns the polygon's stroke color.
+ * Returns: the polygon's stroke color.
  *
  * Since: 0.4
  */
@@ -523,7 +523,7 @@ champlain_polygon_set_stroke (ChamplainPolygon *polygon,
  * champlain_polygon_get_stroke:
  * @polygon: The polygon
  *
- * Returns if the polygon has a stroke
+ * Returns: TRUE if the polygon has a stroke, FALSE otherwise.
  *
  * Since: 0.4
  */
@@ -558,7 +558,7 @@ champlain_polygon_set_fill (ChamplainPolygon *polygon,
  * champlain_polygon_get_fill:
  * @polygon: The polygon
  *
- * Returns if the polygon is filled
+ * Returns: TRUE if the polygon is filled, FALSE otherwise.
  *
  * Since: 0.4
  */
@@ -593,7 +593,7 @@ champlain_polygon_set_stroke_width (ChamplainPolygon *polygon,
  * champlain_polygon_get_stroke_width:
  * @polygon: The polygon
  *
- * Returns the width of the stroke
+ * Returns: the width of the stroke
  *
  * Since: 0.4
  */

@@ -923,7 +923,6 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
   /**
   * ChamplainView::animation-completed:
-  * @view: the #ChamplainView that received the signal
   *
   * The ::animation-completed signal is emitted when any animation in the view
   * ends.  This is a detailed signal.  For example, if you want to be signaled
@@ -1025,7 +1024,6 @@ champlain_view_init (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
       priv->map_layer);
 
-
   g_signal_connect (priv->finger_scroll, "button-press-event",
       G_CALLBACK (finger_scroll_button_press_cb), view);
   g_signal_connect_after (priv->finger_scroll, "button-release-event",
@@ -1113,6 +1111,18 @@ viewport_pos_changed_cb (GObject *gobject,
   g_object_notify (G_OBJECT (view), "latitude");
 }
 
+/**
+ * champlain_view_set_size:
+ * @view: a #ChamplainView
+ * @width: the width in pixels
+ * @height: the height in pixels
+ *
+ * Sets the size of the view.  This function will most probably be deprecated in
+ * future versions in favor of #clutter_actor_set_size.  In the mean time, you need
+ * to call both.
+ *
+ * Since: 0.1
+ */
 //FIXME: move to an handler of actor size change
 void
 champlain_view_set_size (ChamplainView *view,
@@ -1307,7 +1317,7 @@ finger_scroll_key_press_cb (ClutterActor *actor,
 /**
  * champlain_view_new:
  *
- * Returns a new #ChamplainView ready to be used as a #ClutterActor.
+ * Returns: a new #ChamplainView ready to be used as a #ClutterActor.
  *
  * Since: 0.4
  */
@@ -1728,7 +1738,7 @@ champlain_view_add_layer (ChamplainView *view,
  * @lat: a variable where to put the latitude of the event
  * @lon: a variable where to put the longitude of the event
  *
- * Returns the latitude, longitude coordinates for the given ClutterEvent.
+ * Returns: the latitude, longitude coordinates for the given ClutterEvent.
  *
  * Since: 0.2.8
  */
@@ -1791,7 +1801,7 @@ champlain_view_get_coords_from_event (ChamplainView *view,
  * @lat: a variable where to put the latitude of the event
  * @lon: a variable where to put the longitude of the event
  *
- * Returns the latitude, longitude coordinates for the given x, y position in
+ * Returns: the latitude, longitude coordinates for the given x, y position in
  * the view.  Use if you get coordinates from GtkEvents for example.
  *
  * Since: 0.4
@@ -2389,7 +2399,7 @@ view_set_zoom_level_at (ChamplainView *view,
  * champlain_view_get_zoom_level:
  * @view: The view
  *
- * Returns the view's current zoom level.
+ * Returns: the view's current zoom level.
  *
  * Since: 0.4
  */
@@ -2407,7 +2417,7 @@ champlain_view_get_zoom_level (ChamplainView *view)
  * champlain_view_get_min_zoom_level:
  * @view: The view
  *
- * Returns the view's minimal zoom level allowed.
+ * Returns: the view's minimal zoom level allowed.
  *
  * Since: 0.4
  */
@@ -2425,7 +2435,7 @@ champlain_view_get_min_zoom_level (ChamplainView *view)
  * champlain_view_get_max_zoom_level:
  * @view: The view
  *
- * Returns the view's maximal zoom level allowed.
+ * Returns: the view's maximal zoom level allowed.
  *
  * Since: 0.4
  */
@@ -2443,7 +2453,7 @@ champlain_view_get_max_zoom_level (ChamplainView *view)
  * champlain_view_get_map_source:
  * @view: The view
  *
- * Returns the view's current map source. If you need to keep a reference to the
+ * Returns: the view's current map source. If you need to keep a reference to the
  * map source then you have to call #g_object_ref.
  *
  * Since: 0.4
@@ -2462,7 +2472,7 @@ champlain_view_get_map_source (ChamplainView *view)
  * champlain_view_get_decel_rate:
  * @view: The view
  *
- * Returns the view's deceleration rate.
+ * Returns: the view's deceleration rate.
  *
  * Since: 0.4
  */
@@ -2481,7 +2491,7 @@ champlain_view_get_decel_rate (ChamplainView *view)
  * champlain_view_get_scroll_mode:
  * @view: The view
  *
- * Returns the view's scroll mode behaviour.
+ * Returns: the view's scroll mode behaviour.
  *
  * Since: 0.4
  */
@@ -2498,7 +2508,7 @@ champlain_view_get_scroll_mode (ChamplainView *view)
  * champlain_view_get_keep_center_on_resize:
  * @view: The view
  *
- * Returns TRUE if the view keeps the center or resize.
+ * Returns: TRUE if the view keeps the center or resize, FALSE otherwise.
  *
  * Since: 0.4
  */
@@ -2515,7 +2525,7 @@ champlain_view_get_keep_center_on_resize (ChamplainView *view)
  * champlain_view_get_show_license:
  * @view: The view
  *
- * Returns TRUE if the view displays the license.
+ * Returns: TRUE if the view displays the license, FALSE otherwise.
  *
  * Since: 0.4
  */
@@ -2532,7 +2542,7 @@ champlain_view_get_show_license (ChamplainView *view)
  * champlain_view_get_zoom_on_double_click:
  * @view: The view
  *
- * Returns TRUE if the view zooms on double click.
+ * Returns: TRUE if the view zooms on double click, FALSE otherwise.
  *
  * Since: 0.4
  */

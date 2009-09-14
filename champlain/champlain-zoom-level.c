@@ -243,7 +243,7 @@ champlain_zoom_level_init (ChamplainZoomLevel *self)
 /**
  * champlain_zoom_level_new:
  *
- * Returns a new ChamplainZoomLevel
+ * Returns: a new #ChamplainZoomLevel
  *
  * Since: 0.4
  */
@@ -303,7 +303,7 @@ champlain_zoom_level_remove_tile (ChamplainZoomLevel *self,
  * champlain_zoom_level_tile_count:
  * @self: a #ChamplainZoomLevel
  *
- * Returns the number of tiles in a #ChamplainZoomLevel.
+ * Returns: the number of tiles in a #ChamplainZoomLevel.
  *
  * Since: 0.4
  */
@@ -320,7 +320,7 @@ champlain_zoom_level_tile_count (ChamplainZoomLevel *self)
  * @self: a #ChamplainZoomLevel
  * @index: an index
  *
- * Returns the #ChamplainTile at given index
+ * Returns: the #ChamplainTile at given index
  *
  * Since: 0.4
  */
@@ -339,7 +339,7 @@ champlain_zoom_level_get_nth_tile (ChamplainZoomLevel *self,
  * champlain_zoom_level_get_width:
  * @self: a #ChamplainZoomLevel
  *
- * Returns the absolute width of a #ChamplainZoomLevel in tiles
+ * Returns: the width of a #ChamplainZoomLevel in tiles
  *
  * Since: 0.4
  */
@@ -355,7 +355,7 @@ champlain_zoom_level_get_width (ChamplainZoomLevel *self)
  * champlain_zoom_level_get_height:
  * @self: a #ChamplainZoomLevel
  *
- * Returns the absolute height of a #ChamplainZoomLevel in tiles
+ * Returns: the height of a #ChamplainZoomLevel in tiles
  *
  * Since: 0.4
  */
@@ -371,7 +371,7 @@ champlain_zoom_level_get_height (ChamplainZoomLevel *self)
  * champlain_zoom_level_get_zoom_level:
  * @self: a #ChamplainZoomLevel
  *
- * Returns the zoom level of a #ChamplainZoomLevel
+ * Returns: the zoom level of a #ChamplainZoomLevel
  *
  * Since: 0.4
  */
@@ -447,7 +447,7 @@ champlain_zoom_level_set_zoom_level (ChamplainZoomLevel *self,
  * champlain_zoom_level_get_actor:
  * @self: a #ChamplainZoomLevel
  *
- * Returns the #ClutterActor containing all the tiles of a #ChamplainZoomLevel,
+ * Returns: the #ClutterActor containing all the tiles of a #ChamplainZoomLevel,
  * it should not be unref.
  *
  * Since: 0.4

@@ -200,7 +200,7 @@ champlain_base_marker_init (ChamplainBaseMarker *marker)
 /**
  * champlain_base_marker_new:
  *
- * Returns a new #ChamplainBaseMarker ready to be used as a #ClutterActor.
+ * Returns: a new #ChamplainBaseMarker ready to be used as a #ClutterActor.
  *
  * Since: 0.4
  */
@@ -268,7 +268,7 @@ champlain_base_marker_set_highlighted (ChamplainBaseMarker *champlainBaseMarker,
  * champlain_base_marker_get_highlighted:
  * @marker: a #ChamplainBaseMarker
  *
- * Returns the highlighted or not state of the marker.
+ * Returns: the highlighted or not state of the marker.
  *
  * Since: 0.4
  */

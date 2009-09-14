@@ -118,10 +118,11 @@ static void queue_redraw (ChamplainMarker *marker);
  * champlain_marker_set_hightlight_color:
  * @color: a #ClutterColor
  *
+ *
  * Changes the highlight color, this is to ensure a better integration with
  * the desktop, this is automatically done by GtkChamplainEmbed.
  *
- * Since: 0.2
+ * Since: 0.4
  */
 void
 champlain_marker_set_highlight_color (ClutterColor *color)
@@ -713,7 +714,7 @@ champlain_marker_init (ChamplainMarker *marker)
 /**
  * champlain_marker_new:
  *
- * Returns a new #ChamplainMarker ready to be used as a #ClutterActor.
+ * Returns: a new #ChamplainMarker ready to be used as a #ClutterActor.
  *
  * Since: 0.2
  */
@@ -730,7 +731,7 @@ champlain_marker_new (void)
  * @text_color: a #ClutterColor, the color of the text, can be NULL
  * @marker_color: a #ClutterColor, the color of the marker, can be NULL
  *
- * Returns a new #ChamplainMarker with a drawn marker containing the given text.
+ * Returns: a new #ChamplainMarker with a drawn marker containing the given text.
  *
  * Since: 0.2
  */
@@ -760,7 +761,7 @@ champlain_marker_new_with_text (const gchar *text,
  * champlain_marker_new_with_image:
  * @actor: The actor of the image.
  *
- * Returns a new #ChamplainMarker with a drawn marker containing the given
+ * Returns: a new #ChamplainMarker with a drawn marker containing the given
  * image.
  *
  * Since: 0.4
@@ -782,7 +783,7 @@ champlain_marker_new_with_image (ClutterActor *actor)
  * @filename: The filename of the image.
  * @error: Return location for an error.
  *
- * Returns a new #ChamplainMarker with a drawn marker containing the given
+ * Returns: a new #ChamplainMarker with a drawn marker containing the given
  * image.
  *
  * Since: 0.4
@@ -810,7 +811,7 @@ champlain_marker_new_from_file (const gchar *filename,
  * @text: The text
  * @actor: The image
  *
- * Returns a new #ChamplainMarker with a drawn marker containing the given
+ * Returns: a new #ChamplainMarker with a drawn marker containing the given
  * image.
  *
  * Since: 0.4
@@ -1159,7 +1160,7 @@ champlain_marker_set_draw_background (ChamplainMarker *marker,
  * champlain_marker_get_image:
  * @marker: The marker
  *
- * Returns the marker's image.
+ * Returns: the marker's image.
  *
  * Since: 0.4
  */
@@ -1177,7 +1178,7 @@ champlain_marker_get_image (ChamplainMarker *marker)
  * champlain_marker_get_use_markup:
  * @marker: The marker
  *
- * Returns if the marker's text contains markup.
+ * Returns: if the marker's text contains markup.
  *
  * Since: 0.4
  */
@@ -1195,7 +1196,7 @@ champlain_marker_get_use_markup (ChamplainMarker *marker)
  * champlain_marker_get_text:
  * @marker: The marker
  *
- * Returns the marker's text.
+ * Returns: the marker's text.
  *
  * Since: 0.4
  */
@@ -1213,7 +1214,7 @@ champlain_marker_get_text (ChamplainMarker *marker)
  * champlain_marker_get_alignment:
  * @marker: The marker
  *
- * Returns the marker's text alignment.
+ * Returns: the marker's text alignment.
  *
  * Since: 0.4
  */
@@ -1231,7 +1232,7 @@ champlain_marker_get_alignment (ChamplainMarker *marker)
  * champlain_marker_get_color:
  * @marker: The marker
  *
- * Returns the marker's color.
+ * Returns: the marker's color.
  *
  * Since: 0.4
  */
@@ -1249,7 +1250,7 @@ champlain_marker_get_color (ChamplainMarker *marker)
  * champlain_marker_get_text_color:
  * @marker: The marker
  *
- * Returns the marker's text color.
+ * Returns: the marker's text color.
  *
  * Since: 0.4
  */
@@ -1267,7 +1268,7 @@ champlain_marker_get_text_color (ChamplainMarker *marker)
  * champlain_marker_get_font_name:
  * @marker: The marker
  *
- * Returns the marker's font name.
+ * Returns: the marker's font name.
  *
  * Since: 0.4
  */
@@ -1285,7 +1286,7 @@ champlain_marker_get_font_name (ChamplainMarker *marker)
  * champlain_marker_get_wrap:
  * @marker: The marker
  *
- * Returns if the marker's text wraps.
+ * Returns: if the marker's text wraps.
  *
  * Since: 0.4
  */
@@ -1303,7 +1304,7 @@ champlain_marker_get_wrap (ChamplainMarker *marker)
  * champlain_marker_get_wrap_mode:
  * @marker: The marker
  *
- * Returns the marker's text wrap mode.
+ * Returns: the marker's text wrap mode.
  *
  * Since: 0.4
  */
@@ -1321,7 +1322,7 @@ champlain_marker_get_wrap_mode (ChamplainMarker *marker)
  * champlain_marker_get_ellipsize:
  * @marker: The marker
  *
- * Returns the marker's text ellipsize mode.
+ * Returns: the marker's text ellipsize mode.
  *
  * Since: 0.4
  */
@@ -1339,7 +1340,7 @@ champlain_marker_get_ellipsize (ChamplainMarker *marker)
  * champlain_marker_get_single_line_mode:
  * @marker: The marker
  *
- * Returns the marker's text single side mode.
+ * Returns: the marker's text single side mode.
  *
  * Since: 0.4
  */
@@ -1357,7 +1358,7 @@ champlain_marker_get_single_line_mode (ChamplainMarker *marker)
  * champlain_marker_get_draw_background:
  * @marker: The marker
  *
- * Returns if the marker's has a background.
+ * Returns: if the marker's has a background.
  *
  * Since: 0.4
  */

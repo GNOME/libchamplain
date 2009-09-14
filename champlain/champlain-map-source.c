@@ -334,7 +334,7 @@ champlain_map_source_init (ChamplainMapSource *champlainMapSource)
  * champlain_map_source_get_max_zoom_level:
  * @map_source: a #ChamplainMapSource
  *
- * Returns the maximum zoom level this map source supports
+ * Returns: the maximum zoom level this map source supports
  *
  * Since: 0.4
  */
@@ -351,7 +351,7 @@ champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source)
  * champlain_map_source_get_min_zoom_level:
  * @map_source: a #ChamplainMapSource
  *
- * Returns the miminum zoom level this map source supports
+ * Returns: the miminum zoom level this map source supports
  *
  * Since: 0.4
  */
@@ -368,7 +368,7 @@ champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source)
  * champlain_map_source_get_tile_size:
  * @map_source: a #ChamplainMapSource
  *
- * Returns the tile's size (width and height) in pixels for this map source
+ * Returns: the tile's size (width and height) in pixels for this map source
  *
  * Since: 0.4
  */
@@ -387,7 +387,7 @@ champlain_map_source_get_tile_size (ChamplainMapSource *map_source)
  * @zoom_level: the zoom level
  * @longitude: a longitude
  *
- * Returns the x position on the map using this map source's projection.
+ * Returns: the x position on the map using this map source's projection.
  * (0, 0) is located at the top left.
  *
  * Since: 0.4
@@ -410,7 +410,7 @@ champlain_map_source_get_x (ChamplainMapSource *map_source,
  * @zoom_level: the zoom level
  * @latitude: a latitude
  *
- * Returns the y position on the map using this map source's projection.
+ * Returns: the y position on the map using this map source's projection.
  * (0, 0) is located at the top left.
  *
  * Since: 0.4
@@ -434,7 +434,7 @@ champlain_map_source_get_y (ChamplainMapSource *map_source,
  * @map_source: a #ChamplainMapSource
  * @zoom_level: the zoom level
  *
- * Returns the number of tiles in a row at this zoom level for this map source.
+ * Returns: the number of tiles in a row at this zoom level for this map source.
  *
  * Since: 0.4
  */
@@ -454,7 +454,7 @@ champlain_map_source_get_row_count (ChamplainMapSource *map_source,
  * @map_source: a #ChamplainMapSource
  * @zoom_level: the zoom level
  *
- * Returns the number of tiles in a column at this zoom level for this map
+ * Returns: the number of tiles in a column at this zoom level for this map
  * source.
  *
  * Since: 0.4
@@ -495,7 +495,7 @@ champlain_map_source_fill_tile (ChamplainMapSource *map_source,
  * @zoom_level: the zoom level
  * @x: a x position
  *
- * Returns the longitude corresponding to this x position in the map source's
+ * Returns: the longitude corresponding to this x position in the map source's
  * projection.
  *
  * Since: 0.4
@@ -518,7 +518,7 @@ champlain_map_source_get_longitude (ChamplainMapSource *map_source,
  * @zoom_level: the zoom level
  * @y: a y position
  *
- * Returns the latitude corresponding to this y position in the map source's
+ * Returns: the latitude corresponding to this y position in the map source's
  * projection.
  *
  * Since: 0.4
@@ -540,7 +540,7 @@ champlain_map_source_get_latitude (ChamplainMapSource *map_source,
  * champlain_map_source_get_name:
  * @map_source: a #ChamplainMapSource
  *
- * Returns the map source's name.
+ * Returns: the map source's name.
  *
  * Since: 0.4
  */
@@ -579,7 +579,7 @@ champlain_map_source_set_name (ChamplainMapSource *map_source,
  * champlain_map_source_get_license:
  * @map_source: a #ChamplainMapSource
  *
- * Returns the map source's license.
+ * Returns: the map source's license.
  *
  * Since: 0.4
  */
@@ -618,7 +618,7 @@ champlain_map_source_set_license (ChamplainMapSource *map_source,
  * champlain_map_source_get_license_uri:
  * @map_source: a #ChamplainMapSource
  *
- * Returns the map source's license URI.
+ * Returns: the map source's license URI.
  *
  * Since: 0.4
  */
@@ -658,7 +658,7 @@ champlain_map_source_set_license_uri (ChamplainMapSource *map_source,
  * champlain_map_source_get_projection:
  * @map_source: a #ChamplainMapSource
  *
- * Returns the map source's projection.
+ * Returns: the map source's projection.
  *
  * Since: 0.4
  */
@@ -695,7 +695,7 @@ champlain_map_source_set_projection (ChamplainMapSource *map_source,
  * champlain_map_source_get_id:
  * @map_source: a #ChamplainMapSource
  *
- * Returns the map source's id.
+ * Returns: the map source's id.
  *
  * Since: 0.4
  */

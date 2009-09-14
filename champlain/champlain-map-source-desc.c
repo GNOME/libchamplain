@@ -119,10 +119,8 @@ champlain_map_source_desc_free (ChamplainMapSourceDesc *desc)
 
 /**
  * champlain_map_source_desc_new:
- * @lat: the latitude
- * @lon: the longitude
  *
- * Return value: a newly allocated #ChamplainMapSourceDesc to be freed with #champlain_map_source_desc_free
+ * Returns: a newly allocated #ChamplainMapSourceDesc to be freed with #champlain_map_source_desc_free
  *
  * Since: 0.4
  */
