@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 use Cwd;
 use File::Spec;
 
-use Gtk2::CodeGen;
+use Glib::CodeGen;
 use Glib::MakeHelper;
 use ExtUtils::Depends;
 use ExtUtils::PkgConfig;
@@ -41,21 +41,6 @@ sub main {
 		return;
 	}
 	
-	# If libchamplain-gtk is installed the GTK bindings will be generated
-	eval {
-		my %conf = ExtUtils::PkgConfig->find("champlain-gtk-$champlain_version");
-		$pkgconfig{cflags} .= $conf{cflags} . ' -DCHAMPLAINPERL_GTK';
-		$pkgconfig{libs} .= $conf{libs};
-		
-		# All XS files that start with Gtk2Champlain are for libchamplain-gtk
-		push @XS_FILES, <xs/Gtk2Champlain*.xs>;
-		push @typemaps, 'maps-gtk';
-		push @deps, 'Gtk2';
-	};
-	if (my $error = $@) {
-		warn "Ignoring the Gtk2 bindings ($error)";
-	}
-	
 	$DEPENDS = ExtUtils::Depends->new('Champlain', @deps);
 	
 	$DEPENDS->add_pm(
@@ -64,8 +49,8 @@ sub main {
 	);
 
 	# Code generation
-	Gtk2::CodeGen->parse_maps('champlain', input => [ @typemaps ]);
-	Gtk2::CodeGen->write_boot(xs_files => [ @XS_FILES ]);
+	Glib::CodeGen->parse_maps('champlain', input => [ @typemaps ]);
+	Glib::CodeGen->write_boot(xs_files => [ @XS_FILES ]);
 	
 	
 	$DEPENDS->set_inc($pkgconfig{cflags} . ' -I./build');
