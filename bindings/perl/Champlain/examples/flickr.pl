@@ -23,8 +23,7 @@ use warnings;
 use open ':std', ':utf8';
 
 use Glib qw(TRUE FALSE);
-use Clutter qw(-gtk-init);
-use Gtk2 qw(-init);
+use Clutter qw(-threads-init -init);
 use Champlain;
 use XML::LibXML;
 use Carp;
@@ -45,38 +44,26 @@ sub main {
 
 	local $| = 1;
 
-	my $window = Gtk2::Window->new();
-	$window->set_border_width(10);
-	$window->set_title("Champlain + Flickr - Demo");
-	$window->signal_connect('destroy' => sub { Gtk2->main_quit() });
-
-	my $vbox = Gtk2::VBox->new(FALSE, 10);
+	my $stage = Clutter::Stage->get_default();
+	$stage->set_size(800, 600);
 
 	# Create the map view
-	my $gtk2_map = Gtk2::ChamplainEmbed->new();
-	my $map = $gtk2_map->get_view();
+	my $map = Champlain::View->new();
 	$map->center_on(47.130885, -70.764141);
 	$map->set_scroll_mode('kinetic');
 	$map->set_zoom_level(5);
-	$gtk2_map->set_size_request(640, 480);
+	$map->set_size(640, 480);
 
 	# Create the markers and marker layer
 	my $layer = Champlain::Layer->new();
 	$layer->show();
 	$map->add_layer($layer);
-	
+
 	$LABEL = make_label();
 	$LABEL->hide();
 	$map->add($LABEL);
 
-	my $viewport = Gtk2::Viewport->new();
-	$viewport->set_shadow_type('etched-in');
-	$viewport->add($gtk2_map);
-
-	$vbox->add($viewport);
-
-	$window->add($vbox);
-	$window->show_all();
+	$stage->show_all();
 
 	my $icon = Clutter::Texture->new(
 		File::Spec->catfile($FindBin::Bin, 'images', 'flickr.png')
@@ -91,7 +78,7 @@ sub main {
 	};
 	$map->signal_connect_after("button-release-event", \&flickr_search, $data);
 
-	Gtk2->main();
+	Clutter->main();
 
 	return 0;
 }
@@ -276,7 +263,7 @@ sub flickr_download_photo_callback {
 sub make_label {
 
 	my $black = Clutter::Color->new(0x00, 0x00, 0x00, 0xff);
-	my $button_text = Clutter::Label->new("Sans 16", '', $black);
+	my $button_text = Clutter::Text->new("Sans 16", '', $black);
 	$button_text->set_position(10, 10);
 
 	return $button_text;
