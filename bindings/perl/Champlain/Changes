@@ -1,5 +1,8 @@
 Revision history for Champlain
 
+0.07 Tue Sep 15 22:05:38 CEST 2009
+	Port to libchamplain 0.4 and clutter 1.0
+
 0.06 Sat Aug  8 09:32:26 CEST 2009
 	Full coverage for libchamplain 0.3.5 (the last release to use clutter 0.8).
 	Updated the example flickr.pl.
