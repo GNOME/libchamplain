@@ -2,11 +2,12 @@ Champlain
 =========
 
 Perl bindings for the C library "libchamplain" that provides a ClutterActor for
-displaying maps. Libchamplain provides a simple mechanism for rendering maps in
-an application or for embedding maps in an existing application.
+displaying geographical maps from various free sources. Libchamplain provides a
+simple mechanism for rendering maps in an application or for embedding maps in
+an existing application.
 
-The library relies on Clutter for all rendering and can easily embedded in any
-Gtk2 application. 
+The library relies on Clutter for all rendering and can easily be embedded in
+any Gtk2 application.
 
 The maps displayed are taken from various sources, all providing maps for free,
 at the moment the following sources area available: OpenStreetMap, OpenAerialMap
@@ -30,7 +31,7 @@ To install this module, run the following commands:
 
 SUPPORT AND DOCUMENTATION
 
-After installing, you can find documentation for this module with the
+After installing you can find documentation for this module with the
 perldoc command.
 
 	perldoc Champlain
