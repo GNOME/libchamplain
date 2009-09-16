@@ -84,8 +84,24 @@ Emmanuel Rodriguez E<lt>potyl@cpan.orgE<gt>.
 Copyright (C) 2009 by Emmanuel Rodriguez.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms of:
+
+=over 4
+
+=item the GNU Lesser General Public License, version 2.1; or
+
+=item the Artistic License, version 2.0.
+
+=back
+
+This module is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+You should have received a copy of the GNU Library General Public
+License along with this module; if not, see L<http://www.gnu.org/licenses/>.
+
+For the terms of The Artistic License, see L<perlartistic>.
 
 =cut
 
