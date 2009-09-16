@@ -26,8 +26,8 @@ sub test_empty_multiple {
 	my $layer = Champlain::SelectionLayer->new();
 	isa_ok($layer, 'Champlain::Layer');
 
-	is($layer->get_selection_mode, 'multiple');
-	is($layer->get('selection_mode'), 'multiple');
+	is($layer->get_selection_mode, 'single');
+	is($layer->get('selection_mode'), 'single');
 
 	is($layer->get_selected, undef, "[empty] get_selected()");
 
@@ -63,11 +63,11 @@ sub test_empty_single {
 	my $layer = Champlain::SelectionLayer->new();
 	isa_ok($layer, 'Champlain::Layer');
 
-	is($layer->get_selection_mode, 'multiple');
-	is($layer->get('selection_mode'), 'multiple');
-	$layer->set_selection_mode('single');
 	is($layer->get_selection_mode, 'single');
 	is($layer->get('selection_mode'), 'single');
+	$layer->set_selection_mode('multiple');
+	is($layer->get_selection_mode, 'multiple');
+	is($layer->get('selection_mode'), 'multiple');
 
 	is($layer->get_selected, undef, "[empty] get_selected()");
 
@@ -102,6 +102,7 @@ sub test_empty_single {
 sub test_markers_multiple {
 	my $layer = Champlain::SelectionLayer->new();
 	isa_ok($layer, 'Champlain::Layer');
+	$layer->set_selection_mode('multiple');
 
 
 	my @layer_markers = (
@@ -243,6 +244,10 @@ sub test_markers_single {
 sub test_selection_mode_change {
 	my $layer = Champlain::SelectionLayer->new();
 	isa_ok($layer, 'Champlain::Layer');
+
+	# In the past the default selection mode was multiple, so we set it back to
+	# single just like in the old times
+	$layer->set_selection_mode('multiple');
 
 	my $notify = 0;
 	$layer->signal_connect('notify::selection-mode', sub {
