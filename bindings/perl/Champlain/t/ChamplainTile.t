@@ -27,8 +27,8 @@ sub test_new_full {
 	is($tile->get_zoom_level(), 1, "get_zoom_level() full tile");
 	is($tile->get_size(), 514, "get_size() full tile");
 	is($tile->get_state(), 'init', "get_state() full tile");
-	is($tile->get_uri(), '', "get_uri() full tile");
-	is($tile->get_filename(), '', "get_filename() full tile");
+	is($tile->get_uri(), undef, "get_uri() full tile");
+	is($tile->get_filename(), undef, "get_filename() full tile");
 	isa_ok($tile->get_actor(), 'Clutter::Actor', "get_actor() full tile");
 	is($tile->get_content(), undef, "get_content() full tile");
 	is($tile->get_etag(), undef, "get_etag() full tile");
@@ -52,8 +52,8 @@ sub test_new_empty {
 	is($tile->get_zoom_level(), 0, "get_zoom_level() default tile");
 	is($tile->get_size(), 0, "get_size() default tile");
 	is($tile->get_state(), 'init', "get_state() default tile");
-	is($tile->get_uri(), '', "get_uri() default tile");
-	is($tile->get_filename(), '', "get_filename() default tile");
+	is($tile->get_uri(), undef, "get_uri() default tile");
+	is($tile->get_filename(), undef, "get_filename() default tile");
 	isa_ok($tile->get_actor(), 'Clutter::Actor', "get_actor() default tile");
 	is($tile->get_content(), undef, "get_content() full tile");
 	is($tile->get_etag(), undef, "get_etag() full tile");
