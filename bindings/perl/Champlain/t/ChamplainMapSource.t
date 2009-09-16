@@ -85,6 +85,15 @@ sub test_osm_osmarender {
 sub test_oam {
 	my $label = "OpenAerialMap";
 	my $map = get_oam();
+
+	if (! defined $map) {
+		# The map source is now gone
+		SKIP: {
+			skip "The map source $label is no longer available", 33;
+		};
+		return;
+	}
+
 	isa_ok($map, 'Champlain::MapSource');
 	
 	# Map identification
@@ -232,8 +241,8 @@ sub generic_map_operations {
 	my $tile = Champlain::Tile->new();
 	is($tile->get_size(), 0, "get_size() default tile");
 	is($tile->get_state(), 'init', "get_state() default tile");
-	is($tile->get_uri(), '', "get_uri() default tile");
-	is($tile->get_filename(), '', "get_filename() default tile");
+	is($tile->get_uri(), undef, "get_uri() default tile");
+	is($tile->get_filename(), undef, "get_filename() default tile");
 	$map->fill_tile($tile);
 	is($tile->get_size(), $map->get_tile_size, "size is filled");
 	is($tile->get_state(), 'loading', "state changed");
