@@ -261,6 +261,10 @@ sub test_go_to {
 	my $view = Champlain::View->new();
 	isa_ok($view, 'Champlain::View');
 
+	# Set a proper zoom-level otherwise the test will fail because we would be
+	# zoomed in Antartica.
+	$view->set_property("zoom-level", 4);
+
 	# Place the view in the center
 	$view->center_on(0, 0);
 	is($view->get('latitude'), 0, "center_on() reset latitude");
@@ -325,15 +329,16 @@ sub test_ensure_visible {
 	is($view->get('longitude'), 0);
 	is($view->get('zoom-level'), 6);
 
-	# Must add the view to a stage for this test
-	my $stage = Clutter::Stage->get_default();
-	$view->set_size(400, 400);
-	$stage->add($view);
-
 	# Ensure that 2 points are visible
 	my (@marker1) = (48.218611, 17.146397);
 	my (@marker2) = (48.21066, 16.31476);
-	$view->ensure_visible(@marker1, @marker2, TRUE);
+
+	# Must start the animations from the event loop
+	Glib::Idle->add(sub {
+		diag("Start ensure visible");
+		$view->ensure_visible(@marker1, @marker2, TRUE);
+		return FALSE;
+	});
 	run_animation_loop($view);
 	
 	# Check if we got somewhere close to the middle of the markers
@@ -417,15 +422,13 @@ sub create_marker {
 sub run_animation_loop {
 	my ($view) = @_;
 
-	# Set a proper zoom-level otherwise the test will fail because we would be
-	# zoomed in Antartica.
-	$view->set_property("zoom-level", 4);
-#	if (!$view->get_stage) {
-#		my $stage = Clutter::Stage->get_default();
-#		$stage->add($view);
-#		$stage->set_size(400, 400);
-#		#$stage->show_all();
-#    }
+	if (!$view->get_stage) {
+		my $stage = Clutter::Stage->get_default();
+		$stage->add($view);
+		$stage->set_size(400, 400);
+		$view->set_size($stage->get_size);
+		#$stage->show_all();
+	}
 
 
 	# Give us a bit of time to get there since this is an animation and it
