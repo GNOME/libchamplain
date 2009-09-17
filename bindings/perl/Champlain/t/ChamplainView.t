@@ -270,12 +270,10 @@ sub test_go_to {
 	# Go to a different place
 	my ($latitude, $longitude) = (48.218611, 17.146397);
 	$view->go_to($latitude, $longitude);
-
 	run_animation_loop($view);
 	
 	# Check if we got somewhere close to desired location
 	is_view_near($view, $latitude, $longitude);
-	
 	
 	# Replace the view in the center
 	$view->center_on(0, 0);
@@ -336,7 +334,6 @@ sub test_ensure_visible {
 	my (@marker1) = (48.218611, 17.146397);
 	my (@marker2) = (48.21066, 16.31476);
 	$view->ensure_visible(@marker1, @marker2, TRUE);
-
 	run_animation_loop($view);
 	
 	# Check if we got somewhere close to the middle of the markers
@@ -379,7 +376,6 @@ sub test_ensure_markers_visible {
 	$view->set_size(400, 400);
 
 	$view->ensure_markers_visible(\@markers, TRUE);
-
 	run_animation_loop($view);
 	
 	# Check if we got somewhere close to the middle of the markers
@@ -421,9 +417,15 @@ sub create_marker {
 sub run_animation_loop {
 	my ($view) = @_;
 
-#	if (my $stage = $view->get_stage) {
-#		$stage->show_all();
-#	}
+	# Set a proper zoom-level otherwise the test will fail because we would be
+	# zoomed in Antartica.
+	$view->set_property("zoom-level", 4);
+#	if (!$view->get_stage) {
+#		my $stage = Clutter::Stage->get_default();
+#		$stage->add($view);
+#		$stage->set_size(400, 400);
+#		#$stage->show_all();
+#    }
 
 
 	# Give us a bit of time to get there since this is an animation and it
