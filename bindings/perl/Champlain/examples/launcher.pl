@@ -24,7 +24,7 @@ sub main {
 	# Create the map view
 	my $map = Champlain::View->new();
 	$map->set_scroll_mode('kinetic');
-	$map->set_size(800, 600);
+	$map->set_size($stage->get_size);
 	$stage->add($map);
 	
 	# Create the zoom buttons

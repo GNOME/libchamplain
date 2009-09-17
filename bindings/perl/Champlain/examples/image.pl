@@ -29,9 +29,11 @@ sub main {
 
 	# Create the map view
 	my $map = Champlain::View->new();
+	$map->set_size($stage->get_size);
 	$map->center_on(47.130885, -70.764141);
 	$map->set_scroll_mode('kinetic');
 	$map->set_zoom_level(5);
+	$stage->add($map);
 
 	# Create the markers and marker layer
 	my $layer = create_marker_layer($map);

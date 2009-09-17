@@ -53,6 +53,7 @@ sub main {
 	$map->set_scroll_mode('kinetic');
 	$map->set_zoom_level(5);
 	$map->set_size(640, 480);
+	$stage->add($map);
 
 	# Create the markers and marker layer
 	my $layer = Champlain::Layer->new();

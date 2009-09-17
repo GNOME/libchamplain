@@ -32,10 +32,12 @@ sub main {
 
 	# Create the map stuff
 	my $map = Champlain::View->new();
+	$map->set_size($stage->get_size);
 	$map->center_on(0, 0);
 	$map->set_scroll_mode('kinetic');
 	$map->set_zoom_level(3);
-	
+	$stage->add($map);
+
 	my $layer = Champlain::Layer->new();
 	$map->add_layer($layer);
 
@@ -46,8 +48,8 @@ sub main {
 	my $soup = My::Soup->new($capitals_url);
 
 	my $data = {
-		map   => $map,
-		layer => $layer,
+		map     => $map,
+		layer   => $layer,
 		markers => [],
 	};
 
