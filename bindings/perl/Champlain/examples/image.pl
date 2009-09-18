@@ -15,8 +15,8 @@ use strict;
 use warnings;
 
 use Glib qw(TRUE FALSE);
+use Gtk2;
 use Clutter qw(-threads-init -init);
-use Gtk2 qw(-init);
 use Champlain;
 use LWP::UserAgent;
 
