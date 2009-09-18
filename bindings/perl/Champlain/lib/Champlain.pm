@@ -16,7 +16,7 @@ Champlain - Map rendering canvas
 	# Create the map view and set some properties
 	my $map = Champlain::View->new();
 	$map->set('scroll-mode', 'kinetic');
-	$map->set_size(800, 600);
+	$map->set_size($stage->get_size);
 	$map->set_property('zoom-level', 7);
 	$map->center_on(45.466, -73.75);
 	
