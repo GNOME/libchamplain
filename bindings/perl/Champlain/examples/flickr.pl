@@ -14,7 +14,7 @@ Where I<key> is a valid Flickr key.
 
 This sample scripts shows how to interact with the Flickr API and to display
 thumbnails for pictures near a location. The Flickr API interaction is triggered
-when a middle-click in done in a location  on the map.
+when a middle-click in done in a location on the map.
 
 =cut
 
@@ -67,9 +67,21 @@ sub main {
 
 	$stage->show_all();
 
+
+	#
+	# This is the default icon that will be displayed while the flickr a image
+	# is being downloaded. This exact actor ($icon) will never be displayed,
+	# instead copies of it (clones) will be displayed.
+	#
+	# Since clutter 1.0 an actor can only be cloned if it is added to the stage.
+	# It doesn't need to be visible, just to be in the stage.
+	#
 	my $icon = Clutter::Texture->new(
 		File::Spec->catfile($FindBin::Bin, 'images', 'flickr.png')
 	);
+	$stage->add($icon);
+	$icon->hide();
+
 
 	# Middle click on a location to trigger the Flickr interaction
 	$map->set_reactive(TRUE);
