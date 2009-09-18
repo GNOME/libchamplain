@@ -52,7 +52,7 @@ sub main {
 	$map->center_on(47.130885, -70.764141);
 	$map->set_scroll_mode('kinetic');
 	$map->set_zoom_level(5);
-	$map->set_size(640, 480);
+	$map->set_size($stage->get_size);
 	$stage->add($map);
 
 	# Create the markers and marker layer
