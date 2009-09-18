@@ -12,7 +12,7 @@ Where I<key> is a valid Flickr key.
 
 =head1 DESCRIPTION
 
-This sample scripts shows how to interact with the Flickr API and to display
+This sample script shows how to interact with the Flickr API and to display
 thumbnails for pictures near a location. The Flickr API interaction is triggered
 when a middle-click in done in a location on the map.
 
