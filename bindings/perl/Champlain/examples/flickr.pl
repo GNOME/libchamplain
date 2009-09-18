@@ -23,6 +23,7 @@ use warnings;
 use open ':std', ':utf8';
 
 use Glib qw(TRUE FALSE);
+use Gtk2;
 use Clutter qw(-threads-init -init);
 use Champlain;
 use XML::LibXML;
