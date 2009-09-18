@@ -68,8 +68,9 @@ sub test_generic {
 	my $factory = Champlain::MapSourceFactory->dup_default();
 	my $source_new = $factory->create(Champlain::MapSourceFactory->OSM_MAPNIK);
 	if ($source_original->get_id eq $source_new->get_id) {
-		# Same kind of map source, take another one
-		$source_new = $factory->create(Champlain::MapSourceFactory->OAM);
+		# The new map source is the same as the original! Take another map
+		# source instead
+		$source_new = $factory->create(Champlain::MapSourceFactory->OSM_OSMARENDER);
 	}
 	$view->set_map_source($source_new);
 	is($view->get('map-source'), $source_new, "set_map_source()");
