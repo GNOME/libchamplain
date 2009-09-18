@@ -1,6 +1,7 @@
 ^build/
 \.svn
 ^Makefile$
+^Makefile.am$
 ^Makefile[.]old$
 ^xs/.*[.][co]$
 ^blib/
