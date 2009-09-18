@@ -136,7 +136,7 @@ sub flickr_photos_search_callback {
 		my $longitude = $photo_node->getAttribute('longitude');
 
 		# Add a marker for the image
-		my $icon = Clutter::Texture::Clone->new($data->{icon});
+		my $icon = Clutter::Clone->new($data->{icon});
 		my $marker = Champlain::Marker->new_with_image($icon);
 		$marker->set_position($latitude, $longitude);
 		$data->{layer}->add($marker);
