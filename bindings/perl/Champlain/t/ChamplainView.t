@@ -78,8 +78,8 @@ sub test_generic {
 
 	
 	# Change the decel rate
-	$view->set_decel_rate(0.5);
-	is($view->get('decel-rate'), 0.5, "set_decel_rate()");
+	$view->set_decel_rate(1.2);
+	is($view->get('decel-rate'), 1.2, "set_decel_rate()");
 	$view->set_decel_rate(1.5);
 	is($view->get('decel-rate'), 1.5, "set_decel_rate()");
 	is($view->get_decel_rate, 1.5, "get_decel_rate()");
