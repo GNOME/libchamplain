@@ -49,6 +49,7 @@ GtkChamplain-0.5.gir: $(INTROSPECTION_SCANNER) libchamplain-gtk-0.5.la
 	--include=Clutter-1.0 \
 	--include=Gtk-2.0 \
 	--library=champlain-gtk-0.5 \
+	--libtool="$(LIBTOOL)" \
 	--output $@ \
 	--pkg gobject-2.0 \
 	--pkg gtk+-2.0 \
