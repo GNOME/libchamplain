@@ -16,8 +16,7 @@ use warnings;
 use open ':std', ':utf8';
 
 use Glib qw(TRUE FALSE);
-use Clutter qw(-gtk-init);
-use Gtk2 qw(-init);
+use Clutter qw(-threads-init -init);
 use Champlain;
 
 use XML::LibXML;
@@ -28,41 +27,29 @@ exit main();
 
 sub main {
 
-	my $window = Gtk2::Window->new();
-	my $vbox = Gtk2::VBox->new(FALSE, 0);
-	
-	
+	my $stage = Clutter::Stage->get_default();
+	$stage->set_size(800, 600);
+
 	# Create the map stuff
-	my $gtk2_map = Gtk2::ChamplainEmbed->new();
-	my $map = $gtk2_map->get_view();
-	$gtk2_map->set_size_request(640, 480);
+	my $map = Champlain::View->new();
+	$map->set_size($stage->get_size);
 	$map->center_on(0, 0);
 	$map->set_scroll_mode('kinetic');
 	$map->set_zoom_level(3);
-	
+	$stage->add($map);
+
 	my $layer = Champlain::Layer->new();
 	$map->add_layer($layer);
-	
-	
-	my $viewport = Gtk2::Viewport->new();
-	$viewport->set_shadow_type('etched-in');
-	$viewport->add($gtk2_map);
-	$vbox->pack_start($viewport, TRUE, TRUE, 0);
-	
-	$window->add($vbox);
-	$window->set_size_request($gtk2_map->get_size_request);
-	$window->signal_connect(destroy => sub {
-		Gtk2->main_quit();
-	});
-	$window->show_all();
+
+	$stage->show_all();
 
 	
 	my $capitals_url = "http://en.wikipedia.org/wiki/List_of_national_capitals";
 	my $soup = My::Soup->new($capitals_url);
 
 	my $data = {
-		map   => $map,
-		layer => $layer,
+		map     => $map,
+		layer   => $layer,
 		markers => [],
 	};
 
@@ -78,7 +65,7 @@ sub main {
 	$soup->do_get($capitals_url, \&capitals_main_callback, $data);
 	
 	
-	Gtk2->main();
+	Clutter->main();
 	
 	
 	return 0;

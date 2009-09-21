@@ -15,45 +15,34 @@ use strict;
 use warnings;
 
 use Glib qw(TRUE FALSE);
-use Clutter qw(-gtk-init);
-use Gtk2 qw(-init);
+use Gtk2;
+use Clutter qw(-threads-init -init);
 use Champlain;
 use LWP::UserAgent;
 
 exit main();
 
 sub main {
-	
-	my $window = Gtk2::Window->new();
-	$window->set_border_width(10);
-	$window->set_title("Champlain - Demo");
-	$window->signal_connect('destroy' => sub { Gtk2->main_quit() });
-	
-	my $vbox = Gtk2::VBox->new(FALSE, 10);	
+
+	my $stage = Clutter::Stage->get_default();
+	$stage->set_size(800, 600);
 
 	# Create the map view
-	my $gtk2_map = Gtk2::ChamplainEmbed->new();
-	my $map = $gtk2_map->get_view();
+	my $map = Champlain::View->new();
+	$map->set_size($stage->get_size);
 	$map->center_on(47.130885, -70.764141);
 	$map->set_scroll_mode('kinetic');
 	$map->set_zoom_level(5);
-	$gtk2_map->set_size_request(640, 480);
-	
+	$stage->add($map);
+
 	# Create the markers and marker layer
 	my $layer = create_marker_layer($map);
 	$map->add_layer($layer);
-	
-	my $viewport = Gtk2::Viewport->new();
-	$viewport->set_shadow_type('etched-in');
-	$viewport->add($gtk2_map);
 
-	$vbox->add($viewport);
+	$stage->show_all();
 
-	$window->add($vbox);
-	$window->show_all();
-	
-	Gtk2->main();
-	
+	Clutter->main();
+
 	return 0;
 }
 

@@ -48,11 +48,22 @@ sub test_map_factory {
 		Champlain::MapSourceFactory->OSM_CYCLE_MAP,
 		"OpenStreetMap Cycle Map"
 	);
-	generic_create(
-		$factory,
-		Champlain::MapSourceFactory->OAM,
-		"OpenAerialMap"
-	);
+
+	# OpenAerialMap is no longer working
+	if (0) {
+		generic_create(
+			$factory,
+			Champlain::MapSourceFactory->OAM,
+			"OpenAerialMap"
+		);
+	}
+	else {
+		# The map source is now gone
+		SKIP: {
+			skip "The map source OpenAerialMap is no longer available", 3;
+		};
+	}
+
 	generic_create(
 		$factory,
 		Champlain::MapSourceFactory->MFF_RELIEF,
@@ -75,7 +86,7 @@ sub test_map_register {
 	
 	# Add a new map
 	my $description = {
-  	id => 'perl',
+		id => 'perl',
 		name => 'Perl Fake Map',
 		license => 'Artistic License',
 		license_uri => 'http://dev.perl.org/licenses/artistic.html',

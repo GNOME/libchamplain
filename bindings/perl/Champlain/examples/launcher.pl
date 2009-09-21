@@ -24,7 +24,7 @@ sub main {
 	# Create the map view
 	my $map = Champlain::View->new();
 	$map->set_scroll_mode('kinetic');
-	$map->set_size(800, 600);
+	$map->set_size($stage->get_size);
 	$stage->add($map);
 	
 	# Create the zoom buttons
@@ -80,7 +80,7 @@ sub make_button {
 	$button_bg->set_opacity(0xcc);
 
 	my $black = Clutter::Color->new(0x00, 0x00, 0x00, 0xff);
-	my $button_text = Clutter::Label->new("Sans 10", $text, $black);
+	my $button_text = Clutter::Text->new("Sans 10", $text, $black);
 	$button->add($button_text);
 	my ($width, $height) = $button_text->get_size();
 

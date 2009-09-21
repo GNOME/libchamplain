@@ -15,9 +15,8 @@ Champlain - Map rendering canvas
 	
 	# Create the map view and set some properties
 	my $map = Champlain::View->new();
-	$map->set('scroll-mode', 'kinetic');
-	$map->set_size(800, 600);
-	$map->set_property('zoom-level', 7);
+	$map->set_size($stage->get_size);
+	$map->set_zoom_level(7);
 	$map->center_on(45.466, -73.75);
 	
 	# Pack the actors	
@@ -30,11 +29,8 @@ Champlain - Map rendering canvas
 =head1 DESCRIPTION
 
 Champlain is a Perl binding for the C library libchamplain which provides a
-canvas widget based on Clutter that displays maps from various free map sources
-such as I<OpenStreetMap>, I<OpenAerialMap> and I<Maps for free>.
-
-If the C library is compiled with GTK support then the map widget can also be
-embedded in any GTK application.
+canvas widget based on L<Clutter> that displays maps from various free map
+sources such as I<OpenStreetMap>, I<OpenAerialMap> and I<Maps for free>.
 
 For more information about libchamplain see:
 L<http://projects.gnome.org/libchamplain/>.
@@ -60,6 +56,21 @@ and maximal values for (latitude, longitude) coordinates:
 
 	use Champlain ':coords';
 
+=head1 Gtk2 support
+
+In the past I<Champlain> provided also support for a L<Gtk2> widget if the C
+library libchamplain was compiled with GTK support and if Clutter would be
+built with Gtk2 support.
+
+While this was very handy it made the Perl modules hard to maintain and starting
+with Clutter 1.0 the Gtk2 wrappers are no longer bundled. They will be provided
+by another CPAN package that doesn't exist yet. This will mimic what the C
+libraries do and what other bindings do.
+
+In the meanwhile this means that this Perl module no longer supports Gtk2.
+Just as with Clutter, another module will be created that will add support for
+Gtk2 once the Gkt2 Perl bindings for Clutter are written.
+
 =head1 BUGS
 
 The library libchamplain is quite young and its API is changing as the code
@@ -84,15 +95,31 @@ Emmanuel Rodriguez E<lt>potyl@cpan.orgE<gt>.
 Copyright (C) 2009 by Emmanuel Rodriguez.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms of:
+
+=over 4
+
+=item the GNU Lesser General Public License, version 2.1; or
+
+=item the Artistic License, version 2.0.
+
+=back
+
+This module is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+You should have received a copy of the GNU Library General Public
+License along with this module; if not, see L<http://www.gnu.org/licenses/>.
+
+For the terms of The Artistic License, see L<perlartistic>.
 
 =cut
 
 use warnings;
 use strict;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use base 'DynaLoader';
 use Exporter 'import';
@@ -145,8 +172,5 @@ sub MAP_MFF_RELIEF {
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
 __PACKAGE__->bootstrap($VERSION);
-
-
-package Champlain::MapSourceDesc;
 
 1;

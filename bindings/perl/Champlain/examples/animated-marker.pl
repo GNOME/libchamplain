@@ -79,10 +79,10 @@ sub create_animation {
 	my ($texture) = @_;
 	
 	# Timeline controlling the animation
-	my $timeline = Clutter::Timeline->new_for_duration(1000);
+	my $timeline = Clutter::Timeline->new(1000);
 	$self->set(timeline => $timeline);
 	$timeline->set_loop(TRUE);
-	my $alpha = Clutter::Alpha->new($timeline, \&Clutter::Alpha::sine_inc);
+	my $alpha = Clutter::Alpha->new($timeline, 'ease-in-sine');
 	
 	# Circle's echo growing
 	my $behaviour_zoom = Clutter::Behaviour::Scale->new($alpha, 0.5, 0.5, 2.0, 2.0);
@@ -98,7 +98,7 @@ sub create_animation {
 
 
 sub create_static_circle {
-	my $texture = Clutter::Texture::Cairo->new($MARKER_SIZE, $MARKER_SIZE);
+	my $texture = Clutter::CairoTexture->new($MARKER_SIZE, $MARKER_SIZE);
 	my $cr = $texture->create_context();
 	
 	# Draw the circle
@@ -118,7 +118,7 @@ sub create_static_circle {
 
 
 sub create_echo_circle {
-	my $texture = Clutter::Texture::Cairo->new($MARKER_SIZE * 2, $MARKER_SIZE * 2);
+	my $texture = Clutter::CairoTexture->new($MARKER_SIZE * 2, $MARKER_SIZE * 2);
 	my $cr = $texture->create_context();
 	
 	# Draw the circle

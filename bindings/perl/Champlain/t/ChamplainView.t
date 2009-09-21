@@ -68,8 +68,9 @@ sub test_generic {
 	my $factory = Champlain::MapSourceFactory->dup_default();
 	my $source_new = $factory->create(Champlain::MapSourceFactory->OSM_MAPNIK);
 	if ($source_original->get_id eq $source_new->get_id) {
-		# Same kind of map source, take another one
-		$source_new = $factory->create(Champlain::MapSourceFactory->OAM);
+		# The new map source is the same as the original! Take another map
+		# source instead
+		$source_new = $factory->create(Champlain::MapSourceFactory->OSM_OSMARENDER);
 	}
 	$view->set_map_source($source_new);
 	is($view->get('map-source'), $source_new, "set_map_source()");
@@ -77,8 +78,8 @@ sub test_generic {
 
 	
 	# Change the decel rate
-	$view->set_decel_rate(0.5);
-	is($view->get('decel-rate'), 0.5, "set_decel_rate()");
+	$view->set_decel_rate(1.2);
+	is($view->get('decel-rate'), 1.2, "set_decel_rate()");
 	$view->set_decel_rate(1.5);
 	is($view->get('decel-rate'), 1.5, "set_decel_rate()");
 	is($view->get_decel_rate, 1.5, "get_decel_rate()");
@@ -261,6 +262,10 @@ sub test_go_to {
 	my $view = Champlain::View->new();
 	isa_ok($view, 'Champlain::View');
 
+	# Set a proper zoom-level otherwise the test will fail because we would be
+	# zoomed in Antartica.
+	$view->set_property("zoom-level", 4);
+
 	# Place the view in the center
 	$view->center_on(0, 0);
 	is($view->get('latitude'), 0, "center_on() reset latitude");
@@ -270,12 +275,10 @@ sub test_go_to {
 	# Go to a different place
 	my ($latitude, $longitude) = (48.218611, 17.146397);
 	$view->go_to($latitude, $longitude);
-
 	run_animation_loop($view);
 	
 	# Check if we got somewhere close to desired location
 	is_view_near($view, $latitude, $longitude);
-	
 	
 	# Replace the view in the center
 	$view->center_on(0, 0);
@@ -327,16 +330,16 @@ sub test_ensure_visible {
 	is($view->get('longitude'), 0);
 	is($view->get('zoom-level'), 6);
 
-	# Must add the view to a stage for this test
-	my $stage = Clutter::Stage->get_default();
-	$view->set_size(400, 400);
-	$stage->add($view);
-
 	# Ensure that 2 points are visible
 	my (@marker1) = (48.218611, 17.146397);
 	my (@marker2) = (48.21066, 16.31476);
-	$view->ensure_visible(@marker1, @marker2, TRUE);
 
+	# Must start the animations from the event loop
+	Glib::Idle->add(sub {
+		diag("Start ensure visible");
+		$view->ensure_visible(@marker1, @marker2, TRUE);
+		return FALSE;
+	});
 	run_animation_loop($view);
 	
 	# Check if we got somewhere close to the middle of the markers
@@ -379,7 +382,6 @@ sub test_ensure_markers_visible {
 	$view->set_size(400, 400);
 
 	$view->ensure_markers_visible(\@markers, TRUE);
-
 	run_animation_loop($view);
 	
 	# Check if we got somewhere close to the middle of the markers
@@ -421,9 +423,13 @@ sub create_marker {
 sub run_animation_loop {
 	my ($view) = @_;
 
-#	if (my $stage = $view->get_stage) {
-#		$stage->show_all();
-#	}
+	if (!$view->get_stage) {
+		my $stage = Clutter::Stage->get_default();
+		$stage->add($view);
+		$stage->set_size(400, 400);
+		$view->set_size($stage->get_size);
+		#$stage->show_all();
+	}
 
 
 	# Give us a bit of time to get there since this is an animation and it

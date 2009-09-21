@@ -1,11 +1,11 @@
 Changes
+COPYING
 MANIFEST
 MANIFEST.SKIP
 Makefile.PL
 README
 lib/Champlain.pm
 maps
-maps-gtk
 champlain-perl.h
 xs/Champlain.xs
 xs/ChamplainBaseMarker.xs
@@ -22,7 +22,6 @@ xs/ChamplainSelectionLayer.xs
 xs/ChamplainTile.xs
 xs/ChamplainView.xs
 xs/ChamplainZoomLevel.xs
-xs/Gtk2ChamplainEmbed.xs
 t/Champlain.t
 t/ChamplainBaseMarker.t
 t/ChamplainLayer.t
@@ -37,12 +36,10 @@ t/ChamplainSelectionLayer.t
 t/ChamplainTile.t
 t/ChamplainView.t
 t/ChamplainZoomLevel.t
-t/Gtk2ChamplainEmbed.t
 examples/animated-marker.pl
 examples/capitals.pl
 examples/image.pl
 examples/launcher.pl
-examples/gtk2.pl
 examples/polygons.pl
 examples/flickr.pl
 examples/images/who.png
