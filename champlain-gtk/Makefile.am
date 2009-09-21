@@ -8,17 +8,17 @@ CLEANFILES = $(BUILT_SOURCES)
 CHAMPLAIN_GTK_MARSHAL = champlain-gtk-marshal
 CHAMPLAIN_GTK_MARSHAL_LIST = champlain-gtk-marshal.list
 
-lib_LTLIBRARIES = libchamplain-gtk-0.4.la
+lib_LTLIBRARIES = libchamplain-gtk-0.5.la
 
-libchamplain_gtk_0_4_la_SOURCES = \
+libchamplain_gtk_0_5_la_SOURCES = \
 	$(CHAMPLAIN_GTK_MARSHAL_LIST)		 \
 	$(BUILT_SOURCES) 			\
 	gtk-champlain-embed.c
 
 noinst_HEADERS = gtk-champlain-embed.h
 
-libchamplain_gtk_0_4_la_LIBADD = $(GTK_DEPS_LIBS) 	\
-	$(top_builddir)/champlain/libchamplain-0.4.la
+libchamplain_gtk_0_5_la_LIBADD = $(GTK_DEPS_LIBS) 	\
+	$(top_builddir)/champlain/libchamplain-0.5.la
 
 champlain-gtk-marshal.h: $(CHAMPLAIN_GTK_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --header --prefix=champlain_gtk_marshal $< > $(CHAMPLAIN_GTK_MARSHAL).h
@@ -26,10 +26,10 @@ champlain-gtk-marshal.h: $(CHAMPLAIN_GTK_MARSHAL_LIST)
 champlain-gtk-marshal.c: $(CHAMPLAIN_GTK_MARSHAL_LIST)
 	@GLIB_GENMARSHAL@ --body --prefix=champlain_gtk_marshal $< > $(CHAMPLAIN_GTK_MARSHAL).c
 
-libchamplain_includedir=$(includedir)/libchamplain-gtk-0.4/champlain-gtk
+libchamplain_includedir=$(includedir)/libchamplain-gtk-0.5/champlain-gtk
 libchamplain_include_HEADERS = champlain-gtk.h gtk-champlain-embed.h
 
-libchamplain_gtk_0_4_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
+libchamplain_gtk_0_5_la_LDFLAGS= -version-info $(LIBRARY_VERSION)
 
 AM_CPPFLAGS = $(GTK_DEPS_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_GTK_COMPILATION
 AM_LDFLAGS = $(GTK_DEPS_LIBS) -export-symbols-regex ^gtk_champlain_.*
@@ -39,22 +39,22 @@ EXTRA_DIST = $(CHAMPLAIN_GTK_MARSHAL_LIST)
 if HAVE_INTROSPECTION
 BUILT_GIRSOURCES =
 
-GtkChamplain-0.4.gir: $(INTROSPECTION_SCANNER) libchamplain-gtk-0.4.la
+GtkChamplain-0.5.gir: $(INTROSPECTION_SCANNER) libchamplain-gtk-0.5.la
 	$(QUIET_GEN)$(INTROSPECTION_SCANNER) -v \
-	--namespace GtkChamplain --nsversion=0.4 \
+	--namespace GtkChamplain --nsversion=0.5 \
 	--strip-prefix=GtkChamplain \
 	$(INCLUDES) \
 	--add-include-path=$(srcdir) --add-include=path=. \
 	--c-include="$(libchamplain_include_HEADERS)" \
 	--include=Clutter-1.0 \
 	--include=Gtk-2.0 \
-	--library=champlain-gtk-0.4 \
+	--library=champlain-gtk-0.5 \
 	--output $@ \
 	--pkg gobject-2.0 \
 	--pkg gtk+-2.0 \
-	$(libchamplain_gtk_0_4_la_SOURCES) $(libchamplain_include_HEADERS)
+	$(libchamplain_gtk_0_5_la_SOURCES) $(libchamplain_include_HEADERS)
 
-BUILT_GIRSOURCES += GtkChamplain-0.4.gir
+BUILT_GIRSOURCES += GtkChamplain-0.5.gir
 
 # INTROSPECTION_GIRDIR/INTROSPECTION_TYPELIBDIR aren't the right place to
 # install anything - we need to install inside our prefix.

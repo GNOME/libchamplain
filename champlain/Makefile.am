@@ -12,7 +12,7 @@ CLEANFILES = $(BUILT_SOURCES)
 CHAMPLAIN_MARSHAL = champlain-marshal
 CHAMPLAIN_MARSHAL_LIST = champlain-marshal.list
 
-lib_LTLIBRARIES = libchamplain-0.4.la
+lib_LTLIBRARIES = libchamplain-0.5.la
 
 libchamplain_headers = \
 	champlain.h 			\
@@ -34,7 +34,7 @@ libchamplain_headers = \
 	champlain-version.h
 
 
-libchamplain_0_4_la_SOURCES = \
+libchamplain_0_5_la_SOURCES = \
 	$(CHAMPLAIN_MARSHAL_LIST) 	\
 	$(BUILT_SOURCES) 		\
 	champlain-debug.c 		\
@@ -93,11 +93,11 @@ libchamplain_include_HEADERS = \
 	champlain-polygon.h		\
 	champlain-version.h
 
-libchamplain_0_4_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) ../tidy/libtidy-1.0.la
+libchamplain_0_5_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) ../tidy/libtidy-1.0.la
 
-libchamplain_includedir = $(includedir)/libchamplain-0.4/champlain
+libchamplain_includedir = $(includedir)/libchamplain-0.5/champlain
 
-libchamplain_0_4_la_LDFLAGS = -version-info $(LIBRARY_VERSION) \
+libchamplain_0_5_la_LDFLAGS = -version-info $(LIBRARY_VERSION) \
 	-export-symbols-regex		\
 	^champlain_.*
 
@@ -145,7 +145,7 @@ champlain-enum-types.c: $(libchamplain_headers) Makefile
 			--fhead "#include <glib-object.h>\n" \
 			--fhead "#include \"champlain-enum-types.h\"\n\n" \
 			--fprod "\n/* enumerations from \"@filename@\" */" \
-			--vhead "static const G@Type@Value _@enum_name@_values[] = {" \
+	--vhead "static const G@Type@Value _@enum_name@_values[] = {" \
 			--vprod "  { @VALUENAME@, \"@VALUENAME@\", \"@valuenick@\" }," \
 			--vtail "  { 0, NULL, NULL }\n};\n\n" \
 			--vtail "GType\n@enum_name@_get_type (void)\n{\n" \
@@ -160,22 +160,22 @@ champlain-enum-types.c: $(libchamplain_headers) Makefile
 if HAVE_INTROSPECTION
 BUILT_GIRSOURCES =
 
-Champlain-0.4.gir: $(INTROSPECTION_SCANNER) libchamplain-0.4.la
+Champlain-0.5.gir: $(INTROSPECTION_SCANNER) libchamplain-0.5.la
 	$(QUIET_GEN)$(INTROSPECTION_SCANNER) -v \
-	--namespace Champlain --nsversion=0.4 \
+	--namespace Champlain --nsversion=0.5 \
 	--strip-prefix=Champlain \
 	$(INCLUDES) \
 	--add-include-path=$(srcdir) --add-include=path=. \
 	--c-include="$(libchamplain_include_HEADERS)" \
 	--include=Clutter-1.0 \
 	--include=Gtk-2.0 \
-	--library=champlain-0.4 \
+	--library=champlain-0.5 \
 	--output $@ \
 	--pkg gobject-2.0 \
 	--pkg gtk+-2.0 \
-	$(libchamplain_0_4_la_SOURCES) $(libchamplain_include_HEADERS)
+	$(libchamplain_0_5_la_SOURCES) $(libchamplain_include_HEADERS)
 
-BUILT_GIRSOURCES += Champlain-0.4.gir
+BUILT_GIRSOURCES += Champlain-0.5.gir
 
 # INTROSPECTION_GIRDIR/INTROSPECTION_TYPELIBDIR aren't the right place to
 # install anything - we need to install inside our prefix.
