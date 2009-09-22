@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 6;
+use Clutter::TestHelper tests => 9;
 
 use Champlain;
 
@@ -32,5 +32,17 @@ sub tests {
 	$layer->hide();
 	ok(!$layer->get('visible'), "hide()");
 
+	# Too hard to test, but at least we call them
+	$layer->animate_in_all_markers();
+	$layer->animate_out_all_markers();
+
+	# Show/Hide the markers
+	ok($marker->get('visible'), "marker is not visible");
+	$layer->hide_all_markers();
+	ok(!$marker->get('visible'), "hide_all_markers()");
+
+
+	$layer->show_all_markers();
+	ok($marker->get('visible'), "show_all_markers()");
 	return 0;
 }
