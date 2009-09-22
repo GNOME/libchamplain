@@ -30,6 +30,12 @@ sub tests {
 	$marker->set_highlighted(FALSE);
 	is($marker->get_highlighted(), FALSE, "Changed highlighted to false");
 
+    # Can't be tested but at least we call them
+    $marker->animate_in();
+    $marker->animate_in_with_delay(200);
+    $marker->animate_out();
+    $marker->animate_out_with_delay(200);
+
 	return 0;
 }
 
