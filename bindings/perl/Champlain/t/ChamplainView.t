@@ -433,8 +433,8 @@ sub run_animation_loop {
 
 
 	# Give us a bit of time to get there since this is an animation and it
-	# requires an event loop. We add an idle timeout in order to make sure that we
-	# don't wait forever.
+	# requires an event loop. We add an idle timeout in order to make sure that
+	# we don't wait forever.
 	$view->signal_connect('animation-completed' => sub {
 		Clutter->main_quit();
 	});
