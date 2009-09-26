@@ -1,8 +1,12 @@
 Revision history for Champlain
 
+0.08 Wed Sep 23 19:06:04 CEST 2009
+	Full API coverage for libchamplain 0.4.
+
+
 0.07 Wed Sep 16 19:18:20 CEST 2009
-	Port to libchamplain 0.4 and clutter 1.0
-	Dual license: LGPL 2.1 and Artistic License 2.0
+	Port to libchamplain 0.4 and clutter 1.0.
+	Dual license: LGPL 2.1 and Artistic License 2.0.
 
 
 0.06 Sat Aug  8 09:32:26 CEST 2009
