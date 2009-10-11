@@ -44,13 +44,16 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_CACHE_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_CACHE, ChamplainCacheClass))
 
-typedef struct {
-  GObject parent;
-} ChamplainCache;
+typedef struct _ChamplainCache      ChamplainCache;
+typedef struct _ChamplainCacheClass ChamplainCacheClass;
 
-typedef struct {
+struct _ChamplainCache {
+  GObject parent;
+};
+
+struct _ChamplainCacheClass {
   GObjectClass parent_class;
-} ChamplainCacheClass;
+};
 
 GType champlain_cache_get_type (void);
 

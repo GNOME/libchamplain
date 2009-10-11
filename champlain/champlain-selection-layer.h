@@ -65,15 +65,18 @@ typedef enum {
   CHAMPLAIN_SELECTION_MULTIPLE
 } ChamplainSelectionMode;
 
-typedef struct {
+typedef struct _ChamplainSelectionLayer      ChamplainSelectionLayer;
+typedef struct _ChamplainSelectionLayerClass ChamplainSelectionLayerClass;
+
+struct _ChamplainSelectionLayer {
   ChamplainLayer parent;
 
   ChamplainSelectionLayerPrivate *priv;
-} ChamplainSelectionLayer;
+};
 
-typedef struct {
+struct _ChamplainSelectionLayerClass {
   ChamplainLayerClass parent_class;
-} ChamplainSelectionLayerClass;
+};
 
 GType champlain_selection_layer_get_type (void);
 

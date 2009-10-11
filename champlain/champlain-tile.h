@@ -45,15 +45,18 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainTilePrivate ChamplainTilePrivate;
 
-typedef struct {
+typedef struct _ChamplainTile        ChamplainTile;
+typedef struct _ChamplainTileClass   ChamplainTileClass;
+
+struct _ChamplainTile {
   GObject parent;
 
   ChamplainTilePrivate *priv;
-} ChamplainTile;
+};
 
-typedef struct {
+struct _ChamplainTileClass {
   GObjectClass parent_class;
-} ChamplainTileClass;
+};
 
 GType champlain_tile_get_type (void);
 

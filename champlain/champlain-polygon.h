@@ -49,14 +49,17 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainPolygonPrivate ChamplainPolygonPrivate;
 
-typedef struct {
+typedef struct _ChamplainPolygon        ChamplainPolygon;
+typedef struct _ChamplainPolygonClass   ChamplainPolygonClass;
+
+struct _ChamplainPolygon {
   GInitiallyUnowned parent;
   ChamplainPolygonPrivate *priv;
-} ChamplainPolygon;
+};
 
-typedef struct {
+struct _ChamplainPolygonClass {
   GInitiallyUnownedClass parent_class;
-} ChamplainPolygonClass;
+};
 
 GType champlain_polygon_get_type (void);
 
