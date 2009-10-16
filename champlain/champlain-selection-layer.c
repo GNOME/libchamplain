@@ -45,9 +45,18 @@ G_DEFINE_TYPE (ChamplainSelectionLayer, champlain_selection_layer, CHAMPLAIN_TYP
 
 enum
 {
+  /* normal signals */
+  CHANGED,
+  LAST_SIGNAL
+};
+
+enum
+{
   PROP_0,
   PROP_SELECTION_MODE
 };
+
+static guint signals[LAST_SIGNAL] = { 0, };
 
 struct _ChamplainSelectionLayerPrivate {
   ChamplainSelectionMode mode;
@@ -116,6 +125,18 @@ champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
            CHAMPLAIN_TYPE_SELECTION_MODE,
            CHAMPLAIN_SELECTION_SINGLE,
            CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainSelectionLayer::changed
+  *
+  * The changed signal is emitted when the selected marker(s) change.
+  *
+  * Since: 0.4.1
+  */
+  signals[CHANGED] =
+      g_signal_new ("changed", G_OBJECT_CLASS_TYPE (object_class),
+          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+          g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 }
 
 static void
@@ -126,6 +147,8 @@ marker_select (ChamplainSelectionLayer *layer,
   g_object_ref (marker);
   g_object_set (marker, "highlighted", TRUE, NULL);
   layer->priv->selection = g_list_prepend (layer->priv->selection, marker);
+
+  g_signal_emit_by_name (layer, "changed", NULL);
 }
 
 static void
@@ -327,6 +350,8 @@ champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
       selection = g_list_delete_link (selection, selection);
     }
   layer->priv->selection = selection;
+
+  g_signal_emit_by_name (layer, "changed", NULL);
 }
 
 /**
@@ -385,6 +410,8 @@ champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
       g_object_set (selection->data, "highlighted", FALSE, NULL);
       g_object_unref (selection->data);
       layer->priv->selection = g_list_delete_link (layer->priv->selection, selection);
+
+      g_signal_emit_by_name (layer, "changed", NULL);
     }
 }
 
