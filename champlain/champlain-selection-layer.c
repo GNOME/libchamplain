@@ -266,7 +266,8 @@ champlain_selection_layer_new ()
 }
 
 /**
- * champlain_selection_get_selected:
+ * champlain_selection_layer_get_selected:
+ * @layer: a #ChamplainSelectionLayer
  *
  * This function will return NULL if in CHAMPLAIN_SELETION_MULTIPLE.
  *
@@ -287,7 +288,8 @@ champlain_selection_layer_get_selected (ChamplainSelectionLayer *layer)
 }
 
 /**
- * champlain_selection_get_selected_markers:
+ * champlain_selection_layer_get_selected_markers:
+ * @layer: a #ChamplainSelectionLayer
  *
  * Returns: the list of selected #ChamplainBaseMarker or NULL if none is selected.
  * You shouldn't free that list.
@@ -302,6 +304,7 @@ champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer)
 
 /**
  * champlain_selection_layer_count_selected_markers:
+ * @layer: a #ChamplainSelectionLayer
  *
  * Returns: the number of selected #ChamplainBaseMarker
  *
