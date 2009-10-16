@@ -313,6 +313,8 @@ champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer)
 guint
 champlain_selection_layer_count_selected_markers (ChamplainSelectionLayer *layer)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer), 0);
+
   return g_list_length (layer->priv->selection);
 }
 
@@ -329,6 +331,9 @@ void
 champlain_selection_layer_select (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
 {
+  g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+
   api_select (layer, marker);
 }
 
@@ -343,6 +348,8 @@ champlain_selection_layer_select (ChamplainSelectionLayer *layer,
 void
 champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
 {
+  g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
+
   GList *selection = layer->priv->selection;
 
   DEBUG ("Deselect all");
@@ -369,6 +376,8 @@ champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
 void
 champlain_selection_layer_select_all (ChamplainSelectionLayer *layer)
 {
+  g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
+
   gint n_children = 0;
   gint i = 0;
 
@@ -404,6 +413,9 @@ void
 champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
 {
+  g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+
   GList *selection;
 
   DEBUG ("Deselect %p", marker);
@@ -431,6 +443,9 @@ gboolean
 champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer), FALSE);
+  g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker), FALSE);
+
   GList *selection;
 
   selection = g_list_find (layer->priv->selection, marker);
