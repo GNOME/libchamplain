@@ -561,10 +561,12 @@ champlain_view_get_property (GObject *object,
   switch (prop_id)
     {
       case PROP_LONGITUDE:
-        g_value_set_double (value, priv->longitude);
+        g_value_set_double (value,
+            CLAMP (priv->longitude, CHAMPLAIN_MIN_LONG, CHAMPLAIN_MAX_LONG));
         break;
       case PROP_LATITUDE:
-        g_value_set_double (value, priv->latitude);
+        g_value_set_double (value, 
+            CLAMP (priv->latitude, CHAMPLAIN_MIN_LAT, CHAMPLAIN_MAX_LAT));
         break;
       case PROP_ZOOM_LEVEL:
         g_value_set_int (value, priv->zoom_level);
@@ -1399,8 +1401,8 @@ champlain_view_center_on (ChamplainView *view,
   gint x, y;
   ChamplainViewPrivate *priv = view->priv;
 
-  priv->longitude = longitude;
-  priv->latitude = latitude;
+  priv->longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONG, CHAMPLAIN_MAX_LONG);
+  priv->latitude = CLAMP (latitude, CHAMPLAIN_MIN_LAT, CHAMPLAIN_MAX_LAT);
 
   if (!priv->map)
     {
