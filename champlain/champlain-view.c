@@ -2077,6 +2077,8 @@ champlain_view_set_map_source (ChamplainView *view,
   view_load_visible_tiles (view);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), group);
 
+  g_object_notify (G_OBJECT (view), "map-source");
+
   update_license (view);
   g_idle_add (marker_reposition, view);
   view_tiles_reposition (view);
