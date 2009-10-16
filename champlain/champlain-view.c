@@ -1716,11 +1716,11 @@ champlain_view_add_layer (ChamplainView *view,
     ChamplainLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CLUTTER_IS_ACTOR (layer));
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
   ChamplainViewPrivate *priv = view->priv;
-  clutter_container_add (CLUTTER_CONTAINER (priv->user_layers),
-      CLUTTER_ACTOR (layer), NULL);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->user_layers),
+      CLUTTER_ACTOR (layer));
   clutter_actor_raise_top (CLUTTER_ACTOR (layer));
 
   if (priv->map)
@@ -1731,6 +1731,30 @@ champlain_view_add_layer (ChamplainView *view,
 
   clutter_container_foreach (CLUTTER_CONTAINER (layer),
       CLUTTER_CALLBACK (connect_marker_notify_cb), view);
+}
+
+/**
+ * champlain_view_remove_layer:
+ * @view: a #ChamplainView
+ * @layer: a #ChamplainLayer
+ *
+ * Removes the layer from the view
+ *
+ * Since: 0.4.1
+ */
+void
+champlain_view_remove_layer (ChamplainView *view,
+    ChamplainLayer *layer)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  g_signal_handlers_disconnect_by_func (layer,
+      G_CALLBACK (layer_add_marker_cb), view);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->user_layers),
+      CLUTTER_ACTOR (layer));
 }
 
 /**
