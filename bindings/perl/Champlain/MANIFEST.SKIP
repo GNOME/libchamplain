@@ -9,4 +9,5 @@
 ^Champlain[.]bs
 ^Champlain-
 ^pm_to_blib$
-\.gitignore
+[.]gitignore
+^[.]xs-coverage[.]ignore
