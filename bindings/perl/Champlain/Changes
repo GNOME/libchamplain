@@ -16,8 +16,8 @@ Revision history for Champlain
 0.06 Sat Aug  8 09:32:26 CEST 2009
 	Full coverage for libchamplain 0.3.5 (the last release to use clutter 0.8).
 	Updated the example flickr.pl.
-    Fixed a timeout in the unit tests.
-    Unit tests for all methods except for the cache API.
+	Fixed a timeout in the unit tests.
+	Unit tests for all methods except for the cache API.
 
 
 0.05 Sat Jun 27 23:05:56 CEST 2009
