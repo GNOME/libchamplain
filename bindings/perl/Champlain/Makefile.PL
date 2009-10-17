@@ -22,7 +22,7 @@ sub main {
 	mkdir 'build', 0777;
 	
 	# The version of libchamplain (and friends) for which this module can built against
-	my $champlain_version = '0.4.1';
+	my $champlain_version = '0.4';
 	
 	# Find libchamplain
 	my @typemaps = ();
