@@ -1,5 +1,9 @@
 Revision history for Champlain
 
+0.09 Sat Oct 17 19:15:01 CEST 2009
+	Update the OpenStreetMap license (fixes unit tests).
+
+
 0.08 Wed Sep 23 19:06:04 CEST 2009
 	Full API coverage for libchamplain 0.4.
 
