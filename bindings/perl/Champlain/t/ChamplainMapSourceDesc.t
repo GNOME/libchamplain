@@ -37,8 +37,8 @@ sub test_get_set {
 	isa_ok($source, 'Champlain::MapSourceDesc');
 	is($source->id, Champlain::MapSourceFactory->OSM_MAPNIK, "get id()");
 	is($source->name, 'OpenStreetMap Mapnik', "get name()");
-	is($source->license, "(CC) BY 2.0 OpenStreetMap contributors", "get license()");
-	is($source->license_uri, 'http://creativecommons.org/licenses/by/2.0/', "get license_uri()");
+	is($source->license, "CC-BY-SA 2.0 OpenStreetMap contributors", "get license()");
+	is($source->license_uri, 'http://creativecommons.org/licenses/by-sa/2.0/', "get license_uri()");
 	is($source->min_zoom_level, 0, "get min_zoom_level()");
 	is($source->max_zoom_level, 18, "get max_zoom_level()");
 	is($source->projection, 'mercator', "get projection()");
