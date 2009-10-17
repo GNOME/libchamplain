@@ -72,7 +72,7 @@ sub test_osm_osmarender {
 	is($map->get_id, 'osm-osmarender', "$label id");
 	is($map->get_name, 'OpenStreetMap Osmarender', "$label name");
 	is($map->get_min_zoom_level, 0, "$label min zoom");
-	is($map->get_max_zoom_level, 18, "$label max zoom");
+	is($map->get_max_zoom_level, 17, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
 	is($map->get_license, $OSM_LICENSE, "$label license");
 	is($map->get_license_uri, $OSM_URL_LICENSE , "$label license_uri");
