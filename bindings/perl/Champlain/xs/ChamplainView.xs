@@ -146,3 +146,7 @@ champlain_view_add_polygon (ChamplainView *view, ChamplainPolygon *polygon)
 
 void
 champlain_view_remove_polygon (ChamplainView *view, ChamplainPolygon *polygon)
+
+
+void
+champlain_view_remove_layer (ChamplainView *view, ChamplainLayer *layer)
