@@ -148,5 +148,9 @@ void
 champlain_view_remove_polygon (ChamplainView *view, ChamplainPolygon *polygon)
 
 
+#if CHAMPLAIN_CHECK_VERSION (0, 4, 1)
+
 void
 champlain_view_remove_layer (ChamplainView *view, ChamplainLayer *layer)
+
+#endif /* 0.4.1 */
