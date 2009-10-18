@@ -107,7 +107,7 @@
   (c-name "ChamplainMapProjection")
   (gtype-id "CHAMPLAIN_TYPE_MAP_PROJECTION")
   (values
-    '("r" "CHAMPLAIN_MAP_PROJECTION_MERCATOR")
+    '("mercator" "CHAMPLAIN_MAP_PROJECTION_MERCATOR")
   )
 )
 
@@ -125,11 +125,6 @@
 
 (define-function cache_dup_default
   (c-name "champlain_cache_dup_default")
-  (return-type "ChamplainCache*")
-)
-
-(define-function cache_get_default
-  (c-name "champlain_cache_get_default")
   (return-type "ChamplainCache*")
 )
 
@@ -358,6 +353,15 @@
 (define-method add_layer
   (of-object "ChamplainView")
   (c-name "champlain_view_add_layer")
+  (return-type "none")
+  (parameters
+    '("ChamplainLayer*" "layer")
+  )
+)
+
+(define-method remove_layer
+  (of-object "ChamplainView")
+  (c-name "champlain_view_remove_layer")
   (return-type "none")
   (parameters
     '("ChamplainLayer*" "layer")
@@ -917,20 +921,9 @@
   (return-type "ChamplainMapSourceFactory*")
 )
 
-(define-function map_source_factory_get_default
-  (c-name "champlain_map_source_factory_get_default")
-  (return-type "ChamplainMapSourceFactory*")
-)
-
 (define-method dup_list
   (of-object "ChamplainMapSourceFactory")
   (c-name "champlain_map_source_factory_dup_list")
-  (return-type "GSList*")
-)
-
-(define-method get_list
-  (of-object "ChamplainMapSourceFactory")
-  (c-name "champlain_map_source_factory_get_list")
   (return-type "GSList*")
 )
 
@@ -950,7 +943,7 @@
   (parameters
     '("ChamplainMapSourceDesc*" "desc")
     '("ChamplainMapSourceConstructor" "constructor")
-    '("gpointer" "user_data")
+    '("gpointer" "data")
   )
 )
 
@@ -996,15 +989,6 @@
   (return-type "none")
   (parameters
     '("const-gchar*" "uri_format")
-  )
-)
-
-(define-function network_map_source_fill_tile
-  (c-name "champlain_network_map_source_fill_tile")
-  (return-type "none")
-  (parameters
-    '("ChamplainMapSource*" "map_source")
-    '("ChamplainTile*" "tile")
   )
 )
 
