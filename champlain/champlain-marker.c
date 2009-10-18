@@ -133,6 +133,19 @@ champlain_marker_set_highlight_color (ClutterColor *color)
   SELECTED_COLOR.alpha = color->alpha;
 }
 
+/**
+ * champlain_marker_get_hightlight_color:
+ *
+ * Returns: the highlight color. Should not be freed.
+ *
+ * Since: 0.4.1
+ */
+const ClutterColor *
+champlain_marker_get_highlight_color ()
+{
+  return &SELECTED_COLOR;
+}
+
 static void
 champlain_marker_get_property (GObject *object,
                                guint prop_id,
