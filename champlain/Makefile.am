@@ -164,8 +164,12 @@ Champlain-0.4.gir: $(INTROSPECTION_SCANNER) libchamplain-0.4.la
 	$(QUIET_GEN)$(INTROSPECTION_SCANNER) -v \
 	--namespace Champlain --nsversion=0.4 \
 	--strip-prefix=Champlain \
-	$(INCLUDES) \
-	--add-include-path=$(srcdir) --add-include=path=. \
+	$(DEPS_CFLAGS) \
+	$(SOUP_CFLAGS) \
+	-I$(top_srcdir)/tidy		\
+	-I$(top_srcdir)			\
+	-DCHAMPLAIN_COMPILATION 	\
+	--add-include-path=$(builddir) \
 	--c-include="$(libchamplain_include_HEADERS)" \
 	--include=Clutter-1.0 \
 	--include=Gtk-2.0 \
@@ -174,7 +178,8 @@ Champlain-0.4.gir: $(INTROSPECTION_SCANNER) libchamplain-0.4.la
 	--output $@ \
 	--pkg gobject-2.0 \
 	--pkg gtk+-2.0 \
-	$(libchamplain_0_4_la_SOURCES) $(libchamplain_include_HEADERS)
+	$(addprefix $(srcdir)/,$(libchamplain_0_4_la_SOURCES)) \
+	$(addprefix $(srcdir)/,$(libchamplain_include_HEADERS))
 
 BUILT_GIRSOURCES += Champlain-0.4.gir
 

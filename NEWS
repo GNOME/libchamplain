@@ -2,7 +2,7 @@ libchamplain 0.4.1 (2009-10-18)
 ===============================
 
 Stable release
-Python and Perl bindings are in a working state.
+GObject-introspection, Python and Perl bindings are in a working state.
 
 Enhancements:
 
