@@ -45,14 +45,17 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainZoomLevelPrivate ChamplainZoomLevelPrivate;
 
-typedef struct {
+typedef struct _ChamplainZoomLevel        ChamplainZoomLevel;
+typedef struct _ChamplainZoomLevelClass   ChamplainZoomLevelClass;
+
+struct _ChamplainZoomLevel{
   GObject parent;
   ChamplainZoomLevelPrivate *priv;
-} ChamplainZoomLevel;
+};
 
-typedef struct {
+struct _ChamplainZoomLevelClass{
   GObjectClass parent_class;
-} ChamplainZoomLevelClass;
+};
 
 GType champlain_zoom_level_get_type (void);
 

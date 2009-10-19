@@ -160,8 +160,8 @@ ChamplainMapSourceDesc OSM_MAPNIK_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
     "OpenStreetMap Mapnik",
-    "(CC) BY 2.0 OpenStreetMap contributors",
-    "http://creativecommons.org/licenses/by/2.0/",
+    "CC-BY-SA 2.0 OpenStreetMap contributors",
+    "http://creativecommons.org/licenses/by-sa/2.0/",
     0,
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
@@ -175,10 +175,10 @@ ChamplainMapSourceDesc OSM_OSMARENDER_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
     "OpenStreetMap Osmarender",
-    "(CC) BY 2.0 OpenStreetMap contributors",
-    "http://creativecommons.org/licenses/by/2.0/",
+    "CC-BY-SA 2.0 OpenStreetMap contributors",
+    "http://creativecommons.org/licenses/by-sa/2.0/",
     0,
-    18,
+    17,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
     champlain_map_source_new_generic,
     "http://tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png",
@@ -190,8 +190,8 @@ ChamplainMapSourceDesc OSM_CYCLEMAP_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
     "OpenStreetMap Cycle Map",
-    "(CC) BY 2.0 OpenStreetMap contributors",
-    "http://creativecommons.org/licenses/by/2.0/",
+    "CC-BY-SA 2.0 OpenStreetMap contributors",
+    "http://creativecommons.org/licenses/by-sa/2.0/",
     0,
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
@@ -205,13 +205,13 @@ ChamplainMapSourceDesc OSM_TRANSPORTMAP_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP,
     "OpenStreetMap Transport Map",
-    "(CC) BY 2.0 OpenStreetMap contributors",
-    "http://creativecommons.org/licenses/by/2.0/",
+    "CC-BY-SA 2.0 OpenStreetMap contributors",
+    "http://creativecommons.org/licenses/by-sa/2.0/",
     0,
     18,
     CHAMPLAIN_MAP_PROJECTION_MERCATOR,
     champlain_map_source_new_generic,
-       "http://tile.xn--pnvkarte-m4a.de/tilegen/#Z#/#X#/#Y#.png",
+    "http://tile.xn--pnvkarte-m4a.de/tilegen/#Z#/#X#/#Y#.png",
     NULL
   };
 

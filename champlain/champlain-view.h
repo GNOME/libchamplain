@@ -118,6 +118,8 @@ void champlain_view_set_zoom_on_double_click (ChamplainView *view,
 
 void champlain_view_add_layer (ChamplainView *view,
     ChamplainLayer *layer);
+void champlain_view_remove_layer (ChamplainView *view,
+    ChamplainLayer *layer);
 
 gboolean champlain_view_get_coords_from_event (ChamplainView *view,
     ClutterEvent *event,

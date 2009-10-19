@@ -561,10 +561,12 @@ champlain_view_get_property (GObject *object,
   switch (prop_id)
     {
       case PROP_LONGITUDE:
-        g_value_set_double (value, priv->longitude);
+        g_value_set_double (value,
+            CLAMP (priv->longitude, CHAMPLAIN_MIN_LONG, CHAMPLAIN_MAX_LONG));
         break;
       case PROP_LATITUDE:
-        g_value_set_double (value, priv->latitude);
+        g_value_set_double (value, 
+            CLAMP (priv->latitude, CHAMPLAIN_MIN_LAT, CHAMPLAIN_MAX_LAT));
         break;
       case PROP_ZOOM_LEVEL:
         g_value_set_int (value, priv->zoom_level);
@@ -1399,8 +1401,8 @@ champlain_view_center_on (ChamplainView *view,
   gint x, y;
   ChamplainViewPrivate *priv = view->priv;
 
-  priv->longitude = longitude;
-  priv->latitude = latitude;
+  priv->longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONG, CHAMPLAIN_MAX_LONG);
+  priv->latitude = CLAMP (latitude, CHAMPLAIN_MIN_LAT, CHAMPLAIN_MAX_LAT);
 
   if (!priv->map)
     {
@@ -1714,11 +1716,11 @@ champlain_view_add_layer (ChamplainView *view,
     ChamplainLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CLUTTER_IS_ACTOR (layer));
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
   ChamplainViewPrivate *priv = view->priv;
-  clutter_container_add (CLUTTER_CONTAINER (priv->user_layers),
-      CLUTTER_ACTOR (layer), NULL);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->user_layers),
+      CLUTTER_ACTOR (layer));
   clutter_actor_raise_top (CLUTTER_ACTOR (layer));
 
   if (priv->map)
@@ -1729,6 +1731,30 @@ champlain_view_add_layer (ChamplainView *view,
 
   clutter_container_foreach (CLUTTER_CONTAINER (layer),
       CLUTTER_CALLBACK (connect_marker_notify_cb), view);
+}
+
+/**
+ * champlain_view_remove_layer:
+ * @view: a #ChamplainView
+ * @layer: a #ChamplainLayer
+ *
+ * Removes the layer from the view
+ *
+ * Since: 0.4.1
+ */
+void
+champlain_view_remove_layer (ChamplainView *view,
+    ChamplainLayer *layer)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  g_signal_handlers_disconnect_by_func (layer,
+      G_CALLBACK (layer_add_marker_cb), view);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->user_layers),
+      CLUTTER_ACTOR (layer));
 }
 
 /**
@@ -2076,6 +2102,8 @@ champlain_view_set_map_source (ChamplainView *view,
 
   view_load_visible_tiles (view);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+
+  g_object_notify (G_OBJECT (view), "map-source");
 
   update_license (view);
   g_idle_add (marker_reposition, view);

@@ -45,9 +45,18 @@ G_DEFINE_TYPE (ChamplainSelectionLayer, champlain_selection_layer, CHAMPLAIN_TYP
 
 enum
 {
+  /* normal signals */
+  CHANGED,
+  LAST_SIGNAL
+};
+
+enum
+{
   PROP_0,
   PROP_SELECTION_MODE
 };
+
+static guint signals[LAST_SIGNAL] = { 0, };
 
 struct _ChamplainSelectionLayerPrivate {
   ChamplainSelectionMode mode;
@@ -116,6 +125,18 @@ champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
            CHAMPLAIN_TYPE_SELECTION_MODE,
            CHAMPLAIN_SELECTION_SINGLE,
            CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainSelectionLayer::changed
+  *
+  * The changed signal is emitted when the selected marker(s) change.
+  *
+  * Since: 0.4.1
+  */
+  signals[CHANGED] =
+      g_signal_new ("changed", G_OBJECT_CLASS_TYPE (object_class),
+          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+          g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 }
 
 static void
@@ -126,6 +147,8 @@ marker_select (ChamplainSelectionLayer *layer,
   g_object_ref (marker);
   g_object_set (marker, "highlighted", TRUE, NULL);
   layer->priv->selection = g_list_prepend (layer->priv->selection, marker);
+
+  g_signal_emit_by_name (layer, "changed", NULL);
 }
 
 static void
@@ -243,7 +266,8 @@ champlain_selection_layer_new ()
 }
 
 /**
- * champlain_selection_get_selected:
+ * champlain_selection_layer_get_selected:
+ * @layer: a #ChamplainSelectionLayer
  *
  * This function will return NULL if in CHAMPLAIN_SELETION_MULTIPLE.
  *
@@ -264,7 +288,8 @@ champlain_selection_layer_get_selected (ChamplainSelectionLayer *layer)
 }
 
 /**
- * champlain_selection_get_selected_markers:
+ * champlain_selection_layer_get_selected_markers:
+ * @layer: a #ChamplainSelectionLayer
  *
  * Returns: the list of selected #ChamplainBaseMarker or NULL if none is selected.
  * You shouldn't free that list.
@@ -279,6 +304,7 @@ champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer)
 
 /**
  * champlain_selection_layer_count_selected_markers:
+ * @layer: a #ChamplainSelectionLayer
  *
  * Returns: the number of selected #ChamplainBaseMarker
  *
@@ -287,6 +313,8 @@ champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer)
 guint
 champlain_selection_layer_count_selected_markers (ChamplainSelectionLayer *layer)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer), 0);
+
   return g_list_length (layer->priv->selection);
 }
 
@@ -303,6 +331,9 @@ void
 champlain_selection_layer_select (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
 {
+  g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+
   api_select (layer, marker);
 }
 
@@ -317,6 +348,8 @@ champlain_selection_layer_select (ChamplainSelectionLayer *layer,
 void
 champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
 {
+  g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
+
   GList *selection = layer->priv->selection;
 
   DEBUG ("Deselect all");
@@ -327,6 +360,8 @@ champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
       selection = g_list_delete_link (selection, selection);
     }
   layer->priv->selection = selection;
+
+  g_signal_emit_by_name (layer, "changed", NULL);
 }
 
 /**
@@ -341,6 +376,8 @@ champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
 void
 champlain_selection_layer_select_all (ChamplainSelectionLayer *layer)
 {
+  g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
+
   gint n_children = 0;
   gint i = 0;
 
@@ -376,6 +413,9 @@ void
 champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
 {
+  g_return_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+
   GList *selection;
 
   DEBUG ("Deselect %p", marker);
@@ -385,6 +425,8 @@ champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
       g_object_set (selection->data, "highlighted", FALSE, NULL);
       g_object_unref (selection->data);
       layer->priv->selection = g_list_delete_link (layer->priv->selection, selection);
+
+      g_signal_emit_by_name (layer, "changed", NULL);
     }
 }
 
@@ -401,6 +443,9 @@ gboolean
 champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
 {
+  g_return_val_if_fail (CHAMPLAIN_IS_SELECTION_LAYER (layer), FALSE);
+  g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker), FALSE);
+
   GList *selection;
 
   selection = g_list_find (layer->priv->selection, marker);

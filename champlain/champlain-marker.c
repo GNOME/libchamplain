@@ -55,6 +55,7 @@
 #define DEFAULT_FONT_NAME "Sans 11"
 
 static ClutterColor SELECTED_COLOR = {0x00, 0x33, 0xcc, 0xff};
+static ClutterColor SELECTED_TEXT_COLOR = {0xff, 0xff, 0xff, 0xff};
 
 static ClutterColor DEFAULT_COLOR = {0x33, 0x33, 0x33, 0xff};
 static ClutterColor DEFAULT_TEXT_COLOR = {0xee, 0xee, 0xee, 0xff};
@@ -131,6 +132,51 @@ champlain_marker_set_highlight_color (ClutterColor *color)
   SELECTED_COLOR.green = color->green;
   SELECTED_COLOR.blue = color->blue;
   SELECTED_COLOR.alpha = color->alpha;
+}
+
+/**
+ * champlain_marker_get_hightlight_color:
+ *
+ * Returns: the highlight color. Should not be freed.
+ *
+ * Since: 0.4.1
+ */
+const ClutterColor *
+champlain_marker_get_highlight_color ()
+{
+  return &SELECTED_COLOR;
+}
+
+/**
+ * champlain_marker_set_hightlight_text_color:
+ * @color: a #ClutterColor
+ *
+ *
+ * Changes the highlight text color, this is to ensure a better integration with
+ * the desktop, this is automatically done by GtkChamplainEmbed.
+ *
+ * Since: 0.4
+ */
+void
+champlain_marker_set_highlight_text_color (ClutterColor *color)
+{
+  SELECTED_TEXT_COLOR.red = color->red;
+  SELECTED_TEXT_COLOR.green = color->green;
+  SELECTED_TEXT_COLOR.blue = color->blue;
+  SELECTED_TEXT_COLOR.alpha = color->alpha;
+}
+
+/**
+ * champlain_marker_get_hightlight_text_color:
+ *
+ * Returns: the highlight text color. Should not be freed.
+ *
+ * Since: 0.4.1
+ */
+const ClutterColor *
+champlain_marker_get_highlight_text_color ()
+{
+  return &SELECTED_TEXT_COLOR;
 }
 
 static void
@@ -558,6 +604,7 @@ static void
 draw_marker (ChamplainMarker *marker)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainBaseMarkerPrivate *base_priv = CHAMPLAIN_BASE_MARKER (marker)->priv;
   guint height = 0, point = 0;
   guint total_width = 0, total_height = 0;
 
@@ -605,7 +652,8 @@ draw_marker (ChamplainMarker *marker)
       if (height > total_height)
         total_height = height;
 
-      clutter_text_set_color (CLUTTER_TEXT (priv->text_actor), priv->text_color);
+      clutter_text_set_color (CLUTTER_TEXT (priv->text_actor),
+          (base_priv->highlighted ? &SELECTED_TEXT_COLOR : priv->text_color));
       if (clutter_actor_get_parent (priv->text_actor) == NULL)
         clutter_container_add_actor (CLUTTER_CONTAINER (marker), priv->text_actor);
     }

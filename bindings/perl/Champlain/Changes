@@ -1,5 +1,10 @@
 Revision history for Champlain
 
+0.09 Sat Oct 17 19:41:46 CEST 2009
+	Full API coverage for libchamplain 0.4.1.
+	Update the OpenStreetMap license (fixes unit tests).
+
+
 0.08 Wed Sep 23 19:06:04 CEST 2009
 	Full API coverage for libchamplain 0.4.
 
@@ -12,8 +17,8 @@ Revision history for Champlain
 0.06 Sat Aug  8 09:32:26 CEST 2009
 	Full coverage for libchamplain 0.3.5 (the last release to use clutter 0.8).
 	Updated the example flickr.pl.
-    Fixed a timeout in the unit tests.
-    Unit tests for all methods except for the cache API.
+	Fixed a timeout in the unit tests.
+	Unit tests for all methods except for the cache API.
 
 
 0.05 Sat Jun 27 23:05:56 CEST 2009

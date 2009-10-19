@@ -238,15 +238,27 @@ champlain_cache_init (ChamplainCache *self)
     }
 
   sqlite3_exec (priv->data,
+      "PRAGMA synchronous=OFF;"
+      "PRAGMA count_changes=OFF;",
+      NULL, NULL, &error_msg);
+  if (error_msg != NULL)
+    {
+      DEBUG ("Set PRAGMA: %s", error_msg);
+      sqlite3_free (error_msg);
+      goto cleanup;
+    }
+
+  sqlite3_exec (priv->data,
       "CREATE TABLE IF NOT EXISTS tiles ("
-      "filename TEXT PRIMARY KEY, etag TEXT, "
+      "filename TEXT PRIMARY KEY, "
+      "etag TEXT, "
       "popularity INT DEFAULT 1, "
       "size INT DEFAULT 0)",
       NULL, NULL, &error_msg);
   if (error_msg != NULL)
     {
       DEBUG ("Creating table 'tiles' failed: %s", error_msg);
-          sqlite3_free (error_msg);
+      sqlite3_free (error_msg);
       goto cleanup;
     }
 
@@ -362,6 +374,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
 
   filename = champlain_tile_get_filename (tile);
+  DEBUG ("fill of %s", filename);
 
   if (!g_file_test (filename, G_FILE_TEST_EXISTS))
     goto cleanup;
@@ -460,6 +473,8 @@ champlain_cache_tile_is_expired (ChamplainCache *self,
   g_time_val_add (&now, (-24ul * 60ul * 60ul * 1000ul * 1000ul * 7ul)); // Cache expires 7 days
   validate_cache = modified_time->tv_sec < now.tv_sec;
 
+  DEBUG ("%p is %s expired", tile, (validate_cache ? "": "not"));
+
   return validate_cache;
 }
 
@@ -480,6 +495,8 @@ inc_popularity (gpointer data)
 
   last = g_slist_last (priv->popularity_queue);
   filename = last->data;
+
+  DEBUG ("popularity of %s", filename);
 
   sql_rc = sqlite3_bind_text (priv->stmt_update, 1, filename, -1, SQLITE_STATIC);
   if (sql_rc != SQLITE_OK)
@@ -504,7 +521,7 @@ cleanup:
   g_free (filename);
 
   /* Ask to be called again until the list is emptied */
-  return TRUE;
+  return priv->popularity_queue != NULL;
 }
 
 static void
@@ -559,6 +576,8 @@ champlain_cache_update_tile (ChamplainCache *self,
   gchar *query, *error = NULL;
 
   ChamplainCachePrivate *priv = GET_PRIVATE (self);
+
+  DEBUG ("Update of %p", tile);
 
   query = sqlite3_mprintf ("REPLACE INTO tiles (filename, etag, size) VALUES (%Q, %Q, %d)",
       champlain_tile_get_filename (tile),

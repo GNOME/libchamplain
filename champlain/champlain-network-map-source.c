@@ -138,13 +138,25 @@ champlain_network_map_source_set_property (GObject *object,
         priv->offline = g_value_get_boolean (value);
         break;
       case PROP_PROXY_URI:
-        g_free (priv->proxy_uri);
+        {
+          SoupURI *uri = NULL;
 
-        priv->proxy_uri = g_value_dup_string (value);
-        if (soup_session)
-          g_object_set (G_OBJECT (soup_session), "proxy-uri",
-              soup_uri_new (priv->proxy_uri), NULL);
-        break;
+          g_free (priv->proxy_uri);
+
+          priv->proxy_uri = g_value_dup_string (value);
+          if (priv->proxy_uri)
+            uri = soup_uri_new (priv->proxy_uri);
+
+          if (soup_session)
+            g_object_set (G_OBJECT (soup_session),
+                "proxy-uri", uri,
+                NULL);
+
+          if (uri)
+            g_object_unref (uri);
+
+          break;
+        }
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -611,8 +623,13 @@ fill_tile (ChamplainMapSource *map_source,
 
       if (!soup_session)
         {
-          soup_session = soup_session_async_new_with_options ("proxy-uri",
-              soup_uri_new (priv->proxy_uri),
+          SoupURI *uri = NULL;
+
+          if (priv->proxy_uri)
+            uri = soup_uri_new (priv->proxy_uri);
+
+          soup_session = soup_session_async_new_with_options (
+              "proxy-uri", uri,
 #ifdef HAVE_LIBSOUP_GNOME
               SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
 #endif
@@ -622,6 +639,9 @@ fill_tile (ChamplainMapSource *map_source,
               "max-conns-per-host", 2, NULL); // This is as required by OSM
           g_object_add_weak_pointer (G_OBJECT (soup_session),
               (gpointer *) &soup_session);
+
+          if (uri)
+            g_object_unref (uri);
         }
 
       uri = champlain_network_map_source_get_tile_uri (source,

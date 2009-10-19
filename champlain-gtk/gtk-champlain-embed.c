@@ -209,7 +209,6 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 {
   ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
   ClutterActor *stage;
-  GtkStyle *style;
 
   GtkChamplainEmbedPrivate *priv = GET_PRIVATE (embed);
   embed->priv = priv;
@@ -245,22 +244,26 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 
   gtk_container_add (GTK_CONTAINER (embed), priv->clutter_embed);
 
-  /* Set selection color */
-  style = gtk_widget_get_style (GTK_WIDGET (embed));
-  ClutterColor color = {0, 0, 0, };
-  gtk_clutter_get_bg_color (GTK_WIDGET (embed), GTK_STATE_SELECTED, &color);
-  champlain_marker_set_highlight_color (&color);
-
 }
 
 static void
 view_realize_cb (GtkWidget *widget,
     GtkChamplainEmbed *view)
 {
+  ClutterColor color = {0, 0, 0, };
   GtkChamplainEmbedPrivate *priv = view->priv;
 
-  // Setup mouse cursor to a hand
+  /* Setup mouse cursor to a hand */
   gdk_window_set_cursor (gtk_widget_get_window (priv->clutter_embed), priv->cursor_hand_open);
+
+  /* Set selection color */
+  gtk_clutter_get_bg_color (GTK_WIDGET (widget), GTK_STATE_SELECTED, &color);
+  champlain_marker_set_highlight_color (&color);
+
+  gtk_clutter_get_text_color (GTK_WIDGET (widget), GTK_STATE_SELECTED, &color);
+  champlain_marker_set_highlight_text_color (&color);
+
+  /* To be added later: bg[active] (for selected markers, but focus is on another widget) */
 }
 
 static void

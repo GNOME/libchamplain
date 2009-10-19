@@ -62,7 +62,11 @@ sub test_generic {
 	# Can't be tested but at least we check that it doesn't crash when invoked
 	my $layer = Champlain::Layer->new();
 	$view->add_layer($layer);
-	
+
+	SKIP: {
+		Champlain->CHECK_VERSION(0, 4, 1) or skip '0.4.1 stuff', 0;
+		$view->remove_layer($layer);
+	}
 	
 	# Change the map source (get a different map source)
 	my $factory = Champlain::MapSourceFactory->dup_default();
