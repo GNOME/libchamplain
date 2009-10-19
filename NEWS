@@ -1,3 +1,28 @@
+libchamplain 0.4.1 (2009-10-18)
+===============================
+
+Stable release
+Python and Perl bindings are in a working state.
+
+Enhancements:
+
+* Added champlain_view_remove_layer (Pierre-Luc Beaudoin)
+* ChamplainSelectionLayer now have a "changed" signal (Pierre-Luc Beaudoin)
+* Added champlain_marker_set_highlighted_text_color (Pierre-Luc Beaudoin)
+* Added champlain_marker_get_highlighted_text_color (Pierre-Luc Beaudoin)
+* Added champlain_marker_get_highlighted_color (Pierre-Luc Beaudoin)
+
+Fixes:
+
+* Selection color is always blue (Pierre-Luc Beaudoin)
+* 595534: Fix building on Solaris (Halton Huo)
+* Emit map-source notifications (Pierre-Luc Beaudoin)
+* Don't emit invalid lat and lon notifications (Pierre-Luc Beaudoin)
+* 597272: Adjust the typedefs to to keep the C++ bindings happy (Debarshi Ray)
+* Fix OSM licences (Bruce Cowan)
+* Fix slowdowns with big caches (Pierre-Luc Beaudoin)
+* 598106: champlain plugin: map isn't displayed (Pierre-Luc Beaudoin)
+
 libchamplain 0.4 (2009-09-14)
 ===============================
 

@@ -28,7 +28,7 @@ AM_PROG_CC_C_O
 AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
 # Checks for libraries.
-LIBRARY_VERSION=0:0:0
+LIBRARY_VERSION=1:0:1
 # API_VERSION is used to generate pc files only
 API_VERSION=api_version
 CHAMPLAIN_MAJOR_VERSION=champlain_major_version
