@@ -1241,6 +1241,24 @@
   )
 )
 
+(define-function marker_get_highlight_color
+  (c-name "champlain_marker_get_highlight_color")
+  (return-type "const-ClutterColor*")
+)
+
+(define-function marker_set_highlight_text_color
+  (c-name "champlain_marker_set_highlight_text_color")
+  (return-type "none")
+  (parameters
+    '("ClutterColor*" "color")
+  )
+)
+
+(define-function marker_get_highlight_text_color
+  (c-name "champlain_marker_get_highlight_text_color")
+  (return-type "const-ClutterColor*")
+)
+
 
 
 ;; From champlain-base-marker.h
