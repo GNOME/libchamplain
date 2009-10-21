@@ -47,7 +47,7 @@ GtkChamplain-0.4.gir: $(INTROSPECTION_SCANNER) libchamplain-gtk-0.4.la
 	$(SOUP_CFLAGS) \
 	-I$(top_srcdir)			\
 	-DCHAMPLAIN_COMPILATION 	\
-	--add-include-path=$(builddir) \
+	--add-include-path=$(top_builddir)/champlain \
 	--c-include="$(libchamplain_include_HEADERS)" \
 	--include=Champlain-0.4 \
 	--include=Clutter-1.0 \
@@ -71,7 +71,7 @@ typelibsdir = $(libdir)/girepository-1.0/
 typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
 
 %.typelib: %.gir $(INTROSPECTION_COMPILER)
-	$(QUIET_GEN)$(DEBUG) $(INTROSPECTION_COMPILER) --includedir=$(srcdir) --includedir=. $(INTROSPECTION_COMPILER_OPTS) $< -o $(builddir)/$(@F)
+	$(QUIET_GEN)$(DEBUG) $(INTROSPECTION_COMPILER) --includedir=$(srcdir) --includedir=. --includedir=$(top_builddir)/champlain $(INTROSPECTION_COMPILER_OPTS) $< -o $(builddir)/$(@F)
 
 CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
 endif
