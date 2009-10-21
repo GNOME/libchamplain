@@ -22,7 +22,7 @@ champlain_la_SOURCES =					\
 
 champlain_la_LIBADD =					\
 	$(PYTHON_BINDING_LIBS)				\
-	$(top_builddir)/champlain/libchamplain-0.4.la
+	$(top_builddir)/champlain/libchamplain-0.5.la
 
 champlain_la_LDFLAGS =					\
 	-module -avoid-version
