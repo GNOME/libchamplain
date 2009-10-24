@@ -158,7 +158,6 @@ champlain_local_map_data_source_load_map_data (ChamplainLocalMapDataSource *self
   ChamplainBoundingBox *bbox;
   MemphisMap *map = memphis_map_new ();
 
-  memphis_map_set_debug_level (map, 0);
   memphis_map_load_from_file (map, map_path);
 
   if (priv->map)

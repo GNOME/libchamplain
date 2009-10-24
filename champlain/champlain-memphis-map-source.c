@@ -57,8 +57,6 @@
 #define MAX_THREADS 4
 #define DEFAULT_TILE_SIZE 256 // FIXME: switching between map sources
                               // with different tile size crashes champlain.
-/* 0: Be quiet, 1: Normal output, 2: Be verbose */
-#define MEMPHIS_INTERNAL_DEBUG_LEVEL 0
 
 const gchar default_rules[] =
   "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
@@ -531,8 +529,6 @@ champlain_memphis_map_source_new_full (ChamplainMapSourceDesc *desc,
 
   priv->renderer = memphis_renderer_new_full (priv->rules, map);
   memphis_renderer_set_resolution (priv->renderer, DEFAULT_TILE_SIZE);
-  memphis_renderer_set_debug_level (priv->renderer,
-      MEMPHIS_INTERNAL_DEBUG_LEVEL);
 
   memphis_rule_set_load_from_data (priv->rules, default_rules,
       strlen (default_rules));

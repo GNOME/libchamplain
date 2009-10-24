@@ -252,7 +252,6 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
     }
 
   MemphisMap *map = memphis_map_new ();
-  memphis_map_set_debug_level (map, 0);
   memphis_map_load_from_data (map,
       msg->response_body->data,
       msg->response_body->length);
