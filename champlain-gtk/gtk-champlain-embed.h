@@ -54,7 +54,7 @@ struct _GtkChamplainEmbedClass
 
 GType gtk_champlain_embed_get_type (void);
 
-GtkWidget *gtk_champlain_embed_new ();
+GtkWidget *gtk_champlain_embed_new (void);
 ChamplainView *gtk_champlain_embed_get_view (GtkChamplainEmbed* embed);
 
 /* DEPRECATED API */

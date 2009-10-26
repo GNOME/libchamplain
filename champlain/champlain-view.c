@@ -859,7 +859,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
        g_param_spec_double ("decel-rate",
             "Deceleration rate",
             "Rate at which the view will decelerate in kinetic mode.",
-            0.0, 2.0, 1.1, CHAMPLAIN_PARAM_READWRITE));
+            1.0001, 2.0, 1.1, CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainView:keep-center-on-resize:
@@ -2114,7 +2114,7 @@ champlain_view_set_map_source (ChamplainView *view,
 /**
 * champlain_view_set_decel_rate:
 * @view: a #ChamplainView
-* @rate: a #gdouble between 0.0 and 2.0
+* @rate: a #gdouble between 1.001 and 2.0
 *
 * The deceleration rate for the kinetic mode.
 *
@@ -2126,7 +2126,7 @@ champlain_view_set_decel_rate (ChamplainView *view,
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view) &&
       rate < 2.0 &&
-      rate > 0.0);
+      rate > 1.0001);
 
   ChamplainViewPrivate *priv = view->priv;
 

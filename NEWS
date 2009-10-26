@@ -1,3 +1,17 @@
+libchamplain 0.4.2 (2009-10-26)
+===============================
+
+Stable release
+GObject-introspection, Python and Perl bindings are in a working state.
+
+Fixes:
+
+* 595552: ChamplainView "decel-rate" accepts values below 1.0
+  (Pierre-Luc Beaudoin)
+* 598942: Fix champlain-gtk GObject introspection (Koop Mast)
+* Fix compiler warning "function declaration isn't a prototype"
+  (Pierre-Luc Beaudoin)
+
 libchamplain 0.4.1 (2009-10-18)
 ===============================
 
