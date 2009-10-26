@@ -36,7 +36,7 @@
 static ClutterColor DEFAULT_FILL_COLOR = {0xcc, 0x00, 0x00, 0xaa};
 static ClutterColor DEFAULT_STROKE_COLOR = {0xa4, 0x00, 0x00, 0xff};
 
-G_DEFINE_TYPE (ChamplainPolygon, champlain_polygon, G_TYPE_OBJECT)
+G_DEFINE_TYPE (ChamplainPolygon, champlain_polygon, G_TYPE_INITIALLY_UNOWNED)
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_POLYGON, ChamplainPolygonPrivate))
