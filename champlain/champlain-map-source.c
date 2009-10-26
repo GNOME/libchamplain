@@ -72,7 +72,7 @@ enum
 
 /* static guint champlain_map_source_signals[LAST_SIGNAL] = { 0, }; */
 
-G_DEFINE_TYPE (ChamplainMapSource, champlain_map_source, G_TYPE_OBJECT);
+G_DEFINE_TYPE (ChamplainMapSource, champlain_map_source, G_TYPE_INITIALLY_UNOWNED);
 
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourcePrivate))
 

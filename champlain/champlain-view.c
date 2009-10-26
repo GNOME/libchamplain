@@ -2071,7 +2071,7 @@ champlain_view_set_map_source (ChamplainView *view,
     return;
 
   g_object_unref (priv->map_source);
-  priv->map_source = g_object_ref (source);
+  priv->map_source = g_object_ref_sink (source);
 
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);

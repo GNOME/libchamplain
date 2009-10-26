@@ -49,13 +49,13 @@ typedef enum
 
 struct _ChamplainMapSource
 {
-  GObject parent;
+  GInitiallyUnowned parent;
   ChamplainMapSourcePrivate *priv;
 };
 
 struct _ChamplainMapSourceClass
 {
-  GObjectClass parent_class;
+  GInitiallyUnownedClass parent_class;
 
   void (*fill_tile) (ChamplainMapSource *map_source,
                     ChamplainTile *tile);
