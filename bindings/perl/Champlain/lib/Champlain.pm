@@ -37,7 +37,7 @@ L<http://projects.gnome.org/libchamplain/>.
 
 =head1 EXPORTS
 
-The library makes the following constants available:
+The module defines the following constants which can be exported on demand:
 
 =over
 
@@ -69,7 +69,7 @@ libraries do and what other bindings do.
 
 In the meanwhile this means that this Perl module no longer supports Gtk2.
 Just as with Clutter, another module will be created that will add support for
-Gtk2 once the Gkt2 Perl bindings for Clutter are written.
+Gtk2 once the Gtk2 Perl bindings for Clutter are written.
 
 =head1 BUGS
 
