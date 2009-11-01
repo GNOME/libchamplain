@@ -50,7 +50,10 @@ sub main {
 
 	# Code generation
 	Glib::CodeGen->parse_maps('champlain', input => [ @typemaps ]);
-	Glib::CodeGen->write_boot(xs_files => [ @XS_FILES ]);
+	Glib::CodeGen->write_boot(
+		xs_files => [ @XS_FILES ],
+		ignore   => qr/^Champlain$/,
+	);
 	
 	
 	$DEPENDS->set_inc($pkgconfig{cflags} . ' -I./build');
