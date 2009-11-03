@@ -1,8 +1,9 @@
 Revision history for Champlain
 
-0.10 Tue Nov  3 06:08:30 CET 2009
+0.10 Tue Nov  3 06:31:52 CET 2009
 	Build update: add Champliain to write_boot ignore.
 	Minor documentation update.
+	Advertise Gtk2::Champlain.
 
 
 0.09 Sat Oct 17 19:41:46 CEST 2009
