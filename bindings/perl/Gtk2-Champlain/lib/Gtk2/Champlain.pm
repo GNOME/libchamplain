@@ -12,24 +12,19 @@ Gtk2::Champlain - Gtk2 map rendering widget
 	my $window = Gtk2::Window->new('toplevel');
 	$window->signal_connect(destroy => sub { Gtk2->main_quit(); });
 	$window->set_title('Free maps');
+	$window->set_default_size(800, 600);
 	
-	# Standard clutter canvas
+	# Embeddable map widget
 	my $embed = Gtk2::Champlain::Embed->new();
-	
-	my $stage = Clutter::Stage->get_default();
-	$stage->set_size(800, 600);
+	$window->add($embed);
 	
 	# Configure the map view
 	my $map = $embed->get_view();
-	$map->set_size($stage->get_size);
 	$map->set_zoom_level(7);
 	$map->center_on(45.466, -73.75);
 	
-	# Pack the widgets
-	$window->add($embed);
+	# Show all widgets and start the main loop
 	$window->show_all();
-	
-	# Main loop
 	Gtk2->main();
 
 =head1 DESCRIPTION
