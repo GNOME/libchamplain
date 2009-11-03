@@ -1,7 +1,7 @@
 Revision history for Champlain
 
-0.10 Sun Nov  1 18:49:22 CET 2009
-	Build update.
+0.10 Tue Nov  3 06:08:30 CET 2009
+	Build update: add Champliain to write_boot ignore.
 	Minor documentation update.
 
 
