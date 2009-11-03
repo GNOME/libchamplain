@@ -1,0 +1,14 @@
+Changes
+COPYING
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Gtk2/Champlain.pm
+maps
+champlain-gtk-perl.h
+xs/.gitignore
+xs/Gtk2Champlain.xs
+xs/Gtk2ChamplainEmbed.xs
+t/Gtk2ChamplainEmbed.t
+examples/gtk2-champlain.pl

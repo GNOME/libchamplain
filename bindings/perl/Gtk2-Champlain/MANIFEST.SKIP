@@ -1,0 +1,12 @@
+^build/
+^Makefile$
+^Makefile[.]am$
+^Makefile[.]in$
+^Makefile[.]old$
+^xs/.*[.][co]$
+^blib/
+^Champlain[.]bs
+^Gtk2-Champlain-
+^pm_to_blib$
+[.]gitignore
+^[.]xs-coverage[.]ignore
