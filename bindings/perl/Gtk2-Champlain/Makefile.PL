@@ -17,20 +17,19 @@ my @XS_FILES = ();
 exit main();
 
 sub main {
+
+	my %deps = (
+			'Gtk2::Clutter' => '0.100',
+			'Champlain'     => '0.09',
+	);
 	
 	# Create the build folder used by the code generation utilities
 	mkdir 'build', 0777;
 	
-	# The version of libchamplain for which this module can built against
-	my $champlain_version = '0.4';
-	
-	# Find libchamplain
-	my @typemaps = ('maps');
-	my @deps = ('Champlain', 'Gtk2::Clutter');
+	# Find libchamplain-gtk
 	my %pkgconfig;
-
 	eval {
-		%pkgconfig = ExtUtils::PkgConfig->find("champlain-gtk-$champlain_version");
+		%pkgconfig = ExtUtils::PkgConfig->find("champlain-gtk-0.4");
 		push @XS_FILES, <xs/Gtk2Champlain*.xs>;
 	};
 	if (my $error = $@) {
@@ -38,7 +37,7 @@ sub main {
 		return;
 	}
 	
-	$DEPENDS = ExtUtils::Depends->new('Gtk2::Champlain', @deps);
+	$DEPENDS = ExtUtils::Depends->new('Gtk2::Champlain', keys %deps);
 	
 	$DEPENDS->add_pm(
 		File::Spec->catfile('lib', 'Gtk2', 'Champlain.pm'),
@@ -46,7 +45,7 @@ sub main {
 	);
 
 	# Code generation
-	Gtk2::CodeGen->parse_maps('champlain-gtk', input => [ @typemaps ]);
+	Gtk2::CodeGen->parse_maps('champlain-gtk', input => [ 'maps' ]);
 	Gtk2::CodeGen->write_boot(
 		ignore   => qr/^Gtk2::Champlain$/,
 		xs_files => [ @XS_FILES ]
@@ -78,10 +77,7 @@ sub main {
 		ABSTRACT_FROM => File::Spec->catfile('lib', 'Gtk2', 'Champlain.pm'),
 		LICENSE       => 'perl, lgpl',
 
-		PREREQ_PM     => {
-			'Gtk2::Clutter' => '0.100',
-			'Champlain'     => '0.09',
-		},
+		PREREQ_PM     => \%deps,
 		PREREQ_FATAL  => 1,
 		
 		XSPROTOARG    => '-noprototypes ',
