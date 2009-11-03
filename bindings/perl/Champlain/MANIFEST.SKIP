@@ -1,5 +1,4 @@
 ^build/
-\.svn
 ^Makefile$
 ^Makefile[.]am$
 ^Makefile[.]in$
