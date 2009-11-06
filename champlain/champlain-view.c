@@ -2035,7 +2035,8 @@ view_update_state (ChamplainView *view)
       if (tile == NULL)
         continue;
 
-      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING)
+      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING ||
+          champlain_tile_get_state (tile) == CHAMPLAIN_STATE_VALIDATING_CACHE)
         new_state = CHAMPLAIN_STATE_LOADING;
     }
 
