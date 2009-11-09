@@ -1000,14 +1000,51 @@ button_release_cb (ClutterActor *actor,
 }
 
 static void
+update_scale (ChamplainView *view,
+    GParamSpec *arg1,
+    gpointer *p)
+{
+  ClutterActor *text;
+  ChamplainViewPrivate *priv = view->priv;
+  ChamplainZoomLevel *level;
+  gfloat m_per_pixel;
+  gchar *label;
+  ChamplainTile *tile;
+
+  /* Height is in pixels.
+     m/px = m/° * 180° / height_in_pixels
+
+     We assume that m/° = 60 * average length of arcsecond, aka
+     nautical mile, so m/° = 111120 m/°
+  */
+
+  if (! priv || !priv->map || !priv->map->current_level) {
+    return;
+  }
+  level = priv->map->current_level;
+  tile = champlain_zoom_level_get_nth_tile(level, 0);
+  m_per_pixel = 1852 * 60 * 180 /  (champlain_tile_get_size (tile) * champlain_zoom_level_get_height (level));
+  printf("FOO: %.2f\n", m_per_pixel);
+  printf("FOO: %d\n", champlain_zoom_level_get_height (level));
+
+  label = g_strdup_printf("%.2f km", (m_per_pixel * SCALE_WIDTH) / 1000);
+  printf("FOO2: %s\n", label);
+
+  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-label");
+  clutter_text_set_text (CLUTTER_TEXT (text), label);
+}
+
+static void
 create_scale (ChamplainView *view)
 {
   ClutterActor *scale, *text;
   cairo_t *cr;
   gfloat width, height;
   ChamplainViewPrivate *priv = view->priv;
-
   priv->scale_actor = g_object_ref (clutter_group_new());
+
+  g_signal_connect (view, "notify::zoom-level", G_CALLBACK (update_scale),
+		    NULL);
 
   scale = clutter_cairo_texture_new (SCALE_WIDTH, SCALE_HEIGHT);
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (scale));
@@ -1022,7 +1059,8 @@ create_scale (ChamplainView *view)
   cairo_stroke (cr);
   cairo_destroy (cr);
 
-  text = clutter_text_new_with_text ("Sans 9", "100 km");
+  text = clutter_text_new_with_text ("Sans 9", "X km");
+  clutter_actor_set_name (text, "scale-label");
   clutter_actor_get_size (text, &width, &height);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
   clutter_actor_set_position (text, (SCALE_WIDTH - width) / 2, SCALE_HEIGHT - height - SCALE_LINE_WIDTH);
