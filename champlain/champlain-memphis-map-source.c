@@ -555,6 +555,13 @@ champlain_memphis_map_source_load_rules (
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
 
+  // TODO: Remove test when memphis handles invalid paths properly
+  if (!g_file_test (rules_path, G_FILE_TEST_EXISTS))
+    {
+      g_critical("Error: \"%s\" does not exist.", rules_path);
+      return;
+    }
+
   ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
 
   g_static_rw_lock_writer_lock (&MemphisLock);

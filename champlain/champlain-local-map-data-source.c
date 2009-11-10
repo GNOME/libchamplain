@@ -154,6 +154,13 @@ champlain_local_map_data_source_load_map_data (ChamplainLocalMapDataSource *self
   g_return_if_fail (CHAMPLAIN_IS_LOCAL_MAP_DATA_SOURCE (self)
       && map_path);
 
+  // TODO: Remove test when memphis handles invalid paths properly
+  if (!g_file_test (map_path, G_FILE_TEST_EXISTS))
+    {
+      g_critical("Error: \"%s\" does not exist.", map_path);
+      return;
+    }
+
   ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
   ChamplainBoundingBox *bbox;
   MemphisMap *map = memphis_map_new ();
