@@ -825,8 +825,7 @@ main (int argc,
   gtk_box_pack_start (GTK_BOX (menubox), memphis_box, TRUE, TRUE, 0);
 
   /* viewport */
-  viewport = gtk_viewport_new (NULL, NULL);
-  gtk_viewport_set_shadow_type (GTK_VIEWPORT(viewport), GTK_SHADOW_ETCHED_IN);
+  viewport = gtk_frame_new (NULL);
   gtk_container_add (GTK_CONTAINER (viewport), widget);
 
   gtk_box_pack_end (GTK_BOX (hbox), menubox, FALSE, FALSE, 0);
