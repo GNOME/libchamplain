@@ -157,7 +157,7 @@ champlain_local_map_data_source_load_map_data (ChamplainLocalMapDataSource *self
   // TODO: Remove test when memphis handles invalid paths properly
   if (!g_file_test (map_path, G_FILE_TEST_EXISTS))
     {
-      g_critical("Error: \"%s\" does not exist.", map_path);
+      g_critical ("Error: \"%s\" does not exist.", map_path);
       return;
     }
 

@@ -507,7 +507,7 @@ rules_changed (GtkWidget *widget, ChamplainView *view)
   if (strncmp (champlain_map_source_get_id (source), "memphis", 7) == 0)
     {
       champlain_memphis_map_source_load_rules (
-          CHAMPLAIN_MEMPHIS_MAP_SOURCE(source),
+          CHAMPLAIN_MEMPHIS_MAP_SOURCE (source),
           file);
       load_rules_into_gui (view);
     }
@@ -518,7 +518,7 @@ zoom_changed (GtkSpinButton *spinbutton,
               ChamplainView *view)
 {
   gint zoom = gtk_spin_button_get_value_as_int(spinbutton);
-  g_object_set(G_OBJECT(view), "zoom-level", zoom, NULL);
+  g_object_set (G_OBJECT(view), "zoom-level", zoom, NULL);
 }
 
 static void
@@ -527,7 +527,7 @@ map_zoom_changed (ChamplainView *view,
                   GtkSpinButton *spinbutton)
 {
   gint zoom;
-  g_object_get(G_OBJECT(view), "zoom-level", &zoom, NULL);
+  g_object_get (G_OBJECT(view), "zoom-level", &zoom, NULL);
   gtk_spin_button_set_value(spinbutton, zoom);
 }
 
@@ -569,7 +569,7 @@ build_source_combo_box (GtkComboBox *box)
 
     desc = (ChamplainMapSourceDesc*) iter->data;
 
-    gtk_tree_store_append (store, &parent, NULL );
+    gtk_tree_store_append (store, &parent, NULL);
     gtk_tree_store_set (store, &parent, COL_ID, desc->id,
         COL_NAME, desc->name, -1);
 
@@ -584,7 +584,7 @@ build_source_combo_box (GtkComboBox *box)
   cell = gtk_cell_renderer_text_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (box), cell, FALSE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (box), cell,
-      "text", COL_NAME, NULL );
+      "text", COL_NAME, NULL);
 }
 
 static void
@@ -610,7 +610,7 @@ build_data_combo_box (GtkComboBox *box)
   cell = gtk_cell_renderer_text_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (box), cell, FALSE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (box), cell,
-      "text", 0, NULL );
+      "text", 0, NULL);
 }
 
 static void
@@ -632,7 +632,7 @@ build_rules_combo_box (GtkComboBox *box)
   cell = gtk_cell_renderer_text_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (box), cell, FALSE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (box), cell,
-      "text", 0, NULL );
+      "text", 0, NULL);
 }
 
 void list_item_selected_cb (GtkTreeView *tree_view,

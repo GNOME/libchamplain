@@ -558,7 +558,7 @@ champlain_memphis_map_source_load_rules (
   // TODO: Remove test when memphis handles invalid paths properly
   if (!g_file_test (rules_path, G_FILE_TEST_EXISTS))
     {
-      g_critical("Error: \"%s\" does not exist.", rules_path);
+      g_critical ("Error: \"%s\" does not exist.", rules_path);
       return;
     }
 
