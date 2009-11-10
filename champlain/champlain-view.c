@@ -1000,9 +1000,9 @@ button_release_cb (ClutterActor *actor,
 }
 
 static void
-update_scale (ChamplainView *view,
+update_scale (gpointer *unused,
     GParamSpec *arg1,
-    gpointer *p)
+    ChamplainView *view)
 {
   ClutterActor *text;
   ChamplainViewPrivate *priv = view->priv;
@@ -1011,11 +1011,11 @@ update_scale (ChamplainView *view,
   gchar *label;
   ChamplainTile *tile;
 
-  /* Height is in pixels.
-     m/px = m/° * 180° / height_in_pixels
+  /* Width is in pixels.
+     m/px = radius_at_latitude / width_in_pixels
+     k = radius of earth = 6 378.1 km
+     radius_at_latitude = 2π * k * sin (π/2-θ)
 
-     We assume that m/° = 60 * average length of arcsecond, aka
-     nautical mile, so m/° = 111120 m/°
   */
 
   if (! priv || !priv->map || !priv->map->current_level) {
@@ -1023,7 +1023,8 @@ update_scale (ChamplainView *view,
   }
   level = priv->map->current_level;
   tile = champlain_zoom_level_get_nth_tile(level, 0);
-  m_per_pixel = 1852 * 60 * 180 /  (champlain_tile_get_size (tile) * champlain_zoom_level_get_height (level));
+  m_per_pixel = 2 * M_PI * 6378100 * sin(M_PI/2 - M_PI / 180*priv->latitude) /
+    (champlain_tile_get_size (tile) * champlain_zoom_level_get_width (level));
   printf("FOO: %.2f\n", m_per_pixel);
   printf("FOO: %d\n", champlain_zoom_level_get_height (level));
 
@@ -1044,7 +1045,9 @@ create_scale (ChamplainView *view)
   priv->scale_actor = g_object_ref (clutter_group_new());
 
   g_signal_connect (view, "notify::zoom-level", G_CALLBACK (update_scale),
-		    NULL);
+		    view);
+  g_signal_connect (priv->viewport, "notify::y-origin",
+		    G_CALLBACK (update_scale), view);
 
   scale = clutter_cairo_texture_new (SCALE_WIDTH, SCALE_HEIGHT);
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (scale));
