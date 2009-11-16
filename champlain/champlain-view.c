@@ -1021,6 +1021,12 @@ update_scale (gpointer *unused,
   if (! priv || !priv->map || !priv->map->current_level) {
     return;
   }
+  if (priv->display_scale) {
+    clutter_actor_show(priv->scale_actor);
+  } else {
+    clutter_actor_hide(priv->scale_actor);
+  }
+
   level = priv->map->current_level;
   tile = champlain_zoom_level_get_nth_tile(level, 0);
   m_per_pixel = 2 * M_PI * 6378100 * sin(M_PI/2 - M_PI / 180*priv->latitude) /
@@ -1047,6 +1053,8 @@ create_scale (ChamplainView *view)
   g_signal_connect (view, "notify::zoom-level", G_CALLBACK (update_scale),
 		    view);
   g_signal_connect (priv->viewport, "notify::y-origin",
+		    G_CALLBACK (update_scale), view);
+  g_signal_connect (view, "notify::display-scale",
 		    G_CALLBACK (update_scale), view);
 
   scale = clutter_cairo_texture_new (SCALE_WIDTH, SCALE_HEIGHT);
@@ -2791,3 +2799,21 @@ champlain_view_remove_polygon (ChamplainView *view,
 
   g_object_unref (polygon);
 }
+
+void
+champlain_view_show_scale (ChamplainView* view)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  g_object_set (G_OBJECT (view), "display-scale", TRUE, NULL);
+}
+
+void
+champlain_view_hide_scale (ChamplainView* view)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  g_object_set (G_OBJECT (view), "display-scale", FALSE, NULL);
+
+}
+

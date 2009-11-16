@@ -147,6 +147,8 @@ void champlain_view_add_polygon (ChamplainView *view,
 void champlain_view_remove_polygon (ChamplainView *view,
     ChamplainPolygon *polygon);
 
+void champlain_view_show_scale (ChamplainView *view);
+void champlain_view_hide_scale (ChamplainView *view);
 
 G_END_DECLS
 
