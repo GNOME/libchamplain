@@ -15,9 +15,8 @@ polygons_SOURCES = polygons.c
 polygons_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.5.la
 
 url_marker_SOURCES = url-marker.c
-url_marker_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-0.5.la
 url_marker_CPPFLAGS = $(DEPS_CFLAGS) $(SOUP_CFLAGS)
-url_marker_LDADD = $(SOUP_DEPS_LIBS) $(DEPS_LIBS) ../champlain/libchamplain-0.5.la
+url_marker_LDADD = $(SOUP_LIBS) $(DEPS_LIBS) ../champlain/libchamplain-0.5.la
 
 if ENABLE_GTK
 noinst_PROGRAMS += launcher-gtk

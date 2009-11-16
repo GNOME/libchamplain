@@ -3,6 +3,6 @@ Champlain.bs
 blib/
 build/
 pm_to_blib
-Champlain-*.tar.gz
+Gtk2-Champlain-*.tar.gz
 xs/*.c
 xs/*.o

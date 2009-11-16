@@ -28,16 +28,17 @@ Champlain - Map rendering canvas
 
 =head1 DESCRIPTION
 
-Champlain is a Perl binding for the C library libchamplain which provides a
-canvas widget based on L<Clutter> that displays maps from various free map
-sources such as I<OpenStreetMap>, I<OpenAerialMap> and I<Maps for free>.
+Champlain consists of the Perl bindings for the C library libchamplain which
+provides a canvas widget based on L<Clutter> that displays maps from various
+free map sources such as I<OpenStreetMap>, I<OpenAerialMap> and
+I<Maps for free>.
 
 For more information about libchamplain see:
 L<http://projects.gnome.org/libchamplain/>.
 
 =head1 EXPORTS
 
-The library makes the following constants available:
+The module defines the following constants which can be exported on demand:
 
 =over
 
@@ -52,7 +53,7 @@ The library makes the following constants available:
 =back
 
 The tag I<coords> can be used for importing the constants providing the minimal
-and maximal values for (latitude, longitude) coordinates:
+and maximal values for I<(latitude, longitude)> coordinates:
 
 	use Champlain ':coords';
 
@@ -63,13 +64,12 @@ library libchamplain was compiled with GTK support and if Clutter would be
 built with Gtk2 support.
 
 While this was very handy it made the Perl modules hard to maintain and starting
-with Clutter 1.0 the Gtk2 wrappers are no longer bundled. They will be provided
-by another CPAN package that doesn't exist yet. This will mimic what the C
-libraries do and what other bindings do.
+with Clutter 1.0 the Gtk2 wrappers are no longer bundled together. Instead they
+now need to be downloaded and installed separately. This mimics what the C
+libraries and other bindings already do for Clutter & co.
 
-In the meanwhile this means that this Perl module no longer supports Gtk2.
-Just as with Clutter, another module will be created that will add support for
-Gtk2 once the Gkt2 Perl bindings for Clutter are written.
+The Gtk2 Perl bindings for this widget are available in CPAN as
+L<Gtk2::Champlain>.
 
 =head1 BUGS
 
@@ -119,7 +119,7 @@ For the terms of The Artistic License, see L<perlartistic>.
 use warnings;
 use strict;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use base 'DynaLoader';
 use Exporter 'import';
@@ -174,3 +174,4 @@ sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 __PACKAGE__->bootstrap($VERSION);
 
 1;
+

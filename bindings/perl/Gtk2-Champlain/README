@@ -1,20 +1,17 @@
-Champlain
-=========
+Gtk2::Champlain
+===============
 
-Perl bindings for the C library "libchamplain" that provides a ClutterActor for
-displaying geographical maps from various free sources. Libchamplain provides a
-simple mechanism for rendering maps in an application or for embedding maps in
-an existing application.
-
-The library relies on Clutter for all rendering and can easily be embedded in
-any Gtk2 application (look for Gtk2::Champlain on CPAN).
+Perl bindings for the C library "libchamplain-gtk" that provides a GtkWidget
+for displaying geographical maps from various free sources. Libchamplain-gtk
+provides a simple mechanism for rendering maps in a Gtk application. The library
+relies on Clutter for all rendering.
 
 The maps displayed are taken from various sources, all providing maps for free,
 at the moment the following sources area available: OpenStreetMap, OpenAerialMap
 and Maps for free. It's also possible to provide other sources through a simple
 API.
 
-For more information about libchamplain refer to the library's web site:
+For more information about libchamplain-gtk refer to the library's web site:
 
 	http://projects.gnome.org/libchamplain/
 
