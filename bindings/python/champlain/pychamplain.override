@@ -10,6 +10,7 @@ headers
 modulename champlain
 %%
 import gobject.GObject as PyGObject_Type
+import gobject.GObject as PyGInitiallyUnowned_Type
 import clutter.Actor as PyClutterActor_Type
 import clutter.Group as PyClutterGroup_Type
 import clutter.Color as PyClutterColor_Type
