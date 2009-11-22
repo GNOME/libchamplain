@@ -23,7 +23,7 @@
 
 (define-object MapSource
   (in-module "Champlain")
-  (parent "GObject")
+  (parent "GInitiallyUnowned")
   (c-name "ChamplainMapSource")
   (gtype-id "CHAMPLAIN_TYPE_MAP_SOURCE")
 )
@@ -51,7 +51,7 @@
 
 (define-object Polygon
   (in-module "Champlain")
-  (parent "GObject")
+  (parent "GInitiallyUnowned")
   (c-name "ChamplainPolygon")
   (gtype-id "CHAMPLAIN_TYPE_POLYGON")
 )
