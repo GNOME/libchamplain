@@ -2,6 +2,7 @@
 
 #include <pygobject.h>
 #include "pychamplain.h"
+#include <champlain/champlain.h>
 
 DL_EXPORT(void) initchamplain (void);
 extern PyMethodDef champlain_functions[];
@@ -18,7 +19,21 @@ initchamplain (void)
 	
 	champlain_register_classes (d);
 	champlain_add_constants(m, "CHAMPLAIN_");
-	
+ 
+	/* constants */
+	PyModule_AddObject(m, "MAP_SOURCE_OSM_MAPNIK", Py_BuildValue("s", 
+		CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK));
+	PyModule_AddObject(m, "MAP_SOURCE_OSM_OSMARENDER", Py_BuildValue("s", 
+		CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER));
+	PyModule_AddObject(m, "MAP_SOURCE_OSM_CYCLE_MAP", Py_BuildValue("s", 
+		CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP));
+	PyModule_AddObject(m, "MAP_SOURCE_OSM_TRANSPORT_MAP", Py_BuildValue("s", 
+		CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP));
+	PyModule_AddObject(m, "MAP_SOURCE_OAM", Py_BuildValue("s", 
+		CHAMPLAIN_MAP_SOURCE_OAM));
+	PyModule_AddObject(m, "MAP_SOURCE_MFF_RELIEF", Py_BuildValue("s", 
+		CHAMPLAIN_MAP_SOURCE_MFF_RELIEF));
+
 	if (PyErr_Occurred ()) {
 		PyErr_Print();
 		Py_FatalError ("can't initialise module champlain");
