@@ -425,3 +425,33 @@ _wrap_champlain_map_source_desc_new(PyGBoxed *self, PyObject *args, PyObject *kw
     return 0;
 }
 %%
+override-attr ChamplainPoint.lat
+static int
+_wrap_champlain_point__set_lat (PyGBoxed *self, PyObject *value, 
+    void *closure)
+{
+    gdouble val;
+
+    val = PyFloat_AsDouble(value);
+    if (PyErr_Occurred())
+        return -1;
+
+    pyg_boxed_get(self, ChamplainPoint)->lat = val;
+    return 0;
+}
+%%
+override-attr ChamplainPoint.lon
+static int
+_wrap_champlain_point__set_lon(PyGBoxed *self, PyObject *value, 
+    void *closure)
+{
+    gdouble val;
+
+    val = PyFloat_AsDouble(value);
+    if (PyErr_Occurred())
+        return -1;
+
+    pyg_boxed_get(self, ChamplainPoint)->lon = val;
+    return 0;
+}
+%%
