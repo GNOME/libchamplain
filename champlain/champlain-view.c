@@ -1058,7 +1058,7 @@ update_scale (ChamplainView *view)
 
   /* First tick */
   cairo_move_to (cr, SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
-  cairo_line_to (cr, SCALE_INSIDE_PADDING, 3 * SCALE_HEIGHT / 4);
+  cairo_line_to (cr, SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2 );
   cairo_stroke (cr);
 
   /* Line */
@@ -1067,13 +1067,13 @@ update_scale (ChamplainView *view)
   cairo_stroke (cr);
 
   /* Middle tick */
-  cairo_move_to (cr, scale_width / 2 + SCALE_INSIDE_PADDING, 3 * SCALE_HEIGHT / 8);
-  cairo_line_to (cr, scale_width / 2 + SCALE_INSIDE_PADDING, 5 * SCALE_HEIGHT / 8);
+  cairo_move_to (cr, scale_width / 2 + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
+  cairo_line_to (cr, scale_width / 2 + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
   cairo_stroke (cr);
 
   /* Last tick */
   cairo_move_to (cr, scale_width + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
-  cairo_line_to (cr, scale_width + SCALE_INSIDE_PADDING, 3 * SCALE_HEIGHT / 4);
+  cairo_line_to (cr, scale_width + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
   cairo_stroke (cr);
 
   cairo_destroy (cr);
