@@ -159,6 +159,7 @@ struct _ChamplainViewPrivate
 
   ClutterActor *scale_actor;
   gboolean show_scale;
+  ChamplainUnit scale_unit;
 
   ChamplainState state; /* View's global state */
 
@@ -1003,7 +1004,7 @@ button_release_cb (ClutterActor *actor,
 static void
 update_scale (ChamplainView *view)
 {
-  gboolean is_small_unit = FALSE;  /* indicates if using meters */
+  gboolean is_small_unit = TRUE;  /* indicates if using meters */
   ClutterActor *text, *line;
   gfloat width;
   ChamplainViewPrivate *priv = view->priv;
@@ -1011,10 +1012,11 @@ update_scale (ChamplainView *view)
   gfloat scale_width = SCALE_WIDTH;
   gchar *label;
   cairo_t *cr;
-  gint base;
+  gfloat base;
   gfloat factor;
+  gboolean final_unit = FALSE;
 
-  if (! priv || !priv->map || !priv->map->current_level)
+  if (!priv || !priv->map || !priv->map->current_level)
     return;
 
   if (priv->show_scale)
@@ -1030,32 +1032,60 @@ update_scale (ChamplainView *view)
   m_per_pixel = champlain_map_source_get_meters_per_pixel (priv->map_source,
       priv->zoom_level, priv->latitude, priv->longitude);
 
-  /* Keep the closest power of 10 */
-  base = floor (log (m_per_pixel * scale_width) / log (10));
-  base = pow (10, base);
+  if (priv->scale_unit == CHAMPLAIN_UNIT_MILES)
+    m_per_pixel *= 3.28; /* m_per_pixel is now in ft */
 
-  /* How many times can it be fitted in our max scale width */
-  scale_width /= m_per_pixel * scale_width / base;
-  factor = floor (SCALE_WIDTH / scale_width);
-  base *= factor;
-  scale_width *= factor;
-
-  if (base / 1000 > 1)
+  /* This loop will find the pretty value to display on the scale.
+   * It will be run once for metric units, and twice for imperials
+   * so that both feet and miles have pretty numbers.
+   */
+  do
     {
-      base /= 1000;
-      is_small_unit = FALSE;
+      /* Keep the previous power of 10 */
+      base = floor (log (m_per_pixel * scale_width) / log (10));
+      base = pow (10, base);
+
+      /* How many times can it be fitted in our max scale width */
+      scale_width /= m_per_pixel * scale_width / base;
+      factor = floor (SCALE_WIDTH / scale_width);
+      base *= factor;
+      scale_width *= factor;
+
+      if (priv->scale_unit == CHAMPLAIN_UNIT_KM)
+        {
+          if (base / 1000 >= 1)
+            {
+              base /= 1000; /* base is now in km */
+              is_small_unit = FALSE;
+            }
+          final_unit = TRUE; /* Don't need to recompute */
+        }
+      else if (priv->scale_unit == CHAMPLAIN_UNIT_MILES)
+        {
+          if (is_small_unit && base / 5280 >= 1)
+            {
+              m_per_pixel /= 5280; /* m_per_pixel is now in miles */
+              is_small_unit = FALSE;
+              /* we need to recompute the base because 1000 ft != 1 mile */
+            }
+          else
+            final_unit = TRUE;
+        }
     }
-  else
-    is_small_unit = TRUE;
+  while (!final_unit);
 
   text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-far-label");
-  label = g_strdup_printf ("%d", base);
-  /* Get only digits width */
+  label = g_strdup_printf ("%g", base);
+  /* Get only digits width for centering */
   clutter_text_set_text (CLUTTER_TEXT (text), label);
   g_free (label);
   clutter_actor_get_size (text, &width, NULL);
-
-  label = g_strdup_printf ("%d %s", base, (is_small_unit ? "m": "km"));
+  /* actual label with unit */
+  label = g_strdup_printf ("%g %s", base,
+      priv->scale_unit == CHAMPLAIN_UNIT_KM ?
+      (is_small_unit ? "m": "km"):
+      (is_small_unit ? "ft": "miles")
+      );
   clutter_text_set_text (CLUTTER_TEXT (text), label);
   g_free (label);
   clutter_actor_set_position (text, (scale_width - width / 2) + SCALE_INSIDE_PADDING, - SCALE_INSIDE_PADDING);
@@ -1164,6 +1194,7 @@ champlain_view_init (ChamplainView *view)
   priv->map = NULL;
   priv->polygon_redraw_id = 0;
   priv->show_scale = TRUE;
+  priv->scale_unit = CHAMPLAIN_UNIT_KM;
 
   /* Setup viewport */
   priv->viewport = g_object_ref (tidy_viewport_new ());
@@ -2396,6 +2427,27 @@ champlain_view_set_show_scale (ChamplainView *view,
 }
 
 /**
+* champlain_view_set_scale_unit:
+* @view: a #ChamplainView
+* @unit: a #ChamplainUnit
+*
+* Sets the scales unit.
+*
+* Since: 0.4.3
+*/
+void
+champlain_view_set_scale_unit (ChamplainView *view,
+    ChamplainUnit unit)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->scale_unit = unit;
+  update_scale (view);
+}
+
+/**
 * champlain_view_set_zoom_on_double_click:
 * @view: a #ChamplainView
 * @value: a #gboolean
@@ -2778,6 +2830,23 @@ champlain_view_get_show_scale (ChamplainView *view)
 
   ChamplainViewPrivate *priv = view->priv;
   return priv->show_scale;
+}
+
+/**
+ * champlain_view_get_scale_unit:
+ * @view: The view
+ *
+ * Returns: The unit used by the scale
+ *
+ * Since: 0.4.3
+ */
+ChamplainUnit
+champlain_view_get_scale_unit (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->scale_unit;
 }
 
 /**

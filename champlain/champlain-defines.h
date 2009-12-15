@@ -47,4 +47,10 @@ typedef enum
   CHAMPLAIN_STATE_DONE
 } ChamplainState;
 
+typedef enum
+{
+  CHAMPLAIN_UNIT_KM,
+  CHAMPLAIN_UNIT_MILES,
+} ChamplainUnit;
+
 #endif

@@ -114,6 +114,7 @@ void champlain_view_set_keep_center_on_resize (ChamplainView *view,
     gboolean value);
 void champlain_view_set_show_license (ChamplainView *view, gboolean value);
 void champlain_view_set_show_scale (ChamplainView *view, gboolean value);
+void champlain_view_set_scale_unit (ChamplainView *view, ChamplainUnit unit);
 void champlain_view_set_zoom_on_double_click (ChamplainView *view,
     gboolean value);
 
@@ -142,6 +143,7 @@ ChamplainScrollMode champlain_view_get_scroll_mode (ChamplainView *view);
 gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
 gboolean champlain_view_get_show_license (ChamplainView *view);
 gboolean champlain_view_get_show_scale (ChamplainView *view);
+ChamplainUnit champlain_view_get_scale_unit (ChamplainView *view);
 gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
 
 void champlain_view_add_polygon (ChamplainView *view,
