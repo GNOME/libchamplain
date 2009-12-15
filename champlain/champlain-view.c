@@ -97,6 +97,7 @@ enum
   PROP_STATE,
   PROP_SHOW_SCALE,
   PROP_SCALE_UNIT,
+  PROP_MAX_SCALE_WIDTH,
 };
 
 #define PADDING 10
@@ -161,6 +162,7 @@ struct _ChamplainViewPrivate
   ClutterActor *scale_actor;
   gboolean show_scale;
   ChamplainUnit scale_unit;
+  guint max_scale_width;
 
   ChamplainState state; /* View's global state */
 
@@ -230,7 +232,6 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     guint duration);
 
 #define SCALE_HEIGHT  20
-#define SCALE_WIDTH   100
 #define SCALE_PADDING 10
 #define SCALE_INSIDE_PADDING 10
 #define SCALE_LINE_WIDTH 2
@@ -602,6 +603,9 @@ champlain_view_get_property (GObject *object,
       case PROP_SHOW_SCALE:
         g_value_set_boolean (value, priv->show_scale);
         break;
+      case PROP_MAX_SCALE_WIDTH:
+        g_value_set_uint (value, priv->max_scale_width);
+        break;
       case PROP_SCALE_UNIT:
         g_value_set_enum (value, priv->scale_unit);
         break;
@@ -665,6 +669,9 @@ champlain_view_set_property (GObject *object,
       break;
     case PROP_SHOW_SCALE:
       champlain_view_set_show_scale (view, g_value_get_boolean (value));
+      break;
+    case PROP_MAX_SCALE_WIDTH:
+      champlain_view_set_max_scale_width (view, g_value_get_uint (value));
       break;
     case PROP_SCALE_UNIT:
       champlain_view_set_scale_unit (view, g_value_get_enum (value));
@@ -968,6 +975,24 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            G_PARAM_READWRITE));
 
   /**
+  * ChamplainView:max-scale-width:
+  *
+  * The size of the map scale on screen in pixels.
+  *
+  * Since: 0.4.3
+  */
+  g_object_class_install_property (object_class,
+       PROP_MAX_SCALE_WIDTH,
+       g_param_spec_uint ("max-scale-width",
+           "The width of the scale",
+           "The max width of the scale"
+           "on screen",
+           1,
+           2000,
+           100,
+           G_PARAM_READWRITE));
+
+  /**
   * ChamplainView:scale-unit:
   *
   * The scale's units.
@@ -1032,7 +1057,7 @@ update_scale (ChamplainView *view)
   gfloat width;
   ChamplainViewPrivate *priv = view->priv;
   gfloat m_per_pixel;
-  gfloat scale_width = SCALE_WIDTH;
+  gfloat scale_width = priv->max_scale_width;
   gchar *label;
   cairo_t *cr;
   gfloat base;
@@ -1070,7 +1095,7 @@ update_scale (ChamplainView *view)
 
       /* How many times can it be fitted in our max scale width */
       scale_width /= m_per_pixel * scale_width / base;
-      factor = floor (SCALE_WIDTH / scale_width);
+      factor = floor (priv->max_scale_width / scale_width);
       base *= factor;
       scale_width *= factor;
 
@@ -1158,9 +1183,17 @@ create_scale (ChamplainView *view)
   ClutterActor *scale, *text;
   gfloat width;
   ChamplainViewPrivate *priv = view->priv;
-  priv->scale_actor = g_object_ref (clutter_group_new());
 
-  scale = clutter_cairo_texture_new (SCALE_WIDTH + 2 * SCALE_INSIDE_PADDING, SCALE_HEIGHT + 2 * SCALE_INSIDE_PADDING);
+  if (priv->scale_actor)
+    {
+      g_object_unref (priv->scale_actor);
+      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage), priv->scale_actor);
+    }
+
+  priv->scale_actor = g_object_ref (clutter_group_new());
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->scale_actor);
+
+  scale = clutter_cairo_texture_new (priv->max_scale_width + 2 * SCALE_INSIDE_PADDING, SCALE_HEIGHT + 2 * SCALE_INSIDE_PADDING);
   clutter_actor_set_name (scale, "scale-line");
 
   text = clutter_text_new_with_text ("Sans 9", "X km");
@@ -1218,6 +1251,7 @@ champlain_view_init (ChamplainView *view)
   priv->polygon_redraw_id = 0;
   priv->show_scale = TRUE;
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
+  priv->max_scale_width = 100;
 
   /* Setup viewport */
   priv->viewport = g_object_ref (tidy_viewport_new ());
@@ -1230,7 +1264,6 @@ champlain_view_init (ChamplainView *view)
 
   /* Setup scale */
   create_scale (view);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->scale_actor);
 
   /* Setup finger scroll */
   priv->finger_scroll = g_object_ref (tidy_finger_scroll_new (priv->scroll_mode));
@@ -2450,6 +2483,28 @@ champlain_view_set_show_scale (ChamplainView *view,
 }
 
 /**
+* champlain_view_set_max_scale_width:
+* @view: a #ChamplainView
+* @value: a #guint in pixels
+*
+* Sets the maximum width of the scale on the screen in pixels
+*
+* Since: 0.4.3
+*/
+void
+champlain_view_set_max_scale_width (ChamplainView *view,
+    guint value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->max_scale_width = value;
+  create_scale (view);
+  update_scale (view);
+}
+
+/**
 * champlain_view_set_scale_unit:
 * @view: a #ChamplainView
 * @unit: a #ChamplainUnit
@@ -2853,6 +2908,23 @@ champlain_view_get_show_scale (ChamplainView *view)
 
   ChamplainViewPrivate *priv = view->priv;
   return priv->show_scale;
+}
+
+/**
+ * champlain_view_get_max_scale_width:
+ * @view: The view
+ *
+ * Returns: The max scale width in pixels.
+ *
+ * Since: 0.4.3
+ */
+guint
+champlain_view_get_max_scale_width (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->max_scale_width;
 }
 
 /**
