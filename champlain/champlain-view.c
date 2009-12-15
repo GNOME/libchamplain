@@ -1003,6 +1003,7 @@ button_release_cb (ClutterActor *actor,
 static void
 update_scale (ChamplainView *view)
 {
+  gboolean is_small_unit = FALSE;  /* indicates if using meters */
   ClutterActor *text, *line;
   gfloat width;
   ChamplainViewPrivate *priv = view->priv;
@@ -1039,7 +1040,13 @@ update_scale (ChamplainView *view)
   base *= factor;
   scale_width *= factor;
 
-  base /= 1000;
+  if (base / 1000 > 1)
+    {
+      base /= 1000;
+      is_small_unit = FALSE;
+    }
+  else
+    is_small_unit = TRUE;
 
   text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-far-label");
   label = g_strdup_printf ("%d", base);
@@ -1048,13 +1055,13 @@ update_scale (ChamplainView *view)
   g_free (label);
   clutter_actor_get_size (text, &width, NULL);
 
-  label = g_strdup_printf ("%d km", base);
+  label = g_strdup_printf ("%d %s", base, (is_small_unit ? "m": "km"));
   clutter_text_set_text (CLUTTER_TEXT (text), label);
   g_free (label);
   clutter_actor_set_position (text, (scale_width - width / 2) + SCALE_INSIDE_PADDING, - SCALE_INSIDE_PADDING);
 
   text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-mid-label");
-  label = g_strdup_printf ("%d", base / 2);
+  label = g_strdup_printf ("%g", base / 2.0);
   clutter_text_set_text (CLUTTER_TEXT (text), label);
   clutter_actor_get_size (text, &width, NULL);
   clutter_actor_set_position (text, (scale_width - width) / 2 + SCALE_INSIDE_PADDING, - SCALE_INSIDE_PADDING);
