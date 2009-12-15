@@ -1691,6 +1691,7 @@ champlain_view_center_on (ChamplainView *view,
   view_load_visible_tiles (view);
   view_tiles_reposition (view);
   view_update_polygons (view);
+  update_scale (view);
   marker_reposition (view);
 }
 
@@ -2744,7 +2745,6 @@ view_set_zoom_level_at (ChamplainView *view,
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
       new_group);
   champlain_view_center_on (view, lat2, lon2);
-  update_scale (view);
 
   g_object_notify (G_OBJECT (view), "zoom-level");
   return TRUE;
