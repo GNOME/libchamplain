@@ -1002,11 +1002,13 @@ button_release_cb (ClutterActor *actor,
 static void
 update_scale (ChamplainView *view)
 {
-  ClutterActor *text;
+  ClutterActor *text, *line;
+  gfloat width, height;
   ChamplainViewPrivate *priv = view->priv;
   gfloat m_per_pixel;
-  gfloat width = SCALE_WIDTH;
+  gfloat scale_width = SCALE_WIDTH;
   gchar *label;
+  cairo_t *cr;
 
   if (! priv || !priv->map || !priv->map->current_level)
     return;
@@ -1022,46 +1024,58 @@ update_scale (ChamplainView *view)
     }
 
   m_per_pixel = champlain_map_source_get_meters_per_pixel (priv->map_source,
-      priv->zoom_level, priv->latitude, priv->longitude) * width;
+      priv->zoom_level, priv->latitude, priv->longitude) * scale_width;
   label = g_strdup_printf ("%.2f km", m_per_pixel / 1000);
 
   text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-label");
   clutter_text_set_text (CLUTTER_TEXT (text), label);
+  clutter_actor_get_size (text, &width, &height);
+  clutter_actor_set_position (text, (scale_width - width) / 2, -height / 2);
+
+  /* Draw the line */
+  line = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-line");
+  clutter_cairo_texture_clear (CLUTTER_CAIRO_TEXTURE (line));
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (line));
+
+  cairo_set_source_rgb (cr, 0, 0, 0);
+
+  /* First tick */
+  cairo_move_to (cr, 0, SCALE_HEIGHT / 4);
+  cairo_line_to (cr, 0, 3 * SCALE_HEIGHT / 4);
+  cairo_stroke (cr);
+
+  /* Line */
+  cairo_move_to (cr, 0, SCALE_HEIGHT / 2);
+  cairo_line_to (cr, scale_width, SCALE_HEIGHT / 2);
+  cairo_stroke (cr);
+
+  /* Last tick */
+  cairo_move_to (cr, scale_width, SCALE_HEIGHT / 4);
+  cairo_line_to (cr, scale_width, 3 * SCALE_HEIGHT / 4);
+  cairo_stroke (cr);
+
+  cairo_destroy (cr);
 }
 
 static void
 create_scale (ChamplainView *view)
 {
   ClutterActor *scale, *text;
-  cairo_t *cr;
-  gfloat width, height;
   ChamplainViewPrivate *priv = view->priv;
   priv->scale_actor = g_object_ref (clutter_group_new());
 
   scale = clutter_cairo_texture_new (SCALE_WIDTH, SCALE_HEIGHT);
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (scale));
-
-  cairo_set_source_rgb (cr, 0, 0, 0);
-  cairo_move_to (cr, 0, SCALE_HEIGHT / 2);
-  cairo_line_to (cr, 0, SCALE_HEIGHT);
-  cairo_line_to (cr, SCALE_WIDTH, SCALE_HEIGHT);
-  cairo_line_to (cr, SCALE_WIDTH, SCALE_HEIGHT / 2);
-
-  cairo_set_line_width (cr, SCALE_LINE_WIDTH);
-  cairo_stroke (cr);
-  cairo_destroy (cr);
+  clutter_actor_set_name (scale, "scale-line");
 
   text = clutter_text_new_with_text ("Sans 9", "X km");
   clutter_actor_set_name (text, "scale-label");
-  clutter_actor_get_size (text, &width, &height);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
-  clutter_actor_set_position (text, (SCALE_WIDTH - width) / 2, SCALE_HEIGHT - height - SCALE_LINE_WIDTH);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), scale);
   clutter_actor_set_position (priv->scale_actor, SCALE_PADDING,
     priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING);
 
-  clutter_actor_set_opacity (priv->scale_actor, 150);
+  clutter_actor_set_opacity (priv->scale_actor, 200);
 }
 
 static void
