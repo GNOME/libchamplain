@@ -230,6 +230,8 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
 #define SCALE_HEIGHT  20
 #define SCALE_WIDTH   100
 #define SCALE_PADDING 10
+#define SCALE_INSIDE_PADDING 10
+#define SCALE_LINE_WIDTH 2
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -1043,7 +1045,7 @@ update_scale (ChamplainView *view)
 
   /* Center the label */
   clutter_actor_get_size (text, &width, &height);
-  clutter_actor_set_position (text, (scale_width - width) / 2, -height / 2);
+  clutter_actor_set_position (text, (scale_width - width) / 2 + SCALE_INSIDE_PADDING, -height / 2);
 
   /* Draw the line */
   line = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-line");
@@ -1051,25 +1053,27 @@ update_scale (ChamplainView *view)
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (line));
 
   cairo_set_source_rgb (cr, 0, 0, 0);
+  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+  cairo_set_line_width (cr, SCALE_LINE_WIDTH);
 
   /* First tick */
-  cairo_move_to (cr, 0, SCALE_HEIGHT / 4);
-  cairo_line_to (cr, 0, 3 * SCALE_HEIGHT / 4);
+  cairo_move_to (cr, SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
+  cairo_line_to (cr, SCALE_INSIDE_PADDING, 3 * SCALE_HEIGHT / 4);
   cairo_stroke (cr);
 
   /* Line */
-  cairo_move_to (cr, 0, SCALE_HEIGHT / 2);
-  cairo_line_to (cr, scale_width, SCALE_HEIGHT / 2);
+  cairo_move_to (cr, SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
+  cairo_line_to (cr, scale_width + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
   cairo_stroke (cr);
 
   /* Middle tick */
-  cairo_move_to (cr, scale_width / 2, 3 * SCALE_HEIGHT / 8);
-  cairo_line_to (cr, scale_width / 2, 5 * SCALE_HEIGHT / 8);
+  cairo_move_to (cr, scale_width / 2 + SCALE_INSIDE_PADDING, 3 * SCALE_HEIGHT / 8);
+  cairo_line_to (cr, scale_width / 2 + SCALE_INSIDE_PADDING, 5 * SCALE_HEIGHT / 8);
   cairo_stroke (cr);
 
   /* Last tick */
-  cairo_move_to (cr, scale_width, SCALE_HEIGHT / 4);
-  cairo_line_to (cr, scale_width, 3 * SCALE_HEIGHT / 4);
+  cairo_move_to (cr, scale_width + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
+  cairo_line_to (cr, scale_width + SCALE_INSIDE_PADDING, 3 * SCALE_HEIGHT / 4);
   cairo_stroke (cr);
 
   cairo_destroy (cr);
@@ -1082,7 +1086,7 @@ create_scale (ChamplainView *view)
   ChamplainViewPrivate *priv = view->priv;
   priv->scale_actor = g_object_ref (clutter_group_new());
 
-  scale = clutter_cairo_texture_new (SCALE_WIDTH, SCALE_HEIGHT);
+  scale = clutter_cairo_texture_new (SCALE_WIDTH + 2 * SCALE_INSIDE_PADDING, SCALE_HEIGHT + 2 * SCALE_INSIDE_PADDING);
   clutter_actor_set_name (scale, "scale-line");
 
   text = clutter_text_new_with_text ("Sans 9", "X km");
@@ -1090,8 +1094,8 @@ create_scale (ChamplainView *view)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), scale);
-  clutter_actor_set_position (priv->scale_actor, SCALE_PADDING,
-    priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING);
+  clutter_actor_set_position (priv->scale_actor, SCALE_PADDING - SCALE_INSIDE_PADDING,
+    priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING - SCALE_INSIDE_PADDING);
 
   clutter_actor_set_opacity (priv->scale_actor, 200);
 }
