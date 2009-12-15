@@ -158,7 +158,7 @@ struct _ChamplainViewPrivate
   ClutterActor *license_actor; /* Contains the license info */
 
   ClutterActor *scale_actor;
-  gboolean display_scale;
+  gboolean show_scale;
 
   ChamplainState state; /* View's global state */
 
@@ -597,7 +597,7 @@ champlain_view_get_property (GObject *object,
         g_value_set_enum (value, priv->scroll_mode);
         break;
       case PROP_DISPLAY_SCALE:
-        g_value_set_boolean (value, priv->display_scale);
+        g_value_set_boolean (value, priv->show_scale);
         break;
       case PROP_DECEL_RATE:
         {
@@ -658,7 +658,7 @@ champlain_view_set_property (GObject *object,
       champlain_view_set_scroll_mode (view, g_value_get_enum (value));
       break;
     case PROP_DISPLAY_SCALE:
-      priv->display_scale = g_value_get_boolean (value);
+      champlain_view_set_show_scale (view, g_value_get_enum (value));
       break;
     case PROP_DECEL_RATE:
       champlain_view_set_decel_rate (view, g_value_get_double (value));
@@ -1000,9 +1000,7 @@ button_release_cb (ClutterActor *actor,
 }
 
 static void
-update_scale (gpointer *unused,
-    GParamSpec *arg1,
-    ChamplainView *view)
+update_scale (ChamplainView *view)
 {
   ClutterActor *text;
   ChamplainViewPrivate *priv = view->priv;
@@ -1021,13 +1019,14 @@ update_scale (gpointer *unused,
   if (! priv || !priv->map || !priv->map->current_level)
     return;
 
-  if (priv->display_scale)
+  if (priv->show_scale)
     {
       clutter_actor_show(priv->scale_actor);
     }
   else
     {
       clutter_actor_hide(priv->scale_actor);
+      return;
     }
 
   level = priv->map->current_level;
@@ -1049,19 +1048,6 @@ create_scale (ChamplainView *view)
   gfloat width, height;
   ChamplainViewPrivate *priv = view->priv;
   priv->scale_actor = g_object_ref (clutter_group_new());
-
-  g_signal_connect (view,
-      "notify::zoom-level",
-      G_CALLBACK (update_scale),
-      view);
-  g_signal_connect (priv->viewport,
-      "notify::y-origin",
-      G_CALLBACK (update_scale),
-      view);
-  g_signal_connect (view,
-      "notify::display-scale",
-      G_CALLBACK (update_scale),
-      view);
 
   scale = clutter_cairo_texture_new (SCALE_WIDTH, SCALE_HEIGHT);
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (scale));
@@ -1122,7 +1108,7 @@ champlain_view_init (ChamplainView *view)
   priv->goto_context = NULL;
   priv->map = NULL;
   priv->polygon_redraw_id = 0;
-  priv->display_scale = TRUE;
+  priv->show_scale = TRUE;
 
   /* Setup viewport */
   priv->viewport = g_object_ref (tidy_viewport_new ());
@@ -1235,6 +1221,7 @@ viewport_pos_changed_cb (GObject *gobject,
   view_tiles_reposition (view);
   marker_reposition (view);
   view_update_polygons (view);
+  update_scale (view);
 
   priv->longitude = viewport_get_current_longitude (priv);
   priv->latitude = viewport_get_current_latitude (priv);
@@ -2333,6 +2320,27 @@ champlain_view_set_show_license (ChamplainView *view,
 }
 
 /**
+* champlain_view_set_show_scale:
+* @view: a #ChamplainView
+* @value: a #gboolean
+*
+* Show the scale on the map view.
+*
+* Since: 0.4.3
+*/
+void
+champlain_view_set_show_scale (ChamplainView *view,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->show_scale = value;
+  update_scale (view);
+}
+
+/**
 * champlain_view_set_zoom_on_double_click:
 * @view: a #ChamplainView
 * @value: a #gboolean
@@ -2551,6 +2559,7 @@ view_set_zoom_level_at (ChamplainView *view,
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer),
       new_group);
   champlain_view_center_on (view, lat2, lon2);
+  update_scale (view);
 
   g_object_notify (G_OBJECT (view), "zoom-level");
   return TRUE;
@@ -2697,6 +2706,23 @@ champlain_view_get_show_license (ChamplainView *view)
 
   ChamplainViewPrivate *priv = view->priv;
   return priv->show_license;
+}
+
+/**
+ * champlain_view_get_show_scale:
+ * @view: The view
+ *
+ * Returns: TRUE if the view displays the scale, FALSE otherwise.
+ *
+ * Since: 0.4.3
+ */
+gboolean
+champlain_view_get_show_scale (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->show_scale;
 }
 
 /**
