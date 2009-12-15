@@ -1018,24 +1018,24 @@ update_scale (gpointer *unused,
 
   */
 
-  if (! priv || !priv->map || !priv->map->current_level) {
+  if (! priv || !priv->map || !priv->map->current_level)
     return;
-  }
-  if (priv->display_scale) {
-    clutter_actor_show(priv->scale_actor);
-  } else {
-    clutter_actor_hide(priv->scale_actor);
-  }
+
+  if (priv->display_scale)
+    {
+      clutter_actor_show(priv->scale_actor);
+    }
+  else
+    {
+      clutter_actor_hide(priv->scale_actor);
+    }
 
   level = priv->map->current_level;
   tile = champlain_zoom_level_get_nth_tile(level, 0);
   m_per_pixel = 2 * M_PI * 6378100 * sin(M_PI/2 - M_PI / 180*priv->latitude) /
     (champlain_tile_get_size (tile) * champlain_zoom_level_get_width (level));
-  printf("FOO: %.2f\n", m_per_pixel);
-  printf("FOO: %d\n", champlain_zoom_level_get_height (level));
 
   label = g_strdup_printf("%.2f km", (m_per_pixel * SCALE_WIDTH) / 1000);
-  printf("FOO2: %s\n", label);
 
   text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-label");
   clutter_text_set_text (CLUTTER_TEXT (text), label);
@@ -1050,12 +1050,18 @@ create_scale (ChamplainView *view)
   ChamplainViewPrivate *priv = view->priv;
   priv->scale_actor = g_object_ref (clutter_group_new());
 
-  g_signal_connect (view, "notify::zoom-level", G_CALLBACK (update_scale),
-		    view);
-  g_signal_connect (priv->viewport, "notify::y-origin",
-		    G_CALLBACK (update_scale), view);
-  g_signal_connect (view, "notify::display-scale",
-		    G_CALLBACK (update_scale), view);
+  g_signal_connect (view,
+      "notify::zoom-level",
+      G_CALLBACK (update_scale),
+      view);
+  g_signal_connect (priv->viewport,
+      "notify::y-origin",
+      G_CALLBACK (update_scale),
+      view);
+  g_signal_connect (view,
+      "notify::display-scale",
+      G_CALLBACK (update_scale),
+      view);
 
   scale = clutter_cairo_texture_new (SCALE_WIDTH, SCALE_HEIGHT);
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (scale));
