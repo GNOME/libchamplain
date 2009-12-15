@@ -971,7 +971,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            "Show the map scale",
            "Show the map scale "
            "on the screen",
-           TRUE,
+           FALSE,
            G_PARAM_READWRITE));
 
   /**
@@ -1249,7 +1249,7 @@ champlain_view_init (ChamplainView *view)
   priv->goto_context = NULL;
   priv->map = NULL;
   priv->polygon_redraw_id = 0;
-  priv->show_scale = TRUE;
+  priv->show_scale = FALSE;
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
   priv->max_scale_width = 100;
 
