@@ -114,6 +114,11 @@ void champlain_map_source_set_projection (ChamplainMapSource *map_source,
     ChamplainMapProjection projection);
 ChamplainMapProjection champlain_map_source_get_projection (ChamplainMapSource *map_source);
 
+gfloat champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source,
+    gint zoom_level,
+    gdouble latitude,
+    gdouble longitude);
+
 G_END_DECLS
 
 #endif

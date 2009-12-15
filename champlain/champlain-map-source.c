@@ -730,3 +730,35 @@ champlain_map_source_set_id (ChamplainMapSource *map_source,
   g_object_notify (G_OBJECT (map_source), "id");
 }
 
+#define EARTH_RADIUS 6378137 /* meters, Equatorial radius */
+
+/**
+ * champlain_map_source_get_meters_per_pixel:
+ * @map_source: a #ChamplainMapSource
+ * @zoom_level: the zoom level
+ * @latitude: a latitude
+ * @longitude: a longitude
+ *
+ * Returns: the meters per pixel at the position on the map using this map source's projection.
+ *
+ * Since: 0.4.3
+ */
+gfloat
+champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source,
+    gint zoom_level,
+    gdouble latitude,
+    gdouble longitude)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
+  /* Width is in pixels. (1 px)
+     m/px = radius_at_latitude / width_in_pixels
+     k = radius of earth = 6 378.1 km
+     radius_at_latitude = 2π * k * sin (π/2-θ)
+  */
+
+  ChamplainMapSourcePrivate *priv = map_source->priv;
+  // FIXME: support other projections
+  return 2 * M_PI * EARTH_RADIUS * sin (M_PI/2 - M_PI / 180 * latitude) /
+    (priv->tile_size * champlain_map_source_get_row_count (map_source, zoom_level));
+}

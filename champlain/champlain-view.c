@@ -1004,37 +1004,26 @@ update_scale (ChamplainView *view)
 {
   ClutterActor *text;
   ChamplainViewPrivate *priv = view->priv;
-  ChamplainZoomLevel *level;
   gfloat m_per_pixel;
+  gfloat width = SCALE_WIDTH;
   gchar *label;
-  ChamplainTile *tile;
-
-  /* Width is in pixels.
-     m/px = radius_at_latitude / width_in_pixels
-     k = radius of earth = 6 378.1 km
-     radius_at_latitude = 2π * k * sin (π/2-θ)
-
-  */
 
   if (! priv || !priv->map || !priv->map->current_level)
     return;
 
   if (priv->show_scale)
     {
-      clutter_actor_show(priv->scale_actor);
+      clutter_actor_show (priv->scale_actor);
     }
   else
     {
-      clutter_actor_hide(priv->scale_actor);
+      clutter_actor_hide (priv->scale_actor);
       return;
     }
 
-  level = priv->map->current_level;
-  tile = champlain_zoom_level_get_nth_tile(level, 0);
-  m_per_pixel = 2 * M_PI * 6378100 * sin(M_PI/2 - M_PI / 180*priv->latitude) /
-    (champlain_tile_get_size (tile) * champlain_zoom_level_get_width (level));
-
-  label = g_strdup_printf("%.2f km", (m_per_pixel * SCALE_WIDTH) / 1000);
+  m_per_pixel = champlain_map_source_get_meters_per_pixel (priv->map_source,
+      priv->zoom_level, priv->latitude, priv->longitude) * width;
+  label = g_strdup_printf ("%.2f km", m_per_pixel / 1000);
 
   text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-label");
   clutter_text_set_text (CLUTTER_TEXT (text), label);
