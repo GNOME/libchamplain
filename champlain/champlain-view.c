@@ -230,7 +230,6 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
 #define SCALE_HEIGHT  20
 #define SCALE_WIDTH   100
 #define SCALE_PADDING 10
-#define SCALE_LINE_WIDTH 4.0
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -1009,6 +1008,8 @@ update_scale (ChamplainView *view)
   gfloat scale_width = SCALE_WIDTH;
   gchar *label;
   cairo_t *cr;
+  gint base;
+  gfloat factor;
 
   if (! priv || !priv->map || !priv->map->current_level)
     return;
@@ -1024,11 +1025,23 @@ update_scale (ChamplainView *view)
     }
 
   m_per_pixel = champlain_map_source_get_meters_per_pixel (priv->map_source,
-      priv->zoom_level, priv->latitude, priv->longitude) * scale_width;
-  label = g_strdup_printf ("%.2f km", m_per_pixel / 1000);
+      priv->zoom_level, priv->latitude, priv->longitude);
 
+  /* Keep the closest power of 10 */
+  base = floor (log (m_per_pixel * scale_width) / log (10));
+  base = pow (10, base);
+
+  /* How many times can it be fitted in our max scale width */
+  scale_width /= m_per_pixel * scale_width / base;
+  factor = floor (SCALE_WIDTH / scale_width);
+  base *= factor;
+  scale_width *= factor;
+
+  label = g_strdup_printf ("%d km", base / 1000);
   text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-label");
   clutter_text_set_text (CLUTTER_TEXT (text), label);
+
+  /* Center the label */
   clutter_actor_get_size (text, &width, &height);
   clutter_actor_set_position (text, (scale_width - width) / 2, -height / 2);
 
@@ -1047,6 +1060,11 @@ update_scale (ChamplainView *view)
   /* Line */
   cairo_move_to (cr, 0, SCALE_HEIGHT / 2);
   cairo_line_to (cr, scale_width, SCALE_HEIGHT / 2);
+  cairo_stroke (cr);
+
+  /* Middle tick */
+  cairo_move_to (cr, scale_width / 2, 3 * SCALE_HEIGHT / 8);
+  cairo_line_to (cr, scale_width / 2, 5 * SCALE_HEIGHT / 8);
   cairo_stroke (cr);
 
   /* Last tick */
