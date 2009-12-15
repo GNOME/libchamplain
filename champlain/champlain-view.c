@@ -1004,7 +1004,7 @@ static void
 update_scale (ChamplainView *view)
 {
   ClutterActor *text, *line;
-  gfloat width, height;
+  gfloat width;
   ChamplainViewPrivate *priv = view->priv;
   gfloat m_per_pixel;
   gfloat scale_width = SCALE_WIDTH;
@@ -1039,13 +1039,26 @@ update_scale (ChamplainView *view)
   base *= factor;
   scale_width *= factor;
 
-  label = g_strdup_printf ("%d km", base / 1000);
-  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-label");
-  clutter_text_set_text (CLUTTER_TEXT (text), label);
+  base /= 1000;
 
-  /* Center the label */
-  clutter_actor_get_size (text, &width, &height);
-  clutter_actor_set_position (text, (scale_width - width) / 2 + SCALE_INSIDE_PADDING, -height / 2);
+  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-far-label");
+  label = g_strdup_printf ("%d", base);
+  /* Get only digits width */
+  clutter_text_set_text (CLUTTER_TEXT (text), label);
+  g_free (label);
+  clutter_actor_get_size (text, &width, NULL);
+
+  label = g_strdup_printf ("%d km", base);
+  clutter_text_set_text (CLUTTER_TEXT (text), label);
+  g_free (label);
+  clutter_actor_set_position (text, (scale_width - width / 2) + SCALE_INSIDE_PADDING, - SCALE_INSIDE_PADDING);
+
+  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-mid-label");
+  label = g_strdup_printf ("%d", base / 2);
+  clutter_text_set_text (CLUTTER_TEXT (text), label);
+  clutter_actor_get_size (text, &width, NULL);
+  clutter_actor_set_position (text, (scale_width - width) / 2 + SCALE_INSIDE_PADDING, - SCALE_INSIDE_PADDING);
+  g_free (label);
 
   /* Draw the line */
   line = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-line");
@@ -1083,6 +1096,7 @@ static void
 create_scale (ChamplainView *view)
 {
   ClutterActor *scale, *text;
+  gfloat width;
   ChamplainViewPrivate *priv = view->priv;
   priv->scale_actor = g_object_ref (clutter_group_new());
 
@@ -1090,8 +1104,17 @@ create_scale (ChamplainView *view)
   clutter_actor_set_name (scale, "scale-line");
 
   text = clutter_text_new_with_text ("Sans 9", "X km");
-  clutter_actor_set_name (text, "scale-label");
+  clutter_actor_set_name (text, "scale-far-label");
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
+
+  text = clutter_text_new_with_text ("Sans 9", "X km");
+  clutter_actor_set_name (text, "scale-mid-label");
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
+
+  text = clutter_text_new_with_text ("Sans 9", "0");
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
+  clutter_actor_get_size (text, &width, NULL);
+  clutter_actor_set_position (text, SCALE_INSIDE_PADDING - width / 2, - SCALE_INSIDE_PADDING);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), scale);
   clutter_actor_set_position (priv->scale_actor, SCALE_PADDING - SCALE_INSIDE_PADDING,
