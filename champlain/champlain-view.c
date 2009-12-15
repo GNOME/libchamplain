@@ -95,7 +95,8 @@ enum
   PROP_SHOW_LICENSE,
   PROP_ZOOM_ON_DOUBLE_CLICK,
   PROP_STATE,
-  PROP_DISPLAY_SCALE,
+  PROP_SHOW_SCALE,
+  PROP_SCALE_UNIT,
 };
 
 #define PADDING 10
@@ -598,8 +599,11 @@ champlain_view_get_property (GObject *object,
       case PROP_SCROLL_MODE:
         g_value_set_enum (value, priv->scroll_mode);
         break;
-      case PROP_DISPLAY_SCALE:
+      case PROP_SHOW_SCALE:
         g_value_set_boolean (value, priv->show_scale);
+        break;
+      case PROP_SCALE_UNIT:
+        g_value_set_enum (value, priv->scale_unit);
         break;
       case PROP_DECEL_RATE:
         {
@@ -659,8 +663,11 @@ champlain_view_set_property (GObject *object,
     case PROP_SCROLL_MODE:
       champlain_view_set_scroll_mode (view, g_value_get_enum (value));
       break;
-    case PROP_DISPLAY_SCALE:
-      champlain_view_set_show_scale (view, g_value_get_enum (value));
+    case PROP_SHOW_SCALE:
+      champlain_view_set_show_scale (view, g_value_get_boolean (value));
+      break;
+    case PROP_SCALE_UNIT:
+      champlain_view_set_scale_unit (view, g_value_get_enum (value));
       break;
     case PROP_DECEL_RATE:
       champlain_view_set_decel_rate (view, g_value_get_double (value));
@@ -949,15 +956,31 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   *
   * Display the map scale.
   *
-  * Since: 0.6
+  * Since: 0.4.3
   */
   g_object_class_install_property (object_class,
-       PROP_DISPLAY_SCALE,
-       g_param_spec_boolean ("display-scale",
-           "Display the map scale",
-           "Display the map scale "
+       PROP_SHOW_SCALE,
+       g_param_spec_boolean ("show-scale",
+           "Show the map scale",
+           "Show the map scale "
            "on the screen",
            TRUE,
+           G_PARAM_READWRITE));
+
+  /**
+  * ChamplainView:scale-unit:
+  *
+  * The scale's units.
+  *
+  * Since: 0.4.3
+  */
+  g_object_class_install_property (object_class,
+       PROP_SCALE_UNIT,
+       g_param_spec_enum ("scale-unit",
+           "The scale's unit",
+           "The map scale's unit",
+           CHAMPLAIN_TYPE_UNIT,
+           CHAMPLAIN_UNIT_KM,
            G_PARAM_READWRITE));
 
   /**
