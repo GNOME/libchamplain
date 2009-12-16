@@ -445,7 +445,10 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
 static gboolean
 redraw_polygon_on_idle (PolygonRedrawContext *ctx)
 {
-  draw_polygon (ctx->view, ctx->polygon);
+
+  if (ctx->polygon)
+    draw_polygon (ctx->view, ctx->polygon);
+
   ctx->view->priv->polygon_redraw_id = 0;
   // ctx is freed by g_idle_add_full
   return FALSE;
@@ -464,6 +467,7 @@ notify_polygon_cb (ChamplainPolygon *polygon,
   ctx = g_new0 (PolygonRedrawContext, 1);
   ctx->view = view;
   ctx->polygon = polygon;
+  g_object_add_weak_pointer (polygon, &ctx->polygon);
 
   view->priv->polygon_redraw_id = g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
       (GSourceFunc) redraw_polygon_on_idle, ctx, g_free);
