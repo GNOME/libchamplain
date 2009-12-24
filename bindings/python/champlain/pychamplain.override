@@ -482,3 +482,39 @@ _wrap_champlain_selection_layer_get_selected_markers(PyGObject *self) {
     return ret;
 }
 %%
+override champlain_marker_new_with_text kwargs
+static PyObject *
+_wrap_champlain_marker_new_with_text(PyObject *self, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = { "text", "font", "text_color", "marker_color", NULL };
+    char *text, *font = NULL;
+    ClutterColor *text_color = NULL, *marker_color = NULL;
+    ClutterActor *ret;
+    PyObject *py_text_color = NULL, *py_marker_color = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs,"s|sOO:marker_new_with_text", 
+            kwlist, &text, &font, &py_text_color, &py_marker_color))
+        return NULL;
+    if (py_text_color!=NULL){
+        if (pyg_boxed_check(py_text_color, CLUTTER_TYPE_COLOR))
+            text_color = pyg_boxed_get(py_text_color, ClutterColor);
+        else {
+            PyErr_SetString(PyExc_TypeError, "text_color should be a ClutterColor");
+            return NULL;
+        }
+    }
+    if (py_marker_color!=NULL){
+        if (pyg_boxed_check(py_marker_color, CLUTTER_TYPE_COLOR))
+            marker_color = pyg_boxed_get(py_marker_color, ClutterColor);
+        else {
+            PyErr_SetString(PyExc_TypeError, "marker_color should be a ClutterColor");
+            return NULL;
+        }
+    }
+    
+    ret = champlain_marker_new_with_text(text, font, text_color, marker_color);
+    
+    /* pygobject_new handles NULL checking */
+    return pygobject_new((GObject *)ret);
+}
+%%
