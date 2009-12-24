@@ -12,6 +12,7 @@ python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	champlain-polygon.h			\
 	champlain-point.h			\
 	champlain-layer.h			\
+	champlain-selection-layer.h		\
 	champlain-map-source.h			\
 	champlain-map-source-desc.h		\
 	champlain-map-source-factory.h		\

@@ -455,3 +455,30 @@ _wrap_champlain_point__set_lon(PyGBoxed *self, PyObject *value,
     return 0;
 }
 %%
+override champlain_selection_layer_get_selected_markers kwargs
+static PyObject *
+_wrap_champlain_selection_layer_get_selected_markers(PyGObject *self) {
+    const GList *iter, *list;
+    PyObject *ret;
+
+    list = champlain_selection_layer_get_selected_markers(
+        CHAMPLAIN_SELECTION_LAYER(self->obj));
+       
+    if ((ret = PyList_New(0)) == NULL)
+        return NULL;
+
+    for(iter = list; iter != NULL; iter = iter->next) {
+        ChamplainMarker *marker = (ChamplainMarker *) iter->data;
+        PyObject *py_marker = NULL;
+
+        py_marker = pygobject_new((GObject *) marker);
+        if (!py_marker){
+            Py_DECREF(ret);
+            return NULL;
+        }
+        PyList_Append(ret, py_marker);
+        Py_DECREF(py_marker);
+    }
+    return ret;
+}
+%%
