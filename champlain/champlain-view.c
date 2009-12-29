@@ -467,7 +467,7 @@ notify_polygon_cb (ChamplainPolygon *polygon,
   ctx = g_new0 (PolygonRedrawContext, 1);
   ctx->view = view;
   ctx->polygon = polygon;
-  g_object_add_weak_pointer (polygon, &ctx->polygon);
+  g_object_add_weak_pointer (G_OBJECT (polygon), (gpointer *) &ctx->polygon);
 
   view->priv->polygon_redraw_id = g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
       (GSourceFunc) redraw_polygon_on_idle, ctx, g_free);
