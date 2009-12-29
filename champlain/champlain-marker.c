@@ -113,7 +113,6 @@ G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CHAMPLAIN_TYPE_BASE_MARKER);
 #define CHAMPLAIN_MARKER_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
 
 static void draw_marker (ChamplainMarker *marker);
-static void queue_redraw (ChamplainMarker *marker);
 
 /**
  * champlain_marker_set_hightlight_color:
@@ -719,8 +718,18 @@ redraw_on_idle (gpointer gobject)
   return FALSE;
 }
 
-static void
-queue_redraw (ChamplainMarker *marker)
+/** champlain_marker_queue_redraw:
+ * @marker: a #ChamplainMarker
+ *
+ * Queue a redraw of the marker as soon as possible. This function should not
+ * be used unless you are subclassing ChamplainMarker and adding new properties
+ * that affect the aspect of the marker.  When they change, call this function
+ * to update the marker.
+ *
+ * Since: 0.4.3
+ */
+void
+champlain_marker_queue_redraw (ChamplainMarker *marker)
 {
   if (!marker->priv->redraw_id)
     marker->priv->redraw_id = g_idle_add (redraw_on_idle, marker);
@@ -731,7 +740,7 @@ notify_highlighted (GObject *gobject,
     GParamSpec *pspec,
     gpointer user_data)
 {
-  queue_redraw (CHAMPLAIN_MARKER (gobject));
+  champlain_marker_queue_redraw (CHAMPLAIN_MARKER (gobject));
 }
 
 static void
@@ -899,7 +908,7 @@ champlain_marker_set_text (ChamplainMarker *marker,
     g_free (priv->text);
 
   priv->text = g_strdup (text);
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -931,7 +940,7 @@ champlain_marker_set_image (ChamplainMarker *marker,
     priv->image = image;
 
   g_object_notify (G_OBJECT (marker), "image");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -953,7 +962,7 @@ champlain_marker_set_use_markup (ChamplainMarker *marker,
 
   priv->use_markup = markup;
   g_object_notify (G_OBJECT (marker), "use-markup");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -975,7 +984,7 @@ champlain_marker_set_alignment (ChamplainMarker *marker,
 
   priv->alignment = alignment;
   g_object_notify (G_OBJECT (marker), "alignment");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -1004,7 +1013,7 @@ champlain_marker_set_color (ChamplainMarker *marker,
 
   priv->color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (marker), "color");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -1033,7 +1042,7 @@ champlain_marker_set_text_color (ChamplainMarker *marker,
 
   priv->text_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (marker), "text-color");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -1062,7 +1071,7 @@ champlain_marker_set_font_name (ChamplainMarker *marker,
 
   priv->font_name = g_strdup (font_name);
   g_object_notify (G_OBJECT (marker), "font-name");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -1084,7 +1093,7 @@ champlain_marker_set_wrap (ChamplainMarker *marker,
 
   priv->wrap = wrap;
   g_object_notify (G_OBJECT (marker), "wrap");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -1106,7 +1115,7 @@ champlain_marker_set_wrap_mode (ChamplainMarker *marker,
 
   priv->wrap_mode = wrap_mode;
   g_object_notify (G_OBJECT (marker), "wrap");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -1135,7 +1144,7 @@ champlain_marker_set_attributes (ChamplainMarker *marker,
   priv->attributes = attributes;
 
   g_object_notify (G_OBJECT (marker), "attributes");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -1157,7 +1166,7 @@ champlain_marker_set_ellipsize (ChamplainMarker *marker,
 
   priv->ellipsize = ellipsize;
   g_object_notify (G_OBJECT (marker), "ellipsize");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 /**
  * champlain_marker_set_single_line_mode:
@@ -1179,7 +1188,7 @@ champlain_marker_set_single_line_mode (ChamplainMarker *marker,
   priv->single_line_mode = mode;
 
   g_object_notify (G_OBJECT (marker), "single-line-mode");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
@@ -1201,7 +1210,7 @@ champlain_marker_set_draw_background (ChamplainMarker *marker,
 
   priv->draw_background = background;
   g_object_notify (G_OBJECT (marker), "draw-background");
-  queue_redraw (marker);
+  champlain_marker_queue_redraw (marker);
 }
 
 /**
