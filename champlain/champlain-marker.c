@@ -620,10 +620,10 @@ draw_marker (ChamplainMarker *marker)
     {
       ClutterText *label;
       if (priv->text_actor == NULL)
-      {
-        priv->text_actor = clutter_text_new_with_text (priv->font_name, priv->text);
-        g_object_ref (priv->text_actor);
-      }
+        {
+          priv->text_actor = clutter_text_new_with_text (priv->font_name, priv->text);
+          g_object_ref (priv->text_actor);
+        }
 
       label = CLUTTER_TEXT (priv->text_actor);
       clutter_text_set_font_name (label, priv->font_name);
