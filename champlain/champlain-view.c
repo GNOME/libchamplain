@@ -1413,18 +1413,14 @@ update_license (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
 
-  if (priv->license_actor)
-  {
-    g_object_unref (priv->license_actor);
-    clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage),
-        priv->license_actor);
-    priv->license_actor = NULL;
-  }
-
-  if (priv->show_license)
+  if (!priv->license_actor)
     {
       priv->license_actor = g_object_ref (clutter_text_new_with_text ("sans 8",
           champlain_map_source_get_license (priv->map_source)));
+    }
+
+  if (priv->show_license)
+    {
       clutter_actor_set_opacity (priv->license_actor, 128);
       clutter_actor_show (priv->license_actor);
 
