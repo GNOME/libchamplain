@@ -93,6 +93,7 @@ enum
   PROP_SCROLL_MODE,
   PROP_KEEP_CENTER_ON_RESIZE,
   PROP_SHOW_LICENSE,
+  PROP_LICENSE_EXTRA,
   PROP_ZOOM_ON_DOUBLE_CLICK,
   PROP_STATE,
   PROP_SHOW_SCALE,
@@ -158,6 +159,7 @@ struct _ChamplainViewPrivate
 
   gboolean show_license;
   ClutterActor *license_actor; /* Contains the license info */
+  gchar *license_text; /* Extra license text */
 
   ClutterActor *scale_actor;
   gboolean show_scale;
@@ -622,6 +624,9 @@ champlain_view_get_property (GObject *object,
       case PROP_SHOW_LICENSE:
         g_value_set_boolean (value, priv->show_license);
         break;
+      case PROP_LICENSE_EXTRA:
+        g_value_set_string (value, priv->license_text);
+        break;
       case PROP_ZOOM_ON_DOUBLE_CLICK:
         g_value_set_boolean (value, priv->zoom_on_double_click);
         break;
@@ -684,6 +689,9 @@ champlain_view_set_property (GObject *object,
       break;
     case PROP_SHOW_LICENSE:
       champlain_view_set_show_license (view, g_value_get_boolean (value));
+      break;
+    case PROP_LICENSE_EXTRA:
+      champlain_view_set_license_text (view, g_value_get_string (value));
       break;
     case PROP_ZOOM_ON_DOUBLE_CLICK:
       champlain_view_set_zoom_on_double_click (view, g_value_get_boolean (value));
@@ -926,6 +934,23 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            "Show the map data license",
            "Show the map data license on the map view",
            TRUE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+  * ChamplainView:license-text:
+  *
+  * Sets additional text to be displayed in the license area.  The map's
+  * license will be added below it. Your text can have multiple line, just use
+  * "\n" in between.
+  *
+  * Since: 0.4.3
+  */
+  g_object_class_install_property (object_class,
+       PROP_LICENSE_EXTRA,
+       g_param_spec_string ("license-text",
+           "Additional license",
+           "Additional license text",
+           "",
+           CHAMPLAIN_PARAM_READWRITE));
 
   /**
   * ChamplainView:zoom-on-double-click:
@@ -1234,6 +1259,7 @@ champlain_view_init (ChamplainView *view)
   priv->zoom_on_double_click = TRUE;
   priv->show_license = TRUE;
   priv->license_actor = NULL;
+  priv->license_text = NULL;
   priv->stage = g_object_ref (clutter_group_new ());
   priv->scroll_mode = CHAMPLAIN_SCROLL_MODE_PUSH;
   priv->viewport_size.x = 0;
@@ -1412,23 +1438,37 @@ static void
 update_license (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
+  gchar *license;
 
   if (!priv->license_actor)
     {
-      priv->license_actor = g_object_ref (clutter_text_new_with_text ("sans 8",
-          champlain_map_source_get_license (priv->map_source)));
-    }
-
-  if (priv->show_license)
-    {
+      priv->license_actor = g_object_ref (clutter_text_new ());
+      clutter_text_set_font_name (CLUTTER_TEXT (priv->license_actor), "sans 8");
       clutter_actor_set_opacity (priv->license_actor, 128);
-      clutter_actor_show (priv->license_actor);
-
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage),
           priv->license_actor);
       clutter_actor_raise_top (priv->license_actor);
+    }
+
+  if (priv->license_text)
+    license = g_strjoin ("\n",
+        priv->license_text,
+        champlain_map_source_get_license (priv->map_source),
+        NULL);
+  else
+    license = g_strdup (champlain_map_source_get_license (priv->map_source));
+
+  clutter_text_set_text (CLUTTER_TEXT (priv->license_actor), license);
+
+  if (priv->show_license)
+    {
+      clutter_actor_show (priv->license_actor);
       license_set_position (view);
     }
+  else
+    clutter_actor_hide (priv->license_actor);
+
+  g_free (license);
 }
 
 static gboolean
@@ -2436,6 +2476,28 @@ champlain_view_set_keep_center_on_resize (ChamplainView *view,
 }
 
 /**
+* champlain_view_set_license_text:
+* @view: a #ChamplainView
+* @text: a license
+*
+* Show the additional license text on the map view.  The text will preceed the
+* map's licence when displayed. Use "\n" to separate the lines.
+*
+* Since: 0.4.3
+*/
+void
+champlain_view_set_license_text (ChamplainView *view,
+    const gchar *text)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->license_text = g_strdup (text);
+  update_license (view);
+}
+
+/**
 * champlain_view_set_show_license:
 * @view: a #ChamplainView
 * @value: a #gboolean
@@ -2888,6 +2950,24 @@ champlain_view_get_show_license (ChamplainView *view)
   ChamplainViewPrivate *priv = view->priv;
   return priv->show_license;
 }
+
+/**
+ * champlain_view_get_license_text:
+ * @view: The view
+ *
+ * Returns: the additional license text
+ *
+ * Since: 0.4.3
+ */
+const gchar *
+champlain_view_get_license_text (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->license_text;
+}
+
 
 /**
  * champlain_view_get_show_scale:
