@@ -93,6 +93,9 @@ void champlain_polygon_set_stroke (ChamplainPolygon *polygon,
 void champlain_polygon_set_stroke_width (ChamplainPolygon *polygon,
     gdouble value);
 gdouble champlain_polygon_get_stroke_width (ChamplainPolygon *polygon);
+void champlain_polygon_set_mark_points (ChamplainPolygon *polygon,
+    gboolean value);
+gboolean champlain_polygon_get_mark_points (ChamplainPolygon *polygon);
 
 void champlain_polygon_show (ChamplainPolygon *polygon);
 void champlain_polygon_hide (ChamplainPolygon *polygon);

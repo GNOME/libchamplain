@@ -427,6 +427,10 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
       y -= priv->viewport_size.y + priv->anchor.y;
 
       cairo_line_to (cr, x, y);
+
+      if (polygon->priv->mark_points)
+        cairo_arc (cr, x, y, polygon->priv->stroke_width, 0, 2 * M_PI);
+
       list = list->next;
     }
 

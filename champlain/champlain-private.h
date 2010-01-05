@@ -48,6 +48,7 @@ struct _ChamplainPolygonPrivate {
   gdouble stroke_width;
   ClutterActor *actor;
   gboolean visible;
+  gboolean mark_points;
 };
 
 typedef struct
