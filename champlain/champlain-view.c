@@ -3152,21 +3152,3 @@ champlain_view_remove_polygon (ChamplainView *view,
 
   g_object_unref (polygon);
 }
-
-void
-champlain_view_show_scale (ChamplainView* view)
-{
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  g_object_set (G_OBJECT (view), "display-scale", TRUE, NULL);
-}
-
-void
-champlain_view_hide_scale (ChamplainView* view)
-{
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  g_object_set (G_OBJECT (view), "display-scale", FALSE, NULL);
-
-}
-
