@@ -268,7 +268,7 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
   *
   * Wether the polygons points should be marked for extra visibility.
   *
-  * Since: 0.X
+  * Since: 0.4.3
   */
   g_object_class_install_property (object_class,
       PROP_MARK_POINTS,
@@ -637,7 +637,7 @@ champlain_polygon_get_stroke_width (ChamplainPolygon *polygon)
  * Sets the property determining if the points in the polygon
  * should get marked for extra visibility when drawing the polygon.
  *
- * Since: 0.X
+ * Since: 0.4.3
  */
 void
 champlain_polygon_set_mark_points (ChamplainPolygon *polygon,

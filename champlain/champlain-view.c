@@ -428,9 +428,6 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
 
       cairo_line_to (cr, x, y);
 
-      if (polygon->priv->mark_points)
-        cairo_arc (cr, x, y, polygon->priv->stroke_width, 0, 2 * M_PI);
-
       list = list->next;
     }
 
@@ -456,6 +453,30 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
 
   if (polygon->priv->stroke)
     cairo_stroke (cr);
+
+  if (polygon->priv->mark_points)
+    {
+      /* Draw points */
+      GList *list = g_list_first (polygon->priv->points);
+      while (list != NULL)
+        {
+          ChamplainPoint *point = (ChamplainPoint*) list->data;
+          gfloat x, y;
+
+          x = champlain_map_source_get_x (priv->map_source, priv->zoom_level,
+              point->lon);
+          y = champlain_map_source_get_y (priv->map_source, priv->zoom_level,
+              point->lat);
+
+          x -= priv->viewport_size.x + priv->anchor.x;
+          y -= priv->viewport_size.y + priv->anchor.y;
+
+          cairo_arc (cr, x, y, polygon->priv->stroke_width * 1.5, 0, 2 * M_PI);
+          cairo_fill (cr);
+
+          list = list->next;
+        }
+    }
 
   cairo_destroy (cr);
 }

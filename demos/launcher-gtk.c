@@ -233,6 +233,9 @@ main (int argc,
   champlain_polygon_append_point (polygon, 45.4000, -73.1815);
   champlain_polygon_append_point (polygon, 45.4151, -73.1218);
   champlain_polygon_set_stroke_width (polygon, 5.0);
+  g_object_set (G_OBJECT (polygon),
+      "mark-points", TRUE,
+      NULL);
   champlain_view_add_polygon (CHAMPLAIN_VIEW (view), polygon);
   champlain_polygon_hide (polygon);
 
