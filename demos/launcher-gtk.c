@@ -211,8 +211,12 @@ main (int argc,
   widget = gtk_champlain_embed_new ();
   view = gtk_champlain_embed_get_view (GTK_CHAMPLAIN_EMBED (widget));
 
-  g_object_set (G_OBJECT (view), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
-      "zoom-level", 5, "show-scale", TRUE, NULL);
+  g_object_set (G_OBJECT (view),
+      "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
+      "zoom-level", 5,
+      "license-text", "Don't eat cereals with orange juice\nIt tastes bad",
+      "show-scale", TRUE,
+      NULL);
   layer = create_marker_layer (view);
   champlain_view_add_layer(view, layer);
   champlain_layer_hide_all_markers (CHAMPLAIN_LAYER (layer));
