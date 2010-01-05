@@ -384,14 +384,13 @@ static void
 license_set_position (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
-  gfloat width, height;
 
   if (!priv->license_actor)
     return;
 
-  clutter_actor_get_size (priv->license_actor, &width, &height);
-  clutter_actor_set_position (priv->license_actor, priv->viewport_size.width -
-      PADDING - width, priv->viewport_size.height - PADDING - height);
+  clutter_actor_set_position (priv->license_actor,
+      priv->viewport_size.width - PADDING,
+      priv->viewport_size.height - PADDING);
 }
 
 static void
@@ -1444,9 +1443,11 @@ update_license (ChamplainView *view)
     {
       priv->license_actor = g_object_ref (clutter_text_new ());
       clutter_text_set_font_name (CLUTTER_TEXT (priv->license_actor), "sans 8");
+      clutter_text_set_line_alignment (CLUTTER_TEXT (priv->license_actor), PANGO_ALIGN_RIGHT);
       clutter_actor_set_opacity (priv->license_actor, 128);
       clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage),
           priv->license_actor);
+      clutter_actor_set_anchor_point_from_gravity (priv->license_actor, CLUTTER_GRAVITY_SOUTH_EAST);
       clutter_actor_raise_top (priv->license_actor);
     }
 
