@@ -119,7 +119,7 @@ For the terms of The Artistic License, see L<perlartistic>.
 use warnings;
 use strict;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use base 'DynaLoader';
 use Exporter 'import';
