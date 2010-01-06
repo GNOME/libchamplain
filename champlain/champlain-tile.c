@@ -66,7 +66,6 @@ struct _ChamplainTilePrivate {
   gchar *filename; /* The tile's cache filename */
   ClutterActor *actor; /* An actor grouping all content actors */
   ClutterActor *content_actor; /* The actual tile actor */
-  ClutterAnimation *animation; /* The fade in animation */
 
   GTimeVal *modified_time; /* The last modified time of the cache */
   gchar* etag; /* The HTTP ETag sent by the server */
@@ -161,14 +160,6 @@ static void
 champlain_tile_dispose (GObject *object)
 {
   ChamplainTilePrivate *priv = CHAMPLAIN_TILE (object)->priv;
-
-  /* Force the animation to finish */
-  if (priv->animation != NULL)
-    {
-      clutter_animation_completed (priv->animation);
-      /* this will call the animation complete callback and free the context,
-       * the animation object will be unreffed too */
-    }
 
   if (priv->actor != NULL)
     {
@@ -395,7 +386,6 @@ champlain_tile_init (ChamplainTile *self)
   g_object_add_weak_pointer (G_OBJECT (priv->actor), (gpointer*)&priv->actor);
 
   priv->content_actor = NULL;
-  priv->animation = NULL;
 }
 
 /**
@@ -818,23 +808,19 @@ typedef struct {
 
 static void
 fade_in_completed (ClutterAnimation *animation,
-    gpointer data)
+    ClutterActor *old_actor)
 {
-  AnimationContext* ctx = (AnimationContext*) data;
-  ChamplainTilePrivate *priv = ctx->tile->priv;
+  ClutterActor *parent;
 
-  priv->animation = NULL;
+  if (old_actor == NULL)
+    return;
 
-  if (ctx->old_actor != NULL)
-    {
-      if (priv->actor != NULL)
-        clutter_container_remove (CLUTTER_CONTAINER (priv->actor), ctx->old_actor, NULL);
+  parent = clutter_actor_get_parent (old_actor);
 
-      g_object_unref (ctx->old_actor);
-    }
+  if (parent != NULL)
+    clutter_container_remove (CLUTTER_CONTAINER (parent), old_actor, NULL);
 
-  g_object_unref (ctx->tile);
-  g_free (ctx);
+  g_object_unref (old_actor);
 }
 
 /**
@@ -858,10 +844,6 @@ champlain_tile_set_content (ChamplainTile *self,
   ChamplainTilePrivate *priv = self->priv;
   ClutterActor *old_actor = NULL;
 
-  /* Don't start another animation if there's already one going on */
-  if (priv->animation != NULL)
-    clutter_animation_completed (priv->animation);
-
   if (priv->content_actor != NULL)
     {
       /* it sometimes happen that the priv->content_actor has been destroyed,
@@ -870,7 +852,7 @@ champlain_tile_set_content (ChamplainTile *self,
 
       if (fade_in == TRUE)
         old_actor = g_object_ref (priv->content_actor);
-      else
+      else if (priv->actor != NULL)
         clutter_container_remove (CLUTTER_CONTAINER (priv->actor), priv->content_actor, NULL);
 
       g_object_unref (priv->content_actor);
@@ -881,15 +863,17 @@ champlain_tile_set_content (ChamplainTile *self,
 
   if (fade_in == TRUE && priv->actor != NULL)
     {
+      ClutterAnimation *animation;
+
       clutter_actor_set_opacity (actor, 0);
 
-      AnimationContext *ctx = g_new0 (AnimationContext, 1);
-      ctx->tile = g_object_ref (self);
-      priv->animation = clutter_actor_animate (actor, CLUTTER_EASE_IN_CUBIC,
-          500, "opacity", 255, NULL);
-      ctx->old_actor = old_actor;
+      animation = clutter_actor_animate (actor,
+          CLUTTER_EASE_IN_CUBIC,
+          500,
+          "opacity", 255,
+          NULL);
 
-      g_signal_connect (priv->animation, "completed", G_CALLBACK (fade_in_completed), ctx);
+      g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), old_actor);
     }
 
   priv->content_actor = g_object_ref (actor);
