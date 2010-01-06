@@ -1101,6 +1101,8 @@ button_release_cb (ClutterActor *actor,
 static void
 update_scale (ChamplainView *view)
 {
+  static gfloat previous_m_per_pixel = 0.0;
+
   gboolean is_small_unit = TRUE;  /* indicates if using meters */
   ClutterActor *text, *line;
   gfloat width;
@@ -1113,7 +1115,7 @@ update_scale (ChamplainView *view)
   gfloat factor;
   gboolean final_unit = FALSE;
 
-  if (!priv || !priv->map || !priv->map->current_level)
+  if (!priv->map || !priv->map->current_level)
     return;
 
   if (priv->show_scale)
@@ -1128,6 +1130,12 @@ update_scale (ChamplainView *view)
 
   m_per_pixel = champlain_map_source_get_meters_per_pixel (priv->map_source,
       priv->zoom_level, priv->latitude, priv->longitude);
+
+  /* Don't redraw too often */
+  if (fabs (m_per_pixel - previous_m_per_pixel) < 0.01)
+    return;
+
+  previous_m_per_pixel = m_per_pixel;
 
   if (priv->scale_unit == CHAMPLAIN_UNIT_MILES)
     m_per_pixel *= 3.28; /* m_per_pixel is now in ft */
