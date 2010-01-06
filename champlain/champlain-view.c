@@ -1143,25 +1143,28 @@ update_scale (ChamplainView *view)
       base = pow (10, base);
 
       /* How many times can it be fitted in our max scale width */
+      g_assert (base > 0);
+      g_assert (m_per_pixel * scale_width / base > 0);
       scale_width /= m_per_pixel * scale_width / base;
+      g_assert (scale_width > 0);
       factor = floor (priv->max_scale_width / scale_width);
       base *= factor;
       scale_width *= factor;
 
       if (priv->scale_unit == CHAMPLAIN_UNIT_KM)
         {
-          if (base / 1000 >= 1)
+          if (base / 1000.0 >= 1)
             {
-              base /= 1000; /* base is now in km */
+              base /= 1000.0; /* base is now in km */
               is_small_unit = FALSE;
             }
           final_unit = TRUE; /* Don't need to recompute */
         }
       else if (priv->scale_unit == CHAMPLAIN_UNIT_MILES)
         {
-          if (is_small_unit && base / 5280 >= 1)
+          if (is_small_unit && base / 5280.0 >= 1)
             {
-              m_per_pixel /= 5280; /* m_per_pixel is now in miles */
+              m_per_pixel /= 5280.0; /* m_per_pixel is now in miles */
               is_small_unit = FALSE;
               /* we need to recompute the base because 1000 ft != 1 mile */
             }
