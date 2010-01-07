@@ -7,7 +7,7 @@ use Clutter::TestHelper tests => 165;
 
 use Champlain qw(:coords :maps);
 
-my $OSM_LICENSE = "CC-BY-SA 2.0 OpenStreetMap contributors";
+my $OSM_LICENSE_REGEXP = qr/OpenStreetMap contributors/;
 my $OSM_URL_LICENSE = 'http://creativecommons.org/licenses/by-sa/2.0/';
 
 exit tests();
@@ -34,7 +34,7 @@ sub test_osm_mapnik {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 18, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
-	is($map->get_license, $OSM_LICENSE, "$label license");
+	ok($map->get_license =~ /$OSM_LICENSE_REGEXP/, "$label license");
 	is($map->get_license_uri, $OSM_URL_LICENSE , "$label license_uri");
 	
 	# Generic map operations
@@ -54,7 +54,7 @@ sub test_osm_cyclemap {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 18, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
-	is($map->get_license, $OSM_LICENSE, "$label license");
+	ok($map->get_license =~ /$OSM_LICENSE_REGEXP/, "$label license");
 	is($map->get_license_uri, $OSM_URL_LICENSE , "$label license_uri");
 	
 	# Generic map operations
@@ -74,7 +74,7 @@ sub test_osm_osmarender {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 17, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
-	is($map->get_license, $OSM_LICENSE, "$label license");
+	ok($map->get_license =~ /$OSM_LICENSE_REGEXP/, "$label license");
 	is($map->get_license_uri, $OSM_URL_LICENSE , "$label license_uri");
 	
 	# Generic map operations
