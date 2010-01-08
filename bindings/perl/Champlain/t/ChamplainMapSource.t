@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 165;
+use Clutter::TestHelper tests => 166;
 
 use Champlain qw(:coords :maps);
 
@@ -13,11 +13,18 @@ my $OSM_URL_LICENSE = 'http://creativecommons.org/licenses/by-sa/2.0/';
 exit tests();
 
 sub tests {
-	test_osm_mapnik();
+	my $map = test_osm_mapnik();
 	test_osm_cyclemap();
 	test_osm_osmarender();
 	test_oam();
 	test_mff_relief();
+
+	SKIP: {
+		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 1;
+		my $meters = $map->get_meters_per_pixel($map->get_min_zoom_level, 0, 0);
+		ok($meters > 0, "Meters per pixel $meters");
+	}
+
 	return 0;
 }
 
@@ -39,6 +46,8 @@ sub test_osm_mapnik {
 	
 	# Generic map operations
 	generic_map_operations($label, $map);
+
+	return $map;
 }
 
 
