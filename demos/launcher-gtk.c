@@ -56,6 +56,17 @@ toggle_layer (GtkToggleButton *widget,
     }
 }
 
+gboolean
+mouse_click_cb (ClutterActor *actor, ClutterEvent *event, gpointer data)
+{
+    gdouble lat, lon;
+
+    champlain_view_get_coords_from_event (CHAMPLAIN_VIEW (data), event, &lat, &lon);
+    g_print ("Mouse click at: %f  %f\n", lat, lon);
+
+    return TRUE;
+}
+
 static void
 map_source_changed (GtkWidget *widget,
                     ChamplainView *view)
@@ -210,6 +221,9 @@ main (int argc,
 
   widget = gtk_champlain_embed_new ();
   view = gtk_champlain_embed_get_view (GTK_CHAMPLAIN_EMBED (widget));
+  clutter_actor_set_reactive (CLUTTER_ACTOR (view), TRUE);
+  g_signal_connect (view, "button-release-event", G_CALLBACK (mouse_click_cb), view);
+
 
   g_object_set (G_OBJECT (view),
       "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
