@@ -108,6 +108,17 @@ sub test_generic {
 	
 	# Call ensure_visible(), it's to test, but at least we test that it doesn't crash
 	$view->ensure_visible(10, 10, 30, 30, TRUE);
+
+
+
+	SKIP: {
+		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 2;
+		$view->set_license_text("Perl Universal License");
+		is($view->get_license_text, "Perl Universal License", "set_license_text(text)");
+
+		$view->set_license_text(undef);
+		is($view->get_license_text, undef, "set_license_text(undef)");
+	}
 }
 
 

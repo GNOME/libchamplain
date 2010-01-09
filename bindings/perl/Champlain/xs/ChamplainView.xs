@@ -154,3 +154,15 @@ void
 champlain_view_remove_layer (ChamplainView *view, ChamplainLayer *layer)
 
 #endif /* 0.4.1 */
+
+
+#if CHAMPLAIN_CHECK_VERSION (0, 4, 3)
+
+const gchar_ornull *
+champlain_view_get_license_text (ChamplainView *view)
+
+
+void
+champlain_view_set_license_text (ChamplainView *view, const gchar_ornull *text)
+
+#endif /* 0.4.3 */
