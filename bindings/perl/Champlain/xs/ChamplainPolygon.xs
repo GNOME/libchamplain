@@ -91,3 +91,15 @@ champlain_polygon_hide (ChamplainPolygon *polygon)
 
 void
 champlain_polygon_remove_point (ChamplainPolygon *self, ChamplainPoint *point)
+
+
+#if CHAMPLAIN_CHECK_VERSION (0, 4, 3)
+
+void
+champlain_polygon_set_mark_points (ChamplainPolygon *polygon, gboolean value)
+
+
+gboolean
+champlain_polygon_get_mark_points (ChamplainPolygon *polygon)
+
+#endif /* 0.4.3 */

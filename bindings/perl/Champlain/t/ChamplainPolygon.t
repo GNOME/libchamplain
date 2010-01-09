@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 50;
+use Clutter::TestHelper tests => 52;
 
 use Champlain;
 
@@ -43,6 +43,15 @@ sub test_empty {
 	# These fields have no accessor yet
 	ok(!$polygon->get('closed-path'), "closed-path is unset on a new polygon");
 	ok($polygon->get('visible'), "closed-path is set on a new polygon");
+
+	SKIP: {
+		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 2;
+		$polygon->set_mark_points(TRUE);
+		is($polygon->get_mark_points, TRUE, "set_mark_points(TRUE)");
+
+		$polygon->set_mark_points(FALSE);
+		is($polygon->get_mark_points, FALSE, "set_mark_points(FALSE)");
+	}
 }
 
 
