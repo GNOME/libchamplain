@@ -1083,10 +1083,14 @@ button_release_cb (ClutterActor *actor,
   gboolean found = FALSE;
   ChamplainViewPrivate *priv = view->priv;
 
+  if (clutter_event_get_button (event) != 1)
+    return FALSE;
+
   children = clutter_container_get_children (CLUTTER_CONTAINER (priv->user_layers));
   for (;children != NULL; children = g_list_next (children))
     {
-      if (CHAMPLAIN_IS_SELECTION_LAYER (children->data))
+      if (CHAMPLAIN_IS_SELECTION_LAYER (children->data) &&
+          champlain_selection_layer_count_selected_markers (CHAMPLAIN_SELECTION_LAYER (children->data)) > 0)
         {
           champlain_selection_layer_unselect_all (CHAMPLAIN_SELECTION_LAYER (children->data));
           found = TRUE;
