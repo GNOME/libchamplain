@@ -144,10 +144,19 @@ champlain_marker_set_highlight_color (class, ClutterColor *color);
 	C_ARGS: color
 
 
+void
+champlain_marker_set_highlight_text_color (class, ClutterColor *color);
+	C_ARGS: color
+
+
 #if CHAMPLAIN_CHECK_VERSION (0, 4, 1)
 
 ClutterColor*
 champlain_marker_get_highlight_color (class)
+	C_ARGS:  /* No args */
+
+const ClutterColor*
+champlain_marker_get_highlight_text_color (class)
 	C_ARGS:  /* No args */
 
 #endif /* 0.4.1 */
