@@ -38,25 +38,9 @@ sub test_generic {
 	ok($view->get('latitude') != $latitude, "center_on() changed latitude");
 	ok($view->get('longitude') != $longitude, "center_on() changed longitude");
 	
-	# NOTE: In recent versions of libchamplain the view requests the first tile
-	#       (0, 0 at zoom level 0). If the tile is already in the cache then it
-	#       will be loaded and the view's initial size will be of the tile's size.
-	#       If the tile is not in the cache then it will be downloaded
-	#       asynchronously and the view will have a size of (0, 0).
-	#
-	#       For the moment there's no mechanism for disabling the cache nor for
-	#       finding out if the view has a tile loaded. This is why the test for
-	#       both.
-	# 
-	#
-	my $source_original = $view->get('map-source');
-	ok($view->get('width') == 0 || $view->get('width') == $source_original->get_tile_size, "original width");
-	ok($view->get('height') == 0 || $view->get('height') == $source_original->get_tile_size, "original height");
-
-	# set_size() can be tested by checking the properties width and height
 	$view->set_size(600, 400);
-	is($view->get('width'), 600, "set_size() changed width");
-	is($view->get('height'), 400, "set_size() changed height");
+	ok($view->get('width') >= 600, "set_size() changed width");
+	ok($view->get('height') >=  400, "set_size() changed height");
 
 	
 	# Can't be tested but at least we check that it doesn't crash when invoked
@@ -71,6 +55,7 @@ sub test_generic {
 	# Change the map source (get a different map source)
 	my $factory = Champlain::MapSourceFactory->dup_default();
 	my $source_new = $factory->create(Champlain::MapSourceFactory->OSM_MAPNIK);
+	my $source_original = $view->get('map-source');
 	if ($source_original->get_id eq $source_new->get_id) {
 		# The new map source is the same as the original! Take another map
 		# source instead
