@@ -165,4 +165,28 @@ champlain_view_get_license_text (ChamplainView *view)
 void
 champlain_view_set_license_text (ChamplainView *view, const gchar_ornull *text)
 
+
+guint
+champlain_view_get_max_scale_width (ChamplainView *view)
+
+
+ChamplainUnit
+champlain_view_get_scale_unit (ChamplainView *view)
+
+
+gboolean
+champlain_view_get_show_scale (ChamplainView *view)
+
+
+void
+champlain_view_set_max_scale_width (ChamplainView *view, guint value)
+
+
+void
+champlain_view_set_scale_unit (ChamplainView *view, ChamplainUnit unit)
+
+
+void
+champlain_view_set_show_scale (ChamplainView *view, gboolean value)
+
 #endif /* 0.4.3 */

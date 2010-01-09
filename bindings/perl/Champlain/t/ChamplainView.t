@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 82;
+use Clutter::TestHelper tests => 88;
 
 use Champlain ':coords';
 
@@ -110,7 +110,6 @@ sub test_generic {
 	$view->ensure_visible(10, 10, 30, 30, TRUE);
 
 
-
 	SKIP: {
 		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 2;
 		$view->set_license_text("Perl Universal License");
@@ -118,6 +117,27 @@ sub test_generic {
 
 		$view->set_license_text(undef);
 		is($view->get_license_text, undef, "set_license_text(undef)");
+
+
+		$view->set_max_scale_width(200);
+		is($view->get_max_scale_width, 200, "set_max_scale_width(200)");
+
+		$view->set_max_scale_width(400);
+		is($view->get_max_scale_width, 400, "set_max_scale_width(400)");
+
+
+		$view->set_scale_unit('miles');
+		is($view->get_scale_unit, 'miles', "set_max_scale_width('miles')");
+
+		$view->set_scale_unit('km');
+		is($view->get_scale_unit, 'km', "set_max_scale_width('km')");
+
+
+		$view->set_show_scale(TRUE);
+		is($view->get_show_scale, TRUE, "set_show_scale(TRUE)");
+
+		$view->set_show_scale(FALSE);
+		is($view->get_show_scale, FALSE, "set_show_scale(FALSE)");
 	}
 }
 

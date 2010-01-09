@@ -16,3 +16,4 @@ CHAMPLAIN_TYPE_POINT               ChamplainPoint             GBoxed   Champlain
 CHAMPLAIN_TYPE_POLYGON             ChamplainPolygon           GObject  Champlain::Polygon
 CHAMPLAIN_TYPE_SELECTION_LAYER     ChamplainSelectionLayer    GObject  Champlain::SelectionLayer
 CHAMPLAIN_TYPE_SELECTION_MODE      ChamplainSelectionMode     GEnum    Champlain::SelectionMode
+CHAMPLAIN_TYPE_UNIT                ChamplainUnit              GEnum    Champlain::Unit
