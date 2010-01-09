@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 312;
+use Clutter::TestHelper tests => 318;
 use Test::Builder;
 
 use Champlain ':coords';
@@ -29,6 +29,14 @@ sub tests {
 
 	# Can't be tested but at least we call it
 	Champlain::Marker->set_highlight_color(Clutter::Color->new(0xff, 0xff, 0x00));
+	SKIP: {
+		Champlain->CHECK_VERSION(0, 4, 1) or skip '0.4.1 stuff', 1;
+		is_color(
+			Champlain::Marker->get_highlight_color,
+			Clutter::Color->new(0xff, 0xff, 0x00),
+			"get_highlight_color()"
+		);
+	}
 
 	return 0;
 }
