@@ -1008,7 +1008,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            G_PARAM_READABLE));
 
   /**
-  * ChamplainView:display-scale:
+  * ChamplainView:show-scale:
   *
   * Display the map scale.
   *
