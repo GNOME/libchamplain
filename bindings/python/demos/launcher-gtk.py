@@ -53,6 +53,7 @@ class LauncherGTK:
         bbox.add(button)
 
         button = gtk.ToggleButton(label="Markers")
+        button.set_active(True)
         button.connect("toggled", self.toggle_layer)
         bbox.add(button)
 
