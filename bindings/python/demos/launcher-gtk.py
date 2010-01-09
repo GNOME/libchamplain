@@ -23,6 +23,7 @@ class LauncherGTK:
 
         self.layer = create_marker_layer(self.view)
         self.view.add_layer(self.layer)
+        self.layer.hide_all_markers()
 
         self.polygon = polygon = champlain.Polygon()
         # Cheap approx of Highway 10
@@ -53,7 +54,7 @@ class LauncherGTK:
         bbox.add(button)
 
         button = gtk.ToggleButton(label="Markers")
-        button.set_active(True)
+        button.set_active(False)
         button.connect("toggled", self.toggle_layer)
         bbox.add(button)
 
