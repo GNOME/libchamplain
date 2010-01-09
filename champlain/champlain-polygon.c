@@ -655,7 +655,7 @@ champlain_polygon_set_mark_points (ChamplainPolygon *polygon,
  *
  * Returns: wether points in polygon gets marked for extra visibility.
  *
- * Since: 0.X
+ * Since: 0.4.3
  */
 gboolean
 champlain_polygon_get_mark_points (ChamplainPolygon *polygon)
