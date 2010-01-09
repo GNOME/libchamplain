@@ -160,3 +160,11 @@ champlain_marker_get_highlight_text_color (class)
 	C_ARGS:  /* No args */
 
 #endif /* 0.4.1 */
+
+
+#if CHAMPLAIN_CHECK_VERSION (0, 4, 3)
+
+void
+champlain_marker_queue_redraw (ChamplainMarker *marker)
+
+#endif /* 0.4.3 */

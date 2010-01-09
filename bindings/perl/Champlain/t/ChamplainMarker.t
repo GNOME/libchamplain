@@ -21,6 +21,7 @@ exit tests();
 
 
 sub tests {
+
 	test_new();
 	test_new_with_text();
 	test_new_from_file();
@@ -211,6 +212,13 @@ sub generic_test {
 	is($marker->get_font_name, "Mono 14", "set_font_name()");
 	$marker->set_font_name(undef);
 	is($marker->get_font_name, $DEFAULT_FONT_NAME, "set_font_name(undef)");
+
+
+	# Can't be tested but at least we call it
+	SKIP: {
+		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 0;
+		$marker->queue_redraw();
+	}
 }
 
 
