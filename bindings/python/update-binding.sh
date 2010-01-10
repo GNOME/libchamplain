@@ -12,6 +12,7 @@ python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	champlain-polygon.h			\
 	champlain-point.h			\
 	champlain-layer.h			\
+	champlain-selection-layer.h		\
 	champlain-map-source.h			\
 	champlain-map-source-desc.h		\
 	champlain-map-source-factory.h		\
@@ -20,7 +21,7 @@ python /usr/share/pygobject/2.0/codegen/h2def.py	\
 	champlain-base-marker.h			\
 	champlain-tile.h			\
 	champlain-zoom-level.h			\
-| sed "s/GInitiallyUnowned/GObject/g" > ../bindings/python/champlain/pychamplain-base.defs
+ > ../bindings/python/champlain/pychamplain-base.defs
 
 
 # Update the list of headers from Makefile.am
@@ -33,14 +34,5 @@ python /usr/share/pygobject/2.0/codegen/h2def.py	\
 
 # Keep original version
 cd ../bindings/python
-cp champlain/pychamplain.defs /tmp
+cp champlain/pychamplain-base.defs /tmp
 cp champlain-gtk/pychamplaingtk.defs /tmp
-
-# Apply patches
-#patch -p0 < pychamplain.patch
-#patch -p0 < pychamplaingtk.patch
-
-# Make modification then run that:
-#diff -up /tmp/pychamplain.defs champlain/pychamplain.defs > pychamplain.patch
-#diff -up /tmp/pychamplaingtk.defs champlain-gtk/pychamplaingtk.defs > pychamplaingtk.patch
-

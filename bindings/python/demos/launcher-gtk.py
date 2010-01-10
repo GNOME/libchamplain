@@ -23,6 +23,23 @@ class LauncherGTK:
 
         self.layer = create_marker_layer(self.view)
         self.view.add_layer(self.layer)
+        self.layer.hide_all_markers()
+
+        self.polygon = polygon = champlain.Polygon()
+        # Cheap approx of Highway 10
+        polygon.append_point(45.4095, -73.3197)
+        polygon.append_point(45.4104, -73.2846)
+        polygon.append_point(45.4178, -73.2239)
+        polygon.append_point(45.4176, -73.2181)
+        polygon.append_point(45.4151, -73.2126)
+        polygon.append_point(45.4016, -73.1926)
+        polygon.append_point(45.3994, -73.1877)
+        polygon.append_point(45.4000, -73.1815)
+        polygon.append_point(45.4151, -73.1218)
+        polygon.set_stroke_width(5.0);
+        polygon.set_property("mark-points", True)
+        self.view.add_polygon(polygon)
+        polygon.hide()
 
         embed = cluttergtk.Embed()
         embed.set_size_request(640, 480)
@@ -37,6 +54,7 @@ class LauncherGTK:
         bbox.add(button)
 
         button = gtk.ToggleButton(label="Markers")
+        button.set_active(False)
         button.connect("toggled", self.toggle_layer)
         bbox.add(button)
 
@@ -81,8 +99,10 @@ class LauncherGTK:
 
     def toggle_layer(self, widget):
         if widget.get_active():
+            self.polygon.show()    
             self.layer.animate_in_all_markers()
         else:
+            self.polygon.hide()    
             self.layer.animate_out_all_markers()
 
     def zoom_changed(self, widget):

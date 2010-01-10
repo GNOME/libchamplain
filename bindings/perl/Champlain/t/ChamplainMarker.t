@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 312;
+use Clutter::TestHelper tests => 324;
 use Test::Builder;
 
 use Champlain ':coords';
@@ -21,16 +21,40 @@ exit tests();
 
 
 sub tests {
+
 	test_new();
 	test_new_with_text();
 	test_new_from_file();
 	test_new_full();
 	test_new_with_image();
-
-	# Can't be tested but at least we call it
-	Champlain::Marker->set_highlight_color(Clutter::Color->new(0xff, 0xff, 0x00));
+	test_global_colors();
 
 	return 0;
+}
+
+
+sub test_global_colors {
+
+	Champlain::Marker->set_highlight_color(Clutter::Color->new(0xff, 0xff, 0x00));
+	SKIP: {
+		Champlain->CHECK_VERSION(0, 4, 1) or skip '0.4.1 stuff', 1;
+		is_color(
+			Champlain::Marker->get_highlight_color,
+			Clutter::Color->new(0xff, 0xff, 0x00),
+			"get_highlight_color()"
+		);
+	}
+
+
+	Champlain::Marker->set_highlight_text_color(Clutter::Color->new(0xff, 0xef, 0x00));
+	SKIP: {
+		Champlain->CHECK_VERSION(0, 4, 1) or skip '0.4.1 stuff', 1;
+		is_color(
+			Champlain::Marker->get_highlight_text_color,
+			Clutter::Color->new(0xff, 0xef, 0x00),
+			"get_highlight_color()"
+		);
+	}
 }
 
 
@@ -188,6 +212,13 @@ sub generic_test {
 	is($marker->get_font_name, "Mono 14", "set_font_name()");
 	$marker->set_font_name(undef);
 	is($marker->get_font_name, $DEFAULT_FONT_NAME, "set_font_name(undef)");
+
+
+	# Can't be tested but at least we call it
+	SKIP: {
+		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 0;
+		$marker->queue_redraw();
+	}
 }
 
 

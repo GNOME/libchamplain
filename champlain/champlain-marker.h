@@ -117,6 +117,8 @@ const ClutterColor * champlain_marker_get_highlight_color (void);
 void champlain_marker_set_highlight_text_color (ClutterColor *color);
 const ClutterColor * champlain_marker_get_highlight_text_color (void);
 
+void champlain_marker_queue_redraw (ChamplainMarker *marker);
+
 G_END_DECLS
 
 #endif

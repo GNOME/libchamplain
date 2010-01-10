@@ -93,8 +93,12 @@ enum
   PROP_SCROLL_MODE,
   PROP_KEEP_CENTER_ON_RESIZE,
   PROP_SHOW_LICENSE,
+  PROP_LICENSE_EXTRA,
   PROP_ZOOM_ON_DOUBLE_CLICK,
-  PROP_STATE
+  PROP_STATE,
+  PROP_SHOW_SCALE,
+  PROP_SCALE_UNIT,
+  PROP_MAX_SCALE_WIDTH,
 };
 
 #define PADDING 10
@@ -155,6 +159,12 @@ struct _ChamplainViewPrivate
 
   gboolean show_license;
   ClutterActor *license_actor; /* Contains the license info */
+  gchar *license_text; /* Extra license text */
+
+  ClutterActor *scale_actor;
+  gboolean show_scale;
+  ChamplainUnit scale_unit;
+  guint max_scale_width;
 
   ChamplainState state; /* View's global state */
 
@@ -222,6 +232,11 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble latitude,
     gdouble longitude,
     guint duration);
+
+#define SCALE_HEIGHT  20
+#define SCALE_PADDING 10
+#define SCALE_INSIDE_PADDING 10
+#define SCALE_LINE_WIDTH 2
 
 static gdouble
 viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
@@ -369,14 +384,13 @@ static void
 license_set_position (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
-  gfloat width, height;
 
   if (!priv->license_actor)
     return;
 
-  clutter_actor_get_size (priv->license_actor, &width, &height);
-  clutter_actor_set_position (priv->license_actor, priv->viewport_size.width -
-      PADDING - width, priv->viewport_size.height - PADDING - height);
+  clutter_actor_set_position (priv->license_actor,
+      priv->viewport_size.width - PADDING,
+      priv->viewport_size.height - PADDING);
 }
 
 static void
@@ -413,6 +427,7 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
       y -= priv->viewport_size.y + priv->anchor.y;
 
       cairo_line_to (cr, x, y);
+
       list = list->next;
     }
 
@@ -439,13 +454,40 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
   if (polygon->priv->stroke)
     cairo_stroke (cr);
 
+  if (polygon->priv->mark_points)
+    {
+      /* Draw points */
+      GList *list = g_list_first (polygon->priv->points);
+      while (list != NULL)
+        {
+          ChamplainPoint *point = (ChamplainPoint*) list->data;
+          gfloat x, y;
+
+          x = champlain_map_source_get_x (priv->map_source, priv->zoom_level,
+              point->lon);
+          y = champlain_map_source_get_y (priv->map_source, priv->zoom_level,
+              point->lat);
+
+          x -= priv->viewport_size.x + priv->anchor.x;
+          y -= priv->viewport_size.y + priv->anchor.y;
+
+          cairo_arc (cr, x, y, polygon->priv->stroke_width * 1.5, 0, 2 * M_PI);
+          cairo_fill (cr);
+
+          list = list->next;
+        }
+    }
+
   cairo_destroy (cr);
 }
 
 static gboolean
 redraw_polygon_on_idle (PolygonRedrawContext *ctx)
 {
-  draw_polygon (ctx->view, ctx->polygon);
+
+  if (ctx->polygon)
+    draw_polygon (ctx->view, ctx->polygon);
+
   ctx->view->priv->polygon_redraw_id = 0;
   // ctx is freed by g_idle_add_full
   return FALSE;
@@ -464,6 +506,7 @@ notify_polygon_cb (ChamplainPolygon *polygon,
   ctx = g_new0 (PolygonRedrawContext, 1);
   ctx->view = view;
   ctx->polygon = polygon;
+  g_object_add_weak_pointer (G_OBJECT (polygon), (gpointer *) &ctx->polygon);
 
   view->priv->polygon_redraw_id = g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
       (GSourceFunc) redraw_polygon_on_idle, ctx, g_free);
@@ -583,6 +626,15 @@ champlain_view_get_property (GObject *object,
       case PROP_SCROLL_MODE:
         g_value_set_enum (value, priv->scroll_mode);
         break;
+      case PROP_SHOW_SCALE:
+        g_value_set_boolean (value, priv->show_scale);
+        break;
+      case PROP_MAX_SCALE_WIDTH:
+        g_value_set_uint (value, priv->max_scale_width);
+        break;
+      case PROP_SCALE_UNIT:
+        g_value_set_enum (value, priv->scale_unit);
+        break;
       case PROP_DECEL_RATE:
         {
           gdouble decel = 0.0;
@@ -595,6 +647,9 @@ champlain_view_get_property (GObject *object,
         break;
       case PROP_SHOW_LICENSE:
         g_value_set_boolean (value, priv->show_license);
+        break;
+      case PROP_LICENSE_EXTRA:
+        g_value_set_string (value, priv->license_text);
         break;
       case PROP_ZOOM_ON_DOUBLE_CLICK:
         g_value_set_boolean (value, priv->zoom_on_double_click);
@@ -641,6 +696,15 @@ champlain_view_set_property (GObject *object,
     case PROP_SCROLL_MODE:
       champlain_view_set_scroll_mode (view, g_value_get_enum (value));
       break;
+    case PROP_SHOW_SCALE:
+      champlain_view_set_show_scale (view, g_value_get_boolean (value));
+      break;
+    case PROP_MAX_SCALE_WIDTH:
+      champlain_view_set_max_scale_width (view, g_value_get_uint (value));
+      break;
+    case PROP_SCALE_UNIT:
+      champlain_view_set_scale_unit (view, g_value_get_enum (value));
+      break;
     case PROP_DECEL_RATE:
       champlain_view_set_decel_rate (view, g_value_get_double (value));
       break;
@@ -649,6 +713,9 @@ champlain_view_set_property (GObject *object,
       break;
     case PROP_SHOW_LICENSE:
       champlain_view_set_show_license (view, g_value_get_boolean (value));
+      break;
+    case PROP_LICENSE_EXTRA:
+      champlain_view_set_license_text (view, g_value_get_string (value));
       break;
     case PROP_ZOOM_ON_DOUBLE_CLICK:
       champlain_view_set_zoom_on_double_click (view, g_value_get_boolean (value));
@@ -893,6 +960,23 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            TRUE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
+  * ChamplainView:license-text:
+  *
+  * Sets additional text to be displayed in the license area.  The map's
+  * license will be added below it. Your text can have multiple line, just use
+  * "\n" in between.
+  *
+  * Since: 0.4.3
+  */
+  g_object_class_install_property (object_class,
+       PROP_LICENSE_EXTRA,
+       g_param_spec_string ("license-text",
+           "Additional license",
+           "Additional license text",
+           "",
+           CHAMPLAIN_PARAM_READWRITE));
+
+  /**
   * ChamplainView:zoom-on-double-click:
   *
   * Should the view zoom in and recenter when the user double click on the map.
@@ -924,6 +1008,56 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            G_PARAM_READABLE));
 
   /**
+  * ChamplainView:show-scale:
+  *
+  * Display the map scale.
+  *
+  * Since: 0.4.3
+  */
+  g_object_class_install_property (object_class,
+       PROP_SHOW_SCALE,
+       g_param_spec_boolean ("show-scale",
+           "Show the map scale",
+           "Show the map scale "
+           "on the screen",
+           FALSE,
+           G_PARAM_READWRITE));
+
+  /**
+  * ChamplainView:max-scale-width:
+  *
+  * The size of the map scale on screen in pixels.
+  *
+  * Since: 0.4.3
+  */
+  g_object_class_install_property (object_class,
+       PROP_MAX_SCALE_WIDTH,
+       g_param_spec_uint ("max-scale-width",
+           "The width of the scale",
+           "The max width of the scale"
+           "on screen",
+           1,
+           2000,
+           100,
+           G_PARAM_READWRITE));
+
+  /**
+  * ChamplainView:scale-unit:
+  *
+  * The scale's units.
+  *
+  * Since: 0.4.3
+  */
+  g_object_class_install_property (object_class,
+       PROP_SCALE_UNIT,
+       g_param_spec_enum ("scale-unit",
+           "The scale's unit",
+           "The map scale's unit",
+           CHAMPLAIN_TYPE_UNIT,
+           CHAMPLAIN_UNIT_KM,
+           G_PARAM_READWRITE));
+
+  /**
   * ChamplainView::animation-completed:
   *
   * The ::animation-completed signal is emitted when any animation in the view
@@ -949,10 +1083,14 @@ button_release_cb (ClutterActor *actor,
   gboolean found = FALSE;
   ChamplainViewPrivate *priv = view->priv;
 
+  if (clutter_event_get_button (event) != 1)
+    return FALSE;
+
   children = clutter_container_get_children (CLUTTER_CONTAINER (priv->user_layers));
   for (;children != NULL; children = g_list_next (children))
     {
-      if (CHAMPLAIN_IS_SELECTION_LAYER (children->data))
+      if (CHAMPLAIN_IS_SELECTION_LAYER (children->data) &&
+          champlain_selection_layer_count_selected_markers (CHAMPLAIN_SELECTION_LAYER (children->data)) > 0)
         {
           champlain_selection_layer_unselect_all (CHAMPLAIN_SELECTION_LAYER (children->data));
           found = TRUE;
@@ -964,6 +1102,183 @@ button_release_cb (ClutterActor *actor,
   return found;
 }
 
+static void
+update_scale (ChamplainView *view)
+{
+  static gfloat previous_m_per_pixel = 0.0;
+
+  gboolean is_small_unit = TRUE;  /* indicates if using meters */
+  ClutterActor *text, *line;
+  gfloat width;
+  ChamplainViewPrivate *priv = view->priv;
+  gfloat m_per_pixel;
+  gfloat scale_width = priv->max_scale_width;
+  gchar *label;
+  cairo_t *cr;
+  gfloat base;
+  gfloat factor;
+  gboolean final_unit = FALSE;
+
+  if (!priv->map || !priv->map->current_level)
+    return;
+
+  if (priv->show_scale)
+    {
+      clutter_actor_show (priv->scale_actor);
+    }
+  else
+    {
+      clutter_actor_hide (priv->scale_actor);
+      return;
+    }
+
+  m_per_pixel = champlain_map_source_get_meters_per_pixel (priv->map_source,
+      priv->zoom_level, priv->latitude, priv->longitude);
+
+  /* Don't redraw too often */
+  if (fabs (m_per_pixel - previous_m_per_pixel) < 0.01)
+    return;
+
+  previous_m_per_pixel = m_per_pixel;
+
+  if (priv->scale_unit == CHAMPLAIN_UNIT_MILES)
+    m_per_pixel *= 3.28; /* m_per_pixel is now in ft */
+
+  /* This loop will find the pretty value to display on the scale.
+   * It will be run once for metric units, and twice for imperials
+   * so that both feet and miles have pretty numbers.
+   */
+  do
+    {
+      /* Keep the previous power of 10 */
+      base = floor (log (m_per_pixel * scale_width) / log (10));
+      base = pow (10, base);
+
+      /* How many times can it be fitted in our max scale width */
+      g_assert (base > 0);
+      g_assert (m_per_pixel * scale_width / base > 0);
+      scale_width /= m_per_pixel * scale_width / base;
+      g_assert (scale_width > 0);
+      factor = floor (priv->max_scale_width / scale_width);
+      base *= factor;
+      scale_width *= factor;
+
+      if (priv->scale_unit == CHAMPLAIN_UNIT_KM)
+        {
+          if (base / 1000.0 >= 1)
+            {
+              base /= 1000.0; /* base is now in km */
+              is_small_unit = FALSE;
+            }
+          final_unit = TRUE; /* Don't need to recompute */
+        }
+      else if (priv->scale_unit == CHAMPLAIN_UNIT_MILES)
+        {
+          if (is_small_unit && base / 5280.0 >= 1)
+            {
+              m_per_pixel /= 5280.0; /* m_per_pixel is now in miles */
+              is_small_unit = FALSE;
+              /* we need to recompute the base because 1000 ft != 1 mile */
+            }
+          else
+            final_unit = TRUE;
+        }
+    }
+  while (!final_unit);
+
+  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-far-label");
+  label = g_strdup_printf ("%g", base);
+  /* Get only digits width for centering */
+  clutter_text_set_text (CLUTTER_TEXT (text), label);
+  g_free (label);
+  clutter_actor_get_size (text, &width, NULL);
+  /* actual label with unit */
+  label = g_strdup_printf ("%g %s", base,
+      priv->scale_unit == CHAMPLAIN_UNIT_KM ?
+      (is_small_unit ? "m": "km"):
+      (is_small_unit ? "ft": "miles")
+      );
+  clutter_text_set_text (CLUTTER_TEXT (text), label);
+  g_free (label);
+  clutter_actor_set_position (text, (scale_width - width / 2) + SCALE_INSIDE_PADDING, - SCALE_INSIDE_PADDING);
+
+  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-mid-label");
+  label = g_strdup_printf ("%g", base / 2.0);
+  clutter_text_set_text (CLUTTER_TEXT (text), label);
+  clutter_actor_get_size (text, &width, NULL);
+  clutter_actor_set_position (text, (scale_width - width) / 2 + SCALE_INSIDE_PADDING, - SCALE_INSIDE_PADDING);
+  g_free (label);
+
+  /* Draw the line */
+  line = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-line");
+  clutter_cairo_texture_clear (CLUTTER_CAIRO_TEXTURE (line));
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (line));
+
+  cairo_set_source_rgb (cr, 0, 0, 0);
+  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+  cairo_set_line_width (cr, SCALE_LINE_WIDTH);
+
+  /* First tick */
+  cairo_move_to (cr, SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
+  cairo_line_to (cr, SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2 );
+  cairo_stroke (cr);
+
+  /* Line */
+  cairo_move_to (cr, SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
+  cairo_line_to (cr, scale_width + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
+  cairo_stroke (cr);
+
+  /* Middle tick */
+  cairo_move_to (cr, scale_width / 2 + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
+  cairo_line_to (cr, scale_width / 2 + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
+  cairo_stroke (cr);
+
+  /* Last tick */
+  cairo_move_to (cr, scale_width + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
+  cairo_line_to (cr, scale_width + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
+  cairo_stroke (cr);
+
+  cairo_destroy (cr);
+}
+
+static void
+create_scale (ChamplainView *view)
+{
+  ClutterActor *scale, *text;
+  gfloat width;
+  ChamplainViewPrivate *priv = view->priv;
+
+  if (priv->scale_actor)
+    {
+      g_object_unref (priv->scale_actor);
+      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage), priv->scale_actor);
+    }
+
+  priv->scale_actor = g_object_ref (clutter_group_new());
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->scale_actor);
+
+  scale = clutter_cairo_texture_new (priv->max_scale_width + 2 * SCALE_INSIDE_PADDING, SCALE_HEIGHT + 2 * SCALE_INSIDE_PADDING);
+  clutter_actor_set_name (scale, "scale-line");
+
+  text = clutter_text_new_with_text ("Sans 9", "X km");
+  clutter_actor_set_name (text, "scale-far-label");
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
+
+  text = clutter_text_new_with_text ("Sans 9", "X km");
+  clutter_actor_set_name (text, "scale-mid-label");
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
+
+  text = clutter_text_new_with_text ("Sans 9", "0");
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
+  clutter_actor_get_size (text, &width, NULL);
+  clutter_actor_set_position (text, SCALE_INSIDE_PADDING - width / 2, - SCALE_INSIDE_PADDING);
+
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), scale);
+  clutter_actor_set_position (priv->scale_actor, SCALE_PADDING - SCALE_INSIDE_PADDING,
+    priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING - SCALE_INSIDE_PADDING);
+
+  clutter_actor_set_opacity (priv->scale_actor, 200);
+}
 
 static void
 champlain_view_init (ChamplainView *view)
@@ -983,6 +1298,7 @@ champlain_view_init (ChamplainView *view)
   priv->zoom_on_double_click = TRUE;
   priv->show_license = TRUE;
   priv->license_actor = NULL;
+  priv->license_text = NULL;
   priv->stage = g_object_ref (clutter_group_new ());
   priv->scroll_mode = CHAMPLAIN_SCROLL_MODE_PUSH;
   priv->viewport_size.x = 0;
@@ -998,6 +1314,9 @@ champlain_view_init (ChamplainView *view)
   priv->goto_context = NULL;
   priv->map = NULL;
   priv->polygon_redraw_id = 0;
+  priv->show_scale = FALSE;
+  priv->scale_unit = CHAMPLAIN_UNIT_KM;
+  priv->max_scale_width = 100;
 
   /* Setup viewport */
   priv->viewport = g_object_ref (tidy_viewport_new ());
@@ -1007,6 +1326,9 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (viewport_pos_changed_cb), view);
   g_signal_connect (priv->viewport, "notify::y-origin",
       G_CALLBACK (viewport_pos_changed_cb), view);
+
+  /* Setup scale */
+  create_scale (view);
 
   /* Setup finger scroll */
   priv->finger_scroll = g_object_ref (tidy_finger_scroll_new (priv->scroll_mode));
@@ -1055,6 +1377,7 @@ champlain_view_init (ChamplainView *view)
   champlain_view_set_size (view, priv->viewport_size.width,
       priv->viewport_size.height);
 
+  clutter_actor_raise_top (priv->scale_actor);
   resize_viewport (view);
 
   priv->state = CHAMPLAIN_STATE_DONE;
@@ -1105,6 +1428,7 @@ viewport_pos_changed_cb (GObject *gobject,
   view_tiles_reposition (view);
   marker_reposition (view);
   view_update_polygons (view);
+  update_scale (view);
 
   priv->longitude = viewport_get_current_longitude (priv);
   priv->latitude = viewport_get_current_latitude (priv);
@@ -1139,6 +1463,8 @@ champlain_view_set_size (ChamplainView *view,
   priv->viewport_size.height = height;
 
   license_set_position (view);
+  clutter_actor_set_position (priv->scale_actor, SCALE_PADDING,
+      priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING);
   resize_viewport (view);
 
   if (priv->keep_center_on_resize)
@@ -1151,27 +1477,39 @@ static void
 update_license (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
+  gchar *license;
 
-  if (priv->license_actor)
-  {
-    g_object_unref (priv->license_actor);
-    clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage),
-        priv->license_actor);
-    priv->license_actor = NULL;
-  }
+  if (!priv->license_actor)
+    {
+      priv->license_actor = g_object_ref (clutter_text_new ());
+      clutter_text_set_font_name (CLUTTER_TEXT (priv->license_actor), "sans 8");
+      clutter_text_set_line_alignment (CLUTTER_TEXT (priv->license_actor), PANGO_ALIGN_RIGHT);
+      clutter_actor_set_opacity (priv->license_actor, 128);
+      clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage),
+          priv->license_actor);
+      clutter_actor_set_anchor_point_from_gravity (priv->license_actor, CLUTTER_GRAVITY_SOUTH_EAST);
+      clutter_actor_raise_top (priv->license_actor);
+    }
+
+  if (priv->license_text)
+    license = g_strjoin ("\n",
+        priv->license_text,
+        champlain_map_source_get_license (priv->map_source),
+        NULL);
+  else
+    license = g_strdup (champlain_map_source_get_license (priv->map_source));
+
+  clutter_text_set_text (CLUTTER_TEXT (priv->license_actor), license);
 
   if (priv->show_license)
     {
-      priv->license_actor = g_object_ref (clutter_text_new_with_text ("sans 8",
-          champlain_map_source_get_license (priv->map_source)));
-      clutter_actor_set_opacity (priv->license_actor, 128);
       clutter_actor_show (priv->license_actor);
-
-      clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage),
-          priv->license_actor);
-      clutter_actor_raise_top (priv->license_actor);
       license_set_position (view);
     }
+  else
+    clutter_actor_hide (priv->license_actor);
+
+  g_free (license);
 }
 
 static gboolean
@@ -1430,6 +1768,7 @@ champlain_view_center_on (ChamplainView *view,
   view_load_visible_tiles (view);
   view_tiles_reposition (view);
   view_update_polygons (view);
+  update_scale (view);
   marker_reposition (view);
 }
 
@@ -2178,6 +2517,28 @@ champlain_view_set_keep_center_on_resize (ChamplainView *view,
 }
 
 /**
+* champlain_view_set_license_text:
+* @view: a #ChamplainView
+* @text: a license
+*
+* Show the additional license text on the map view.  The text will preceed the
+* map's licence when displayed. Use "\n" to separate the lines.
+*
+* Since: 0.4.3
+*/
+void
+champlain_view_set_license_text (ChamplainView *view,
+    const gchar *text)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->license_text = g_strdup (text);
+  update_license (view);
+}
+
+/**
 * champlain_view_set_show_license:
 * @view: a #ChamplainView
 * @value: a #gboolean
@@ -2198,6 +2559,70 @@ champlain_view_set_show_license (ChamplainView *view,
 
   priv->show_license = value;
   update_license (view);
+}
+
+/**
+* champlain_view_set_show_scale:
+* @view: a #ChamplainView
+* @value: a #gboolean
+*
+* Show the scale on the map view.
+*
+* Since: 0.4.3
+*/
+void
+champlain_view_set_show_scale (ChamplainView *view,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->show_scale = value;
+  update_scale (view);
+}
+
+/**
+* champlain_view_set_max_scale_width:
+* @view: a #ChamplainView
+* @value: a #guint in pixels
+*
+* Sets the maximum width of the scale on the screen in pixels
+*
+* Since: 0.4.3
+*/
+void
+champlain_view_set_max_scale_width (ChamplainView *view,
+    guint value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->max_scale_width = value;
+  create_scale (view);
+  update_scale (view);
+}
+
+/**
+* champlain_view_set_scale_unit:
+* @view: a #ChamplainView
+* @unit: a #ChamplainUnit
+*
+* Sets the scales unit.
+*
+* Since: 0.4.3
+*/
+void
+champlain_view_set_scale_unit (ChamplainView *view,
+    ChamplainUnit unit)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->scale_unit = unit;
+  update_scale (view);
 }
 
 /**
@@ -2565,6 +2990,75 @@ champlain_view_get_show_license (ChamplainView *view)
 
   ChamplainViewPrivate *priv = view->priv;
   return priv->show_license;
+}
+
+/**
+ * champlain_view_get_license_text:
+ * @view: The view
+ *
+ * Returns: the additional license text
+ *
+ * Since: 0.4.3
+ */
+const gchar *
+champlain_view_get_license_text (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->license_text;
+}
+
+
+/**
+ * champlain_view_get_show_scale:
+ * @view: The view
+ *
+ * Returns: TRUE if the view displays the scale, FALSE otherwise.
+ *
+ * Since: 0.4.3
+ */
+gboolean
+champlain_view_get_show_scale (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->show_scale;
+}
+
+/**
+ * champlain_view_get_max_scale_width:
+ * @view: The view
+ *
+ * Returns: The max scale width in pixels.
+ *
+ * Since: 0.4.3
+ */
+guint
+champlain_view_get_max_scale_width (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->max_scale_width;
+}
+
+/**
+ * champlain_view_get_scale_unit:
+ * @view: The view
+ *
+ * Returns: The unit used by the scale
+ *
+ * Since: 0.4.3
+ */
+ChamplainUnit
+champlain_view_get_scale_unit (ChamplainView *view)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  ChamplainViewPrivate *priv = view->priv;
+  return priv->scale_unit;
 }
 
 /**

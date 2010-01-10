@@ -23,7 +23,7 @@
 
 (define-object MapSource
   (in-module "Champlain")
-  (parent "GObject")
+  (parent "GInitiallyUnowned")
   (c-name "ChamplainMapSource")
   (gtype-id "CHAMPLAIN_TYPE_MAP_SOURCE")
 )
@@ -51,9 +51,16 @@
 
 (define-object Polygon
   (in-module "Champlain")
-  (parent "GObject")
+  (parent "GInitiallyUnowned")
   (c-name "ChamplainPolygon")
   (gtype-id "CHAMPLAIN_TYPE_POLYGON")
+)
+
+(define-object SelectionLayer
+  (in-module "Champlain")
+  (parent "ChamplainLayer")
+  (c-name "ChamplainSelectionLayer")
+  (gtype-id "CHAMPLAIN_TYPE_SELECTION_LAYER")
 )
 
 (define-object Tile
@@ -99,6 +106,27 @@
     '("loading" "CHAMPLAIN_STATE_LOADING")
     '("validating-cache" "CHAMPLAIN_STATE_VALIDATING_CACHE")
     '("done" "CHAMPLAIN_STATE_DONE")
+  )
+)
+
+(define-enum Unit
+  (in-module "Champlain")
+  (c-name "ChamplainUnit")
+  (gtype-id "CHAMPLAIN_TYPE_UNIT")
+  (values
+    '("km" "CHAMPLAIN_UNIT_KM")
+    '("miles" "CHAMPLAIN_UNIT_MILES")
+  )
+)
+
+(define-enum SelectionMode
+  (in-module "Champlain")
+  (c-name "ChamplainSelectionMode")
+  (gtype-id "CHAMPLAIN_TYPE_SELECTION_MODE")
+  (values
+    '("none" "CHAMPLAIN_SELECTION_NONE")
+    '("single" "CHAMPLAIN_SELECTION_SINGLE")
+    '("multiple" "CHAMPLAIN_SELECTION_MULTIPLE")
   )
 )
 
@@ -341,6 +369,42 @@
   )
 )
 
+(define-method set_license_text
+  (of-object "ChamplainView")
+  (c-name "champlain_view_set_license_text")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "text")
+  )
+)
+
+(define-method set_show_scale
+  (of-object "ChamplainView")
+  (c-name "champlain_view_set_show_scale")
+  (return-type "none")
+  (parameters
+    '("gboolean" "value")
+  )
+)
+
+(define-method set_scale_unit
+  (of-object "ChamplainView")
+  (c-name "champlain_view_set_scale_unit")
+  (return-type "none")
+  (parameters
+    '("ChamplainUnit" "unit")
+  )
+)
+
+(define-method set_max_scale_width
+  (of-object "ChamplainView")
+  (c-name "champlain_view_set_max_scale_width")
+  (return-type "none")
+  (parameters
+    '("guint" "value")
+  )
+)
+
 (define-method set_zoom_on_double_click
   (of-object "ChamplainView")
   (c-name "champlain_view_set_zoom_on_double_click")
@@ -437,6 +501,30 @@
   (of-object "ChamplainView")
   (c-name "champlain_view_get_show_license")
   (return-type "gboolean")
+)
+
+(define-method get_license_text
+  (of-object "ChamplainView")
+  (c-name "champlain_view_get_license_text")
+  (return-type "const-gchar*")
+)
+
+(define-method get_show_scale
+  (of-object "ChamplainView")
+  (c-name "champlain_view_get_show_scale")
+  (return-type "gboolean")
+)
+
+(define-method get_max_scale_width
+  (of-object "ChamplainView")
+  (c-name "champlain_view_get_max_scale_width")
+  (return-type "guint")
+)
+
+(define-method get_scale_unit
+  (of-object "ChamplainView")
+  (c-name "champlain_view_get_scale_unit")
+  (return-type "ChamplainUnit")
 )
 
 (define-method get_zoom_on_double_click
@@ -599,6 +687,21 @@
   (return-type "gdouble")
 )
 
+(define-method set_mark_points
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_set_mark_points")
+  (return-type "none")
+  (parameters
+    '("gboolean" "value")
+  )
+)
+
+(define-method get_mark_points
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_get_mark_points")
+  (return-type "gboolean")
+)
+
 (define-method show
   (of-object "ChamplainPolygon")
   (c-name "champlain_polygon_show")
@@ -709,6 +812,93 @@
   (of-object "ChamplainLayer")
   (c-name "champlain_layer_hide_all_markers")
   (return-type "none")
+)
+
+
+
+;; From champlain-selection-layer.h
+
+(define-function selection_layer_get_type
+  (c-name "champlain_selection_layer_get_type")
+  (return-type "GType")
+)
+
+(define-function selection_layer_new
+  (c-name "champlain_selection_layer_new")
+  (is-constructor-of "ChamplainSelectionLayer")
+  (return-type "ChamplainLayer*")
+)
+
+(define-method get_selected
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_get_selected")
+  (return-type "ChamplainBaseMarker*")
+)
+
+(define-method get_selected_markers
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_get_selected_markers")
+  (return-type "const-GList*")
+)
+
+(define-method count_selected_markers
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_count_selected_markers")
+  (return-type "guint")
+)
+
+(define-method select
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_select")
+  (return-type "none")
+  (parameters
+    '("ChamplainBaseMarker*" "marker")
+  )
+)
+
+(define-method unselect
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_unselect")
+  (return-type "none")
+  (parameters
+    '("ChamplainBaseMarker*" "marker")
+  )
+)
+
+(define-method marker_is_selected
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_marker_is_selected")
+  (return-type "gboolean")
+  (parameters
+    '("ChamplainBaseMarker*" "marker")
+  )
+)
+
+(define-method select_all
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_select_all")
+  (return-type "none")
+)
+
+(define-method unselect_all
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_unselect_all")
+  (return-type "none")
+)
+
+(define-method set_selection_mode
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_set_selection_mode")
+  (return-type "none")
+  (parameters
+    '("ChamplainSelectionMode" "mode")
+  )
+)
+
+(define-method get_selection_mode
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_get_selection_mode")
+  (return-type "ChamplainSelectionMode")
 )
 
 
@@ -878,6 +1068,17 @@
   (of-object "ChamplainMapSource")
   (c-name "champlain_map_source_get_projection")
   (return-type "ChamplainMapProjection")
+)
+
+(define-method get_meters_per_pixel
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_meters_per_pixel")
+  (return-type "gfloat")
+  (parameters
+    '("gint" "zoom_level")
+    '("gdouble" "latitude")
+    '("gdouble" "longitude")
+  )
 )
 
 
@@ -1257,6 +1458,12 @@
 (define-function marker_get_highlight_text_color
   (c-name "champlain_marker_get_highlight_text_color")
   (return-type "const-ClutterColor*")
+)
+
+(define-method queue_redraw
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_queue_redraw")
+  (return-type "none")
 )
 
 

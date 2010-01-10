@@ -19,3 +19,4 @@ champlain_zoom_level_get_type
 champlain_debug
 champlain_debug_flag_is_set
 champlain_debug_set_flags
+champlain_unit_get_type

@@ -160,7 +160,7 @@ ChamplainMapSourceDesc OSM_MAPNIK_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
     "OpenStreetMap Mapnik",
-    "CC-BY-SA 2.0 OpenStreetMap contributors",
+    "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
     "http://creativecommons.org/licenses/by-sa/2.0/",
     0,
     18,
@@ -175,7 +175,7 @@ ChamplainMapSourceDesc OSM_OSMARENDER_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
     "OpenStreetMap Osmarender",
-    "CC-BY-SA 2.0 OpenStreetMap contributors",
+    "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
     "http://creativecommons.org/licenses/by-sa/2.0/",
     0,
     17,
@@ -190,7 +190,7 @@ ChamplainMapSourceDesc OSM_CYCLEMAP_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
     "OpenStreetMap Cycle Map",
-    "CC-BY-SA 2.0 OpenStreetMap contributors",
+    "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
     "http://creativecommons.org/licenses/by-sa/2.0/",
     0,
     18,
@@ -205,7 +205,7 @@ ChamplainMapSourceDesc OSM_TRANSPORTMAP_DESC =
   {
     CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP,
     "OpenStreetMap Transport Map",
-    "CC-BY-SA 2.0 OpenStreetMap contributors",
+    "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
     "http://creativecommons.org/licenses/by-sa/2.0/",
     0,
     18,

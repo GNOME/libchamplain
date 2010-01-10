@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use Clutter::TestHelper tests => 165;
+use Clutter::TestHelper tests => 177;
 
 use Champlain qw(:coords :maps);
 
-my $OSM_LICENSE = "CC-BY-SA 2.0 OpenStreetMap contributors";
+my $OSM_LICENSE_REGEXP = qr/OpenStreetMap contributors/;
 my $OSM_URL_LICENSE = 'http://creativecommons.org/licenses/by-sa/2.0/';
 
 exit tests();
@@ -18,6 +18,7 @@ sub tests {
 	test_osm_osmarender();
 	test_oam();
 	test_mff_relief();
+
 	return 0;
 }
 
@@ -34,7 +35,7 @@ sub test_osm_mapnik {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 18, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
-	is($map->get_license, $OSM_LICENSE, "$label license");
+	ok($map->get_license =~ /$OSM_LICENSE_REGEXP/, "$label license");
 	is($map->get_license_uri, $OSM_URL_LICENSE , "$label license_uri");
 	
 	# Generic map operations
@@ -54,7 +55,7 @@ sub test_osm_cyclemap {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 18, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
-	is($map->get_license, $OSM_LICENSE, "$label license");
+	ok($map->get_license =~ /$OSM_LICENSE_REGEXP/, "$label license");
 	is($map->get_license_uri, $OSM_URL_LICENSE , "$label license_uri");
 	
 	# Generic map operations
@@ -74,7 +75,7 @@ sub test_osm_osmarender {
 	is($map->get_min_zoom_level, 0, "$label min zoom");
 	is($map->get_max_zoom_level, 17, "$label max zoom");
 	is($map->get_tile_size, 256, "$label tile size");
-	is($map->get_license, $OSM_LICENSE, "$label license");
+	ok($map->get_license =~ /$OSM_LICENSE_REGEXP/, "$label license");
 	is($map->get_license_uri, $OSM_URL_LICENSE , "$label license_uri");
 	
 	# Generic map operations
@@ -238,6 +239,20 @@ sub generic_map_operations {
 		1,
 		"$label column count at min zoom"
 	);
+
+
+	# Check that min zoom level and max zoom level meters per pixel at different
+	SKIP: {
+		Champlain->CHECK_VERSION(0, 4, 3) or skip '0.4.3 stuff', 2;
+		my $meters_at_min = $map->get_meters_per_pixel($map->get_min_zoom_level, 0, 0);
+		ok($meters_at_min > 0, "Meters per pixel $meters_at_min at min zoom level");
+
+		my $meters_at_max = $map->get_meters_per_pixel($map->get_max_zoom_level, 0, 0);
+		ok($meters_at_max > 0, "Meters per pixel $meters_at_max at max zoom level");
+
+		ok($meters_at_max < $meters_at_min, "Meters per pixel are different at max/min zoom level");
+	}
+
 
 	my $tile = Champlain::Tile->new();
 	is($tile->get_size(), 0, "get_size() default tile");

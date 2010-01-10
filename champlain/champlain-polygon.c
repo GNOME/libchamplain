@@ -51,6 +51,7 @@ enum
   PROP_FILL_COLOR,
   PROP_STROKE,
   PROP_VISIBLE,
+  PROP_MARK_POINTS,
 };
 
 static void
@@ -83,6 +84,9 @@ champlain_polygon_get_property (GObject *object,
         break;
       case PROP_VISIBLE:
         g_value_set_boolean (value, priv->visible);
+        break;
+      case PROP_MARK_POINTS:
+        g_value_set_boolean (value, priv->mark_points);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -127,6 +131,10 @@ champlain_polygon_set_property (GObject *object,
             champlain_polygon_show (CHAMPLAIN_POLYGON (object));
         else
             champlain_polygon_hide (CHAMPLAIN_POLYGON (object));
+        break;
+      case PROP_MARK_POINTS:
+        champlain_polygon_set_mark_points (CHAMPLAIN_POLYGON (object),
+            g_value_get_boolean (value));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -256,6 +264,21 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
+  * ChamplainPolygon:mark-points:
+  *
+  * Wether the polygons points should be marked for extra visibility.
+  *
+  * Since: 0.4.3
+  */
+  g_object_class_install_property (object_class,
+      PROP_MARK_POINTS,
+      g_param_spec_boolean ("mark-points",
+          "Mark Points",
+          "The polygon's points are marked for visibility",
+          FALSE,
+          CHAMPLAIN_PARAM_READWRITE));
+
+  /**
   * ChamplainPolygon:visible:
   *
   * Wether the polygon is visible
@@ -281,6 +304,7 @@ champlain_polygon_init (ChamplainPolygon *polygon)
   polygon->priv->fill = FALSE;
   polygon->priv->stroke = TRUE;
   polygon->priv->stroke_width = 2.0;
+  polygon->priv->mark_points = FALSE;
 
   polygon->priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   polygon->priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
@@ -603,6 +627,42 @@ champlain_polygon_get_stroke_width (ChamplainPolygon *polygon)
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), 0);
 
   return polygon->priv->stroke_width;
+}
+
+/**
+ * champlain_polygon_set_mark_points:
+ * @polygon: The polygon
+ * @value: mark points when drawing the polygon.
+ *
+ * Sets the property determining if the points in the polygon
+ * should get marked for extra visibility when drawing the polygon.
+ *
+ * Since: 0.4.3
+ */
+void
+champlain_polygon_set_mark_points (ChamplainPolygon *polygon,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
+
+  polygon->priv->mark_points = value;
+  g_object_notify (G_OBJECT (polygon), "mark-points");
+}
+
+/**
+ * champlain_polygon_get_mark_points:
+ * @polygon: The polygon
+ *
+ * Returns: wether points in polygon gets marked for extra visibility.
+ *
+ * Since: 0.4.3
+ */
+gboolean
+champlain_polygon_get_mark_points (ChamplainPolygon *polygon)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), FALSE);
+
+  return polygon->priv->mark_points;
 }
 
 /**

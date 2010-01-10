@@ -1,5 +1,5 @@
 ;; -*- scheme -*-
-; object definitions ...
 
 (include "pychamplain-base.defs")
 (include "pychamplain-boxed-types.defs")
+(include "pychamplain-constructors.defs")

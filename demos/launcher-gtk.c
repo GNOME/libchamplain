@@ -56,6 +56,17 @@ toggle_layer (GtkToggleButton *widget,
     }
 }
 
+gboolean
+mouse_click_cb (ClutterActor *actor, ClutterEvent *event, gpointer data)
+{
+    gdouble lat, lon;
+
+    champlain_view_get_coords_from_event (CHAMPLAIN_VIEW (data), event, &lat, &lon);
+    g_print ("Mouse click at: %f  %f\n", lat, lon);
+
+    return TRUE;
+}
+
 static void
 map_source_changed (GtkWidget *widget,
                     ChamplainView *view)
@@ -210,9 +221,16 @@ main (int argc,
 
   widget = gtk_champlain_embed_new ();
   view = gtk_champlain_embed_get_view (GTK_CHAMPLAIN_EMBED (widget));
+  clutter_actor_set_reactive (CLUTTER_ACTOR (view), TRUE);
+  g_signal_connect (view, "button-release-event", G_CALLBACK (mouse_click_cb), view);
 
-  g_object_set (G_OBJECT (view), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
-      "zoom-level", 5, NULL);
+
+  g_object_set (G_OBJECT (view),
+      "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
+      "zoom-level", 5,
+      "license-text", "Don't eat cereals with orange juice\nIt tastes bad",
+      "show-scale", TRUE,
+      NULL);
   layer = create_marker_layer (view);
   champlain_view_add_layer(view, layer);
   champlain_layer_hide_all_markers (CHAMPLAIN_LAYER (layer));
@@ -229,6 +247,9 @@ main (int argc,
   champlain_polygon_append_point (polygon, 45.4000, -73.1815);
   champlain_polygon_append_point (polygon, 45.4151, -73.1218);
   champlain_polygon_set_stroke_width (polygon, 5.0);
+  g_object_set (G_OBJECT (polygon),
+      "mark-points", TRUE,
+      NULL);
   champlain_view_add_polygon (CHAMPLAIN_VIEW (view), polygon);
   champlain_polygon_hide (polygon);
 

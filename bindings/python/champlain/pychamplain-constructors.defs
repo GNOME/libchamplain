@@ -1,0 +1,14 @@
+;; -*- scheme -*-
+; constructor definitions ...
+
+(define-function map_source_new
+  (c-name "champlain_map_source_new")
+  (is-constructor-of "ChamplainMapSource")
+  (return-type "ChamplainMapSource*")
+)
+
+(define-function network_map_source_new
+  (c-name "champlain_network_map_source_new")
+  (is-constructor-of "ChamplainNetworkMapSource")
+  (return-type "ChamplainNetworkMapSource*")
+)
