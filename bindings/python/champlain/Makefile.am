@@ -38,6 +38,9 @@ pychamplain.c: pychamplain.override pychamplain.defs
 
 EXTRA_DIST =			\
 	pychamplain.override	\
+	pychamplain-constructors.defs	\
+	pychamplain-boxed-types.defs	\
+	pychamplain-base.defs	\
 	pychamplain.defs	\
 	pychamplain.h
 
