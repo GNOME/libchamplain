@@ -211,7 +211,6 @@ static void connect_marker_notify_cb (ChamplainMarker *marker,
 static gboolean finger_scroll_button_press_cb (ClutterActor *actor,
     ClutterButtonEvent *event, ChamplainView *view);
 static void update_license (ChamplainView *view);
-static void license_set_position (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
 static void view_position_tile (ChamplainView* view, ChamplainTile* tile);
 static void view_tiles_reposition (ChamplainView* view);
@@ -375,22 +374,10 @@ create_initial_map (ChamplainView *view)
   g_idle_add (marker_reposition, view);
   view_tiles_reposition (view);
   update_license (view);
+  resize_viewport (view);
 
   g_object_notify (G_OBJECT (view), "zoom-level");
   g_object_notify (G_OBJECT (view), "map-source");
-}
-
-static void
-license_set_position (ChamplainView *view)
-{
-  ChamplainViewPrivate *priv = view->priv;
-
-  if (!priv->license_actor)
-    return;
-
-  clutter_actor_set_position (priv->license_actor,
-      priv->viewport_size.width - PADDING,
-      priv->viewport_size.height - PADDING);
 }
 
 static void
@@ -523,9 +510,6 @@ resize_viewport (ChamplainView *view)
 
   if (!priv->map)
     return;
-
-  clutter_actor_set_size (priv->finger_scroll, priv->viewport_size.width,
-      priv->viewport_size.height);
 
   tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->viewport), &hadjust,
       &vadjust);
@@ -804,6 +788,47 @@ champlain_view_dispose (GObject *object)
 }
 
 static void
+champlain_view_allocate (ClutterActor          *actor,
+                         const ClutterActorBox *box,
+                         ClutterAllocationFlags flags)
+{
+  ChamplainView *view = CHAMPLAIN_VIEW (actor);
+  ChamplainViewPrivate *priv = view->priv;
+  guint width, height;
+
+  /* Chain up */
+  CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->allocate (actor, box, flags);
+
+  if (flags != CLUTTER_ALLOCATION_NONE)
+    return;
+
+  width = box->x2 - box->x1;
+  height = box->y2 - box->y1;
+
+  if (priv->viewport_size.width == width && priv->viewport_size.height == height)
+    return;
+
+  priv->viewport_size.width = width;
+  priv->viewport_size.height = height;
+
+  clutter_actor_set_size (priv->finger_scroll, width, height);
+
+  clutter_actor_set_position (priv->license_actor,
+      priv->viewport_size.width - PADDING,
+      priv->viewport_size.height - PADDING);
+  clutter_actor_set_position (priv->scale_actor,
+      SCALE_PADDING,
+      height - SCALE_HEIGHT - SCALE_PADDING);
+
+  resize_viewport (view);
+
+  if (priv->keep_center_on_resize)
+    champlain_view_center_on (view, priv->latitude, priv->longitude);
+  else
+    view_load_visible_tiles (view);
+}
+
+static void
 champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 {
   g_type_class_add_private (champlainViewClass, sizeof (ChamplainViewPrivate));
@@ -812,6 +837,9 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   object_class->dispose = champlain_view_dispose;
   object_class->get_property = champlain_view_get_property;
   object_class->set_property = champlain_view_set_property;
+
+  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (champlainViewClass);
+  actor_class->allocate = champlain_view_allocate;
 
   /**
   * ChamplainView:longitude:
@@ -1374,9 +1402,6 @@ champlain_view_init (ChamplainView *view)
       priv->polygon_layer);
   clutter_actor_raise (priv->polygon_layer, priv->map_layer);
 
-  champlain_view_set_size (view, priv->viewport_size.width,
-      priv->viewport_size.height);
-
   clutter_actor_raise_top (priv->scale_actor);
   resize_viewport (view);
 
@@ -1443,9 +1468,8 @@ viewport_pos_changed_cb (GObject *gobject,
  * @width: the width in pixels
  * @height: the height in pixels
  *
- * Sets the size of the view.  This function will most probably be deprecated in
- * future versions in favor of #clutter_actor_set_size.  In the mean time, you need
- * to call both.
+ * Sets the size of the view.  This function is deprecated and should not be used in new code
+ * Use #clutter_actor_set_size instead.
  *
  * Since: 0.1
  */
@@ -1455,23 +1479,9 @@ champlain_view_set_size (ChamplainView *view,
     guint width,
     guint height)
 {
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  ChamplainViewPrivate *priv = view->priv;
-
-  priv->viewport_size.width = width;
-  priv->viewport_size.height = height;
-
-  license_set_position (view);
-  clutter_actor_set_position (priv->scale_actor, SCALE_PADDING,
-      priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING);
-  resize_viewport (view);
-
-  if (priv->keep_center_on_resize)
-    champlain_view_center_on (view, priv->latitude, priv->longitude);
-  else
-    view_load_visible_tiles (view);
+  clutter_actor_set_size (CLUTTER_ACTOR (view), width, height);
 }
+
 
 static void
 update_license (ChamplainView *view)
@@ -1502,10 +1512,7 @@ update_license (ChamplainView *view)
   clutter_text_set_text (CLUTTER_TEXT (priv->license_actor), license);
 
   if (priv->show_license)
-    {
-      clutter_actor_show (priv->license_actor);
-      license_set_position (view);
-    }
+    clutter_actor_show (priv->license_actor);
   else
     clutter_actor_hide (priv->license_actor);
 
@@ -1954,10 +1961,12 @@ champlain_view_set_zoom_level (ChamplainView *view,
   gdouble longitude;
   gdouble latitude;
 
-  if (priv->map == NULL)
+  if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE(priv, zoom_level))
     return;
 
-  if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE(priv, zoom_level))
+  priv->zoom_level = zoom_level;
+
+  if (priv->map == NULL)
     return;
 
   champlain_view_stop_go_to (view);
@@ -1968,7 +1977,6 @@ champlain_view_set_zoom_level (ChamplainView *view,
 
   DEBUG ("Zooming to %d", zoom_level);
 
-  priv->zoom_level = zoom_level;
   /* Fix to bug 575133: keep the lat,lon as it gets set to a wrong value
    * when resizing the viewport, when passing from zoom_level 7 to 6
    * (or more precisely when anchor is set to 0).

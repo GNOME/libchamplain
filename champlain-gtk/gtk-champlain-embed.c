@@ -199,7 +199,7 @@ set_view (GtkChamplainEmbed* embed,
     }
 
   priv->view = g_object_ref (view);
-  champlain_view_set_size (priv->view, priv->width, priv->height);
+  clutter_actor_set_size (CLUTTER_ACTOR (priv->view), priv->width, priv->height);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
 }
@@ -274,7 +274,7 @@ view_size_allocated_cb (GtkWidget *widget,
   GtkChamplainEmbedPrivate *priv = view->priv;
 
   if (priv->view != NULL)
-    champlain_view_set_size (priv->view, allocation->width, allocation->height);
+    clutter_actor_set_size (CLUTTER_ACTOR (priv->view), allocation->width, allocation->height);
 
   priv->width = allocation->width;
   priv->height = allocation->height;
