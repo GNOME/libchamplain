@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import cluttergtk # must be the first to be imported
-import clutter
 import gobject
 import gtk
 import champlain
@@ -18,8 +16,10 @@ class LauncherGTK:
 
         vbox = gtk.VBox(False, 12)
 
-        self.view = champlain.View()
-        self.view.set_property("scroll-mode", champlain.SCROLL_MODE_KINETIC)
+        embed = champlaingtk.ChamplainEmbed()
+        embed.set_size_request(640, 480)
+
+        self.view = embed.get_view()
 
         self.layer = create_marker_layer(self.view)
         self.view.add_layer(self.layer)
@@ -40,9 +40,6 @@ class LauncherGTK:
         polygon.set_property("mark-points", True)
         self.view.add_polygon(polygon)
         polygon.hide()
-
-        embed = cluttergtk.Embed()
-        embed.set_size_request(640, 480)
 
         bbox = gtk.HBox(False, 6)
         button = gtk.Button(stock=gtk.STOCK_ZOOM_IN)
@@ -81,12 +78,6 @@ class LauncherGTK:
         vbox.add(embed)
 
         self.window.add(vbox)
-        # we need to realize the widget before we get the stage
-        embed.realize()
-
-        stage = embed.get_stage()
-        self.view.set_size(640, 480)
-        stage.add(self.view)
 
         self.window.show_all()
         self.view.center_on(45.466, -73.75)
