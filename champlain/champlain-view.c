@@ -1102,6 +1102,27 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
 }
 
+static void
+create_license (ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = view->priv;
+
+  if (priv->license_actor)
+    {
+      g_object_unref (priv->license_actor);
+      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
+    }
+
+  priv->license_actor = g_object_ref (clutter_text_new ());
+  clutter_text_set_font_name (CLUTTER_TEXT (priv->license_actor), "sans 8");
+  clutter_text_set_line_alignment (CLUTTER_TEXT (priv->license_actor), PANGO_ALIGN_RIGHT);
+  clutter_actor_set_opacity (priv->license_actor, 128);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage),
+      priv->license_actor);
+  clutter_actor_set_anchor_point_from_gravity (priv->license_actor, CLUTTER_GRAVITY_SOUTH_EAST);
+  clutter_actor_raise_top (priv->license_actor);
+}
+
 static gboolean
 button_release_cb (ClutterActor *actor,
     ClutterEvent *event,
@@ -1358,6 +1379,9 @@ champlain_view_init (ChamplainView *view)
   /* Setup scale */
   create_scale (view);
 
+  /* Setup license */
+  create_license (view);
+
   /* Setup finger scroll */
   priv->finger_scroll = g_object_ref (tidy_finger_scroll_new (priv->scroll_mode));
 
@@ -1482,24 +1506,11 @@ champlain_view_set_size (ChamplainView *view,
   clutter_actor_set_size (CLUTTER_ACTOR (view), width, height);
 }
 
-
 static void
 update_license (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
   gchar *license;
-
-  if (!priv->license_actor)
-    {
-      priv->license_actor = g_object_ref (clutter_text_new ());
-      clutter_text_set_font_name (CLUTTER_TEXT (priv->license_actor), "sans 8");
-      clutter_text_set_line_alignment (CLUTTER_TEXT (priv->license_actor), PANGO_ALIGN_RIGHT);
-      clutter_actor_set_opacity (priv->license_actor, 128);
-      clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage),
-          priv->license_actor);
-      clutter_actor_set_anchor_point_from_gravity (priv->license_actor, CLUTTER_GRAVITY_SOUTH_EAST);
-      clutter_actor_raise_top (priv->license_actor);
-    }
 
   if (priv->license_text)
     license = g_strjoin ("\n",
