@@ -32,6 +32,7 @@ demos/animated-marker
 demos/launcher
 demos/launcher-gtk
 demos/polygons
+demos/url-marker
 depcomp
 compile
 docs/reference-gtk/version.xml
@@ -56,7 +57,4 @@ tidy/tidy-marshal.c
 tidy/tidy-marshal.h
 *~
 tags
-demos/launcher
-demos/launcher-gtk
-demos/animated-marker
 *.sw?
