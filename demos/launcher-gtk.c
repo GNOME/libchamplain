@@ -231,6 +231,8 @@ main (int argc,
       "license-text", "Don't eat cereals with orange juice\nIt tastes bad",
       "show-scale", TRUE,
       NULL);
+  champlain_view_center_on(CHAMPLAIN_VIEW(view), 45.466, -73.75);
+
   layer = create_marker_layer (view);
   champlain_view_add_layer(view, layer);
   champlain_layer_hide_all_markers (CHAMPLAIN_LAYER (layer));
@@ -296,7 +298,6 @@ main (int argc,
 
   /* make sure that everything, window and label, are visible */
   gtk_widget_show_all (window);
-  champlain_view_center_on(CHAMPLAIN_VIEW(view), 45.466, -73.75);
   /* start the main loop */
   gtk_main ();
 
