@@ -191,7 +191,6 @@ static gboolean scroll_event (ClutterActor *actor, ClutterScrollEvent *event,
 static void marker_reposition_cb (ChamplainMarker *marker, ChamplainView *view);
 static void layer_reposition_cb (ClutterActor *layer, ChamplainView *view);
 static gboolean marker_reposition (gpointer data);
-static void create_initial_map (ChamplainView *view);
 static void resize_viewport (ChamplainView *view);
 static void champlain_view_get_property (GObject *object, guint prop_id,
     GValue *value, GParamSpec *pspec);
@@ -361,26 +360,6 @@ marker_reposition (gpointer data)
 }
 
 static void
-create_initial_map (ChamplainView *view)
-{
-  ChamplainViewPrivate *priv = view->priv;
-  ClutterActor *group;
-
-  priv->map = map_new ();
-  map_load_level (priv->map, priv->map_source, priv->zoom_level);
-  group = champlain_zoom_level_get_actor (priv->map->current_level);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), group);
-
-  g_idle_add (marker_reposition, view);
-  view_tiles_reposition (view);
-  update_license (view);
-  resize_viewport (view);
-
-  g_object_notify (G_OBJECT (view), "zoom-level");
-  g_object_notify (G_OBJECT (view), "map-source");
-}
-
-static void
 draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
 {
   cairo_t *cr;
@@ -508,16 +487,13 @@ resize_viewport (ChamplainView *view)
 
   ChamplainViewPrivate *priv = view->priv;
 
-  if (!priv->map)
-    return;
-
   tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->viewport), &hadjust,
       &vadjust);
 
   if (priv->zoom_level < 8)
     {
       lower = -priv->viewport_size.width / 2.0;
-      upper = champlain_zoom_level_get_width (priv->map->current_level) *
+      upper = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level) *
           champlain_map_source_get_tile_size (priv->map_source) -
           priv->viewport_size.width / 2.0;
     }
@@ -532,7 +508,7 @@ resize_viewport (ChamplainView *view)
   if (priv->zoom_level < 8)
     {
       lower = -priv->viewport_size.height / 2.0;
-      upper = champlain_zoom_level_get_height (priv->map->current_level) *
+      upper = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
           champlain_map_source_get_tile_size (priv->map_source) -
           priv->viewport_size.height / 2.0;
     }
@@ -829,6 +805,35 @@ champlain_view_allocate (ClutterActor          *actor,
 }
 
 static void
+champlain_view_realize (ClutterActor *actor)
+{
+  ChamplainView *view = CHAMPLAIN_VIEW (actor);
+  ChamplainViewPrivate *priv = view->priv;
+  ClutterActor *group;
+
+  /*
+   We should be calling this but it segfaults
+   CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->realize (actor);
+   ClutterStage uses clutter_actor_realize.
+   */
+  clutter_actor_realize (actor);
+
+  priv->map = map_new ();
+  map_load_level (priv->map, priv->map_source, priv->zoom_level);
+  group = champlain_zoom_level_get_actor (priv->map->current_level);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), group);
+
+  /* Setup the viewport according to the zoom level */
+  //resize_viewport (view);
+
+  g_object_notify (G_OBJECT (view), "zoom-level");
+  g_object_notify (G_OBJECT (view), "map-source");
+
+  /* this call will launch the tiles loading */
+  champlain_view_center_on (view, priv->latitude, priv->longitude);
+}
+
+static void
 champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 {
   g_type_class_add_private (champlainViewClass, sizeof (ChamplainViewPrivate));
@@ -840,6 +845,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (champlainViewClass);
   actor_class->allocate = champlain_view_allocate;
+  actor_class->realize = champlain_view_realize;
 
   /**
   * ChamplainView:longitude:
@@ -1761,9 +1767,7 @@ champlain_view_center_on (ChamplainView *view,
   priv->latitude = CLAMP (latitude, CHAMPLAIN_MIN_LAT, CHAMPLAIN_MAX_LAT);
 
   if (!priv->map)
-    {
-      create_initial_map (view);
-    }
+    return;
 
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
