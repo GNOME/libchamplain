@@ -381,7 +381,7 @@ champlain_cache_fill_tile (ChamplainCache *self,
 
   file = g_file_new_for_path (filename);
   info = g_file_query_info (file,
-      G_FILE_ATTRIBUTE_TIME_MODIFIED "," G_FILE_ATTRIBUTE_ETAG_VALUE,
+      G_FILE_ATTRIBUTE_TIME_MODIFIED,
       G_FILE_QUERY_INFO_NONE, NULL, NULL);
   g_file_info_get_modification_time (info, &modified_time);
   champlain_tile_set_modified_time (tile, &modified_time);
