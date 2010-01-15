@@ -210,6 +210,7 @@ static void connect_marker_notify_cb (ChamplainMarker *marker,
 static gboolean finger_scroll_button_press_cb (ClutterActor *actor,
     ClutterButtonEvent *event, ChamplainView *view);
 static void update_license (ChamplainView *view);
+static void update_scale (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
 static void view_position_tile (ChamplainView* view, ChamplainTile* tile);
 static void view_tiles_reposition (ChamplainView* view);
@@ -275,6 +276,64 @@ viewport_get_current_latitude (ChamplainViewPrivate *priv)
   return viewport_get_latitude_at (priv,
       priv->anchor.y + priv->viewport_size.y +
       priv->viewport_size.height / 2.0);
+}
+
+/* Updates the internals after the viewport changed */
+static void
+update_viewport (ChamplainView *view,
+    gfloat x,
+    gfloat y)
+{
+  ChamplainViewPrivate *priv = view->priv;
+
+  ChamplainFloatPoint old_anchor;
+
+  old_anchor.x = priv->anchor.x;
+  old_anchor.y = priv->anchor.y;
+
+  view_update_anchor (view,
+      x + priv->anchor.x + priv->viewport_size.width / 2.0,
+      y + priv->anchor.y + priv->viewport_size.height / 2.0);
+
+  if (priv->anchor.x - old_anchor.x != 0)
+    {
+      ChamplainFloatPoint diff;
+
+      diff.x = priv->anchor.x - old_anchor.x;
+      diff.y = priv->anchor.y - old_anchor.y;
+
+      DEBUG("Relocating the viewport by %f, %f", diff.x, diff.y);
+      tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
+          x - diff.x, y - diff.y, 0);
+      return;
+    }
+
+  priv->viewport_size.x = x;
+  priv->viewport_size.y = y;
+
+  view_load_visible_tiles (view);
+  view_tiles_reposition (view);
+  marker_reposition (view);
+  update_scale (view);
+
+  view_update_polygons (view);
+  priv->longitude = viewport_get_current_longitude (priv);
+  priv->latitude = viewport_get_current_latitude (priv);
+
+  g_object_notify (G_OBJECT (view), "longitude");
+  g_object_notify (G_OBJECT (view), "latitude");
+}
+
+static void 
+panning_completed (TidyFingerScroll *scroll,
+                   ChamplainView *view)
+{
+  gfloat x, y;
+
+  tidy_viewport_get_origin (TIDY_VIEWPORT (view->priv->viewport), &x, &y,
+      NULL);
+
+  update_viewport (view, x, y);
 }
 
 static gboolean
@@ -1397,6 +1456,8 @@ champlain_view_init (ChamplainView *view)
 
   g_signal_connect (priv->finger_scroll, "scroll-event",
       G_CALLBACK (scroll_event), view);
+  g_signal_connect (priv->finger_scroll, "panning-completed",
+      G_CALLBACK (panning_completed), view);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->finger_scroll),
       priv->viewport);
@@ -1450,50 +1511,20 @@ viewport_pos_changed_cb (GObject *gobject,
 {
   ChamplainViewPrivate *priv = view->priv;
 
-  ChamplainFloatPoint rect;
-  ChamplainFloatPoint old_anchor;
+  gfloat x, y;
 
-  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &rect.x, &rect.y,
+  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y,
       NULL);
 
-  if (rect.x == priv->viewport_size.x &&
-      rect.y == priv->viewport_size.y)
+  if (x == priv->viewport_size.x &&
+      y == priv->viewport_size.y)
       return;
 
-  old_anchor.x = priv->anchor.x;
-  old_anchor.y = priv->anchor.y;
-
-  view_update_anchor (view,
-      rect.x + priv->anchor.x + priv->viewport_size.width / 2.0,
-      rect.y + priv->anchor.y + priv->viewport_size.height / 2.0);
-
-  if (priv->anchor.x - old_anchor.x != 0)
-    {
-      ChamplainFloatPoint diff;
-
-      diff.x = priv->anchor.x - old_anchor.x;
-      diff.y = priv->anchor.y - old_anchor.y;
-
-      DEBUG("Relocating the viewport by %f, %f", diff.x, diff.y);
-      tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
-          rect.x - diff.x, rect.y - diff.y, 0);
+  if (fabs (x - priv->viewport_size.x) < 100 &&
+      fabs (y - priv->viewport_size.y) < 100)
       return;
-    }
 
-  priv->viewport_size.x = rect.x;
-  priv->viewport_size.y = rect.y;
-
-  view_load_visible_tiles (view);
-  view_tiles_reposition (view);
-  marker_reposition (view);
-  view_update_polygons (view);
-  update_scale (view);
-
-  priv->longitude = viewport_get_current_longitude (priv);
-  priv->latitude = viewport_get_current_latitude (priv);
-
-  g_object_notify (G_OBJECT (view), "longitude");
-  g_object_notify (G_OBJECT (view), "latitude");
+  update_viewport (view, x, y);
 }
 
 /**
