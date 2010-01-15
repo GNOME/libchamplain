@@ -142,6 +142,43 @@ _wrap_champlain_view_get_coords_from_event(PyGObject *self, PyObject *args,
     return Py_BuildValue("(dd)", lat, lon);
 }
 %%
+override champlain_view_set_size kwargs
+static PyObject *
+_wrap_champlain_view_set_size(PyGObject *self, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = { "width", "height", NULL };
+    PyObject *py_width = NULL, *py_height = NULL;
+    guint width = 0, height = 0;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs,"OO:ChamplainView.set_size", kwlist, &py_width, &py_height))
+        return NULL;
+    if (py_width) {
+        if (PyLong_Check(py_width))
+            width = PyLong_AsUnsignedLong(py_width);
+        else if (PyInt_Check(py_width))
+            width = PyInt_AsLong(py_width);
+        else
+            PyErr_SetString(PyExc_TypeError, "Parameter 'width' must be an int or a long");
+        if (PyErr_Occurred())
+            return NULL;
+    }
+    if (py_height) {
+        if (PyLong_Check(py_height))
+            height = PyLong_AsUnsignedLong(py_height);
+        else if (PyInt_Check(py_height))
+            height = PyInt_AsLong(py_height);
+        else
+            PyErr_SetString(PyExc_TypeError, "Parameter 'height' must be an int or a long");
+        if (PyErr_Occurred())
+            return NULL;
+    }
+
+    clutter_actor_set_size(CLUTTER_ACTOR(self->obj), width, height);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+%%
 override champlain_view_get_coords_at kwargs
 static PyObject *
 _wrap_champlain_view_get_coords_at(PyGObject *self, PyObject *args) 
