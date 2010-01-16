@@ -1396,6 +1396,7 @@ create_scale (ChamplainView *view)
     priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING - SCALE_INSIDE_PADDING);
 
   clutter_actor_set_opacity (priv->scale_actor, 200);
+  clutter_actor_raise_top (priv->scale_actor);
 }
 
 static void
@@ -1445,12 +1446,6 @@ champlain_view_init (ChamplainView *view)
   g_signal_connect (priv->viewport, "notify::y-origin",
       G_CALLBACK (viewport_pos_changed_cb), view);
 
-  /* Setup scale */
-  create_scale (view);
-
-  /* Setup license */
-  create_license (view);
-
   /* Setup finger scroll */
   priv->finger_scroll = g_object_ref (tidy_finger_scroll_new (priv->scroll_mode));
 
@@ -1497,8 +1492,13 @@ champlain_view_init (ChamplainView *view)
       priv->polygon_layer);
   clutter_actor_raise (priv->polygon_layer, priv->map_layer);
 
-  clutter_actor_raise_top (priv->scale_actor);
   resize_viewport (view);
+
+  /* Setup scale */
+  create_scale (view);
+
+  /* Setup license */
+  create_license (view);
 
   priv->state = CHAMPLAIN_STATE_DONE;
   g_object_notify (G_OBJECT (view), "state");
