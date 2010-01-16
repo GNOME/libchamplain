@@ -890,6 +890,9 @@ champlain_view_realize (ClutterActor *actor)
 
   /* this call will launch the tiles loading */
   champlain_view_center_on (view, priv->latitude, priv->longitude);
+
+  update_scale (view);
+  update_license (view);
 }
 
 static void
