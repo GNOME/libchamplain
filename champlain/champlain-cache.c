@@ -417,7 +417,9 @@ champlain_cache_fill_tile (ChamplainCache *self,
     }
 
   /* Load the cached version */
-  actor = clutter_texture_new_from_file (filename, &error);
+  actor = clutter_texture_new ();
+  clutter_texture_set_load_async (CLUTTER_TEXTURE (actor), TRUE);
+  clutter_texture_set_from_file (CLUTTER_TEXTURE (actor), filename, &error);
   if (error == NULL)
     {
         champlain_tile_set_content (tile, actor, FALSE);
