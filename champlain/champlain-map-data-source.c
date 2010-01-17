@@ -32,7 +32,7 @@
 #include "champlain-bounding-box.h"
 #include "champlain-enum-types.h"
 
-G_DEFINE_TYPE (ChamplainMapDataSource, champlain_map_data_source, G_TYPE_OBJECT)
+G_DEFINE_TYPE (ChamplainMapDataSource, champlain_map_data_source, G_TYPE_INITIALLY_UNOWNED)
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_MAP_DATA_SOURCE, ChamplainMapDataSourcePrivate))

@@ -27,7 +27,12 @@ libchamplain_headers = \
 	champlain-enum-types.h		\
 	champlain-tile.h		\
 	champlain-map-source.h		\
-	champlain-network-map-source.h	\
+	champlain-map-source-chain.h	\
+	champlain-tile-source.h		\
+	champlain-tile-cache.h		\
+	champlain-network-tile-source.h	\
+	champlain-error-tile-source.h	\
+	champlain-file-cache.h		\
 	champlain-map-source-factory.h	\
 	champlain-map-source-desc.h	\
 	champlain-polygon.h		\
@@ -51,11 +56,15 @@ libchamplain_0_5_la_SOURCES = \
 	champlain-zoom-level.c 		\
 	champlain-tile.c		\
 	champlain-map-source.c		\
-	champlain-network-map-source.c	\
+	champlain-map-source-chain.c	\
+	champlain-tile-source.c		\
+	champlain-tile-cache.c		\
+	champlain-network-tile-source.c	\
+	champlain-error-tile-source.c	\
+	champlain-file-cache.c		\
 	champlain-map-source-factory.c	\
 	champlain-map-source-desc.c	\
 	champlain-point.c		\
-	champlain-cache.c		\
 	champlain-polygon.c	\
 	champlain-memphis-map-source.c  \
 	champlain-map-data-source.c \
@@ -75,10 +84,15 @@ noinst_HEADERS = \
 	champlain-tile.h 		\
 	champlain-enum-types.h		\
 	champlain-map-source.h		\
-	champlain-network-map-source.h	\
+	champlain-map-source-chain.h	\
+	champlain-tile-source.h		\
+	champlain-tile-cache.h		\
+	champlain-network-tile-source.h	\
+	champlain-error-tile-source.h	\
+	champlain-file-cache.h		\
+	champlain-enum-types.h		\
 	champlain-map-source-factory.h	\
 	champlain-map-source-desc.h	\
-	champlain-cache.h		\
 	champlain-polygon.h		\
 	champlain-version.h
 
@@ -91,15 +105,20 @@ libchamplain_include_HEADERS = \
 	champlain-layer.h 		\
 	champlain-selection-layer.h 	\
 	champlain-map-source.h		\
-	champlain-network-map-source.h	\
+	champlain-map-source-chain.h	\
+	champlain-tile-source.h		\
+	champlain-tile-cache.h		\
+	champlain-network-tile-source.h	\
+	champlain-error-tile-source.h	\
+	champlain-file-cache.h		\
 	champlain-map-source-factory.h	\
 	champlain-map-source-desc.h	\
 	champlain-tile.h		\
 	champlain-zoom-level.h		\
 	champlain-base-marker.h		\
 	champlain-marker.h		\
-	champlain-cache.h		\
 	champlain-polygon.h		\
+	champlain-version.h
 	champlain-version.h		\
 	champlain-memphis-map-source.h  \
 	champlain-map-data-source.h \

@@ -42,11 +42,11 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MAP_DATA_SOURCE, ChamplainMapDataSourceClass))
 
 typedef struct {
-  GObject parent;
+  GInitiallyUnowned parent;
 } ChamplainMapDataSource;
 
 typedef struct {
-  GObjectClass parent_class;
+  GInitiallyUnownedClass parent_class;
   MemphisMap* (*get_map_data) (ChamplainMapDataSource *data_source);
 } ChamplainMapDataSourceClass;
 

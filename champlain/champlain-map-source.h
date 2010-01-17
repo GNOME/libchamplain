@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2010 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,105 +20,84 @@
 #error "Only <champlain/champlain.h> can be included directly."
 #endif
 
-#ifndef CHAMPLAIN_MAP_SOURCE_H
-#define CHAMPLAIN_MAP_SOURCE_H
+#ifndef _CHAMPLAIN_MAP_SOURCE_H_
+#define _CHAMPLAIN_MAP_SOURCE_H_
 
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-tile.h>
 #include <champlain/champlain-zoom-level.h>
 
-#include <glib-object.h>
-
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_MAP_SOURCE     (champlain_map_source_get_type())
-#define CHAMPLAIN_MAP_SOURCE(obj)     (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSource))
-#define CHAMPLAIN_MAP_SOURCE_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
-#define CHAMPLAIN_IS_MAP_SOURCE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_MAP_SOURCE))
-#define CHAMPLAIN_IS_MAP_SOURCE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass),  CHAMPLAIN_TYPE_MAP_SOURCE))
-#define CHAMPLAIN_MAP_SOURCE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj),  CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
+#define CHAMPLAIN_TYPE_MAP_SOURCE             (champlain_map_source_get_type ())
+#define CHAMPLAIN_MAP_SOURCE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSource))
+#define CHAMPLAIN_MAP_SOURCE_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
+#define CHAMPLAIN_IS_MAP_SOURCE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_MAP_SOURCE))
+#define CHAMPLAIN_IS_MAP_SOURCE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MAP_SOURCE))
+#define CHAMPLAIN_MAP_SOURCE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
 
-typedef struct _ChamplainMapSource ChamplainMapSource;
 typedef struct _ChamplainMapSourceClass ChamplainMapSourceClass;
-typedef struct _ChamplainMapSourcePrivate ChamplainMapSourcePrivate;
-
-typedef enum
-{
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR
-} ChamplainMapProjection;
 
 struct _ChamplainMapSource
 {
-  GInitiallyUnowned parent;
-  ChamplainMapSourcePrivate *priv;
+  GInitiallyUnowned parent_instance;
 };
 
 struct _ChamplainMapSourceClass
 {
   GInitiallyUnownedClass parent_class;
 
+  const gchar * (*get_id) (ChamplainMapSource *map_source);
+  const gchar * (*get_name) (ChamplainMapSource *map_source);
+  const gchar * (*get_license) (ChamplainMapSource *map_source);
+  const gchar * (*get_license_uri) (ChamplainMapSource *map_source);
+  guint (*get_min_zoom_level) (ChamplainMapSource *map_source);
+  guint (*get_max_zoom_level) (ChamplainMapSource *map_source);
+  guint (*get_tile_size) (ChamplainMapSource *map_source);
+
   void (*fill_tile) (ChamplainMapSource *map_source,
-                    ChamplainTile *tile);
+                     ChamplainTile *tile);
 };
 
 GType champlain_map_source_get_type (void);
 
-gint champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source);
+ChamplainMapSource *champlain_map_source_get_next_source (ChamplainMapSource *map_source);
+void champlain_map_source_set_next_source (ChamplainMapSource *map_source,
+    ChamplainMapSource *next_source);
 
-gint champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source);
-
+const gchar * champlain_map_source_get_id (ChamplainMapSource *map_source);
+const gchar * champlain_map_source_get_name (ChamplainMapSource *map_source);
+const gchar * champlain_map_source_get_license (ChamplainMapSource *map_source);
+const gchar * champlain_map_source_get_license_uri (ChamplainMapSource *map_source);
+guint champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source);
+guint champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source);
 guint champlain_map_source_get_tile_size (ChamplainMapSource *map_source);
 
 guint champlain_map_source_get_x (ChamplainMapSource *map_source,
-    gint zoom_level,
-    gdouble longitude);
-
+                                  guint zoom_level,
+                                  gdouble longitude);
 guint champlain_map_source_get_y (ChamplainMapSource *map_source,
-    gint zoom_level,
-    gdouble latitude);
-
+                                  guint zoom_level,
+                                  gdouble latitude);
 gdouble champlain_map_source_get_longitude (ChamplainMapSource *map_source,
-    gint zoom_level,
+    guint zoom_level,
     guint x);
-
 gdouble champlain_map_source_get_latitude (ChamplainMapSource *map_source,
-    gint zoom_level,
+    guint zoom_level,
     guint y);
-
 guint champlain_map_source_get_row_count (ChamplainMapSource *map_source,
-    gint zoom_level);
-
+    guint zoom_level);
 guint champlain_map_source_get_column_count (ChamplainMapSource *map_source,
-    gint zoom_level);
-
-void champlain_map_source_fill_tile (ChamplainMapSource *map_source,
-    ChamplainTile *tile);
-
-void champlain_map_source_set_id (ChamplainMapSource *map_source,
-    const gchar *id);
-const gchar * champlain_map_source_get_id (ChamplainMapSource *map_source);
-
-void champlain_map_source_set_name (ChamplainMapSource *map_source,
-    const gchar *name);
-const gchar * champlain_map_source_get_name (ChamplainMapSource *map_source);
-
-void champlain_map_source_set_license (ChamplainMapSource *map_source,
-    const gchar *license);
-const gchar * champlain_map_source_get_license (ChamplainMapSource *map_source);
-
-void champlain_map_source_set_license_uri (ChamplainMapSource *map_source,
-    const gchar *license_uri);
-const gchar * champlain_map_source_get_license_uri (ChamplainMapSource *map_source);
-
-void champlain_map_source_set_projection (ChamplainMapSource *map_source,
-    ChamplainMapProjection projection);
-ChamplainMapProjection champlain_map_source_get_projection (ChamplainMapSource *map_source);
-
-gfloat champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source,
-    gint zoom_level,
+    guint zoom_level);
+gdouble champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source,
+    guint zoom_level,
     gdouble latitude,
     gdouble longitude);
 
+void champlain_map_source_fill_tile (ChamplainMapSource *map_source,
+                                     ChamplainTile *tile);
+
 G_END_DECLS
 
-#endif
+#endif /* _CHAMPLAIN_MAP_SOURCE_H_ */
+

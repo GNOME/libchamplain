@@ -29,7 +29,6 @@
 #include <glib.h>
 
 #include "champlain/champlain-defines.h"
-#include "champlain/champlain-cache.h"
 #include "champlain/champlain-layer.h"
 #include "champlain/champlain-selection-layer.h"
 #include "champlain/champlain-base-marker.h"
@@ -38,8 +37,13 @@
 #include "champlain/champlain-enum-types.h"
 #include "champlain/champlain-point.h"
 #include "champlain/champlain-map-source.h"
+#include "champlain/champlain-map-source-chain.h"
+#include "champlain/champlain-tile-source.h"
+#include "champlain/champlain-tile-cache.h"
+#include "champlain/champlain-network-tile-source.h"
+#include "champlain/champlain-file-cache.h"
+#include "champlain/champlain-error-tile-source.h"
 #include "champlain/champlain-map-source-factory.h"
-#include "champlain/champlain-network-map-source.h"
 #include "champlain/champlain-version.h"
 #include "champlain/champlain-memphis-map-source.h"
 #include "champlain/champlain-map-data-source.h"

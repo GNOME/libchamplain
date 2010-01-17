@@ -47,8 +47,6 @@ enum
   PROP_Y,
   PROP_ZOOM_LEVEL,
   PROP_SIZE,
-  PROP_URI,
-  PROP_FILENAME,
   PROP_STATE,
   PROP_ACTOR,
   PROP_CONTENT,
@@ -61,9 +59,7 @@ struct _ChamplainTilePrivate {
   gint size; /* The tile's width and height (only support square tiles */
   gint zoom_level; /* The tile's zoom level */
 
-  gchar *uri; /* The URI where to find the tile */
   ChamplainState state; /* The tile state: loading, validation, done */
-  gchar *filename; /* The tile's cache filename */
   ClutterActor *actor; /* An actor grouping all content actors */
   ClutterActor *content_actor; /* The actual tile actor */
 
@@ -94,12 +90,6 @@ champlain_tile_get_property (GObject *object,
         break;
       case PROP_STATE:
         g_value_set_enum (value, champlain_tile_get_state (self));
-        break;
-      case PROP_URI:
-        g_value_set_string (value, champlain_tile_get_uri (self));
-        break;
-      case PROP_FILENAME:
-        g_value_set_string (value, champlain_tile_get_filename (self));
         break;
       case PROP_ACTOR:
         g_value_set_object (value, champlain_tile_get_actor (self));
@@ -139,12 +129,6 @@ champlain_tile_set_property (GObject *object,
       case PROP_STATE:
         champlain_tile_set_state (self, g_value_get_enum (value));
         break;
-      case PROP_URI:
-        champlain_tile_set_uri (self, g_value_get_string (value));
-        break;
-      case PROP_FILENAME:
-        champlain_tile_set_filename (self, g_value_get_string (value));
-        break;
       case PROP_CONTENT:
         champlain_tile_set_content (self, g_value_get_object (value), FALSE);
         break;
@@ -176,13 +160,13 @@ champlain_tile_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_tile_parent_class)->dispose (object);
 }
 
+
+
 static void
 champlain_tile_finalize (GObject *object)
 {
   ChamplainTilePrivate *priv = CHAMPLAIN_TILE (object)->priv;
 
-  g_free (priv->uri);
-  g_free (priv->filename);
   g_free (priv->modified_time);
   g_free (priv->etag);
 
@@ -286,36 +270,6 @@ champlain_tile_class_init (ChamplainTileClass *klass)
           G_PARAM_READWRITE));
 
   /**
-  * ChamplainTile:uri:
-  *
-  * The remote uri of the tile
-  *
-  * Since: 0.4
-  */
-  g_object_class_install_property (object_class,
-      PROP_URI,
-      g_param_spec_string ("uri",
-          "URI",
-          "The URI of the tile",
-          "",
-          G_PARAM_READWRITE));
-
-  /**
-  * ChamplainTile:filename:
-  *
-  * The local path of the cached tile
-  *
-  * Since: 0.4
-  */
-  g_object_class_install_property (object_class,
-      PROP_FILENAME,
-      g_param_spec_string ("filename",
-          "Filename",
-          "The filename of the tile",
-          "",
-          G_PARAM_READWRITE));
-
-  /**
   * ChamplainTile:actor:
   *
   * The #ClutterActor where the tile content is rendered.  Should never change
@@ -377,8 +331,6 @@ champlain_tile_init (ChamplainTile *self)
   priv->y = 0;
   priv->zoom_level = 0;
   priv->size = 0;
-  priv->uri = NULL;
-  priv->filename = NULL;
   priv->modified_time = NULL;
   priv->etag = NULL;
 
@@ -479,38 +431,6 @@ champlain_tile_get_state (ChamplainTile *self)
   g_return_val_if_fail (CHAMPLAIN_TILE (self), CHAMPLAIN_STATE_NONE);
 
   return self->priv->state;
-}
-
-/**
- * champlain_tile_get_uri:
- * @self: the #ChamplainTile
- *
- * Returns: the tile's remote uri
- *
- * Since: 0.4
- */
-G_CONST_RETURN gchar *
-champlain_tile_get_uri (ChamplainTile *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
-
-  return self->priv->uri;
-}
-
-/**
- * champlain_tile_get_filename:
- * @self: the #ChamplainTile
- *
- * Returns: the tile's local filename
- *
- * Since: 0.4
- */
-G_CONST_RETURN gchar *
-champlain_tile_get_filename (ChamplainTile *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
-
-  return self->priv->filename;
 }
 
 /**
@@ -649,54 +569,6 @@ champlain_tile_new_full (gint x,
 {
   return g_object_new (CHAMPLAIN_TYPE_TILE, "x", x, "y", y, "zoom-level",
       zoom_level, "size", size, NULL);
-}
-
-/**
- * champlain_tile_set_uri:
- * @self: the #ChamplainTile
- * @uri: the uri
- *
- * Sets the tile's uri
- *
- * Since: 0.4
- */
-void
-champlain_tile_set_uri (ChamplainTile *self,
-    const gchar *uri)
-{
-  g_return_if_fail (CHAMPLAIN_TILE (self));
-  g_return_if_fail (uri != NULL);
-
-  ChamplainTilePrivate *priv = self->priv;
-
-  g_free (priv->uri);
-  priv->uri = g_strdup (uri);
-
-  g_object_notify (G_OBJECT (self), "uri");
-}
-
-/**
- * champlain_tile_set_filename:
- * @self: the #ChamplainTile
- * @filename: a local path to an image
- *
- * Sets the tile's filename
- *
- * Since: 0.4
- */
-void
-champlain_tile_set_filename (ChamplainTile *self,
-    const gchar *filename)
-{
-  g_return_if_fail (CHAMPLAIN_TILE (self));
-  g_return_if_fail (filename != NULL);
-
-  ChamplainTilePrivate *priv = self->priv;
-
-  g_free (priv->filename);
-  priv->filename = g_strdup (filename);
-
-  g_object_notify (G_OBJECT (self), "filename");
 }
 
 /**

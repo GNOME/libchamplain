@@ -39,13 +39,16 @@
 #include "champlain-debug.h"
 
 #include "champlain.h"
-#include "champlain-cache.h"
+#include "champlain-file-cache.h"
 #include "champlain-defines.h"
 #include "champlain-enum-types.h"
 #include "champlain-map-source.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
 #include "champlain-zoom-level.h"
+#include "champlain-network-tile-source.h"
+#include "champlain-map-source-chain.h"
+#include "champlain-error-tile-source.h"
 
 #include <glib.h>
 #include <string.h>
@@ -354,7 +357,12 @@ ChamplainMapSource *
 champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     const gchar *id)
 {
+//  ChamplainMapSource *map_source = NULL;
+//  ChamplainMapSourceChain *source_chain;
+//  ChamplainMapSource *source;
   GSList *item;
+//  guint tile_size;
+//  gchar *cache_path;
 
   item = factory->priv->registered_sources;
 
@@ -362,10 +370,28 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     {
       ChamplainMapSourceDesc *desc = CHAMPLAIN_MAP_SOURCE_DESC (item->data);
       if (strcmp (desc->id, id) == 0)
-        return desc->constructor (desc, desc->data);
+        return desc->constructor (desc, desc->data); //map_source = desc->constructor (desc, desc->data);
       item = g_slist_next (item);
     }
-  return NULL;
+
+//  if (!map_source)
+     return NULL;
+
+/*  source_chain = champlain_map_source_chain_new ();
+
+  tile_size = champlain_map_source_get_tile_size(map_source);
+  source = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
+
+  champlain_map_source_chain_push_map_source(source_chain, source);
+  champlain_map_source_chain_push_map_source(source_chain, map_source);
+
+  cache_path = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
+  source = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new_full (100000000, cache_path, TRUE));
+  g_free(cache_path);
+
+  champlain_map_source_chain_push_map_source(source_chain, source);
+
+  return CHAMPLAIN_MAP_SOURCE(source_chain);*/
 }
 
 /**
@@ -402,7 +428,7 @@ static ChamplainMapSource *
 champlain_map_source_new_generic (
      ChamplainMapSourceDesc *desc, gpointer user_data)
 {
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_map_source_new_full (
+  return CHAMPLAIN_MAP_SOURCE (champlain_network_tile_source_new_full (
       desc->id,
       desc->name,
       desc->license,
@@ -431,12 +457,18 @@ champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
             desc->uri_format);
     }
   else if (g_strcmp0 (desc->id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK) == 0)
-    {
       map_data_source = CHAMPLAIN_MAP_DATA_SOURCE (champlain_network_map_data_source_new ());
-    }
   else
     return NULL;
 
   return CHAMPLAIN_MAP_SOURCE (champlain_memphis_map_source_new_full (
-      desc, map_data_source));
+      desc->id,
+      desc->name,
+      desc->license,
+      desc->license_uri,
+      desc->min_zoom_level,
+      desc->max_zoom_level,
+      256,
+      desc->projection,
+      map_data_source));
 }

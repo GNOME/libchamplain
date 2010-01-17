@@ -71,8 +71,6 @@ gint champlain_tile_get_y (ChamplainTile *self);
 gint champlain_tile_get_zoom_level (ChamplainTile *self);
 guint champlain_tile_get_size (ChamplainTile *self);
 ChamplainState champlain_tile_get_state (ChamplainTile *self);
-G_CONST_RETURN gchar * champlain_tile_get_uri (ChamplainTile *self);
-G_CONST_RETURN gchar * champlain_tile_get_filename (ChamplainTile *self);
 ClutterActor * champlain_tile_get_actor (ChamplainTile *self);
 ClutterActor * champlain_tile_get_content (ChamplainTile *self);
 const GTimeVal * champlain_tile_get_modified_time (ChamplainTile *self);
@@ -88,10 +86,6 @@ void champlain_tile_set_size (ChamplainTile *self,
     guint size);
 void champlain_tile_set_state (ChamplainTile *self,
     ChamplainState state);
-void champlain_tile_set_uri (ChamplainTile *self,
-    const gchar *uri);
-void champlain_tile_set_filename (ChamplainTile *self,
-    const gchar *filename);
 void champlain_tile_set_content (ChamplainTile *self,
     ClutterActor* actor,
     gboolean fade_in);

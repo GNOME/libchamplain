@@ -610,7 +610,7 @@ champlain_view_get_property (GObject *object,
             CLAMP (priv->longitude, CHAMPLAIN_MIN_LONG, CHAMPLAIN_MAX_LONG));
         break;
       case PROP_LATITUDE:
-        g_value_set_double (value, 
+        g_value_set_double (value,
             CLAMP (priv->latitude, CHAMPLAIN_MIN_LAT, CHAMPLAIN_MAX_LAT));
         break;
       case PROP_ZOOM_LEVEL:
@@ -1286,13 +1286,35 @@ static void
 champlain_view_init (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  ChamplainMapSourceChain *source_chain;
+  ChamplainMapSource *source;
+  ChamplainMapSource *src;
+  guint tile_size;
+  gchar *cache_path;
 
   champlain_debug_set_flags (g_getenv ("CHAMPLAIN_DEBUG"));
 
   view->priv = priv;
 
   priv->factory = champlain_map_source_factory_dup_default ();
-  priv->map_source = champlain_map_source_factory_create (priv->factory, CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK);
+  source = champlain_map_source_factory_create (priv->factory, CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK);
+
+  source_chain = champlain_map_source_chain_new ();
+
+  tile_size = champlain_map_source_get_tile_size(source);
+  src = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
+
+  champlain_map_source_chain_push_map_source(source_chain, src);
+  champlain_map_source_chain_push_map_source(source_chain, source);
+
+  cache_path = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
+  src = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new_full (100000000, cache_path, TRUE));
+  g_free(cache_path);
+
+  champlain_map_source_chain_push_map_source(source_chain, src);
+
+  priv->map_source = CHAMPLAIN_MAP_SOURCE(source_chain);
+
   priv->zoom_level = 0;
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
@@ -2304,6 +2326,7 @@ view_load_visible_tiles (ChamplainView *view)
                   champlain_tile_get_actor (tile), NULL);
 
               champlain_zoom_level_add_tile (level, tile);
+              champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
               champlain_map_source_fill_tile (priv->map_source, tile);
 
               g_object_unref (tile);
@@ -2405,8 +2428,7 @@ view_reload_tiles_cb (ChamplainMapSource *map_source,
       if (tile == NULL)
         continue;
 
-      if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADING &&
-          champlain_tile_get_state (tile) != CHAMPLAIN_STATE_VALIDATING_CACHE)
+      if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADING)
         champlain_map_source_fill_tile (priv->map_source, tile);
     }
   view_update_state (view);
@@ -2435,8 +2457,7 @@ view_update_state (ChamplainView *view)
       if (tile == NULL)
         continue;
 
-      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING ||
-          champlain_tile_get_state (tile) == CHAMPLAIN_STATE_VALIDATING_CACHE)
+      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING)
         new_state = CHAMPLAIN_STATE_LOADING;
     }
 

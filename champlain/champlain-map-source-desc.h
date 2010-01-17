@@ -24,7 +24,7 @@
 #define CHAMPLAIN_MAP_SOURCE_DESC_H
 
 #include <glib-object.h>
-#include "champlain-map-source.h"
+#include "champlain-tile-source.h"
 
 G_BEGIN_DECLS
 

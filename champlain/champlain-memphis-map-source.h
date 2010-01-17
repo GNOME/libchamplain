@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Simon Wenner <simon@wenner.ch>
+ * Copyright (C) 2010 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,9 +20,8 @@
 #ifndef _CHAMPLAIN_MEMPHIS_MAP_SOURCE
 #define _CHAMPLAIN_MEMPHIS_MAP_SOURCE
 
+#include <champlain/champlain-tile-source.h>
 #include <champlain/champlain-map-data-source.h>
-#include <champlain/champlain-map-source.h>
-#include <champlain/champlain-map-source-desc.h>
 #include <memphis/memphis.h>
 
 #include <glib-object.h>
@@ -46,17 +46,23 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MEMPHIS_MAP_SOURCE, ChamplainMemphisMapSourceClass))
 
 typedef struct {
-  ChamplainMapSource parent;
+  ChamplainTileSource parent;
 } ChamplainMemphisMapSource;
 
 typedef struct {
-  ChamplainMapSourceClass parent_class;
+  ChamplainTileSourceClass parent_class;
 } ChamplainMemphisMapSourceClass;
 
 GType champlain_memphis_map_source_get_type (void);
 
-ChamplainMemphisMapSource * champlain_memphis_map_source_new_full (
-    ChamplainMapSourceDesc *desc,
+ChamplainMemphisMapSource* champlain_memphis_map_source_new_full (const gchar *id,
+    const gchar *name,
+    const gchar *license,
+    const gchar *license_uri,
+    guint min_zoom,
+    guint max_zoom,
+    guint tile_size,
+    ChamplainMapProjection projection,
     ChamplainMapDataSource *map_data_source);
 
 void champlain_memphis_map_source_load_rules (
@@ -68,15 +74,6 @@ void champlain_memphis_map_source_set_map_data_source (
     ChamplainMapDataSource *map_data_source);
 
 ChamplainMapDataSource * champlain_memphis_map_source_get_map_data_source (
-    ChamplainMemphisMapSource *map_source);
-
-void champlain_memphis_map_source_delete_session_cache (
-    ChamplainMemphisMapSource *map_source);
-
-void champlain_memphis_map_source_set_session_id (
-    ChamplainMemphisMapSource *map_source,
-    const gchar *session_id);
-const gchar * champlain_memphis_map_source_get_session_id (
     ChamplainMemphisMapSource *map_source);
 
 ClutterColor * champlain_memphis_map_source_get_background_color (

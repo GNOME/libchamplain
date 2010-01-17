@@ -29,6 +29,8 @@
 typedef struct _ChamplainView ChamplainView;
 typedef struct _ChamplainViewClass ChamplainViewClass;
 
+typedef struct _ChamplainMapSource ChamplainMapSource;
+
 #define CHAMPLAIN_PARAM_READABLE     \
         (G_PARAM_READABLE |     \
          G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
@@ -42,8 +44,6 @@ typedef enum
   CHAMPLAIN_STATE_NONE,
   CHAMPLAIN_STATE_INIT,
   CHAMPLAIN_STATE_LOADING,
-  CHAMPLAIN_STATE_VALIDATING_CACHE, /* Use by tiles when there is cache,
-                                       but it is being validated */
   CHAMPLAIN_STATE_DONE
 } ChamplainState;
 
