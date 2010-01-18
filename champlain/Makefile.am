@@ -37,7 +37,7 @@ libchamplain_headers = \
 	champlain-map-source-desc.h	\
 	champlain-polygon.h		\
 	champlain-version.h		\
-	champlain-memphis-map-source.h  \
+	champlain-memphis-tile-source.h  \
 	champlain-map-data-source.h	\
 	champlain-local-map-data-source.h \
 	champlain-network-map-data-source.h \
@@ -66,7 +66,7 @@ libchamplain_0_5_la_SOURCES = \
 	champlain-map-source-desc.c	\
 	champlain-point.c		\
 	champlain-polygon.c	\
-	champlain-memphis-map-source.c  \
+	champlain-memphis-tile-source.c  \
 	champlain-map-data-source.c \
 	champlain-local-map-data-source.c \
 	champlain-network-map-data-source.c \
@@ -120,7 +120,7 @@ libchamplain_include_HEADERS = \
 	champlain-polygon.h		\
 	champlain-version.h
 	champlain-version.h		\
-	champlain-memphis-map-source.h  \
+	champlain-memphis-tile-source.h  \
 	champlain-map-data-source.h \
 	champlain-local-map-data-source.h \
 	champlain-network-map-data-source.h \

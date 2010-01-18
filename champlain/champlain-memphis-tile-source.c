@@ -18,10 +18,10 @@
  */
 
 /**
- * SECTION:champlain-memphis-map-source
+ * SECTION:champlain-memphis-tile-source
  * @short_description: A map source that draws tiles locally
  *
- * The #ChamplainMemphisMapSource uses the rendering library
+ * The #ChamplainMemphisTileSource uses the rendering library
  * <ulink role="online-location" url="https://trac.openstreetmap.ch/trac/memphis/">
  * LibMemphis</ulink> to draw <ulink role="online-location" url="http://www.openstreetmap.org/">
  * OpenStreetMap</ulink> data. Tiles are rendered in separate threads.
@@ -38,11 +38,11 @@
  *
  * Rendered tiles are cached. The cache is deleted if the map data or rules
  * are changed. This is the default behaviour, but it can be disabled with the
- * #ChamplainMemphisMapSource:persistent-cache property. A persistent cache
+ * #ChamplainMemphisTileSource:persistent-cache property. A persistent cache
  * has to be managed by the client application.
  */
 
-#include "champlain-memphis-map-source.h"
+#include "champlain-memphis-tile-source.h"
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_MEMPHIS
 #include "champlain-debug.h"
@@ -73,14 +73,14 @@ enum
   PROP_MAP_DATA_SOURCE
 };
 
-G_DEFINE_TYPE (ChamplainMemphisMapSource, champlain_memphis_map_source, CHAMPLAIN_TYPE_TILE_SOURCE)
+G_DEFINE_TYPE (ChamplainMemphisTileSource, champlain_memphis_tile_source, CHAMPLAIN_TYPE_TILE_SOURCE)
 
 #define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_MEMPHIS_MAP_SOURCE, ChamplainMemphisMapSourcePrivate))
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_MEMPHIS_TILE_SOURCE, ChamplainMemphisTileSourcePrivate))
 
-typedef struct _ChamplainMemphisMapSourcePrivate ChamplainMemphisMapSourcePrivate;
+typedef struct _ChamplainMemphisTileSourcePrivate ChamplainMemphisTileSourcePrivate;
 
-struct _ChamplainMemphisMapSourcePrivate
+struct _ChamplainMemphisTileSourcePrivate
 {
   ChamplainMapDataSource *map_data_source;
   MemphisRuleSet *rules;
@@ -103,21 +103,21 @@ GStaticRWLock MemphisLock = G_STATIC_RW_LOCK_INIT;
 
 static void fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile);
 
-static void reload_tiles (ChamplainMemphisMapSource *self);
+static void reload_tiles (ChamplainMemphisTileSource *tile_source);
 static void memphis_worker_thread (gpointer data, gpointer user_data);
 static void map_data_changed_cb (ChamplainMapDataSource *map_data_source,
                                  GParamSpec *gobject,
-                                 ChamplainMemphisMapSource *map_source);
+                                 ChamplainMemphisTileSource *tile_source);
 void argb_to_rgba(guchar *data, guint size);
 
 static void
-champlain_memphis_map_source_get_property (GObject *object,
+champlain_memphis_tile_source_get_property (GObject *object,
     guint property_id,
     GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE (object);
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMemphisTileSource *tile_source = CHAMPLAIN_MEMPHIS_TILE_SOURCE (object);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
 
   switch (property_id)
     {
@@ -130,17 +130,17 @@ champlain_memphis_map_source_get_property (GObject *object,
 }
 
 static void
-champlain_memphis_map_source_set_property (GObject *object,
+champlain_memphis_tile_source_set_property (GObject *object,
     guint property_id,
     const GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE (object);
+  ChamplainMemphisTileSource *tile_source = CHAMPLAIN_MEMPHIS_TILE_SOURCE (object);
 
   switch (property_id)
     {
     case PROP_MAP_DATA_SOURCE:
-      champlain_memphis_map_source_set_map_data_source (self,
+      champlain_memphis_tile_source_set_map_data_source (tile_source,
           g_value_get_object (value));
       break;
     default:
@@ -149,10 +149,10 @@ champlain_memphis_map_source_set_property (GObject *object,
 }
 
 static void
-champlain_memphis_map_source_dispose (GObject *object)
+champlain_memphis_tile_source_dispose (GObject *object)
 {
-  ChamplainMemphisMapSource *self = CHAMPLAIN_MEMPHIS_MAP_SOURCE(object);
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainMemphisTileSource *tile_source = CHAMPLAIN_MEMPHIS_TILE_SOURCE(object);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE(tile_source);
 
   if (priv->thpool)
     {
@@ -175,44 +175,44 @@ champlain_memphis_map_source_dispose (GObject *object)
       priv->rules = NULL;
     }
 
-  G_OBJECT_CLASS (champlain_memphis_map_source_parent_class)->dispose (object);
+  G_OBJECT_CLASS (champlain_memphis_tile_source_parent_class)->dispose (object);
 }
 
 static void
-champlain_memphis_map_source_finalize (GObject *object)
+champlain_memphis_tile_source_finalize (GObject *object)
 {
-  G_OBJECT_CLASS (champlain_memphis_map_source_parent_class)->finalize (object);
+  G_OBJECT_CLASS (champlain_memphis_tile_source_parent_class)->finalize (object);
 }
 
 static void
-champlain_memphis_map_source_constructed (GObject *object)
+champlain_memphis_tile_source_constructed (GObject *object)
 {
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE(object);
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE(object);
 
   memphis_renderer_set_resolution (priv->renderer, champlain_map_source_get_tile_size(map_source));
 
-  G_OBJECT_CLASS (champlain_memphis_map_source_parent_class)->constructed (object);
+  G_OBJECT_CLASS (champlain_memphis_tile_source_parent_class)->constructed (object);
 }
 
 static void
-champlain_memphis_map_source_class_init (ChamplainMemphisMapSourceClass *klass)
+champlain_memphis_tile_source_class_init (ChamplainMemphisTileSourceClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ChamplainMapSourceClass *map_source_class = CHAMPLAIN_MAP_SOURCE_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainMemphisMapSourcePrivate));
+  g_type_class_add_private (klass, sizeof (ChamplainMemphisTileSourcePrivate));
 
-  object_class->get_property = champlain_memphis_map_source_get_property;
-  object_class->set_property = champlain_memphis_map_source_set_property;
-  object_class->dispose = champlain_memphis_map_source_dispose;
-  object_class->finalize = champlain_memphis_map_source_finalize;
-  object_class->constructed = champlain_memphis_map_source_constructed;
+  object_class->get_property = champlain_memphis_tile_source_get_property;
+  object_class->set_property = champlain_memphis_tile_source_set_property;
+  object_class->dispose = champlain_memphis_tile_source_dispose;
+  object_class->finalize = champlain_memphis_tile_source_finalize;
+  object_class->constructed = champlain_memphis_tile_source_constructed;
 
   map_source_class->fill_tile = fill_tile;
 
   /**
-  * ChamplainMemphisMapSource:map-data-source:
+  * ChamplainMemphisTileSource:map-data-source:
   *
   * The data source of the renderer
   *
@@ -228,9 +228,9 @@ champlain_memphis_map_source_class_init (ChamplainMemphisMapSourceClass *klass)
 }
 
 static void
-champlain_memphis_map_source_init (ChamplainMemphisMapSource *self)
+champlain_memphis_tile_source_init (ChamplainMemphisTileSource *tile_source)
 {
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE(tile_source);
 
   priv->map_data_source = NULL;
   priv->rules = NULL;
@@ -243,12 +243,12 @@ champlain_memphis_map_source_init (ChamplainMemphisMapSource *self)
 
   priv->renderer = memphis_renderer_new_full (priv->rules, memphis_map_new ());
 
-  priv->thpool = g_thread_pool_new (memphis_worker_thread, self,
+  priv->thpool = g_thread_pool_new (memphis_worker_thread, tile_source,
                                     MAX_THREADS, FALSE, NULL);
 }
 
 /**
- * champlain_memphis_map_source_new_full:
+ * champlain_memphis_tile_source_new_full:
  * @id: the map source's id
  * @name: the map source's name
  * @license: the map source's license
@@ -259,11 +259,11 @@ champlain_memphis_map_source_init (ChamplainMemphisMapSource *self)
  * @projection: the map source's projection
  * @map_data_source: a #ChamplainMapDataSource
  *
- * Returns: a new ChamplainMemphisMapSource.
+ * Returns: a new ChamplainMemphisTileSource.
  *
  * Since: 0.6
  */
-ChamplainMemphisMapSource* champlain_memphis_map_source_new_full (const gchar *id,
+ChamplainMemphisTileSource* champlain_memphis_tile_source_new_full (const gchar *id,
     const gchar *name,
     const gchar *license,
     const gchar *license_uri,
@@ -275,7 +275,7 @@ ChamplainMemphisMapSource* champlain_memphis_map_source_new_full (const gchar *i
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source), NULL);
 
-  return g_object_new (CHAMPLAIN_TYPE_MEMPHIS_MAP_SOURCE,
+  return g_object_new (CHAMPLAIN_TYPE_MEMPHIS_TILE_SOURCE,
                        "id", id,
                        "name", name,
                        "license", license,
@@ -291,13 +291,13 @@ ChamplainMemphisMapSource* champlain_memphis_map_source_new_full (const gchar *i
 static void
 map_data_changed_cb (ChamplainMapDataSource *map_data_source,
                      GParamSpec *gobject,
-                     ChamplainMemphisMapSource *map_source)
+                     ChamplainMemphisTileSource *tile_source)
 {
   g_assert (CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source) &&
-            CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (map_source));
+            CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
 
   MemphisMap *map;
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(map_source);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE(tile_source);
   ChamplainState state;
 
   g_object_get (G_OBJECT (map_data_source), "state", &state, NULL);
@@ -319,7 +319,7 @@ map_data_changed_cb (ChamplainMapDataSource *map_data_source,
   memphis_renderer_set_map (priv->renderer, map);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
-  reload_tiles (map_source);
+  reload_tiles (tile_source);
 }
 
 /*
@@ -448,9 +448,9 @@ memphis_worker_thread (gpointer data, gpointer user_data)
 static void
 fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
 {
-  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (map_source));
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (map_source));
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE(map_source);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE(map_source);
 
   DEBUG ("Render tile (%u, %u, %u)", champlain_tile_get_x (tile),
          champlain_tile_get_y (tile),
@@ -486,12 +486,12 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
 }
 
 static void
-reload_tiles (ChamplainMemphisMapSource *self)
+reload_tiles (ChamplainMemphisTileSource *tile_source)
 {
-  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
 
-  ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE(self);
-  ChamplainTileCache *tile_cache = champlain_tile_source_get_cache(tile_source);
+  ChamplainTileSource *tile_src = CHAMPLAIN_TILE_SOURCE(tile_source);
+  ChamplainTileCache *tile_cache = champlain_tile_source_get_cache(tile_src);
 
   if (tile_cache && !champlain_tile_cache_get_persistent(tile_cache))
     {
@@ -500,13 +500,13 @@ reload_tiles (ChamplainMemphisMapSource *self)
       champlain_tile_cache_clean (tile_cache);
     }
 
-  g_signal_emit_by_name (CHAMPLAIN_MAP_SOURCE (self),
+  g_signal_emit_by_name (CHAMPLAIN_MAP_SOURCE (tile_src),
                          "reload-tiles", NULL);
 }
 
 /**
- * champlain_memphis_map_source_load_rules:
- * @map_source: a #ChamplainMemphisMapSource
+ * champlain_memphis_tile_source_load_rules:
+ * @tile_source: a #ChamplainMemphisTileSource
  * @rules_path: a path to a rules file
  *
  * Loads a Memphis rules file.
@@ -514,11 +514,11 @@ reload_tiles (ChamplainMemphisMapSource *self)
  * Since: 0.6
  */
 void
-champlain_memphis_map_source_load_rules (
-  ChamplainMemphisMapSource *self,
+champlain_memphis_tile_source_load_rules (
+  ChamplainMemphisTileSource *tile_source,
   const gchar *rules_path)
 {
-  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
 
   // TODO: Remove test when memphis handles invalid paths properly
   if (!g_file_test (rules_path, G_FILE_TEST_EXISTS))
@@ -527,7 +527,7 @@ champlain_memphis_map_source_load_rules (
       return;
     }
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
 
   g_static_rw_lock_writer_lock (&MemphisLock);
   if (rules_path)
@@ -537,12 +537,12 @@ champlain_memphis_map_source_load_rules (
                                      strlen (default_rules));
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
-  reload_tiles (self);
+  reload_tiles (tile_source);
 }
 
 /**
- * champlain_memphis_map_source_set_map_data_source:
- * @map_source: a #ChamplainMemphisMapSource
+ * champlain_memphis_tile_source_set_map_data_source:
+ * @tile_source: a #ChamplainMemphisTileSource
  * @map_data_source: a #ChamplainMapDataSource
  *
  * Sets the map data source.
@@ -550,14 +550,14 @@ champlain_memphis_map_source_load_rules (
  * Since: 0.6
  */
 void
-champlain_memphis_map_source_set_map_data_source (
-  ChamplainMemphisMapSource *self,
+champlain_memphis_tile_source_set_map_data_source (
+  ChamplainMemphisTileSource *tile_source,
   ChamplainMapDataSource *map_data_source)
 {
-  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self) &&
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                     CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source));
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
   MemphisMap *map;
 
   if (priv->map_data_source)
@@ -566,7 +566,7 @@ champlain_memphis_map_source_set_map_data_source (
   priv->map_data_source = g_object_ref_sink(map_data_source);
 
   g_signal_connect (priv->map_data_source, "notify::state",
-                    G_CALLBACK (map_data_changed_cb), self);
+                    G_CALLBACK (map_data_changed_cb), tile_source);
 
   map = champlain_map_data_source_get_map_data (priv->map_data_source);
   if (map == NULL)
@@ -583,38 +583,38 @@ champlain_memphis_map_source_set_map_data_source (
 }
 
 /**
- * champlain_memphis_map_source_get_map_data_source:
- * @map_source: a #ChamplainMemphisMapSource
+ * champlain_memphis_tile_source_get_map_data_source:
+ * @map_source: a #ChamplainMemphisTileSource
  *
  * Returns the #ChamplainMapDataSource.
  *
  * Since: 0.6
  */
 ChamplainMapDataSource *
-champlain_memphis_map_source_get_map_data_source (
-  ChamplainMemphisMapSource *self)
+champlain_memphis_tile_source_get_map_data_source (
+  ChamplainMemphisTileSource *tile_source)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
   return priv->map_data_source;
 }
 
 /**
- * champlain_memphis_map_source_get_background_color:
- * @map_source: a #ChamplainMemphisMapSource
+ * champlain_memphis_tile_source_get_background_color:
+ * @map_source: a #ChamplainMemphisTileSource
  *
  * Returns the background color of the map as a newly-allocated
  * #ClutterColor.
  *
  * Since: 0.6
  */
-ClutterColor * champlain_memphis_map_source_get_background_color (
-  ChamplainMemphisMapSource *self)
+ClutterColor * champlain_memphis_tile_source_get_background_color (
+  ChamplainMemphisTileSource *tile_source)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
   ClutterColor color;
   guint8 r, b, g, a;
 
@@ -630,8 +630,8 @@ ClutterColor * champlain_memphis_map_source_get_background_color (
 }
 
 /**
- * champlain_memphis_map_source_set_background_color:
- * @map_source: a #ChamplainMemphisMapSource
+ * champlain_memphis_tile_source_set_background_color:
+ * @map_source: a #ChamplainMemphisTileSource
  * @color: a #ClutterColor
  *
  * Sets the background color of the map from a #ClutterColor.
@@ -639,25 +639,25 @@ ClutterColor * champlain_memphis_map_source_get_background_color (
  * Since: 0.6
  */
 void
-champlain_memphis_map_source_set_background_color (
-  ChamplainMemphisMapSource *self,
+champlain_memphis_tile_source_set_background_color (
+  ChamplainMemphisTileSource *tile_source,
   const ClutterColor *color)
 {
-  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
 
   g_static_rw_lock_writer_lock (&MemphisLock);
   memphis_rule_set_set_bg_color (priv->rules, color->red,
                                  color->green, color->blue, color->alpha);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
-  reload_tiles (self);
+  reload_tiles (tile_source);
 }
 
 /**
- * champlain_memphis_map_source_set_rule:
- * @map_source: a #ChamplainMemphisMapSource
+ * champlain_memphis_tile_source_set_rule:
+ * @map_source: a #ChamplainMemphisTileSource
  * @rule: a #MemphisRule
  *
  * Edits or adds a #MemphisRule to the rules-set. New rules are appended
@@ -666,24 +666,24 @@ champlain_memphis_map_source_set_background_color (
  * Since: 0.6
  */
 void
-champlain_memphis_map_source_set_rule (ChamplainMemphisMapSource *self,
+champlain_memphis_tile_source_set_rule (ChamplainMemphisTileSource *tile_source,
                                        MemphisRule *rule)
 {
-  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self) &&
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                     MEMPHIS_RULE (rule));
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
 
   g_static_rw_lock_writer_lock (&MemphisLock);
   memphis_rule_set_set_rule (priv->rules, rule);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
-  reload_tiles (self);
+  reload_tiles (tile_source);
 }
 
 /**
- * champlain_memphis_map_source_get_rule:
- * @map_source: a #ChamplainMemphisMapSource
+ * champlain_memphis_tile_source_get_rule:
+ * @map_source: a #ChamplainMemphisTileSource
  * @id: an id string
  *
  * Returns the requested #MemphisRule or NULL if none is found.
@@ -691,13 +691,13 @@ champlain_memphis_map_source_set_rule (ChamplainMemphisMapSource *self,
  * Since: 0.6
  */
 MemphisRule *
-champlain_memphis_map_source_get_rule (ChamplainMemphisMapSource *self,
+champlain_memphis_tile_source_get_rule (ChamplainMemphisTileSource *tile_source,
                                        const gchar *id)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self) &&
+  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                         id != NULL, NULL);
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
   MemphisRule *rule;
 
   g_static_rw_lock_reader_lock (&MemphisLock);
@@ -708,8 +708,8 @@ champlain_memphis_map_source_get_rule (ChamplainMemphisMapSource *self,
 }
 
 /**
- * champlain_memphis_map_source_get_rule_ids:
- * @map_source: a #ChamplainMemphisMapSource
+ * champlain_memphis_tile_source_get_rule_ids:
+ * @map_source: a #ChamplainMemphisTileSource
  *
  * Returns a #GList of id strings of the form:
  * key1|key2|...|keyN:value1|value2|...|valueM
@@ -719,11 +719,11 @@ champlain_memphis_map_source_get_rule (ChamplainMemphisMapSource *self,
  * Since: 0.6
  */
 GList *
-champlain_memphis_map_source_get_rule_ids (ChamplainMemphisMapSource *self)
+champlain_memphis_tile_source_get_rule_ids (ChamplainMemphisTileSource *tile_source)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self), NULL);
+  g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
   GList *list;
 
   g_static_rw_lock_reader_lock (&MemphisLock);
@@ -734,25 +734,25 @@ champlain_memphis_map_source_get_rule_ids (ChamplainMemphisMapSource *self)
 }
 
 /**
- * champlain_memphis_map_source_remove_rule:
- * @map_source: a #ChamplainMemphisMapSource
+ * champlain_memphis_tile_source_remove_rule:
+ * @map_source: a #ChamplainMemphisTileSource
  * @id: an id string
  *
  * Removes the rule with the given id.
  *
  * Since: 0.6
  */
-void champlain_memphis_map_source_remove_rule (
-  ChamplainMemphisMapSource *self,
+void champlain_memphis_tile_source_remove_rule (
+  ChamplainMemphisTileSource *tile_source,
   const gchar *id)
 {
-  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_MAP_SOURCE (self));
+  g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
 
-  ChamplainMemphisMapSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
 
   g_static_rw_lock_writer_lock (&MemphisLock);
   memphis_rule_set_remove_rule (priv->rules, id);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
-  reload_tiles (self);
+  reload_tiles (tile_source);
 }

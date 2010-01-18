@@ -461,7 +461,7 @@ champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
   else
     return NULL;
 
-  return CHAMPLAIN_MAP_SOURCE (champlain_memphis_map_source_new_full (
+  return CHAMPLAIN_MAP_SOURCE (champlain_memphis_tile_source_new_full (
       desc->id,
       desc->name,
       desc->license,

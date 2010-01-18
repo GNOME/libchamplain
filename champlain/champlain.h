@@ -45,7 +45,7 @@
 #include "champlain/champlain-error-tile-source.h"
 #include "champlain/champlain-map-source-factory.h"
 #include "champlain/champlain-version.h"
-#include "champlain/champlain-memphis-map-source.h"
+#include "champlain/champlain-memphis-tile-source.h"
 #include "champlain/champlain-map-data-source.h"
 #include "champlain/champlain-local-map-data-source.h"
 #include "champlain/champlain-network-map-data-source.h"
