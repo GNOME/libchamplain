@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 m4_define([champlain_major_version], [0])
 m4_define([champlain_minor_version], [4])
-m4_define([champlain_micro_version], [3])
+m4_define([champlain_micro_version], [4])
 m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
 m4_define([api_version],
@@ -91,6 +91,18 @@ AC_ARG_ENABLE(debug,
 
 if test x$enable_debug = xyes; then
   AC_DEFINE(ENABLE_DEBUG, [], [Enable debug code])
+fi
+
+# -----------------------------------------------------------
+# Enable Maemo optimizations
+# -----------------------------------------------------------
+
+AC_ARG_ENABLE(maemo,
+  AC_HELP_STRING([--enable-maemo],[compile with maemo optimizations]),
+    [enable_maemo=yes])
+
+if test x$enable_maemo = xyes; then
+  AC_DEFINE(USE_MAEMO, [], [Enable Maemo Optimizations])
 fi
 
 # -----------------------------------------------------------

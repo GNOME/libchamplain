@@ -377,12 +377,21 @@ static gchar *
 get_filename (ChamplainNetworkMapSource *source,
     ChamplainTile *tile)
 {
+#ifdef USE_MAEMO
+  return g_strdup_printf ("/home/user/MyDocs/.maps" G_DIR_SEPARATOR_S
+             "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
+             "%d" G_DIR_SEPARATOR_S "%d.png",
+             champlain_map_source_get_id (CHAMPLAIN_MAP_SOURCE (source)),
+             champlain_tile_get_zoom_level (tile),
+             champlain_tile_get_x (tile), champlain_tile_get_y (tile));
+#else
   return g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s" G_DIR_SEPARATOR_S
              "%s" G_DIR_SEPARATOR_S "%d" G_DIR_SEPARATOR_S
              "%d" G_DIR_SEPARATOR_S "%d.png", g_get_user_cache_dir (),
              CACHE_SUBDIR, champlain_map_source_get_id (CHAMPLAIN_MAP_SOURCE (source)),
              champlain_tile_get_zoom_level (tile),
              champlain_tile_get_x (tile), champlain_tile_get_y (tile));
+#endif
 }
 
 static ClutterActor *error_actor = NULL;
