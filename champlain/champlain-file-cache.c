@@ -543,10 +543,12 @@ fill_tile (ChamplainMapSource *map_source,
 
 load_next:
   if (CHAMPLAIN_IS_MAP_SOURCE(next_source))
-    {
-      champlain_map_source_fill_tile(next_source, tile);
-    }
-  champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+    champlain_map_source_fill_tile(next_source, tile);
+
+  /* if we have some content, use the tile even if it wasn't validated */
+  if (champlain_tile_get_content(tile) &&
+      champlain_tile_get_state(tile) != CHAMPLAIN_STATE_DONE)
+    champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 
 cleanup:
   sqlite3_reset (priv->stmt_select);
