@@ -426,7 +426,6 @@ memphis_worker_thread (gpointer data, gpointer user_data)
 
   DEBUG ("Draw Tile (%d, %d, %d)", x, y, z);
 
-  // FIXME - memphis should support multithreaded access to utilize multiple CPUs
   g_static_rw_lock_reader_lock (&MemphisLock);
   // FIXME - memphis needs to indicate if it cannot render the tile so we can
   // load the tile from the next map source
