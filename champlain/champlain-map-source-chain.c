@@ -219,7 +219,7 @@ void reload_tiles_cb(ChamplainMapSource *map_source, ChamplainMapSourceChain *so
   g_signal_emit_by_name (source_chain, "reload-tiles", NULL);
 }
 
-void champlain_map_source_chain_push_map_source(ChamplainMapSourceChain *source_chain, ChamplainMapSource *map_source)
+void champlain_map_source_chain_push(ChamplainMapSourceChain *source_chain, ChamplainMapSource *map_source)
 {
   ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
   gboolean is_cache = FALSE;

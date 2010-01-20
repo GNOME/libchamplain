@@ -75,11 +75,6 @@ map_source_changed (GtkWidget *widget,
   ChamplainMapSource *source;
   GtkTreeIter iter;
   GtkTreeModel *model;
-  ChamplainMapSourceChain *source_chain;
-  ChamplainMapSource *src;
-  guint tile_size;
-  gchar *cache_path;
-
 
   if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (widget), &iter))
     return;
@@ -91,21 +86,7 @@ map_source_changed (GtkWidget *widget,
   ChamplainMapSourceFactory *factory = champlain_map_source_factory_dup_default ();
   source = champlain_map_source_factory_create (factory, id);
 
-  source_chain = champlain_map_source_chain_new ();
-
-  tile_size = champlain_map_source_get_tile_size(source);
-  src = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
-
-  champlain_map_source_chain_push_map_source(source_chain, src);
-  champlain_map_source_chain_push_map_source(source_chain, source);
-
-  cache_path = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
-  src = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new_full (100000000, cache_path, TRUE));
-  g_free(cache_path);
-
-  champlain_map_source_chain_push_map_source(source_chain, src);
-
-  g_object_set (G_OBJECT (view), "map-source", source_chain, NULL);
+  g_object_set (G_OBJECT (view), "map-source", source, NULL);
   g_object_unref (factory);
 }
 

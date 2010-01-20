@@ -1286,34 +1286,16 @@ static void
 champlain_view_init (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
-  ChamplainMapSourceChain *source_chain;
   ChamplainMapSource *source;
-  ChamplainMapSource *src;
-  guint tile_size;
-  gchar *cache_path;
 
   champlain_debug_set_flags (g_getenv ("CHAMPLAIN_DEBUG"));
 
   view->priv = priv;
 
   priv->factory = champlain_map_source_factory_dup_default ();
-  source = champlain_map_source_factory_create (priv->factory, CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK);
+  source = champlain_map_source_factory_create_cached_source (priv->factory, CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK);
 
-  source_chain = champlain_map_source_chain_new ();
-
-  tile_size = champlain_map_source_get_tile_size(source);
-  src = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
-
-  champlain_map_source_chain_push_map_source(source_chain, src);
-  champlain_map_source_chain_push_map_source(source_chain, source);
-
-  cache_path = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
-  src = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new_full (100000000, cache_path, TRUE));
-  g_free(cache_path);
-
-  champlain_map_source_chain_push_map_source(source_chain, src);
-
-  priv->map_source = CHAMPLAIN_MAP_SOURCE(source_chain);
+  priv->map_source = CHAMPLAIN_MAP_SOURCE(source);
 
   priv->zoom_level = 0;
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);

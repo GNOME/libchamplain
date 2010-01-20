@@ -51,6 +51,7 @@ struct _ChamplainFileCacheClass
 
 GType champlain_file_cache_get_type (void);
 
+ChamplainFileCache* champlain_file_cache_new (void);
 ChamplainFileCache* champlain_file_cache_new_full (guint size_limit,
     const gchar *cache_dir, gboolean persistent);
 

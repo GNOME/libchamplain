@@ -428,7 +428,6 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
       ChamplainMapSourceChain *source_chain;
       ChamplainMapSource *src;
       guint tile_size;
-      gchar *cache_path;
 
       if (g_strcmp0 (id, "memphis-local") == 0)
         {
@@ -465,14 +464,12 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
       tile_size = champlain_map_source_get_tile_size(tile_source);
       src = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
 
-      champlain_map_source_chain_push_map_source(source_chain, src);
-      champlain_map_source_chain_push_map_source(source_chain, tile_source);
+      champlain_map_source_chain_push(source_chain, src);
+      champlain_map_source_chain_push(source_chain, tile_source);
 
-      cache_path = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
-      src = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new_full (100000000, cache_path, FALSE));
-      g_free(cache_path);
+      src = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new_full (100000000, NULL, FALSE));
 
-      champlain_map_source_chain_push_map_source(source_chain, src);
+      champlain_map_source_chain_push(source_chain, src);
 
       g_object_set (G_OBJECT (view), "map-source", source_chain, NULL);
       if (strncmp (id, "memphis", 7) == 0)

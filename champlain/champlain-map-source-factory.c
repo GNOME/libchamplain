@@ -357,12 +357,7 @@ ChamplainMapSource *
 champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     const gchar *id)
 {
-//  ChamplainMapSource *map_source = NULL;
-//  ChamplainMapSourceChain *source_chain;
-//  ChamplainMapSource *source;
   GSList *item;
-//  guint tile_size;
-//  gchar *cache_path;
 
   item = factory->priv->registered_sources;
 
@@ -370,28 +365,35 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     {
       ChamplainMapSourceDesc *desc = CHAMPLAIN_MAP_SOURCE_DESC (item->data);
       if (strcmp (desc->id, id) == 0)
-        return desc->constructor (desc, desc->data); //map_source = desc->constructor (desc, desc->data);
+        return desc->constructor (desc, desc->data);
       item = g_slist_next (item);
     }
 
-//  if (!map_source)
-     return NULL;
+  return NULL;
+}
 
-/*  source_chain = champlain_map_source_chain_new ();
+ChamplainMapSource * champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *factory,
+    const gchar *id)
+{
+  ChamplainMapSourceChain *source_chain;
+  ChamplainMapSource *tile_source;
+  ChamplainMapSource *error_source;
+  ChamplainMapSource *file_cache;
+  guint tile_size;
 
-  tile_size = champlain_map_source_get_tile_size(map_source);
-  source = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
+  tile_source = champlain_map_source_factory_create (factory, id);
 
-  champlain_map_source_chain_push_map_source(source_chain, source);
-  champlain_map_source_chain_push_map_source(source_chain, map_source);
+  tile_size = champlain_map_source_get_tile_size(tile_source);
+  error_source = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
 
-  cache_path = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
-  source = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new_full (100000000, cache_path, TRUE));
-  g_free(cache_path);
+  file_cache = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new ());
 
-  champlain_map_source_chain_push_map_source(source_chain, source);
+  source_chain = champlain_map_source_chain_new ();
+  champlain_map_source_chain_push(source_chain, error_source);
+  champlain_map_source_chain_push(source_chain, tile_source);
+  champlain_map_source_chain_push(source_chain, file_cache);
 
-  return CHAMPLAIN_MAP_SOURCE(source_chain);*/
+  return CHAMPLAIN_MAP_SOURCE(source_chain);
 }
 
 /**

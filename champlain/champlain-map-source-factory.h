@@ -61,6 +61,8 @@ GSList * champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *facto
 
 ChamplainMapSource * champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     const gchar *id);
+ChamplainMapSource * champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *factory,
+    const gchar *id);
 
 gboolean
 champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,

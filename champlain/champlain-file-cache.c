@@ -357,6 +357,19 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
   priv->stmt_update = NULL;
 }
 
+ChamplainFileCache* champlain_file_cache_new (void)
+{
+  gchar *cache_path;
+  ChamplainFileCache *cache;
+
+  cache_path = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
+  cache = g_object_new (CHAMPLAIN_TYPE_FILE_CACHE, "size-limit", 100000000,
+                        "cache-dir", cache_path, "persistent-cache", TRUE, NULL);
+  g_free(cache_path);
+
+  return cache;
+}
+
 ChamplainFileCache* champlain_file_cache_new_full (guint size_limit,
     const gchar *cache_dir, gboolean persistent)
 {
