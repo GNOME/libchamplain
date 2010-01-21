@@ -193,11 +193,11 @@ get_id (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (map_source), NULL);
 
-  ChamplainMapSource *next_source = champlain_map_source_get_next_source(map_source);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source), NULL);
 
-  return champlain_map_source_get_id(next_source);
+  return champlain_map_source_get_id (next_source);
 }
 
 static const gchar *
@@ -205,11 +205,11 @@ get_name (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (map_source), NULL);
 
-  ChamplainMapSource *next_source = champlain_map_source_get_next_source(map_source);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source), NULL);
 
-  return champlain_map_source_get_name(next_source);
+  return champlain_map_source_get_name (next_source);
 }
 
 static const gchar *
@@ -217,11 +217,11 @@ get_license (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (map_source), NULL);
 
-  ChamplainMapSource *next_source = champlain_map_source_get_next_source(map_source);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source), NULL);
 
-  return champlain_map_source_get_license(next_source);
+  return champlain_map_source_get_license (next_source);
 }
 
 static const gchar *
@@ -229,11 +229,11 @@ get_license_uri (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (map_source), NULL);
 
-  ChamplainMapSource *next_source = champlain_map_source_get_next_source(map_source);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source), NULL);
 
-  return champlain_map_source_get_license_uri(next_source);
+  return champlain_map_source_get_license_uri (next_source);
 }
 
 static guint
@@ -241,11 +241,11 @@ get_min_zoom_level (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (map_source), 0);
 
-  ChamplainMapSource *next_source = champlain_map_source_get_next_source(map_source);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source), 0);
 
-  return champlain_map_source_get_min_zoom_level(next_source);
+  return champlain_map_source_get_min_zoom_level (next_source);
 }
 
 static guint
@@ -253,11 +253,11 @@ get_max_zoom_level (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (map_source), 0);
 
-  ChamplainMapSource *next_source = champlain_map_source_get_next_source(map_source);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source), 0);
 
-  return champlain_map_source_get_max_zoom_level(next_source);
+  return champlain_map_source_get_max_zoom_level (next_source);
 }
 
 static guint
@@ -265,9 +265,9 @@ get_tile_size (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (map_source), 0);
 
-  ChamplainMapSource *next_source = champlain_map_source_get_next_source(map_source);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source), 0);
 
-  return champlain_map_source_get_tile_size(next_source);
+  return champlain_map_source_get_tile_size (next_source);
 }

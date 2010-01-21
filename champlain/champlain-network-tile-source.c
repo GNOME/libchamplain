@@ -92,7 +92,7 @@ champlain_network_tile_source_get_property (GObject *object,
 {
   ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(object);
 
-  switch(prop_id)
+  switch (prop_id)
     {
     case PROP_URI_FORMAT:
       g_value_set_string (value, priv->uri_format);
@@ -116,16 +116,16 @@ champlain_network_tile_source_set_property (GObject *object,
 {
   ChamplainNetworkTileSource *tile_source = CHAMPLAIN_NETWORK_TILE_SOURCE(object);
 
-  switch(prop_id)
+  switch (prop_id)
     {
     case PROP_URI_FORMAT:
-      champlain_network_tile_source_set_uri_format(tile_source, g_value_get_string (value));
+      champlain_network_tile_source_set_uri_format (tile_source, g_value_get_string (value));
       break;
     case PROP_OFFLINE:
-      champlain_network_tile_source_set_offline(tile_source, g_value_get_boolean (value));
+      champlain_network_tile_source_set_offline (tile_source, g_value_get_boolean (value));
       break;
     case PROP_PROXY_URI:
-      champlain_network_tile_source_set_proxy_uri(tile_source, g_value_get_string (value));
+      champlain_network_tile_source_set_proxy_uri (tile_source, g_value_get_string (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -376,15 +376,15 @@ tile_loaded_cb (SoupSession *session,
   TileLoadedCallbackData *callback_data = (TileLoadedCallbackData *)user_data;
   ChamplainMapSource *map_source = callback_data->map_source;
   ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE(map_source);
-  ChamplainTileCache *tile_cache = champlain_tile_source_get_cache(tile_source);
-  ChamplainMapSource *next_source = champlain_map_source_get_next_source(map_source);
+  ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
   ChamplainTile *tile = callback_data->tile;
   GdkPixbufLoader* loader;
   GError *error = NULL;
   ClutterActor *actor;
   const gchar *etag;
 
-  g_free(user_data);
+  g_free (user_data);
 
   DEBUG ("Got reply %d", msg->status_code);
 
@@ -402,7 +402,7 @@ tile_loaded_cb (SoupSession *session,
   if (msg->status_code == SOUP_STATUS_NOT_MODIFIED)
     {
       if (tile_cache)
-        champlain_tile_cache_refresh_tile_time(tile_cache, tile);
+        champlain_tile_cache_refresh_tile_time (tile_cache, tile);
       goto finish;
     }
 
@@ -417,7 +417,7 @@ tile_loaded_cb (SoupSession *session,
     }
 
   /* Load the data from the http response */
-  loader = gdk_pixbuf_loader_new();
+  loader = gdk_pixbuf_loader_new ();
   if (!gdk_pixbuf_loader_write (loader,
                                 (const guchar *) msg->response_body->data,
                                 msg->response_body->length,
@@ -484,7 +484,7 @@ load_next_cleanup:
 load_next:
   if (next_source)
     {
-      champlain_map_source_fill_tile(next_source, tile);
+      champlain_map_source_fill_tile (next_source, tile);
     }
   g_object_unref (tile);
   g_object_unref (map_source);
@@ -546,7 +546,7 @@ fill_tile (ChamplainMapSource *map_source,
           g_free (date);
         }
 
-      callback_data = g_new(TileLoadedCallbackData, 1);
+      callback_data = g_new (TileLoadedCallbackData, 1);
       callback_data->tile = tile;
       callback_data->map_source = map_source;
 
@@ -562,9 +562,9 @@ fill_tile (ChamplainMapSource *map_source,
     }
   else
     {
-      ChamplainMapSource *next_source = champlain_map_source_get_next_source(map_source);
+      ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
       if (CHAMPLAIN_IS_MAP_SOURCE(next_source))
-          champlain_map_source_fill_tile(next_source, tile);
+          champlain_map_source_fill_tile (next_source, tile);
     }
 }

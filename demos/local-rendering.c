@@ -81,12 +81,12 @@ data_source_state_changed (ChamplainView *view,
   if (state == CHAMPLAIN_STATE_LOADING)
     {
       gtk_image_set_from_stock (image, GTK_STOCK_NETWORK, GTK_ICON_SIZE_BUTTON);
-      g_print("NET DATA SOURCE STATE: loading\n");
+      g_print ("NET DATA SOURCE STATE: loading\n");
     }
   else
     {
       gtk_image_clear (image);
-      g_print("NET DATA SOURCE STATE: done\n");
+      g_print ("NET DATA SOURCE STATE: done\n");
     }
 }
 
@@ -461,15 +461,15 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
 
       source_chain = champlain_map_source_chain_new ();
 
-      tile_size = champlain_map_source_get_tile_size(tile_source);
+      tile_size = champlain_map_source_get_tile_size (tile_source);
       src = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
 
-      champlain_map_source_chain_push(source_chain, src);
-      champlain_map_source_chain_push(source_chain, tile_source);
+      champlain_map_source_chain_push (source_chain, src);
+      champlain_map_source_chain_push (source_chain, tile_source);
 
       src = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new_full (100000000, NULL, FALSE));
 
-      champlain_map_source_chain_push(source_chain, src);
+      champlain_map_source_chain_push (source_chain, src);
 
       g_object_set (G_OBJECT (view), "map-source", source_chain, NULL);
       if (strncmp (id, "memphis", 7) == 0)
@@ -524,7 +524,7 @@ static void
 zoom_changed (GtkSpinButton *spinbutton,
               ChamplainView *view)
 {
-  gint zoom = gtk_spin_button_get_value_as_int(spinbutton);
+  gint zoom = gtk_spin_button_get_value_as_int (spinbutton);
   g_object_set (G_OBJECT(view), "zoom-level", zoom, NULL);
 }
 
@@ -535,21 +535,21 @@ map_zoom_changed (ChamplainView *view,
 {
   gint zoom;
   g_object_get (G_OBJECT(view), "zoom-level", &zoom, NULL);
-  gtk_spin_button_set_value(spinbutton, zoom);
+  gtk_spin_button_set_value (spinbutton, zoom);
 }
 
 static void
 zoom_in (GtkWidget *widget,
          ChamplainView *view)
 {
-  champlain_view_zoom_in(view);
+  champlain_view_zoom_in (view);
 }
 
 static void
 zoom_out (GtkWidget *widget,
           ChamplainView *view)
 {
-  champlain_view_zoom_out(view);
+  champlain_view_zoom_out (view);
 }
 
 static void
@@ -730,7 +730,7 @@ main (int argc,
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_out), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
-  button = gtk_spin_button_new_with_range(0, 20, 1);
+  button = gtk_spin_button_new_with_range (0, 20, 1);
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (button),
                              champlain_view_get_zoom_level (view));
   g_signal_connect (button, "changed", G_CALLBACK (zoom_changed), view);
@@ -819,8 +819,8 @@ main (int argc,
   gtk_tree_view_append_column (GTK_TREE_VIEW (tree_view), column);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (tree_view), FALSE);
 
-  selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-  g_signal_connect(tree_view, "row-activated", G_CALLBACK(list_item_selected_cb), view);
+  selection = gtk_tree_view_get_selection (GTK_TREE_VIEW(tree_view));
+  g_signal_connect (tree_view, "row-activated", G_CALLBACK(list_item_selected_cb), view);
 
   scrolled = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled),

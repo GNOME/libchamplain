@@ -69,7 +69,7 @@ champlain_tile_source_get_property (GObject *object,
 {
   ChamplainTileSourcePrivate *priv = GET_PRIVATE(object);
 
-  switch(prop_id)
+  switch (prop_id)
     {
     case PROP_ID:
       g_value_set_string (value, priv->id);
@@ -111,7 +111,7 @@ champlain_tile_source_set_property (GObject *object,
 {
   ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE(object);
 
-  switch(prop_id)
+  switch (prop_id)
     {
     case PROP_ID:
       champlain_tile_source_set_id (tile_source,
@@ -337,13 +337,13 @@ champlain_tile_source_set_cache (ChamplainTileSource *tile_source,
   ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
 
   if (priv->cache != NULL)
-    g_object_unref(priv->cache);
+    g_object_unref (priv->cache);
 
   if (cache)
     {
       g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (cache));
 
-      g_object_ref_sink(cache);
+      g_object_ref_sink (cache);
     }
 
   priv->cache = cache;

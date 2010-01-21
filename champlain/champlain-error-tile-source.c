@@ -80,7 +80,7 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
   ClutterActor *clone;
   guint size;
 
-  if (champlain_tile_get_content(tile))
+  if (champlain_tile_get_content (tile))
     /* cache is just validating tile - don't generate error tile in this case */
     return;
 

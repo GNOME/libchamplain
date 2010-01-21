@@ -53,8 +53,8 @@ GType champlain_map_source_chain_get_type (void);
 
 ChamplainMapSourceChain* champlain_map_source_chain_new (void);
 
-void champlain_map_source_chain_push(ChamplainMapSourceChain *source_chain, ChamplainMapSource *map_source);
-void champlain_map_source_chain_pop_map_source(ChamplainMapSourceChain *source_chain);
+void champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain, ChamplainMapSource *map_source);
+void champlain_map_source_chain_pop_map_source (ChamplainMapSourceChain *source_chain);
 
 G_END_DECLS
 

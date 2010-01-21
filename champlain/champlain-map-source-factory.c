@@ -91,7 +91,7 @@ champlain_map_source_factory_get_property (GObject *object,
   //ChamplainMapSourceFactory *map_source_factory = CHAMPLAIN_MAP_SOURCE_FACTORY(object);
   //ChamplainMapSourceFactoryPrivate *priv = map_source_factory->priv;
 
-  switch(prop_id)
+  switch (prop_id)
     {
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -107,7 +107,7 @@ champlain_map_source_factory_set_property (GObject *object,
   //ChamplainMapSourceFactory *map_source_factory = CHAMPLAIN_MAP_SOURCE_FACTORY(object);
   //ChamplainMapSourceFactoryPrivate *priv = map_source_factory->priv;
 
-  switch(prop_id)
+  switch (prop_id)
     {
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -383,15 +383,15 @@ ChamplainMapSource * champlain_map_source_factory_create_cached_source (Champlai
 
   tile_source = champlain_map_source_factory_create (factory, id);
 
-  tile_size = champlain_map_source_get_tile_size(tile_source);
+  tile_size = champlain_map_source_get_tile_size (tile_source);
   error_source = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
 
   file_cache = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new ());
 
   source_chain = champlain_map_source_chain_new ();
-  champlain_map_source_chain_push(source_chain, error_source);
-  champlain_map_source_chain_push(source_chain, tile_source);
-  champlain_map_source_chain_push(source_chain, file_cache);
+  champlain_map_source_chain_push (source_chain, error_source);
+  champlain_map_source_chain_push (source_chain, tile_source);
+  champlain_map_source_chain_push (source_chain, file_cache);
 
   return CHAMPLAIN_MAP_SOURCE(source_chain);
 }

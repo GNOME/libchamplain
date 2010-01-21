@@ -48,7 +48,7 @@ struct _ChamplainMapSourcePrivate
   gulong sig_handler_id;
 };
 
-static void reload_tiles_cb(ChamplainMapSource *orig, ChamplainMapSource *self);
+static void reload_tiles_cb (ChamplainMapSource *orig, ChamplainMapSource *self);
 
 static void
 champlain_map_source_get_property (GObject *object,
@@ -58,7 +58,7 @@ champlain_map_source_get_property (GObject *object,
 {
   ChamplainMapSourcePrivate *priv = GET_PRIVATE(object);
 
-  switch(prop_id)
+  switch (prop_id)
     {
     case PROP_NEXT_SOURCE:
       g_value_set_object (value, priv->next_source);
@@ -76,7 +76,7 @@ champlain_map_source_set_property (GObject *object,
 {
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE(object);
 
-  switch(prop_id)
+  switch (prop_id)
     {
     case PROP_NEXT_SOURCE:
       champlain_map_source_set_next_source (map_source,
@@ -180,7 +180,7 @@ champlain_map_source_get_next_source (ChamplainMapSource *map_source)
 }
 
 static
-void reload_tiles_cb(ChamplainMapSource *orig, ChamplainMapSource *self)
+void reload_tiles_cb (ChamplainMapSource *orig, ChamplainMapSource *self)
 {
   /* propagate the signal up the chain */
   g_signal_emit_by_name (self, "reload-tiles", NULL);
@@ -199,14 +199,14 @@ champlain_map_source_set_next_source (ChamplainMapSource *map_source,
       if (g_signal_handler_is_connected (priv->next_source, priv->sig_handler_id))
         g_signal_handler_disconnect (priv->next_source, priv->sig_handler_id);
 
-      g_object_unref(priv->next_source);
+      g_object_unref (priv->next_source);
     }
 
   if (next_source)
     {
       g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source));
 
-      g_object_ref_sink(next_source);
+      g_object_ref_sink (next_source);
 
       priv->sig_handler_id = g_signal_connect (next_source, "reload-tiles",
                              G_CALLBACK (reload_tiles_cb), map_source);
@@ -281,7 +281,7 @@ champlain_map_source_get_x (ChamplainMapSource *map_source,
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
 
   // FIXME: support other projections
-  return ((longitude + 180.0) / 360.0 * pow(2.0, zoom_level)) * champlain_map_source_get_tile_size (map_source);
+  return ((longitude + 180.0) / 360.0 * pow (2.0, zoom_level)) * champlain_map_source_get_tile_size (map_source);
 }
 
 guint
