@@ -1,3 +1,35 @@
+libchamplain 0.5.0 (2010-01-24)
+===============================
+
+Unstable release
+Bindings have not been updated yet.
+The API is not settled yet.
+
+Additions:
+* Add local rendering of OpenStreetMap data (Simon Wenner, Google Summer of
+  Code 2009)
+* New map source infrastructure (à la Pipe and Filter) (Jiří Techet)
+
+libchamplain 0.4.3 (2010-01-09)
+===============================
+
+Stable release
+GObject-introspection, Python (Victor Godoy Poluceno) and Perl
+(Emmanuel Rodriguez) bindings are in a working state.
+
+Additions:
+* A scale (Tollef Fog Heen and Pierre-Luc Beaudoin)
+* User configurable additional license text to view
+* An option to highligh points in Polygons (Andreas Henriksson)
+
+Fixes:
+* Also report as loading when validating the cache
+* Debian Bug #555082: fix linking with gold (Laurent Bigonville)
+* 604784: SIGSEGV in function cairo_set_operator
+* Fix segfault when polygon has been delete before redraw
+* Make queue_redraw visible to subclasses
+* Some memory usage improvements by reusing images already loaded
+* Don't eat clicks on the map when using ChamplainSelectionLayer
 libchamplain 0.4.3 (2010-01-09)
 ===============================
 
