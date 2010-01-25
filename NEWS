@@ -1,3 +1,16 @@
+libchamplain 0.5.1 (2010-01-25)
+===============================
+
+Unstable release
+Bindings have not been updated yet.
+The API is not settled yet.
+
+Fixes:
+* Disable Python and Instrospection until libMemphis gets bindings
+  (Pierre-Luc Beaudoin)
+* Add missing files in tarball (Pierre-Luc Beaudoin)
+* Remove generated headers from build (Götz Waschk)
+
 libchamplain 0.5.0 (2010-01-24)
 ===============================
 
@@ -9,6 +22,7 @@ Additions:
 * Add local rendering of OpenStreetMap data (Simon Wenner, Google Summer of
   Code 2009)
 * New map source infrastructure (à la Pipe and Filter) (Jiří Techet)
+* ChamplainPolygon and ChamplainMapSource inherit from GInitiallyUnowned
 
 libchamplain 0.4.3 (2010-01-09)
 ===============================
