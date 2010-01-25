@@ -33,6 +33,10 @@ typedef struct _ChamplainBoundingBox ChamplainBoundingBox;
 
 /**
  * ChamplainBoundingBox:
+ * @left: left coordinate
+ * @bottom: bottom coordinate
+ * @right: right coordinate
+ * @top: top coordinate
  *
  * Defines the area of a ChamplainMapDataSource that contains data.
  *

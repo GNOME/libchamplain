@@ -221,7 +221,7 @@ champlain_network_map_data_source_init (ChamplainNetworkMapDataSource *self)
 /**
  * champlain_network_map_data_source_new:
  *
- * Returns a new #ChamplainNetworkMapDataSource
+ * Returns: a new #ChamplainNetworkMapDataSource
  *
  * Since: 0.6
  */
@@ -235,7 +235,7 @@ static void
 load_map_data_cb (SoupSession *session, SoupMessage *msg,
     gpointer user_data)
 {
-  ChamplainNetworkMapDataSource *self = 
+  ChamplainNetworkMapDataSource *self =
       CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (user_data);
   ChamplainNetworkMapDataSourcePrivate *priv = GET_PRIVATE (self);
   ChamplainBoundingBox *bbox;
@@ -340,7 +340,7 @@ champlain_network_map_data_source_load_map_data (
  * champlain_network_map_data_source_get_api_uri:
  * @map_data_source: a #ChamplainNetworkMapDataSource
  *
- * Returns the URI of the API server.
+ * Returns: the URI of the API server.
  *
  * Since: 0.6
  */

@@ -755,6 +755,7 @@ champlain_tile_set_content (ChamplainTile *self,
 
 /**
  * champlain_tile_get_content:
+ * @self: the #ChamplainTile
  *
  * Returns: the tile's content, this actor will change each time the tile's content changes.
  * You should not unref this content, it is owned by the tile.

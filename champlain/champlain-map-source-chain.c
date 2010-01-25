@@ -16,6 +16,20 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-map-source-chain
+ * @short_description: A map source simplifying creation of source chains
+ *
+ * This map source simplifies creation of map chains by providing two
+ * functions for their creation and modification in a stack-like manner:
+ * champlain_map_source_chain_push() and champlain_map_source_chain_pop().
+ * For instance, to create a chain consisting of #ChamplainFileCache,
+ * #ChamplainNetworkTileSource and #ChamplainErrorTileSource, the map
+ * sources have to be pushed into the chain in the reverse order starting
+ * from #ChamplainErrorTileSource. After its creation, #ChamplainMapSourceChain
+ * behaves as a chain of map sources it contains.
+ */
+
 #include "champlain-map-source-chain.h"
 #include "champlain-tile-cache.h"
 #include "champlain-tile-source.h"
@@ -49,7 +63,7 @@ champlain_map_source_chain_dispose (GObject *object)
   ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(object);
 
   while (priv->stack_top)
-    champlain_map_source_chain_pop_map_source (source_chain);
+    champlain_map_source_chain_pop (source_chain);
 
   G_OBJECT_CLASS (champlain_map_source_chain_parent_class)->dispose (object);
 }
@@ -91,6 +105,15 @@ champlain_map_source_chain_init (ChamplainMapSourceChain *source_chain)
   priv->sig_handler_id = 0;
 }
 
+/**
+ * champlain_map_source_chain_new:
+ *
+ * Constructor of #ChamplainMapSourceChain.
+ *
+ * Returns: a new empty #ChamplainMapSourceChain.
+ *
+ * Since: 0.6
+ */
 ChamplainMapSourceChain* champlain_map_source_chain_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE_CHAIN, NULL);
@@ -219,6 +242,15 @@ void reload_tiles_cb (ChamplainMapSource *map_source, ChamplainMapSourceChain *s
   g_signal_emit_by_name (source_chain, "reload-tiles", NULL);
 }
 
+/**
+ * champlain_map_source_chain_push:
+ * @source_chain: a #ChamplainMapSourceChain
+ * @map_source: the #ChamplainMapSource to be pushed into the chain
+ *
+ * Pushes a map source into the chain.
+ *
+ * Since: 0.6
+ */
 void champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain, ChamplainMapSource *map_source)
 {
   ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
@@ -256,7 +288,15 @@ void champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain, Cha
                          G_CALLBACK (reload_tiles_cb), source_chain);
 }
 
-void champlain_map_source_chain_pop_map_source (ChamplainMapSourceChain *source_chain)
+/**
+ * champlain_map_source_chain_pop:
+ * @source_chain: a #ChamplainMapSourceChain
+ *
+ * Pops the map source from the top of the stack from the chain.
+ *
+ * Since: 0.6
+ */
+void champlain_map_source_chain_pop (ChamplainMapSourceChain *source_chain)
 {
   ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
   ChamplainMapSource *old_stack_top = priv->stack_top;

@@ -35,11 +35,6 @@
  * (TODO: link to the specification) The default rules only show
  * highways as thin black lines.
  * Once loaded, rules can be queried and edited.
- *
- * Rendered tiles are cached. The cache is deleted if the map data or rules
- * are changed. This is the default behaviour, but it can be disabled with the
- * #ChamplainMemphisTileSource:persistent-cache property. A persistent cache
- * has to be managed by the client application.
  */
 
 #include "champlain-memphis-tile-source.h"
@@ -583,9 +578,9 @@ champlain_memphis_tile_source_set_map_data_source (
 
 /**
  * champlain_memphis_tile_source_get_map_data_source:
- * @map_source: a #ChamplainMemphisTileSource
+ * @tile_source: a #ChamplainMemphisTileSource
  *
- * Returns the #ChamplainMapDataSource.
+ * Returns: the #ChamplainMapDataSource.
  *
  * Since: 0.6
  */
@@ -601,9 +596,9 @@ champlain_memphis_tile_source_get_map_data_source (
 
 /**
  * champlain_memphis_tile_source_get_background_color:
- * @map_source: a #ChamplainMemphisTileSource
+ * @tile_source: a #ChamplainMemphisTileSource
  *
- * Returns the background color of the map as a newly-allocated
+ * Returns: the background color of the map as a newly-allocated
  * #ClutterColor.
  *
  * Since: 0.6
@@ -630,7 +625,7 @@ ClutterColor * champlain_memphis_tile_source_get_background_color (
 
 /**
  * champlain_memphis_tile_source_set_background_color:
- * @map_source: a #ChamplainMemphisTileSource
+ * @tile_source: a #ChamplainMemphisTileSource
  * @color: a #ClutterColor
  *
  * Sets the background color of the map from a #ClutterColor.
@@ -656,7 +651,7 @@ champlain_memphis_tile_source_set_background_color (
 
 /**
  * champlain_memphis_tile_source_set_rule:
- * @map_source: a #ChamplainMemphisTileSource
+ * @tile_source: a #ChamplainMemphisTileSource
  * @rule: a #MemphisRule
  *
  * Edits or adds a #MemphisRule to the rules-set. New rules are appended
@@ -666,7 +661,7 @@ champlain_memphis_tile_source_set_background_color (
  */
 void
 champlain_memphis_tile_source_set_rule (ChamplainMemphisTileSource *tile_source,
-                                       MemphisRule *rule)
+                                        MemphisRule *rule)
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                     MEMPHIS_RULE (rule));
@@ -682,16 +677,16 @@ champlain_memphis_tile_source_set_rule (ChamplainMemphisTileSource *tile_source,
 
 /**
  * champlain_memphis_tile_source_get_rule:
- * @map_source: a #ChamplainMemphisTileSource
+ * @tile_source: a #ChamplainMemphisTileSource
  * @id: an id string
  *
- * Returns the requested #MemphisRule or NULL if none is found.
+ * Returns: the requested #MemphisRule or NULL if none is found.
  *
  * Since: 0.6
  */
 MemphisRule *
 champlain_memphis_tile_source_get_rule (ChamplainMemphisTileSource *tile_source,
-                                       const gchar *id)
+                                        const gchar *id)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                         id != NULL, NULL);
@@ -708,9 +703,9 @@ champlain_memphis_tile_source_get_rule (ChamplainMemphisTileSource *tile_source,
 
 /**
  * champlain_memphis_tile_source_get_rule_ids:
- * @map_source: a #ChamplainMemphisTileSource
+ * @tile_source: a #ChamplainMemphisTileSource
  *
- * Returns a #GList of id strings of the form:
+ * Returns: a #GList of id strings of the form:
  * key1|key2|...|keyN:value1|value2|...|valueM
  *
  * Example: "waterway:river|stream|canal"
@@ -734,7 +729,7 @@ champlain_memphis_tile_source_get_rule_ids (ChamplainMemphisTileSource *tile_sou
 
 /**
  * champlain_memphis_tile_source_remove_rule:
- * @map_source: a #ChamplainMemphisTileSource
+ * @tile_source: a #ChamplainMemphisTileSource
  * @id: an id string
  *
  * Removes the rule with the given id.

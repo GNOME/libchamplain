@@ -17,6 +17,20 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-network-tile-source
+ * @short_description: A map source that downloads tiles from a web server
+ *
+ * This object is specialized for map tiles that can be downloaded
+ * from a web server.  This includes all web based map services such as
+ * OpenStreetMap, Google Maps, Yahoo Maps and more.  This object contains
+ * all mechanisms necessary to download tiles.
+ *
+ * Some preconfigured network map sources are built-in this library,
+ * see #ChamplainMapSourceFactory.
+ *
+ */
+
 #include "config.h"
 
 #include "champlain-network-tile-source.h"
@@ -177,6 +191,13 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
 
   map_source_class->fill_tile = fill_tile;
 
+  /**
+  * ChamplainNetworkTileSource:uri-format
+  *
+  * The uri format of the tile source, see #champlain_network_tile_source_set_uri_format
+  *
+  * Since: 0.4
+  */
   pspec = g_param_spec_string ("uri-format",
                                "URI Format",
                                "The URI format",
@@ -184,6 +205,13 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
                                (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_URI_FORMAT, pspec);
 
+  /**
+  * ChamplainNetworkTileSource:offline
+  *
+  * Specifies whether the network tile source can access network
+  *
+  * Since: 0.4
+  */
   pspec = g_param_spec_boolean ("offline",
                                 "Offline",
                                 "Offline",
@@ -191,6 +219,13 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
                                 G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_OFFLINE, pspec);
 
+  /**
+  * ChamplainNetworkTileSource:proxy-uri
+  *
+  * The proxy uri used to access network
+  *
+  * Since: 0.4
+  */
   pspec = g_param_spec_string ("proxy-uri",
                                "Proxy URI",
                                "The proxy URI to use to access network",
@@ -220,6 +255,24 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
 
 }
 
+/**
+ * champlain_network_tile_source_new_full:
+ * @id: the map source's id
+ * @name: the map source's name
+ * @license: the map source's license
+ * @license_uri: the map source's license URI
+ * @min_zoom: the map source's minimum zoom level
+ * @max_zoom: the map source's maximum zoom level
+ * @tile_size: the map source's tile size (in pixels)
+ * @projection: the map source's projection
+ * @uri_format: the URI to fetch the tiles from, see #champlain_network_tile_source_set_uri_format
+ *
+ * Constructor of #ChamplainNetworkTileSource.
+ *
+ * Returns: a constructed #ChamplainNetworkTileSource
+ *
+ * Since: 0.4
+ */
 ChamplainNetworkTileSource*
 champlain_network_tile_source_new_full (const gchar *id,
                                         const gchar *name,
@@ -240,6 +293,17 @@ champlain_network_tile_source_new_full (const gchar *id,
   return source;
 }
 
+/**
+ * champlain_network_tile_source_get_uri_format:
+ * @tile_source: the #ChamplainNetworkTileSource
+ *
+ * Default constructor of #ChamplainNetworkTileSource.
+ *
+ * Returns: A URI format used for URI creation when downloading tiles. See
+ * champlain_network_tile_source_set_uri_format() for more information.
+ *
+ * Since: 0.6
+ */
 const gchar *
 champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *tile_source)
 {
@@ -249,6 +313,21 @@ champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *tile_s
   return priv->uri_format;
 }
 
+/**
+ * champlain_network_tile_source_set_uri_format:
+ * @tile_source: the #ChamplainNetworkTileSource
+ * @uri_format: the URI format
+ *
+ * A URI format is a URI where x, y and zoom level information have been
+ * marked for parsing and insertion.  There can be an unlimited number of
+ * marked items in a URI format.  They are delimited by "#" before and after
+ * the variable name. There are 3 defined variable names: X, Y, and Z.
+ *
+ * For example, this is the OpenStreetMap URI format:
+ * "http://tile.openstreetmap.org/\#Z\#/\#X\#/\#Y\#.png"
+ *
+ * Since: 0.4
+ */
 void
 champlain_network_tile_source_set_uri_format (ChamplainNetworkTileSource *tile_source,
     const gchar *uri_format)
@@ -263,6 +342,16 @@ champlain_network_tile_source_set_uri_format (ChamplainNetworkTileSource *tile_s
   g_object_notify (G_OBJECT (tile_source), "uri-format");
 }
 
+/**
+ * champlain_network_tile_source_get_proxy_uri:
+ * @tile_source: the #ChamplainNetworkTileSource
+ *
+ * Gets the proxy uri used to access network.
+ *
+ * Returns: the proxy uri
+ *
+ * Since: 0.6
+ */
 const gchar *
 champlain_network_tile_source_get_proxy_uri (ChamplainNetworkTileSource *tile_source)
 {
@@ -272,6 +361,15 @@ champlain_network_tile_source_get_proxy_uri (ChamplainNetworkTileSource *tile_so
   return priv->proxy_uri;
 }
 
+/**
+ * champlain_network_tile_source_set_proxy_uri:
+ * @tile_source: the #ChamplainNetworkTileSource
+ * @proxy_uri: the proxy uri used to access network
+ *
+ * Sets the proxy uri used to access network.
+ *
+ * Since: 0.6
+ */
 void
 champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_source,
     const gchar *proxy_uri)
@@ -298,6 +396,16 @@ champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_so
   g_object_notify (G_OBJECT (tile_source), "proxy-uri");
 }
 
+/**
+ * champlain_network_tile_source_get_offline:
+ * @tile_source: the #ChamplainNetworkTileSource
+ *
+ * Gets offline status.
+ *
+ * Returns: TRUE when the tile source is set to be offline; FALSE otherwise.
+ *
+ * Since: 0.6
+ */
 gboolean
 champlain_network_tile_source_get_offline (ChamplainNetworkTileSource *tile_source)
 {
@@ -307,6 +415,15 @@ champlain_network_tile_source_get_offline (ChamplainNetworkTileSource *tile_sour
   return priv->offline;
 }
 
+/**
+ * champlain_network_tile_source_set_offline:
+ * @tile_source: the #ChamplainNetworkTileSource
+ * @offline: TRUE when the tile source should be offline; FALSE otherwise
+ *
+ * Sets offline status.
+ *
+ * Since: 0.6
+ */
 void
 champlain_network_tile_source_set_offline (ChamplainNetworkTileSource *tile_source,
     gboolean offline)

@@ -17,6 +17,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-error-tile-source
+ * @short_description: A map source displaying error tiles
+ *
+ * #ChamplainErrorTileSource always fills a tile with error tile image.
+ * Applications can create their own error tile sources to change the look
+ * of the error tile.
+ */
+
 #include "champlain-error-tile-source.h"
 
 G_DEFINE_TYPE (ChamplainErrorTileSource, champlain_error_tile_source, CHAMPLAIN_TYPE_TILE_SOURCE);
@@ -65,6 +74,16 @@ champlain_error_tile_source_init (ChamplainErrorTileSource *error_source)
   priv->error_actor = NULL;
 }
 
+/**
+ * champlain_error_tile_source_new_full:
+ * @tile_size: size of the error tile
+ *
+ * Constructor of #ChamplainErrorTileSource.
+ *
+ * Returns: a constructed #ChamplainErrorTileSource
+ *
+ * Since: 0.6
+ */
 ChamplainErrorTileSource* champlain_error_tile_source_new_full (guint tile_size)
 {
   return g_object_new (CHAMPLAIN_TYPE_ERROR_TILE_SOURCE, "tile-size", tile_size, NULL);

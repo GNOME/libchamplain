@@ -18,7 +18,7 @@
 
 /**
  * SECTION:champlain-map-source-factory
- * @short_description: Manages #ChamplainMapSource
+ * @short_description: Manages #ChamplainMapSource instances
  *
  * This factory manages the create of #ChamplainMapSource. It contains names
  * and constructor functions for each available map sources in libchamplain.
@@ -328,6 +328,7 @@ champlain_map_source_factory_dup_default (void)
 
 /**
  * champlain_map_source_factory_dup_list:
+ * @factory: the Factory
  *
  * Returns: the list of registered map sources, the items should not be freed,
  * the list should be freed with #g_slist_free.
@@ -372,6 +373,17 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
   return NULL;
 }
 
+/**
+ * champlain_map_source_factory_create_cached_source:
+ * @factory: the Factory
+ * @id: the wanted map source id
+ *
+ * Returns: a ready to use #ChamplainMapSourceChain consisting of
+ * #ChamplainFileCache, #ChamplainMapSource matching the given name, and
+ * #ChamplainErrorTileSource.
+ *
+ * Since: 0.6
+ */
 ChamplainMapSource * champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *factory,
     const gchar *id)
 {

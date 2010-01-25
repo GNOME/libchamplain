@@ -52,10 +52,14 @@
     <title>II. Map Source API Reference</title>
     <xi:include href="xml/champlain-map-source-factory.xml"/>
     <xi:include href="xml/champlain-map-source.xml"/>
-    <xi:include href="xml/champlain-network-map-source.xml"/>
-    <xi:include href="xml/champlain-memphis-map-source.xml"/>
     <xi:include href="xml/champlain-tile.xml"/>
-    <xi:include href="xml/champlain-cache.xml"/>
+    <xi:include href="xml/champlain-map-source-chain.xml"/>
+    <xi:include href="xml/champlain-tile-source.xml"/>
+    <xi:include href="xml/champlain-tile-cache.xml"/>
+    <xi:include href="xml/champlain-network-tile-source.xml"/>
+    <xi:include href="xml/champlain-memphis-tile-source.xml"/>
+    <xi:include href="xml/champlain-error-tile-source.xml"/>
+    <xi:include href="xml/champlain-file-cache.xml"/>
   </chapter>
   <chapter>
     <title>III. Map Data Source API Reference</title>

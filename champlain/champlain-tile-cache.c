@@ -16,6 +16,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-tile-cache
+ * @short_description: A base class of tile caches
+ *
+ * This class defines properties and methods common to all caches (that is, map
+ * sources that permit storage and retrieval of tiles). Tiles are typically
+ * stored by #ChamplainTileSource objects.
+ */
+
 #include "champlain-tile-cache.h"
 
 G_DEFINE_TYPE (ChamplainTileCache, champlain_tile_cache, CHAMPLAIN_TYPE_MAP_SOURCE);
@@ -42,6 +51,7 @@ static const gchar *get_license_uri (ChamplainMapSource *map_source);
 static guint get_min_zoom_level (ChamplainMapSource *map_source);
 static guint get_max_zoom_level (ChamplainMapSource *map_source);
 static guint get_tile_size (ChamplainMapSource *map_source);
+static ChamplainMapProjection get_projection (ChamplainMapSource *map_source);
 
 static void
 champlain_tile_cache_get_property (GObject *object,
@@ -120,6 +130,7 @@ champlain_tile_cache_class_init (ChamplainTileCacheClass *klass)
   map_source_class->get_min_zoom_level = get_min_zoom_level;
   map_source_class->get_max_zoom_level = get_max_zoom_level;
   map_source_class->get_tile_size = get_tile_size;
+  map_source_class->get_projection = get_projection;
 
   map_source_class->fill_tile = NULL;
 
@@ -128,10 +139,18 @@ champlain_tile_cache_class_init (ChamplainTileCacheClass *klass)
   tile_cache_class->store_tile = NULL;
   tile_cache_class->clean = NULL;
 
+  /**
+  * ChamplainTileCache:persistent-cache
+  *
+  * Determines whether the cache is persistent or temporary (cleaned upon
+  * destruction)
+  *
+  * Since: 0.6
+  */
   pspec = g_param_spec_boolean ("persistent-cache",
                                 "Persistent Cache",
                                 "Specifies whether the cache is persistent",
-                                FALSE,
+                                TRUE,
                                 G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_PERSISTENT_CACHE, pspec);
 }
@@ -144,6 +163,16 @@ champlain_tile_cache_init (ChamplainTileCache *tile_cache)
   priv->persistent = FALSE;
 }
 
+/**
+ * champlain_tile_cache_get_persistent:
+ * @tile_cache: a #ChamplainTileCache
+ *
+ * Gets cache persistency information.
+ *
+ * Returns: TRUE when the cache is persistent; FALSE otherwise.
+ *
+ * Since: 0.6
+ */
 gboolean
 champlain_tile_cache_get_persistent (ChamplainTileCache *tile_cache)
 {
@@ -153,6 +182,17 @@ champlain_tile_cache_get_persistent (ChamplainTileCache *tile_cache)
   return priv->persistent;
 }
 
+/**
+ * champlain_tile_cache_store_tile:
+ * @tile_cache: a #ChamplainTileCache
+ * @tile: a #ChamplainTile
+ * @contents: the tile contents that should be stored
+ * @size: size of the contents in bytes
+ *
+ * Stores the tile including the metadata into the cache.
+ *
+ * Since: 0.6
+ */
 void
 champlain_tile_cache_store_tile (ChamplainTileCache *tile_cache,
                                  ChamplainTile *tile,
@@ -164,6 +204,15 @@ champlain_tile_cache_store_tile (ChamplainTileCache *tile_cache,
   return CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->store_tile (tile_cache, tile, contents, size);
 }
 
+/**
+ * champlain_tile_cache_refresh_tile_time:
+ * @tile_cache: a #ChamplainTileCache
+ * @tile: a #ChamplainTile
+ *
+ * Refreshes the tile access time in the cache.
+ *
+ * Since: 0.6
+ */
 void
 champlain_tile_cache_refresh_tile_time (ChamplainTileCache *tile_cache, ChamplainTile *tile)
 {
@@ -172,6 +221,21 @@ champlain_tile_cache_refresh_tile_time (ChamplainTileCache *tile_cache, Champlai
   return CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->refresh_tile_time (tile_cache, tile);
 }
 
+/**
+ * champlain_tile_cache_on_tile_filled:
+ * @tile_cache: a #ChamplainTileCache
+ * @tile: a #ChamplainTile
+ *
+ * When a cache fills a tile and the next source in the chain is a tile cache,
+ * it should call this function on the next source. This way all the caches
+ * preceding a tile source in the chain get informed that the tile was used and
+ * can modify their metadata accordingly in the implementation of this function.
+ * In addition, the call of this function should be chained so within the
+ * implementation of this function it should be called on the next source
+ * in the chain when next source is a tile cache.
+ *
+ * Since: 0.6
+ */
 void
 champlain_tile_cache_on_tile_filled (ChamplainTileCache *tile_cache, ChamplainTile *tile)
 {
@@ -180,6 +244,15 @@ champlain_tile_cache_on_tile_filled (ChamplainTileCache *tile_cache, ChamplainTi
   return CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->on_tile_filled (tile_cache, tile);
 }
 
+/**
+ * champlain_tile_cache_clean:
+ * @tile_cache: a #ChamplainTileCache
+ *
+ * Erases the contents of the cache. This function will fail when the cache is
+ * not temporary.
+ *
+ * Since: 0.6
+ */
 void
 champlain_tile_cache_clean (ChamplainTileCache *tile_cache)
 {
@@ -270,4 +343,16 @@ get_tile_size (ChamplainMapSource *map_source)
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source), 0);
 
   return champlain_map_source_get_tile_size (next_source);
+}
+
+static ChamplainMapProjection
+get_projection (ChamplainMapSource *map_source)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (map_source), CHAMPLAIN_MAP_PROJECTION_MERCATOR);
+
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
+
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source), CHAMPLAIN_MAP_PROJECTION_MERCATOR);
+
+  return champlain_map_source_get_projection (next_source);
 }

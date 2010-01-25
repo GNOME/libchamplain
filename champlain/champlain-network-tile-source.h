@@ -61,16 +61,16 @@ ChamplainNetworkTileSource* champlain_network_tile_source_new_full (const gchar 
     ChamplainMapProjection projection,
     const gchar *uri_format);
 
-const gchar * champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *source);
-void champlain_network_tile_source_set_uri_format (ChamplainNetworkTileSource *source,
+const gchar * champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *tile_source);
+void champlain_network_tile_source_set_uri_format (ChamplainNetworkTileSource *tile_source,
     const gchar *uri_format);
 
-gboolean champlain_network_tile_source_get_offline (ChamplainNetworkTileSource *source);
-void champlain_network_tile_source_set_offline (ChamplainNetworkTileSource *source,
+gboolean champlain_network_tile_source_get_offline (ChamplainNetworkTileSource *tile_source);
+void champlain_network_tile_source_set_offline (ChamplainNetworkTileSource *tile_source,
     gboolean offline);
 
-const gchar * champlain_network_tile_source_get_proxy_uri (ChamplainNetworkTileSource *source);
-void champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *source,
+const gchar * champlain_network_tile_source_get_proxy_uri (ChamplainNetworkTileSource *tile_source);
+void champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_source,
     const gchar *proxy_uri);
 
 G_END_DECLS

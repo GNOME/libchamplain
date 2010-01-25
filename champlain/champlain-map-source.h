@@ -38,6 +38,11 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainMapSourceClass ChamplainMapSourceClass;
 
+typedef enum
+{
+  CHAMPLAIN_MAP_PROJECTION_MERCATOR
+} ChamplainMapProjection;
+
 struct _ChamplainMapSource
 {
   GInitiallyUnowned parent_instance;
@@ -54,6 +59,7 @@ struct _ChamplainMapSourceClass
   guint (*get_min_zoom_level) (ChamplainMapSource *map_source);
   guint (*get_max_zoom_level) (ChamplainMapSource *map_source);
   guint (*get_tile_size) (ChamplainMapSource *map_source);
+  ChamplainMapProjection (*get_projection) (ChamplainMapSource *map_source);
 
   void (*fill_tile) (ChamplainMapSource *map_source,
                      ChamplainTile *tile);
@@ -72,6 +78,7 @@ const gchar * champlain_map_source_get_license_uri (ChamplainMapSource *map_sour
 guint champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source);
 guint champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source);
 guint champlain_map_source_get_tile_size (ChamplainMapSource *map_source);
+ChamplainMapProjection champlain_map_source_get_projection (ChamplainMapSource *map_source);
 
 guint champlain_map_source_get_x (ChamplainMapSource *map_source,
                                   guint zoom_level,

@@ -193,7 +193,7 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
  * champlain_map_data_source_get_map_data:
  * @data_source: a #ChamplainMapDataSource
  *
- * Returns the #MemphisMap of the data source or NULL.
+ * Returns: the #MemphisMap of the data source or NULL.
  *
  * Since: 0.6
  */

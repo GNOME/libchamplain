@@ -40,11 +40,6 @@ G_BEGIN_DECLS
 typedef struct _ChamplainTileSource ChamplainTileSource;
 typedef struct _ChamplainTileSourceClass ChamplainTileSourceClass;
 
-typedef enum
-{
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR
-} ChamplainMapProjection;
-
 struct _ChamplainTileSource
 {
   ChamplainMapSource parent_instance;
@@ -56,10 +51,6 @@ struct _ChamplainTileSourceClass
 };
 
 GType champlain_tile_source_get_type (void);
-
-ChamplainMapProjection champlain_tile_source_get_projection (ChamplainTileSource *tile_source);
-void champlain_tile_source_set_projection (ChamplainTileSource *tile_source,
-    ChamplainMapProjection projection);
 
 ChamplainTileCache *champlain_tile_source_get_cache (ChamplainTileSource *tile_source);
 void champlain_tile_source_set_cache (ChamplainTileSource *tile_source,
@@ -79,7 +70,9 @@ void champlain_tile_source_set_min_zoom_level (ChamplainTileSource *tile_source,
 void champlain_tile_source_set_max_zoom_level (ChamplainTileSource *tile_source,
     guint zoom_level);
 void champlain_tile_source_set_tile_size (ChamplainTileSource *tile_source,
-    guint zoom_level);
+    guint tile_size);
+void champlain_tile_source_set_projection (ChamplainTileSource *tile_source,
+    ChamplainMapProjection projection);
 
 G_END_DECLS
 

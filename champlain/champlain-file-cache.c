@@ -17,6 +17,16 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-file-cache
+ * @short_description: Stores and loads cached tiles from the file system
+ *
+ * #ChamplainFileCache is a map source that stores and retrieves tiles from the
+ * file system. It can be temporary (deleted when the object is destroyed) or
+ * permanent. Tiles most frequently loaded gain in "popularity". This popularity
+ * is taken into account when purging the cache.
+ */
+
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_CACHE
 #include "champlain-debug.h"
 
@@ -319,6 +329,15 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
   object_class->set_property = champlain_file_cache_set_property;
   object_class->constructed = champlain_file_cache_constructed;
 
+  /**
+  * ChamplainFileCache:size-limit:
+  *
+  * The cache size limit in bytes.
+  *
+  * Note: this new value will not be applied until you call #champlain_cache_purge
+  *
+  * Since: 0.4
+  */
   pspec = g_param_spec_uint ("size-limit",
                              "Size Limit",
                              "The cache's size limit (Mb)",
@@ -328,6 +347,13 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
                              G_PARAM_CONSTRUCT | G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_SIZE_LIMIT, pspec);
 
+  /**
+  * ChamplainFileCache:cache-dir:
+  *
+  * The directory where the tile database is stored.
+  *
+  * Since: 0.6
+  */
   pspec = g_param_spec_string ("cache-dir",
                                "Cache Directory",
                                "The directory of the cache",
@@ -357,6 +383,16 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
   priv->stmt_update = NULL;
 }
 
+/**
+ * champlain_file_cache_new:
+ *
+ * Default constructor of #ChamplainFileCache.
+ *
+ * Returns: a constructed permanent cache of maximal size 100000000 B inside
+ * ~/.cache/champlain.
+ *
+ * Since: 0.6
+ */
 ChamplainFileCache* champlain_file_cache_new (void)
 {
   gchar *cache_path;
@@ -370,6 +406,22 @@ ChamplainFileCache* champlain_file_cache_new (void)
   return cache;
 }
 
+/**
+ * champlain_file_cache_new_full:
+ * @size_limit: maximal size of the cache in bytes
+ * @cache_dir: the directory where the cache is created. For temporary caches
+ * one more directory with random name is created inside this directory.
+ * When cache_dir == NULL, a cache in ~/.cache/champlain is used for permanent
+ * caches and /tmp for temporary caches.
+ * @persistent: if TRUE, the cache is persistent; otherwise the cache is
+ * temporary and will be deleted when the cache object is destructed.
+ *
+ * Constructor of #ChamplainFileCache.
+ *
+ * Returns: a constructed #ChamplainFileCache
+ *
+ * Since: 0.6
+ */
 ChamplainFileCache* champlain_file_cache_new_full (guint size_limit,
     const gchar *cache_dir, gboolean persistent)
 {
@@ -379,6 +431,16 @@ ChamplainFileCache* champlain_file_cache_new_full (guint size_limit,
   return cache;
 }
 
+/**
+ * champlain_file_cache_get_size_limit:
+ * @file_cache: a #ChamplainCache
+ *
+ * Gets the cache size limit in bytes.
+ *
+ * Returns: size limit
+ *
+ * Since: 0.4
+ */
 guint
 champlain_file_cache_get_size_limit (ChamplainFileCache *file_cache)
 {
@@ -388,6 +450,16 @@ champlain_file_cache_get_size_limit (ChamplainFileCache *file_cache)
   return priv->size_limit;
 }
 
+/**
+ * champlain_file_cache_get_cache_dir:
+ * @file_cache: a #ChamplainCache
+ *
+ * Gets the directory where the cache database is stored.
+ *
+ * Returns: the directory
+ *
+ * Since: 0.6
+ */
 const gchar *
 champlain_file_cache_get_cache_dir (ChamplainFileCache *file_cache)
 {
@@ -397,6 +469,15 @@ champlain_file_cache_get_cache_dir (ChamplainFileCache *file_cache)
   return priv->cache_dir;
 }
 
+/**
+ * champlain_file_cache_set_size_limit:
+ * @file_cache: a #ChamplainCache
+ * @size_limit: the cache limit in bytes
+ *
+ * Sets the cache size limit in bytes.
+ *
+ * Since: 0.4
+ */
 void
 champlain_file_cache_set_size_limit (ChamplainFileCache *file_cache,
                                      guint size_limit)
@@ -782,6 +863,15 @@ purge_on_idle (gpointer data)
   return FALSE;
 }
 
+/**
+ * champlain_file_cache_purge_on_idle:
+ * @file_cache: a #ChamplainCache
+ *
+ * Purge the cache from the less popular tiles until cache's size limit is reached.
+ * This is a non blocking call as the purge will happen when the application is idle
+ *
+ * Since: 0.4
+ */
 void
 champlain_file_cache_purge_on_idle (ChamplainFileCache *file_cache)
 {
@@ -789,6 +879,14 @@ champlain_file_cache_purge_on_idle (ChamplainFileCache *file_cache)
   g_idle_add (purge_on_idle, file_cache);
 }
 
+/**
+ * champlain_file_cache_purge:
+ * @file_cache: a #ChamplainCache
+ *
+ * Purge the cache from the less popular tiles until cache's size limit is reached.
+ *
+ * Since: 0.4
+ */
 void
 champlain_file_cache_purge (ChamplainFileCache *file_cache)
 {

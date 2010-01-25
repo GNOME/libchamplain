@@ -718,7 +718,8 @@ redraw_on_idle (gpointer gobject)
   return FALSE;
 }
 
-/** champlain_marker_queue_redraw:
+/**
+ * champlain_marker_queue_redraw:
  * @marker: a #ChamplainMarker
  *
  * Queue a redraw of the marker as soon as possible. This function should not
