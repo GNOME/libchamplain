@@ -45,6 +45,7 @@ libchamplain_headers = \
 libchamplain_0_5_la_SOURCES = \
 	$(CHAMPLAIN_MARSHAL_LIST) 	\
 	$(BUILT_SOURCES) 		\
+	$(libchamplain_headers)		\
 	champlain-debug.c 		\
 	champlain-view.c 		\
 	champlain-layer.c 		\
@@ -73,27 +74,7 @@ libchamplain_0_5_la_SOURCES = \
 
 noinst_HEADERS = \
 	champlain-debug.h  		\
-	champlain-view.h 		\
-	champlain-base-marker.h 	\
-	champlain-marker.h 		\
-	champlain-private.h 		\
-	champlain-point.h 		\
-	champlain-map.h  		\
-	champlain-zoom-level.h 		\
-	champlain-tile.h 		\
-	champlain-enum-types.h		\
-	champlain-map-source.h		\
-	champlain-map-source-chain.h	\
-	champlain-tile-source.h		\
-	champlain-tile-cache.h		\
-	champlain-network-tile-source.h	\
-	champlain-error-tile-source.h	\
-	champlain-file-cache.h		\
-	champlain-enum-types.h		\
-	champlain-map-source-factory.h	\
-	champlain-map-source-desc.h	\
-	champlain-polygon.h		\
-	champlain-version.h
+	champlain-private.h
 
 libchamplain_include_HEADERS = \
 	champlain.h 			\
