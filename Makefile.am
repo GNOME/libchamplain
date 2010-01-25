@@ -22,7 +22,7 @@ endif
 pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
 
-DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc --enable-python
+DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc --disable-python --disable-introspection
 
 CLEANFILES = $(pcfiles) $(other_pcfiles)
 all: $(other_pcfiles)
