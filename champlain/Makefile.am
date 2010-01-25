@@ -24,7 +24,6 @@ libchamplain_headers = \
 	champlain-base-marker.h		\
 	champlain-marker.h		\
 	champlain-map.h			\
-	champlain-enum-types.h		\
 	champlain-tile.h		\
 	champlain-map-source.h		\
 	champlain-map-source-chain.h	\
