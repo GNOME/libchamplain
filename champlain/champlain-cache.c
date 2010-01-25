@@ -210,8 +210,12 @@ champlain_cache_init (ChamplainCache *self)
   priv->popularity_queue = NULL;
   priv->popularity_id = 0;
 
+#ifdef USE_MAEMO
+  filename = g_strdup_printf ("/home/user/MyDocs/.maps/champlain-cache.db");
+#else
   filename = g_build_filename (g_get_user_cache_dir (), "champlain",
       "cache.db", NULL);
+#endif
 
   champlain_cache_set_size_limit (self, 100000000);
 
