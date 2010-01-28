@@ -84,7 +84,7 @@ map_source_changed (GtkWidget *widget,
   gtk_tree_model_get (model, &iter, COL_ID, &id, -1);
 
   ChamplainMapSourceFactory *factory = champlain_map_source_factory_dup_default ();
-  source = champlain_map_source_factory_create (factory, id);
+  source = champlain_map_source_factory_create_cached_source (factory, id);
 
   g_object_set (G_OBJECT (view), "map-source", source, NULL);
   g_object_unref (factory);
