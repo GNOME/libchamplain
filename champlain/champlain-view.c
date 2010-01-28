@@ -2330,40 +2330,59 @@ view_load_visible_tiles (ChamplainView *view)
     }
 
   //Load new tiles if needed
-  for (i = x_first; i < x_count; i++)
     {
-      for (j = y_first; j < y_count; j++)
+      // this all looks wrong because y_count/x_count are the max, not the width
+      gint arm_size, arm_max, spiral_pos;
+      gint dirs[5] = {0, 1, 0, -1, 0};
+
+      i = x_first + (x_count - x_first) / 2 - 1;
+      j = y_first + (y_count - y_first) / 2 - 1;
+      arm_max = MAX(x_count - x_first, y_count - y_first) + 2;
+
+      for (arm_size = 1; arm_size < arm_max; arm_size += 2)
         {
-          gboolean exist = FALSE;
-          for (k = 0; k < champlain_zoom_level_tile_count (level) && !exist; k++)
+          for (spiral_pos = 0; spiral_pos < arm_size * 4; spiral_pos++)
             {
-              ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
+              if (j >= y_first && j < y_count && i >= x_first && i < x_count)
+                {
+                  gboolean exist = FALSE;
 
-              if (tile == NULL)
-                continue;
+                  for (k = 0; k < champlain_zoom_level_tile_count (level) && !exist; k++)
+                    {
+                      ChamplainTile *tile = champlain_zoom_level_get_nth_tile (level, k);
 
-              gint tile_x = champlain_tile_get_x (tile);
-              gint tile_y = champlain_tile_get_y (tile);
+                      if (tile == NULL)
+                        continue;
 
-              if ( tile_x == i && tile_y == j)
-                exist = TRUE;
+                      gint tile_x = champlain_tile_get_x (tile);
+                      gint tile_y = champlain_tile_get_y (tile);
+
+                      if ( tile_x == i && tile_y == j)
+                        exist = TRUE;
+                    }
+
+                  if(!exist)
+                    {
+                      ChamplainTile *tile;
+
+                      DEBUG ("Loading tile %d, %d, %d", champlain_zoom_level_get_zoom_level (level), i, j);
+                      tile = champlain_tile_new ();
+                      g_object_set (G_OBJECT (tile), "x", i, "y", j, "zoom-level", champlain_zoom_level_get_zoom_level (level), NULL);
+                      g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
+                      clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)),
+                          champlain_tile_get_actor (tile), NULL);
+
+                      champlain_zoom_level_add_tile (level, tile);
+                      champlain_map_source_fill_tile (priv->map_source, tile);
+
+                      g_object_unref (tile);
+                    }
+                }
+              i += dirs[spiral_pos / arm_size + 1];
+              j += dirs[spiral_pos / arm_size];
             }
-
-          if(!exist)
-            {
-              DEBUG ("Loading tile %d, %d, %d", champlain_zoom_level_get_zoom_level (level), i, j);
-              ChamplainTile *tile = champlain_tile_new ();
-              g_object_set (G_OBJECT (tile), "x", i, "y", j, "zoom-level", champlain_zoom_level_get_zoom_level (level), NULL);
-
-              g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
-              clutter_container_add (CLUTTER_CONTAINER (champlain_zoom_level_get_actor (level)),
-                  champlain_tile_get_actor (tile), NULL);
-
-              champlain_zoom_level_add_tile (level, tile);
-              champlain_map_source_fill_tile (priv->map_source, tile);
-
-              g_object_unref (tile);
-            }
+          i--;
+          j--;
         }
     }
   view_update_state (view);
