@@ -71,7 +71,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap I"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap II"
 #define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "OpenCycleMap"
-#define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "Opnvkarte"
+#define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "Public Transport"
 #define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
 #define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "MapsForFree Relief"
 #else
