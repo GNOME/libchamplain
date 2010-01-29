@@ -24,6 +24,8 @@ Fixes:
   Beaudoin)
 * 606393: The display of tiles looks very programmatic, they now load in spiral
   order (Jason Woofenden)
+* Limit the number of times notify::latitude and notify::longitude are emited
+  (Pierre-Luc Beaudoin)
 
 libchamplain 0.4.3 (2010-01-09)
 ===============================
