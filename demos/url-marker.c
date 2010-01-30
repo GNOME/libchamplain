@@ -270,5 +270,6 @@ main (int argc, char *argv[])
 
   g_object_unref (session);
 
+  clutter_actor_destroy (view);
   return 0;
 }

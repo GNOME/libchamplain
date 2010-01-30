@@ -143,5 +143,6 @@ main (int argc,
   clutter_actor_show (stage);
   clutter_main ();
 
+  clutter_actor_destroy (actor);
   return 0;
 }

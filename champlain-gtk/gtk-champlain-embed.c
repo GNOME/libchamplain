@@ -145,6 +145,8 @@ gtk_champlain_embed_dispose (GObject *object)
       gdk_cursor_unref (priv->cursor_hand_closed);
       priv->cursor_hand_closed = NULL;
     }
+
+  G_OBJECT_CLASS (gtk_champlain_embed_parent_class)->dispose (object);
 }
 
 static void
