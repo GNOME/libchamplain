@@ -70,6 +70,7 @@ static gchar *get_filename (ChamplainFileCache *file_cache, ChamplainTile *tile)
 static gboolean tile_is_expired (ChamplainFileCache *file_cache, ChamplainTile *tile);
 static void delete_tile (ChamplainFileCache *file_cache, const gchar *filename);
 static void delete_dir_recursive (GFile *parent);
+static gboolean create_cache_dir (const gchar *dir_name);
 
 static void fill_tile (ChamplainMapSource *map_source,
                        ChamplainTile *tile);
@@ -198,6 +199,22 @@ champlain_file_cache_finalize (GObject *object)
   G_OBJECT_CLASS (champlain_file_cache_parent_class)->finalize (object);
 }
 
+static gboolean
+create_cache_dir (const gchar *dir_name)
+{
+  /* If needed, create the cache's dirs */
+  if (dir_name)
+    {
+      if (g_mkdir_with_parents (dir_name, 0700) == -1 && errno != EEXIST)
+        {
+          g_warning ("Unable to create the image cache path '%s': %s",
+                     dir_name, g_strerror (errno));
+          return FALSE;
+        }
+    }
+  return TRUE;
+}
+
 static void
 init_cache  (ChamplainFileCache *file_cache)
 {
@@ -208,19 +225,21 @@ init_cache  (ChamplainFileCache *file_cache)
   gint error;
 
   g_print ("init! '%d'\n", champlain_tile_cache_get_persistent (tile_cache));
-  /* If needed, create the cache's dirs */
-  if (priv->cache_dir)
-    {
-      if (g_mkdir_with_parents (priv->cache_dir, 0700) == -1 && errno != EEXIST)
-        {
-          g_warning ("Unable to create the image cache path '%s': %s",
-                     priv->cache_dir, g_strerror (errno));
-          return;
-        }
-    }
+  
+  g_return_if_fail (create_cache_dir (priv->cache_dir));
 
   if (champlain_tile_cache_get_persistent (tile_cache))
-    priv->real_cache_dir = g_strdup (priv->cache_dir);
+    {
+      if (priv->cache_dir)
+        priv->real_cache_dir = g_strdup (priv->cache_dir);
+      else
+        {
+          priv->real_cache_dir = g_build_path (G_DIR_SEPARATOR_S,
+                                               g_get_user_cache_dir (),
+                                               "champlain", NULL);
+          g_return_if_fail (create_cache_dir (priv->real_cache_dir));
+        }
+    }
   else
     {
       /* Create temporary directory for non-persistent caches */
