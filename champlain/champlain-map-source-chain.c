@@ -43,6 +43,7 @@ typedef struct _ChamplainMapSourceChainPrivate ChamplainMapSourceChainPrivate;
 struct _ChamplainMapSourceChainPrivate
 {
   ChamplainMapSource *stack_top;
+  ChamplainMapSource *stack_bottom;
   gulong sig_handler_id;
 };
 
@@ -55,6 +56,9 @@ static guint get_max_zoom_level (ChamplainMapSource *map_source);
 static guint get_tile_size (ChamplainMapSource *map_source);
 
 static void fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile);
+static void on_set_next_source (ChamplainMapSource *map_source,
+                                ChamplainMapSource *old_next_source,
+                                ChamplainMapSource *new_next_source);
 
 static void
 champlain_map_source_chain_dispose (GObject *object)
@@ -95,6 +99,7 @@ champlain_map_source_chain_class_init (ChamplainMapSourceChainClass *klass)
   map_source_class->get_tile_size = get_tile_size;
 
   map_source_class->fill_tile = fill_tile;
+  map_source_class->on_set_next_source = on_set_next_source;
 }
 
 static void
@@ -102,7 +107,7 @@ champlain_map_source_chain_init (ChamplainMapSourceChain *source_chain)
 {
   ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
   priv->stack_top = NULL;
-  priv->sig_handler_id = 0;
+  priv->stack_bottom = NULL;
 }
 
 /**
@@ -114,7 +119,8 @@ champlain_map_source_chain_init (ChamplainMapSourceChain *source_chain)
  *
  * Since: 0.6
  */
-ChamplainMapSourceChain* champlain_map_source_chain_new (void)
+ChamplainMapSourceChain*
+champlain_map_source_chain_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE_CHAIN, NULL);
 }
@@ -203,8 +209,9 @@ get_tile_size (ChamplainMapSource *map_source)
   return champlain_map_source_get_tile_size (priv->stack_top);
 }
 
-static void fill_tile (ChamplainMapSource *map_source,
-                       ChamplainTile *tile)
+static void
+fill_tile (ChamplainMapSource *map_source,
+           ChamplainTile *tile)
 {
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   g_return_if_fail (source_chain);
@@ -215,10 +222,27 @@ static void fill_tile (ChamplainMapSource *map_source,
   champlain_map_source_fill_tile (priv->stack_top, tile);
 }
 
-static void assign_cache_of_next_source_sequence (ChamplainMapSource *start_map_source, ChamplainTileCache *tile_cache)
+static void
+on_set_next_source (ChamplainMapSource *map_source,
+                    ChamplainMapSource *old_next_source,
+                    ChamplainMapSource *new_next_source)
+{
+  ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
+  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+
+  g_return_if_fail (source_chain);
+
+  if (priv->stack_bottom)
+    champlain_map_source_set_next_source (priv->stack_bottom, new_next_source);
+}
+
+static void
+assign_cache_of_next_source_sequence (ChamplainMapSourceChain *source_chain,
+                                      ChamplainMapSource *start_map_source,
+                                      ChamplainTileCache *tile_cache)
 {
   ChamplainMapSource *map_source = start_map_source;
-  ChamplainTileSource *tile_source;
+  ChamplainMapSource *chain_next_source = champlain_map_source_get_next_source (CHAMPLAIN_MAP_SOURCE(source_chain));
 
   do
     {
@@ -226,17 +250,15 @@ static void assign_cache_of_next_source_sequence (ChamplainMapSource *start_map_
     }
   while (CHAMPLAIN_IS_TILE_CACHE(map_source));
 
-  tile_source = CHAMPLAIN_TILE_SOURCE(map_source);
-  while (tile_source)
+  while (CHAMPLAIN_IS_TILE_SOURCE(map_source) && map_source != chain_next_source)
     {
-      champlain_tile_source_set_cache (tile_source, tile_cache);
+      champlain_tile_source_set_cache (CHAMPLAIN_TILE_SOURCE(map_source), tile_cache);
       map_source = champlain_map_source_get_next_source (map_source);
-      tile_source = CHAMPLAIN_TILE_SOURCE(map_source);
     }
 }
 
-static
-void reload_tiles_cb (ChamplainMapSource *map_source, ChamplainMapSourceChain *source_chain)
+static void
+reload_tiles_cb (ChamplainMapSource *map_source, ChamplainMapSourceChain *source_chain)
 {
   /* propagate the signal from the chain that is inside champlain_map_source_chain */
   g_signal_emit_by_name (source_chain, "reload-tiles", NULL);
@@ -251,7 +273,8 @@ void reload_tiles_cb (ChamplainMapSource *map_source, ChamplainMapSourceChain *s
  *
  * Since: 0.6
  */
-void champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain, ChamplainMapSource *map_source)
+void
+champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain, ChamplainMapSource *map_source)
 {
   ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
   gboolean is_cache = FALSE;
@@ -265,9 +288,15 @@ void champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain, Cha
 
   if (!priv->stack_top)
     {
+      ChamplainMapSource *chain_next_source = champlain_map_source_get_next_source (CHAMPLAIN_MAP_SOURCE(source_chain));
+
       /* tile source has to be last */
       g_return_if_fail (!is_cache);
+
       priv->stack_top = map_source;
+      priv->stack_bottom = map_source;
+      if (chain_next_source)
+        champlain_map_source_set_next_source (priv->stack_bottom, chain_next_source);
     }
   else
     {
@@ -280,7 +309,7 @@ void champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain, Cha
       if (is_cache)
         {
           ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE(map_source);
-          assign_cache_of_next_source_sequence (priv->stack_top, tile_cache);
+          assign_cache_of_next_source_sequence (source_chain, priv->stack_top, tile_cache);
         }
     }
 
@@ -296,10 +325,12 @@ void champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain, Cha
  *
  * Since: 0.6
  */
-void champlain_map_source_chain_pop (ChamplainMapSourceChain *source_chain)
+void
+champlain_map_source_chain_pop (ChamplainMapSourceChain *source_chain)
 {
   ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
   ChamplainMapSource *old_stack_top = priv->stack_top;
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (priv->stack_top);
 
   g_return_if_fail (priv->stack_top);
 
@@ -308,16 +339,24 @@ void champlain_map_source_chain_pop (ChamplainMapSourceChain *source_chain)
 
   if (CHAMPLAIN_IS_TILE_CACHE(priv->stack_top))
     {
-      ChamplainMapSource *map_source = champlain_map_source_get_next_source (priv->stack_top);
       ChamplainTileCache *tile_cache = NULL;
 
-      if (CHAMPLAIN_IS_TILE_CACHE(map_source))
-        tile_cache = CHAMPLAIN_TILE_CACHE(map_source);
+      if (CHAMPLAIN_IS_TILE_CACHE(next_source))
+        tile_cache = CHAMPLAIN_TILE_CACHE(next_source);
 
-      assign_cache_of_next_source_sequence (priv->stack_top, tile_cache);
+      /* _push() guarantees that the last source is tile_source so we can be
+         sure that the next map source is still within the chain */
+      assign_cache_of_next_source_sequence (source_chain, priv->stack_top, tile_cache);
     }
 
-  priv->stack_top = champlain_map_source_get_next_source (priv->stack_top);
+  if (next_source == champlain_map_source_get_next_source (CHAMPLAIN_MAP_SOURCE(source_chain)))
+  {
+    priv->stack_top = NULL;
+    priv->stack_bottom = NULL;
+  }
+  else
+    priv->stack_top = next_source;
+
   if (priv->stack_top)
     {
       priv->sig_handler_id = g_signal_connect (priv->stack_top, "reload-tiles",

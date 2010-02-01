@@ -83,6 +83,9 @@ struct _ChamplainMapSourcePrivate
 };
 
 static void reload_tiles_cb (ChamplainMapSource *orig, ChamplainMapSource *self);
+static void on_set_next_source (ChamplainMapSource *map_source,
+                                ChamplainMapSource *old_next_source,
+                                ChamplainMapSource *new_next_source);
 
 static void
 champlain_map_source_get_property (GObject *object,
@@ -173,6 +176,7 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
   klass->get_projection = NULL;
 
   klass->fill_tile = NULL;
+  klass->on_set_next_source = on_set_next_source;
 
   /**
   * ChamplainMapSource:next-source:
@@ -238,6 +242,25 @@ void reload_tiles_cb (ChamplainMapSource *orig, ChamplainMapSource *self)
   g_signal_emit_by_name (self, "reload-tiles", NULL);
 }
 
+static void
+on_set_next_source (ChamplainMapSource *map_source,
+                    ChamplainMapSource *old_next_source,
+                    ChamplainMapSource *new_next_source)
+{
+  ChamplainMapSourcePrivate *priv = GET_PRIVATE(map_source);
+  if (old_next_source)
+    {
+      if (g_signal_handler_is_connected (old_next_source, priv->sig_handler_id))
+        g_signal_handler_disconnect (old_next_source, priv->sig_handler_id);
+    }
+
+  if (new_next_source)
+    {
+      priv->sig_handler_id = g_signal_connect (new_next_source, "reload-tiles",
+                             G_CALLBACK (reload_tiles_cb), map_source);
+    }
+}
+
 /**
  * champlain_map_source_set_next_source:
  * @map_source: a #ChamplainMapSource
@@ -255,22 +278,16 @@ champlain_map_source_set_next_source (ChamplainMapSource *map_source,
 
   ChamplainMapSourcePrivate *priv = GET_PRIVATE(map_source);
 
-  if (priv->next_source != NULL)
-    {
-      if (g_signal_handler_is_connected (priv->next_source, priv->sig_handler_id))
-        g_signal_handler_disconnect (priv->next_source, priv->sig_handler_id);
+  CHAMPLAIN_MAP_SOURCE_GET_CLASS (map_source)->on_set_next_source (map_source, priv->next_source, next_source);
 
-      g_object_unref (priv->next_source);
-    }
+  if (priv->next_source != NULL)
+    g_object_unref (priv->next_source);
 
   if (next_source)
     {
       g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (next_source));
 
       g_object_ref_sink (next_source);
-
-      priv->sig_handler_id = g_signal_connect (next_source, "reload-tiles",
-                             G_CALLBACK (reload_tiles_cb), map_source);
     }
 
   priv->next_source = next_source;
