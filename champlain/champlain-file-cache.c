@@ -573,9 +573,10 @@ fill_tile (ChamplainMapSource *map_source,
     {
       g_file_info_get_modification_time (info, &modified_time);
       champlain_tile_set_modified_time (tile, &modified_time);
+
+      g_object_unref (info);
     }
   g_object_unref (file);
-  g_object_unref (info);
 
   /* Notify other caches that the tile has been filled */
   if (CHAMPLAIN_IS_TILE_CACHE(next_source))
