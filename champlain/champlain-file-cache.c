@@ -207,6 +207,7 @@ init_cache  (ChamplainFileCache *file_cache)
   gchar *error_msg = NULL;
   gint error;
 
+  g_print ("init! '%d'\n", champlain_tile_cache_get_persistent (tile_cache));
   /* If needed, create the cache's dirs */
   if (priv->cache_dir)
     {
@@ -304,16 +305,6 @@ init_cache  (ChamplainFileCache *file_cache)
 }
 
 static void
-champlain_file_cache_constructed  (GObject *object)
-{
-  ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(object);
-
-  init_cache (file_cache);
-
-  G_OBJECT_CLASS (champlain_file_cache_parent_class)->constructed (object);
-}
-
-static void
 champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
 {
   ChamplainMapSourceClass *map_source_class = CHAMPLAIN_MAP_SOURCE_CLASS (klass);
@@ -327,7 +318,6 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
   object_class->dispose = champlain_file_cache_dispose;
   object_class->get_property = champlain_file_cache_get_property;
   object_class->set_property = champlain_file_cache_set_property;
-  object_class->constructed = champlain_file_cache_constructed;
 
   /**
   * ChamplainFileCache:size-limit:
@@ -374,13 +364,19 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
 {
   ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
 
-  priv->size_limit = 0;
-  priv->cache_dir = NULL;
+  priv->size_limit = 100000000;
+#ifdef USE_MAEMO
+  priv->cache_dir = g_strdup ("/home/user/MyDocs/.Maps/");
+#else
+  priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
+#endif
 
   priv->real_cache_dir = NULL;
   priv->db = NULL;
   priv->stmt_select = NULL;
   priv->stmt_update = NULL;
+
+  init_cache (file_cache);
 }
 
 /**
@@ -395,20 +391,7 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
  */
 ChamplainFileCache* champlain_file_cache_new (void)
 {
-  gchar *cache_path;
-  ChamplainFileCache *cache;
-
-#ifdef USE_MAEMO
-  cache_path = g_strdup ("/home/user/MyDocs/.Maps/");
-#else
-  cache_path = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
-#endif
-
-  cache = g_object_new (CHAMPLAIN_TYPE_FILE_CACHE, "size-limit", 100000000,
-                        "cache-dir", cache_path, "persistent-cache", TRUE, NULL);
-  g_free (cache_path);
-
-  return cache;
+  return CHAMPLAIN_FILE_CACHE (g_object_new (CHAMPLAIN_TYPE_FILE_CACHE, NULL));
 }
 
 /**

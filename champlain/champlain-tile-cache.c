@@ -160,7 +160,7 @@ champlain_tile_cache_init (ChamplainTileCache *tile_cache)
 {
   ChamplainTileCachePrivate *priv = GET_PRIVATE (tile_cache);
 
-  priv->persistent = FALSE;
+  priv->persistent = TRUE;
 }
 
 /**
