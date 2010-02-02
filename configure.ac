@@ -95,6 +95,18 @@ if test x$enable_debug = xyes; then
 fi
 
 # -----------------------------------------------------------
+# Enable Maemo optimizations
+# -----------------------------------------------------------
+
+AC_ARG_ENABLE(maemo,
+  AC_HELP_STRING([--enable-maemo],[compile with maemo optimizations]),
+    [enable_maemo=yes])
+
+if test x$enable_maemo = xyes; then
+  AC_DEFINE(USE_MAEMO, [], [Enable Maemo Optimizations])
+fi
+
+# -----------------------------------------------------------
 # Enable gtk
 # -----------------------------------------------------------
 

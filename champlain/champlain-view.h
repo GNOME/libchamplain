@@ -105,7 +105,8 @@ void champlain_view_set_map_source (ChamplainView *view,
     ChamplainMapSource *map_source);
 void champlain_view_set_size (ChamplainView *view,
     guint width,
-    guint height);
+    guint height)
+    CHAMPLAIN_OBSOLETE_API;
 void champlain_view_set_decel_rate (ChamplainView *view,
     gdouble rate);
 void champlain_view_set_scroll_mode (ChamplainView *view,

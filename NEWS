@@ -24,12 +24,37 @@ Additions:
 * New map source infrastructure (à la Pipe and Filter) (Jiří Techet)
 * ChamplainPolygon and ChamplainMapSource inherit from GInitiallyUnowned
 
-libchamplain 0.4.3 (2010-01-09)
+libchamplain 0.4.4 (2010-01-28)
 ===============================
 
 Stable release
 GObject-introspection, Python (Victor Godoy Poluceno) and Perl
 (Emmanuel Rodriguez) bindings are in a working state.
+
+Fixes:
+* 580372: Get rid of champlain_view_set_size, replaced by
+  clutter_actor_set_size (Pierre-luc Beaudoin)
+* Fix the Python demos to use ChamplainEmbed instead of ClutterEmbed (Lorenzo
+  Masini)
+* Ship all the python .defs files in tarballs, fixes the Python bindings
+  (Lorenzo Masini)
+* Simplification of the internal licence displaying code (Pierre-Luc Beaudoin)
+* Optimize the initialization process, now loads only the needed tiles
+  (Pierre-Luc Beaudoin)
+* Limit further more the number of times the scale is redrawn (Pierre-Luc
+  Beaudoin)
+* Limit the internal operations that happen when the user moves (Pierre-Luc
+  Beaudoin)
+* Async loading of tiles from the cache (Pierre-Luc Beaudoin)
+* Use the shared tile cache paths when built with --enable-maemo (Pierre-Luc
+  Beaudoin)
+* 606393: The display of tiles looks very programmatic, they now load in spiral
+  order (Jason Woofenden)
+* Limit the number of times notify::latitude and notify::longitude are emited
+  (Pierre-Luc Beaudoin)
+
+libchamplain 0.4.3 (2010-01-09)
+===============================
 
 Additions:
 * A scale (Tollef Fog Heen and Pierre-Luc Beaudoin)
@@ -44,6 +69,7 @@ Fixes:
 * Make queue_redraw visible to subclasses
 * Some memory usage improvements by reusing images already loaded
 * Don't eat clicks on the map when using ChamplainSelectionLayer
+
 libchamplain 0.4.3 (2010-01-09)
 ===============================
 

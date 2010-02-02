@@ -398,7 +398,12 @@ ChamplainFileCache* champlain_file_cache_new (void)
   gchar *cache_path;
   ChamplainFileCache *cache;
 
+#ifdef USE_MAEMO
+  cache_path = g_strdup ("/home/user/MyDocs/.Maps/");
+#else
   cache_path = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
+#endif
+
   cache = g_object_new (CHAMPLAIN_TYPE_FILE_CACHE, "size-limit", 100000000,
                         "cache-dir", cache_path, "persistent-cache", TRUE, NULL);
   g_free (cache_path);
@@ -560,7 +565,9 @@ fill_tile (ChamplainMapSource *map_source,
   DEBUG ("fill of %s", filename);
 
   /* Load the cached version */
-  actor = clutter_texture_new_from_file (filename, &gerror);
+  actor = clutter_texture_new ();
+  clutter_texture_set_load_async (CLUTTER_TEXTURE (actor), TRUE);
+  clutter_texture_set_from_file (CLUTTER_TEXTURE (actor), filename, &gerror);
   if (actor)
     {
       champlain_tile_set_content (tile, actor, FALSE);
@@ -577,7 +584,7 @@ fill_tile (ChamplainMapSource *map_source,
   /* Retrieve modification time */
   file = g_file_new_for_path (filename);
   info = g_file_query_info (file,
-                            G_FILE_ATTRIBUTE_TIME_MODIFIED "," G_FILE_ATTRIBUTE_ETAG_VALUE,
+                            G_FILE_ATTRIBUTE_TIME_MODIFIED,
                             G_FILE_QUERY_INFO_NONE, NULL, NULL);
   if (info)
     {

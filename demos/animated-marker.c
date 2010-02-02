@@ -113,7 +113,7 @@ main (int argc, char *argv[])
 
   /* Create the map view */
   actor = champlain_view_new ();
-  champlain_view_set_size (CHAMPLAIN_VIEW (actor), 800, 600);
+  clutter_actor_set_size (CLUTTER_ACTOR (actor), 800, 600);
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
 
   /* Create the marker layer */

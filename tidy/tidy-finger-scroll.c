@@ -63,6 +63,15 @@ enum {
   PROP_BUFFER,
 };
 
+enum
+{
+  /* normal signals */
+  PANNING_COMPLETED,
+  LAST_SIGNAL
+};
+
+static guint signals[LAST_SIGNAL] = { 0, };
+
 static void
 tidy_finger_scroll_get_property (GObject *object, guint property_id,
                                  GValue *value, GParamSpec *pspec)
@@ -177,6 +186,11 @@ tidy_finger_scroll_class_init (TidyFingerScrollClass *klass)
                                                       "events to buffer",
                                                       1, G_MAXUINT, 3,
                                                       G_PARAM_READWRITE));
+
+  signals[PANNING_COMPLETED] =
+      g_signal_new ("panning-completed", G_OBJECT_CLASS_TYPE (object_class),
+          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+          g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 }
 
 static gboolean
@@ -294,6 +308,8 @@ deceleration_completed_cb (ClutterTimeline *timeline,
   clamp_adjustments (scroll);
   g_object_unref (timeline);
   scroll->priv->deceleration_timeline = NULL;
+
+  g_signal_emit_by_name (scroll, "panning-completed", NULL);
 }
 
 static void
@@ -545,6 +561,7 @@ button_release_event_cb (ClutterActor *actor,
   if (!decelerating)
     {
       clamp_adjustments (scroll);
+      g_signal_emit_by_name (scroll, "panning-completed", NULL);
     }
 
   /* Pass through events to children.
