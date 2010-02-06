@@ -929,7 +929,7 @@ champlain_marker_set_image (ChamplainMarker *marker,
   ChamplainMarkerPrivate *priv = marker->priv;
 
   if (priv->image != NULL)
-    g_object_unref (priv->image);
+    clutter_actor_destroy (priv->image);
 
   if (image != NULL)
     {
