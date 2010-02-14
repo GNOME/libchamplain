@@ -225,7 +225,7 @@ init_cache  (ChamplainFileCache *file_cache)
   gint error;
 
   g_print ("init! '%d'\n", champlain_tile_cache_get_persistent (tile_cache));
-  
+
   g_return_if_fail (create_cache_dir (priv->cache_dir));
 
   if (champlain_tile_cache_get_persistent (tile_cache))
@@ -542,46 +542,41 @@ tile_is_expired (ChamplainFileCache *file_cache, ChamplainTile *tile)
   return validate_cache;
 }
 
-static void
-fill_tile (ChamplainMapSource *map_source,
-           ChamplainTile *tile)
+typedef struct
 {
-  g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (map_source));
-  g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
+  ChamplainMapSource *map_source;
+  ChamplainTile *tile;
+  gchar *filename;
+  gulong handler;
+} TileLoadedCallbackData;
 
+static void
+tile_loaded_cb (ClutterTexture *texture,
+                const GError *error,
+                TileLoadedCallbackData *user_data)
+{
+  ChamplainMapSource *map_source = user_data->map_source;
+  gchar *filename = user_data->filename;
+  ChamplainTile *tile = user_data->tile;
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(map_source);
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
   ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
   GFileInfo *info = NULL;
   GFile *file = NULL;
-  GError *gerror = NULL;
-  ClutterActor *actor = NULL;
-  gchar *filename = NULL;
+  ClutterActor *actor = CLUTTER_ACTOR(texture);
   GTimeVal modified_time = {0,};
 
-  if (champlain_tile_get_content (tile))
-    /* Previous cache in the chain is validating its contents */
-    goto load_next;
+  g_signal_handler_disconnect (texture, user_data->handler);
+  g_free (user_data);
 
-  filename = get_filename (file_cache, tile);
-  DEBUG ("fill of %s", filename);
-
-  /* Load the cached version */
-  actor = clutter_texture_new ();
-  clutter_texture_set_load_async (CLUTTER_TEXTURE (actor), TRUE);
-  clutter_texture_set_from_file (CLUTTER_TEXTURE (actor), filename, &gerror);
-  if (actor)
+  if (error)
     {
-      champlain_tile_set_content (tile, actor, FALSE);
-      champlain_tile_set_size (tile, champlain_map_source_get_tile_size (map_source));
-    }
-  else
-    {
-      DEBUG ("Failed to load tile %s, error: %s",
-             filename, gerror->message);
-      g_error_free (gerror);
+      DEBUG ("Failed to load tile %s, error: %s", filename, error->message);
       goto load_next;
     }
+
+  champlain_tile_set_content (tile, actor, FALSE);
+  champlain_tile_set_size (tile, champlain_map_source_get_tile_size (map_source));
 
   /* Retrieve modification time */
   file = g_file_new_for_path (filename);
@@ -599,9 +594,7 @@ fill_tile (ChamplainMapSource *map_source,
 
   /* Notify other caches that the tile has been filled */
   if (CHAMPLAIN_IS_TILE_CACHE(next_source))
-    {
-      on_tile_filled (CHAMPLAIN_TILE_CACHE(next_source), tile);
-    }
+    on_tile_filled (CHAMPLAIN_TILE_CACHE(next_source), tile);
 
   if (tile_is_expired (file_cache, tile))
     {
@@ -657,6 +650,52 @@ load_next:
 cleanup:
   sqlite3_reset (priv->stmt_select);
   g_free (filename);
+  g_object_unref (tile);
+  g_object_unref (map_source);
+}
+
+static void
+fill_tile (ChamplainMapSource *map_source,
+           ChamplainTile *tile)
+{
+  g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (map_source));
+  g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
+
+  if (!champlain_tile_get_content (tile))
+    {
+      ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(map_source);
+      TileLoadedCallbackData *callback_data;
+      ClutterTexture *texture;
+
+      callback_data = g_new (TileLoadedCallbackData, 1);
+      callback_data->tile = tile;
+      callback_data->map_source = map_source;
+      callback_data->filename = get_filename (file_cache, tile);
+
+      DEBUG ("fill of %s", callback_data->filename);
+
+      /* Ref the tile as it may be freeing during the loading
+       * Unref when the loading is done.
+       */
+      g_object_ref (tile);
+      g_object_ref (map_source);
+
+      /* Load the cached version */
+      texture = CLUTTER_TEXTURE(clutter_texture_new ());
+      callback_data->handler = g_signal_connect (texture, "load-finished",
+                               G_CALLBACK (tile_loaded_cb),
+                               callback_data);
+      clutter_texture_set_load_async (texture, TRUE);
+      clutter_texture_set_from_file (texture, callback_data->filename, NULL);
+    }
+  else
+    {
+      ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
+
+      /* Previous cache in the chain is validating its contents */
+      if (CHAMPLAIN_IS_MAP_SOURCE(next_source))
+        champlain_map_source_fill_tile (next_source, tile);
+    }
 }
 
 static void

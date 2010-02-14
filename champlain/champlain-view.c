@@ -333,7 +333,7 @@ update_viewport (ChamplainView *view,
     g_object_notify (G_OBJECT (view), "latitude");
 }
 
-static void 
+static void
 panning_completed (TidyFingerScroll *scroll,
                    ChamplainView *view)
 {
@@ -2389,6 +2389,7 @@ view_load_visible_tiles (ChamplainView *view)
                           champlain_tile_get_actor (tile), NULL);
 
                       champlain_zoom_level_add_tile (level, tile);
+                      champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
                       champlain_map_source_fill_tile (priv->map_source, tile);
 
                       g_object_unref (tile);
@@ -2497,7 +2498,10 @@ view_reload_tiles_cb (ChamplainMapSource *map_source,
         continue;
 
       if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADING)
+      {
+        champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
         champlain_map_source_fill_tile (priv->map_source, tile);
+      }
     }
   view_update_state (view);
 }
