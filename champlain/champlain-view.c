@@ -831,6 +831,37 @@ champlain_view_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
 }
 
+static gboolean
+_update_idle_cb (ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble lat, lon;
+
+  clutter_actor_set_size (priv->finger_scroll,
+                          priv->viewport_size.width,
+                          priv->viewport_size.height);
+
+  /* Need to save latitude and longitude since they get changed by
+   * resize_viewport */
+  lat = priv->latitude;
+  lon = priv->longitude;
+
+  resize_viewport (view);
+
+  clutter_actor_set_position (priv->license_actor,
+      priv->viewport_size.width - PADDING,
+      priv->viewport_size.height - PADDING);
+  clutter_actor_set_position (priv->scale_actor,
+      SCALE_PADDING,
+      priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING);
+
+  if (priv->keep_center_on_resize)
+    champlain_view_center_on (view, lat, lon);
+  else
+    view_load_visible_tiles (view);
+
+  return FALSE;
+}
 static void
 champlain_view_allocate (ClutterActor          *actor,
                          const ClutterActorBox *box,
@@ -843,9 +874,6 @@ champlain_view_allocate (ClutterActor          *actor,
   /* Chain up */
   CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->allocate (actor, box, flags);
 
-  if (flags != CLUTTER_ALLOCATION_NONE)
-    return;
-
   width = box->x2 - box->x1;
   height = box->y2 - box->y1;
 
@@ -855,21 +883,10 @@ champlain_view_allocate (ClutterActor          *actor,
   priv->viewport_size.width = width;
   priv->viewport_size.height = height;
 
-  clutter_actor_set_size (priv->finger_scroll, width, height);
-
-  clutter_actor_set_position (priv->license_actor,
-      priv->viewport_size.width - PADDING,
-      priv->viewport_size.height - PADDING);
-  clutter_actor_set_position (priv->scale_actor,
-      SCALE_PADDING,
-      height - SCALE_HEIGHT - SCALE_PADDING);
-
-  resize_viewport (view);
-
-  if (priv->keep_center_on_resize)
-    champlain_view_center_on (view, priv->latitude, priv->longitude);
-  else
-    view_load_visible_tiles (view);
+  g_idle_add_full (G_PRIORITY_HIGH_IDLE,
+                   (GSourceFunc)_update_idle_cb,
+                   g_object_ref (view),
+                   (GDestroyNotify)g_object_unref);
 }
 
 static void
@@ -904,6 +921,44 @@ champlain_view_realize (ClutterActor *actor)
   update_license (view);
 }
 
+/* These return fixed sizes because either a.) We expect the user to size
+ * explicitly with clutter_actor_get_size or b.) place it in a container that
+ * allocates it whatever it wants.
+ */
+static void
+champlain_view_get_preferred_width (ClutterActor *actor,
+                                    gfloat        for_height,
+                                    gfloat       *min_width,
+                                    gfloat       *nat_width)
+{
+  ChamplainView *view = CHAMPLAIN_VIEW (actor);
+  ChamplainViewPrivate *priv = view->priv;
+  gint width = champlain_map_source_get_tile_size (priv->map_source);
+
+  if (min_width)
+    *min_width = 1;
+
+  if (nat_width)
+    *nat_width = width;
+}
+
+static void
+champlain_view_get_preferred_height (ClutterActor *actor,
+                                     gfloat        for_width,
+                                     gfloat       *min_height,
+                                     gfloat       *nat_height)
+{
+  ChamplainView *view = CHAMPLAIN_VIEW (actor);
+  ChamplainViewPrivate *priv = view->priv;
+  gint height = champlain_map_source_get_tile_size (priv->map_source);
+
+  if (min_height)
+    *min_height = 1;
+
+  if (nat_height)
+    *nat_height = height;
+}
+
 static void
 champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 {
@@ -916,6 +971,8 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (champlainViewClass);
   actor_class->allocate = champlain_view_allocate;
+  actor_class->get_preferred_width = champlain_view_get_preferred_width;
+  actor_class->get_preferred_height = champlain_view_get_preferred_height;
   actor_class->realize = champlain_view_realize;
 
   /**
