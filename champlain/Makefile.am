@@ -98,7 +98,6 @@ libchamplain_include_HEADERS = \
 	champlain-base-marker.h		\
 	champlain-marker.h		\
 	champlain-polygon.h		\
-	champlain-version.h
 	champlain-version.h		\
 	champlain-memphis-tile-source.h  \
 	champlain-map-data-source.h \
