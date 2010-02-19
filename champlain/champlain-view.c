@@ -285,12 +285,14 @@ update_viewport (ChamplainView *view,
     gfloat y)
 {
   ChamplainViewPrivate *priv = view->priv;
-  gfloat lat, lon;
+  gfloat old_lat, old_lon;
 
   ChamplainFloatPoint old_anchor;
 
   old_anchor.x = priv->anchor.x;
   old_anchor.y = priv->anchor.y;
+  old_lon = priv->longitude;
+  old_lat = priv->latitude;
 
   view_update_anchor (view,
       x + priv->anchor.x + priv->viewport_size.width / 2.0,
@@ -316,18 +318,15 @@ update_viewport (ChamplainView *view,
   view_tiles_reposition (view);
   marker_reposition (view);
   update_scale (view);
-
   view_update_polygons (view);
-  lon = viewport_get_current_longitude (priv);
-  lat = viewport_get_current_latitude (priv);
 
-  priv->longitude = lon;
-  priv->latitude = lat;
+  priv->longitude = viewport_get_current_longitude (priv);
+  priv->latitude = viewport_get_current_latitude (priv);
 
-  if (fabs (priv->longitude - lon) > 0.001)
+  if (fabs (priv->longitude - old_lon) > 0.001)
     g_object_notify (G_OBJECT (view), "longitude");
 
-  if (fabs (priv->latitude - lat) > 0.001)
+  if (fabs (priv->latitude - old_lat) > 0.001)
     g_object_notify (G_OBJECT (view), "latitude");
 }
 
