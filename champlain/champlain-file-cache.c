@@ -883,6 +883,7 @@ on_tile_filled (ChamplainTileCache *tile_cache,
   filename = get_filename (file_cache, tile);
 
   DEBUG ("popularity of %s", filename);
+  sqlite3_reset (priv->stmt_update);
 
   sql_rc = sqlite3_bind_text (priv->stmt_update, 1, filename, -1, SQLITE_STATIC);
   if (sql_rc != SQLITE_OK)
