@@ -237,6 +237,7 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
       CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (user_data);
   ChamplainNetworkMapDataSourcePrivate *priv = self->priv;
   ChamplainBoundingBox *bbox;
+  GError *err = NULL;
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
@@ -252,9 +253,17 @@ load_map_data_cb (SoupSession *session, SoupMessage *msg,
   MemphisMap *map = memphis_map_new ();
   memphis_map_load_from_data (map,
       msg->response_body->data,
-      msg->response_body->length);
+      msg->response_body->length,
+      &err);
 
   DEBUG ("BBox data received");
+
+  if (err != NULL)
+    {
+      g_critical ("Can't load map data: \"%s\"", err->message);
+      memphis_map_free (map);
+      return;
+    }
 
   if (priv->map)
     memphis_map_free (priv->map);

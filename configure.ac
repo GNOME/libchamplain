@@ -55,7 +55,7 @@ PKG_CHECK_MODULES(DEPS,
       cairo >= 1.4,
       gio-2.0 >= 2.16,
       sqlite3 >= 3.0,
-      memphis-0.1 >= 0.1
+      memphis-0.2 >= 0.2
   ]
 )
 # check for gtk-doc
@@ -120,7 +120,7 @@ if test x$enable_gtk = xyes; then
   PKG_CHECK_MODULES(GTK_DEPS,
     [   gtk+-2.0 >= 2.12,
         clutter-gtk-0.10 >= 0.10,
-        memphis-0.1 >= 0.1
+        memphis-0.2 >= 0.2
     ]
   )
 

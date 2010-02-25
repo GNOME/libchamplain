@@ -164,8 +164,15 @@ champlain_local_map_data_source_load_map_data (ChamplainLocalMapDataSource *self
   ChamplainLocalMapDataSourcePrivate *priv = self->priv;
   ChamplainBoundingBox *bbox;
   MemphisMap *map = memphis_map_new ();
+  GError *err = NULL;
 
-  memphis_map_load_from_file (map, map_path);
+  memphis_map_load_from_file (map, map_path, &err);
+  if (err != NULL)
+    {
+      g_critical ("Can't load map file: \"%s\"", err->message);
+      memphis_map_free (map);
+      return;
+    }
 
   if (priv->map)
     memphis_map_free (priv->map);

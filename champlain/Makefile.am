@@ -181,6 +181,7 @@ Champlain-0.5.gir: $(INTROSPECTION_SCANNER) libchamplain-0.5.la
 	--c-include="$(libchamplain_include_HEADERS)" \
 	--include=Clutter-1.0 \
 	--include=Gtk-2.0 \
+	--include=Memphis-0.2 \
 	--library=champlain-0.5 \
 	--libtool="$(LIBTOOL)" \
 	--output $@ \

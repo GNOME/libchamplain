@@ -241,7 +241,7 @@ champlain_memphis_tile_source_init (ChamplainMemphisTileSource *tile_source)
 
   priv->rules = memphis_rule_set_new ();
   memphis_rule_set_load_from_data (priv->rules, default_rules,
-      strlen (default_rules));
+      strlen (default_rules), NULL);
 
   priv->renderer = memphis_renderer_new_full (priv->rules, memphis_map_new ());
 
@@ -538,13 +538,25 @@ champlain_memphis_tile_source_load_rules (
     }
 
   ChamplainMemphisTileSourcePrivate *priv = tile_source->priv;
+  GError *err = NULL;
 
   g_static_rw_lock_writer_lock (&MemphisLock);
   if (rules_path)
-    memphis_rule_set_load_from_file (priv->rules, rules_path);
+    {
+      memphis_rule_set_load_from_file (priv->rules, rules_path, &err);
+      if (err != NULL)
+       {
+          g_critical ("Can't load rules file: \"%s\"", err->message);
+          memphis_rule_set_load_from_data (priv->rules, default_rules,
+                                           strlen (default_rules), NULL);
+          g_static_rw_lock_writer_unlock (&MemphisLock);
+          return;
+       }
+    }
   else
     memphis_rule_set_load_from_data (priv->rules, default_rules,
-                                     strlen (default_rules));
+                                     strlen (default_rules), NULL);
+
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
   reload_tiles (tile_source);
