@@ -212,7 +212,7 @@ champlain_network_map_data_source_init (ChamplainNetworkMapDataSource *self)
 
   priv->map = NULL;
   priv->api_uri = g_strdup ("http://www.informationfreeway.org/api/0.6");
-  /* informationfreeway.org is a load-balancer for different api server */
+  /* informationfreeway.org is a load-balancer for different api servers */
   priv->proxy_uri = g_strdup ("");
 }
 
