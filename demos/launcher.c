@@ -87,7 +87,7 @@ main (int argc,
 {
   ClutterActor* actor, *stage, *buttons, *button;
   ChamplainLayer *layer;
-  gfloat width, total_width = 0;;
+  gfloat width, total_width = 0;
 
   g_thread_init (NULL);
   clutter_init (&argc, &argv);
