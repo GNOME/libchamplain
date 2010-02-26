@@ -34,4 +34,8 @@ local_rendering_LDADD = $(GTK_DEPS_LIBS) $(DEPS_LIBS) \
 		../champlain/libchamplain-0.5.la
 endif
 
-EXTRA_DIST= markers.h
+EXTRA_DIST = markers.h
+
+if HAVE_INTROSPECTION
+EXTRA_DIST += launcher.js
+endif
