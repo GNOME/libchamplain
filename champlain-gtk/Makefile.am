@@ -49,7 +49,7 @@ GtkChamplain-0.5.gir: $(INTROSPECTION_SCANNER) libchamplain-gtk-0.5.la
 	-DCHAMPLAIN_COMPILATION 	\
 	--add-include-path=$(top_builddir)/champlain \
 	--c-include="$(libchamplain_include_HEADERS)" \
-	--include=Champlain-0.4 \
+	--include=Champlain-0.5 \
 	--include=Clutter-1.0 \
 	--include=Gtk-2.0 \
 	--library=champlain-gtk-0.5 \
