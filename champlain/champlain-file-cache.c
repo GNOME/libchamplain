@@ -228,29 +228,17 @@ init_cache  (ChamplainFileCache *file_cache)
 
   g_print ("init! '%d'\n", champlain_tile_cache_get_persistent (tile_cache));
 
-  g_return_if_fail (create_cache_dir (priv->cache_dir));
-
   if (champlain_tile_cache_get_persistent (tile_cache))
     {
-      if (priv->cache_dir)
-        priv->real_cache_dir = g_strdup (priv->cache_dir);
-      else
-        {
-          priv->real_cache_dir = g_build_path (G_DIR_SEPARATOR_S,
-                                               g_get_user_cache_dir (),
-                                               "champlain", NULL);
-          g_return_if_fail (create_cache_dir (priv->real_cache_dir));
-        }
+      priv->real_cache_dir = g_strdup (priv->cache_dir);
+      g_return_if_fail (create_cache_dir (priv->real_cache_dir));
     }
   else
     {
       /* Create temporary directory for non-persistent caches */
       gchar *tmplate = NULL;
 
-      if (priv->cache_dir)
-        tmplate = g_build_filename (priv->cache_dir, "champlain-XXXXXX", NULL);
-      else
-        tmplate = g_build_filename (g_get_tmp_dir (), "champlain-XXXXXX", NULL);
+      tmplate = g_build_filename (priv->cache_dir, "champlain-XXXXXX", NULL);
 
       priv->real_cache_dir = mkdtemp (tmplate);
 
@@ -258,10 +246,9 @@ init_cache  (ChamplainFileCache *file_cache)
         {
           g_warning ("Filed to create filename for temporary cache");
           g_free (tmplate);
+          return;
         }
     }
-
-  g_return_if_fail (priv->real_cache_dir);
 
   filename = g_build_filename (priv->real_cache_dir,
                                "cache.db", NULL);
@@ -329,6 +316,24 @@ static void
 champlain_file_cache_constructed (GObject *object)
 {
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(object);
+  ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE(file_cache);
+  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+
+  if (!priv->cache_dir)
+    {
+      if (champlain_tile_cache_get_persistent (tile_cache))
+        {
+#ifdef USE_MAEMO
+          priv->cache_dir = g_strdup ("/home/user/MyDocs/.Maps/");
+#else
+          priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S,
+                                          g_get_user_cache_dir (),
+                                          "champlain", NULL);
+#endif
+        }
+      else
+        priv->cache_dir = (gchar *) g_get_tmp_dir ();
+    }
 
   init_cache (file_cache);
 
@@ -342,7 +347,7 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
   ChamplainTileCacheClass *tile_cache_class = CHAMPLAIN_TILE_CACHE_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GParamSpec *pspec;
-  gchar *cache_dir;
+  gchar *cache_dir = NULL;
 
   g_type_class_add_private (klass, sizeof (ChamplainFileCachePrivate));
 
@@ -369,12 +374,6 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
                              100000000,
                              G_PARAM_CONSTRUCT | G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_SIZE_LIMIT, pspec);
-
-#ifdef USE_MAEMO
-  cache_dir = g_strdup ("/home/user/MyDocs/.Maps/");
-#else
-  cache_dir = g_build_path (G_DIR_SEPARATOR_S, g_get_user_cache_dir (), "champlain", NULL);
-#endif
 
   /**
   * ChamplainFileCache:cache-dir:
@@ -403,10 +402,7 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
 {
   ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
 
-  /*
-     priv->cache_dir initialized by the default value of the
-     G_PARAM_CONSTRUCT_ONLY property
-  */
+  priv->cache_dir = NULL;
   priv->size_limit = 100000000;
   priv->real_cache_dir = NULL;
   priv->db = NULL;
