@@ -38,19 +38,6 @@ struct _ChamplainBaseMarkerPrivate
   gboolean highlighted;
 };
 
-struct _ChamplainPolygonPrivate {
-  GList *points;
-  gboolean closed_path;
-  ClutterColor *stroke_color;
-  gboolean fill;
-  ClutterColor *fill_color;
-  gboolean stroke;
-  gdouble stroke_width;
-  ClutterActor *actor;
-  gboolean visible;
-  gboolean mark_points;
-};
-
 typedef struct
 {
   gfloat x;

@@ -84,10 +84,15 @@ struct _ChamplainMemphisTileSourcePrivate
   gboolean no_map_data;
 };
 
-typedef struct _TileLoadedData TileLoadedData;
+typedef struct _WorkerThreadData WorkerThreadData;
 
-struct _TileLoadedData
+struct _WorkerThreadData
 {
+  gint x;
+  gint y;
+  guint z;
+  guint size;
+
   ChamplainMapSource *map_source;
   ChamplainTile *tile;
   cairo_surface_t *cst;
@@ -330,25 +335,34 @@ void argb_to_rgba (guchar *data, guint size)
 }
 
 static gboolean
-tile_loaded_cb (gpointer data)
+tile_loaded_cb (gpointer worker_data)
 {
-  TileLoadedData *tdata = (TileLoadedData *) data;
-  ChamplainMapSource *map_source = tdata->map_source;
-  ChamplainTile *tile = tdata->tile;
-  cairo_surface_t *cst = tdata->cst;
+  WorkerThreadData *data = (WorkerThreadData *) worker_data;
+  ChamplainMapSource *map_source = data->map_source;
+  ChamplainTile *tile = data->tile;
+  cairo_surface_t *cst = data->cst;
   ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE(map_source);
   ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
   cairo_t *cr_clutter;
   ClutterActor *actor;
-  guint size;
+  guint size = data->size;
   GError *error = NULL;
 
-  g_free (tdata);
+  if (tile)
+    g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer*)&data->tile);
+
+  g_free (data);
+
+  if (!tile)
+    {
+      DEBUG ("Tile destroyed while loading");
+      cairo_surface_destroy (cst);
+      g_object_unref (map_source);
+      return FALSE;
+    }
 
   // FIXME - once memphis detects when tile cannot be rendered, call fill_tile
   // on next_source here and return
-
-  size = champlain_tile_get_size (tile);
 
   /* draw the clutter texture */
   actor = clutter_cairo_texture_new (size, size);
@@ -394,49 +408,33 @@ tile_loaded_cb (gpointer data)
   champlain_tile_set_content (tile, actor, TRUE);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 
-  g_object_unref (tile);
   g_object_unref (map_source);
 
   return FALSE;
 }
 
 static void
-memphis_worker_thread (gpointer data, gpointer user_data)
+memphis_worker_thread (gpointer worker_data, gpointer user_data)
 {
-  ChamplainTile *tile = (ChamplainTile *)data;
-  ChamplainMapSource *map_source = (ChamplainMapSource *)user_data;
+  WorkerThreadData *data = (WorkerThreadData *)worker_data;
+  ChamplainMapSource *map_source = data->map_source;
   cairo_t *cr;
-  cairo_surface_t *cst;
-  guint x, y, z, size;
-  TileLoadedData *loaded_data;
-
-  x = champlain_tile_get_x (tile);
-  y = champlain_tile_get_y (tile);
-  z = champlain_tile_get_zoom_level (tile);
-  size = champlain_tile_get_size (tile);
 
   /* create a clutter-independant surface to draw on */
-  cst = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, size, size);
-  cr = cairo_create (cst);
+  data->cst = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, data->size, data->size);
+  cr = cairo_create (data->cst);
 
-  DEBUG ("Draw Tile (%d, %d, %d)", x, y, z);
+  DEBUG ("Draw Tile (%d, %d, %d)", data->x, data->y, data->z);
 
   g_static_rw_lock_reader_lock (&MemphisLock);
   // FIXME - memphis needs to indicate if it cannot render the tile so we can
   // load the tile from the next map source
-  memphis_renderer_draw_tile (GET_PRIVATE(map_source)->renderer, cr, x, y, z);
+  memphis_renderer_draw_tile (GET_PRIVATE(map_source)->renderer, cr, data->x, data->y, data->z);
   g_static_rw_lock_reader_unlock (&MemphisLock);
 
   cairo_destroy (cr);
 
-  /* Write the tile content and cache entry */
-  loaded_data = g_new (TileLoadedData, 1);
-  loaded_data->map_source = map_source;
-  loaded_data->tile = tile;
-  loaded_data->cst = cst;
-
-  clutter_threads_add_idle_full (G_PRIORITY_DEFAULT, tile_loaded_cb,
-                                 loaded_data, NULL);
+  clutter_threads_add_idle_full (G_PRIORITY_DEFAULT, tile_loaded_cb, data, NULL);
 }
 
 static void
@@ -460,21 +458,29 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
   else
     {
       GError *error = NULL;
-      guint size;
+      WorkerThreadData *data;
 
-      size = champlain_map_source_get_tile_size (map_source);
-      champlain_tile_set_size (tile, size);
+      data = g_new (WorkerThreadData, 1);
+      data->x = champlain_tile_get_x (tile);
+      data->y = champlain_tile_get_y (tile);
+      data->z = champlain_tile_get_zoom_level (tile);
+      data->size = champlain_map_source_get_tile_size (map_source);
+      data->tile = tile;
+      data->map_source = map_source;
 
-      g_object_ref (tile);
+      g_object_add_weak_pointer (G_OBJECT (tile), (gpointer*)&data->tile);
+
       g_object_ref (map_source);
 
-      g_thread_pool_push (priv->thpool, tile, &error);
+      champlain_tile_set_size (tile, data->size);
+
+      g_thread_pool_push (priv->thpool, data, &error);
       if (error)
         {
           g_error ("Thread pool error: %s", error->message);
           g_error_free (error);
           g_object_unref (map_source);
-          g_object_unref (tile);
+          g_free (data);
         }
     }
 }

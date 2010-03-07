@@ -200,7 +200,7 @@ set_view (GtkChamplainEmbed* embed,
       clutter_container_remove_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
     }
 
-  priv->view = g_object_ref (view);
+  priv->view = g_object_ref_sink (view);
   clutter_actor_set_size (CLUTTER_ACTOR (priv->view), priv->width, priv->height);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));

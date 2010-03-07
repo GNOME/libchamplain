@@ -60,14 +60,11 @@ typedef enum {
 struct _ChamplainView
 {
   ClutterGroup group;
-
-  ChamplainViewPrivate *priv;
 };
 
 struct _ChamplainViewClass
 {
   ClutterGroupClass parent_class;
-
 };
 
 GType champlain_view_get_type (void);

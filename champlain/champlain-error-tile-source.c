@@ -100,8 +100,12 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
   guint size;
 
   if (champlain_tile_get_content (tile))
-    /* cache is just validating tile - don't generate error tile in this case */
+  {
+    /* cache is just validating tile - don't generate error tile in this case - instead use what we have */
+    if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_DONE)
+      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
     return;
+  }
 
   size = champlain_map_source_get_tile_size (map_source);
 

@@ -41,7 +41,6 @@
 #include "champlain-defines.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
-#include "champlain-map.h"
 #include "champlain-tile.h"
 #include "champlain-zoom-level.h"
 
@@ -110,7 +109,7 @@ struct _ChamplainMarkerPrivate
 
 G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CHAMPLAIN_TYPE_BASE_MARKER);
 
-#define CHAMPLAIN_MARKER_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
+#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
 
 static void draw_marker (ChamplainMarker *marker);
 
@@ -184,8 +183,7 @@ champlain_marker_get_property (GObject *object,
                                GValue *value,
                                GParamSpec *pspec)
 {
-    ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
-    ChamplainMarkerPrivate *priv = marker->priv;
+    ChamplainMarkerPrivate *priv = GET_PRIVATE (object);
 
     switch (prop_id)
       {
@@ -283,22 +281,71 @@ champlain_marker_set_property (GObject *object,
 }
 
 static void
+champlain_marker_dispose (GObject *object)
+{
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (object);
+
+  if (priv->background)
+    {
+      g_object_unref (priv->background);
+      priv->background = NULL;
+    }
+
+  if (priv->shadow)
+    {
+      g_object_unref (priv->shadow);
+      priv->shadow = NULL;
+    }
+
+  if (priv->text_actor)
+    {
+      g_object_unref (priv->text_actor);
+      priv->text_actor = NULL;
+    }
+
+  if (priv->image)
+    {
+      g_object_unref (priv->image);
+      priv->image = NULL;
+    }
+
+  if (priv->attributes)
+    {
+      pango_attr_list_unref (priv->attributes);
+      priv->attributes = NULL;
+    }
+
+  G_OBJECT_CLASS (champlain_marker_parent_class)->dispose (object);
+}
+
+static void
 champlain_marker_finalize (GObject *object)
 {
-  ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (object);
 
-  if (priv->text != NULL)
-    g_free (priv->text);
-  priv->text = NULL;
+  if (priv->text)
+    {
+      g_free (priv->text);
+      priv->text = NULL;
+    }
 
-  if (priv->image != NULL)
-    g_object_unref (priv->image);
-  priv->image = NULL;
+  if (priv->font_name)
+    {
+      g_free (priv->font_name);
+      priv->font_name = NULL;
+    }
 
-  if (priv->background != NULL)
-    g_object_unref (priv->background);
-  priv->background = NULL;
+  if (priv->color)
+    {
+      clutter_color_free (priv->color);
+      priv->color = NULL;
+    }
+
+  if (priv->text_color)
+    {
+      clutter_color_free (priv->text_color);
+      priv->text_color = NULL;
+    }
 
   if (priv->redraw_id)
     {
@@ -316,6 +363,7 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
 
   GObjectClass *object_class = G_OBJECT_CLASS (markerClass);
   object_class->finalize = champlain_marker_finalize;
+  object_class->dispose = champlain_marker_dispose;
   object_class->get_property = champlain_marker_get_property;
   object_class->set_property = champlain_marker_set_property;
 
@@ -498,7 +546,7 @@ draw_shadow (ChamplainMarker *marker,
    gint height,
    gint point)
 {
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
   ClutterActor *shadow = NULL;
   cairo_t *cr;
   gdouble slope;
@@ -550,7 +598,7 @@ draw_background (ChamplainMarker *marker,
     gint height,
     gint point)
 {
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
   ChamplainBaseMarkerPrivate *base_priv = CHAMPLAIN_BASE_MARKER (marker)->priv;
   ClutterActor *bg = NULL;
   ClutterColor *color;
@@ -602,7 +650,7 @@ draw_background (ChamplainMarker *marker,
 static void
 draw_marker (ChamplainMarker *marker)
 {
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
   ChamplainBaseMarkerPrivate *base_priv = CHAMPLAIN_BASE_MARKER (marker)->priv;
   guint height = 0, point = 0;
   guint total_width = 0, total_height = 0;
@@ -713,8 +761,9 @@ static gboolean
 redraw_on_idle (gpointer gobject)
 {
   ChamplainMarker *marker = CHAMPLAIN_MARKER (gobject);
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
   CHAMPLAIN_MARKER_GET_CLASS (gobject)->draw_marker (marker);
-  marker->priv->redraw_id = 0;
+  priv->redraw_id = 0;
   return FALSE;
 }
 
@@ -732,8 +781,9 @@ redraw_on_idle (gpointer gobject)
 void
 champlain_marker_queue_redraw (ChamplainMarker *marker)
 {
-  if (!marker->priv->redraw_id)
-    marker->priv->redraw_id = g_idle_add (redraw_on_idle, marker);
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
+  if (!priv->redraw_id)
+    priv->redraw_id = g_idle_add (redraw_on_idle, marker);
 }
 
 static void
@@ -747,8 +797,7 @@ notify_highlighted (GObject *gobject,
 static void
 champlain_marker_init (ChamplainMarker *marker)
 {
-  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker) ;
-  marker->priv = priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   priv->text = NULL;
   priv->image = NULL;
@@ -903,7 +952,7 @@ champlain_marker_set_text (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   if (priv->text != NULL)
     g_free (priv->text);
@@ -927,10 +976,13 @@ champlain_marker_set_image (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   if (priv->image != NULL)
-    clutter_actor_destroy (priv->image);
+    {
+      g_object_unref (image);
+      clutter_actor_destroy (priv->image);
+    }
 
   if (image != NULL)
     {
@@ -959,7 +1011,7 @@ champlain_marker_set_use_markup (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   priv->use_markup = markup;
   g_object_notify (G_OBJECT (marker), "use-markup");
@@ -981,7 +1033,7 @@ champlain_marker_set_alignment (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   priv->alignment = alignment;
   g_object_notify (G_OBJECT (marker), "alignment");
@@ -1004,13 +1056,13 @@ champlain_marker_set_color (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   if (priv->color != NULL)
     clutter_color_free (priv->color);
 
   if (color == NULL)
-     color = &DEFAULT_COLOR;
+    color = &DEFAULT_COLOR;
 
   priv->color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (marker), "color");
@@ -1033,7 +1085,7 @@ champlain_marker_set_text_color (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   if (priv->text_color != NULL)
     clutter_color_free (priv->text_color);
@@ -1062,7 +1114,7 @@ champlain_marker_set_font_name (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   if (priv->font_name != NULL)
     g_free (priv->font_name);
@@ -1090,7 +1142,7 @@ champlain_marker_set_wrap (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   priv->wrap = wrap;
   g_object_notify (G_OBJECT (marker), "wrap");
@@ -1112,7 +1164,7 @@ champlain_marker_set_wrap_mode (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   priv->wrap_mode = wrap_mode;
   g_object_notify (G_OBJECT (marker), "wrap");
@@ -1134,7 +1186,7 @@ champlain_marker_set_attributes (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   if (attributes)
     pango_attr_list_ref (attributes);
@@ -1163,7 +1215,7 @@ champlain_marker_set_ellipsize (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   priv->ellipsize = ellipsize;
   g_object_notify (G_OBJECT (marker), "ellipsize");
@@ -1184,7 +1236,7 @@ champlain_marker_set_single_line_mode (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   priv->single_line_mode = mode;
 
@@ -1207,7 +1259,7 @@ champlain_marker_set_draw_background (ChamplainMarker *marker,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   priv->draw_background = background;
   g_object_notify (G_OBJECT (marker), "draw-background");
@@ -1227,7 +1279,7 @@ champlain_marker_get_image (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), NULL);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->image;
 }
@@ -1245,7 +1297,7 @@ champlain_marker_get_use_markup (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->use_markup;
 }
@@ -1263,7 +1315,7 @@ champlain_marker_get_text (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->text;
 }
@@ -1281,7 +1333,7 @@ champlain_marker_get_alignment (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->alignment;
 }
@@ -1299,7 +1351,7 @@ champlain_marker_get_color (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), NULL);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->color;
 }
@@ -1317,7 +1369,7 @@ champlain_marker_get_text_color (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), NULL);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->text_color;
 }
@@ -1335,7 +1387,7 @@ champlain_marker_get_font_name (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->font_name;
 }
@@ -1353,7 +1405,7 @@ champlain_marker_get_wrap (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->wrap;
 }
@@ -1371,7 +1423,7 @@ champlain_marker_get_wrap_mode (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->wrap_mode;
 }
@@ -1389,7 +1441,7 @@ champlain_marker_get_ellipsize (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->ellipsize;
 }
@@ -1407,7 +1459,7 @@ champlain_marker_get_single_line_mode (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->single_line_mode;
 }
@@ -1425,7 +1477,7 @@ champlain_marker_get_draw_background (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   return priv->draw_background;
 }

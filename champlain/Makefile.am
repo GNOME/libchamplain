@@ -23,7 +23,6 @@ libchamplain_headers = \
 	champlain-selection-layer.h 	\
 	champlain-base-marker.h		\
 	champlain-marker.h		\
-	champlain-map.h			\
 	champlain-tile.h		\
 	champlain-map-source.h		\
 	champlain-map-source-chain.h	\
@@ -52,7 +51,6 @@ libchamplain_0_5_la_SOURCES = \
 	champlain-selection-layer.c 	\
 	champlain-base-marker.c 	\
 	champlain-marker.c 		\
-	champlain-map.c  		\
 	champlain-zoom-level.c 		\
 	champlain-tile.c		\
 	champlain-map-source.c		\

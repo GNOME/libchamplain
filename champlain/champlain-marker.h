@@ -45,8 +45,6 @@ typedef struct _ChamplainMarkerClass ChamplainMarkerClass;
 struct _ChamplainMarker
 {
   ChamplainBaseMarker base;
-
-  ChamplainMarkerPrivate *priv;
 };
 
 struct _ChamplainMarkerClass

@@ -208,7 +208,7 @@ champlain_layer_add_marker (ChamplainLayer *layer,
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
   g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
 
-  clutter_container_add (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker), NULL);
+  clutter_container_add_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
 }
 
 /**
@@ -227,7 +227,7 @@ champlain_layer_remove_marker (ChamplainLayer *layer,
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
   g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
 
-  clutter_container_remove (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker), NULL);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
 }
 
 /**

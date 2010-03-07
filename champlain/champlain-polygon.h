@@ -24,6 +24,7 @@
 #define CHAMPLAIN_POLYGON_H
 
 #include <champlain/champlain-point.h>
+#include <champlain/champlain-defines.h>
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
@@ -53,12 +54,11 @@ typedef struct _ChamplainPolygon        ChamplainPolygon;
 typedef struct _ChamplainPolygonClass   ChamplainPolygonClass;
 
 struct _ChamplainPolygon {
-  GInitiallyUnowned parent;
-  ChamplainPolygonPrivate *priv;
+  ClutterGroup parent;
 };
 
 struct _ChamplainPolygonClass {
-  GInitiallyUnownedClass parent_class;
+  ClutterGroupClass parent_class;
 };
 
 GType champlain_polygon_get_type (void);
@@ -99,6 +99,12 @@ gboolean champlain_polygon_get_mark_points (ChamplainPolygon *polygon);
 
 void champlain_polygon_show (ChamplainPolygon *polygon);
 void champlain_polygon_hide (ChamplainPolygon *polygon);
+
+void champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
+                                     ChamplainMapSource *map_source,
+                                     guint zoom_level,
+                                     gfloat width, gfloat height,
+                                     gfloat shift_x, gfloat shift_y);
 
 G_END_DECLS
 

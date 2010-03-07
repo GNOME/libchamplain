@@ -49,12 +49,11 @@ typedef struct _ChamplainZoomLevel        ChamplainZoomLevel;
 typedef struct _ChamplainZoomLevelClass   ChamplainZoomLevelClass;
 
 struct _ChamplainZoomLevel{
-  GObject parent;
-  ChamplainZoomLevelPrivate *priv;
+  ClutterGroup parent;
 };
 
 struct _ChamplainZoomLevelClass{
-  GObjectClass parent_class;
+  ClutterGroupClass parent_class;
 };
 
 GType champlain_zoom_level_get_type (void);
@@ -64,7 +63,6 @@ ChamplainZoomLevel* champlain_zoom_level_new (void);
 guint champlain_zoom_level_get_width (ChamplainZoomLevel *self);
 guint champlain_zoom_level_get_height (ChamplainZoomLevel *self);
 gint champlain_zoom_level_get_zoom_level (ChamplainZoomLevel *self);
-ClutterActor* champlain_zoom_level_get_actor (ChamplainZoomLevel *self);
 
 void champlain_zoom_level_set_width (ChamplainZoomLevel *self,
     guint width);
@@ -73,13 +71,9 @@ void champlain_zoom_level_set_height (ChamplainZoomLevel *self,
 void champlain_zoom_level_set_zoom_level (ChamplainZoomLevel *self,
     gint zoom_level);
 
-void champlain_zoom_level_add_tile (ChamplainZoomLevel *self,
-    ChamplainTile *tile);
-void champlain_zoom_level_remove_tile (ChamplainZoomLevel *self,
-    ChamplainTile *tile);
-guint champlain_zoom_level_tile_count (ChamplainZoomLevel *self);
-ChamplainTile* champlain_zoom_level_get_nth_tile (ChamplainZoomLevel *self,
-    guint index);
+gboolean champlain_zoom_level_zoom_to (ChamplainZoomLevel *self,
+    ChamplainMapSource *source,
+    guint zoomLevel);
 
 G_END_DECLS
 

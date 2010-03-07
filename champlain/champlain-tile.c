@@ -25,7 +25,6 @@
 #include "champlain-tile.h"
 
 #include "champlain-enum-types.h"
-#include "champlain-map.h"
 #include "champlain-private.h"
 
 #include <math.h>
@@ -35,7 +34,7 @@
 #include <gio/gio.h>
 #include <clutter/clutter.h>
 
-G_DEFINE_TYPE (ChamplainTile, champlain_tile, G_TYPE_OBJECT)
+G_DEFINE_TYPE (ChamplainTile, champlain_tile, CLUTTER_TYPE_GROUP)
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_TILE, ChamplainTilePrivate))
@@ -48,7 +47,6 @@ enum
   PROP_ZOOM_LEVEL,
   PROP_SIZE,
   PROP_STATE,
-  PROP_ACTOR,
   PROP_CONTENT,
   PROP_ETAG
 };
@@ -60,7 +58,6 @@ struct _ChamplainTilePrivate {
   gint zoom_level; /* The tile's zoom level */
 
   ChamplainState state; /* The tile state: loading, validation, done */
-  ClutterActor *actor; /* An actor grouping all content actors */
   ClutterActor *content_actor; /* The actual tile actor */
 
   GTimeVal *modified_time; /* The last modified time of the cache */
@@ -90,9 +87,6 @@ champlain_tile_get_property (GObject *object,
         break;
       case PROP_STATE:
         g_value_set_enum (value, champlain_tile_get_state (self));
-        break;
-      case PROP_ACTOR:
-        g_value_set_object (value, champlain_tile_get_actor (self));
         break;
       case PROP_CONTENT:
         g_value_set_object (value, champlain_tile_get_content (self));
@@ -143,20 +137,6 @@ champlain_tile_set_property (GObject *object,
 static void
 champlain_tile_dispose (GObject *object)
 {
-  ChamplainTilePrivate *priv = CHAMPLAIN_TILE (object)->priv;
-
-  if (priv->actor != NULL)
-    {
-      g_object_unref (G_OBJECT (priv->actor));
-      priv->actor = NULL;
-    }
-
-  if (priv->content_actor != NULL)
-    {
-      g_object_unref (G_OBJECT (priv->content_actor));
-      priv->content_actor = NULL;
-    }
-
   G_OBJECT_CLASS (champlain_tile_parent_class)->dispose (object);
 }
 
@@ -165,7 +145,7 @@ champlain_tile_dispose (GObject *object)
 static void
 champlain_tile_finalize (GObject *object)
 {
-  ChamplainTilePrivate *priv = CHAMPLAIN_TILE (object)->priv;
+  ChamplainTilePrivate *priv = GET_PRIVATE (object);
 
   g_free (priv->modified_time);
   g_free (priv->etag);
@@ -270,22 +250,6 @@ champlain_tile_class_init (ChamplainTileClass *klass)
           G_PARAM_READWRITE));
 
   /**
-  * ChamplainTile:actor:
-  *
-  * The #ClutterActor where the tile content is rendered.  Should never change
-  * during the tile's life.
-  *
-  * Since: 0.4
-  */
-  g_object_class_install_property (object_class,
-      PROP_ACTOR,
-      g_param_spec_object ("actor",
-          "Actor",
-          "The tile's actor",
-          CLUTTER_TYPE_ACTOR,
-          G_PARAM_READABLE));
-
-  /**
   * ChamplainTile:content:
   *
   * The #ClutterActor with the specific image content.  When changing this
@@ -324,7 +288,6 @@ static void
 champlain_tile_init (ChamplainTile *self)
 {
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
-  self->priv = priv;
 
   priv->state = CHAMPLAIN_STATE_INIT;
   priv->x = 0;
@@ -333,9 +296,6 @@ champlain_tile_init (ChamplainTile *self)
   priv->size = 0;
   priv->modified_time = NULL;
   priv->etag = NULL;
-
-  priv->actor = g_object_ref (clutter_group_new ());
-  g_object_add_weak_pointer (G_OBJECT (priv->actor), (gpointer*)&priv->actor);
 
   priv->content_actor = NULL;
 }
@@ -366,7 +326,7 @@ champlain_tile_get_x (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  return self->priv->x;
+  return GET_PRIVATE (self)->x;
 }
 
 /**
@@ -382,7 +342,7 @@ champlain_tile_get_y (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  return self->priv->y;
+  return GET_PRIVATE (self)->y;
 }
 
 /**
@@ -398,7 +358,7 @@ champlain_tile_get_zoom_level (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  return self->priv->zoom_level;
+  return GET_PRIVATE (self)->zoom_level;
 }
 
 /**
@@ -414,7 +374,7 @@ champlain_tile_get_size (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  return self->priv->size;
+  return GET_PRIVATE (self)->size;
 }
 
 /**
@@ -430,24 +390,7 @@ champlain_tile_get_state (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), CHAMPLAIN_STATE_NONE);
 
-  return self->priv->state;
-}
-
-/**
- * champlain_tile_get_actor:
- * @self: the #ChamplainTile
- *
- * Returns: the tile's actor.  This actor should not change during the tile's
- * lifetime. You should not unref this actor, it is owned by the tile.
- *
- * Since: 0.4
- */
-ClutterActor *
-champlain_tile_get_actor (ChamplainTile *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
-
-  return self->priv->actor;
+  return GET_PRIVATE (self)->state;
 }
 
 /**
@@ -465,7 +408,7 @@ champlain_tile_set_x (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  self->priv->x = x;
+  GET_PRIVATE (self)->x = x;
 
   g_object_notify (G_OBJECT (self), "x");
 }
@@ -485,7 +428,7 @@ champlain_tile_set_y (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  self->priv->y = y;
+  GET_PRIVATE (self)->y = y;
 
   g_object_notify (G_OBJECT (self), "y");
 }
@@ -505,7 +448,7 @@ champlain_tile_set_zoom_level (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  self->priv->zoom_level = zoom_level;
+  GET_PRIVATE (self)->zoom_level = zoom_level;
 
   g_object_notify (G_OBJECT (self), "zoom-level");
 }
@@ -525,7 +468,7 @@ champlain_tile_set_size (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  self->priv->size = size;
+  GET_PRIVATE (self)->size = size;
 
   g_object_notify (G_OBJECT (self), "size");
 }
@@ -545,7 +488,7 @@ champlain_tile_set_state (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  self->priv->state = state;
+  GET_PRIVATE (self)->state = state;
 
   g_object_notify (G_OBJECT (self), "state");
 }
@@ -584,7 +527,7 @@ champlain_tile_get_modified_time (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
-  return self->priv->modified_time;
+  return GET_PRIVATE (self)->modified_time;
 }
 
 /**
@@ -603,7 +546,7 @@ champlain_tile_set_modified_time (ChamplainTile *self,
   g_return_if_fail (CHAMPLAIN_TILE (self));
   g_return_if_fail (time != NULL);
 
-  ChamplainTilePrivate *priv = self->priv;
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
   g_free (priv->modified_time);
   priv->modified_time = g_memdup(time_, sizeof (GTimeVal));
@@ -622,7 +565,7 @@ champlain_tile_get_modified_time_string (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
-  ChamplainTilePrivate *priv = self->priv;
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
   if (priv->modified_time == NULL)
     return NULL;
@@ -648,7 +591,7 @@ champlain_tile_get_etag (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), "");
 
-  return self->priv->etag;
+  return GET_PRIVATE (self)->etag;
 }
 
 /**
@@ -666,7 +609,7 @@ champlain_tile_set_etag (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  ChamplainTilePrivate *priv = self->priv;
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
   g_free (priv->etag);
   priv->etag = g_strdup (etag);
@@ -674,25 +617,22 @@ champlain_tile_set_etag (ChamplainTile *self,
 }
 
 typedef struct {
-  ChamplainTile *tile;
   ClutterActor *old_actor;
-} AnimationContext;
+} FadeInCompletedData;
 
 static void
 fade_in_completed (ClutterAnimation *animation,
-    ClutterActor *old_actor)
+    FadeInCompletedData *data)
 {
-  ClutterActor *parent;
+  ClutterActor *old_actor = data->old_actor;
 
-  if (old_actor == NULL)
-    return;
+  if (old_actor)
+    {
+      g_object_remove_weak_pointer (G_OBJECT (old_actor), (gpointer*)&data->old_actor);
+      clutter_actor_destroy (old_actor);
+    }
 
-  parent = clutter_actor_get_parent (old_actor);
-
-  if (parent != NULL)
-    clutter_container_remove (CLUTTER_CONTAINER (parent), old_actor, NULL);
-
-  g_object_unref (old_actor);
+  g_free(data);
 }
 
 /**
@@ -711,30 +651,25 @@ champlain_tile_set_content (ChamplainTile *self,
     gboolean fade_in)
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
-  g_return_if_fail (actor != NULL);
+  g_return_if_fail (CLUTTER_ACTOR (actor));
 
-  ChamplainTilePrivate *priv = self->priv;
-  ClutterActor *old_actor = NULL;
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
-  if (priv->content_actor != NULL)
+  if (priv->content_actor)
     {
       /* it sometimes happen that the priv->content_actor has been destroyed,
        * this assert will help determine when with no impact on the user */
       g_assert (CLUTTER_IS_ACTOR (priv->content_actor));
 
-      if (fade_in == TRUE)
-        old_actor = g_object_ref (priv->content_actor);
-      else if (priv->actor != NULL)
-        clutter_container_remove (CLUTTER_CONTAINER (priv->actor), priv->content_actor, NULL);
-
-      g_object_unref (priv->content_actor);
+      if (!fade_in)
+        clutter_container_remove_actor (CLUTTER_CONTAINER (self), priv->content_actor);
     }
 
-  if (priv->actor != NULL)
-    clutter_container_add (CLUTTER_CONTAINER (priv->actor), actor, NULL);
+  clutter_container_add_actor (CLUTTER_CONTAINER (self), actor);
 
-  if (fade_in == TRUE && priv->actor != NULL)
+  if (fade_in)
     {
+      FadeInCompletedData *data;
       ClutterAnimation *animation;
 
       clutter_actor_set_opacity (actor, 0);
@@ -745,10 +680,16 @@ champlain_tile_set_content (ChamplainTile *self,
           "opacity", 255,
           NULL);
 
-      g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), old_actor);
+      data = g_new (FadeInCompletedData, 1);
+      data->old_actor = priv->content_actor;
+
+      if (data->old_actor)
+        g_object_add_weak_pointer (G_OBJECT (data->old_actor), (gpointer*)&data->old_actor);
+
+      g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), data);
     }
 
-  priv->content_actor = g_object_ref (actor);
+  priv->content_actor = actor;
 
   g_object_notify (G_OBJECT (self), "content");
 }
@@ -767,6 +708,5 @@ champlain_tile_get_content (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
-  return self->priv->content_actor;
+  return GET_PRIVATE (self)->content_actor;
 }
-

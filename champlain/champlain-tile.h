@@ -49,13 +49,11 @@ typedef struct _ChamplainTile        ChamplainTile;
 typedef struct _ChamplainTileClass   ChamplainTileClass;
 
 struct _ChamplainTile {
-  GObject parent;
-
-  ChamplainTilePrivate *priv;
+  ClutterGroup parent;
 };
 
 struct _ChamplainTileClass {
-  GObjectClass parent_class;
+  ClutterGroupClass parent_class;
 };
 
 GType champlain_tile_get_type (void);
@@ -71,7 +69,6 @@ gint champlain_tile_get_y (ChamplainTile *self);
 gint champlain_tile_get_zoom_level (ChamplainTile *self);
 guint champlain_tile_get_size (ChamplainTile *self);
 ChamplainState champlain_tile_get_state (ChamplainTile *self);
-ClutterActor * champlain_tile_get_actor (ChamplainTile *self);
 ClutterActor * champlain_tile_get_content (ChamplainTile *self);
 const GTimeVal * champlain_tile_get_modified_time (ChamplainTile *self);
 gchar * champlain_tile_get_modified_time_string (ChamplainTile *self);

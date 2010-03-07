@@ -501,17 +501,21 @@ tile_loaded_cb (SoupSession *session,
   ClutterActor *actor;
   const gchar *etag;
 
+  if (tile)
+    g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer*)&callback_data->tile);
+
   g_free (user_data);
 
   DEBUG ("Got reply %d", msg->status_code);
 
-  if (msg->status_code == SOUP_STATUS_CANCELLED)
+  if (!tile || msg->status_code == SOUP_STATUS_CANCELLED)
     {
-      DEBUG ("Download of tile %d, %d got cancelled",
-             champlain_tile_get_x (tile), champlain_tile_get_y (tile));
-      //champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+      if (!tile)
+        DEBUG ("Tile destroyed while loading");
+      else
+        DEBUG ("Download of tile %d, %d got cancelled",
+               champlain_tile_get_x (tile), champlain_tile_get_y (tile));
 
-      g_object_unref (tile);
       g_object_unref (map_source);
       return;
     }
@@ -603,13 +607,11 @@ load_next:
     {
       champlain_map_source_fill_tile (next_source, tile);
     }
-  g_object_unref (tile);
   g_object_unref (map_source);
   return;
 
 finish:
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-  g_object_unref (tile);
   g_object_unref (map_source);
 }
 
@@ -667,10 +669,7 @@ fill_tile (ChamplainMapSource *map_source,
       callback_data->tile = tile;
       callback_data->map_source = map_source;
 
-      /* Ref the tile as it may be freeing during the loading
-       * Unref when the loading is done.
-       */
-      g_object_ref (tile);
+      g_object_add_weak_pointer (G_OBJECT (tile), (gpointer*)&callback_data->tile);
       g_object_ref (map_source);
 
       soup_session_queue_message (priv->soup_session, msg,

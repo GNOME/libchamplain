@@ -579,7 +579,19 @@ tile_loaded_cb (ClutterTexture *texture,
   GTimeVal modified_time = {0,};
 
   g_signal_handler_disconnect (texture, user_data->handler);
+
+  if (tile)
+    g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer*)&user_data->tile);
+
   g_free (user_data);
+
+  if (!tile)
+    {
+      DEBUG ("Tile destroyed while loading");
+      if (!error && actor)
+        clutter_actor_destroy (actor);
+      goto cleanup;
+    }
 
   if (error)
     {
@@ -653,16 +665,14 @@ tile_loaded_cb (ClutterTexture *texture,
 load_next:
   if (CHAMPLAIN_IS_MAP_SOURCE(next_source))
     champlain_map_source_fill_tile (next_source, tile);
-
-  /* if we have some content, use the tile even if it wasn't validated */
-  if (champlain_tile_get_content (tile) &&
-      champlain_tile_get_state (tile) != CHAMPLAIN_STATE_DONE)
+  else if (champlain_tile_get_content (tile) &&
+           champlain_tile_get_state (tile) != CHAMPLAIN_STATE_DONE)
+    /* if we have some content, use the tile even if it wasn't validated */
     champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 
 cleanup:
   sqlite3_reset (priv->stmt_select);
   g_free (filename);
-  g_object_unref (tile);
   g_object_unref (map_source);
 }
 
@@ -686,10 +696,7 @@ fill_tile (ChamplainMapSource *map_source,
 
       DEBUG ("fill of %s", callback_data->filename);
 
-      /* Ref the tile as it may be freeing during the loading
-       * Unref when the loading is done.
-       */
-      g_object_ref (tile);
+      g_object_add_weak_pointer (G_OBJECT (tile), (gpointer*)&callback_data->tile);
       g_object_ref (map_source);
 
       /* Load the cached version */
