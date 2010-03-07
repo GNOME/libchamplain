@@ -356,13 +356,17 @@ tile_loaded_cb (gpointer worker_data)
   if (!tile)
     {
       DEBUG ("Tile destroyed while loading");
-      cairo_surface_destroy (cst);
-      g_object_unref (map_source);
-      return FALSE;
+      goto cleanup;
     }
 
-  // FIXME - once memphis detects when tile cannot be rendered, call fill_tile
-  // on next_source here and return
+  if (!cst)
+    {
+      /* tile not rendered, load next */
+      ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
+      if (next_source)
+        champlain_map_source_fill_tile (next_source, tile);
+      goto cleanup;
+    }
 
   /* draw the clutter texture */
   actor = clutter_cairo_texture_new (size, size);
@@ -403,11 +407,12 @@ tile_loaded_cb (gpointer worker_data)
       g_object_unref (pixbuf);
     }
 
-  cairo_surface_destroy (cst);
-
   champlain_tile_set_content (tile, actor, TRUE);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 
+cleanup:
+  if (cst)
+    cairo_surface_destroy (cst);
   g_object_unref (map_source);
 
   return FALSE;
@@ -418,21 +423,32 @@ memphis_worker_thread (gpointer worker_data, gpointer user_data)
 {
   WorkerThreadData *data = (WorkerThreadData *)worker_data;
   ChamplainMapSource *map_source = data->map_source;
-  cairo_t *cr;
+  gboolean has_data = TRUE;
 
-  /* create a clutter-independant surface to draw on */
-  data->cst = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, data->size, data->size);
-  cr = cairo_create (data->cst);
-
-  DEBUG ("Draw Tile (%d, %d, %d)", data->x, data->y, data->z);
+  data->cst = NULL;
 
   g_static_rw_lock_reader_lock (&MemphisLock);
-  // FIXME - memphis needs to indicate if it cannot render the tile so we can
-  // load the tile from the next map source
-  memphis_renderer_draw_tile (GET_PRIVATE(map_source)->renderer, cr, data->x, data->y, data->z);
+  has_data = memphis_renderer_tile_has_data (GET_PRIVATE(map_source)->renderer, data->x, data->y, data->z);
   g_static_rw_lock_reader_unlock (&MemphisLock);
 
-  cairo_destroy (cr);
+  printf ("memphis_renderer_tile_has_data returns: %d\n", (int)has_data);
+
+  if (has_data)
+    {
+      cairo_t *cr;
+
+      /* create a clutter-independant surface to draw on */
+      data->cst = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, data->size, data->size);
+      cr = cairo_create (data->cst);
+
+      DEBUG ("Draw Tile (%d, %d, %d)", data->x, data->y, data->z);
+
+      g_static_rw_lock_reader_lock (&MemphisLock);
+      memphis_renderer_draw_tile (GET_PRIVATE(map_source)->renderer, cr, data->x, data->y, data->z);
+      g_static_rw_lock_reader_unlock (&MemphisLock);
+
+      cairo_destroy (cr);
+    }
 
   clutter_threads_add_idle_full (G_PRIORITY_DEFAULT, tile_loaded_cb, data, NULL);
 }
