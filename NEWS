@@ -1,3 +1,15 @@
+libchamplain 0.4.5 (2010-03-10)
+===============================
+
+Stable release
+GObject-introspection, Python (Victor Godoy Poluceno) and Perl
+(Emmanuel Rodriguez) bindings are in a working state.
+
+Fixes:
+* Fix missing lat/lon property notifications (Jonathon Jongsma)
+* Remove the need to explicitly set the size of actors (Rob Bradford)
+* Properly get rid of marker's previous image (Pierre-Luc Beaudoin)
+
 libchamplain 0.4.4 (2010-01-28)
 ===============================
 
