@@ -1057,7 +1057,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
            "View's state",
            "View's global state",
            CHAMPLAIN_TYPE_STATE,
-           CHAMPLAIN_STATE_INIT,
+           CHAMPLAIN_STATE_NONE,
            G_PARAM_READABLE));
 
   /**
@@ -1386,7 +1386,7 @@ champlain_view_init (ChamplainView *view)
   priv->anchor.x = 0;
   priv->anchor.y = 0;
   priv->anchor_zoom_level = 0;
-  priv->state = CHAMPLAIN_STATE_INIT;
+  priv->state = CHAMPLAIN_STATE_NONE;
   priv->latitude = 0.0f;
   priv->longitude = 0.0f;
   priv->goto_context = NULL;

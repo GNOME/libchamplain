@@ -289,7 +289,7 @@ champlain_tile_init (ChamplainTile *self)
 {
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
-  priv->state = CHAMPLAIN_STATE_INIT;
+  priv->state = CHAMPLAIN_STATE_NONE;
   priv->x = 0;
   priv->y = 0;
   priv->zoom_level = 0;

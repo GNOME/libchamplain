@@ -42,7 +42,6 @@ typedef struct _ChamplainMapSource ChamplainMapSource;
 typedef enum
 {
   CHAMPLAIN_STATE_NONE,
-  CHAMPLAIN_STATE_INIT,
   CHAMPLAIN_STATE_LOADING,
   CHAMPLAIN_STATE_DONE
 } ChamplainState;

@@ -171,7 +171,7 @@ champlain_map_data_source_class_init (ChamplainMapDataSourceClass *klass)
            "map data source's state",
            "The state of the map data source",
            CHAMPLAIN_TYPE_STATE,
-           CHAMPLAIN_STATE_INIT,
+           CHAMPLAIN_STATE_NONE,
            G_PARAM_READWRITE));
 }
 
@@ -186,7 +186,7 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
   priv->bounding_box->right = 0.0;
   priv->bounding_box->top = 0.0;
 
-  priv->state = CHAMPLAIN_STATE_INIT;
+  priv->state = CHAMPLAIN_STATE_NONE;
 }
 
 /**
