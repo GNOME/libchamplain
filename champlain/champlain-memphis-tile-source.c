@@ -427,11 +427,10 @@ memphis_worker_thread (gpointer worker_data, gpointer user_data)
 
   data->cst = NULL;
 
-  g_static_rw_lock_reader_lock (&MemphisLock);
-  has_data = memphis_renderer_tile_has_data (GET_PRIVATE(map_source)->renderer, data->x, data->y, data->z);
-  g_static_rw_lock_reader_unlock (&MemphisLock);
-
-  printf ("memphis_renderer_tile_has_data returns: %d\n", (int)has_data);
+// uncomment when libmemphis works correctly
+//  g_static_rw_lock_reader_lock (&MemphisLock);
+//  has_data = memphis_renderer_tile_has_data (GET_PRIVATE(map_source)->renderer, data->x, data->y, data->z);
+//  g_static_rw_lock_reader_unlock (&MemphisLock);
 
   if (has_data)
     {
