@@ -89,6 +89,12 @@ typedef struct
   ChamplainTile *tile;
 } TileLoadedCallbackData;
 
+typedef struct
+{
+  ChamplainMapSource *map_source;
+  SoupMessage *msg;
+} TileDestroyedCbData;
+
 static void fill_tile (ChamplainMapSource *map_source,
                        ChamplainTile *tile);
 
@@ -146,13 +152,17 @@ champlain_network_tile_source_set_property (GObject *object,
     }
 }
 
+
 static void
 champlain_network_tile_source_dispose (GObject *object)
 {
   ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(object);
 
   if (priv->soup_session)
+  {
     soup_session_abort (priv->soup_session);
+    priv->soup_session = NULL;
+  }
 
   G_OBJECT_CLASS (champlain_network_tile_source_parent_class)->dispose (object);
 }
@@ -486,6 +496,27 @@ get_tile_uri (ChamplainNetworkTileSource *source,
 }
 
 static void
+tile_destroyed_cb (ChamplainTile *tile, TileDestroyedCbData *data)
+{
+  if (data->map_source && data->msg)
+    {
+      DEBUG ("Canceling tile download");
+      ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(data->map_source);
+
+      soup_session_cancel_message (priv->soup_session, data->msg, SOUP_STATUS_CANCELLED);
+    }
+}
+
+static void
+destroy_cb_data (TileDestroyedCbData *data, GClosure *closure)
+{
+  if (data->map_source)
+    g_object_remove_weak_pointer(G_OBJECT (data->map_source), (gpointer*)&data->map_source);
+
+  g_free (data);
+}
+
+static void
 tile_loaded_cb (SoupSession *session,
                 SoupMessage *msg,
                 gpointer user_data)
@@ -664,6 +695,16 @@ fill_tile (ChamplainMapSource *map_source,
 
           g_free (date);
         }
+
+      TileDestroyedCbData *tile_destroyed_cb_data = g_new (TileDestroyedCbData, 1);
+      tile_destroyed_cb_data->map_source = map_source;
+      tile_destroyed_cb_data->msg = msg;
+
+      g_object_add_weak_pointer (G_OBJECT (msg), (gpointer*)&tile_destroyed_cb_data->msg);
+      g_object_add_weak_pointer (G_OBJECT (map_source), (gpointer*)&tile_destroyed_cb_data->map_source);
+
+      g_signal_connect_data (tile, "destroy", G_CALLBACK (tile_destroyed_cb),
+                             tile_destroyed_cb_data, (GClosureNotify) destroy_cb_data, 0);
 
       callback_data = g_new (TileLoadedCallbackData, 1);
       callback_data->tile = tile;
