@@ -2318,6 +2318,7 @@ view_load_visible_tiles (ChamplainView *view)
                                     "size", tile_size, NULL);
                       g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
                       clutter_container_add_actor (CLUTTER_CONTAINER (level), CLUTTER_ACTOR (tile));
+                      view_position_tile (view, tile);
 
                       champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
                       champlain_map_source_fill_tile (priv->map_source, tile);
@@ -2365,8 +2366,7 @@ view_tiles_reposition (ChamplainView* view)
     {
       ChamplainTile *tile = CHAMPLAIN_TILE (clutter_group_get_nth_child (CLUTTER_GROUP (priv->map_zoom_level), i));
 
-      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
-        view_position_tile (view, tile);
+      view_position_tile (view, tile);
     }
 }
 
@@ -2403,7 +2403,6 @@ tile_state_notify (GObject *gobject,
     GParamSpec *pspec,
     gpointer data)
 {
-  view_position_tile (CHAMPLAIN_VIEW (data), CHAMPLAIN_TILE (gobject));
   view_update_state (CHAMPLAIN_VIEW (data));
 }
 
