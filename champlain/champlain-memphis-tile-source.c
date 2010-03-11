@@ -487,8 +487,6 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
 
       g_object_ref (map_source);
 
-      champlain_tile_set_size (tile, data->size);
-
       g_thread_pool_push (priv->thpool, data, &error);
       if (error)
         {

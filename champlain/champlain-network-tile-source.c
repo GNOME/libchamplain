@@ -626,7 +626,6 @@ tile_loaded_cb (SoupSession *session,
     }
 
   champlain_tile_set_content (tile, actor, TRUE);
-  champlain_tile_set_size (tile, champlain_map_source_get_tile_size (map_source));
 
   goto finish;
 

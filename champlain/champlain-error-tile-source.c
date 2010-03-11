@@ -148,6 +148,5 @@ fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
   clone = clutter_clone_new (priv->error_actor);
 
   champlain_tile_set_content (tile, clone, TRUE);
-  champlain_tile_set_size (tile, size);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 }
