@@ -59,6 +59,7 @@ struct _ChamplainTilePrivate {
 
   ChamplainState state; /* The tile state: loading, validation, done */
   ClutterActor *content_actor; /* The actual tile actor */
+  gboolean fade_in;
 
   GTimeVal *modified_time; /* The last modified time of the cache */
   gchar* etag; /* The HTTP ETag sent by the server */
@@ -139,8 +140,6 @@ champlain_tile_dispose (GObject *object)
 {
   G_OBJECT_CLASS (champlain_tile_parent_class)->dispose (object);
 }
-
-
 
 static void
 champlain_tile_finalize (GObject *object)
@@ -296,6 +295,7 @@ champlain_tile_init (ChamplainTile *self)
   priv->size = 0;
   priv->modified_time = NULL;
   priv->etag = NULL;
+  priv->fade_in = FALSE;
 
   priv->content_actor = NULL;
 }
@@ -473,6 +473,15 @@ champlain_tile_set_size (ChamplainTile *self,
   g_object_notify (G_OBJECT (self), "size");
 }
 
+static void
+fade_in_completed (ClutterAnimation *animation, ChamplainTile *self)
+{
+  if (clutter_group_get_n_children (CLUTTER_GROUP (self)) > 1)
+    clutter_actor_destroy (clutter_group_get_nth_child (CLUTTER_GROUP (self), 0));
+
+  g_object_unref (self);
+}
+
 /**
  * champlain_tile_set_state:
  * @self: the #ChamplainTile
@@ -483,13 +492,41 @@ champlain_tile_set_size (ChamplainTile *self,
  * Since: 0.4
  */
 void
-champlain_tile_set_state (ChamplainTile *self,
-    ChamplainState state)
+champlain_tile_set_state (ChamplainTile *self, ChamplainState state)
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  GET_PRIVATE (self)->state = state;
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
+  if (state == priv->state)
+    return;
+
+  if (state == CHAMPLAIN_STATE_DONE && priv->content_actor &&
+      clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
+    {
+      if (!priv->fade_in)
+        clutter_group_remove_all (CLUTTER_GROUP (self));
+
+      clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->content_actor);
+
+      if (priv->fade_in)
+        {
+          ClutterAnimation *animation;
+
+          clutter_actor_set_opacity (priv->content_actor, 0);
+
+          animation = clutter_actor_animate (priv->content_actor,
+              CLUTTER_EASE_IN_CUBIC,
+              500,
+              "opacity", 255,
+              NULL);
+
+          g_object_ref (self);
+          g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), self);
+        }
+    }
+
+  priv->state = state;
   g_object_notify (G_OBJECT (self), "state");
 }
 
@@ -616,25 +653,6 @@ champlain_tile_set_etag (ChamplainTile *self,
   g_object_notify (G_OBJECT (self), "etag");
 }
 
-typedef struct {
-  ClutterActor *old_actor;
-} FadeInCompletedData;
-
-static void
-fade_in_completed (ClutterAnimation *animation,
-    FadeInCompletedData *data)
-{
-  ClutterActor *old_actor = data->old_actor;
-
-  if (old_actor)
-    {
-      g_object_remove_weak_pointer (G_OBJECT (old_actor), (gpointer*)&data->old_actor);
-      clutter_actor_destroy (old_actor);
-    }
-
-  g_free(data);
-}
-
 /**
  * champlain_tile_set_content:
  * @self: the #ChamplainTile
@@ -655,39 +673,11 @@ champlain_tile_set_content (ChamplainTile *self,
 
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
-  if (priv->content_actor)
-    {
-      /* it sometimes happen that the priv->content_actor has been destroyed,
-       * this assert will help determine when with no impact on the user */
-      g_assert (CLUTTER_IS_ACTOR (priv->content_actor));
+  priv->fade_in = fade_in;
 
-      if (!fade_in)
-        clutter_container_remove_actor (CLUTTER_CONTAINER (self), priv->content_actor);
-    }
-
-  clutter_container_add_actor (CLUTTER_CONTAINER (self), actor);
-
-  if (fade_in)
-    {
-      FadeInCompletedData *data;
-      ClutterAnimation *animation;
-
-      clutter_actor_set_opacity (actor, 0);
-
-      animation = clutter_actor_animate (actor,
-          CLUTTER_EASE_IN_CUBIC,
-          500,
-          "opacity", 255,
-          NULL);
-
-      data = g_new (FadeInCompletedData, 1);
-      data->old_actor = priv->content_actor;
-
-      if (data->old_actor)
-        g_object_add_weak_pointer (G_OBJECT (data->old_actor), (gpointer*)&data->old_actor);
-
-      g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), data);
-    }
+  if (priv->content_actor &&
+      clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
+    clutter_actor_destroy (priv->content_actor);
 
   priv->content_actor = actor;
 
