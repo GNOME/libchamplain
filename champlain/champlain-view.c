@@ -1708,11 +1708,12 @@ view_update_anchor (ChamplainView *view,
   if (priv->zoom_level >= 8)
     need_anchor = TRUE;
 
+  /* update anchor one viewport size before reaching the margin to be sure */
   if (priv->anchor_zoom_level != priv->zoom_level ||
-      x - priv->anchor.x + priv->viewport_size.width >= G_MAXINT16 ||
-      y - priv->anchor.y + priv->viewport_size.height >= G_MAXINT16 ||
-      x - priv->anchor.x + priv->viewport_size.width <= 0 ||
-      y - priv->anchor.y + priv->viewport_size.height <= 0 )
+      x - priv->anchor.x - priv->viewport_size.width / 2 >= G_MAXINT16 - 2 * priv->viewport_size.width ||
+      y - priv->anchor.y - priv->viewport_size.height / 2 >= G_MAXINT16 - 2 * priv->viewport_size.height ||
+      x - priv->anchor.x - priv->viewport_size.width / 2 <= 0 + priv->viewport_size.width ||
+      y - priv->anchor.y - priv->viewport_size.height / 2 <= 0 + priv->viewport_size.height )
     need_update = TRUE;
 
   if (need_anchor && need_update)
