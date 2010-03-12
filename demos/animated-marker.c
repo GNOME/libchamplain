@@ -92,11 +92,26 @@ create_marker ()
 
   clutter_timeline_start (timeline);
 
-  /* Sets marker position on the map */
-  champlain_base_marker_set_position (CHAMPLAIN_BASE_MARKER (marker),
-      45.528178, -73.563788);
-
   return marker;
+}
+
+double lat = 45.466;
+double lon = -73.75;
+
+typedef struct
+{
+  ChamplainView *view;
+  ChamplainBaseMarker *marker;
+} GpsCallbackData;
+
+static gboolean
+gps_callback (GpsCallbackData *data)
+{
+  lat += 0.005;
+  lon += 0.005;
+  champlain_view_center_on (data->view, lat, lon);
+  champlain_base_marker_set_position (data->marker, lat, lon);
+  return TRUE;
 }
 
 int
@@ -104,6 +119,7 @@ main (int argc, char *argv[])
 {
   ClutterActor* actor, *marker, *stage;
   ChamplainLayer *layer;
+  GpsCallbackData callback_data;
 
   g_thread_init (NULL);
   clutter_init (&argc, &argv);
@@ -126,9 +142,15 @@ main (int argc, char *argv[])
   clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
 
   /* Finish initialising the map view */
-  g_object_set (G_OBJECT (actor), "zoom-level", 5,
+  g_object_set (G_OBJECT (actor), "zoom-level", 12,
       "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC, NULL);
-  champlain_view_center_on (CHAMPLAIN_VIEW (actor), 45.466, -73.75);
+  champlain_view_center_on (CHAMPLAIN_VIEW (actor), lat, lon);
+
+  /* Create callback that updates the map periodically */
+  callback_data.view = CHAMPLAIN_VIEW (actor);
+  callback_data.marker = CHAMPLAIN_BASE_MARKER (marker);
+
+  g_timeout_add (1000, (GSourceFunc) gps_callback, &callback_data);
 
   clutter_actor_show (stage);
   clutter_main ();
