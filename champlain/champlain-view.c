@@ -1779,12 +1779,12 @@ champlain_view_center_on (ChamplainView *view,
 
   view_update_anchor (view, x, y);
 
-  x -= priv->anchor.x;
-  y -= priv->anchor.y;
+  priv->viewport_size.x = x - priv->anchor.x - priv->viewport_size.width / 2.0;
+  priv->viewport_size.y = y - priv->anchor.y - priv->viewport_size.height / 2.0;
 
   tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
-    x - priv->viewport_size.width / 2.0,
-    y - priv->viewport_size.height / 2.0,
+    priv->viewport_size.x,
+    priv->viewport_size.y,
     0);
 
   g_object_notify (G_OBJECT (view), "longitude");
