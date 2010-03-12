@@ -2224,11 +2224,11 @@ view_load_visible_tiles (ChamplainView *view)
   gint size;
   ChamplainZoomLevel *level;
 
-  viewport.x += priv->anchor.x;
-  viewport.y += priv->anchor.y;
-
   size = champlain_map_source_get_tile_size (priv->map_source);
   level = priv->map_zoom_level;
+
+  viewport.x += priv->anchor.x;
+  viewport.y += priv->anchor.y;
 
   if (viewport.x < 0)
     viewport.x = 0;
@@ -2241,15 +2241,15 @@ view_load_visible_tiles (ChamplainView *view)
   gint x_first = viewport.x / size;
   gint y_first = viewport.y / size;
 
-  x_count += x_first;
-  y_count += y_first;
+  gint x_last = x_first + x_count;
+  gint y_last = y_first + y_count;
 
-  if(x_count > champlain_zoom_level_get_width (level))
-    x_count = champlain_zoom_level_get_width (level);
-  if(y_count > champlain_zoom_level_get_height (level))
-    y_count = champlain_zoom_level_get_height (level);
+  if(x_last > champlain_zoom_level_get_width (level))
+    x_last = champlain_zoom_level_get_width (level);
+  if(y_last > champlain_zoom_level_get_height (level))
+    y_last = champlain_zoom_level_get_height (level);
 
-  DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_count, y_count);
+  DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_last, y_last);
 
   int i, j;
   guint k = 0;
@@ -2263,8 +2263,8 @@ view_load_visible_tiles (ChamplainView *view)
       gint tile_x = champlain_tile_get_x (tile);
       gint tile_y = champlain_tile_get_y (tile);
 
-      if (tile_x < x_first || tile_x > x_count ||
-          tile_y < y_first || tile_y > y_count)
+      if (tile_x < x_first || tile_x > x_last ||
+          tile_y < y_first || tile_y > y_last)
       {
         clutter_container_remove_actor (CLUTTER_CONTAINER (level), CLUTTER_ACTOR (tile));
         count--;
@@ -2274,62 +2274,57 @@ view_load_visible_tiles (ChamplainView *view)
     }
 
   //Load new tiles if needed
+  gint arm_size, arm_max, spiral_pos;
+  gint dirs[5] = {0, 1, 0, -1, 0};
+
+  i = x_first + x_count / 2 - 1;
+  j = y_first + y_count / 2 - 1;
+  arm_max = MAX(x_last - x_first, y_last - y_first) + 2;
+
+  for (arm_size = 1; arm_size < arm_max; arm_size += 2)
     {
-      // this all looks wrong because y_count/x_count are the max, not the width
-      gint arm_size, arm_max, spiral_pos;
-      gint dirs[5] = {0, 1, 0, -1, 0};
-
-      i = x_first + (x_count - x_first) / 2 - 1;
-      j = y_first + (y_count - y_first) / 2 - 1;
-      arm_max = MAX(x_count - x_first, y_count - y_first) + 2;
-
-      for (arm_size = 1; arm_size < arm_max; arm_size += 2)
+      for (spiral_pos = 0; spiral_pos < arm_size * 4; spiral_pos++)
         {
-          for (spiral_pos = 0; spiral_pos < arm_size * 4; spiral_pos++)
+          if (j >= y_first && j < y_last && i >= x_first && i < x_last)
             {
-              if (j >= y_first && j < y_count && i >= x_first && i < x_count)
+              gboolean exist = FALSE;
+
+              for (k = 0; k < clutter_group_get_n_children (CLUTTER_GROUP (level)); k++)
                 {
-                  gboolean exist = FALSE;
+                  ChamplainTile *tile = CHAMPLAIN_TILE (clutter_group_get_nth_child (CLUTTER_GROUP (level), k));
 
-                  for (k = 0; k < clutter_group_get_n_children (CLUTTER_GROUP (level)) && !exist; k++)
+                  gint tile_x = champlain_tile_get_x (tile);
+                  gint tile_y = champlain_tile_get_y (tile);
+
+                  if ( tile_x == i && tile_y == j)
                     {
-                      ChamplainTile *tile = CHAMPLAIN_TILE (clutter_group_get_nth_child (CLUTTER_GROUP (level), k));
-
-                      gint tile_x = champlain_tile_get_x (tile);
-                      gint tile_y = champlain_tile_get_y (tile);
-
-                      if ( tile_x == i && tile_y == j)
-                        {
-                          exist = TRUE;
-                          break;
-                        }
-                    }
-
-                  if(!exist)
-                    {
-                      ChamplainTile *tile;
-                      guint tile_size;
-
-                      DEBUG ("Loading tile %d, %d, %d", champlain_zoom_level_get_zoom_level (level), i, j);
-                      tile = champlain_tile_new ();
-                      tile_size = champlain_map_source_get_tile_size (priv->map_source);
-                      g_object_set (G_OBJECT (tile), "x", i, "y", j,
-                                    "zoom-level", champlain_zoom_level_get_zoom_level (level),
-                                    "size", tile_size, NULL);
-                      g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
-                      clutter_container_add_actor (CLUTTER_CONTAINER (level), CLUTTER_ACTOR (tile));
-                      view_position_tile (view, tile);
-
-                      champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
-                      champlain_map_source_fill_tile (priv->map_source, tile);
+                      exist = TRUE;
+                      break;
                     }
                 }
-              i += dirs[spiral_pos / arm_size + 1];
-              j += dirs[spiral_pos / arm_size];
+
+              if(!exist)
+                {
+                  ChamplainTile *tile;
+
+                  DEBUG ("Loading tile %d, %d, %d", champlain_zoom_level_get_zoom_level (level), i, j);
+                  tile = champlain_tile_new ();
+                  g_object_set (G_OBJECT (tile), "x", i, "y", j,
+                                "zoom-level", champlain_zoom_level_get_zoom_level (level),
+                                "size", size, NULL);
+                  g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
+                  clutter_container_add_actor (CLUTTER_CONTAINER (level), CLUTTER_ACTOR (tile));
+                  view_position_tile (view, tile);
+
+                  champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
+                  champlain_map_source_fill_tile (priv->map_source, tile);
+                }
             }
-          i--;
-          j--;
+          i += dirs[spiral_pos / arm_size + 1];
+          j += dirs[spiral_pos / arm_size];
         }
+      i--;
+      j--;
     }
   view_update_state (view);
 }
