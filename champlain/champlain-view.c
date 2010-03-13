@@ -2468,17 +2468,13 @@ champlain_view_set_map_source (ChamplainView *view,
 
   champlain_zoom_level_zoom_to (priv->map_zoom_level, priv->map_source, priv->zoom_level);
 
-  view_load_visible_tiles (view);
-
-  g_object_notify (G_OBJECT (view), "map-source");
-
   update_license (view);
-  g_idle_add (marker_reposition, view);
-  view_tiles_reposition (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
 
   g_signal_connect (priv->map_source, "reload-tiles",
     G_CALLBACK (view_reload_tiles_cb), view);
+
+  g_object_notify (G_OBJECT (view), "map-source");
 }
 
 /**
