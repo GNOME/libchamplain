@@ -2370,27 +2370,15 @@ view_reload_tiles_cb (ChamplainMapSource *map_source,
     ChamplainView* view)
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
-  gint i, tile_count;
 
-  // update current_level
-  tile_count = clutter_group_get_n_children (CLUTTER_GROUP (priv->map_zoom_level));
-
-  for (i = 0; i < tile_count; i++)
+  while (clutter_group_get_n_children (CLUTTER_GROUP (priv->map_zoom_level)) > 0)
     {
-      ChamplainTile *tile = CHAMPLAIN_TILE (clutter_group_get_nth_child (CLUTTER_GROUP (priv->map_zoom_level), i));
+      ChamplainTile *tile = CHAMPLAIN_TILE (clutter_group_get_nth_child (CLUTTER_GROUP (priv->map_zoom_level), 0));
 
-      DEBUG("Reload tile: %d, %d\n", champlain_tile_get_x (tile),
-          champlain_tile_get_y (tile));
-
-      // TODO - we should destroy the loading tiles (they may be loading
-      // with different parameters of the renderer) and load new tiles instead
-      if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADING)
-        {
-          champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
-          champlain_map_source_fill_tile (priv->map_source, tile);
-        }
+      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_zoom_level), CLUTTER_ACTOR (tile));
     }
-  view_update_state (view);
+
+  view_load_visible_tiles (view);
 }
 
 static void
