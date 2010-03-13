@@ -211,7 +211,6 @@ static void update_license (ChamplainView *view);
 static void update_scale (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
 static void view_position_tile (ChamplainView* view, ChamplainTile* tile);
-static void view_tiles_reposition (ChamplainView* view);
 static void view_reload_tiles_cb (ChamplainMapSource *map_source,
     ChamplainView* view);
 static void view_update_state (ChamplainView *view);
@@ -307,7 +306,6 @@ update_viewport (ChamplainView *view,
   priv->viewport_size.y = y;
 
   view_load_visible_tiles (view);
-  view_tiles_reposition (view);
   marker_reposition (view);
   update_scale (view);
 
@@ -1791,7 +1789,6 @@ champlain_view_center_on (ChamplainView *view,
   g_object_notify (G_OBJECT (view), "latitude");
 
   view_load_visible_tiles (view);
-  view_tiles_reposition (view);
   view_update_polygons (view);
   update_scale (view);
   marker_reposition (view);
@@ -2299,6 +2296,8 @@ view_load_visible_tiles (ChamplainView *view)
                   if ( tile_x == i && tile_y == j)
                     {
                       exist = TRUE;
+                      /* only update the tile's position */
+                      view_position_tile (view, tile);
                       break;
                     }
                 }
@@ -2349,20 +2348,6 @@ view_position_tile (ChamplainView* view,
   clutter_actor_set_position (actor,
     (x * size) - priv->anchor.x,
     (y * size) - priv->anchor.y);
-}
-
-static void
-view_tiles_reposition (ChamplainView* view)
-{
-  ChamplainViewPrivate *priv = GET_PRIVATE (view);
-  gint i;
-
-  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->map_zoom_level)); i++)
-    {
-      ChamplainTile *tile = CHAMPLAIN_TILE (clutter_group_get_nth_child (CLUTTER_GROUP (priv->map_zoom_level), i));
-
-      view_position_tile (view, tile);
-    }
 }
 
 static void
