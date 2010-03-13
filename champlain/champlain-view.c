@@ -2751,16 +2751,13 @@ champlain_view_ensure_visible (ChamplainView *view,
         zoom_level--;
 
       if (zoom_level <= priv->min_zoom_level)
-        break;
+        {
+          zoom_level = priv->min_zoom_level;
+          min_lat = min_lon = width = height = 0;
+          break;
+        }
     }
-  while (good_size == FALSE);
-
-  // JT question - what's the purpose of this? The condition is never satisfied...
-  if (good_size == FALSE)
-    {
-      zoom_level = priv->min_zoom_level;
-      min_lat = min_lon = width = height = 0;
-    }
+  while (!good_size);
 
   DEBUG ("Ideal zoom level is %d", zoom_level);
   champlain_view_set_zoom_level (view, zoom_level);
