@@ -1480,10 +1480,6 @@ viewport_pos_changed_cb (GObject *gobject,
   tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y,
       NULL);
 
-  if (x == priv->viewport_size.x &&
-      y == priv->viewport_size.y)
-      return;
-
   if (fabs (x - priv->viewport_size.x) < 100 &&
       fabs (y - priv->viewport_size.y) < 100)
       return;
