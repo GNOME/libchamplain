@@ -2193,6 +2193,7 @@ view_load_visible_tiles (ChamplainView *view)
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   ChamplainRectangle viewport = priv->viewport_size;
   gint size;
+  GList *children;
   ChamplainZoomLevel *level;
 
   size = champlain_map_source_get_tile_size (priv->map_source);
@@ -2226,23 +2227,20 @@ view_load_visible_tiles (ChamplainView *view)
   guint k = 0;
 
   // Get rid of old tiles first
-  int count = clutter_group_get_n_children (CLUTTER_GROUP (level));
-  while (k < count)
+  children = clutter_container_get_children (CLUTTER_CONTAINER (level));
+  for ( ; children != NULL; children = g_list_next (children))
     {
-      ChamplainTile *tile = CHAMPLAIN_TILE (clutter_group_get_nth_child (CLUTTER_GROUP (level), k));
+      ChamplainTile *tile = CHAMPLAIN_TILE (children->data);
 
       gint tile_x = champlain_tile_get_x (tile);
       gint tile_y = champlain_tile_get_y (tile);
 
       if (tile_x < x_first || tile_x > x_last ||
           tile_y < y_first || tile_y > y_last)
-      {
         clutter_container_remove_actor (CLUTTER_CONTAINER (level), CLUTTER_ACTOR (tile));
-        count--;
-      }
-      else
-        k++;
     }
+
+  g_list_free (children);
 
   //Load new tiles if needed
   gint arm_size, arm_max, spiral_pos;
