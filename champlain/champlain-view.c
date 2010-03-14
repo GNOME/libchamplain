@@ -1980,12 +1980,12 @@ champlain_view_set_zoom_level (ChamplainView *view,
   if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE(priv, zoom_level))
     return;
 
-  priv->zoom_level = zoom_level;
-
   champlain_view_stop_go_to (view);
 
   if (!champlain_zoom_level_zoom_to (priv->map_zoom_level, priv->map_source, zoom_level))
     return;
+
+  priv->zoom_level = zoom_level;
 
   DEBUG ("Zooming to %d", zoom_level);
 
