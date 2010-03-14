@@ -117,8 +117,7 @@ static void
 reorder_marker (ClutterGroup *layer,
     ChamplainBaseMarker *marker)
 {
-  GList* markers = clutter_container_get_children (CLUTTER_CONTAINER(layer));
-  GList* it;
+  guint i;
   gdouble y, tmp_y, low_y;
   ChamplainBaseMarker *lowest = NULL;
 
@@ -126,9 +125,9 @@ reorder_marker (ClutterGroup *layer,
   y = 90 - y;
   low_y = G_MAXDOUBLE;
 
-  for (it = markers; it != NULL; it = it->next)
+  for (i = 0; i < clutter_group_get_n_children (layer); i++)
     {
-      ChamplainBaseMarker *prev_marker = (ChamplainBaseMarker*) it->data;
+      ChamplainBaseMarker *prev_marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (layer, i));
 
       if (prev_marker == (ChamplainBaseMarker*) marker)
         continue;
@@ -146,8 +145,6 @@ reorder_marker (ClutterGroup *layer,
   if (lowest)
     clutter_container_lower_child (CLUTTER_CONTAINER(layer),
         CLUTTER_ACTOR (marker), CLUTTER_ACTOR (lowest));
-
-  g_list_free (markers);
 }
 
 static void
@@ -273,21 +270,18 @@ champlain_layer_hide (ChamplainLayer *layer)
 void
 champlain_layer_animate_in_all_markers (ChamplainLayer *layer)
 {
-  GList *children, *child;
+  guint i;
   guint delay = 0;
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
-
-  for (child = children; child != NULL; child = g_list_next (child))
+  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
-      champlain_base_marker_animate_in_with_delay (CHAMPLAIN_BASE_MARKER (child->data),
-          delay);
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+
+      champlain_base_marker_animate_in_with_delay (marker, delay);
       delay += 50;
     }
-
-  g_list_free (children);
 }
 
 /**
@@ -301,21 +295,18 @@ champlain_layer_animate_in_all_markers (ChamplainLayer *layer)
 void
 champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
 {
-  GList *children, *child;
+  guint i;
   guint delay = 0;
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
-
-  for (child = children; child != NULL; child = g_list_next (child))
+  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
-      champlain_base_marker_animate_out_with_delay (CHAMPLAIN_BASE_MARKER (child->data),
-          delay);
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+
+      champlain_base_marker_animate_out_with_delay (marker, delay);
       delay += 50;
     }
-
-  g_list_free (children);
 }
 
 /**
@@ -329,18 +320,16 @@ champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
 void
 champlain_layer_show_all_markers (ChamplainLayer *layer)
 {
-  GList *children, *child;
+  guint i;
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
-
-  for (child = children; child != NULL; child = g_list_next (child))
+  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
-      clutter_actor_show (CLUTTER_ACTOR (child->data));
-    }
+      ClutterActor *marker = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
 
-  g_list_free (children);
+      clutter_actor_show (marker);
+    }
 }
 
 /**
@@ -354,16 +343,14 @@ champlain_layer_show_all_markers (ChamplainLayer *layer)
 void
 champlain_layer_hide_all_markers (ChamplainLayer *layer)
 {
-  GList *children, *child;
+  guint i;
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  children = clutter_container_get_children (CLUTTER_CONTAINER (layer));
-
-  for (child = children; child != NULL; child = g_list_next (child))
+  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
-      clutter_actor_hide (CLUTTER_ACTOR (child->data));
-    }
+      ClutterActor *marker = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
 
-  g_list_free (children);
+      clutter_actor_hide (marker);
+    }
 }

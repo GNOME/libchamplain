@@ -1145,25 +1145,23 @@ button_release_cb (ClutterActor *actor,
     ClutterEvent *event,
     ChamplainView *view)
 {
-  GList *children = NULL;
+  guint i;
   gboolean found = FALSE;
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
   if (clutter_event_get_button (event) != 1)
     return FALSE;
 
-  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->user_layers));
-  for (;children != NULL; children = g_list_next (children))
+  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->user_layers)); i++)
     {
-      if (CHAMPLAIN_IS_SELECTION_LAYER (children->data) &&
-          champlain_selection_layer_count_selected_markers (CHAMPLAIN_SELECTION_LAYER (children->data)) > 0)
+      ChamplainSelectionLayer *layer = CHAMPLAIN_SELECTION_LAYER (clutter_group_get_nth_child (CLUTTER_GROUP (priv->user_layers), i));
+
+      if (layer && champlain_selection_layer_count_selected_markers (layer ) > 0)
         {
-          champlain_selection_layer_unselect_all (CHAMPLAIN_SELECTION_LAYER (children->data));
+          champlain_selection_layer_unselect_all (layer);
           found = TRUE;
         }
     }
-
-  g_list_free (children);
 
   return found;
 }
