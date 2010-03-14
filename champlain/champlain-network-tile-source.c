@@ -44,7 +44,6 @@
 #include "champlain-map-source.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
-#include "champlain-zoom-level.h"
 
 #include <errno.h>
 #include <gdk/gdk.h>

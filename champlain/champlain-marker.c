@@ -42,7 +42,6 @@
 #include "champlain-marshal.h"
 #include "champlain-private.h"
 #include "champlain-tile.h"
-#include "champlain-zoom-level.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>

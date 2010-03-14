@@ -28,7 +28,6 @@
 #include <champlain/champlain-layer.h>
 #include <champlain/champlain-polygon.h>
 #include <champlain/champlain-map-source.h>
-#include <champlain/champlain-zoom-level.h>
 
 #include <glib.h>
 #include <glib-object.h>

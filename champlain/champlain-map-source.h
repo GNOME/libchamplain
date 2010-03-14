@@ -25,7 +25,6 @@
 
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-tile.h>
-#include <champlain/champlain-zoom-level.h>
 
 G_BEGIN_DECLS
 

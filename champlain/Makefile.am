@@ -51,7 +51,6 @@ libchamplain_0_5_la_SOURCES = \
 	champlain-selection-layer.c 	\
 	champlain-base-marker.c 	\
 	champlain-marker.c 		\
-	champlain-zoom-level.c 		\
 	champlain-tile.c		\
 	champlain-map-source.c		\
 	champlain-map-source-chain.c	\
@@ -92,7 +91,6 @@ libchamplain_include_HEADERS = \
 	champlain-map-source-factory.h	\
 	champlain-map-source-desc.h	\
 	champlain-tile.h		\
-	champlain-zoom-level.h		\
 	champlain-base-marker.h		\
 	champlain-marker.h		\
 	champlain-polygon.h		\

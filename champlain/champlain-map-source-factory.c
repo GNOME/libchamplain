@@ -45,7 +45,6 @@
 #include "champlain-map-source.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
-#include "champlain-zoom-level.h"
 #include "champlain-network-tile-source.h"
 #include "champlain-map-source-chain.h"
 #include "champlain-error-tile-source.h"
