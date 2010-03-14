@@ -1555,23 +1555,15 @@ scroll_to (ChamplainView *view,
     gint y)
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  gfloat lat, lon;
+
+  lat = champlain_map_source_get_latitude (priv->map_source, priv->zoom_level, y);
+  lon = champlain_map_source_get_longitude (priv->map_source, priv->zoom_level, x);
 
   if (priv->scroll_mode == CHAMPLAIN_SCROLL_MODE_KINETIC)
-    {
-      gfloat lat, lon;
-
-      lat = champlain_map_source_get_latitude (priv->map_source, priv->zoom_level, y);
-      lon = champlain_map_source_get_longitude (priv->map_source, priv->zoom_level, x);
-
-      champlain_view_go_to_with_duration (view, lat, lon, 300);
-    }
+    champlain_view_go_to_with_duration (view, lat, lon, 300);
   else if (priv->scroll_mode == CHAMPLAIN_SCROLL_MODE_PUSH)
-    {
-      tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
-        x - priv->viewport_size.width / 2.0,
-        y - priv->viewport_size.height / 2.0,
-        0);
-    }
+    champlain_view_center_on (view, lat, lon);
 }
 
 /* These functions should be exposed in the next API break */
