@@ -559,7 +559,7 @@ champlain_map_source_get_row_count (ChamplainMapSource *map_source,
 
   //ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
-  return pow (2, zoom_level);
+  return (zoom_level != 0) ? 2 << (zoom_level - 1) : 1;
 }
 
 /**
@@ -582,7 +582,7 @@ champlain_map_source_get_column_count (ChamplainMapSource *map_source,
 
   //ChamplainMapSourcePrivate *priv = map_source->priv;
   // FIXME: support other projections
-  return pow (2, zoom_level);
+  return (zoom_level != 0) ? 2 << (zoom_level - 1) : 1;
 }
 
 #define EARTH_RADIUS 6378137.0 /* meters, Equatorial radius */
