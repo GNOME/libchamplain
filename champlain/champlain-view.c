@@ -176,6 +176,7 @@ struct _ChamplainViewPrivate
   /* Lines and shapes */
   ClutterActor *polygon_layer;  /* Contains the polygons */
 
+  GTimeVal last_update_time;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -1377,6 +1378,10 @@ champlain_view_init (ChamplainView *view)
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
   priv->max_scale_width = 100;
 
+  /* make sure the last update time is in the past */
+  g_get_current_time (&priv->last_update_time);
+  g_time_val_add (&priv->last_update_time, -1000 * 1000);
+
   /* Setup map layer */
   priv->map_layer = g_object_ref (clutter_group_new ());
   clutter_actor_show (priv->map_layer);
@@ -1459,15 +1464,32 @@ viewport_pos_changed_cb (GObject *gobject,
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
   gfloat x, y;
+  GTimeVal now, next_update_time;
+  gboolean skip_update;
 
   tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y,
       NULL);
 
-  if (fabs (x - priv->viewport_size.x) < 100 &&
-      fabs (y - priv->viewport_size.y) < 100)
-      return;
+  skip_update = fabs (x - priv->viewport_size.x) < 100 &&
+                fabs (y - priv->viewport_size.y) < 100;
 
-  update_viewport (view, x, y);
+  if (skip_update)
+    {
+      g_get_current_time (&now);
+      next_update_time = priv->last_update_time;
+      g_time_val_add (&next_update_time, 250 * 1000); // Refresh at least 4-times a second
+
+      skip_update =  next_update_time.tv_sec > now.tv_sec ||
+                     (next_update_time.tv_sec == now.tv_sec &&
+                      next_update_time.tv_usec > now.tv_usec);
+    }
+
+  if (!skip_update)
+    {
+      g_get_current_time (&priv->last_update_time);
+
+      update_viewport (view, x, y);
+    }
 }
 
 /**
