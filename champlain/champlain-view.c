@@ -176,7 +176,8 @@ struct _ChamplainViewPrivate
   /* Lines and shapes */
   ClutterActor *polygon_layer;  /* Contains the polygons */
 
-  GTimeVal last_update_time;
+  guint update_cb_id;
+  gboolean perform_update;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -231,6 +232,7 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble latitude,
     gdouble longitude,
     guint duration);
+static gboolean perform_update_cb (ChamplainView *view);
 
 #define SCALE_HEIGHT  20
 #define SCALE_PADDING 10
@@ -649,6 +651,8 @@ champlain_view_dispose (GObject *object)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  g_source_remove (priv->update_cb_id);
 
   if (priv->factory != NULL)
     {
@@ -1377,10 +1381,7 @@ champlain_view_init (ChamplainView *view)
   priv->show_scale = FALSE;
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
   priv->max_scale_width = 100;
-
-  /* make sure the last update time is in the past */
-  g_get_current_time (&priv->last_update_time);
-  g_time_val_add (&priv->last_update_time, -1000 * 1000);
+  priv->perform_update = TRUE;
 
   /* Setup map layer */
   priv->map_layer = g_object_ref (clutter_group_new ());
@@ -1449,11 +1450,22 @@ champlain_view_init (ChamplainView *view)
   /* Setup license */
   create_license (view);
 
+  priv->update_cb_id = g_timeout_add (250, (GSourceFunc) perform_update_cb, view);
+
   priv->state = CHAMPLAIN_STATE_DONE;
   g_object_notify (G_OBJECT (view), "state");
 
   g_signal_connect (priv->map_source, "reload-tiles",
     G_CALLBACK (view_reload_tiles_cb), view);
+}
+
+static gboolean
+perform_update_cb (ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+
+  priv->perform_update = TRUE;
+  return TRUE;
 }
 
 static void
@@ -1464,29 +1476,15 @@ viewport_pos_changed_cb (GObject *gobject,
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
   gfloat x, y;
-  GTimeVal now, next_update_time;
-  gboolean skip_update;
 
   tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y,
       NULL);
 
-  skip_update = fabs (x - priv->viewport_size.x) < 100 &&
-                fabs (y - priv->viewport_size.y) < 100;
-
-  if (skip_update)
+  if (fabs (x - priv->viewport_size.x) > 100 ||
+      fabs (y - priv->viewport_size.y) > 100 ||
+      priv->perform_update)
     {
-      g_get_current_time (&now);
-      next_update_time = priv->last_update_time;
-      g_time_val_add (&next_update_time, 250 * 1000); // Refresh at least 4-times a second
-
-      skip_update =  next_update_time.tv_sec > now.tv_sec ||
-                     (next_update_time.tv_sec == now.tv_sec &&
-                      next_update_time.tv_usec > now.tv_usec);
-    }
-
-  if (!skip_update)
-    {
-      g_get_current_time (&priv->last_update_time);
+      priv->perform_update = FALSE;
 
       update_viewport (view, x, y);
     }
