@@ -2249,8 +2249,8 @@ view_load_visible_tiles (ChamplainView *view)
   gint arm_size, arm_max, spiral_pos;
   gint dirs[5] = {0, 1, 0, -1, 0};
 
-  i = x_first + x_count / 2 - 1;
-  j = y_first + y_count / 2 - 1;
+  i = x_first + (x_last - x_first) / 2 - 1;
+  j = y_first + (y_last - y_first) / 2 - 1;
   arm_max = MAX(x_last - x_first, y_last - y_first) + 2;
 
   for (arm_size = 1; arm_size < arm_max; arm_size += 2)
