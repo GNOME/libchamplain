@@ -1967,6 +1967,8 @@ champlain_view_set_zoom_level (ChamplainView *view,
 
   priv->zoom_level = zoom_level;
 
+  clutter_group_remove_all (CLUTTER_GROUP (priv->map_layer));
+
   DEBUG ("Zooming to %d", zoom_level);
 
   resize_viewport (view);
@@ -2412,6 +2414,8 @@ champlain_view_set_map_source (ChamplainView *view,
       g_object_notify (G_OBJECT (view), "zoom-level");
     }
 
+  clutter_group_remove_all (CLUTTER_GROUP (priv->map_layer));
+
   update_license (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
 
@@ -2792,6 +2796,8 @@ view_set_zoom_level_at (ChamplainView *view,
   y_diff = priv->viewport_size.height / 2 - rel_y;
 
   priv->zoom_level = zoom_level;
+
+  clutter_group_remove_all (CLUTTER_GROUP (priv->map_layer));
 
   /* Get the new x,y in the new zoom level */
   x2 = champlain_map_source_get_x (priv->map_source, priv->zoom_level, lon);
