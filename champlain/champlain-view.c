@@ -2233,7 +2233,8 @@ view_load_visible_tiles (ChamplainView *view)
   DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_end, y_end);
 
   int i, j;
-  guint k = 0;
+
+  gboolean *tile_map = g_new0 (gboolean, x_count * y_count);
 
   // Get rid of old tiles first
   children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
@@ -2247,6 +2248,8 @@ view_load_visible_tiles (ChamplainView *view)
       if (tile_x < x_first || tile_x >= x_end ||
           tile_y < y_first || tile_y >= y_end)
         clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
+      else
+        tile_map[(tile_y - y_first) * x_count + (tile_x - x_first)] = TRUE;
     }
 
   g_list_free (children);
@@ -2265,27 +2268,11 @@ view_load_visible_tiles (ChamplainView *view)
         {
           if (j >= y_first && j < y_end && i >= x_first && i < x_end)
             {
-              gboolean exist = FALSE;
-
-              for (k = 0; k < clutter_group_get_n_children (CLUTTER_GROUP (priv->map_layer)); k++)
-                {
-                  ChamplainTile *tile = CHAMPLAIN_TILE (clutter_group_get_nth_child (CLUTTER_GROUP (priv->map_layer), k));
-
-                  gint tile_x = champlain_tile_get_x (tile);
-                  gint tile_y = champlain_tile_get_y (tile);
-
-                  if ( tile_x == i && tile_y == j)
-                    {
-                      exist = TRUE;
-                      /* only update the tile's position */
-                      view_position_tile (view, tile);
-                      break;
-                    }
-                }
-
-              if(!exist)
+              if (!tile_map[(j - y_first) * x_count + (i - x_first)])
                 {
                   ChamplainTile *tile;
+
+                  tile_map[(j - y_first) * x_count + (i - x_first)] = TRUE;
 
                   DEBUG ("Loading tile %d, %d, %d", priv->zoom_level, i, j);
                   tile = champlain_tile_new ();
@@ -2306,6 +2293,9 @@ view_load_visible_tiles (ChamplainView *view)
       i--;
       j--;
     }
+
+  g_free (tile_map);
+
   view_update_state (view);
 }
 
