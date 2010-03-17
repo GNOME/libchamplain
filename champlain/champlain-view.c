@@ -2327,12 +2327,7 @@ view_reload_tiles_cb (ChamplainMapSource *map_source,
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
 
-  while (clutter_group_get_n_children (CLUTTER_GROUP (priv->map_layer)) > 0)
-    {
-      ChamplainTile *tile = CHAMPLAIN_TILE (clutter_group_get_nth_child (CLUTTER_GROUP (priv->map_layer), 0));
-
-      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
-    }
+  clutter_group_remove_all (CLUTTER_GROUP (priv->map_layer));
 
   view_load_visible_tiles (view);
 }
