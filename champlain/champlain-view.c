@@ -2213,18 +2213,24 @@ view_load_visible_tiles (ChamplainView *view)
   gint x_first = viewport.x / size;
   gint y_first = viewport.y / size;
 
-  gint x_last = x_first + x_count;
-  gint y_last = y_first + y_count;
+  gint x_end = x_first + x_count;
+  gint y_end = y_first + y_count;
 
-  gint max_x_last = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
-  gint max_y_last = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+  gint max_x_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
+  gint max_y_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
 
-  if (x_last > max_x_last)
-    x_last = max_x_last;
-  if (y_last > max_y_last)
-    y_last = max_y_last;
+  if (x_end > max_x_end)
+    {
+      x_end = max_x_end;
+      x_count = x_end - x_first;
+    }
+  if (y_end > max_y_end)
+    {
+      y_end = max_y_end;
+      y_count = y_end - y_first;
+    }
 
-  DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_last, y_last);
+  DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_end, y_end);
 
   int i, j;
   guint k = 0;
@@ -2238,8 +2244,8 @@ view_load_visible_tiles (ChamplainView *view)
       gint tile_x = champlain_tile_get_x (tile);
       gint tile_y = champlain_tile_get_y (tile);
 
-      if (tile_x < x_first || tile_x > x_last ||
-          tile_y < y_first || tile_y > y_last)
+      if (tile_x < x_first || tile_x >= x_end ||
+          tile_y < y_first || tile_y >= y_end)
         clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
     }
 
@@ -2249,15 +2255,15 @@ view_load_visible_tiles (ChamplainView *view)
   gint arm_size, arm_max, spiral_pos;
   gint dirs[5] = {0, 1, 0, -1, 0};
 
-  i = x_first + (x_last - x_first) / 2 - 1;
-  j = y_first + (y_last - y_first) / 2 - 1;
-  arm_max = MAX(x_last - x_first, y_last - y_first) + 2;
+  i = x_first + x_count / 2 - 1;
+  j = y_first + y_count / 2 - 1;
+  arm_max = MAX(x_count, y_count) + 2;
 
   for (arm_size = 1; arm_size < arm_max; arm_size += 2)
     {
       for (spiral_pos = 0; spiral_pos < arm_size * 4; spiral_pos++)
         {
-          if (j >= y_first && j < y_last && i >= x_first && i < x_last)
+          if (j >= y_first && j < y_end && i >= x_first && i < x_end)
             {
               gboolean exist = FALSE;
 
