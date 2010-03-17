@@ -124,6 +124,11 @@ typedef struct {
   ChamplainPolygon *polygon;
 } PolygonRedrawContext;
 
+typedef struct {
+  ChamplainTile *tile;
+  ChamplainMapSource *map_source;
+} FillTileCallbackData;
+
 struct _ChamplainViewPrivate
 {
   ClutterActor *stage;
@@ -233,6 +238,7 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble longitude,
     guint duration);
 static gboolean perform_update_cb (ChamplainView *view);
+static gboolean fill_tile_cb (FillTileCallbackData *data);
 
 #define SCALE_HEIGHT  20
 #define SCALE_PADDING 10
@@ -2286,6 +2292,7 @@ view_load_visible_tiles (ChamplainView *view)
               if (!tile_map[(j - y_first) * x_count + (i - x_first)])
                 {
                   ChamplainTile *tile;
+                  FillTileCallbackData *data;
 
                   tile_map[(j - y_first) * x_count + (i - x_first)] = TRUE;
 
@@ -2299,7 +2306,16 @@ view_load_visible_tiles (ChamplainView *view)
                   view_position_tile (view, tile);
 
                   champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
-                  champlain_map_source_fill_tile (priv->map_source, tile);
+
+                  data = g_new (FillTileCallbackData, 1);
+                  data->tile = tile;
+                  data->map_source = priv->map_source;
+
+                  g_object_add_weak_pointer (G_OBJECT (tile), (gpointer*)&data->tile);
+                  g_object_ref (priv->map_source);
+
+                  /* set priority high, otherwise tiles will be loaded after panning is done */
+                  g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) fill_tile_cb, data, NULL);
                 }
             }
           i += dirs[spiral_pos / arm_size + 1];
@@ -2312,6 +2328,24 @@ view_load_visible_tiles (ChamplainView *view)
   g_free (tile_map);
 
   view_update_state (view);
+}
+
+static gboolean
+fill_tile_cb (FillTileCallbackData *data)
+{
+  ChamplainTile *tile = data->tile;
+  ChamplainMapSource *map_source = data->map_source;
+
+  if (data->tile)
+    {
+      g_object_remove_weak_pointer (G_OBJECT (data->tile), (gpointer*)&data->tile);
+      champlain_map_source_fill_tile (map_source, tile);
+    }
+
+  g_free (data);
+  g_object_unref (map_source);
+
+  return FALSE;
 }
 
 static void
