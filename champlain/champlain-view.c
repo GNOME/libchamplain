@@ -2268,7 +2268,10 @@ view_load_visible_tiles (ChamplainView *view)
           zoom_level != priv->zoom_level)
         clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
       else
-        tile_map[(tile_y - y_first) * x_count + (tile_x - x_first)] = TRUE;
+        {
+          tile_map[(tile_y - y_first) * x_count + (tile_x - x_first)] = TRUE;
+          view_position_tile (view, tile);
+        }
     }
 
   g_list_free (children);
