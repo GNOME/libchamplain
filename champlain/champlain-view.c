@@ -485,6 +485,13 @@ resize_viewport (ChamplainView *view)
       lower = 0;
       upper = G_MAXINT16;
     }
+
+  /* block emmision of signal by priv->viewport with viewport_pos_changed_cb()
+     callback - the signal can be emitted by updating TidyAdjustment, but
+     calling the callback now would be a disaster since we don't have updated
+     anchor yet*/
+  g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
+
   g_object_set (hadjust, "lower", lower, "upper", upper,
       "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
 
@@ -502,6 +509,9 @@ resize_viewport (ChamplainView *view)
     }
   g_object_set (vadjust, "lower", lower, "upper", upper,
       "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
+
+  /* no more updates of TidyAdjustment, we can unblock the signal again */
+  g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 
   /* Resize polygon actors */
   if (priv->viewport_size.width == 0 ||
@@ -732,16 +742,10 @@ static gboolean
 _update_idle_cb (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
-  gdouble lat, lon;
 
   clutter_actor_set_size (priv->finger_scroll,
                           priv->viewport_size.width,
                           priv->viewport_size.height);
-
-  /* Need to save latitude and longitude since they get changed by
-   * resize_viewport */
-  lat = priv->latitude;
-  lon = priv->longitude;
 
   resize_viewport (view);
 
@@ -753,7 +757,7 @@ _update_idle_cb (ChamplainView *view)
       priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING);
 
   if (priv->keep_center_on_resize)
-    champlain_view_center_on (view, lat, lon);
+    champlain_view_center_on (view, priv->latitude, priv->longitude);
   else
     view_load_visible_tiles (view);
 
@@ -1971,8 +1975,6 @@ champlain_view_set_zoom_level (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
-  gdouble longitude;
-  gdouble latitude;
 
   if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE(priv, zoom_level))
     return;
@@ -1983,16 +1985,9 @@ champlain_view_set_zoom_level (ChamplainView *view,
 
   DEBUG ("Zooming to %d", zoom_level);
 
-  /* Fix to bug 575133: keep the lat,lon as it gets set to a wrong value
-   * when resizing the viewport, when passing from zoom_level 7 to 6
-   * (or more precisely when anchor is set to 0).
-   */
-  longitude = priv->longitude;
-  latitude = priv->latitude;
-
   resize_viewport (view);
 
-  champlain_view_center_on (view, latitude, longitude);
+  champlain_view_center_on (view, priv->latitude, priv->longitude);
 
   g_object_notify (G_OBJECT (view), "zoom-level");
 }
