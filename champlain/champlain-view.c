@@ -2251,8 +2251,6 @@ view_load_visible_tiles (ChamplainView *view)
 
   DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_end, y_end);
 
-  int i, j;
-
   gboolean *tile_map = g_new0 (gboolean, x_count * y_count);
 
   // Get rid of old tiles first
@@ -2276,53 +2274,55 @@ view_load_visible_tiles (ChamplainView *view)
   g_list_free (children);
 
   //Load new tiles if needed
-  gint arm_size, arm_max, spiral_pos;
+  gint arm_size, arm_max, turn;
   gint dirs[5] = {0, 1, 0, -1, 0};
+  int i, x, y;
 
-  i = x_first + x_count / 2 - 1;
-  j = y_first + y_count / 2 - 1;
+  x = x_first + x_count / 2 - 1;
+  y = y_first + y_count / 2 - 1;
   arm_max = MAX(x_count, y_count) + 2;
+  arm_size = 1;
 
-  for (arm_size = 1; arm_size < arm_max; arm_size += 2)
+  for (turn = 0; arm_size < arm_max; turn++)
     {
-      for (spiral_pos = 0; spiral_pos < arm_size * 4; spiral_pos++)
+      for (i = 0; i < arm_size; i++)
         {
-          if (j >= y_first && j < y_end && i >= x_first && i < x_end)
+          if (y >= y_first && y < y_end && x >= x_first && x < x_end &&
+              !tile_map[(y - y_first) * x_count + (x - x_first)])
             {
-              if (!tile_map[(j - y_first) * x_count + (i - x_first)])
-                {
-                  ChamplainTile *tile;
-                  FillTileCallbackData *data;
+              ChamplainTile *tile;
+              FillTileCallbackData *data;
 
-                  tile_map[(j - y_first) * x_count + (i - x_first)] = TRUE;
+              tile_map[(y - y_first) * x_count + (x - x_first)] = TRUE;
 
-                  DEBUG ("Loading tile %d, %d, %d", priv->zoom_level, i, j);
-                  tile = champlain_tile_new ();
-                  g_object_set (G_OBJECT (tile), "x", i, "y", j,
-                                "zoom-level", priv->zoom_level,
-                                "size", size, NULL);
-                  g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
-                  clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
-                  view_position_tile (view, tile);
+              DEBUG ("Loading tile %d, %d, %d", priv->zoom_level, x, y);
+              tile = champlain_tile_new ();
+              g_object_set (G_OBJECT (tile), "x", x, "y", y,
+                            "zoom-level", priv->zoom_level,
+                            "size", size, NULL);
+              g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
+              clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
+              view_position_tile (view, tile);
 
-                  champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
+              champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
 
-                  data = g_new (FillTileCallbackData, 1);
-                  data->tile = tile;
-                  data->map_source = priv->map_source;
+              data = g_new (FillTileCallbackData, 1);
+              data->tile = tile;
+              data->map_source = priv->map_source;
 
-                  g_object_add_weak_pointer (G_OBJECT (tile), (gpointer*)&data->tile);
-                  g_object_ref (priv->map_source);
+              g_object_add_weak_pointer (G_OBJECT (tile), (gpointer*)&data->tile);
+              g_object_ref (priv->map_source);
 
-                  /* set priority high, otherwise tiles will be loaded after panning is done */
-                  g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) fill_tile_cb, data, NULL);
-                }
+              /* set priority high, otherwise tiles will be loaded after panning is done */
+              g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) fill_tile_cb, data, NULL);
             }
-          i += dirs[spiral_pos / arm_size + 1];
-          j += dirs[spiral_pos / arm_size];
+
+          x += dirs[turn % 4 + 1];
+          y += dirs[turn % 4];
         }
-      i--;
-      j--;
+
+      if (turn % 2 == 1)
+        arm_size++;
     }
 
   g_free (tile_map);
