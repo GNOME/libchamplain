@@ -3127,13 +3127,9 @@ champlain_view_add_polygon (ChamplainView *view,
   g_signal_connect (polygon, "notify",
       G_CALLBACK (notify_polygon_cb), view);
 
-// JT question: what was the code below good for? It definitely leaks memory...
-/*  if (view->priv->viewport_size.width == 0 ||
-      view->priv->viewport_size.height == 0)
-  {
-    polygon->priv->actor = NULL;
+  if (priv->viewport_size.width == 0 ||
+      priv->viewport_size.height == 0)
     return;
-  }*/
 
   clutter_actor_set_position (CLUTTER_ACTOR (polygon), 0, 0);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->polygon_layer),
