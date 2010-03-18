@@ -2296,8 +2296,6 @@ view_load_visible_tiles (ChamplainView *view)
               ChamplainTile *tile;
               FillTileCallbackData *data;
 
-              tile_map[(y - y_first) * x_count + (x - x_first)] = TRUE;
-
               DEBUG ("Loading tile %d, %d, %d", priv->zoom_level, x, y);
               tile = champlain_tile_new ();
               g_object_set (G_OBJECT (tile), "x", x, "y", y,
