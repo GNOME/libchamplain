@@ -306,9 +306,12 @@ update_viewport (ChamplainView *view,
       diff.y = priv->anchor.y - old_anchor.y;
 
       DEBUG("Relocating the viewport by %f, %f", diff.x, diff.y);
+
+      g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
       tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
           x - diff.x, y - diff.y, 0);
-      return;
+      g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
+ //     return;
     }
 
   priv->viewport_size.x = x;
@@ -1781,10 +1784,12 @@ champlain_view_center_on (ChamplainView *view,
   priv->viewport_size.x = x - priv->anchor.x - priv->viewport_size.width / 2.0;
   priv->viewport_size.y = y - priv->anchor.y - priv->viewport_size.height / 2.0;
 
+  g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
   tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
     priv->viewport_size.x,
     priv->viewport_size.y,
     0);
+  g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 
   g_object_notify (G_OBJECT (view), "longitude");
   g_object_notify (G_OBJECT (view), "latitude");
