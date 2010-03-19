@@ -407,7 +407,7 @@ tile_loaded_cb (gpointer worker_data)
       g_object_unref (pixbuf);
     }
 
-  champlain_tile_set_content (tile, actor, TRUE);
+  champlain_tile_set_content (tile, actor);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 
 cleanup:

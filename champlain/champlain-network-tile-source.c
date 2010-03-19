@@ -624,7 +624,8 @@ tile_loaded_cb (SoupSession *session,
       goto load_next_cleanup;
     }
 
-  champlain_tile_set_content (tile, actor, TRUE);
+  champlain_tile_set_fade_in (tile, TRUE);
+  champlain_tile_set_content (tile, actor);
 
   goto finish;
 

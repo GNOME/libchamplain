@@ -599,7 +599,7 @@ tile_loaded_cb (ClutterTexture *texture,
       goto load_next;
     }
 
-  champlain_tile_set_content (tile, actor, FALSE);
+  champlain_tile_set_content (tile, actor);
 
   /* Retrieve modification time */
   file = g_file_new_for_path (filename);

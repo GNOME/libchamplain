@@ -48,7 +48,8 @@ enum
   PROP_SIZE,
   PROP_STATE,
   PROP_CONTENT,
-  PROP_ETAG
+  PROP_ETAG,
+  PROP_FADE_IN
 };
 
 struct _ChamplainTilePrivate {
@@ -95,6 +96,9 @@ champlain_tile_get_property (GObject *object,
       case PROP_ETAG:
         g_value_set_string (value, champlain_tile_get_etag (self));
         break;
+      case PROP_FADE_IN:
+        g_value_set_boolean (value, champlain_tile_get_fade_in (self));
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -125,10 +129,13 @@ champlain_tile_set_property (GObject *object,
         champlain_tile_set_state (self, g_value_get_enum (value));
         break;
       case PROP_CONTENT:
-        champlain_tile_set_content (self, g_value_get_object (value), FALSE);
+        champlain_tile_set_content (self, g_value_get_object (value));
         break;
       case PROP_ETAG:
         champlain_tile_set_etag (self, g_value_get_string (value));
+        break;
+      case PROP_FADE_IN:
+        champlain_tile_set_fade_in (self, g_value_get_boolean (value));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -281,6 +288,20 @@ champlain_tile_class_init (ChamplainTileClass *klass)
           NULL,
           G_PARAM_READWRITE));
 
+  /**
+  * ChamplainTile:fade-in:
+  *
+  * Specifies whether the tile should fade in when loading
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+      PROP_FADE_IN,
+      g_param_spec_boolean ("fade-in",
+          "Fade In",
+          "Tile should fade in",
+          FALSE,
+          G_PARAM_READWRITE));
 }
 
 static void
@@ -657,7 +678,6 @@ champlain_tile_set_etag (ChamplainTile *self,
  * champlain_tile_set_content:
  * @self: the #ChamplainTile
  * @actor: the new content
- * @fade_in: if the new content should be faded in
  *
  * Sets the tile's content
  *
@@ -665,15 +685,12 @@ champlain_tile_set_etag (ChamplainTile *self,
  */
 void
 champlain_tile_set_content (ChamplainTile *self,
-    ClutterActor *actor,
-    gboolean fade_in)
+    ClutterActor *actor)
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
   g_return_if_fail (CLUTTER_ACTOR (actor));
 
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
-
-  priv->fade_in = fade_in;
 
   if (priv->content_actor &&
       clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
@@ -699,4 +716,39 @@ champlain_tile_get_content (ChamplainTile *self)
   g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
   return GET_PRIVATE (self)->content_actor;
+}
+
+/**
+ * champlain_tile_get_fade_in:
+ * @self: the #ChamplainTile
+ *
+ * Returns: the return value determines whether the tile should fade in when loading.
+ *
+ * Since: 0.6
+ */
+gboolean
+champlain_tile_get_fade_in (ChamplainTile *self)
+{
+  g_return_val_if_fail (CHAMPLAIN_TILE (self), FALSE);
+
+  return GET_PRIVATE (self)->fade_in;
+}
+
+/**
+ * champlain_tile_set_fade_in:
+ * @self: the #ChamplainTile
+ * @fade_in: determines whether the tile should fade in when loading
+ *
+ * Sets the flag determining whether the tile should fade in when loading
+ *
+ * Since: 0.6
+ */
+void
+champlain_tile_set_fade_in (ChamplainTile *self, gboolean fade_in)
+{
+  g_return_if_fail (CHAMPLAIN_TILE (self));
+
+  GET_PRIVATE (self)->fade_in = fade_in;
+
+  g_object_notify (G_OBJECT (self), "fade-in");
 }
