@@ -2455,6 +2455,8 @@ champlain_view_set_map_source (ChamplainView *view,
       g_object_notify (G_OBJECT (view), "zoom-level");
     }
 
+  clutter_group_remove_all (CLUTTER_GROUP (priv->map_layer));
+
   update_license (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
 
