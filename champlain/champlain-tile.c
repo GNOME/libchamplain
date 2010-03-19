@@ -525,26 +525,31 @@ champlain_tile_set_state (ChamplainTile *self, ChamplainState state)
   if (state == CHAMPLAIN_STATE_DONE && priv->content_actor &&
       clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
     {
-      if (!priv->fade_in)
-        clutter_group_remove_all (CLUTTER_GROUP (self));
-
       clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->content_actor);
+
+      ClutterAnimation *animation;
+
+      clutter_actor_set_opacity (priv->content_actor, 0);
 
       if (priv->fade_in)
         {
-          ClutterAnimation *animation;
-
-          clutter_actor_set_opacity (priv->content_actor, 0);
-
           animation = clutter_actor_animate (priv->content_actor,
               CLUTTER_EASE_IN_CUBIC,
               500,
               "opacity", 255,
               NULL);
-
-          g_object_ref (self);
-          g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), self);
         }
+      else
+        {
+          animation = clutter_actor_animate (priv->content_actor,
+              CLUTTER_LINEAR,
+              150,
+              "opacity", 255,
+              NULL);
+        }
+
+      g_object_ref (self);
+      g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), self);
     }
 
   priv->state = state;
