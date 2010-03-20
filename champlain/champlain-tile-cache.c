@@ -37,8 +37,6 @@ enum
   PROP_PERSISTENT_CACHE
 };
 
-typedef struct _ChamplainTileCachePrivate ChamplainTileCachePrivate;
-
 struct _ChamplainTileCachePrivate
 {
   gboolean persistent;
@@ -77,7 +75,7 @@ champlain_tile_cache_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainTileCachePrivate *priv = GET_PRIVATE (object);
+  ChamplainTileCachePrivate *priv = CHAMPLAIN_TILE_CACHE (object)->priv;
 
   switch (property_id)
     {
@@ -160,6 +158,8 @@ champlain_tile_cache_init (ChamplainTileCache *tile_cache)
 {
   ChamplainTileCachePrivate *priv = GET_PRIVATE (tile_cache);
 
+  tile_cache->priv = priv;
+
   priv->persistent = TRUE;
 }
 
@@ -178,8 +178,7 @@ champlain_tile_cache_get_persistent (ChamplainTileCache *tile_cache)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache), FALSE);
 
-  ChamplainTileCachePrivate *priv = GET_PRIVATE(tile_cache);
-  return priv->persistent;
+  return tile_cache->priv->persistent;
 }
 
 /**

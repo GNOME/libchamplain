@@ -50,8 +50,6 @@ enum
   PROP_CACHE_DIR
 };
 
-typedef struct _ChamplainFileCachePrivate ChamplainFileCachePrivate;
-
 struct _ChamplainFileCachePrivate
 {
   guint size_limit;
@@ -116,7 +114,7 @@ champlain_file_cache_set_property (GObject *object,
     GParamSpec *pspec)
 {
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE (object);
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (object);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
 
   switch (property_id)
     {
@@ -142,7 +140,7 @@ champlain_file_cache_dispose (GObject *object)
 static void
 finalize_sql (ChamplainFileCache *file_cache)
 {
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
   gint error;
 
   if (priv->stmt_select)
@@ -170,7 +168,7 @@ static void
 delete_temp_cache (ChamplainFileCache *file_cache)
 {
   ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE(file_cache);
-  ChamplainFileCachePrivate *priv = GET_PRIVATE(file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
 
   if (!champlain_tile_cache_get_persistent (tile_cache) && priv->real_cache_dir)
     {
@@ -193,7 +191,7 @@ champlain_file_cache_finalize (GObject *object)
 {
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(object);
   ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE(file_cache);
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
 
   finalize_sql (file_cache);
 
@@ -226,7 +224,7 @@ static void
 init_cache  (ChamplainFileCache *file_cache)
 {
   ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE(file_cache);
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
   gchar *filename = NULL;
   gchar *error_msg = NULL;
   gint error;
@@ -249,7 +247,7 @@ init_cache  (ChamplainFileCache *file_cache)
 
       if (!priv->real_cache_dir)
         {
-          g_warning ("Filed to create filename for temporary cache");
+          g_warning ("Failed to create filename for temporary cache: template '%s'", tmplate);
           g_free (tmplate);
           return;
         }
@@ -322,7 +320,7 @@ champlain_file_cache_constructed (GObject *object)
 {
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(object);
   ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE(file_cache);
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
 
   if (!priv->cache_dir)
     {
@@ -407,6 +405,8 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
 {
   ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
 
+  file_cache->priv = priv;
+
   priv->cache_dir = NULL;
   priv->size_limit = 100000000;
   priv->real_cache_dir = NULL;
@@ -471,8 +471,7 @@ champlain_file_cache_get_size_limit (ChamplainFileCache *file_cache)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_FILE_CACHE (file_cache), 0);
 
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
-  return priv->size_limit;
+  return file_cache->priv->size_limit;
 }
 
 /**
@@ -490,8 +489,7 @@ champlain_file_cache_get_cache_dir (ChamplainFileCache *file_cache)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_FILE_CACHE (file_cache), NULL);
 
-  ChamplainFileCachePrivate *priv = GET_PRIVATE(file_cache);
-  return priv->cache_dir;
+  return file_cache->priv->cache_dir;
 }
 
 /**
@@ -509,7 +507,7 @@ champlain_file_cache_set_size_limit (ChamplainFileCache *file_cache,
 {
   g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (file_cache));
 
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
 
   priv->size_limit = size_limit;
   g_object_notify (G_OBJECT (file_cache), "size-limit");
@@ -519,7 +517,7 @@ static gchar *
 get_filename (ChamplainFileCache *file_cache,
     ChamplainTile *tile)
 {
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
 
   g_return_val_if_fail (CHAMPLAIN_IS_FILE_CACHE (file_cache), NULL);
   g_return_val_if_fail (CHAMPLAIN_IS_TILE (tile), NULL);
@@ -580,7 +578,7 @@ tile_loaded_cb (ClutterTexture *texture,
   ChamplainTile *tile = user_data->tile;
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(map_source);
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
   GFileInfo *info = NULL;
   GFile *file = NULL;
   ClutterActor *actor = CLUTTER_ACTOR(texture);
@@ -774,7 +772,7 @@ store_tile (ChamplainTileCache *tile_cache,
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE(tile_cache);
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(tile_cache);
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
   gchar *query = NULL;
   gchar *error = NULL;
   gchar *path = NULL;
@@ -854,7 +852,7 @@ on_tile_filled (ChamplainTileCache *tile_cache,
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE(tile_cache);
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(tile_cache);
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
   int sql_rc = SQLITE_OK;
   gchar *filename = NULL;
 
@@ -888,7 +886,7 @@ clean (ChamplainTileCache *tile_cache)
   g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (tile_cache));
 
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(tile_cache);
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
 
   g_return_if_fail (!champlain_tile_cache_get_persistent (tile_cache));
 
@@ -909,7 +907,7 @@ delete_tile (ChamplainFileCache *file_cache, const gchar *filename)
   GError *gerror = NULL;
   GFile *file;
 
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
 
   query = sqlite3_mprintf ("DELETE FROM tiles WHERE filename = %Q", filename);
   sqlite3_exec (priv->db, query, NULL, NULL, &error);
@@ -965,7 +963,7 @@ champlain_file_cache_purge (ChamplainFileCache *file_cache)
 {
   g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (file_cache));
 
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = file_cache->priv;
   gchar *query;
   sqlite3_stmt *stmt;
   int rc = 0;

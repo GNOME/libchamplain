@@ -73,7 +73,7 @@ champlain_polygon_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (object);
+  ChamplainPolygonPrivate *priv = CHAMPLAIN_POLYGON (object)->priv;
 
   switch (property_id)
     {
@@ -112,7 +112,7 @@ champlain_polygon_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (object);
+  ChamplainPolygonPrivate *priv = CHAMPLAIN_POLYGON (object)->priv;
 
   switch (property_id)
     {
@@ -304,6 +304,8 @@ champlain_polygon_init (ChamplainPolygon *polygon)
 {
   ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
 
+  polygon->priv = priv;
+
   priv->visible = TRUE;
   priv->points = NULL;
   priv->fill = FALSE;
@@ -347,7 +349,7 @@ champlain_polygon_append_point (ChamplainPolygon *polygon,
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
+  ChamplainPolygonPrivate *priv = polygon->priv;
 
   ChamplainPoint *point = champlain_point_new (lat, lon);
 
@@ -377,7 +379,7 @@ champlain_polygon_insert_point (ChamplainPolygon *polygon,
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
+  ChamplainPolygonPrivate *priv = polygon->priv;
 
   ChamplainPoint *point = champlain_point_new (lat, lon);
 
@@ -401,7 +403,7 @@ champlain_polygon_remove_point (ChamplainPolygon *polygon,
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
+  ChamplainPolygonPrivate *priv = polygon->priv;
 
   priv->points = g_list_remove (priv->points, point);
   g_object_notify (G_OBJECT (polygon), "visible");
@@ -420,7 +422,7 @@ champlain_polygon_clear_points (ChamplainPolygon *polygon)
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
+  ChamplainPolygonPrivate *priv = polygon->priv;
 
   GList *next = priv->points;
   while (next != NULL)
@@ -446,9 +448,7 @@ champlain_polygon_get_points (ChamplainPolygon *polygon)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  return priv->points;
+  return polygon->priv->points;
 }
 
 /**
@@ -467,7 +467,7 @@ champlain_polygon_set_fill_color (ChamplainPolygon *polygon,
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
+  ChamplainPolygonPrivate *priv = polygon->priv;
 
   if (priv->fill_color != NULL)
     clutter_color_free (priv->fill_color);
@@ -495,7 +495,7 @@ champlain_polygon_set_stroke_color (ChamplainPolygon *polygon,
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
+  ChamplainPolygonPrivate *priv = polygon->priv;
 
   if (priv->stroke_color != NULL)
     clutter_color_free (priv->stroke_color);
@@ -520,9 +520,7 @@ champlain_polygon_get_fill_color (ChamplainPolygon *polygon)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  return priv->fill_color;
+  return polygon->priv->fill_color;
 }
 
 /**
@@ -538,9 +536,7 @@ champlain_polygon_get_stroke_color (ChamplainPolygon *polygon)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), NULL);
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  return priv->stroke_color;
+  return polygon->priv->stroke_color;
 }
 
 /**
@@ -558,9 +554,7 @@ champlain_polygon_set_stroke (ChamplainPolygon *polygon,
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  priv->stroke = value;
+  polygon->priv->stroke = value;
   g_object_notify (G_OBJECT (polygon), "stroke");
 }
 
@@ -577,9 +571,7 @@ champlain_polygon_get_stroke (ChamplainPolygon *polygon)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), FALSE);
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  return priv->stroke;
+  return polygon->priv->stroke;
 }
 
 /**
@@ -597,9 +589,7 @@ champlain_polygon_set_fill (ChamplainPolygon *polygon,
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  priv->fill = value;
+  polygon->priv->fill = value;
   g_object_notify (G_OBJECT (polygon), "fill");
 }
 
@@ -616,9 +606,7 @@ champlain_polygon_get_fill (ChamplainPolygon *polygon)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), FALSE);
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  return priv->fill;
+  return polygon->priv->fill;
 }
 
 /**
@@ -636,9 +624,7 @@ champlain_polygon_set_stroke_width (ChamplainPolygon *polygon,
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  priv->stroke_width = value;
+  polygon->priv->stroke_width = value;
   g_object_notify (G_OBJECT (polygon), "stroke-width");
 }
 
@@ -655,9 +641,7 @@ champlain_polygon_get_stroke_width (ChamplainPolygon *polygon)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), 0);
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  return priv->stroke_width;
+  return polygon->priv->stroke_width;
 }
 
 /**
@@ -676,9 +660,7 @@ champlain_polygon_set_mark_points (ChamplainPolygon *polygon,
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  priv->mark_points = value;
+  polygon->priv->mark_points = value;
   g_object_notify (G_OBJECT (polygon), "mark-points");
 }
 
@@ -695,9 +677,7 @@ champlain_polygon_get_mark_points (ChamplainPolygon *polygon)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_POLYGON (polygon), FALSE);
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  return priv->mark_points;
+  return polygon->priv->mark_points;
 }
 
 /**
@@ -713,9 +693,7 @@ champlain_polygon_show (ChamplainPolygon *polygon)
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  priv->visible = TRUE;
+  polygon->priv->visible = TRUE;
   clutter_actor_show (CLUTTER_ACTOR (polygon));
   g_object_notify (G_OBJECT (polygon), "visible");
 }
@@ -733,9 +711,7 @@ champlain_polygon_hide (ChamplainPolygon *polygon)
 {
   g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
 
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
-
-  priv->visible = FALSE;
+  polygon->priv->visible = FALSE;
   clutter_actor_hide (CLUTTER_ACTOR (polygon));
   g_object_notify (G_OBJECT (polygon), "visible");
 }
@@ -749,7 +725,7 @@ champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
     gfloat shift_x,
     gfloat shift_y)
 {
-  ChamplainPolygonPrivate *priv = GET_PRIVATE (polygon);
+  ChamplainPolygonPrivate *priv = polygon->priv;
   ClutterActor *cairo_texture;
   cairo_t *cr;
 

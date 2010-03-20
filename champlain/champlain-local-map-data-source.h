@@ -42,8 +42,12 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_LOCAL_MAP_DATA_SOURCE_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_LOCAL_MAP_DATA_SOURCE, ChamplainLocalMapDataSourceClass))
 
+typedef struct _ChamplainLocalMapDataSourcePrivate ChamplainLocalMapDataSourcePrivate;
+
 typedef struct {
   ChamplainMapDataSource parent;
+
+  ChamplainLocalMapDataSourcePrivate *priv;
 } ChamplainLocalMapDataSource;
 
 typedef struct {

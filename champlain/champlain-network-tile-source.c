@@ -72,8 +72,6 @@ G_DEFINE_TYPE (ChamplainNetworkTileSource, champlain_network_tile_source, CHAMPL
 
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE, ChamplainNetworkTileSourcePrivate))
 
-typedef struct _ChamplainNetworkTileSourcePrivate ChamplainNetworkTileSourcePrivate;
-
 struct _ChamplainNetworkTileSourcePrivate
 {
   gboolean offline;
@@ -109,7 +107,7 @@ champlain_network_tile_source_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE (object)->priv;
 
   switch (prop_id)
     {
@@ -155,7 +153,7 @@ champlain_network_tile_source_set_property (GObject *object,
 static void
 champlain_network_tile_source_dispose (GObject *object)
 {
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE (object)->priv;
 
   if (priv->soup_session)
   {
@@ -169,7 +167,7 @@ champlain_network_tile_source_dispose (GObject *object)
 static void
 champlain_network_tile_source_finalize (GObject *object)
 {
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE(object)->priv;
 
   g_free (priv->uri_format);
   g_free (priv->proxy_uri);
@@ -248,6 +246,8 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
 {
   ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE (tile_source);
 
+  tile_source->priv = priv;
+
   priv->proxy_uri = NULL;
   priv->uri_format = NULL;
   priv->offline = FALSE;
@@ -318,8 +318,7 @@ champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *tile_s
 {
   g_return_val_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-  return priv->uri_format;
+  return tile_source->priv->uri_format;
 }
 
 /**
@@ -343,7 +342,7 @@ champlain_network_tile_source_set_uri_format (ChamplainNetworkTileSource *tile_s
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source));
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
 
   g_free (priv->uri_format);
   priv->uri_format = g_strdup (uri_format);
@@ -366,8 +365,7 @@ champlain_network_tile_source_get_proxy_uri (ChamplainNetworkTileSource *tile_so
 {
   g_return_val_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-  return priv->proxy_uri;
+  return tile_source->priv->proxy_uri;
 }
 
 /**
@@ -385,7 +383,7 @@ champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_so
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source));
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
   SoupURI *uri = NULL;
 
   g_free (priv->proxy_uri);
@@ -420,8 +418,7 @@ champlain_network_tile_source_get_offline (ChamplainNetworkTileSource *tile_sour
 {
   g_return_val_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source), FALSE);
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-  return priv->offline;
+  return tile_source->priv->offline;
 }
 
 /**
@@ -439,21 +436,19 @@ champlain_network_tile_source_set_offline (ChamplainNetworkTileSource *tile_sour
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source));
 
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
-
-  priv->offline = offline;
+  tile_source->priv->offline = offline;
 
   g_object_notify (G_OBJECT (tile_source), "offline");
 }
 
 #define SIZE 8
 static gchar *
-get_tile_uri (ChamplainNetworkTileSource *source,
+get_tile_uri (ChamplainNetworkTileSource *tile_source,
     gint x,
     gint y,
     gint z)
 {
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(source);
+  ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
 
   gchar **tokens;
   gchar *token;
@@ -501,7 +496,7 @@ tile_destroyed_cb (ChamplainTile *tile,
   if (data->map_source && data->msg)
     {
       DEBUG ("Canceling tile download");
-      ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(data->map_source);
+      ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE (data->map_source)->priv;
 
       soup_session_cancel_message (priv->soup_session, data->msg, SOUP_STATUS_CANCELLED);
     }
@@ -653,7 +648,7 @@ fill_tile (ChamplainMapSource *map_source,
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
 
   ChamplainNetworkTileSource *tile_source = CHAMPLAIN_NETWORK_TILE_SOURCE (map_source);
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
 
   if (!priv->offline)
     {

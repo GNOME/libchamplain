@@ -45,8 +45,12 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_MEMPHIS_TILE_SOURCE_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MEMPHIS_TILE_SOURCE, ChamplainMemphisTileSourceClass))
 
+typedef struct _ChamplainMemphisTileSourcePrivate ChamplainMemphisTileSourcePrivate;
+
 typedef struct {
   ChamplainTileSource parent;
+
+  ChamplainMemphisTileSourcePrivate *priv;
 } ChamplainMemphisTileSource;
 
 typedef struct {

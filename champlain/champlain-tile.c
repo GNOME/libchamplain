@@ -151,7 +151,7 @@ champlain_tile_dispose (GObject *object)
 static void
 champlain_tile_finalize (GObject *object)
 {
-  ChamplainTilePrivate *priv = GET_PRIVATE (object);
+  ChamplainTilePrivate *priv = CHAMPLAIN_TILE (object)->priv;
 
   g_free (priv->modified_time);
   g_free (priv->etag);
@@ -309,6 +309,8 @@ champlain_tile_init (ChamplainTile *self)
 {
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
 
+  self->priv = priv;
+
   priv->state = CHAMPLAIN_STATE_NONE;
   priv->x = 0;
   priv->y = 0;
@@ -347,7 +349,7 @@ champlain_tile_get_x (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  return GET_PRIVATE (self)->x;
+  return self->priv->x;
 }
 
 /**
@@ -363,7 +365,7 @@ champlain_tile_get_y (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  return GET_PRIVATE (self)->y;
+  return self->priv->y;
 }
 
 /**
@@ -379,7 +381,7 @@ champlain_tile_get_zoom_level (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  return GET_PRIVATE (self)->zoom_level;
+  return self->priv->zoom_level;
 }
 
 /**
@@ -395,7 +397,7 @@ champlain_tile_get_size (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
 
-  return GET_PRIVATE (self)->size;
+  return self->priv->size;
 }
 
 /**
@@ -411,7 +413,7 @@ champlain_tile_get_state (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), CHAMPLAIN_STATE_NONE);
 
-  return GET_PRIVATE (self)->state;
+  return self->priv->state;
 }
 
 /**
@@ -429,7 +431,7 @@ champlain_tile_set_x (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  GET_PRIVATE (self)->x = x;
+  self->priv->x = x;
 
   g_object_notify (G_OBJECT (self), "x");
 }
@@ -449,7 +451,7 @@ champlain_tile_set_y (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  GET_PRIVATE (self)->y = y;
+  self->priv->y = y;
 
   g_object_notify (G_OBJECT (self), "y");
 }
@@ -469,7 +471,7 @@ champlain_tile_set_zoom_level (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  GET_PRIVATE (self)->zoom_level = zoom_level;
+  self->priv->zoom_level = zoom_level;
 
   g_object_notify (G_OBJECT (self), "zoom-level");
 }
@@ -489,7 +491,7 @@ champlain_tile_set_size (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  GET_PRIVATE (self)->size = size;
+  self->priv->size = size;
 
   g_object_notify (G_OBJECT (self), "size");
 }
@@ -518,7 +520,7 @@ champlain_tile_set_state (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+  ChamplainTilePrivate *priv = self->priv;
 
   if (state == priv->state)
     return;
@@ -591,7 +593,7 @@ champlain_tile_get_modified_time (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
-  return GET_PRIVATE (self)->modified_time;
+  return self->priv->modified_time;
 }
 
 /**
@@ -610,7 +612,7 @@ champlain_tile_set_modified_time (ChamplainTile *self,
   g_return_if_fail (CHAMPLAIN_TILE (self));
   g_return_if_fail (time != NULL);
 
-  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+  ChamplainTilePrivate *priv = self->priv;
 
   g_free (priv->modified_time);
   priv->modified_time = g_memdup(time_, sizeof (GTimeVal));
@@ -629,7 +631,7 @@ champlain_tile_get_modified_time_string (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
-  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+  ChamplainTilePrivate *priv = self->priv;
 
   if (priv->modified_time == NULL)
     return NULL;
@@ -655,7 +657,7 @@ champlain_tile_get_etag (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), "");
 
-  return GET_PRIVATE (self)->etag;
+  return self->priv->etag;
 }
 
 /**
@@ -673,7 +675,7 @@ champlain_tile_set_etag (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+  ChamplainTilePrivate *priv = self->priv;
 
   g_free (priv->etag);
   priv->etag = g_strdup (etag);
@@ -696,7 +698,7 @@ champlain_tile_set_content (ChamplainTile *self,
   g_return_if_fail (CHAMPLAIN_TILE (self));
   g_return_if_fail (CLUTTER_ACTOR (actor));
 
-  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+  ChamplainTilePrivate *priv = self->priv;
 
   if (priv->content_actor &&
       clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
@@ -721,7 +723,7 @@ champlain_tile_get_content (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
 
-  return GET_PRIVATE (self)->content_actor;
+  return self->priv->content_actor;
 }
 
 /**
@@ -737,7 +739,7 @@ champlain_tile_get_fade_in (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), FALSE);
 
-  return GET_PRIVATE (self)->fade_in;
+  return self->priv->fade_in;
 }
 
 /**
@@ -755,7 +757,7 @@ champlain_tile_set_fade_in (ChamplainTile *self,
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
-  GET_PRIVATE (self)->fade_in = fade_in;
+  self->priv->fade_in = fade_in;
 
   g_object_notify (G_OBJECT (self), "fade-in");
 }

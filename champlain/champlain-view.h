@@ -59,6 +59,8 @@ typedef enum {
 struct _ChamplainView
 {
   ClutterGroup group;
+
+  ChamplainViewPrivate *priv;
 };
 
 struct _ChamplainViewClass

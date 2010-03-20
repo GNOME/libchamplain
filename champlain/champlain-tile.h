@@ -50,6 +50,8 @@ typedef struct _ChamplainTileClass   ChamplainTileClass;
 
 struct _ChamplainTile {
   ClutterGroup parent;
+
+  ChamplainTilePrivate *priv;
 };
 
 struct _ChamplainTileClass {

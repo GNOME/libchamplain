@@ -40,8 +40,6 @@ G_DEFINE_TYPE (ChamplainLocalMapDataSource, champlain_local_map_data_source, CHA
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_LOCAL_MAP_DATA_SOURCE, ChamplainLocalMapDataSourcePrivate))
 
-typedef struct _ChamplainLocalMapDataSourcePrivate ChamplainLocalMapDataSourcePrivate;
-
 struct _ChamplainLocalMapDataSourcePrivate {
     MemphisMap* map;
 };
@@ -76,7 +74,7 @@ static void
 champlain_local_map_data_source_dispose (GObject *object)
 {
   ChamplainLocalMapDataSource *self = (ChamplainLocalMapDataSource *) object;
-  ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainLocalMapDataSourcePrivate *priv = self->priv;
 
   if (priv->map)
     {
@@ -96,7 +94,7 @@ champlain_local_map_data_source_finalize (GObject *object)
 static MemphisMap *
 get_map_data (ChamplainMapDataSource *self)
 {
-  ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainLocalMapDataSourcePrivate *priv = CHAMPLAIN_LOCAL_MAP_DATA_SOURCE (self)->priv;
 
   return priv->map;
 }
@@ -121,7 +119,9 @@ static void
 champlain_local_map_data_source_init (ChamplainLocalMapDataSource *self)
 {
   ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
-  
+
+  self->priv = priv;
+
   priv->map = memphis_map_new ();
 }
 
@@ -161,7 +161,7 @@ champlain_local_map_data_source_load_map_data (ChamplainLocalMapDataSource *self
       return;
     }
 
-  ChamplainLocalMapDataSourcePrivate *priv = GET_PRIVATE(self);
+  ChamplainLocalMapDataSourcePrivate *priv = self->priv;
   ChamplainBoundingBox *bbox;
   MemphisMap *map = memphis_map_new ();
 

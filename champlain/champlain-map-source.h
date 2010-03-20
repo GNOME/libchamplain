@@ -35,6 +35,8 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_IS_MAP_SOURCE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MAP_SOURCE))
 #define CHAMPLAIN_MAP_SOURCE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
 
+typedef struct _ChamplainMapSourcePrivate ChamplainMapSourcePrivate;
+
 typedef struct _ChamplainMapSourceClass ChamplainMapSourceClass;
 
 typedef enum
@@ -45,6 +47,8 @@ typedef enum
 struct _ChamplainMapSource
 {
   GInitiallyUnowned parent_instance;
+
+  ChamplainMapSourcePrivate *priv;
 };
 
 struct _ChamplainMapSourceClass

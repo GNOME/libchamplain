@@ -37,12 +37,16 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_IS_TILE_SOURCE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_TILE_SOURCE))
 #define CHAMPLAIN_TILE_SOURCE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_TILE_SOURCE, ChamplainTileSourceClass))
 
+typedef struct _ChamplainTileSourcePrivate ChamplainTileSourcePrivate;
+
 typedef struct _ChamplainTileSource ChamplainTileSource;
 typedef struct _ChamplainTileSourceClass ChamplainTileSourceClass;
 
 struct _ChamplainTileSource
 {
   ChamplainMapSource parent_instance;
+
+  ChamplainTileSourcePrivate *priv;
 };
 
 struct _ChamplainTileSourceClass

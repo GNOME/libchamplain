@@ -55,6 +55,8 @@ typedef struct _ChamplainPolygonClass   ChamplainPolygonClass;
 
 struct _ChamplainPolygon {
   ClutterGroup parent;
+
+  ChamplainPolygonPrivate *priv;
 };
 
 struct _ChamplainPolygonClass {

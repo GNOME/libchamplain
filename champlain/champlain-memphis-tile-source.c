@@ -73,8 +73,6 @@ G_DEFINE_TYPE (ChamplainMemphisTileSource, champlain_memphis_tile_source, CHAMPL
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_MEMPHIS_TILE_SOURCE, ChamplainMemphisTileSourcePrivate))
 
-typedef struct _ChamplainMemphisTileSourcePrivate ChamplainMemphisTileSourcePrivate;
-
 struct _ChamplainMemphisTileSourcePrivate
 {
   ChamplainMapDataSource *map_data_source;
@@ -119,7 +117,7 @@ champlain_memphis_tile_source_get_property (GObject *object,
     GParamSpec *pspec)
 {
   ChamplainMemphisTileSource *tile_source = CHAMPLAIN_MEMPHIS_TILE_SOURCE (object);
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
+  ChamplainMemphisTileSourcePrivate *priv = tile_source->priv;
 
   switch (property_id)
     {
@@ -154,7 +152,7 @@ static void
 champlain_memphis_tile_source_dispose (GObject *object)
 {
   ChamplainMemphisTileSource *tile_source = CHAMPLAIN_MEMPHIS_TILE_SOURCE(object);
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainMemphisTileSourcePrivate *priv = tile_source->priv;
 
   if (priv->thpool)
     {
@@ -190,7 +188,7 @@ static void
 champlain_memphis_tile_source_constructed (GObject *object)
 {
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE(object);
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainMemphisTileSourcePrivate *priv = CHAMPLAIN_MEMPHIS_TILE_SOURCE (object)->priv;
 
   memphis_renderer_set_resolution (priv->renderer, champlain_map_source_get_tile_size (map_source));
 
@@ -233,6 +231,8 @@ static void
 champlain_memphis_tile_source_init (ChamplainMemphisTileSource *tile_source)
 {
   ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+
+  tile_source->priv = priv;
 
   priv->map_data_source = NULL;
   priv->rules = NULL;
@@ -299,7 +299,7 @@ map_data_changed_cb (ChamplainMapDataSource *map_data_source,
             CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
 
   MemphisMap *map;
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainMemphisTileSourcePrivate *priv = tile_source->priv;
   ChamplainState state;
 
   g_object_get (G_OBJECT (map_data_source), "state", &state, NULL);
@@ -418,14 +418,14 @@ memphis_worker_thread (gpointer worker_data,
     gpointer user_data)
 {
   WorkerThreadData *data = (WorkerThreadData *)worker_data;
-  ChamplainMapSource *map_source = data->map_source;
+  ChamplainMemphisTileSource *tile_source = CHAMPLAIN_MEMPHIS_TILE_SOURCE (data->map_source);
   gboolean has_data = TRUE;
 
   data->cst = NULL;
 
 // uncomment when libmemphis works correctly
 //  g_static_rw_lock_reader_lock (&MemphisLock);
-//  has_data = memphis_renderer_tile_has_data (GET_PRIVATE(map_source)->renderer, data->x, data->y, data->z);
+//  has_data = memphis_renderer_tile_has_data (tile_source->priv->renderer, data->x, data->y, data->z);
 //  g_static_rw_lock_reader_unlock (&MemphisLock);
 
   if (has_data)
@@ -439,7 +439,7 @@ memphis_worker_thread (gpointer worker_data,
       DEBUG ("Draw Tile (%d, %d, %d)", data->x, data->y, data->z);
 
       g_static_rw_lock_reader_lock (&MemphisLock);
-      memphis_renderer_draw_tile (GET_PRIVATE(map_source)->renderer, cr, data->x, data->y, data->z);
+      memphis_renderer_draw_tile (tile_source->priv->renderer, cr, data->x, data->y, data->z);
       g_static_rw_lock_reader_unlock (&MemphisLock);
 
       cairo_destroy (cr);
@@ -454,7 +454,7 @@ fill_tile (ChamplainMapSource *map_source,
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (map_source));
 
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE(map_source);
+  ChamplainMemphisTileSourcePrivate *priv = CHAMPLAIN_MEMPHIS_TILE_SOURCE (map_source)->priv;
 
   DEBUG ("Render tile (%u, %u, %u)", champlain_tile_get_x (tile),
          champlain_tile_get_y (tile),
@@ -537,7 +537,7 @@ champlain_memphis_tile_source_load_rules (
       return;
     }
 
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
+  ChamplainMemphisTileSourcePrivate *priv = tile_source->priv;
 
   g_static_rw_lock_writer_lock (&MemphisLock);
   if (rules_path)
@@ -567,7 +567,7 @@ champlain_memphis_tile_source_set_map_data_source (
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                     CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source));
 
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
+  ChamplainMemphisTileSourcePrivate *priv = tile_source->priv;
   MemphisMap *map;
 
   if (priv->map_data_source)
@@ -606,8 +606,7 @@ champlain_memphis_tile_source_get_map_data_source (
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
-  return priv->map_data_source;
+  return tile_source->priv->map_data_source;
 }
 
 /**
@@ -625,12 +624,11 @@ champlain_memphis_tile_source_get_background_color (
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
   ClutterColor color;
   guint8 r, b, g, a;
 
   g_static_rw_lock_reader_lock (&MemphisLock);
-  memphis_rule_set_get_bg_color (priv->rules, &r, &g, &b, &a);
+  memphis_rule_set_get_bg_color (tile_source->priv->rules, &r, &g, &b, &a);
   g_static_rw_lock_reader_unlock (&MemphisLock);
 
   color.red = r;
@@ -656,10 +654,8 @@ champlain_memphis_tile_source_set_background_color (
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
 
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
-
   g_static_rw_lock_writer_lock (&MemphisLock);
-  memphis_rule_set_set_bg_color (priv->rules, color->red,
+  memphis_rule_set_set_bg_color (tile_source->priv->rules, color->red,
                                  color->green, color->blue, color->alpha);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
@@ -683,10 +679,8 @@ champlain_memphis_tile_source_set_rule (ChamplainMemphisTileSource *tile_source,
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                     MEMPHIS_RULE (rule));
 
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
-
   g_static_rw_lock_writer_lock (&MemphisLock);
-  memphis_rule_set_set_rule (priv->rules, rule);
+  memphis_rule_set_set_rule (tile_source->priv->rules, rule);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
   reload_tiles (tile_source);
@@ -708,11 +702,10 @@ champlain_memphis_tile_source_get_rule (ChamplainMemphisTileSource *tile_source,
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                         id != NULL, NULL);
 
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
   MemphisRule *rule;
 
   g_static_rw_lock_reader_lock (&MemphisLock);
-  rule = memphis_rule_set_get_rule (priv->rules, id);
+  rule = memphis_rule_set_get_rule (tile_source->priv->rules, id);
   g_static_rw_lock_reader_unlock (&MemphisLock);
 
   return rule;
@@ -734,11 +727,10 @@ champlain_memphis_tile_source_get_rule_ids (ChamplainMemphisTileSource *tile_sou
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source), NULL);
 
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
   GList *list;
 
   g_static_rw_lock_reader_lock (&MemphisLock);
-  list = memphis_rule_set_get_rule_ids (priv->rules);
+  list = memphis_rule_set_get_rule_ids (tile_source->priv->rules);
   g_static_rw_lock_reader_unlock (&MemphisLock);
 
   return list;
@@ -759,10 +751,8 @@ void champlain_memphis_tile_source_remove_rule (
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
 
-  ChamplainMemphisTileSourcePrivate *priv = GET_PRIVATE (tile_source);
-
   g_static_rw_lock_writer_lock (&MemphisLock);
-  memphis_rule_set_remove_rule (priv->rules, id);
+  memphis_rule_set_remove_rule (tile_source->priv->rules, id);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
   reload_tiles (tile_source);

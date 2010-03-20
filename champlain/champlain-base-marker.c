@@ -76,7 +76,7 @@ champlain_base_marker_get_property (GObject *object,
     GParamSpec *pspec)
 {
     ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (object);
-    ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (base_marker);
+    ChamplainBaseMarkerPrivate *priv = base_marker->priv;
 
     switch (prop_id)
       {
@@ -101,7 +101,7 @@ champlain_base_marker_set_property (GObject *object,
     GParamSpec *pspec)
 {
     ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (object);
-    ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (base_marker);
+    ChamplainBaseMarkerPrivate *priv = base_marker->priv;
 
     switch (prop_id)
     {
@@ -131,9 +131,6 @@ champlain_base_marker_set_property (GObject *object,
 static void
 champlain_base_marker_finalize (GObject *object)
 {
-  //ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (object);
-  //ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (base_marker);
-
   G_OBJECT_CLASS (champlain_base_marker_parent_class)->finalize (object);
 }
 
@@ -188,7 +185,9 @@ static void
 champlain_base_marker_init (ChamplainBaseMarker *marker)
 {
   ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (marker);
+
   marker->priv = priv;
+
   priv->lat = 0;
   priv->lon = 0;
   priv->highlighted = FALSE;
@@ -208,7 +207,6 @@ champlain_base_marker_new (void)
   ChamplainBaseMarker *base_marker;
 
   base_marker = CHAMPLAIN_BASE_MARKER (g_object_new (CHAMPLAIN_TYPE_BASE_MARKER, NULL));
-  //ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (base_marker);
 
   return CLUTTER_ACTOR (base_marker);
 }
@@ -230,7 +228,7 @@ champlain_base_marker_set_position (ChamplainBaseMarker *champlainBaseMarker,
 {
   g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (champlainBaseMarker));
 
-  ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (champlainBaseMarker);
+  ChamplainBaseMarkerPrivate *priv = champlainBaseMarker->priv;
 
   priv->lon = longitude;
   priv->lat = latitude;
@@ -255,9 +253,7 @@ champlain_base_marker_set_highlighted (ChamplainBaseMarker *champlainBaseMarker,
 {
   g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (champlainBaseMarker));
 
-  ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (champlainBaseMarker);
-
-  priv->highlighted = value;
+  champlainBaseMarker->priv->highlighted = value;
 
   g_object_notify (G_OBJECT (champlainBaseMarker), "highlighted");
 }
@@ -275,9 +271,7 @@ champlain_base_marker_get_highlighted (ChamplainBaseMarker *champlainBaseMarker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (champlainBaseMarker), FALSE);
 
-  ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (champlainBaseMarker);
-
-  return priv->highlighted;
+  return champlainBaseMarker->priv->highlighted;
 }
 
 /**

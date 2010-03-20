@@ -36,12 +36,16 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_IS_NETWORK_TILE_SOURCE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE))
 #define CHAMPLAIN_NETWORK_TILE_SOURCE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE, ChamplainNetworkTileSourceClass))
 
+typedef struct _ChamplainNetworkTileSourcePrivate ChamplainNetworkTileSourcePrivate;
+
 typedef struct _ChamplainNetworkTileSource ChamplainNetworkTileSource;
 typedef struct _ChamplainNetworkTileSourceClass ChamplainNetworkTileSourceClass;
 
 struct _ChamplainNetworkTileSource
 {
   ChamplainTileSource parent_instance;
+
+  ChamplainNetworkTileSourcePrivate *priv;
 };
 
 struct _ChamplainNetworkTileSourceClass

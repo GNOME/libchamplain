@@ -38,8 +38,6 @@ G_DEFINE_TYPE (ChamplainMapSourceChain, champlain_map_source_chain, CHAMPLAIN_TY
 
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MAP_SOURCE_CHAIN, ChamplainMapSourceChainPrivate))
 
-typedef struct _ChamplainMapSourceChainPrivate ChamplainMapSourceChainPrivate;
-
 struct _ChamplainMapSourceChainPrivate
 {
   ChamplainMapSource *stack_top;
@@ -64,9 +62,8 @@ static void
 champlain_map_source_chain_dispose (GObject *object)
 {
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN(object);
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(object);
 
-  while (priv->stack_top)
+  while (source_chain->priv->stack_top)
     champlain_map_source_chain_pop (source_chain);
 
   G_OBJECT_CLASS (champlain_map_source_chain_parent_class)->dispose (object);
@@ -106,6 +103,9 @@ static void
 champlain_map_source_chain_init (ChamplainMapSourceChain *source_chain)
 {
   ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+
+  source_chain->priv = priv;
+
   priv->stack_top = NULL;
   priv->stack_bottom = NULL;
 }
@@ -131,7 +131,7 @@ get_id (ChamplainMapSource *map_source)
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   g_return_val_if_fail (source_chain, NULL);
 
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   g_return_val_if_fail (priv->stack_top, NULL);
 
   return champlain_map_source_get_id (priv->stack_top);
@@ -143,7 +143,7 @@ get_name (ChamplainMapSource *map_source)
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   g_return_val_if_fail (source_chain, NULL);
 
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   g_return_val_if_fail (priv->stack_top, NULL);
 
   return champlain_map_source_get_name (priv->stack_top);
@@ -155,7 +155,7 @@ get_license (ChamplainMapSource *map_source)
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   g_return_val_if_fail (source_chain, NULL);
 
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   g_return_val_if_fail (priv->stack_top, NULL);
 
   return champlain_map_source_get_license (priv->stack_top);
@@ -167,7 +167,7 @@ get_license_uri (ChamplainMapSource *map_source)
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   g_return_val_if_fail (source_chain, NULL);
 
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   g_return_val_if_fail (priv->stack_top, NULL);
 
   return champlain_map_source_get_license_uri (priv->stack_top);
@@ -179,7 +179,7 @@ get_min_zoom_level (ChamplainMapSource *map_source)
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   g_return_val_if_fail (source_chain, 0);
 
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   g_return_val_if_fail (priv->stack_top, 0);
 
   return champlain_map_source_get_min_zoom_level (priv->stack_top);
@@ -191,7 +191,7 @@ get_max_zoom_level (ChamplainMapSource *map_source)
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   g_return_val_if_fail (source_chain, 0);
 
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   g_return_val_if_fail (priv->stack_top, 0);
 
   return champlain_map_source_get_max_zoom_level (priv->stack_top);
@@ -203,7 +203,7 @@ get_tile_size (ChamplainMapSource *map_source)
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   g_return_val_if_fail (source_chain, 0);
 
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   g_return_val_if_fail (priv->stack_top, 0);
 
   return champlain_map_source_get_tile_size (priv->stack_top);
@@ -216,7 +216,7 @@ fill_tile (ChamplainMapSource *map_source,
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   g_return_if_fail (source_chain);
 
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   g_return_if_fail (priv->stack_top);
 
   champlain_map_source_fill_tile (priv->stack_top, tile);
@@ -228,7 +228,7 @@ on_set_next_source (ChamplainMapSource *map_source,
     ChamplainMapSource *new_next_source)
 {
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
 
   g_return_if_fail (source_chain);
 
@@ -278,7 +278,7 @@ void
 champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain,
     ChamplainMapSource *map_source)
 {
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   gboolean is_cache = FALSE;
 
   if (CHAMPLAIN_IS_TILE_CACHE(map_source))
@@ -330,7 +330,7 @@ champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain,
 void
 champlain_map_source_chain_pop (ChamplainMapSourceChain *source_chain)
 {
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   ChamplainMapSource *old_stack_top = priv->stack_top;
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (priv->stack_top);
 

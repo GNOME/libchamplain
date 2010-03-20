@@ -36,12 +36,16 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_IS_FILE_CACHE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_FILE_CACHE))
 #define CHAMPLAIN_FILE_CACHE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_FILE_CACHE, ChamplainFileCacheClass))
 
+typedef struct _ChamplainFileCachePrivate ChamplainFileCachePrivate;
+
 typedef struct _ChamplainFileCache ChamplainFileCache;
 typedef struct _ChamplainFileCacheClass ChamplainFileCacheClass;
 
 struct _ChamplainFileCache
 {
   ChamplainTileCache parent_instance;
+
+  ChamplainFileCachePrivate *priv;
 };
 
 struct _ChamplainFileCacheClass

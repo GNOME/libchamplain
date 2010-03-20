@@ -35,12 +35,16 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_IS_ERROR_TILE_SOURCE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_ERROR_TILE_SOURCE))
 #define CHAMPLAIN_ERROR_TILE_SOURCE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_ERROR_TILE_SOURCE, ChamplainErrorTileSourceClass))
 
+typedef struct _ChamplainErrorTileSourcePrivate ChamplainErrorTileSourcePrivate;
+
 typedef struct _ChamplainErrorTileSource ChamplainErrorTileSource;
 typedef struct _ChamplainErrorTileSourceClass ChamplainErrorTileSourceClass;
 
 struct _ChamplainErrorTileSource
 {
   ChamplainTileSource parent_instance;
+
+  ChamplainErrorTileSourcePrivate *priv;
 };
 
 struct _ChamplainErrorTileSourceClass

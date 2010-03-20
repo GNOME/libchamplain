@@ -73,8 +73,6 @@ enum
 
 static guint champlain_map_source_signals[LAST_SIGNAL] = { 0, };
 
-typedef struct _ChamplainMapSourcePrivate ChamplainMapSourcePrivate;
-
 struct _ChamplainMapSourcePrivate
 {
   ChamplainMapSource *next_source;
@@ -93,7 +91,7 @@ champlain_map_source_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainMapSourcePrivate *priv = CHAMPLAIN_MAP_SOURCE (object)->priv;
 
   switch (prop_id)
     {
@@ -127,7 +125,7 @@ champlain_map_source_set_property (GObject *object,
 static void
 champlain_map_source_dispose (GObject *object)
 {
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE(object);
+  ChamplainMapSourcePrivate *priv = CHAMPLAIN_MAP_SOURCE (object)->priv;
 
   if (priv->next_source)
     {
@@ -211,7 +209,10 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
 static void
 champlain_map_source_init (ChamplainMapSource *map_source)
 {
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE(map_source);
+  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
+
+  map_source->priv = priv;
+
   priv->next_source = NULL;
   priv->sig_handler_id = 0;
 }
@@ -231,8 +232,7 @@ champlain_map_source_get_next_source (ChamplainMapSource *map_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), NULL);
 
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE(map_source);
-  return priv->next_source;
+  return map_source->priv->next_source;
 }
 
 static
@@ -247,7 +247,7 @@ on_set_next_source (ChamplainMapSource *map_source,
     ChamplainMapSource *old_next_source,
     ChamplainMapSource *new_next_source)
 {
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE(map_source);
+  ChamplainMapSourcePrivate *priv = map_source->priv;
   if (old_next_source)
     {
       if (g_signal_handler_is_connected (old_next_source, priv->sig_handler_id))
@@ -276,7 +276,7 @@ champlain_map_source_set_next_source (ChamplainMapSource *map_source,
 {
   g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
 
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE(map_source);
+  ChamplainMapSourcePrivate *priv = map_source->priv;
 
   CHAMPLAIN_MAP_SOURCE_GET_CLASS (map_source)->on_set_next_source (map_source, priv->next_source, next_source);
 

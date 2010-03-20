@@ -36,12 +36,16 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_IS_MAP_SOURCE_CHAIN_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MAP_SOURCE_CHAIN))
 #define CHAMPLAIN_MAP_SOURCE_CHAIN_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_CHAIN, ChamplainMapSourceChainClass))
 
+typedef struct _ChamplainMapSourceChainPrivate ChamplainMapSourceChainPrivate;
+
 typedef struct _ChamplainMapSourceChain ChamplainMapSourceChain;
 typedef struct _ChamplainMapSourceChainClass ChamplainMapSourceChainClass;
 
 struct _ChamplainMapSourceChain
 {
   ChamplainMapSource parent_instance;
+
+  ChamplainMapSourceChainPrivate *priv;
 };
 
 struct _ChamplainMapSourceChainClass
