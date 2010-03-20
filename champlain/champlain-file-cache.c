@@ -66,28 +66,33 @@ struct _ChamplainFileCachePrivate
 static void finalize_sql (ChamplainFileCache *file_cache);
 static void delete_temp_cache (ChamplainFileCache *file_cache);
 static void init_cache  (ChamplainFileCache *file_cache);
-static gchar *get_filename (ChamplainFileCache *file_cache, ChamplainTile *tile);
-static gboolean tile_is_expired (ChamplainFileCache *file_cache, ChamplainTile *tile);
-static void delete_tile (ChamplainFileCache *file_cache, const gchar *filename);
+static gchar *get_filename (ChamplainFileCache *file_cache,
+    ChamplainTile *tile);
+static gboolean tile_is_expired (ChamplainFileCache *file_cache,
+    ChamplainTile *tile);
+static void delete_tile (ChamplainFileCache *file_cache,
+    const gchar *filename);
 static void delete_dir_recursive (GFile *parent);
 static gboolean create_cache_dir (const gchar *dir_name);
 
 static void fill_tile (ChamplainMapSource *map_source,
-                       ChamplainTile *tile);
+    ChamplainTile *tile);
 
 static void store_tile (ChamplainTileCache *tile_cache,
-                        ChamplainTile *tile,
-                        const gchar *contents,
-                        gsize size);
-static void refresh_tile_time (ChamplainTileCache *tile_cache, ChamplainTile *tile);
-static void on_tile_filled (ChamplainTileCache *tile_cache, ChamplainTile *tile);
+    ChamplainTile *tile,
+    const gchar *contents,
+    gsize size);
+static void refresh_tile_time (ChamplainTileCache *tile_cache,
+    ChamplainTile *tile);
+static void on_tile_filled (ChamplainTileCache *tile_cache,
+    ChamplainTile *tile);
 static void clean (ChamplainTileCache *tile_cache);
 
 static void
 champlain_file_cache_get_property (GObject *object,
-                                   guint property_id,
-                                   GValue *value,
-                                   GParamSpec *pspec)
+    guint property_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE (object);
 
@@ -106,9 +111,9 @@ champlain_file_cache_get_property (GObject *object,
 
 static void
 champlain_file_cache_set_property (GObject *object,
-                                   guint property_id,
-                                   const GValue *value,
-                                   GParamSpec *pspec)
+    guint property_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE (object);
   ChamplainFileCachePrivate *priv = GET_PRIVATE (object);
@@ -263,9 +268,9 @@ init_cache  (ChamplainFileCache *file_cache)
     }
 
   sqlite3_exec (priv->db,
-                "PRAGMA synchronous=OFF;"
-                "PRAGMA count_changes=OFF;",
-                NULL, NULL, &error_msg);
+      "PRAGMA synchronous=OFF;"
+      "PRAGMA count_changes=OFF;",
+      NULL, NULL, &error_msg);
   if (error_msg != NULL)
     {
       DEBUG ("Set PRAGMA: %s", error_msg);
@@ -274,12 +279,12 @@ init_cache  (ChamplainFileCache *file_cache)
     }
 
   sqlite3_exec (priv->db,
-                "CREATE TABLE IF NOT EXISTS tiles ("
-                "filename TEXT PRIMARY KEY, "
-                "etag TEXT, "
-                "popularity INT DEFAULT 1, "
-                "size INT DEFAULT 0)",
-                NULL, NULL, &error_msg);
+      "CREATE TABLE IF NOT EXISTS tiles ("
+      "filename TEXT PRIMARY KEY, "
+      "etag TEXT, "
+      "popularity INT DEFAULT 1, "
+      "size INT DEFAULT 0)",
+      NULL, NULL, &error_msg);
   if (error_msg != NULL)
     {
       DEBUG ("Creating table 'tiles' failed: %s", error_msg);
@@ -294,18 +299,18 @@ init_cache  (ChamplainFileCache *file_cache)
     {
       priv->stmt_select = NULL;
       DEBUG ("Failed to prepare the select Etag statement, error:%d: %s",
-             error, sqlite3_errmsg (priv->db));
+          error, sqlite3_errmsg (priv->db));
       return;
     }
 
   error = sqlite3_prepare_v2 (priv->db,
-                              "UPDATE tiles SET popularity = popularity + 1 WHERE filename = ?", -1,
-                              &priv->stmt_update, NULL);
+              "UPDATE tiles SET popularity = popularity + 1 WHERE filename = ?", -1,
+              &priv->stmt_update, NULL);
   if (error != SQLITE_OK)
     {
       priv->stmt_update = NULL;
       DEBUG ("Failed to prepare the update popularity statement, error: %s",
-             sqlite3_errmsg (priv->db));
+          sqlite3_errmsg (priv->db));
       return;
     }
 
@@ -327,8 +332,8 @@ champlain_file_cache_constructed (GObject *object)
           priv->cache_dir = g_strdup ("/home/user/MyDocs/.Maps/");
 #else
           priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S,
-                                          g_get_user_cache_dir (),
-                                          "champlain", NULL);
+                                g_get_user_cache_dir (),
+                                "champlain", NULL);
 #endif
         }
       else
@@ -367,12 +372,12 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
   * Since: 0.4
   */
   pspec = g_param_spec_uint ("size-limit",
-                             "Size Limit",
-                             "The cache's size limit (Mb)",
-                             1,
-                             G_MAXINT,
-                             100000000,
-                             G_PARAM_CONSTRUCT | G_PARAM_READWRITE);
+              "Size Limit",
+              "The cache's size limit (Mb)",
+              1,
+              G_MAXINT,
+              100000000,
+              G_PARAM_CONSTRUCT | G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_SIZE_LIMIT, pspec);
 
   /**
@@ -383,10 +388,10 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
   * Since: 0.6
   */
   pspec = g_param_spec_string ("cache-dir",
-                               "Cache Directory",
-                               "The directory of the cache",
-                               cache_dir,
-                               G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
+              "Cache Directory",
+              "The directory of the cache",
+              cache_dir,
+              G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_CACHE_DIR, pspec);
 
   tile_cache_class->store_tile = store_tile;
@@ -442,11 +447,12 @@ ChamplainFileCache* champlain_file_cache_new (void)
  * Since: 0.6
  */
 ChamplainFileCache* champlain_file_cache_new_full (guint size_limit,
-    const gchar *cache_dir, gboolean persistent)
+    const gchar *cache_dir,
+    gboolean persistent)
 {
   ChamplainFileCache * cache;
   cache = g_object_new (CHAMPLAIN_TYPE_FILE_CACHE, "size-limit", size_limit,
-                        "cache-dir", cache_dir, "persistent-cache", persistent, NULL);
+              "cache-dir", cache_dir, "persistent-cache", persistent, NULL);
   return cache;
 }
 
@@ -499,7 +505,7 @@ champlain_file_cache_get_cache_dir (ChamplainFileCache *file_cache)
  */
 void
 champlain_file_cache_set_size_limit (ChamplainFileCache *file_cache,
-                                     guint size_limit)
+    guint size_limit)
 {
   g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (file_cache));
 
@@ -510,7 +516,8 @@ champlain_file_cache_set_size_limit (ChamplainFileCache *file_cache,
 }
 
 static gchar *
-get_filename (ChamplainFileCache *file_cache, ChamplainTile *tile)
+get_filename (ChamplainFileCache *file_cache,
+    ChamplainTile *tile)
 {
   ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
 
@@ -533,7 +540,8 @@ get_filename (ChamplainFileCache *file_cache, ChamplainTile *tile)
 }
 
 static gboolean
-tile_is_expired (ChamplainFileCache *file_cache, ChamplainTile *tile)
+tile_is_expired (ChamplainFileCache *file_cache,
+    ChamplainTile *tile)
 {
   g_return_val_if_fail (CHAMPLAIN_FILE_CACHE (file_cache), FALSE);
   g_return_val_if_fail (CHAMPLAIN_TILE (tile), FALSE);
@@ -564,8 +572,8 @@ typedef struct
 
 static void
 tile_loaded_cb (ClutterTexture *texture,
-                const GError *error,
-                TileLoadedCallbackData *user_data)
+    const GError *error,
+    TileLoadedCallbackData *user_data)
 {
   ChamplainMapSource *map_source = user_data->map_source;
   gchar *filename = user_data->filename;
@@ -604,8 +612,8 @@ tile_loaded_cb (ClutterTexture *texture,
   /* Retrieve modification time */
   file = g_file_new_for_path (filename);
   info = g_file_query_info (file,
-                            G_FILE_ATTRIBUTE_TIME_MODIFIED,
-                            G_FILE_QUERY_INFO_NONE, NULL, NULL);
+             G_FILE_ATTRIBUTE_TIME_MODIFIED,
+             G_FILE_QUERY_INFO_NONE, NULL, NULL);
   if (info)
     {
       g_file_info_get_modification_time (info, &modified_time);
@@ -628,7 +636,7 @@ tile_loaded_cb (ClutterTexture *texture,
       if (sql_rc == SQLITE_ERROR)
         {
           DEBUG ("Failed to prepare the SQL query for finding the Etag of '%s', error: %s",
-                 filename, sqlite3_errmsg (priv->db));
+              filename, sqlite3_errmsg (priv->db));
           goto load_next;
         }
 
@@ -641,13 +649,13 @@ tile_loaded_cb (ClutterTexture *texture,
       else if (sql_rc == SQLITE_DONE)
         {
           DEBUG ("'%s' does't have an etag",
-                 filename);
+              filename);
           goto load_next;
         }
       else if (sql_rc == SQLITE_ERROR)
         {
           DEBUG ("Failed to finding the Etag of '%s', %d error: %s",
-                 filename, sql_rc, sqlite3_errmsg (priv->db));
+              filename, sql_rc, sqlite3_errmsg (priv->db));
           goto load_next;
         }
 
@@ -677,7 +685,7 @@ cleanup:
 
 static void
 fill_tile (ChamplainMapSource *map_source,
-           ChamplainTile *tile)
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (map_source));
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
@@ -717,7 +725,8 @@ fill_tile (ChamplainMapSource *map_source,
 }
 
 static void
-refresh_tile_time (ChamplainTileCache *tile_cache, ChamplainTile *tile)
+refresh_tile_time (ChamplainTileCache *tile_cache,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (tile_cache));
 
@@ -756,9 +765,9 @@ refresh_tile_time (ChamplainTileCache *tile_cache, ChamplainTile *tile)
 
 static void
 store_tile (ChamplainTileCache *tile_cache,
-            ChamplainTile *tile,
-            const gchar *contents,
-            gsize size)
+    ChamplainTile *tile,
+    const gchar *contents,
+    gsize size)
 {
   g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (tile_cache));
 
@@ -815,9 +824,9 @@ store_tile (ChamplainTileCache *tile_cache,
   g_object_unref (ostream);
 
   query = sqlite3_mprintf ("REPLACE INTO tiles (filename, etag, size) VALUES (%Q, %Q, %d)",
-                           filename,
-                           champlain_tile_get_etag (tile),
-                           size);
+              filename,
+              champlain_tile_get_etag (tile),
+              size);
   sqlite3_exec (priv->db, query, NULL, NULL, &error);
   if (error != NULL)
     {
@@ -828,9 +837,7 @@ store_tile (ChamplainTileCache *tile_cache,
 
 store_next:
   if (CHAMPLAIN_IS_TILE_CACHE(next_source))
-    {
-      store_tile (CHAMPLAIN_TILE_CACHE(next_source), tile, contents, size);
-    }
+    store_tile (CHAMPLAIN_TILE_CACHE(next_source), tile, contents, size);
 
   g_free (filename);
   g_free (path);
@@ -838,7 +845,8 @@ store_next:
 }
 
 static void
-on_tile_filled (ChamplainTileCache *tile_cache, ChamplainTile *tile)
+on_tile_filled (ChamplainTileCache *tile_cache,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (tile_cache));
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
@@ -871,9 +879,7 @@ on_tile_filled (ChamplainTileCache *tile_cache, ChamplainTile *tile)
 
 call_next:
   if (CHAMPLAIN_IS_TILE_CACHE(next_source))
-    {
-      on_tile_filled (CHAMPLAIN_TILE_CACHE(next_source), tile);
-    }
+    on_tile_filled (CHAMPLAIN_TILE_CACHE(next_source), tile);
 }
 
 static void

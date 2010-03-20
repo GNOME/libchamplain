@@ -71,9 +71,9 @@ G_DEFINE_TYPE (ChamplainBaseMarker, champlain_base_marker, CLUTTER_TYPE_GROUP);
 
 static void
 champlain_base_marker_get_property (GObject *object,
-                               guint prop_id,
-                               GValue *value,
-                               GParamSpec *pspec)
+    guint prop_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
     ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (object);
     ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (base_marker);
@@ -96,9 +96,9 @@ champlain_base_marker_get_property (GObject *object,
 
 static void
 champlain_base_marker_set_property (GObject *object,
-                               guint prop_id,
-                               const GValue *value,
-                               GParamSpec *pspec)
+    guint prop_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
     ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (object);
     ChamplainBaseMarkerPrivate *priv = CHAMPLAIN_BASE_MARKER_GET_PRIVATE (base_marker);

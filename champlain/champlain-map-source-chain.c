@@ -57,8 +57,8 @@ static guint get_tile_size (ChamplainMapSource *map_source);
 
 static void fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile);
 static void on_set_next_source (ChamplainMapSource *map_source,
-                                ChamplainMapSource *old_next_source,
-                                ChamplainMapSource *new_next_source);
+    ChamplainMapSource *old_next_source,
+    ChamplainMapSource *new_next_source);
 
 static void
 champlain_map_source_chain_dispose (GObject *object)
@@ -211,7 +211,7 @@ get_tile_size (ChamplainMapSource *map_source)
 
 static void
 fill_tile (ChamplainMapSource *map_source,
-           ChamplainTile *tile)
+    ChamplainTile *tile)
 {
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   g_return_if_fail (source_chain);
@@ -224,8 +224,8 @@ fill_tile (ChamplainMapSource *map_source,
 
 static void
 on_set_next_source (ChamplainMapSource *map_source,
-                    ChamplainMapSource *old_next_source,
-                    ChamplainMapSource *new_next_source)
+    ChamplainMapSource *old_next_source,
+    ChamplainMapSource *new_next_source)
 {
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
   ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
@@ -238,8 +238,8 @@ on_set_next_source (ChamplainMapSource *map_source,
 
 static void
 assign_cache_of_next_source_sequence (ChamplainMapSourceChain *source_chain,
-                                      ChamplainMapSource *start_map_source,
-                                      ChamplainTileCache *tile_cache)
+    ChamplainMapSource *start_map_source,
+    ChamplainTileCache *tile_cache)
 {
   ChamplainMapSource *map_source = start_map_source;
   ChamplainMapSource *chain_next_source = champlain_map_source_get_next_source (CHAMPLAIN_MAP_SOURCE(source_chain));
@@ -258,7 +258,8 @@ assign_cache_of_next_source_sequence (ChamplainMapSourceChain *source_chain,
 }
 
 static void
-reload_tiles_cb (ChamplainMapSource *map_source, ChamplainMapSourceChain *source_chain)
+reload_tiles_cb (ChamplainMapSource *map_source,
+    ChamplainMapSourceChain *source_chain)
 {
   /* propagate the signal from the chain that is inside champlain_map_source_chain */
   g_signal_emit_by_name (source_chain, "reload-tiles", NULL);
@@ -274,7 +275,8 @@ reload_tiles_cb (ChamplainMapSource *map_source, ChamplainMapSourceChain *source
  * Since: 0.6
  */
 void
-champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain, ChamplainMapSource *map_source)
+champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain,
+    ChamplainMapSource *map_source)
 {
   ChamplainMapSourceChainPrivate *priv = GET_PRIVATE(source_chain);
   gboolean is_cache = FALSE;

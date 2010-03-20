@@ -189,39 +189,55 @@ G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
 
 static gdouble viewport_get_current_longitude (ChamplainViewPrivate *priv);
 static gdouble viewport_get_current_latitude (ChamplainViewPrivate *priv);
-static gdouble viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x);
-static gdouble viewport_get_latitude_at (ChamplainViewPrivate *priv, gint y);
-static gboolean scroll_event (ClutterActor *actor, ClutterScrollEvent *event,
+static gdouble viewport_get_longitude_at (ChamplainViewPrivate *priv,
+    gint x);
+static gdouble viewport_get_latitude_at (ChamplainViewPrivate *priv,
+    gint y);
+static gboolean scroll_event (ClutterActor *actor,
+    ClutterScrollEvent *event,
     ChamplainView *view);
-static void marker_reposition_cb (ChamplainMarker *marker, ChamplainView *view);
-static void layer_reposition_cb (ClutterActor *layer, ChamplainView *view);
+static void marker_reposition_cb (ChamplainMarker *marker,
+    ChamplainView *view);
+static void layer_reposition_cb (ClutterActor *layer,
+    ChamplainView *view);
 static gboolean marker_reposition (gpointer data);
 static void resize_viewport (ChamplainView *view);
-static void champlain_view_get_property (GObject *object, guint prop_id,
-    GValue *value, GParamSpec *pspec);
-static void champlain_view_set_property (GObject *object, guint prop_id,
-    const GValue *value, GParamSpec *pspec);
+static void champlain_view_get_property (GObject *object,
+    guint prop_id,
+    GValue *value,
+    GParamSpec *pspec);
+static void champlain_view_set_property (GObject *object,
+    guint prop_id,
+    const GValue *value,
+    GParamSpec *pspec);
 static void champlain_view_dispose (GObject *object);
 static void champlain_view_class_init (ChamplainViewClass *champlainViewClass);
 static void champlain_view_init (ChamplainView *view);
-static void viewport_pos_changed_cb (GObject *gobject, GParamSpec *arg1,
+static void viewport_pos_changed_cb (GObject *gobject,
+    GParamSpec *arg1,
     ChamplainView *view);
 static void notify_marker_reposition_cb (ChamplainMarker *marker,
-    GParamSpec *arg1, ChamplainView *view);
-static void layer_add_marker_cb (ClutterGroup *layer, ChamplainMarker *marker,
+    GParamSpec *arg1,
+    ChamplainView *view);
+static void layer_add_marker_cb (ClutterGroup *layer,
+    ChamplainMarker *marker,
     ChamplainView *view);
 static void connect_marker_notify_cb (ChamplainMarker *marker,
     ChamplainView *view);
 static gboolean finger_scroll_button_press_cb (ClutterActor *actor,
-    ClutterButtonEvent *event, ChamplainView *view);
+    ClutterButtonEvent *event,
+    ChamplainView *view);
 static void update_license (ChamplainView *view);
 static void update_scale (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
-static void view_position_tile (ChamplainView* view, ChamplainTile* tile);
+static void view_position_tile (ChamplainView* view,
+    ChamplainTile* tile);
 static void view_reload_tiles_cb (ChamplainMapSource *map_source,
     ChamplainView* view);
 static void view_update_state (ChamplainView *view);
-static void view_update_anchor (ChamplainView *view, gint x, gint y);
+static void view_update_anchor (ChamplainView *view,
+    gint x,
+    gint y);
 static gboolean view_set_zoom_level_at (ChamplainView *view,
     gint zoom_level,
     gint x,
@@ -246,7 +262,8 @@ static gboolean fill_tile_cb (FillTileCallbackData *data);
 #define SCALE_LINE_WIDTH 2
 
 static gdouble
-viewport_get_longitude_at (ChamplainViewPrivate *priv, gint x)
+viewport_get_longitude_at (ChamplainViewPrivate *priv,
+    gint x)
 {
   if (!priv->map_source)
     return 0.0;
@@ -263,7 +280,8 @@ viewport_get_current_longitude (ChamplainViewPrivate *priv)
 }
 
 static gdouble
-viewport_get_latitude_at (ChamplainViewPrivate *priv, gint y)
+viewport_get_latitude_at (ChamplainViewPrivate *priv,
+    gint y)
 {
   if (!priv->map_source)
     return 0.0;
@@ -337,7 +355,7 @@ update_viewport (ChamplainView *view,
 
 static void
 panning_completed (TidyFingerScroll *scroll,
-                   ChamplainView *view)
+    ChamplainView *view)
 {
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   gfloat x, y;
@@ -434,10 +452,10 @@ redraw_polygon_on_idle (PolygonRedrawContext *ctx)
 
   if (ctx->polygon)
     champlain_polygon_draw_polygon (ctx->polygon,
-                                    priv->map_source,
-                                    priv->zoom_level,
-                                    priv->viewport_size.width, priv->viewport_size.height,
-                                    priv->viewport_size.x + priv->anchor.x, priv->viewport_size.y + priv->anchor.y);
+        priv->map_source, priv->zoom_level,
+        priv->viewport_size.width, priv->viewport_size.height,
+        priv->viewport_size.x + priv->anchor.x,
+        priv->viewport_size.y + priv->anchor.y);
 
   priv->polygon_redraw_id = 0;
   // ctx is freed by g_idle_add_full
@@ -768,9 +786,9 @@ _update_idle_cb (ChamplainView *view)
 }
 
 static void
-champlain_view_allocate (ClutterActor          *actor,
-                         const ClutterActorBox *box,
-                         ClutterAllocationFlags flags)
+champlain_view_allocate (ClutterActor *actor,
+    const ClutterActorBox *box,
+    ClutterAllocationFlags flags)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (actor);
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
@@ -826,9 +844,9 @@ champlain_view_realize (ClutterActor *actor)
  */
 static void
 champlain_view_get_preferred_width (ClutterActor *actor,
-                                    gfloat        for_height,
-                                    gfloat       *min_width,
-                                    gfloat       *nat_width)
+    gfloat for_height,
+    gfloat *min_width,
+    gfloat *nat_width)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (actor);
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
@@ -843,9 +861,9 @@ champlain_view_get_preferred_width (ClutterActor *actor,
 
 static void
 champlain_view_get_preferred_height (ClutterActor *actor,
-                                     gfloat        for_width,
-                                     gfloat       *min_height,
-                                     gfloat       *nat_height)
+    gfloat for_width,
+    gfloat *min_height,
+    gfloat *nat_height)
 {
   ChamplainView *view = CHAMPLAIN_VIEW (actor);
   ChamplainViewPrivate *priv = GET_PRIVATE (view);

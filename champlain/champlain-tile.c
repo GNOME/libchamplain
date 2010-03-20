@@ -513,7 +513,8 @@ fade_in_completed (ClutterAnimation *animation, ChamplainTile *self)
  * Since: 0.4
  */
 void
-champlain_tile_set_state (ChamplainTile *self, ChamplainState state)
+champlain_tile_set_state (ChamplainTile *self,
+    ChamplainState state)
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
@@ -749,7 +750,8 @@ champlain_tile_get_fade_in (ChamplainTile *self)
  * Since: 0.6
  */
 void
-champlain_tile_set_fade_in (ChamplainTile *self, gboolean fade_in)
+champlain_tile_set_fade_in (ChamplainTile *self,
+    gboolean fade_in)
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 

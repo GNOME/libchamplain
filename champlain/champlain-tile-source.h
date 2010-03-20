@@ -54,14 +54,14 @@ GType champlain_tile_source_get_type (void);
 
 ChamplainTileCache *champlain_tile_source_get_cache (ChamplainTileSource *tile_source);
 void champlain_tile_source_set_cache (ChamplainTileSource *tile_source,
-                                      ChamplainTileCache *cache);
+    ChamplainTileCache *cache);
 
 void champlain_tile_source_set_id (ChamplainTileSource *tile_source,
-                                   const gchar *id);
+    const gchar *id);
 void champlain_tile_source_set_name (ChamplainTileSource *tile_source,
-                                     const gchar *name);
+    const gchar *name);
 void champlain_tile_source_set_license (ChamplainTileSource *tile_source,
-                                        const gchar *license);
+    const gchar *license);
 void champlain_tile_source_set_license_uri (ChamplainTileSource *tile_source,
     const gchar *license_uri);
 

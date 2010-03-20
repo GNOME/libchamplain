@@ -101,14 +101,16 @@ struct _WorkerThreadData
 /* lock to protect the renderer state while rendering */
 GStaticRWLock MemphisLock = G_STATIC_RW_LOCK_INIT;
 
-static void fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile);
+static void fill_tile (ChamplainMapSource *map_source,
+    ChamplainTile *tile);
 
 static void reload_tiles (ChamplainMemphisTileSource *tile_source);
 static void memphis_worker_thread (gpointer data, gpointer user_data);
 static void map_data_changed_cb (ChamplainMapDataSource *map_data_source,
-                                 GParamSpec *gobject,
-                                 ChamplainMemphisTileSource *tile_source);
-void argb_to_rgba (guchar *data, guint size);
+    GParamSpec *gobject,
+    ChamplainMemphisTileSource *tile_source);
+void argb_to_rgba (guchar *data,
+    guint size);
 
 static void
 champlain_memphis_tile_source_get_property (GObject *object,
@@ -219,12 +221,12 @@ champlain_memphis_tile_source_class_init (ChamplainMemphisTileSourceClass *klass
   * Since: 0.6
   */
   g_object_class_install_property (object_class,
-                                   PROP_MAP_DATA_SOURCE,
-                                   g_param_spec_object ("map-data-source",
-                                       "Map data source",
-                                       "The data source of the renderer",
-                                       CHAMPLAIN_TYPE_MAP_DATA_SOURCE,
-                                       G_PARAM_CONSTRUCT | G_PARAM_READWRITE));
+      PROP_MAP_DATA_SOURCE,
+      g_param_spec_object ("map-data-source",
+          "Map data source",
+          "The data source of the renderer",
+          CHAMPLAIN_TYPE_MAP_DATA_SOURCE,
+          G_PARAM_CONSTRUCT | G_PARAM_READWRITE));
 }
 
 static void
@@ -239,12 +241,12 @@ champlain_memphis_tile_source_init (ChamplainMemphisTileSource *tile_source)
 
   priv->rules = memphis_rule_set_new ();
   memphis_rule_set_load_from_data (priv->rules, default_rules,
-                                   strlen (default_rules));
+      strlen (default_rules));
 
   priv->renderer = memphis_renderer_new_full (priv->rules, memphis_map_new ());
 
   priv->thpool = g_thread_pool_new (memphis_worker_thread, tile_source,
-                                    MAX_THREADS, FALSE, NULL);
+      MAX_THREADS, FALSE, NULL);
 }
 
 /**
@@ -276,22 +278,22 @@ ChamplainMemphisTileSource* champlain_memphis_tile_source_new_full (const gchar 
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source), NULL);
 
   return g_object_new (CHAMPLAIN_TYPE_MEMPHIS_TILE_SOURCE,
-                       "id", id,
-                       "name", name,
-                       "license", license,
-                       "license-uri", license_uri,
-                       "min-zoom-level", min_zoom_level,
-                       "max-zoom-level", max_zoom_level,
-                       "tile-size", tile_size,
-                       "projection", projection,
-                       "map-data-source", map_data_source,
-                       NULL);
+             "id", id,
+             "name", name,
+             "license", license,
+             "license-uri", license_uri,
+             "min-zoom-level", min_zoom_level,
+             "max-zoom-level", max_zoom_level,
+             "tile-size", tile_size,
+             "projection", projection,
+             "map-data-source", map_data_source,
+             NULL);
 }
 
 static void
 map_data_changed_cb (ChamplainMapDataSource *map_data_source,
-                     GParamSpec *gobject,
-                     ChamplainMemphisTileSource *tile_source)
+     GParamSpec *gobject,
+     ChamplainMemphisTileSource *tile_source)
 {
   g_assert (CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source) &&
             CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
@@ -326,7 +328,8 @@ map_data_changed_cb (ChamplainMapDataSource *map_data_source,
 Transform ARGB (Cairo) to RGBA (GdkPixbuf). RGBA is actualy reversed in
 memory, so the transformation is ARGB -> ABGR (i.e. swapping B and R)
 */
-void argb_to_rgba (guchar *data, guint size)
+void argb_to_rgba (guchar *data,
+    guint size)
 {
   guint32 *ptr;
   guint32 *endptr = (guint32 *)data + size / 4;
@@ -386,22 +389,14 @@ tile_loaded_cb (gpointer worker_data)
       /* modify directly the buffer of cairo surface - we don't use it any more
          and we close the surface anyway */
       argb_to_rgba (cairo_image_surface_get_data (cst),
-                    cairo_image_surface_get_stride (cst) * cairo_image_surface_get_height (cst));
+          cairo_image_surface_get_stride (cst) * cairo_image_surface_get_height (cst));
 
       pixbuf = gdk_pixbuf_new_from_data (cairo_image_surface_get_data (cst),
-                                         GDK_COLORSPACE_RGB,
-                                         TRUE,
-                                         8,
-                                         size,
-                                         size,
-                                         cairo_image_surface_get_stride (cst),
-                                         NULL,
-                                         NULL);
+                   GDK_COLORSPACE_RGB, TRUE, 8, size, size,
+                   cairo_image_surface_get_stride (cst), NULL, NULL);
 
       if (gdk_pixbuf_save_to_buffer (pixbuf, &buffer, &buffer_size, "png", &error, NULL))
-        {
-          champlain_tile_cache_store_tile (tile_cache, tile, buffer, buffer_size);
-        }
+        champlain_tile_cache_store_tile (tile_cache, tile, buffer, buffer_size);
 
       g_free (buffer);
       g_object_unref (pixbuf);
@@ -419,7 +414,8 @@ cleanup:
 }
 
 static void
-memphis_worker_thread (gpointer worker_data, gpointer user_data)
+memphis_worker_thread (gpointer worker_data,
+    gpointer user_data)
 {
   WorkerThreadData *data = (WorkerThreadData *)worker_data;
   ChamplainMapSource *map_source = data->map_source;
@@ -453,7 +449,8 @@ memphis_worker_thread (gpointer worker_data, gpointer user_data)
 }
 
 static void
-fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
+fill_tile (ChamplainMapSource *map_source,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (map_source));
 
@@ -564,8 +561,8 @@ champlain_memphis_tile_source_load_rules (
  */
 void
 champlain_memphis_tile_source_set_map_data_source (
-  ChamplainMemphisTileSource *tile_source,
-  ChamplainMapDataSource *map_data_source)
+    ChamplainMemphisTileSource *tile_source,
+    ChamplainMapDataSource *map_data_source)
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                     CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source));
@@ -579,7 +576,7 @@ champlain_memphis_tile_source_set_map_data_source (
   priv->map_data_source = g_object_ref_sink (map_data_source);
 
   g_signal_connect (priv->map_data_source, "notify::state",
-                    G_CALLBACK (map_data_changed_cb), tile_source);
+      G_CALLBACK (map_data_changed_cb), tile_source);
 
   map = champlain_map_data_source_get_map_data (priv->map_data_source);
   if (map == NULL)
@@ -605,7 +602,7 @@ champlain_memphis_tile_source_set_map_data_source (
  */
 ChamplainMapDataSource *
 champlain_memphis_tile_source_get_map_data_source (
-  ChamplainMemphisTileSource *tile_source)
+    ChamplainMemphisTileSource *tile_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source), NULL);
 
@@ -622,8 +619,9 @@ champlain_memphis_tile_source_get_map_data_source (
  *
  * Since: 0.6
  */
-ClutterColor * champlain_memphis_tile_source_get_background_color (
-  ChamplainMemphisTileSource *tile_source)
+ClutterColor *
+champlain_memphis_tile_source_get_background_color (
+    ChamplainMemphisTileSource *tile_source)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source), NULL);
 
@@ -653,8 +651,8 @@ ClutterColor * champlain_memphis_tile_source_get_background_color (
  */
 void
 champlain_memphis_tile_source_set_background_color (
-  ChamplainMemphisTileSource *tile_source,
-  const ClutterColor *color)
+    ChamplainMemphisTileSource *tile_source,
+    const ClutterColor *color)
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
 
@@ -680,7 +678,7 @@ champlain_memphis_tile_source_set_background_color (
  */
 void
 champlain_memphis_tile_source_set_rule (ChamplainMemphisTileSource *tile_source,
-                                        MemphisRule *rule)
+    MemphisRule *rule)
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                     MEMPHIS_RULE (rule));
@@ -705,7 +703,7 @@ champlain_memphis_tile_source_set_rule (ChamplainMemphisTileSource *tile_source,
  */
 MemphisRule *
 champlain_memphis_tile_source_get_rule (ChamplainMemphisTileSource *tile_source,
-                                        const gchar *id)
+    const gchar *id)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source) &&
                         id != NULL, NULL);
@@ -756,8 +754,8 @@ champlain_memphis_tile_source_get_rule_ids (ChamplainMemphisTileSource *tile_sou
  * Since: 0.6
  */
 void champlain_memphis_tile_source_remove_rule (
-  ChamplainMemphisTileSource *tile_source,
-  const gchar *id)
+    ChamplainMemphisTileSource *tile_source,
+    const gchar *id)
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE (tile_source));
 

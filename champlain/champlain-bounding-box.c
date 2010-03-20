@@ -3,7 +3,7 @@
  *
  * This file is inspired by clutter-color.c which is
  * Copyright (C) 2006 OpenedHand, and has the same license.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -90,7 +90,6 @@ champlain_bounding_box_copy (const ChamplainBoundingBox *bbox)
 void
 champlain_bounding_box_free (ChamplainBoundingBox *bbox)
 {
-
   if (G_UNLIKELY (bbox == NULL))
     return;
 

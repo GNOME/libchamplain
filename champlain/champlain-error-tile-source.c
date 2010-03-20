@@ -39,7 +39,8 @@ struct _ChamplainErrorTileSourcePrivate
   ClutterActor *error_actor;
 };
 
-static void fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile);
+static void fill_tile (ChamplainMapSource *map_source,
+    ChamplainTile *tile);
 
 static void
 champlain_error_tile_source_dispose (GObject *object)
@@ -90,7 +91,8 @@ ChamplainErrorTileSource* champlain_error_tile_source_new_full (guint tile_size)
 }
 
 static void
-fill_tile (ChamplainMapSource *map_source, ChamplainTile *tile)
+fill_tile (ChamplainMapSource *map_source,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_ERROR_TILE_SOURCE (map_source));
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));

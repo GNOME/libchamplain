@@ -178,9 +178,9 @@ champlain_marker_get_highlight_text_color ()
 
 static void
 champlain_marker_get_property (GObject *object,
-                               guint prop_id,
-                               GValue *value,
-                               GParamSpec *pspec)
+    guint prop_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
     ChamplainMarkerPrivate *priv = GET_PRIVATE (object);
 
@@ -229,9 +229,9 @@ champlain_marker_get_property (GObject *object,
 
 static void
 champlain_marker_set_property (GObject *object,
-                               guint prop_id,
-                               const GValue *value,
-                               GParamSpec *pspec)
+    guint prop_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
     ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
     //ChamplainMarkerPrivate *priv = marker->priv;

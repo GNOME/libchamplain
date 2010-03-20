@@ -84,11 +84,11 @@ guint champlain_map_source_get_tile_size (ChamplainMapSource *map_source);
 ChamplainMapProjection champlain_map_source_get_projection (ChamplainMapSource *map_source);
 
 guint champlain_map_source_get_x (ChamplainMapSource *map_source,
-                                  guint zoom_level,
-                                  gdouble longitude);
+    guint zoom_level,
+    gdouble longitude);
 guint champlain_map_source_get_y (ChamplainMapSource *map_source,
-                                  guint zoom_level,
-                                  gdouble latitude);
+    guint zoom_level,
+    gdouble latitude);
 gdouble champlain_map_source_get_longitude (ChamplainMapSource *map_source,
     guint zoom_level,
     guint x);
@@ -105,7 +105,7 @@ gdouble champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_sourc
     gdouble longitude);
 
 void champlain_map_source_fill_tile (ChamplainMapSource *map_source,
-                                     ChamplainTile *tile);
+    ChamplainTile *tile);
 
 G_END_DECLS
 

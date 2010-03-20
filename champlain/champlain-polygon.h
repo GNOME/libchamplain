@@ -101,10 +101,12 @@ void champlain_polygon_show (ChamplainPolygon *polygon);
 void champlain_polygon_hide (ChamplainPolygon *polygon);
 
 void champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
-                                     ChamplainMapSource *map_source,
-                                     guint zoom_level,
-                                     gfloat width, gfloat height,
-                                     gfloat shift_x, gfloat shift_y);
+    ChamplainMapSource *map_source,
+    guint zoom_level,
+    gfloat width,
+    gfloat height,
+    gfloat shift_x,
+    gfloat shift_y);
 
 G_END_DECLS
 

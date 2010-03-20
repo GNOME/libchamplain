@@ -55,9 +55,9 @@ static ChamplainMapProjection get_projection (ChamplainMapSource *map_source);
 
 static void
 champlain_tile_cache_get_property (GObject *object,
-                                   guint property_id,
-                                   GValue *value,
-                                   GParamSpec *pspec)
+    guint property_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE (object);
 
@@ -73,9 +73,9 @@ champlain_tile_cache_get_property (GObject *object,
 
 static void
 champlain_tile_cache_set_property (GObject *object,
-                                   guint property_id,
-                                   const GValue *value,
-                                   GParamSpec *pspec)
+    guint property_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainTileCachePrivate *priv = GET_PRIVATE (object);
 
@@ -195,9 +195,9 @@ champlain_tile_cache_get_persistent (ChamplainTileCache *tile_cache)
  */
 void
 champlain_tile_cache_store_tile (ChamplainTileCache *tile_cache,
-                                 ChamplainTile *tile,
-                                 const gchar *contents,
-                                 gsize size)
+    ChamplainTile *tile,
+    const gchar *contents,
+    gsize size)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
 
@@ -214,7 +214,8 @@ champlain_tile_cache_store_tile (ChamplainTileCache *tile_cache,
  * Since: 0.6
  */
 void
-champlain_tile_cache_refresh_tile_time (ChamplainTileCache *tile_cache, ChamplainTile *tile)
+champlain_tile_cache_refresh_tile_time (ChamplainTileCache *tile_cache,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
 
@@ -237,7 +238,8 @@ champlain_tile_cache_refresh_tile_time (ChamplainTileCache *tile_cache, Champlai
  * Since: 0.6
  */
 void
-champlain_tile_cache_on_tile_filled (ChamplainTileCache *tile_cache, ChamplainTile *tile)
+champlain_tile_cache_on_tile_filled (ChamplainTileCache *tile_cache,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
 

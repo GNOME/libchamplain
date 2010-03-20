@@ -109,11 +109,16 @@ void champlain_view_set_scroll_mode (ChamplainView *view,
     ChamplainScrollMode mode);
 void champlain_view_set_keep_center_on_resize (ChamplainView *view,
     gboolean value);
-void champlain_view_set_show_license (ChamplainView *view, gboolean value);
-void champlain_view_set_license_text (ChamplainView *view, const gchar *text);
-void champlain_view_set_show_scale (ChamplainView *view, gboolean value);
-void champlain_view_set_scale_unit (ChamplainView *view, ChamplainUnit unit);
-void champlain_view_set_max_scale_width (ChamplainView *view, guint value);
+void champlain_view_set_show_license (ChamplainView *view,
+    gboolean value);
+void champlain_view_set_license_text (ChamplainView *view,
+    const gchar *text);
+void champlain_view_set_show_scale (ChamplainView *view,
+    gboolean value);
+void champlain_view_set_scale_unit (ChamplainView *view,
+    ChamplainUnit unit);
+void champlain_view_set_max_scale_width (ChamplainView *view,
+    guint value);
 void champlain_view_set_zoom_on_double_click (ChamplainView *view,
     gboolean value);
 

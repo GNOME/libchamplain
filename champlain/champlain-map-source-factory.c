@@ -76,7 +76,7 @@ struct _ChamplainMapSourceFactoryPrivate
 };
 
 static ChamplainMapSource * champlain_map_source_new_generic (
-     ChamplainMapSourceDesc *desc, gpointer data);
+    ChamplainMapSourceDesc *desc, gpointer data);
 
 static ChamplainMapSource * champlain_map_source_new_memphis (
     ChamplainMapSourceDesc *desc, gpointer user_data);
@@ -426,7 +426,8 @@ ChamplainMapSource * champlain_map_source_factory_create_cached_source (Champlai
  */
 gboolean
 champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
-    ChamplainMapSourceDesc *desc, ChamplainMapSourceConstructor constructor,
+    ChamplainMapSourceDesc *desc,
+    ChamplainMapSourceConstructor constructor,
     gpointer data)
 {
 
@@ -439,7 +440,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
 
 static ChamplainMapSource *
 champlain_map_source_new_generic (
-     ChamplainMapSourceDesc *desc, gpointer user_data)
+    ChamplainMapSourceDesc *desc, gpointer user_data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_tile_source_new_full (
       desc->id,

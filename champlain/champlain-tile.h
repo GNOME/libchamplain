@@ -77,7 +77,8 @@ gboolean champlain_tile_get_fade_in (ChamplainTile *self);
 
 void champlain_tile_set_x (ChamplainTile *self,
     gint x);
-void champlain_tile_set_y (ChamplainTile *self, gint y);
+void champlain_tile_set_y (ChamplainTile *self,
+    gint y);
 void champlain_tile_set_zoom_level (ChamplainTile *self,
     gint zoom_level);
 void champlain_tile_set_size (ChamplainTile *self,
@@ -90,7 +91,8 @@ void champlain_tile_set_etag (ChamplainTile *self,
     const gchar *etag);
 void champlain_tile_set_modified_time (ChamplainTile *self,
     const GTimeVal *time);
-void champlain_tile_set_fade_in (ChamplainTile *self, gboolean fade_in);
+void champlain_tile_set_fade_in (ChamplainTile *self,
+    gboolean fade_in);
 
 G_END_DECLS
 
