@@ -1760,7 +1760,7 @@ view_update_anchor (ChamplainView *view,
       DEBUG ("New Anchor (%f, %f) at (%d, %d)", priv->anchor.x, priv->anchor.y, x, y);
     }
 
-  if (need_anchor == FALSE)
+  if (!need_anchor)
     {
       priv->anchor.x = 0;
       priv->anchor.y = 0;

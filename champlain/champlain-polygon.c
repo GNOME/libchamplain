@@ -140,7 +140,7 @@ champlain_polygon_set_property (GObject *object,
             g_value_get_double (value));
         break;
       case PROP_VISIBLE:
-        if (g_value_get_boolean (value) == TRUE)
+        if (g_value_get_boolean (value))
             champlain_polygon_show (CHAMPLAIN_POLYGON (object));
         else
             champlain_polygon_hide (CHAMPLAIN_POLYGON (object));

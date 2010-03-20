@@ -567,7 +567,7 @@ button_release_event_cb (ClutterActor *actor,
   /* Pass through events to children.
    * FIXME: this probably breaks click-count.
    */
-  if (moved == FALSE)
+  if (!moved)
     clutter_event_put ((ClutterEvent *)event);
 
   return moved;

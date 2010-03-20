@@ -712,7 +712,7 @@ draw_marker (ChamplainMarker *marker)
 
   point = (total_height + 2 * PADDING) / 4.0;
 
-  if (priv->draw_background == TRUE)
+  if (priv->draw_background)
     {
       draw_shadow (marker, total_width, total_height, point);
       draw_background (marker, total_width, total_height, point);
@@ -739,7 +739,7 @@ draw_marker (ChamplainMarker *marker)
   if (priv->image != NULL && priv->background != NULL)
     clutter_actor_raise (priv->image, priv->background);
 
-  if (priv->draw_background == TRUE)
+  if (priv->draw_background)
   {
     if (priv->alignment == PANGO_ALIGN_RIGHT)
       clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), total_width, total_height + point);
