@@ -22,7 +22,10 @@
 #include <glib.h>
 #include <clutter/clutter.h>
 
-typedef struct _Map Map;
+/*
+ * WARNING - NEVER put class private declarations here - add accessor methods
+ * to the classes instead. Object encapsulation should be sacred.
+ */
 
 typedef struct
 {
@@ -30,13 +33,6 @@ typedef struct
   gfloat y;
   gfloat z;
 } ChamplainFloatPoint;
-
-struct _ChamplainBaseMarkerPrivate
-{
-  gdouble lon;
-  gdouble lat;
-  gboolean highlighted;
-};
 
 typedef struct
 {

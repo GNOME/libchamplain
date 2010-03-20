@@ -387,12 +387,14 @@ marker_reposition_cb (ChamplainMarker *marker,
     ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
-  ChamplainBaseMarkerPrivate *marker_priv = CHAMPLAIN_BASE_MARKER(marker)->priv;
+  ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (marker);
 
   gint x, y;
 
-  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, marker_priv->lon);
-  y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, marker_priv->lat);
+  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level,
+          champlain_base_marker_get_longitude (base_marker));
+  y = champlain_map_source_get_y (priv->map_source, priv->zoom_level,
+          champlain_base_marker_get_latitude (base_marker));
 
   clutter_actor_set_position (CLUTTER_ACTOR (marker),
     x - priv->anchor.x,

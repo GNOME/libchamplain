@@ -597,7 +597,7 @@ draw_background (ChamplainMarker *marker,
     gint point)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
-  ChamplainBaseMarkerPrivate *base_priv = CHAMPLAIN_BASE_MARKER (marker)->priv;
+  ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (marker);
   ClutterActor *bg = NULL;
   ClutterColor *color;
   ClutterColor darker_color;
@@ -607,7 +607,7 @@ draw_background (ChamplainMarker *marker,
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (bg));
 
   /* If selected, add the selection color to the marker's color */
-  if (base_priv->highlighted)
+  if (champlain_base_marker_get_highlighted (base_marker))
     color = &SELECTED_COLOR;
   else
     color = priv->color;
@@ -649,7 +649,7 @@ static void
 draw_marker (ChamplainMarker *marker)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
-  ChamplainBaseMarkerPrivate *base_priv = CHAMPLAIN_BASE_MARKER (marker)->priv;
+  ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (marker);
   guint height = 0, point = 0;
   guint total_width = 0, total_height = 0;
 
@@ -698,7 +698,7 @@ draw_marker (ChamplainMarker *marker)
         total_height = height;
 
       clutter_text_set_color (CLUTTER_TEXT (priv->text_actor),
-          (base_priv->highlighted ? &SELECTED_TEXT_COLOR : priv->text_color));
+          (champlain_base_marker_get_highlighted (base_marker) ? &SELECTED_TEXT_COLOR : priv->text_color));
       if (clutter_actor_get_parent (priv->text_actor) == NULL)
         clutter_container_add_actor (CLUTTER_CONTAINER (marker), priv->text_actor);
     }

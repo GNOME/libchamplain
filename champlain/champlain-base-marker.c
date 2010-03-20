@@ -69,6 +69,13 @@ G_DEFINE_TYPE (ChamplainBaseMarker, champlain_base_marker, CLUTTER_TYPE_GROUP);
 
 #define CHAMPLAIN_BASE_MARKER_GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_BASE_MARKER, ChamplainBaseMarkerPrivate))
 
+struct _ChamplainBaseMarkerPrivate
+{
+  gdouble lon;
+  gdouble lat;
+  gboolean highlighted;
+};
+
 static void
 champlain_base_marker_get_property (GObject *object,
     guint prop_id,
@@ -135,11 +142,11 @@ champlain_base_marker_finalize (GObject *object)
 }
 
 static void
-champlain_base_marker_class_init (ChamplainBaseMarkerClass *champlainBaseMarkerClass)
+champlain_base_marker_class_init (ChamplainBaseMarkerClass *marker_class)
 {
-  g_type_class_add_private (champlainBaseMarkerClass, sizeof (ChamplainBaseMarkerPrivate));
+  g_type_class_add_private (marker_class, sizeof (ChamplainBaseMarkerPrivate));
 
-  GObjectClass *object_class = G_OBJECT_CLASS (champlainBaseMarkerClass);
+  GObjectClass *object_class = G_OBJECT_CLASS (marker_class);
   object_class->finalize = champlain_base_marker_finalize;
   object_class->get_property = champlain_base_marker_get_property;
   object_class->set_property = champlain_base_marker_set_property;
@@ -222,19 +229,49 @@ champlain_base_marker_new (void)
  * Since: 0.4
  */
 void
-champlain_base_marker_set_position (ChamplainBaseMarker *champlainBaseMarker,
+champlain_base_marker_set_position (ChamplainBaseMarker *marker,
     gdouble latitude,
     gdouble longitude)
 {
-  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (champlainBaseMarker));
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
 
-  ChamplainBaseMarkerPrivate *priv = champlainBaseMarker->priv;
+  ChamplainBaseMarkerPrivate *priv = marker->priv;
 
   priv->lon = longitude;
   priv->lat = latitude;
 
-  g_object_notify (G_OBJECT (champlainBaseMarker), "latitude");
-  g_object_notify (G_OBJECT (champlainBaseMarker), "longitude");
+  g_object_notify (G_OBJECT (marker), "latitude");
+  g_object_notify (G_OBJECT (marker), "longitude");
+}
+
+/**
+ * champlain_base_marker_get_latitude:
+ * @marker: a #ChamplainBaseMarker
+ *
+ * Returns: the latitude of the marker.
+ *
+ * Since: 0.6
+ */
+gdouble champlain_base_marker_get_latitude (ChamplainBaseMarker *marker)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker), 0.0);
+
+  return marker->priv->lat;
+}
+
+/**
+ * champlain_base_marker_get_longitude:
+ * @marker: a #ChamplainBaseMarker
+ *
+ * Returns: the longitude of the marker.
+ *
+ * Since: 0.6
+ */
+gdouble champlain_base_marker_get_longitude (ChamplainBaseMarker *marker)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker), 0.0);
+
+  return marker->priv->lon;
 }
 
 /**
@@ -248,14 +285,14 @@ champlain_base_marker_set_position (ChamplainBaseMarker *champlainBaseMarker,
  * Since: 0.4
  */
 void
-champlain_base_marker_set_highlighted (ChamplainBaseMarker *champlainBaseMarker,
+champlain_base_marker_set_highlighted (ChamplainBaseMarker *marker,
     gboolean value)
 {
-  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (champlainBaseMarker));
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
 
-  champlainBaseMarker->priv->highlighted = value;
+  marker->priv->highlighted = value;
 
-  g_object_notify (G_OBJECT (champlainBaseMarker), "highlighted");
+  g_object_notify (G_OBJECT (marker), "highlighted");
 }
 
 /**
@@ -267,11 +304,11 @@ champlain_base_marker_set_highlighted (ChamplainBaseMarker *champlainBaseMarker,
  * Since: 0.4
  */
 gboolean
-champlain_base_marker_get_highlighted (ChamplainBaseMarker *champlainBaseMarker)
+champlain_base_marker_get_highlighted (ChamplainBaseMarker *marker)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (champlainBaseMarker), FALSE);
+  g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker), FALSE);
 
-  return champlainBaseMarker->priv->highlighted;
+  return marker->priv->highlighted;
 }
 
 /**
