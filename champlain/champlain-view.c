@@ -3108,9 +3108,9 @@ champlain_view_add_polygon (ChamplainView *view,
   g_signal_connect (polygon, "notify",
       G_CALLBACK (notify_polygon_cb), view);
 
-  if (priv->viewport_size.width == 0 ||
-      priv->viewport_size.height == 0)
-    return;
+//  if (priv->viewport_size.width == 0 ||
+//      priv->viewport_size.height == 0)
+//    return;
 
   clutter_actor_set_position (CLUTTER_ACTOR (polygon), 0, 0);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->polygon_layer),
