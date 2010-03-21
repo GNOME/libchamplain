@@ -2222,6 +2222,11 @@ view_load_visible_tiles (ChamplainView *view)
   ChamplainRectangle viewport = priv->viewport_size;
   gint size;
   GList *children;
+  gint x_count, y_count, x_first, y_first, x_end, y_end, max_x_end, max_y_end;
+  gboolean *tile_map;
+  gint arm_size, arm_max, turn;
+  gint dirs[5] = {0, 1, 0, -1, 0};
+  int i, x, y;
 
   size = champlain_map_source_get_tile_size (priv->map_source);
 
@@ -2233,17 +2238,17 @@ view_load_visible_tiles (ChamplainView *view)
   if (viewport.y < 0)
     viewport.y = 0;
 
-  gint x_count = ceil((float)viewport.width / size) + 1;
-  gint y_count = ceil((float)viewport.height / size) + 1;
+  x_count = ceil((float)viewport.width / size) + 1;
+  y_count = ceil((float)viewport.height / size) + 1;
 
-  gint x_first = viewport.x / size;
-  gint y_first = viewport.y / size;
+  x_first = viewport.x / size;
+  y_first = viewport.y / size;
 
-  gint x_end = x_first + x_count;
-  gint y_end = y_first + y_count;
+  x_end = x_first + x_count;
+  y_end = y_first + y_count;
 
-  gint max_x_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
-  gint max_y_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+  max_x_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
+  max_y_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
 
   if (x_end > max_x_end)
     {
@@ -2258,7 +2263,7 @@ view_load_visible_tiles (ChamplainView *view)
 
   DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_end, y_end);
 
-  gboolean *tile_map = g_new0 (gboolean, x_count * y_count);
+  tile_map = g_new0 (gboolean, x_count * y_count);
 
   // Get rid of old tiles first
   children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
@@ -2284,10 +2289,6 @@ view_load_visible_tiles (ChamplainView *view)
   g_list_free (children);
 
   //Load new tiles if needed
-  gint arm_size, arm_max, turn;
-  gint dirs[5] = {0, 1, 0, -1, 0};
-  int i, x, y;
-
   x = x_first + x_count / 2 - 1;
   y = y_first + y_count / 2 - 1;
   arm_max = MAX(x_count, y_count) + 2;
