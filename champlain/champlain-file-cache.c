@@ -335,7 +335,7 @@ champlain_file_cache_constructed (GObject *object)
 #endif
         }
       else
-        priv->cache_dir = (gchar *) g_get_tmp_dir ();
+        priv->cache_dir = g_strdup (g_get_tmp_dir ());
     }
 
   init_cache (file_cache);
