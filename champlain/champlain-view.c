@@ -183,6 +183,7 @@ struct _ChamplainViewPrivate
 
   guint update_cb_id;
   gboolean perform_update;
+  gint tiles_loading;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -234,7 +235,7 @@ static void view_position_tile (ChamplainView* view,
     ChamplainTile* tile);
 static void view_reload_tiles_cb (ChamplainMapSource *map_source,
     ChamplainView* view);
-static void view_update_state (ChamplainView *view);
+static void view_update_state (ChamplainView *view, ChamplainTile *tile);
 static void view_update_anchor (ChamplainView *view,
     gint x,
     gint y);
@@ -255,6 +256,8 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     guint duration);
 static gboolean perform_update_cb (ChamplainView *view);
 static gboolean fill_tile_cb (FillTileCallbackData *data);
+static void tile_destroyed_cb (GObject *gobject,
+    gpointer data);
 
 #define SCALE_HEIGHT  20
 #define SCALE_PADDING 10
@@ -1419,6 +1422,7 @@ champlain_view_init (ChamplainView *view)
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
   priv->max_scale_width = 100;
   priv->perform_update = TRUE;
+  priv->tiles_loading = 0;
 
   /* Setup map layer */
   priv->map_layer = g_object_ref (clutter_group_new ());
@@ -2313,11 +2317,15 @@ view_load_visible_tiles (ChamplainView *view)
               clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
               view_position_tile (view, tile);
 
+              /* updates champlain_view state automatically as
+                 notify::state signal is connected  */
               champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
 
               data = g_new (FillTileCallbackData, 1);
               data->tile = tile;
               data->map_source = priv->map_source;
+
+              g_signal_connect (tile, "destroy", G_CALLBACK (tile_destroyed_cb), view);
 
               g_object_add_weak_pointer (G_OBJECT (tile), (gpointer*)&data->tile);
               g_object_ref (priv->map_source);
@@ -2335,8 +2343,6 @@ view_load_visible_tiles (ChamplainView *view)
     }
 
   g_free (tile_map);
-
-  view_update_state (view);
 }
 
 static gboolean
@@ -2389,35 +2395,55 @@ view_reload_tiles_cb (ChamplainMapSource *map_source,
 }
 
 static void
+tile_destroyed_cb (GObject *gobject,
+    gpointer data)
+{
+  ChamplainView *view = CHAMPLAIN_VIEW (data);
+  ChamplainTile *tile = CHAMPLAIN_TILE (gobject);
+  ChamplainViewPrivate *priv = view->priv;
+
+  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING)
+    {
+      priv->tiles_loading--;
+      if (priv->tiles_loading == 0)
+        {
+          priv->state = CHAMPLAIN_STATE_DONE;
+          g_object_notify (G_OBJECT (view), "state");
+        }
+    }
+}
+
+static void
 tile_state_notify (GObject *gobject,
     GParamSpec *pspec,
     gpointer data)
 {
-  view_update_state (CHAMPLAIN_VIEW (data));
+  view_update_state (CHAMPLAIN_VIEW (data), CHAMPLAIN_TILE (gobject));
 }
 
 static void
-view_update_state (ChamplainView *view)
+view_update_state (ChamplainView *view, ChamplainTile *tile)
 {
+  ChamplainState tile_state = champlain_tile_get_state (tile);
   ChamplainViewPrivate *priv = view->priv;
-  ChamplainState new_state = CHAMPLAIN_STATE_DONE;
-  gint i;
 
-  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->map_layer)); i++)
+  if (tile_state == CHAMPLAIN_STATE_LOADING)
     {
-      ChamplainTile *tile = CHAMPLAIN_TILE (clutter_group_get_nth_child (CLUTTER_GROUP (priv->map_layer), i));
-
-      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING)
+      if (priv->tiles_loading == 0)
         {
-          new_state = CHAMPLAIN_STATE_LOADING;
-          break;
+          priv->state = CHAMPLAIN_STATE_LOADING;
+          g_object_notify (G_OBJECT (view), "state");
         }
+      priv->tiles_loading++;
     }
-
-  if (priv->state != new_state)
+  else if (tile_state == CHAMPLAIN_STATE_DONE)
     {
-      priv->state = new_state;
-      g_object_notify (G_OBJECT (view), "state");
+      priv->tiles_loading--;
+      if (priv->tiles_loading == 0)
+        {
+          priv->state = CHAMPLAIN_STATE_DONE;
+          g_object_notify (G_OBJECT (view), "state");
+        }
     }
 }
 
