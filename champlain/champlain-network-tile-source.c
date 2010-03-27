@@ -523,7 +523,7 @@ tile_loaded_cb (SoupSession *session,
   ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
   ChamplainTile *tile = callback_data->tile;
-  GdkPixbufLoader* loader;
+  GdkPixbufLoader* loader = NULL;
   GError *error = NULL;
   ClutterActor *actor;
   const gchar *etag;
@@ -577,7 +577,7 @@ tile_loaded_cb (SoupSession *session,
           g_error_free (error);
         }
 
-      goto load_next_cleanup;
+      goto load_next;
     }
 
   gdk_pixbuf_loader_close (loader, &error);
@@ -585,7 +585,7 @@ tile_loaded_cb (SoupSession *session,
     {
       g_warning ("Unable to close the pixbuf loader: %s", error->message);
       g_error_free (error);
-      goto load_next_cleanup;
+      goto load_next;
     }
 
   /* Verify if the server sent an etag and save it */
@@ -618,7 +618,7 @@ tile_loaded_cb (SoupSession *session,
         }
 
       g_object_unref (actor);
-      goto load_next_cleanup;
+      goto load_next;
     }
 
   champlain_tile_set_fade_in (tile, TRUE);
@@ -626,16 +626,17 @@ tile_loaded_cb (SoupSession *session,
 
   goto finish;
 
-load_next_cleanup:
-  g_object_unref (loader);
-
 load_next:
+  if (loader)
+    g_object_unref (loader);
   if (next_source)
     champlain_map_source_fill_tile (next_source, tile);
   g_object_unref (map_source);
   return;
 
 finish:
+  if (loader)
+    g_object_unref (loader);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
   g_object_unref (map_source);
 }
