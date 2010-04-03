@@ -120,7 +120,7 @@ if test x$enable_gtk = xyes; then
   PKG_CHECK_MODULES(GTK_DEPS,
     [   gtk+-2.0 >= 2.12,
         clutter-gtk-0.10 >= 0.10,
-        memphis-0.2 >= 0.2
+        memphis-0.2 >= 0.2.1
     ]
   )
 
