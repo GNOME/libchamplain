@@ -41,7 +41,8 @@ pychamplaingtk.c: pychamplaingtk.override pychamplaingtk.defs
 
 EXTRA_DIST =			\
 	pychamplaingtk.override 			\
-	pychamplaingtk.defs
+	pychamplaingtk.defs     \
+	pychamplaingtk-base.defs
 
 CLEANFILES = $(BUILT_SOURCES)
 
