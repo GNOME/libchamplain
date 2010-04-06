@@ -1,5 +1,6 @@
 PYCLUTTERDEFS=`pkg-config --variable=defsdir pyclutter-1.0`
 PYGTKDEFS=`pkg-config --variable=defsdir pygtk-2.0`
+PYMEMPHISDEFS=`pkg-config --variable=defsdir pymemphis-0.2`
 
 AM_CPPFLAGS =						\
 	-I.						\
@@ -33,6 +34,7 @@ pychamplain.c: pychamplain.override pychamplain.defs
 		--register $(PYGTKDEFS)/pango-types.defs \
 		--register $(PYCLUTTERDEFS)/clutter-types.defs \
 		--register $(PYCLUTTERDEFS)/cogl-types.defs \
+		--register $(PYMEMPHISDEFS)/memphis-types.defs \
 		--override pychamplain.override 	\
 		pychamplain.defs > $@
 
