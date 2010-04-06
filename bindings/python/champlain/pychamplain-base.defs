@@ -1,5 +1,10 @@
 ;; -*- scheme -*-
+; boxed definitions ...
+
+; interface definitions ...
+
 ; object definitions ...
+
 (define-object BaseMarker
   (in-module "Champlain")
   (parent "ClutterGroup")
@@ -7,11 +12,18 @@
   (gtype-id "CHAMPLAIN_TYPE_BASE_MARKER")
 )
 
-(define-object Cache
+(define-object ErrorTileSource
   (in-module "Champlain")
-  (parent "GObject")
-  (c-name "ChamplainCache")
-  (gtype-id "CHAMPLAIN_TYPE_CACHE")
+  (parent "ChamplainTileSource")
+  (c-name "ChamplainErrorTileSource")
+  (gtype-id "CHAMPLAIN_TYPE_ERROR_TILE_SOURCE")
+)
+
+(define-object FileCache
+  (in-module "Champlain")
+  (parent "ChamplainTileCache")
+  (c-name "ChamplainFileCache")
+  (gtype-id "CHAMPLAIN_TYPE_FILE_CACHE")
 )
 
 (define-object Layer
@@ -21,11 +33,32 @@
   (gtype-id "CHAMPLAIN_TYPE_LAYER")
 )
 
+(define-object LocalMapDataSource
+  (in-module "Champlain")
+  (parent "ChamplainMapDataSource")
+  (c-name "ChamplainLocalMapDataSource")
+  (gtype-id "CHAMPLAIN_TYPE_LOCAL_MAP_DATA_SOURCE")
+)
+
+(define-object MapDataSource
+  (in-module "Champlain")
+  (parent "GInitiallyUnowned")
+  (c-name "ChamplainMapDataSource")
+  (gtype-id "CHAMPLAIN_TYPE_MAP_DATA_SOURCE")
+)
+
 (define-object MapSource
   (in-module "Champlain")
   (parent "GInitiallyUnowned")
   (c-name "ChamplainMapSource")
   (gtype-id "CHAMPLAIN_TYPE_MAP_SOURCE")
+)
+
+(define-object MapSourceChain
+  (in-module "Champlain")
+  (parent "ChamplainMapSource")
+  (c-name "ChamplainMapSourceChain")
+  (gtype-id "CHAMPLAIN_TYPE_MAP_SOURCE_CHAIN")
 )
 
 (define-object MapSourceFactory
@@ -42,16 +75,30 @@
   (gtype-id "CHAMPLAIN_TYPE_MARKER")
 )
 
-(define-object NetworkMapSource
+(define-object MemphisTileSource
   (in-module "Champlain")
-  (parent "ChamplainMapSource")
-  (c-name "ChamplainNetworkMapSource")
-  (gtype-id "CHAMPLAIN_TYPE_NETWORK_MAP_SOURCE")
+  (parent "ChamplainTileSource")
+  (c-name "ChamplainMemphisTileSource")
+  (gtype-id "CHAMPLAIN_TYPE_MEMPHIS_TILE_SOURCE")
+)
+
+(define-object NetworkMapDataSource
+  (in-module "Champlain")
+  (parent "ChamplainMapDataSource")
+  (c-name "ChamplainNetworkMapDataSource")
+  (gtype-id "CHAMPLAIN_TYPE_NETWORK_MAP_DATA_SOURCE")
+)
+
+(define-object NetworkTileSource
+  (in-module "Champlain")
+  (parent "ChamplainTileSource")
+  (c-name "ChamplainNetworkTileSource")
+  (gtype-id "CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE")
 )
 
 (define-object Polygon
   (in-module "Champlain")
-  (parent "GInitiallyUnowned")
+  (parent "ClutterGroup")
   (c-name "ChamplainPolygon")
   (gtype-id "CHAMPLAIN_TYPE_POLYGON")
 )
@@ -65,9 +112,23 @@
 
 (define-object Tile
   (in-module "Champlain")
-  (parent "GObject")
+  (parent "ClutterGroup")
   (c-name "ChamplainTile")
   (gtype-id "CHAMPLAIN_TYPE_TILE")
+)
+
+(define-object TileCache
+  (in-module "Champlain")
+  (parent "ChamplainMapSource")
+  (c-name "ChamplainTileCache")
+  (gtype-id "CHAMPLAIN_TYPE_TILE_CACHE")
+)
+
+(define-object TileSource
+  (in-module "Champlain")
+  (parent "ChamplainMapSource")
+  (c-name "ChamplainTileSource")
+  (gtype-id "CHAMPLAIN_TYPE_TILE_SOURCE")
 )
 
 (define-object View
@@ -77,19 +138,15 @@
   (gtype-id "CHAMPLAIN_TYPE_VIEW")
 )
 
-(define-object ZoomLevel
-  (in-module "Champlain")
-  (parent "GObject")
-  (c-name "ChamplainZoomLevel")
-  (gtype-id "CHAMPLAIN_TYPE_ZOOM_LEVEL")
-)
+; pointer definitions ...
 
-;; Enumerations and flags ...
+;; Enumerations and Flags ...
+
+;; Untyped enumerations and flags ...
 
 (define-enum ScrollMode
   (in-module "Champlain")
   (c-name "ChamplainScrollMode")
-  (gtype-id "CHAMPLAIN_TYPE_SCROLL_MODE")
   (values
     '("push" "CHAMPLAIN_SCROLL_MODE_PUSH")
     '("kinetic" "CHAMPLAIN_SCROLL_MODE_KINETIC")
@@ -99,30 +156,24 @@
 (define-enum State
   (in-module "Champlain")
   (c-name "ChamplainState")
-  (gtype-id "CHAMPLAIN_TYPE_STATE")
   (values
     '("none" "CHAMPLAIN_STATE_NONE")
-    '("init" "CHAMPLAIN_STATE_INIT")
     '("loading" "CHAMPLAIN_STATE_LOADING")
-    '("validating-cache" "CHAMPLAIN_STATE_VALIDATING_CACHE")
     '("done" "CHAMPLAIN_STATE_DONE")
   )
 )
 
-(define-enum Unit
+(define-enum MapProjection
   (in-module "Champlain")
-  (c-name "ChamplainUnit")
-  (gtype-id "CHAMPLAIN_TYPE_UNIT")
+  (c-name "ChamplainMapProjection")
   (values
-    '("km" "CHAMPLAIN_UNIT_KM")
-    '("miles" "CHAMPLAIN_UNIT_MILES")
+    '("mercator" "CHAMPLAIN_MAP_PROJECTION_MERCATOR")
   )
 )
 
 (define-enum SelectionMode
   (in-module "Champlain")
   (c-name "ChamplainSelectionMode")
-  (gtype-id "CHAMPLAIN_TYPE_SELECTION_MODE")
   (values
     '("none" "CHAMPLAIN_SELECTION_NONE")
     '("single" "CHAMPLAIN_SELECTION_SINGLE")
@@ -130,86 +181,1758 @@
   )
 )
 
-(define-enum MapProjection
+(define-enum Unit
   (in-module "Champlain")
-  (c-name "ChamplainMapProjection")
-  (gtype-id "CHAMPLAIN_TYPE_MAP_PROJECTION")
+  (c-name "ChamplainUnit")
   (values
-    '("mercator" "CHAMPLAIN_MAP_PROJECTION_MERCATOR")
+    '("km" "CHAMPLAIN_UNIT_KM")
+    '("miles" "CHAMPLAIN_UNIT_MILES")
   )
 )
 
 
-;; From champlain.h
+;; From champlain-base-marker.h
 
-
-
-;; From champlain-cache.h
-
-(define-function cache_get_type
-  (c-name "champlain_cache_get_type")
+(define-function base_marker_get_type
+  (c-name "champlain_base_marker_get_type")
   (return-type "GType")
 )
 
-(define-function cache_dup_default
-  (c-name "champlain_cache_dup_default")
-  (return-type "ChamplainCache*")
+(define-function base_marker_new
+  (c-name "champlain_base_marker_new")
+  (is-constructor-of "ChamplainBaseMarker")
+  (return-type "ClutterActor*")
 )
 
-(define-method update_tile
-  (of-object "ChamplainCache")
-  (c-name "champlain_cache_update_tile")
+(define-method set_position
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_set_position")
   (return-type "none")
   (parameters
-    '("ChamplainTile*" "tile")
-    '("guint" "filesize")
+    '("gdouble" "longitude")
+    '("gdouble" "latitude")
   )
 )
 
-(define-method fill_tile
-  (of-object "ChamplainCache")
-  (c-name "champlain_cache_fill_tile")
-  (return-type "gboolean")
+(define-method get_latitude
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_get_latitude")
+  (return-type "gdouble")
+)
+
+(define-method get_longitude
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_get_longitude")
+  (return-type "gdouble")
+)
+
+(define-method set_highlighted
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_set_highlighted")
+  (return-type "none")
   (parameters
-    '("ChamplainTile*" "tile")
+    '("gboolean" "value")
   )
 )
 
-(define-method tile_is_expired
-  (of-object "ChamplainCache")
-  (c-name "champlain_cache_tile_is_expired")
+(define-method get_highlighted
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_get_highlighted")
   (return-type "gboolean")
+)
+
+(define-method animate_in
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_animate_in")
+  (return-type "none")
+)
+
+(define-method animate_in_with_delay
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_animate_in_with_delay")
+  (return-type "none")
   (parameters
-    '("ChamplainTile*" "tile")
+    '("guint" "delay")
   )
+)
+
+(define-method animate_out
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_animate_out")
+  (return-type "none")
+)
+
+(define-method animate_out_with_delay
+  (of-object "ChamplainBaseMarker")
+  (c-name "champlain_base_marker_animate_out_with_delay")
+  (return-type "none")
+  (parameters
+    '("guint" "delay")
+  )
+)
+
+
+
+;; From champlain-bounding-box.h
+
+(define-function bounding_box_get_type
+  (c-name "champlain_bounding_box_get_type")
+  (return-type "GType")
+)
+
+(define-function bounding_box_new
+  (c-name "champlain_bounding_box_new")
+  (is-constructor-of "ChamplainBoundingBox")
+  (return-type "ChamplainBoundingBox*")
+)
+
+(define-method copy
+  (of-object "ChamplainBoundingBox")
+  (c-name "champlain_bounding_box_copy")
+  (return-type "ChamplainBoundingBox*")
+)
+
+(define-method free
+  (of-object "ChamplainBoundingBox")
+  (c-name "champlain_bounding_box_free")
+  (return-type "none")
+)
+
+(define-method get_center
+  (of-object "ChamplainBoundingBox")
+  (c-name "champlain_bounding_box_get_center")
+  (return-type "none")
+  (parameters
+    '("gdouble*" "lat")
+    '("gdouble*" "lon")
+  )
+)
+
+
+
+;; From champlain-defines.h
+
+
+
+;; From champlain-error-tile-source.h
+
+(define-function error_tile_source_get_type
+  (c-name "champlain_error_tile_source_get_type")
+  (return-type "GType")
+)
+
+(define-function error_tile_source_new_full
+  (c-name "champlain_error_tile_source_new_full")
+  (return-type "ChamplainErrorTileSource*")
+  (parameters
+    '("guint" "tile_size")
+  )
+)
+
+
+
+;; From champlain-file-cache.h
+
+(define-function file_cache_get_type
+  (c-name "champlain_file_cache_get_type")
+  (return-type "GType")
+)
+
+(define-function file_cache_new
+  (c-name "champlain_file_cache_new")
+  (is-constructor-of "ChamplainFileCache")
+  (return-type "ChamplainFileCache*")
+)
+
+(define-function file_cache_new_full
+  (c-name "champlain_file_cache_new_full")
+  (return-type "ChamplainFileCache*")
+  (parameters
+    '("guint" "size_limit")
+    '("const-gchar*" "cache_dir")
+    '("gboolean" "persistent")
+  )
+)
+
+(define-method get_size_limit
+  (of-object "ChamplainFileCache")
+  (c-name "champlain_file_cache_get_size_limit")
+  (return-type "guint")
 )
 
 (define-method set_size_limit
-  (of-object "ChamplainCache")
-  (c-name "champlain_cache_set_size_limit")
+  (of-object "ChamplainFileCache")
+  (c-name "champlain_file_cache_set_size_limit")
   (return-type "none")
   (parameters
     '("guint" "size_limit")
   )
 )
 
-(define-method get_size_limit
-  (of-object "ChamplainCache")
-  (c-name "champlain_cache_get_size_limit")
-  (return-type "guint")
+(define-method get_cache_dir
+  (of-object "ChamplainFileCache")
+  (c-name "champlain_file_cache_get_cache_dir")
+  (return-type "const-gchar*")
 )
 
 (define-method purge
-  (of-object "ChamplainCache")
-  (c-name "champlain_cache_purge")
+  (of-object "ChamplainFileCache")
+  (c-name "champlain_file_cache_purge")
   (return-type "none")
 )
 
 (define-method purge_on_idle
-  (of-object "ChamplainCache")
-  (c-name "champlain_cache_purge_on_idle")
+  (of-object "ChamplainFileCache")
+  (c-name "champlain_file_cache_purge_on_idle")
   (return-type "none")
 )
+
+
+
+;; From champlain-layer.h
+
+(define-function layer_get_type
+  (c-name "champlain_layer_get_type")
+  (return-type "GType")
+)
+
+(define-function layer_new
+  (c-name "champlain_layer_new")
+  (is-constructor-of "ChamplainLayer")
+  (return-type "ChamplainLayer*")
+)
+
+(define-method show
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_show")
+  (return-type "none")
+)
+
+(define-method hide
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_hide")
+  (return-type "none")
+)
+
+(define-method add_marker
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_add_marker")
+  (return-type "none")
+  (parameters
+    '("ChamplainBaseMarker*" "marker")
+  )
+)
+
+(define-method remove_marker
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_remove_marker")
+  (return-type "none")
+  (parameters
+    '("ChamplainBaseMarker*" "marker")
+  )
+)
+
+(define-method animate_in_all_markers
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_animate_in_all_markers")
+  (return-type "none")
+)
+
+(define-method animate_out_all_markers
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_animate_out_all_markers")
+  (return-type "none")
+)
+
+(define-method show_all_markers
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_show_all_markers")
+  (return-type "none")
+)
+
+(define-method hide_all_markers
+  (of-object "ChamplainLayer")
+  (c-name "champlain_layer_hide_all_markers")
+  (return-type "none")
+)
+
+
+
+;; From champlain-local-map-data-source.h
+
+(define-function local_map_data_source_get_type
+  (c-name "champlain_local_map_data_source_get_type")
+  (return-type "GType")
+)
+
+(define-function local_map_data_source_new
+  (c-name "champlain_local_map_data_source_new")
+  (is-constructor-of "ChamplainLocalMapDataSource")
+  (return-type "ChamplainLocalMapDataSource*")
+)
+
+(define-method load_map_data
+  (of-object "ChamplainLocalMapDataSource")
+  (c-name "champlain_local_map_data_source_load_map_data")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "map_path")
+  )
+)
+
+
+
+;; From champlain-map-data-source.h
+
+(define-function map_data_source_get_type
+  (c-name "champlain_map_data_source_get_type")
+  (return-type "GType")
+)
+
+(define-method get_map_data
+  (of-object "ChamplainMapDataSource")
+  (c-name "champlain_map_data_source_get_map_data")
+  (return-type "MemphisMap*")
+)
+
+
+
+;; From champlain-map-source-chain.h
+
+(define-function map_source_chain_get_type
+  (c-name "champlain_map_source_chain_get_type")
+  (return-type "GType")
+)
+
+(define-function map_source_chain_new
+  (c-name "champlain_map_source_chain_new")
+  (is-constructor-of "ChamplainMapSourceChain")
+  (return-type "ChamplainMapSourceChain*")
+)
+
+(define-method push
+  (of-object "ChamplainMapSourceChain")
+  (c-name "champlain_map_source_chain_push")
+  (return-type "none")
+  (parameters
+    '("ChamplainMapSource*" "map_source")
+  )
+)
+
+(define-method pop
+  (of-object "ChamplainMapSourceChain")
+  (c-name "champlain_map_source_chain_pop")
+  (return-type "none")
+)
+
+
+
+;; From champlain-map-source-desc.h
+
+(define-function map_source_desc_get_type
+  (c-name "champlain_map_source_desc_get_type")
+  (return-type "GType")
+)
+
+(define-method copy
+  (of-object "ChamplainMapSourceDesc")
+  (c-name "champlain_map_source_desc_copy")
+  (return-type "ChamplainMapSourceDesc*")
+)
+
+(define-method free
+  (of-object "ChamplainMapSourceDesc")
+  (c-name "champlain_map_source_desc_free")
+  (return-type "none")
+)
+
+(define-function map_source_desc_new
+  (c-name "champlain_map_source_desc_new")
+  (is-constructor-of "ChamplainMapSourceDesc")
+  (return-type "ChamplainMapSourceDesc*")
+)
+
+
+
+;; From champlain-map-source-factory.h
+
+(define-function map_source_factory_get_type
+  (c-name "champlain_map_source_factory_get_type")
+  (return-type "GType")
+)
+
+(define-function map_source_factory_dup_default
+  (c-name "champlain_map_source_factory_dup_default")
+  (return-type "ChamplainMapSourceFactory*")
+)
+
+(define-method dup_list
+  (of-object "ChamplainMapSourceFactory")
+  (c-name "champlain_map_source_factory_dup_list")
+  (return-type "GSList*")
+)
+
+(define-method create
+  (of-object "ChamplainMapSourceFactory")
+  (c-name "champlain_map_source_factory_create")
+  (return-type "ChamplainMapSource*")
+  (parameters
+    '("const-gchar*" "id")
+  )
+)
+
+(define-method create_cached_source
+  (of-object "ChamplainMapSourceFactory")
+  (c-name "champlain_map_source_factory_create_cached_source")
+  (return-type "ChamplainMapSource*")
+  (parameters
+    '("const-gchar*" "id")
+  )
+)
+
+(define-method register
+  (of-object "ChamplainMapSourceFactory")
+  (c-name "champlain_map_source_factory_register")
+  (return-type "gboolean")
+  (parameters
+    '("ChamplainMapSourceDesc*" "desc")
+    '("ChamplainMapSourceConstructor" "constructor")
+    '("gpointer" "data")
+  )
+)
+
+
+
+;; From champlain-map-source.h
+
+(define-function map_source_get_type
+  (c-name "champlain_map_source_get_type")
+  (return-type "GType")
+)
+
+(define-method get_next_source
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_next_source")
+  (return-type "ChamplainMapSource*")
+)
+
+(define-method set_next_source
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_set_next_source")
+  (return-type "none")
+  (parameters
+    '("ChamplainMapSource*" "next_source")
+  )
+)
+
+(define-method get_id
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_id")
+  (return-type "const-gchar*")
+)
+
+(define-method get_name
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_license
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_license")
+  (return-type "const-gchar*")
+)
+
+(define-method get_license_uri
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_license_uri")
+  (return-type "const-gchar*")
+)
+
+(define-method get_min_zoom_level
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_min_zoom_level")
+  (return-type "guint")
+)
+
+(define-method get_max_zoom_level
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_max_zoom_level")
+  (return-type "guint")
+)
+
+(define-method get_tile_size
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_tile_size")
+  (return-type "guint")
+)
+
+(define-method get_projection
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_projection")
+  (return-type "ChamplainMapProjection")
+)
+
+(define-method get_x
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_x")
+  (return-type "guint")
+  (parameters
+    '("guint" "zoom_level")
+    '("gdouble" "longitude")
+  )
+)
+
+(define-method get_y
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_y")
+  (return-type "guint")
+  (parameters
+    '("guint" "zoom_level")
+    '("gdouble" "latitude")
+  )
+)
+
+(define-method get_longitude
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_longitude")
+  (return-type "gdouble")
+  (parameters
+    '("guint" "zoom_level")
+    '("guint" "x")
+  )
+)
+
+(define-method get_latitude
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_latitude")
+  (return-type "gdouble")
+  (parameters
+    '("guint" "zoom_level")
+    '("guint" "y")
+  )
+)
+
+(define-method get_row_count
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_row_count")
+  (return-type "guint")
+  (parameters
+    '("guint" "zoom_level")
+  )
+)
+
+(define-method get_column_count
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_column_count")
+  (return-type "guint")
+  (parameters
+    '("guint" "zoom_level")
+  )
+)
+
+(define-method get_meters_per_pixel
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_get_meters_per_pixel")
+  (return-type "gdouble")
+  (parameters
+    '("guint" "zoom_level")
+    '("gdouble" "latitude")
+    '("gdouble" "longitude")
+  )
+)
+
+(define-method fill_tile
+  (of-object "ChamplainMapSource")
+  (c-name "champlain_map_source_fill_tile")
+  (return-type "none")
+  (parameters
+    '("ChamplainTile*" "tile")
+  )
+)
+
+(define-virtual get_id
+  (of-object "ChamplainMapSource")
+  (return-type "const-gchar*")
+)
+
+(define-virtual get_name
+  (of-object "ChamplainMapSource")
+  (return-type "const-gchar*")
+)
+
+(define-virtual get_license
+  (of-object "ChamplainMapSource")
+  (return-type "const-gchar*")
+)
+
+(define-virtual get_license_uri
+  (of-object "ChamplainMapSource")
+  (return-type "const-gchar*")
+)
+
+(define-virtual get_min_zoom_level
+  (of-object "ChamplainMapSource")
+  (return-type "guint")
+)
+
+(define-virtual get_max_zoom_level
+  (of-object "ChamplainMapSource")
+  (return-type "guint")
+)
+
+(define-virtual get_tile_size
+  (of-object "ChamplainMapSource")
+  (return-type "guint")
+)
+
+(define-virtual get_projection
+  (of-object "ChamplainMapSource")
+  (return-type "ChamplainMapProjection")
+)
+
+(define-virtual fill_tile
+  (of-object "ChamplainMapSource")
+  (return-type "none")
+  (parameters
+    '("ChamplainTile*" "tile")
+  )
+)
+
+(define-virtual on_set_next_source
+  (of-object "ChamplainMapSource")
+  (return-type "none")
+  (parameters
+    '("ChamplainMapSource*" "next_source")
+    '("ChamplainMapSource*" "new_next_source")
+  )
+)
+
+
+
+;; From champlain-marker.h
+
+(define-function marker_get_type
+  (c-name "champlain_marker_get_type")
+  (return-type "GType")
+)
+
+(define-function marker_new
+  (c-name "champlain_marker_new")
+  (is-constructor-of "ChamplainMarker")
+  (return-type "ClutterActor*")
+)
+
+(define-function marker_new_with_text
+  (c-name "champlain_marker_new_with_text")
+  (return-type "ClutterActor*")
+  (parameters
+    '("const-gchar*" "text")
+    '("const-gchar*" "font")
+    '("ClutterColor*" "text_color")
+    '("ClutterColor*" "marker_color")
+  )
+)
+
+(define-function marker_new_with_image
+  (c-name "champlain_marker_new_with_image")
+  (return-type "ClutterActor*")
+  (parameters
+    '("ClutterActor*" "actor")
+  )
+)
+
+(define-function marker_new_from_file
+  (c-name "champlain_marker_new_from_file")
+  (return-type "ClutterActor*")
+  (parameters
+    '("const-gchar*" "filename")
+    '("GError**" "error")
+  )
+)
+
+(define-function marker_new_full
+  (c-name "champlain_marker_new_full")
+  (return-type "ClutterActor*")
+  (parameters
+    '("const-gchar*" "text")
+    '("ClutterActor*" "actor")
+  )
+)
+
+(define-method set_text
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_text")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "text")
+  )
+)
+
+(define-method set_image
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_image")
+  (return-type "none")
+  (parameters
+    '("ClutterActor*" "image")
+  )
+)
+
+(define-method set_use_markup
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_use_markup")
+  (return-type "none")
+  (parameters
+    '("gboolean" "use_markup")
+  )
+)
+
+(define-method set_alignment
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_alignment")
+  (return-type "none")
+  (parameters
+    '("PangoAlignment" "alignment")
+  )
+)
+
+(define-method set_color
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_color")
+  (return-type "none")
+  (parameters
+    '("const-ClutterColor*" "color")
+  )
+)
+
+(define-method set_text_color
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_text_color")
+  (return-type "none")
+  (parameters
+    '("const-ClutterColor*" "color")
+  )
+)
+
+(define-method set_font_name
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_font_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "font_name")
+  )
+)
+
+(define-method set_wrap
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_wrap")
+  (return-type "none")
+  (parameters
+    '("gboolean" "wrap")
+  )
+)
+
+(define-method set_wrap_mode
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_wrap_mode")
+  (return-type "none")
+  (parameters
+    '("PangoWrapMode" "wrap_mode")
+  )
+)
+
+(define-method set_attributes
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_attributes")
+  (return-type "none")
+  (parameters
+    '("PangoAttrList*" "list")
+  )
+)
+
+(define-method set_single_line_mode
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_single_line_mode")
+  (return-type "none")
+  (parameters
+    '("gboolean" "mode")
+  )
+)
+
+(define-method set_ellipsize
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_ellipsize")
+  (return-type "none")
+  (parameters
+    '("PangoEllipsizeMode" "mode")
+  )
+)
+
+(define-method set_draw_background
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_set_draw_background")
+  (return-type "none")
+  (parameters
+    '("gboolean" "background")
+  )
+)
+
+(define-method get_use_markup
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_use_markup")
+  (return-type "gboolean")
+)
+
+(define-method get_text
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_text")
+  (return-type "const-gchar*")
+)
+
+(define-method get_image
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_image")
+  (return-type "ClutterActor*")
+)
+
+(define-method get_alignment
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_alignment")
+  (return-type "PangoAlignment")
+)
+
+(define-method get_color
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_color")
+  (return-type "ClutterColor*")
+)
+
+(define-method get_text_color
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_text_color")
+  (return-type "ClutterColor*")
+)
+
+(define-method get_font_name
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_font_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_wrap
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_wrap")
+  (return-type "gboolean")
+)
+
+(define-method get_wrap_mode
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_wrap_mode")
+  (return-type "PangoWrapMode")
+)
+
+(define-method get_ellipsize
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_ellipsize")
+  (return-type "PangoEllipsizeMode")
+)
+
+(define-method get_single_line_mode
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_single_line_mode")
+  (return-type "gboolean")
+)
+
+(define-method get_draw_background
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_get_draw_background")
+  (return-type "gboolean")
+)
+
+(define-function marker_set_highlight_color
+  (c-name "champlain_marker_set_highlight_color")
+  (return-type "none")
+  (parameters
+    '("ClutterColor*" "color")
+  )
+)
+
+(define-function marker_get_highlight_color
+  (c-name "champlain_marker_get_highlight_color")
+  (return-type "const-ClutterColor*")
+)
+
+(define-function marker_set_highlight_text_color
+  (c-name "champlain_marker_set_highlight_text_color")
+  (return-type "none")
+  (parameters
+    '("ClutterColor*" "color")
+  )
+)
+
+(define-function marker_get_highlight_text_color
+  (c-name "champlain_marker_get_highlight_text_color")
+  (return-type "const-ClutterColor*")
+)
+
+(define-method queue_redraw
+  (of-object "ChamplainMarker")
+  (c-name "champlain_marker_queue_redraw")
+  (return-type "none")
+)
+
+(define-virtual draw_marker
+  (of-object "ChamplainMarker")
+  (return-type "none")
+)
+
+
+
+;; From champlain-memphis-tile-source.h
+
+(define-function memphis_tile_source_get_type
+  (c-name "champlain_memphis_tile_source_get_type")
+  (return-type "GType")
+)
+
+(define-function memphis_tile_source_new_full
+  (c-name "champlain_memphis_tile_source_new_full")
+  (return-type "ChamplainMemphisTileSource*")
+  (parameters
+    '("const-gchar*" "id")
+    '("const-gchar*" "name")
+    '("const-gchar*" "license")
+    '("const-gchar*" "license_uri")
+    '("guint" "min_zoom")
+    '("guint" "max_zoom")
+    '("guint" "tile_size")
+    '("ChamplainMapProjection" "projection")
+    '("ChamplainMapDataSource*" "map_data_source")
+  )
+)
+
+(define-method load_rules
+  (of-object "ChamplainMemphisTileSource")
+  (c-name "champlain_memphis_tile_source_load_rules")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "rules_path")
+  )
+)
+
+(define-method set_map_data_source
+  (of-object "ChamplainMemphisTileSource")
+  (c-name "champlain_memphis_tile_source_set_map_data_source")
+  (return-type "none")
+  (parameters
+    '("ChamplainMapDataSource*" "map_data_source")
+  )
+)
+
+(define-method get_map_data_source
+  (of-object "ChamplainMemphisTileSource")
+  (c-name "champlain_memphis_tile_source_get_map_data_source")
+  (return-type "ChamplainMapDataSource*")
+)
+
+(define-method get_background_color
+  (of-object "ChamplainMemphisTileSource")
+  (c-name "champlain_memphis_tile_source_get_background_color")
+  (return-type "ClutterColor*")
+)
+
+(define-method set_background_color
+  (of-object "ChamplainMemphisTileSource")
+  (c-name "champlain_memphis_tile_source_set_background_color")
+  (return-type "none")
+  (parameters
+    '("const-ClutterColor*" "color")
+  )
+)
+
+(define-method get_rule_ids
+  (of-object "ChamplainMemphisTileSource")
+  (c-name "champlain_memphis_tile_source_get_rule_ids")
+  (return-type "GList*")
+)
+
+(define-method set_rule
+  (of-object "ChamplainMemphisTileSource")
+  (c-name "champlain_memphis_tile_source_set_rule")
+  (return-type "none")
+  (parameters
+    '("MemphisRule*" "rule")
+  )
+)
+
+(define-method get_rule
+  (of-object "ChamplainMemphisTileSource")
+  (c-name "champlain_memphis_tile_source_get_rule")
+  (return-type "MemphisRule*")
+  (parameters
+    '("const-gchar*" "id")
+  )
+)
+
+(define-method remove_rule
+  (of-object "ChamplainMemphisTileSource")
+  (c-name "champlain_memphis_tile_source_remove_rule")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "id")
+  )
+)
+
+
+
+;; From champlain-network-map-data-source.h
+
+(define-function network_map_data_source_get_type
+  (c-name "champlain_network_map_data_source_get_type")
+  (return-type "GType")
+)
+
+(define-function network_map_data_source_new
+  (c-name "champlain_network_map_data_source_new")
+  (is-constructor-of "ChamplainNetworkMapDataSource")
+  (return-type "ChamplainNetworkMapDataSource*")
+)
+
+(define-method load_map_data
+  (of-object "ChamplainNetworkMapDataSource")
+  (c-name "champlain_network_map_data_source_load_map_data")
+  (return-type "none")
+  (parameters
+    '("gdouble" "bound_left")
+    '("gdouble" "bound_bottom")
+    '("gdouble" "bound_right")
+    '("gdouble" "bound_top")
+  )
+)
+
+(define-method get_api_uri
+  (of-object "ChamplainNetworkMapDataSource")
+  (c-name "champlain_network_map_data_source_get_api_uri")
+  (return-type "const-gchar*")
+)
+
+(define-method set_api_uri
+  (of-object "ChamplainNetworkMapDataSource")
+  (c-name "champlain_network_map_data_source_set_api_uri")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "api_uri")
+  )
+)
+
+
+
+;; From champlain-network-tile-source.h
+
+(define-function network_tile_source_get_type
+  (c-name "champlain_network_tile_source_get_type")
+  (return-type "GType")
+)
+
+(define-function network_tile_source_new_full
+  (c-name "champlain_network_tile_source_new_full")
+  (return-type "ChamplainNetworkTileSource*")
+  (parameters
+    '("const-gchar*" "id")
+    '("const-gchar*" "name")
+    '("const-gchar*" "license")
+    '("const-gchar*" "license_uri")
+    '("guint" "min_zoom")
+    '("guint" "max_zoom")
+    '("guint" "tile_size")
+    '("ChamplainMapProjection" "projection")
+    '("const-gchar*" "uri_format")
+  )
+)
+
+(define-method get_uri_format
+  (of-object "ChamplainNetworkTileSource")
+  (c-name "champlain_network_tile_source_get_uri_format")
+  (return-type "const-gchar*")
+)
+
+(define-method set_uri_format
+  (of-object "ChamplainNetworkTileSource")
+  (c-name "champlain_network_tile_source_set_uri_format")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "uri_format")
+  )
+)
+
+(define-method get_offline
+  (of-object "ChamplainNetworkTileSource")
+  (c-name "champlain_network_tile_source_get_offline")
+  (return-type "gboolean")
+)
+
+(define-method set_offline
+  (of-object "ChamplainNetworkTileSource")
+  (c-name "champlain_network_tile_source_set_offline")
+  (return-type "none")
+  (parameters
+    '("gboolean" "offline")
+  )
+)
+
+(define-method get_proxy_uri
+  (of-object "ChamplainNetworkTileSource")
+  (c-name "champlain_network_tile_source_get_proxy_uri")
+  (return-type "const-gchar*")
+)
+
+(define-method set_proxy_uri
+  (of-object "ChamplainNetworkTileSource")
+  (c-name "champlain_network_tile_source_set_proxy_uri")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "proxy_uri")
+  )
+)
+
+
+
+;; From champlain-point.h
+
+(define-function point_get_type
+  (c-name "champlain_point_get_type")
+  (return-type "GType")
+)
+
+(define-method copy
+  (of-object "ChamplainPoint")
+  (c-name "champlain_point_copy")
+  (return-type "ChamplainPoint*")
+)
+
+(define-method free
+  (of-object "ChamplainPoint")
+  (c-name "champlain_point_free")
+  (return-type "none")
+)
+
+(define-function point_new
+  (c-name "champlain_point_new")
+  (is-constructor-of "ChamplainPoint")
+  (return-type "ChamplainPoint*")
+  (parameters
+    '("gdouble" "lat")
+    '("gdouble" "lon")
+  )
+)
+
+
+
+;; From champlain-polygon.h
+
+(define-function polygon_get_type
+  (c-name "champlain_polygon_get_type")
+  (return-type "GType")
+)
+
+(define-function polygon_new
+  (c-name "champlain_polygon_new")
+  (is-constructor-of "ChamplainPolygon")
+  (return-type "ChamplainPolygon*")
+)
+
+(define-method append_point
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_append_point")
+  (return-type "ChamplainPoint*")
+  (parameters
+    '("gdouble" "lat")
+    '("gdouble" "lon")
+  )
+)
+
+(define-method insert_point
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_insert_point")
+  (return-type "ChamplainPoint*")
+  (parameters
+    '("gdouble" "lat")
+    '("gdouble" "lon")
+    '("gint" "pos")
+  )
+)
+
+(define-method remove_point
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_remove_point")
+  (return-type "none")
+  (parameters
+    '("ChamplainPoint*" "point")
+  )
+)
+
+(define-method clear_points
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_clear_points")
+  (return-type "none")
+)
+
+(define-method get_points
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_get_points")
+  (return-type "GList*")
+)
+
+(define-method set_fill_color
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_set_fill_color")
+  (return-type "none")
+  (parameters
+    '("const-ClutterColor*" "color")
+  )
+)
+
+(define-method set_stroke_color
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_set_stroke_color")
+  (return-type "none")
+  (parameters
+    '("const-ClutterColor*" "color")
+  )
+)
+
+(define-method get_fill_color
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_get_fill_color")
+  (return-type "ClutterColor*")
+)
+
+(define-method get_stroke_color
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_get_stroke_color")
+  (return-type "ClutterColor*")
+)
+
+(define-method get_fill
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_get_fill")
+  (return-type "gboolean")
+)
+
+(define-method set_fill
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_set_fill")
+  (return-type "none")
+  (parameters
+    '("gboolean" "value")
+  )
+)
+
+(define-method get_stroke
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_get_stroke")
+  (return-type "gboolean")
+)
+
+(define-method set_stroke
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_set_stroke")
+  (return-type "none")
+  (parameters
+    '("gboolean" "value")
+  )
+)
+
+(define-method set_stroke_width
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_set_stroke_width")
+  (return-type "none")
+  (parameters
+    '("gdouble" "value")
+  )
+)
+
+(define-method get_stroke_width
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_get_stroke_width")
+  (return-type "gdouble")
+)
+
+(define-method set_mark_points
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_set_mark_points")
+  (return-type "none")
+  (parameters
+    '("gboolean" "value")
+  )
+)
+
+(define-method get_mark_points
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_get_mark_points")
+  (return-type "gboolean")
+)
+
+(define-method show
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_show")
+  (return-type "none")
+)
+
+(define-method hide
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_hide")
+  (return-type "none")
+)
+
+(define-method draw_polygon
+  (of-object "ChamplainPolygon")
+  (c-name "champlain_polygon_draw_polygon")
+  (return-type "none")
+  (parameters
+    '("ChamplainMapSource*" "map_source")
+    '("guint" "zoom_level")
+    '("gfloat" "width")
+    '("gfloat" "height")
+    '("gfloat" "shift_x")
+    '("gfloat" "shift_y")
+  )
+)
+
+
+
+;; From champlain-selection-layer.h
+
+(define-function selection_layer_get_type
+  (c-name "champlain_selection_layer_get_type")
+  (return-type "GType")
+)
+
+(define-function selection_layer_new
+  (c-name "champlain_selection_layer_new")
+  (is-constructor-of "ChamplainSelectionLayer")
+  (return-type "ChamplainLayer*")
+)
+
+(define-method get_selected
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_get_selected")
+  (return-type "ChamplainBaseMarker*")
+)
+
+(define-method get_selected_markers
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_get_selected_markers")
+  (return-type "const-GList*")
+)
+
+(define-method count_selected_markers
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_count_selected_markers")
+  (return-type "guint")
+)
+
+(define-method select
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_select")
+  (return-type "none")
+  (parameters
+    '("ChamplainBaseMarker*" "marker")
+  )
+)
+
+(define-method unselect
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_unselect")
+  (return-type "none")
+  (parameters
+    '("ChamplainBaseMarker*" "marker")
+  )
+)
+
+(define-method marker_is_selected
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_marker_is_selected")
+  (return-type "gboolean")
+  (parameters
+    '("ChamplainBaseMarker*" "marker")
+  )
+)
+
+(define-method select_all
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_select_all")
+  (return-type "none")
+)
+
+(define-method unselect_all
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_unselect_all")
+  (return-type "none")
+)
+
+(define-method set_selection_mode
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_set_selection_mode")
+  (return-type "none")
+  (parameters
+    '("ChamplainSelectionMode" "mode")
+  )
+)
+
+(define-method get_selection_mode
+  (of-object "ChamplainSelectionLayer")
+  (c-name "champlain_selection_layer_get_selection_mode")
+  (return-type "ChamplainSelectionMode")
+)
+
+
+
+;; From champlain-tile-cache.h
+
+(define-function tile_cache_get_type
+  (c-name "champlain_tile_cache_get_type")
+  (return-type "GType")
+)
+
+(define-method get_persistent
+  (of-object "ChamplainTileCache")
+  (c-name "champlain_tile_cache_get_persistent")
+  (return-type "gboolean")
+)
+
+(define-method store_tile
+  (of-object "ChamplainTileCache")
+  (c-name "champlain_tile_cache_store_tile")
+  (return-type "none")
+  (parameters
+    '("ChamplainTile*" "tile")
+    '("const-gchar*" "contents")
+    '("gsize" "size")
+  )
+)
+
+(define-method refresh_tile_time
+  (of-object "ChamplainTileCache")
+  (c-name "champlain_tile_cache_refresh_tile_time")
+  (return-type "none")
+  (parameters
+    '("ChamplainTile*" "tile")
+  )
+)
+
+(define-method on_tile_filled
+  (of-object "ChamplainTileCache")
+  (c-name "champlain_tile_cache_on_tile_filled")
+  (return-type "none")
+  (parameters
+    '("ChamplainTile*" "tile")
+  )
+)
+
+(define-method clean
+  (of-object "ChamplainTileCache")
+  (c-name "champlain_tile_cache_clean")
+  (return-type "none")
+)
+
+(define-virtual store_tile
+  (of-object "ChamplainTileCache")
+  (return-type "none")
+  (parameters
+    '("ChamplainTile*" "tile")
+    '("const-gchar*" "contents")
+    '("gsize" "size")
+  )
+)
+
+(define-virtual refresh_tile_time
+  (of-object "ChamplainTileCache")
+  (return-type "none")
+  (parameters
+    '("ChamplainTile*" "tile")
+  )
+)
+
+(define-virtual on_tile_filled
+  (of-object "ChamplainTileCache")
+  (return-type "none")
+  (parameters
+    '("ChamplainTile*" "tile")
+  )
+)
+
+(define-virtual clean
+  (of-object "ChamplainTileCache")
+  (return-type "none")
+)
+
+
+
+;; From champlain-tile-source.h
+
+(define-function tile_source_get_type
+  (c-name "champlain_tile_source_get_type")
+  (return-type "GType")
+)
+
+(define-method get_cache
+  (of-object "ChamplainTileSource")
+  (c-name "champlain_tile_source_get_cache")
+  (return-type "ChamplainTileCache*")
+)
+
+(define-method set_cache
+  (of-object "ChamplainTileSource")
+  (c-name "champlain_tile_source_set_cache")
+  (return-type "none")
+  (parameters
+    '("ChamplainTileCache*" "cache")
+  )
+)
+
+(define-method set_id
+  (of-object "ChamplainTileSource")
+  (c-name "champlain_tile_source_set_id")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "id")
+  )
+)
+
+(define-method set_name
+  (of-object "ChamplainTileSource")
+  (c-name "champlain_tile_source_set_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method set_license
+  (of-object "ChamplainTileSource")
+  (c-name "champlain_tile_source_set_license")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "license")
+  )
+)
+
+(define-method set_license_uri
+  (of-object "ChamplainTileSource")
+  (c-name "champlain_tile_source_set_license_uri")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "license_uri")
+  )
+)
+
+(define-method set_min_zoom_level
+  (of-object "ChamplainTileSource")
+  (c-name "champlain_tile_source_set_min_zoom_level")
+  (return-type "none")
+  (parameters
+    '("guint" "zoom_level")
+  )
+)
+
+(define-method set_max_zoom_level
+  (of-object "ChamplainTileSource")
+  (c-name "champlain_tile_source_set_max_zoom_level")
+  (return-type "none")
+  (parameters
+    '("guint" "zoom_level")
+  )
+)
+
+(define-method set_tile_size
+  (of-object "ChamplainTileSource")
+  (c-name "champlain_tile_source_set_tile_size")
+  (return-type "none")
+  (parameters
+    '("guint" "tile_size")
+  )
+)
+
+(define-method set_projection
+  (of-object "ChamplainTileSource")
+  (c-name "champlain_tile_source_set_projection")
+  (return-type "none")
+  (parameters
+    '("ChamplainMapProjection" "projection")
+  )
+)
+
+
+
+;; From champlain-tile.h
+
+(define-function tile_get_type
+  (c-name "champlain_tile_get_type")
+  (return-type "GType")
+)
+
+(define-function tile_new
+  (c-name "champlain_tile_new")
+  (is-constructor-of "ChamplainTile")
+  (return-type "ChamplainTile*")
+)
+
+(define-function tile_new_full
+  (c-name "champlain_tile_new_full")
+  (return-type "ChamplainTile*")
+  (parameters
+    '("gint" "x")
+    '("gint" "y")
+    '("guint" "size")
+    '("gint" "zoom_level")
+  )
+)
+
+(define-method get_x
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_get_x")
+  (return-type "gint")
+)
+
+(define-method get_y
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_get_y")
+  (return-type "gint")
+)
+
+(define-method get_zoom_level
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_get_zoom_level")
+  (return-type "gint")
+)
+
+(define-method get_size
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_get_size")
+  (return-type "guint")
+)
+
+(define-method get_state
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_get_state")
+  (return-type "ChamplainState")
+)
+
+(define-method get_content
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_get_content")
+  (return-type "ClutterActor*")
+)
+
+(define-method get_modified_time
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_get_modified_time")
+  (return-type "const-GTimeVal*")
+)
+
+(define-method get_modified_time_string
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_get_modified_time_string")
+  (return-type "gchar*")
+)
+
+(define-method get_etag
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_get_etag")
+  (return-type "const-gchar*")
+)
+
+(define-method get_fade_in
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_get_fade_in")
+  (return-type "gboolean")
+)
+
+(define-method set_x
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_set_x")
+  (return-type "none")
+  (parameters
+    '("gint" "x")
+  )
+)
+
+(define-method set_y
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_set_y")
+  (return-type "none")
+  (parameters
+    '("gint" "y")
+  )
+)
+
+(define-method set_zoom_level
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_set_zoom_level")
+  (return-type "none")
+  (parameters
+    '("gint" "zoom_level")
+  )
+)
+
+(define-method set_size
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_set_size")
+  (return-type "none")
+  (parameters
+    '("guint" "size")
+  )
+)
+
+(define-method set_state
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_set_state")
+  (return-type "none")
+  (parameters
+    '("ChamplainState" "state")
+  )
+)
+
+(define-method set_content
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_set_content")
+  (return-type "none")
+  (parameters
+    '("ClutterActor*" "actor")
+  )
+)
+
+(define-method set_etag
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_set_etag")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "etag")
+  )
+)
+
+(define-method set_modified_time
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_set_modified_time")
+  (return-type "none")
+  (parameters
+    '("const-GTimeVal*" "time")
+  )
+)
+
+(define-method set_fade_in
+  (of-object "ChamplainTile")
+  (c-name "champlain_tile_set_fade_in")
+  (return-type "none")
+  (parameters
+    '("gboolean" "fade_in")
+  )
+)
+
+
+
+;; From champlain-version.h
 
 
 
@@ -553,1275 +2276,6 @@
 
 
 
-;; From champlain-defines.h
-
-
-
-;; From champlain-polygon.h
-
-(define-function polygon_get_type
-  (c-name "champlain_polygon_get_type")
-  (return-type "GType")
-)
-
-(define-function polygon_new
-  (c-name "champlain_polygon_new")
-  (is-constructor-of "ChamplainPolygon")
-  (return-type "ChamplainPolygon*")
-)
-
-(define-method append_point
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_append_point")
-  (return-type "ChamplainPoint*")
-  (parameters
-    '("gdouble" "lat")
-    '("gdouble" "lon")
-  )
-)
-
-(define-method insert_point
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_insert_point")
-  (return-type "ChamplainPoint*")
-  (parameters
-    '("gdouble" "lat")
-    '("gdouble" "lon")
-    '("gint" "pos")
-  )
-)
-
-(define-method remove_point
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_remove_point")
-  (return-type "none")
-  (parameters
-    '("ChamplainPoint*" "point")
-  )
-)
-
-(define-method clear_points
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_clear_points")
-  (return-type "none")
-)
-
-(define-method get_points
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_get_points")
-  (return-type "GList*")
-)
-
-(define-method set_fill_color
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_set_fill_color")
-  (return-type "none")
-  (parameters
-    '("const-ClutterColor*" "color")
-  )
-)
-
-(define-method set_stroke_color
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_set_stroke_color")
-  (return-type "none")
-  (parameters
-    '("const-ClutterColor*" "color")
-  )
-)
-
-(define-method get_fill_color
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_get_fill_color")
-  (return-type "ClutterColor*")
-)
-
-(define-method get_stroke_color
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_get_stroke_color")
-  (return-type "ClutterColor*")
-)
-
-(define-method get_fill
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_get_fill")
-  (return-type "gboolean")
-)
-
-(define-method set_fill
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_set_fill")
-  (return-type "none")
-  (parameters
-    '("gboolean" "value")
-  )
-)
-
-(define-method get_stroke
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_get_stroke")
-  (return-type "gboolean")
-)
-
-(define-method set_stroke
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_set_stroke")
-  (return-type "none")
-  (parameters
-    '("gboolean" "value")
-  )
-)
-
-(define-method set_stroke_width
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_set_stroke_width")
-  (return-type "none")
-  (parameters
-    '("gdouble" "value")
-  )
-)
-
-(define-method get_stroke_width
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_get_stroke_width")
-  (return-type "gdouble")
-)
-
-(define-method set_mark_points
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_set_mark_points")
-  (return-type "none")
-  (parameters
-    '("gboolean" "value")
-  )
-)
-
-(define-method get_mark_points
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_get_mark_points")
-  (return-type "gboolean")
-)
-
-(define-method show
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_show")
-  (return-type "none")
-)
-
-(define-method hide
-  (of-object "ChamplainPolygon")
-  (c-name "champlain_polygon_hide")
-  (return-type "none")
-)
-
-
-
-;; From champlain-point.h
-
-(define-function point_get_type
-  (c-name "champlain_point_get_type")
-  (return-type "GType")
-)
-
-(define-method copy
-  (of-object "ChamplainPoint")
-  (c-name "champlain_point_copy")
-  (return-type "ChamplainPoint*")
-)
-
-(define-method free
-  (of-object "ChamplainPoint")
-  (c-name "champlain_point_free")
-  (return-type "none")
-)
-
-(define-function point_new
-  (c-name "champlain_point_new")
-  (is-constructor-of "ChamplainPoint")
-  (return-type "ChamplainPoint*")
-  (parameters
-    '("gdouble" "lat")
-    '("gdouble" "lon")
-  )
-)
-
-
-
-;; From champlain-layer.h
-
-(define-function layer_get_type
-  (c-name "champlain_layer_get_type")
-  (return-type "GType")
-)
-
-(define-function layer_new
-  (c-name "champlain_layer_new")
-  (is-constructor-of "ChamplainLayer")
-  (return-type "ChamplainLayer*")
-)
-
-(define-method show
-  (of-object "ChamplainLayer")
-  (c-name "champlain_layer_show")
-  (return-type "none")
-)
-
-(define-method hide
-  (of-object "ChamplainLayer")
-  (c-name "champlain_layer_hide")
-  (return-type "none")
-)
-
-(define-method add_marker
-  (of-object "ChamplainLayer")
-  (c-name "champlain_layer_add_marker")
-  (return-type "none")
-  (parameters
-    '("ChamplainBaseMarker*" "marker")
-  )
-)
-
-(define-method remove_marker
-  (of-object "ChamplainLayer")
-  (c-name "champlain_layer_remove_marker")
-  (return-type "none")
-  (parameters
-    '("ChamplainBaseMarker*" "marker")
-  )
-)
-
-(define-method animate_in_all_markers
-  (of-object "ChamplainLayer")
-  (c-name "champlain_layer_animate_in_all_markers")
-  (return-type "none")
-)
-
-(define-method animate_out_all_markers
-  (of-object "ChamplainLayer")
-  (c-name "champlain_layer_animate_out_all_markers")
-  (return-type "none")
-)
-
-(define-method show_all_markers
-  (of-object "ChamplainLayer")
-  (c-name "champlain_layer_show_all_markers")
-  (return-type "none")
-)
-
-(define-method hide_all_markers
-  (of-object "ChamplainLayer")
-  (c-name "champlain_layer_hide_all_markers")
-  (return-type "none")
-)
-
-
-
-;; From champlain-selection-layer.h
-
-(define-function selection_layer_get_type
-  (c-name "champlain_selection_layer_get_type")
-  (return-type "GType")
-)
-
-(define-function selection_layer_new
-  (c-name "champlain_selection_layer_new")
-  (is-constructor-of "ChamplainSelectionLayer")
-  (return-type "ChamplainLayer*")
-)
-
-(define-method get_selected
-  (of-object "ChamplainSelectionLayer")
-  (c-name "champlain_selection_layer_get_selected")
-  (return-type "ChamplainBaseMarker*")
-)
-
-(define-method get_selected_markers
-  (of-object "ChamplainSelectionLayer")
-  (c-name "champlain_selection_layer_get_selected_markers")
-  (return-type "const-GList*")
-)
-
-(define-method count_selected_markers
-  (of-object "ChamplainSelectionLayer")
-  (c-name "champlain_selection_layer_count_selected_markers")
-  (return-type "guint")
-)
-
-(define-method select
-  (of-object "ChamplainSelectionLayer")
-  (c-name "champlain_selection_layer_select")
-  (return-type "none")
-  (parameters
-    '("ChamplainBaseMarker*" "marker")
-  )
-)
-
-(define-method unselect
-  (of-object "ChamplainSelectionLayer")
-  (c-name "champlain_selection_layer_unselect")
-  (return-type "none")
-  (parameters
-    '("ChamplainBaseMarker*" "marker")
-  )
-)
-
-(define-method marker_is_selected
-  (of-object "ChamplainSelectionLayer")
-  (c-name "champlain_selection_layer_marker_is_selected")
-  (return-type "gboolean")
-  (parameters
-    '("ChamplainBaseMarker*" "marker")
-  )
-)
-
-(define-method select_all
-  (of-object "ChamplainSelectionLayer")
-  (c-name "champlain_selection_layer_select_all")
-  (return-type "none")
-)
-
-(define-method unselect_all
-  (of-object "ChamplainSelectionLayer")
-  (c-name "champlain_selection_layer_unselect_all")
-  (return-type "none")
-)
-
-(define-method set_selection_mode
-  (of-object "ChamplainSelectionLayer")
-  (c-name "champlain_selection_layer_set_selection_mode")
-  (return-type "none")
-  (parameters
-    '("ChamplainSelectionMode" "mode")
-  )
-)
-
-(define-method get_selection_mode
-  (of-object "ChamplainSelectionLayer")
-  (c-name "champlain_selection_layer_get_selection_mode")
-  (return-type "ChamplainSelectionMode")
-)
-
-
-
-;; From champlain-map-source.h
-
-(define-function map_source_get_type
-  (c-name "champlain_map_source_get_type")
-  (return-type "GType")
-)
-
-(define-method get_min_zoom_level
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_min_zoom_level")
-  (return-type "gint")
-)
-
-(define-method get_max_zoom_level
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_max_zoom_level")
-  (return-type "gint")
-)
-
-(define-method get_tile_size
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_tile_size")
-  (return-type "guint")
-)
-
-(define-method get_x
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_x")
-  (return-type "guint")
-  (parameters
-    '("gint" "zoom_level")
-    '("gdouble" "longitude")
-  )
-)
-
-(define-method get_y
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_y")
-  (return-type "guint")
-  (parameters
-    '("gint" "zoom_level")
-    '("gdouble" "latitude")
-  )
-)
-
-(define-method get_longitude
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_longitude")
-  (return-type "gdouble")
-  (parameters
-    '("gint" "zoom_level")
-    '("guint" "x")
-  )
-)
-
-(define-method get_latitude
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_latitude")
-  (return-type "gdouble")
-  (parameters
-    '("gint" "zoom_level")
-    '("guint" "y")
-  )
-)
-
-(define-method get_row_count
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_row_count")
-  (return-type "guint")
-  (parameters
-    '("gint" "zoom_level")
-  )
-)
-
-(define-method get_column_count
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_column_count")
-  (return-type "guint")
-  (parameters
-    '("gint" "zoom_level")
-  )
-)
-
-(define-method fill_tile
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_fill_tile")
-  (return-type "none")
-  (parameters
-    '("ChamplainTile*" "tile")
-  )
-)
-
-(define-method set_id
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_set_id")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "id")
-  )
-)
-
-(define-method get_id
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_id")
-  (return-type "const-gchar*")
-)
-
-(define-method set_name
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_set_name")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "name")
-  )
-)
-
-(define-method get_name
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_name")
-  (return-type "const-gchar*")
-)
-
-(define-method set_license
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_set_license")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "license")
-  )
-)
-
-(define-method get_license
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_license")
-  (return-type "const-gchar*")
-)
-
-(define-method set_license_uri
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_set_license_uri")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "license_uri")
-  )
-)
-
-(define-method get_license_uri
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_license_uri")
-  (return-type "const-gchar*")
-)
-
-(define-method set_projection
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_set_projection")
-  (return-type "none")
-  (parameters
-    '("ChamplainMapProjection" "projection")
-  )
-)
-
-(define-method get_projection
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_projection")
-  (return-type "ChamplainMapProjection")
-)
-
-(define-method get_meters_per_pixel
-  (of-object "ChamplainMapSource")
-  (c-name "champlain_map_source_get_meters_per_pixel")
-  (return-type "gfloat")
-  (parameters
-    '("gint" "zoom_level")
-    '("gdouble" "latitude")
-    '("gdouble" "longitude")
-  )
-)
-
-
-
-;; From champlain-map-source-desc.h
-
-(define-function map_source_desc_get_type
-  (c-name "champlain_map_source_desc_get_type")
-  (return-type "GType")
-)
-
-(define-method copy
-  (of-object "ChamplainMapSourceDesc")
-  (c-name "champlain_map_source_desc_copy")
-  (return-type "ChamplainMapSourceDesc*")
-)
-
-(define-method free
-  (of-object "ChamplainMapSourceDesc")
-  (c-name "champlain_map_source_desc_free")
-  (return-type "none")
-)
-
-(define-function map_source_desc_new
-  (c-name "champlain_map_source_desc_new")
-  (is-constructor-of "ChamplainMapSourceDesc")
-  (return-type "ChamplainMapSourceDesc*")
-)
-
-
-
-;; From champlain-map-source-factory.h
-
-(define-function map_source_factory_get_type
-  (c-name "champlain_map_source_factory_get_type")
-  (return-type "GType")
-)
-
-(define-function map_source_factory_dup_default
-  (c-name "champlain_map_source_factory_dup_default")
-  (return-type "ChamplainMapSourceFactory*")
-)
-
-(define-method dup_list
-  (of-object "ChamplainMapSourceFactory")
-  (c-name "champlain_map_source_factory_dup_list")
-  (return-type "GSList*")
-)
-
-(define-method create
-  (of-object "ChamplainMapSourceFactory")
-  (c-name "champlain_map_source_factory_create")
-  (return-type "ChamplainMapSource*")
-  (parameters
-    '("const-gchar*" "id")
-  )
-)
-
-(define-method register
-  (of-object "ChamplainMapSourceFactory")
-  (c-name "champlain_map_source_factory_register")
-  (return-type "gboolean")
-  (parameters
-    '("ChamplainMapSourceDesc*" "desc")
-    '("ChamplainMapSourceConstructor" "constructor")
-    '("gpointer" "data")
-  )
-)
-
-
-
-;; From champlain-network-map-source.h
-
-(define-function network_map_source_get_type
-  (c-name "champlain_network_map_source_get_type")
-  (return-type "GType")
-)
-
-(define-function network_map_source_new_full
-  (c-name "champlain_network_map_source_new_full")
-  (return-type "ChamplainNetworkMapSource*")
-  (parameters
-    '("const-gchar*" "id")
-    '("const-gchar*" "name")
-    '("const-gchar*" "license")
-    '("const-gchar*" "license_uri")
-    '("guint" "min_zoom")
-    '("guint" "max_zoom")
-    '("guint" "tile_size")
-    '("ChamplainMapProjection" "projection")
-    '("const-gchar*" "uri_format")
-  )
-)
-
-(define-method get_tile_uri
-  (of-object "ChamplainNetworkMapSource")
-  (c-name "champlain_network_map_source_get_tile_uri")
-  (return-type "gchar*")
-  (parameters
-    '("gint" "x")
-    '("gint" "y")
-    '("gint" "z")
-  )
-)
-
-(define-method set_uri_format
-  (of-object "ChamplainNetworkMapSource")
-  (c-name "champlain_network_map_source_set_uri_format")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "uri_format")
-  )
-)
-
-
-
-;; From champlain-marker.h
-
-(define-function marker_get_type
-  (c-name "champlain_marker_get_type")
-  (return-type "GType")
-)
-
-(define-function marker_new
-  (c-name "champlain_marker_new")
-  (is-constructor-of "ChamplainMarker")
-  (return-type "ClutterActor*")
-)
-
-(define-function marker_new_with_text
-  (c-name "champlain_marker_new_with_text")
-  (return-type "ClutterActor*")
-  (parameters
-    '("const-gchar*" "text")
-    '("const-gchar*" "font")
-    '("ClutterColor*" "text_color")
-    '("ClutterColor*" "marker_color")
-  )
-)
-
-(define-function marker_new_with_image
-  (c-name "champlain_marker_new_with_image")
-  (return-type "ClutterActor*")
-  (parameters
-    '("ClutterActor*" "actor")
-  )
-)
-
-(define-function marker_new_from_file
-  (c-name "champlain_marker_new_from_file")
-  (return-type "ClutterActor*")
-  (parameters
-    '("const-gchar*" "filename")
-    '("GError**" "error")
-  )
-)
-
-(define-function marker_new_full
-  (c-name "champlain_marker_new_full")
-  (return-type "ClutterActor*")
-  (parameters
-    '("const-gchar*" "text")
-    '("ClutterActor*" "actor")
-  )
-)
-
-(define-method set_text
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_text")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "text")
-  )
-)
-
-(define-method set_image
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_image")
-  (return-type "none")
-  (parameters
-    '("ClutterActor*" "image")
-  )
-)
-
-(define-method set_use_markup
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_use_markup")
-  (return-type "none")
-  (parameters
-    '("gboolean" "use_markup")
-  )
-)
-
-(define-method set_alignment
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_alignment")
-  (return-type "none")
-  (parameters
-    '("PangoAlignment" "alignment")
-  )
-)
-
-(define-method set_color
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_color")
-  (return-type "none")
-  (parameters
-    '("const-ClutterColor*" "color")
-  )
-)
-
-(define-method set_text_color
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_text_color")
-  (return-type "none")
-  (parameters
-    '("const-ClutterColor*" "color")
-  )
-)
-
-(define-method set_font_name
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_font_name")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "font_name")
-  )
-)
-
-(define-method set_wrap
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_wrap")
-  (return-type "none")
-  (parameters
-    '("gboolean" "wrap")
-  )
-)
-
-(define-method set_wrap_mode
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_wrap_mode")
-  (return-type "none")
-  (parameters
-    '("PangoWrapMode" "wrap_mode")
-  )
-)
-
-(define-method set_attributes
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_attributes")
-  (return-type "none")
-  (parameters
-    '("PangoAttrList*" "list")
-  )
-)
-
-(define-method set_single_line_mode
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_single_line_mode")
-  (return-type "none")
-  (parameters
-    '("gboolean" "mode")
-  )
-)
-
-(define-method set_ellipsize
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_ellipsize")
-  (return-type "none")
-  (parameters
-    '("PangoEllipsizeMode" "mode")
-  )
-)
-
-(define-method set_draw_background
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_set_draw_background")
-  (return-type "none")
-  (parameters
-    '("gboolean" "background")
-  )
-)
-
-(define-method get_use_markup
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_use_markup")
-  (return-type "gboolean")
-)
-
-(define-method get_text
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_text")
-  (return-type "const-gchar*")
-)
-
-(define-method get_image
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_image")
-  (return-type "ClutterActor*")
-)
-
-(define-method get_alignment
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_alignment")
-  (return-type "PangoAlignment")
-)
-
-(define-method get_color
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_color")
-  (return-type "ClutterColor*")
-)
-
-(define-method get_text_color
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_text_color")
-  (return-type "ClutterColor*")
-)
-
-(define-method get_font_name
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_font_name")
-  (return-type "const-gchar*")
-)
-
-(define-method get_wrap
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_wrap")
-  (return-type "gboolean")
-)
-
-(define-method get_wrap_mode
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_wrap_mode")
-  (return-type "PangoWrapMode")
-)
-
-(define-method get_ellipsize
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_ellipsize")
-  (return-type "PangoEllipsizeMode")
-)
-
-(define-method get_single_line_mode
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_single_line_mode")
-  (return-type "gboolean")
-)
-
-(define-method get_draw_background
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_get_draw_background")
-  (return-type "gboolean")
-)
-
-(define-function marker_set_highlight_color
-  (c-name "champlain_marker_set_highlight_color")
-  (return-type "none")
-  (parameters
-    '("ClutterColor*" "color")
-  )
-)
-
-(define-function marker_get_highlight_color
-  (c-name "champlain_marker_get_highlight_color")
-  (return-type "const-ClutterColor*")
-)
-
-(define-function marker_set_highlight_text_color
-  (c-name "champlain_marker_set_highlight_text_color")
-  (return-type "none")
-  (parameters
-    '("ClutterColor*" "color")
-  )
-)
-
-(define-function marker_get_highlight_text_color
-  (c-name "champlain_marker_get_highlight_text_color")
-  (return-type "const-ClutterColor*")
-)
-
-(define-method queue_redraw
-  (of-object "ChamplainMarker")
-  (c-name "champlain_marker_queue_redraw")
-  (return-type "none")
-)
-
-
-
-;; From champlain-base-marker.h
-
-(define-function base_marker_get_type
-  (c-name "champlain_base_marker_get_type")
-  (return-type "GType")
-)
-
-(define-function base_marker_new
-  (c-name "champlain_base_marker_new")
-  (is-constructor-of "ChamplainBaseMarker")
-  (return-type "ClutterActor*")
-)
-
-(define-method set_position
-  (of-object "ChamplainBaseMarker")
-  (c-name "champlain_base_marker_set_position")
-  (return-type "none")
-  (parameters
-    '("gdouble" "longitude")
-    '("gdouble" "latitude")
-  )
-)
-
-(define-method set_highlighted
-  (of-object "ChamplainBaseMarker")
-  (c-name "champlain_base_marker_set_highlighted")
-  (return-type "none")
-  (parameters
-    '("gboolean" "value")
-  )
-)
-
-(define-method get_highlighted
-  (of-object "ChamplainBaseMarker")
-  (c-name "champlain_base_marker_get_highlighted")
-  (return-type "gboolean")
-)
-
-(define-method animate_in
-  (of-object "ChamplainBaseMarker")
-  (c-name "champlain_base_marker_animate_in")
-  (return-type "none")
-)
-
-(define-method animate_in_with_delay
-  (of-object "ChamplainBaseMarker")
-  (c-name "champlain_base_marker_animate_in_with_delay")
-  (return-type "none")
-  (parameters
-    '("guint" "delay")
-  )
-)
-
-(define-method animate_out
-  (of-object "ChamplainBaseMarker")
-  (c-name "champlain_base_marker_animate_out")
-  (return-type "none")
-)
-
-(define-method animate_out_with_delay
-  (of-object "ChamplainBaseMarker")
-  (c-name "champlain_base_marker_animate_out_with_delay")
-  (return-type "none")
-  (parameters
-    '("guint" "delay")
-  )
-)
-
-
-
-;; From champlain-tile.h
-
-(define-function tile_get_type
-  (c-name "champlain_tile_get_type")
-  (return-type "GType")
-)
-
-(define-function tile_new
-  (c-name "champlain_tile_new")
-  (is-constructor-of "ChamplainTile")
-  (return-type "ChamplainTile*")
-)
-
-(define-function tile_new_full
-  (c-name "champlain_tile_new_full")
-  (return-type "ChamplainTile*")
-  (parameters
-    '("gint" "x")
-    '("gint" "y")
-    '("guint" "size")
-    '("gint" "zoom_level")
-  )
-)
-
-(define-method get_x
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_x")
-  (return-type "gint")
-)
-
-(define-method get_y
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_y")
-  (return-type "gint")
-)
-
-(define-method get_zoom_level
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_zoom_level")
-  (return-type "gint")
-)
-
-(define-method get_size
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_size")
-  (return-type "guint")
-)
-
-(define-method get_state
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_state")
-  (return-type "ChamplainState")
-)
-
-(define-method get_uri
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_uri")
-  (return-type "const-gchar*")
-)
-
-(define-method get_filename
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_filename")
-  (return-type "const-gchar*")
-)
-
-(define-method get_actor
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_actor")
-  (return-type "ClutterActor*")
-)
-
-(define-method get_content
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_content")
-  (return-type "ClutterActor*")
-)
-
-(define-method get_modified_time
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_modified_time")
-  (return-type "const-GTimeVal*")
-)
-
-(define-method get_modified_time_string
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_modified_time_string")
-  (return-type "gchar*")
-)
-
-(define-method get_etag
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_etag")
-  (return-type "const-gchar*")
-)
-
-(define-method set_x
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_set_x")
-  (return-type "none")
-  (parameters
-    '("gint" "x")
-  )
-)
-
-(define-method set_y
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_set_y")
-  (return-type "none")
-  (parameters
-    '("gint" "y")
-  )
-)
-
-(define-method set_zoom_level
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_set_zoom_level")
-  (return-type "none")
-  (parameters
-    '("gint" "zoom_level")
-  )
-)
-
-(define-method set_size
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_set_size")
-  (return-type "none")
-  (parameters
-    '("guint" "size")
-  )
-)
-
-(define-method set_state
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_set_state")
-  (return-type "none")
-  (parameters
-    '("ChamplainState" "state")
-  )
-)
-
-(define-method set_uri
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_set_uri")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "uri")
-  )
-)
-
-(define-method set_filename
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_set_filename")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "filename")
-  )
-)
-
-(define-method set_content
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_set_content")
-  (return-type "none")
-  (parameters
-    '("ClutterActor*" "actor")
-    '("gboolean" "fade_in")
-  )
-)
-
-(define-method set_etag
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_set_etag")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "etag")
-  )
-)
-
-(define-method set_modified_time
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_set_modified_time")
-  (return-type "none")
-  (parameters
-    '("const-GTimeVal*" "time")
-  )
-)
-
-
-
-;; From champlain-zoom-level.h
-
-(define-function zoom_level_get_type
-  (c-name "champlain_zoom_level_get_type")
-  (return-type "GType")
-)
-
-(define-function zoom_level_new
-  (c-name "champlain_zoom_level_new")
-  (is-constructor-of "ChamplainZoomLevel")
-  (return-type "ChamplainZoomLevel*")
-)
-
-(define-method get_width
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_get_width")
-  (return-type "guint")
-)
-
-(define-method get_height
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_get_height")
-  (return-type "guint")
-)
-
-(define-method get_zoom_level
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_get_zoom_level")
-  (return-type "gint")
-)
-
-(define-method get_actor
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_get_actor")
-  (return-type "ClutterActor*")
-)
-
-(define-method set_width
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_set_width")
-  (return-type "none")
-  (parameters
-    '("guint" "width")
-  )
-)
-
-(define-method set_height
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_set_height")
-  (return-type "none")
-  (parameters
-    '("guint" "height")
-  )
-)
-
-(define-method set_zoom_level
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_set_zoom_level")
-  (return-type "none")
-  (parameters
-    '("gint" "zoom_level")
-  )
-)
-
-(define-method add_tile
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_add_tile")
-  (return-type "none")
-  (parameters
-    '("ChamplainTile*" "tile")
-  )
-)
-
-(define-method remove_tile
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_remove_tile")
-  (return-type "none")
-  (parameters
-    '("ChamplainTile*" "tile")
-  )
-)
-
-(define-method tile_count
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_tile_count")
-  (return-type "guint")
-)
-
-(define-method get_nth_tile
-  (of-object "ChamplainZoomLevel")
-  (c-name "champlain_zoom_level_get_nth_tile")
-  (return-type "ChamplainTile*")
-  (parameters
-    '("guint" "index")
-  )
-)
+;; From champlain.h
 
 
