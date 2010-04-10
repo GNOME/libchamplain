@@ -213,6 +213,15 @@ AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
 GOBJECT_INTROSPECTION_CHECK([0.6.3])
 
 # -----------------------------------------------------------
+# Enable vala (default to "no")
+# -----------------------------------------------------------
+AC_ARG_ENABLE(vala,
+  AC_HELP_STRING([--enable-vala],[Include vala champlain (and champlain-gtk)]),
+    enable_vala=$enableval, enable_vala=no )
+
+AM_CONDITIONAL(ENABLE_VALA, test "x$enable_vala" = "xyes")
+
+# -----------------------------------------------------------
 AC_CONFIG_FILES([Makefile
                  champlain/Makefile
                  champlain/champlain-version.h
