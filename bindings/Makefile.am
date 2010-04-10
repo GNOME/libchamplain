@@ -8,5 +8,5 @@ if ENABLE_PYTHON
   SUBDIRS+=python
 endif
 
-DIST_SUBDIRS= managed python perl/Champlain
+DIST_SUBDIRS= managed python perl/Champlain vala
 

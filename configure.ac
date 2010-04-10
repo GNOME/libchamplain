@@ -27,6 +27,9 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
+AC_PATH_PROG(VAPIGEN, vapigen, vapigen)
+AC_SUBST(VAPIGEN)
+
 # Checks for libraries.
 LIBRARY_VERSION=3:2:3
 # API_VERSION is used to generate pc files only
@@ -234,6 +237,9 @@ AC_CONFIG_FILES([Makefile
                  bindings/managed/champlain-gtk/champlain-gtk-sharp.pc
                  bindings/managed/champlain-gtk/champlain-gtk-sharp.dll.config
                  bindings/managed/samples/Makefile
+                 bindings/vala/Makefile
+                 bindings/vala/champlain/Makefile
+                 bindings/vala/champlain-gtk/Makefile
                  bindings/Makefile])
 AC_OUTPUT
 
