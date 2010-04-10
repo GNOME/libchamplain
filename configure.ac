@@ -266,5 +266,6 @@ echo "Bindings:"
 echo "       champlain-sharp: ${enable_managed}"
 echo "       Python bindings: ${enable_python}"
 echo " gobject-introspection: ${enable_introspection}"
+echo "         vala bindings: ${enable_vala}"
 echo ""
 
