@@ -6,8 +6,9 @@ cp champlain-gtk/pychamplaingtk-base.defs /tmp/pychamplaingtk-base.defs.bk
 
 # Update the list of headers from Makefile.am
 cd ../../champlain
-python /usr/share/pygobject/2.0/codegen/defsgen.py \
-    -m champlain -l .libs/libchamplain-0.5.so \
+DEFSGEN="$(pkg-config --variable=codegendir pygobject-2.0)/defsgen.py"
+python ${DEFSGEN} \
+    -m champlain -l .libs/libchamplain-@CHAMPLAIN_API_VERSION@.so \
     -f ../bindings/python/champlain/pychamplain-boxed-types.defs \
 	champlain.h 			\
 	champlain-defines.h		\
@@ -29,17 +30,24 @@ python /usr/share/pygobject/2.0/codegen/defsgen.py \
 	champlain-map-source-desc.h	\
 	champlain-polygon.h		\
 	champlain-version.h		\
-	champlain-memphis-tile-source.h  \
-	champlain-map-data-source.h	\
-	champlain-local-map-data-source.h \
-	champlain-network-map-data-source.h \
-	champlain-bounding-box.h \
     > ../bindings/python/champlain/pychamplain-base.defs
+
+python ${DEFSGEN} \
+    -m champlain -l .libs/libchamplain-@CHAMPLAIN_API_VERSION@.so \
+    -f ../bindings/python/champlain/pychamplainmemphis-boxed-types.defs \
+        champlain-memphis.h             \
+        champlain-memphis-tile-source.h  \
+        champlain-map-data-source.h     \
+        champlain-local-map-data-source.h \
+        champlain-network-map-data-source.h \
+        champlain-bounding-box.h \
+    > ../bindings/python/champlain/pychamplainmemphis-base.defs
 
 # Update the list of headers from Makefile.am
 cd ../champlain-gtk
-python /usr/share/pygobject/2.0/codegen/defsgen.py	\
-    -m champlain -l .libs/libchamplain-gtk-0.5.so \
+python ${DEFSGEN}	\
+    -m gtk_champlain_embed -l .libs/libchamplain-gtk-@CHAMPLAIN_API_VERSION@.so \
 	champlain-gtk.h				\
 	gtk-champlain-embed.h			\
     > ../bindings/python/champlain-gtk/pychamplaingtk-base.defs
+

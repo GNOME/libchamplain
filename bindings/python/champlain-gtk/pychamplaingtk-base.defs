@@ -23,12 +23,12 @@
 
 ;; From gtk-champlain-embed.h
 
-(define-function gtk_champlain_embed_get_type
+(define-function get_type
   (c-name "gtk_champlain_embed_get_type")
   (return-type "GType")
 )
 
-(define-function gtk_champlain_embed_new
+(define-function new
   (c-name "gtk_champlain_embed_new")
   (is-constructor-of "GtkChamplainEmbed")
   (return-type "GtkWidget*")

@@ -4,7 +4,6 @@ headers
 #include <pygobject.h>
 #include <champlain/champlain.h>
 #include <clutter/clutter.h>
-#include <memphis/memphis.h>
 #include "pychamplain.h"
 
 %%
@@ -492,66 +491,7 @@ _wrap_champlain_point__set_lon(PyGBoxed *self, PyObject *value,
     pyg_boxed_get(self, ChamplainPoint)->lon = val;
     return 0;
 }
-%%
-override-attr ChamplainBoundingBox.left
-static int
-_wrap_champlain_bounding_box__set_left (PyGBoxed *self, PyObject *value, 
-    void *closure)
-{
-    gdouble val;
 
-    val = PyFloat_AsDouble(value);
-    if (PyErr_Occurred())
-        return -1;
-
-    pyg_boxed_get(self, ChamplainBoundingBox)->left = val;
-    return 0;
-}
-%%
-override-attr ChamplainBoundingBox.right
-static int
-_wrap_champlain_bounding_box__set_right (PyGBoxed *self, PyObject *value, 
-    void *closure)
-{
-    gdouble val;
-
-    val = PyFloat_AsDouble(value);
-    if (PyErr_Occurred())
-        return -1;
-
-    pyg_boxed_get(self, ChamplainBoundingBox)->right = val;
-    return 0;
-}
-%%
-override-attr ChamplainBoundingBox.top
-static int
-_wrap_champlain_bounding_box__set_top (PyGBoxed *self, PyObject *value, 
-    void *closure)
-{
-    gdouble val;
-
-    val = PyFloat_AsDouble(value);
-    if (PyErr_Occurred())
-        return -1;
-
-    pyg_boxed_get(self, ChamplainBoundingBox)->top = val;
-    return 0;
-}
-%%
-override-attr ChamplainBoundingBox.bottom
-static int
-_wrap_champlain_bounding_box__set_bottom (PyGBoxed *self, PyObject *value, 
-    void *closure)
-{
-    gdouble val;
-
-    val = PyFloat_AsDouble(value);
-    if (PyErr_Occurred())
-        return -1;
-
-    pyg_boxed_get(self, ChamplainBoundingBox)->bottom = val;
-    return 0;
-}
 %%
 override champlain_selection_layer_get_selected_markers kwargs
 static PyObject *

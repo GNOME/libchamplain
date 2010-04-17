@@ -7,7 +7,12 @@ AM_CPPFLAGS =                                           \
 	-I$(top_srcdir)/champlain			\
 	-I$(top_srcdir)                                 \
 	-DDATADIR=\""$(datadir)"\"              	\
+	$(DEPS_CFLAGS)					\
+	$(GTK_CFLAGS)					\
+	$(MEMPHIS_CFLAGS)				\
 	$(PYTHON_BINDING_CFLAGS)			\
+	$(PYTHON_BINDING_GTK_CFLAGS)			\
+	$(PYTHON_BINDING_MEMPHIS_CFLAGS)		\
 	$(PYTHON_INCLUDES)				\
 	$(WARN_CFLAGS)
 
@@ -22,9 +27,14 @@ champlaingtk_la_SOURCES =			\
 	pychamplaingtk.c
 
 champlaingtk_la_LIBADD =					\
-	$(PYTHON_BINDING_LIBS)				\
-	$(top_builddir)/champlain/libchamplain-0.5.la	\
-	$(top_builddir)/champlain-gtk/libchamplain-gtk-0.5.la
+	$(PYTHON_BINDING_LIBS)					\
+	$(PYTHON_BINDING_GTK_LIBS)				\
+	$(PYTHON_BINDING_MEMPHIS_LIBS)				\
+	$(DEPS_CFLAGS)						\
+	$(GTK_CFLAGS)						\
+	$(MEMPHIS_CFLAGS)					\
+	$(top_builddir)/champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la	\
+	$(top_builddir)/champlain-gtk/libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
 
 champlaingtk_la_LDFLAGS =					\
 	-module -avoid-version

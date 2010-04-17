@@ -2,20 +2,29 @@ SUBDIRS = tidy champlain docs/reference
 
 ACLOCAL_AMFLAGS = -I m4
 
-pcfiles = champlain-@API_VERSION@.pc
-other_pcfiles = champlain-@API_VERSION@-uninstalled.pc
-champlain-@API_VERSION@.pc: champlain.pc
+pcfiles = champlain-@CHAMPLAIN_API_VERSION@.pc
+other_pcfiles = champlain-@CHAMPLAIN_API_VERSION@-uninstalled.pc
+champlain-@CHAMPLAIN_API_VERSION@.pc: champlain.pc
 	@cp -f $< $@
-champlain-@API_VERSION@-uninstalled.pc: champlain-uninstalled.pc
+champlain-@CHAMPLAIN_API_VERSION@-uninstalled.pc: champlain-uninstalled.pc
 	@cp -f $< $@
 
 if ENABLE_GTK
 SUBDIRS += champlain-gtk docs/reference-gtk
-pcfiles += champlain-gtk-@API_VERSION@.pc
-champlain-gtk-@API_VERSION@.pc: champlain-gtk.pc
+pcfiles += champlain-gtk-@CHAMPLAIN_API_VERSION@.pc
+champlain-gtk-@CHAMPLAIN_API_VERSION@.pc: champlain-gtk.pc
 	@cp -f $< $@
-other_pcfiles += champlain-gtk-@API_VERSION@-uninstalled.pc
-champlain-gtk-@API_VERSION@-uninstalled.pc: champlain-gtk-uninstalled.pc
+other_pcfiles += champlain-gtk-@CHAMPLAIN_API_VERSION@-uninstalled.pc
+champlain-gtk-@CHAMPLAIN_API_VERSION@-uninstalled.pc: champlain-gtk-uninstalled.pc
+	@cp -f $< $@
+endif
+
+if ENABLE_MEMPHIS
+pcfiles += champlain-memphis-@CHAMPLAIN_API_VERSION@.pc
+champlain-memphis-@CHAMPLAIN_API_VERSION@.pc: champlain-memphis.pc
+	@cp -f $< $@
+other_pcfiles += champlain-memphis-@CHAMPLAIN_API_VERSION@-uninstalled.pc
+champlain-memphis-@CHAMPLAIN_API_VERSION@-uninstalled.pc: champlain-memphis-uninstalled.pc
 	@cp -f $< $@
 endif
 

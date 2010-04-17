@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libchamplain-gtk
 Description: Gtk+ Widget wrapper for libchamplain
 Version: @VERSION@
-Libs: -L${libdir} -lchamplain-gtk-@API_VERSION@
-Cflags: -I${includedir}/libchamplain-gtk-@API_VERSION@
-Requires: champlain-@API_VERSION@ gobject-2.0 clutter-1.0 clutter-gtk-0.10 gtk+-2.0
+Libs: -L${libdir} -lchamplain-gtk-@CHAMPLAIN_API_VERSION@
+Cflags: -I${includedir}/libchamplain-gtk-@CHAMPLAIN_API_VERSION@
+Requires: champlain-@CHAMPLAIN_API_VERSION@ clutter-gtk-0.10 gtk+-2.0

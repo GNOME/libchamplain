@@ -7,36 +7,69 @@ AM_CPPFLAGS =						\
 	-I$(top_srcdir)/champlain			\
 	-I$(top_srcdir)					\
 	-DDATADIR=\""$(datadir)"\"			\
+	$(DEPS_CFLAGS) \
+	$(MEMPHIS_CFLAGS) \
 	$(PYTHON_INCLUDES)				\
 	$(PYTHON_BINDING_CFLAGS)			\
+	$(PYTHON_BINDING_GTK_CFLAGS)			\
+	$(PYTHON_BINDING_MEMPHIS_CFLAGS)		\
 	$(WARN_CFLAGS)
 
-BUILT_SOURCES = 					\
-	pychamplain.c					
+BUILT_SOURCES = pychamplain.c
+
+if ENABLE_MEMPHIS
+BUILT_SOURCES += pychamplainmemphis.c
+endif	
 
 pychamplaindir = $(pyexecdir)
+pychamplainmemphisdir = $(pyexecdir)
+
 pychamplain_LTLIBRARIES = champlain.la
+
+if ENABLE_MEMPHIS
+pychamplain_LTLIBRARIES += champlainmemphis.la
+endif
 
 champlain_la_SOURCES =					\
 	pychamplainmodule.c				\
 	pychamplain.c
+champlainmemphis_la_SOURCES =				\
+	pychamplainmemphismodule.c			\
+	pychamplainmemphis.c
 
 champlain_la_LIBADD =					\
+	$(DEPS_LIBS) \
+	$(MEMPHIS_LIBS) \
 	$(PYTHON_BINDING_LIBS)				\
-	$(top_builddir)/champlain/libchamplain-0.5.la
+	$(PYTHON_BINDING_GTK_LIBS)			\
+	$(PYTHON_BINDING_MEMPHIS_LIBS)			\
+	$(top_builddir)/champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
+champlainmemphis_la_LIBADD = $(champlain_la_LIBADD)
 
 champlain_la_LDFLAGS =					\
 	-module -avoid-version
+champlainmemphis_la_LDFLAGS = $(champlain_la_LDFLAGS)
+
+codegen_register = \
+	--register $(PYCLUTTERDEFS)/clutter-types.defs	\
+	--register $(PYCLUTTERDEFS)/cogl-types.defs	\
+	--register $(PYGTKDEFS)/pango-types.defs
 
 pychamplain.c: pychamplain.override pychamplain.defs
-	$(PYGOBJECTCODEGEN)				\
-		--prefix champlain 			\
-		--register $(PYGTKDEFS)/pango-types.defs \
-		--register $(PYCLUTTERDEFS)/clutter-types.defs \
-		--register $(PYCLUTTERDEFS)/cogl-types.defs \
-		--register $(PYMEMPHISDEFS)/memphis-types.defs \
-		--override pychamplain.override 	\
+	$(PYGOBJECTCODEGEN)		\
+		$(codegen_register)	\
+		--prefix champlain	\
+		--override pychamplain.override		\
 		pychamplain.defs > $@
+
+pychamplainmemphis.c: pychamplainmemphis.override pychamplainmemphis.defs
+	$(PYGOBJECTCODEGEN)		\
+		$(codegen_register)	\
+		--register $(PYMEMPHISDEFS)/memphis-types.defs	\
+		--register pychamplain.defs	\
+		--prefix champlainmemphis		\
+		--override pychamplainmemphis.override	\
+		pychamplainmemphis.defs > $@
 
 EXTRA_DIST =			\
 	pychamplain.override	\
@@ -44,7 +77,12 @@ EXTRA_DIST =			\
 	pychamplain-boxed-types.defs	\
 	pychamplain-base.defs	\
 	pychamplain.defs	\
-	pychamplain.h
+	pychamplain.h		\
+	pychamplainmemphis.override	\
+	pychamplainmemphis-boxed-types.defs	\
+	pychamplainmemphis-base.defs	\
+	pychamplainmemphis.defs	\
+	pychamplainmemphis.h
 
 CLEANFILES = $(BUILT_SOURCES)
 

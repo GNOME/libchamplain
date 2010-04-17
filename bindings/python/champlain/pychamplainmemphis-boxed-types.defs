@@ -1,0 +1,14 @@
+;; -*- scheme -*-
+; boxed type definitions ...
+
+(define-boxed BoundingBox
+  (in-module "Champlain")
+  (c-name "ChamplainBoundingBox")
+  (gtype-id "CHAMPLAIN_TYPE_BOUNDING_BOX")
+  (fields
+    '("double" "left")
+    '("double" "bottom")
+    '("double" "right")
+    '("double" "top")
+  )
+)

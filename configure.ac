@@ -5,7 +5,7 @@ m4_define([champlain_minor_version], [5])
 m4_define([champlain_micro_version], [1])
 m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
-m4_define([api_version],
+m4_define([champlain_api_version],
           [champlain_major_version.champlain_minor_version])
 # if the API changes, set to 0
 AC_PREREQ(2.61)
@@ -13,7 +13,7 @@ AC_INIT([libchamplain],
         [champlain_version],
         pierre-luc@pierlux.com)
 AC_CONFIG_SRCDIR([champlain/champlain.h])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE
@@ -29,14 +29,13 @@ AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
 # Checks for libraries.
 LIBRARY_VERSION=0:0:0
-# API_VERSION is used to generate pc files only
-API_VERSION=api_version
+CHAMPLAIN_API_VERSION=champlain_api_version
 CHAMPLAIN_MAJOR_VERSION=champlain_major_version
 CHAMPLAIN_MINOR_VERSION=champlain_minor_version
 CHAMPLAIN_MICRO_VERSION=champlain_micro_version
 CHAMPLAIN_VERSION=champlain_version
 CHAMPLAIN_MAJORMINOR=champlain_api_version
-AC_SUBST(API_VERSION)
+AC_SUBST(CHAMPLAIN_API_VERSION)
 AC_SUBST(CHAMPLAIN_MAJOR_VERSION)
 AC_SUBST(CHAMPLAIN_MINOR_VERSION)
 AC_SUBST(CHAMPLAIN_MICRO_VERSION)
@@ -44,20 +43,20 @@ AC_SUBST(CHAMPLAIN_VERSION)
 AC_SUBST(CHAMPLAIN_MAJORMINOR)
 
 AC_SUBST(LIBRARY_VERSION)
+
+PKG_CHECK_MODULES(DEPS,
+  [   glib-2.0 >= 2.16
+      gobject-2.0 >= 2.10
+      gdk-2.0 >= 2.10
+      clutter-1.0 >= 1.0
+      cairo >= 1.4
+      gio-2.0 >= 2.16
+      sqlite3 >= 3.0
+  ]
+)
 AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 
-PKG_CHECK_MODULES(DEPS,
-  [   glib-2.0 >= 2.16,
-      gobject-2.0 >= 2.10,
-      gdk-2.0 >= 2.10,
-      clutter-1.0 >= 1.0,
-      cairo >= 1.4,
-      gio-2.0 >= 2.16,
-      sqlite3 >= 3.0,
-      memphis-0.2 >= 0.2
-  ]
-)
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
 IDT_COMPILE_WARNINGS
@@ -65,29 +64,33 @@ IDT_COMPILE_WARNINGS
 # -----------------------------------------------------------
 # Check for libsoup, use libsoup-gnome if available
 # -----------------------------------------------------------
-PKG_CHECK_MODULES(SOUP, libsoup-gnome-2.4 >= 2.26, [
+PKG_CHECK_MODULES(SOUP_GNOME, libsoup-gnome-2.4 >= 2.26, [
+    SOUP=SOUP_GNOME
     have_soup_gnome="yes"
+    SOUP_DEP="libsoup-gnome-2.4"
     AC_DEFINE(HAVE_LIBSOUP_GNOME,1,[libsoup gnome integration])
     ], have_soup_gnome="no")
+
 
 if test "x$have_soup_gnome" = "xno"; then
   PKG_CHECK_MODULES(SOUP, libsoup-2.4 >= 2.4.1,
      have_soup="yes", have_soup="no")
+  SOUP_DEP="libsoup-2.4"
 fi
 
 if test "x$have_soup" = "xno" && test "x$have_soup_gnome" = "xno"; then
-   AC_MSG_ERROR([Couldn't find libsoup or libsoup-gnome.])
+   AC_MSG_ERROR([Could not find libsoup or libsoup-gnome.])
 fi
 
 AC_SUBST(SOUP_CFLAGS)
 AC_SUBST(SOUP_LIBS)
-
+AC_SUBST(SOUP_DEP)
 # -----------------------------------------------------------
 # Enable debug
 # -----------------------------------------------------------
 
 AC_ARG_ENABLE(debug,
-  AC_HELP_STRING([--disable-debug],[compile without debug code]),
+  AS_HELP_STRING([--disable-debug],[compile without debug code]),
     enable_debug=$enableval, enable_debug=yes )
 
 if test x$enable_debug = xyes; then
@@ -99,47 +102,63 @@ fi
 # -----------------------------------------------------------
 
 AC_ARG_ENABLE(maemo,
-  AC_HELP_STRING([--enable-maemo],[compile with maemo optimizations]),
+  AS_HELP_STRING([--enable-maemo],[compile with maemo optimizations]),
     [enable_maemo=yes])
-
-if test x$enable_maemo = xyes; then
-  AC_DEFINE(USE_MAEMO, [], [Enable Maemo Optimizations])
-fi
 
 # -----------------------------------------------------------
 # Enable gtk
 # -----------------------------------------------------------
 
 AC_ARG_ENABLE(gtk,
-  AC_HELP_STRING([--disable-gtk],[Don't compile Gtk+ embedded view]),
+  AS_HELP_STRING([--disable-gtk],[Do not compile Gtk+ embedded view]),
     enable_gtk=$enableval, enable_gtk=yes )
 
 if test x$enable_gtk = xyes; then
-  AC_SUBST(GTK_DEPS_CFLAGS)
-  AC_SUBST(GTK_DEPS_LIBS)
-  PKG_CHECK_MODULES(GTK_DEPS,
-    [   gtk+-2.0 >= 2.12,
-        clutter-gtk-0.10 >= 0.10,
-        memphis-0.2 >= 0.2.1
+  PKG_CHECK_MODULES(GTK,
+    [   gtk+-2.0 >= 2.12
+        clutter-gtk-0.10 >= 0.10
     ]
   )
+  AC_SUBST(GTK_CFLAGS)
+  AC_SUBST(GTK_LIBS)
 
   AC_CONFIG_FILES([champlain-gtk/Makefile
                    docs/reference-gtk/Makefile
                    docs/reference-gtk/version.xml
                    champlain-gtk.pc
                    champlain-gtk-uninstalled.pc])
-
-  AC_DEFINE(ENABLE_GTK, [], [Enable Gtk+ view code])
 fi
 
 AM_CONDITIONAL(ENABLE_GTK, test "x$enable_gtk" = "xyes")
 
 # -----------------------------------------------------------
+# Enable memphis
+# -----------------------------------------------------------
+
+AC_ARG_ENABLE(memphis,
+  AS_HELP_STRING([--disable-memphis],[Disable support of local rendering using libmemphis]),
+    enable_memphis=$enableval, enable_memphis="auto")
+
+if test "x$enable_memphis" = "xauto"; then
+  PKG_CHECK_MODULES(MEMPHIS, [memphis-0.2 >= 0.2.1], enable_memphis="yes", enable_memphis="no")
+elif test "x$enable_memphis" = "xyes"; then
+  PKG_CHECK_MODULES(MEMPHIS, [memphis-0.2 >= 0.2.1])
+fi
+
+if test "x$enable_memphis" = "xyes"; then
+  AC_CONFIG_FILES([champlain-memphis.pc
+                   champlain-memphis-uninstalled.pc])
+  AC_SUBST(MEMPHIS_CFLAGS)
+  AC_SUBST(MEMPHIS_LIBS)
+fi
+
+AM_CONDITIONAL(ENABLE_MEMPHIS, test "x$enable_memphis" = "xyes")
+
+# -----------------------------------------------------------
 # Enable managed (default to "no")
 # -----------------------------------------------------------
 AC_ARG_ENABLE(managed,
-  AC_HELP_STRING([--enable-managed],[Build champlain-sharp (and champlain-gtk-sharp)]),
+  AS_HELP_STRING([--enable-managed],[Build champlain-sharp (and champlain-gtk-sharp)]),
     enable_managed=$enableval, enable_managed=no )
 
 if test x$enable_managed = xyes; then
@@ -181,38 +200,71 @@ AM_CONDITIONAL(ENABLE_MANAGED, test "x$enable_managed" = "xyes")
 # -----------------------------------------------------------
 
 AC_ARG_ENABLE(python,
-  AC_HELP_STRING([--enable-python],[Build python bindings]),
+  AS_HELP_STRING([--enable-python],[Build python bindings]),
     enable_python=$enableval, enable_python=no )
 
 if test x$enable_python = xyes; then
   PKG_CHECK_MODULES(PYTHON_BINDING,
    [
-      pygtk-2.0,
-      pygobject-2.0,
-      glib-2.0,
-      gobject-2.0,
-      clutter-1.0,
-      pyclutter-1.0,
-      pyclutter-gtk-0.10,
-      memphis-0.2,
-      pymemphis-0.2,
-      gtk+-2.0
-   ], have_python="yes", have_python="no")
+      pygtk-2.0 >= 2.12
+      pygobject-2.0 >= 2.10
+      pyclutter-1.0 >= 1.0
+   ]
+  )
 
-  if test "x$have_python" = "xyes" ; then
-    AC_CHECK_PROGS([PYGOBJECTCODEGEN], [pygobject-codegen-2.0 pygtk-codegen-2.0])
-    AM_CHECK_PYTHON_HEADERS(,have_python="no")
+  if test "x$enable_memphis" = "xyes"; then
+    PKG_CHECK_MODULES(PYTHON_BINDING_MEMPHIS, [pymemphis-0.2 >= 0.2])
   fi
-fi
 
-if test "x$enable_python" = "xyes" -a "x$have_python" != "xyes"; then
-   AC_MSG_ERROR([Couldn't find python. Check config.log])
+  if test "x$enable_gtk" = "xyes"; then
+    PKG_CHECK_MODULES(PYTHON_BINDING_GTK, [pyclutter-gtk-0.10 >= 0.10])
+  fi
+
+  AC_CHECK_PROGS([PYGOBJECTCODEGEN], [pygobject-codegen-2.0 pygtk-codegen-2.0], [no])
+
+  if test "PYGOBJECTCODEGEN" = "xno"; then
+     AC_MSG_ERROR([Could not find pygobject-codegen-2.0 or pygtk-codegen-2.0])
+  fi
+
+  AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(Could not find python headers)])
+
+  AC_CONFIG_FILES([bindings/python/Makefile
+                   bindings/python/update-binding.sh
+                   bindings/python/champlain/Makefile
+                   bindings/python/champlain-gtk/Makefile
+                   bindings/python/demos/Makefile],
+                  [chmod +x bindings/python/update-binding.sh])
 fi
 
 AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
 GOBJECT_INTROSPECTION_CHECK([0.6.3])
 
 # -----------------------------------------------------------
+# Generate features header file
+# -----------------------------------------------------------
+
+CHAMPLAIN_CONFIG_COMMANDS([champlain/champlain-features.h],
+[
+  echo '/* Generated by configure.  Do not edit. */'
+  echo '#ifndef CHAMPLAIN_FEATURES_H'
+  echo '#define CHAMPLAIN_FEATURES_H'
+  echo ''
+  if test "x$enable_memphis" = "xyes"; then
+    echo '#define CHAMPLAIN_HAS_MEMPHIS 1'
+    echo ''
+  fi
+  if test "x$enable_maemo" = "xyes"; then
+    echo '#define CHAMPLAIN_HAS_MAEMO 1'
+    echo ''
+  fi
+  echo '#endif'
+],[
+  enable_memphis="$enable_memphis"
+  enable_maemo="$enable_maemo"
+])
+
+# ----------------------------------------------------------
+
 AC_CONFIG_FILES([Makefile
                  champlain/Makefile
                  champlain/champlain-version.h
@@ -223,10 +275,6 @@ AC_CONFIG_FILES([Makefile
                  champlain.pc
                  champlain-uninstalled.pc
                  bindings/perl/Champlain/Makefile
-                 bindings/python/Makefile
-                 bindings/python/champlain/Makefile
-                 bindings/python/champlain-gtk/Makefile
-                 bindings/python/demos/Makefile
                  bindings/managed/Makefile
                  bindings/managed/champlain/Makefile
                  bindings/managed/champlain/AssemblyInfo.cs
@@ -249,6 +297,9 @@ echo "   Documentation: ${enable_gtk_doc}"
 echo "           Debug: ${enable_debug}"
 echo "   libsoup-gnome: ${have_soup_gnome}"
 echo "       Gtk+ View: ${enable_gtk}"
+echo ""
+echo "Extra tile sources:"
+echo "  Memphis source: ${enable_memphis}"
 echo ""
 echo "Bindings:"
 echo "       champlain-sharp: ${enable_managed}"

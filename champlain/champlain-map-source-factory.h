@@ -23,6 +23,7 @@
 #ifndef CHAMPLAIN_MAP_SOURCE_FACTORY_H
 #define CHAMPLAIN_MAP_SOURCE_FACTORY_H
 
+#include <champlain/champlain-features.h>
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-map-source.h>
 #include <champlain/champlain-map-source-desc.h>
@@ -69,7 +70,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
     ChamplainMapSourceDesc *desc, ChamplainMapSourceConstructor constructor,
     gpointer data);
 
-#ifdef USE_MAEMO
+#ifdef CHAMPLAIN_HAS_MAEMO
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap I"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap II"
 #define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "OpenCycleMap"
@@ -85,8 +86,10 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
 #define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "mff-relief"
 #endif
 
+#ifdef CHAMPLAIN_HAS_MEMPHIS
 #define CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL "memphis-local"
 #define CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK "memphis-network"
+#endif
 
 G_END_DECLS
 

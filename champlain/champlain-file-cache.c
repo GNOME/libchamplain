@@ -352,7 +352,7 @@ champlain_file_cache_constructed (GObject *object)
     {
       if (champlain_tile_cache_get_persistent (tile_cache))
         {
-#ifdef USE_MAEMO
+#ifdef CHAMPLAIN_HAS_MAEMO
           priv->cache_dir = g_strdup ("/home/user/MyDocs/.Maps/");
 #else
           priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S,

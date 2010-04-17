@@ -1,0 +1,81 @@
+%%
+headers
+#include <Python.h>
+#include <pygobject.h>
+#include <champlain/champlain.h>
+#include <champlain/champlain-memphis.h>
+#include <memphis/memphis.h>
+#include <clutter/clutter.h>
+#include "pychamplainmemphis.h"
+%%
+modulename champlain.memphis
+%%
+import gobject.GObject as PyGObject_Type
+import gobject.GObject as PyGInitiallyUnowned_Type
+import clutter.Actor as PyClutterActor_Type
+import clutter.Group as PyClutterGroup_Type
+import clutter.Color as PyClutterColor_Type
+import champlain.TileSource as PyChamplainTileSource_Type
+%%
+ignore-glob
+        *_get_type
+%%
+override-attr ChamplainBoundingBox.left
+static int
+_wrap_champlain_bounding_box__set_left (PyGBoxed *self, PyObject *value, 
+    void *closure)
+{
+    gdouble val;
+
+    val = PyFloat_AsDouble(value);
+    if (PyErr_Occurred())
+        return -1;
+
+    pyg_boxed_get(self, ChamplainBoundingBox)->left = val;
+    return 0;
+}
+%%
+override-attr ChamplainBoundingBox.right
+static int
+_wrap_champlain_bounding_box__set_right (PyGBoxed *self, PyObject *value, 
+    void *closure)
+{
+    gdouble val;
+
+    val = PyFloat_AsDouble(value);
+    if (PyErr_Occurred())
+        return -1;
+
+    pyg_boxed_get(self, ChamplainBoundingBox)->right = val;
+    return 0;
+}
+%%
+override-attr ChamplainBoundingBox.top
+static int
+_wrap_champlain_bounding_box__set_top (PyGBoxed *self, PyObject *value, 
+    void *closure)
+{
+    gdouble val;
+
+    val = PyFloat_AsDouble(value);
+    if (PyErr_Occurred())
+        return -1;
+
+    pyg_boxed_get(self, ChamplainBoundingBox)->top = val;
+    return 0;
+}
+%%
+override-attr ChamplainBoundingBox.bottom
+static int
+_wrap_champlain_bounding_box__set_bottom (PyGBoxed *self, PyObject *value, 
+    void *closure)
+{
+    gdouble val;
+
+    val = PyFloat_AsDouble(value);
+    if (PyErr_Occurred())
+        return -1;
+
+    pyg_boxed_get(self, ChamplainBoundingBox)->bottom = val;
+    return 0;
+}
