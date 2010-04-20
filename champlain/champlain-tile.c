@@ -636,7 +636,11 @@ champlain_tile_get_modified_time_string (ChamplainTile *self)
   struct tm *other_time = gmtime (&priv->modified_time->tv_sec);
   char value [100];
 
+#ifdef G_OS_WIN32
+  strftime (value, 100, "%a, %d %b %Y %H:%M:%S %Z", other_time);
+#else
   strftime (value, 100, "%a, %d %b %Y %T %Z", other_time);
+#endif
 
   return g_strdup (value);
 }

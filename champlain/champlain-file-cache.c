@@ -220,6 +220,16 @@ create_cache_dir (const gchar *dir_name)
   return TRUE;
 }
 
+#ifdef G_OS_WIN32
+#include <io.h>
+static char *mkdtemp(char *template)
+{
+	if (!_mktemp(template) || mkdir(template))
+		return NULL;
+	return template;
+}
+#endif
+
 static void
 init_cache  (ChamplainFileCache *file_cache)
 {

@@ -106,6 +106,7 @@ libchamplain_0_5_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) ../tidy/libtidy-1.0.la
 libchamplain_includedir = $(includedir)/libchamplain-0.5/champlain
 
 libchamplain_0_5_la_LDFLAGS = -version-info $(LIBRARY_VERSION) \
+	-no-undefined \
 	-export-symbols-regex		\
 	^champlain_.*
 
