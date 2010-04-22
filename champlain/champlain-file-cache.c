@@ -222,10 +222,26 @@ create_cache_dir (const gchar *dir_name)
 
 #ifdef G_OS_WIN32
 #include <io.h>
+#include <glib/gstdio.h>
 static char *mkdtemp(char *template)
 {
-	if (!_mktemp(template) || mkdir(template))
+	gunichar2 *wtemplate;
+	gchar *tmpl;
+	if (!template)
 		return NULL;
+	wtemplate = g_utf8_to_utf16 (template, -1, NULL, NULL, NULL);
+	if (!_wmktemp (wtemplate)) {
+		g_free (wtemplate);
+		return NULL;
+	}
+	tmpl = g_utf16_to_utf8 (wtemplate, -1, NULL, NULL, NULL);
+	g_free (wtemplate);
+	if ((strlen (template) != strlen (tmpl)) || g_mkdir (tmpl, 0700)) {
+		g_free (tmpl);
+		return NULL;
+	}
+	strcpy (template,tmpl);
+	g_free (tmpl);
 	return template;
 }
 #endif
