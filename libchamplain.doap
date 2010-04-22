@@ -11,9 +11,9 @@
 
   <maintainer>
     <foaf:Person>
-      <foaf:name>Pierre-Luc Beaudoin</foaf:name>
-      <foaf:mbox rdf:resource="mailto:pierre-luc@pierlux.com" />
-      <gnome:userid>plbeaudoin</gnome:userid>
+      <foaf:name>Jiří Techet</foaf:name>
+      <foaf:mbox rdf:resource="mailto:techet@gmail.com" />
+      <gnome:userid>jiritechet</gnome:userid>
     </foaf:Person>
   </maintainer>
 </Project>
