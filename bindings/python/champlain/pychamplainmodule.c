@@ -4,6 +4,14 @@
 #include "pychamplain.h"
 #include <champlain/champlain.h>
 
+static void
+sink_champlain_map_source (GObject *object)
+{
+    if (g_object_is_floating (object)) {
+        g_object_ref_sink (object);
+    }
+}
+
 DL_EXPORT(void) initchamplain (void);
 extern PyMethodDef champlain_functions[];
 
@@ -13,6 +21,8 @@ initchamplain (void)
     PyObject *m, *d;
 
     init_pygobject ();
+
+    pygobject_register_sinkfunc (CHAMPLAIN_TYPE_MAP_SOURCE, sink_champlain_map_source);
 
     m = Py_InitModule ("champlain", champlain_functions);
     d = PyModule_GetDict (m);

@@ -491,7 +491,66 @@ _wrap_champlain_point__set_lon(PyGBoxed *self, PyObject *value,
     pyg_boxed_get(self, ChamplainPoint)->lon = val;
     return 0;
 }
+%%
+override-attr ChamplainBoundingBox.left
+static int
+_wrap_champlain_bounding_box__set_left (PyGBoxed *self, PyObject *value, 
+    void *closure)
+{
+    gdouble val;
 
+    val = PyFloat_AsDouble(value);
+    if (PyErr_Occurred())
+        return -1;
+
+    pyg_boxed_get(self, ChamplainBoundingBox)->left = val;
+    return 0;
+}
+%%
+override-attr ChamplainBoundingBox.right
+static int
+_wrap_champlain_bounding_box__set_right (PyGBoxed *self, PyObject *value, 
+    void *closure)
+{
+    gdouble val;
+
+    val = PyFloat_AsDouble(value);
+    if (PyErr_Occurred())
+        return -1;
+
+    pyg_boxed_get(self, ChamplainBoundingBox)->right = val;
+    return 0;
+}
+%%
+override-attr ChamplainBoundingBox.top
+static int
+_wrap_champlain_bounding_box__set_top (PyGBoxed *self, PyObject *value, 
+    void *closure)
+{
+    gdouble val;
+
+    val = PyFloat_AsDouble(value);
+    if (PyErr_Occurred())
+        return -1;
+
+    pyg_boxed_get(self, ChamplainBoundingBox)->top = val;
+    return 0;
+}
+%%
+override-attr ChamplainBoundingBox.bottom
+static int
+_wrap_champlain_bounding_box__set_bottom (PyGBoxed *self, PyObject *value, 
+    void *closure)
+{
+    gdouble val;
+
+    val = PyFloat_AsDouble(value);
+    if (PyErr_Occurred())
+        return -1;
+
+    pyg_boxed_get(self, ChamplainBoundingBox)->bottom = val;
+    return 0;
+}
 %%
 override champlain_selection_layer_get_selected_markers kwargs
 static PyObject *
@@ -561,4 +620,34 @@ static void
 _wrap_champlain_polygon_tp_dealloc (PyObject *self)
 {
     self->ob_type->tp_free((PyObject*)self);
+}
+%%
+override champlain_file_cache_new_full kwargs
+static PyObject *
+_wrap_champlain_file_cache_new_full(PyObject *self, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = { "size_limit", "cache_dir", "persistent", NULL };
+    PyObject *py_size_limit = NULL;
+    char *cache_dir = NULL;
+    int persistent;
+    ChamplainFileCache *ret;
+    guint size_limit = 0;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs,"Ozi:file_cache_new_full", kwlist, &py_size_limit, &cache_dir, &persistent))
+        return NULL;
+    if (py_size_limit) {
+        if (PyLong_Check(py_size_limit))
+            size_limit = PyLong_AsUnsignedLong(py_size_limit);
+        else if (PyInt_Check(py_size_limit))
+            size_limit = PyInt_AsLong(py_size_limit);
+        else
+            PyErr_SetString(PyExc_TypeError, "Parameter 'size_limit' must be an int or a long");
+        if (PyErr_Occurred())
+            return NULL;
+    }
+    
+    ret = champlain_file_cache_new_full(size_limit, cache_dir, persistent);
+    
+    /* pygobject_new handles NULL checking */
+    return pygobject_new((GObject *)ret);
 }
