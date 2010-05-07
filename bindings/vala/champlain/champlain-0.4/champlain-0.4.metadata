@@ -1,1 +1,5 @@
 Champlain cheader_filename="champlain/champlain.h"
+champlain_view_get_coords_at.lat is_out="1"
+champlain_view_get_coords_at.lon is_out="1"
+champlain_view_get_coords_from_event.lat is_out="1"
+champlain_view_get_coords_from_event.lon is_out="1"
