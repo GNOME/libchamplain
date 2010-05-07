@@ -155,47 +155,6 @@ fi
 AM_CONDITIONAL(ENABLE_MEMPHIS, test "x$enable_memphis" = "xyes")
 
 # -----------------------------------------------------------
-# Enable managed (default to "no")
-# -----------------------------------------------------------
-AC_ARG_ENABLE(managed,
-  AS_HELP_STRING([--enable-managed],[Build champlain-sharp (and champlain-gtk-sharp)]),
-    enable_managed=$enableval, enable_managed=no )
-
-if test x$enable_managed = xyes; then
-  AC_PATH_PROG(MCS, gmcs)
-  AC_SUBST(MCS)
-
-  AC_PATH_PROG(GACUTIL, gacutil)
-  AC_SUBST(GACUTIL)
-
-  PKG_CHECK_MODULES(GAPI, gapi-2.0 >= 2.12.0)
-  AC_PATH_PROG(GAPI_PARSER, gapi2-parser)
-  AC_SUBST(GAPI_PARSER)
-
-  AC_PATH_PROG(GAPI_CODEGEN, gapi2-codegen)
-  AC_SUBST(GAPI_CODEGEN)
-
-  AC_PATH_PROG(GAPI_FIXUP, gapi2-fixup)
-  AC_SUBST(GAPI_FIXUP)
-
-  PKG_CHECK_MODULES(GTKSHARP, gtk-sharp-2.0 > 2.12.0)
-  AC_SUBST(GTKSHARP_LIBS)
-
-  PKG_CHECK_MODULES(CLUTTERSHARP, clutter-sharp >= 0.8.0)
-  AC_SUBST(CLUTTER_SHARP_LIBS)
-
-  PKG_CHECK_MODULES(CLUTTER_GTK_SHARP, clutter-gtk-sharp >= 0.8.0)
-  AC_SUBST(CLUTTER_GTK_SHARP_LIBS)
-
-  CHAMPLAIN_APIVERSION=0.3
-  CHAMPLAIN_GTK_APIVERSION=0.3
-  AC_SUBST(CHAMPLAIN_APIVERSION)
-  AC_SUBST(CHAMPLAIN_GTK_APIVERSION)
-fi
-
-AM_CONDITIONAL(ENABLE_MANAGED, test "x$enable_managed" = "xyes")
-
-# -----------------------------------------------------------
 # Enable Python bindings
 # -----------------------------------------------------------
 
@@ -275,16 +234,6 @@ AC_CONFIG_FILES([Makefile
                  champlain.pc
                  champlain-uninstalled.pc
                  bindings/perl/Champlain/Makefile
-                 bindings/managed/Makefile
-                 bindings/managed/champlain/Makefile
-                 bindings/managed/champlain/AssemblyInfo.cs
-                 bindings/managed/champlain/champlain-sharp.pc
-                 bindings/managed/champlain/champlain-sharp.dll.config
-                 bindings/managed/champlain-gtk/Makefile
-                 bindings/managed/champlain-gtk/AssemblyInfo.cs
-                 bindings/managed/champlain-gtk/champlain-gtk-sharp.pc
-                 bindings/managed/champlain-gtk/champlain-gtk-sharp.dll.config
-                 bindings/managed/samples/Makefile
                  bindings/Makefile])
 AC_OUTPUT
 
@@ -302,7 +251,6 @@ echo "Extra tile sources:"
 echo "  Memphis source: ${enable_memphis}"
 echo ""
 echo "Bindings:"
-echo "       champlain-sharp: ${enable_managed}"
 echo "       Python bindings: ${enable_python}"
 echo " gobject-introspection: ${enable_introspection}"
 echo ""
