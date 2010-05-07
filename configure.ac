@@ -233,7 +233,6 @@ AC_CONFIG_FILES([Makefile
                  docs/reference/version.xml
                  champlain.pc
                  champlain-uninstalled.pc
-                 bindings/perl/Champlain/Makefile
                  bindings/Makefile])
 AC_OUTPUT
 

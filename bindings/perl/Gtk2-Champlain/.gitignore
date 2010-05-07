@@ -1,8 +1,0 @@
-Makefile.old
-Champlain.bs
-blib/
-build/
-pm_to_blib
-Gtk2-Champlain-*.tar.gz
-xs/*.c
-xs/*.o

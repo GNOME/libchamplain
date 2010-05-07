@@ -1,8 +1,8 @@
-SUBDIRS =
+SUBDIRS=
 
 if ENABLE_PYTHON
   SUBDIRS+=python
 endif
 
-DIST_SUBDIRS= python perl/Champlain
+DIST_SUBDIRS=python
 
