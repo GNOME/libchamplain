@@ -47,6 +47,7 @@ GtkChamplain-@CHAMPLAIN_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libchamplain-
 	$(SOUP_CFLAGS) \
 	-I$(top_srcdir)			\
 	-DCHAMPLAIN_COMPILATION 	\
+	-DCHAMPLAIN_GTK_COMPILATION 	\
 	--add-include-path=$(top_builddir)/champlain \
 	--c-include="$(libchamplain_include_HEADERS)" \
 	--include=Champlain-0.5 \

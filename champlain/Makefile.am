@@ -5,7 +5,7 @@ BUILT_SOURCES = \
 	champlain-enum-types.h \
 	champlain-enum-types.c \
 	stamp-enum-types \
-	champlain-version.h 
+	champlain-version.h
 
 CLEANFILES = $(BUILT_SOURCES)
 
@@ -108,7 +108,7 @@ libchamplain_include_HEADERS = \
 	champlain-marker.h		\
 	champlain-polygon.h		\
 	champlain-version.h		\
-	champlain-features.h		
+	champlain-features.h
 
 libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS) ../tidy/libtidy-1.0.la
 
@@ -191,6 +191,7 @@ Champlain-@CHAMPLAIN_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libchamplain-@CH
 	--strip-prefix=Champlain \
 	$(DEPS_CFLAGS) \
 	$(SOUP_CFLAGS) \
+	$(MEMPHIS_CFLAGS) \
 	-I$(top_srcdir)/tidy		\
 	-I$(top_srcdir)			\
 	-DCHAMPLAIN_COMPILATION 	\
