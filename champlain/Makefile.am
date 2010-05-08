@@ -5,7 +5,11 @@ BUILT_SOURCES = \
 	champlain-enum-types.h \
 	champlain-enum-types.c \
 	stamp-enum-types \
-	champlain-version.h
+	champlain-version.h \
+	champlain-features.h
+
+champlain-features.h:
+	cd $(top_builddir) && ./config.status src/$@
 
 CLEANFILES = $(BUILT_SOURCES)
 
@@ -218,7 +222,7 @@ gir_DATA = $(BUILT_GIRSOURCES)
 typelibsdir = $(libdir)/girepository-1.0/
 typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
 
-%.typelib: %.gir $(INTROSPECTION_COMPILER)
+Champlain-@CHAMPLAIN_API_VERSION@.typelib: Champlain-@CHAMPLAIN_API_VERSION@.gir $(INTROSPECTION_COMPILER)
 	$(QUIET_GEN)$(DEBUG) $(INTROSPECTION_COMPILER) --includedir=$(srcdir) --includedir=. $(INTROSPECTION_COMPILER_OPTS) $< -o $(builddir)/$(@F)
 
 CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)

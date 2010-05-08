@@ -71,7 +71,7 @@ gir_DATA = $(BUILT_GIRSOURCES)
 typelibsdir = $(libdir)/girepository-1.0/
 typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
 
-%.typelib: %.gir $(INTROSPECTION_COMPILER)
+GtkChamplain-@CHAMPLAIN_API_VERSION@.typelib: GtkChamplain-@CHAMPLAIN_API_VERSION@.gir $(INTROSPECTION_COMPILER)
 	$(QUIET_GEN)$(DEBUG) $(INTROSPECTION_COMPILER) --includedir=$(srcdir) --includedir=. --includedir=$(top_builddir)/champlain $(INTROSPECTION_COMPILER_OPTS) $< -o $(builddir)/$(@F)
 
 CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)

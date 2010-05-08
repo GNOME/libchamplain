@@ -121,12 +121,6 @@ if test x$enable_gtk = xyes; then
   )
   AC_SUBST(GTK_CFLAGS)
   AC_SUBST(GTK_LIBS)
-
-  AC_CONFIG_FILES([champlain-gtk/Makefile
-                   docs/reference-gtk/Makefile
-                   docs/reference-gtk/version.xml
-                   champlain-gtk.pc
-                   champlain-gtk-uninstalled.pc])
 fi
 
 AM_CONDITIONAL(ENABLE_GTK, test "x$enable_gtk" = "xyes")
@@ -145,12 +139,8 @@ elif test "x$enable_memphis" = "xyes"; then
   PKG_CHECK_MODULES(MEMPHIS, [memphis-0.2 >= 0.2.1])
 fi
 
-if test "x$enable_memphis" = "xyes"; then
-  AC_CONFIG_FILES([champlain-memphis.pc
-                   champlain-memphis-uninstalled.pc])
-  AC_SUBST(MEMPHIS_CFLAGS)
-  AC_SUBST(MEMPHIS_LIBS)
-fi
+AC_SUBST(MEMPHIS_CFLAGS)
+AC_SUBST(MEMPHIS_LIBS)
 
 AM_CONDITIONAL(ENABLE_MEMPHIS, test "x$enable_memphis" = "xyes")
 
@@ -186,13 +176,6 @@ if test x$enable_python = xyes; then
   fi
 
   AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(Could not find python headers)])
-
-  AC_CONFIG_FILES([bindings/python/Makefile
-                   bindings/python/update-binding.sh
-                   bindings/python/champlain/Makefile
-                   bindings/python/champlain-gtk/Makefile
-                   bindings/python/demos/Makefile],
-                  [chmod +x bindings/python/update-binding.sh])
 fi
 
 AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
@@ -229,11 +212,25 @@ AC_CONFIG_FILES([Makefile
                  champlain/champlain-version.h
                  demos/Makefile
                  tidy/Makefile
+                 docs/Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
+                 docs/reference-gtk/Makefile
+                 docs/reference-gtk/version.xml
                  champlain.pc
                  champlain-uninstalled.pc
-                 bindings/Makefile])
+                 champlain-gtk.pc
+                 champlain-gtk-uninstalled.pc
+                 champlain-gtk/Makefile
+                 bindings/Makefile
+                 bindings/python/Makefile
+                 bindings/python/champlain/Makefile
+                 bindings/python/champlain-gtk/Makefile
+                 bindings/python/demos/Makefile
+                 champlain-memphis.pc
+                 champlain-memphis-uninstalled.pc])
+AC_CONFIG_FILES([bindings/python/update-binding.sh],
+                [chmod +x bindings/python/update-binding.sh])
 AC_OUTPUT
 
 echo ""
