@@ -5,13 +5,10 @@ BUILT_SOURCES = \
 
 CLEANFILES = $(BUILT_SOURCES)
 
-CHAMPLAIN_GTK_MARSHAL = champlain-gtk-marshal
-CHAMPLAIN_GTK_MARSHAL_LIST = champlain-gtk-marshal.list
-
 lib_LTLIBRARIES = libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
 
 libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
-	$(CHAMPLAIN_GTK_MARSHAL_LIST)		 \
+	champlain-gtk-marshal.list		 \
 	$(BUILT_SOURCES) 			\
 	gtk-champlain-embed.c
 
@@ -20,11 +17,15 @@ noinst_HEADERS = gtk-champlain-embed.h
 libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(GTK_LIBS) 	\
 	$(top_builddir)/champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 
-champlain-gtk-marshal.h: $(CHAMPLAIN_GTK_MARSHAL_LIST)
-	@GLIB_GENMARSHAL@ --header --prefix=champlain_gtk_marshal $< > $(CHAMPLAIN_GTK_MARSHAL).h
+champlain-gtk-marshal.h: champlain-gtk-marshal.list
+	$(AM_V_GEN) ( $(GLIB_GENMARSHAL) --header --prefix=champlain_gtk_marshal champlain-gtk-marshal.list > champlain-gtk-marshal.tmp \
+	&& mv champlain-gtk-marshal.tmp champlain-gtk-marshal.h ) \
+	|| ( rm -f champlain-gtk-marshal.tmp && exit 1 )
 
-champlain-gtk-marshal.c: $(CHAMPLAIN_GTK_MARSHAL_LIST)
-	@GLIB_GENMARSHAL@ --body --prefix=champlain_gtk_marshal $< > $(CHAMPLAIN_GTK_MARSHAL).c
+champlain-gtk-marshal.c: champlain-gtk-marshal.h
+	$(AM_V_GEN) ( (echo '#include "champlain-gtk-marshal.h"'; $(GLIB_GENMARSHAL) --prefix=champlain_gtk_marshal $(srcdir)/champlain-gtk-marshal.list --body) > champlain-gtk-marshal.tmp \
+	&& mv champlain-gtk-marshal.tmp champlain-gtk-marshal.c ) \
+	|| ( rm -f champlain-gtk-marshal.tmp && exit 1 )
 
 libchamplain_includedir=$(includedir)/libchamplain-gtk-@CHAMPLAIN_API_VERSION@/champlain-gtk
 libchamplain_include_HEADERS = champlain-gtk.h gtk-champlain-embed.h
@@ -34,13 +35,13 @@ libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_LDFLAGS= -version-info $(LIBRARY_VER
 AM_CPPFLAGS = $(GTK_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_GTK_COMPILATION
 AM_LDFLAGS = $(GTK_LIBS) -export-symbols-regex ^gtk_champlain_.*
 
-EXTRA_DIST = $(CHAMPLAIN_GTK_MARSHAL_LIST)
+EXTRA_DIST = champlain-gtk-marshal.list
 
 if HAVE_INTROSPECTION
 BUILT_GIRSOURCES =
 
 GtkChamplain-@CHAMPLAIN_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
-	$(QUIET_GEN)$(INTROSPECTION_SCANNER) -v \
+	$(AM_V_GEN)$(INTROSPECTION_SCANNER) -v \
 	--namespace GtkChamplain --nsversion=@CHAMPLAIN_API_VERSION@ \
 	--strip-prefix=GtkChamplain \
 	$(GTK_CFLAGS) \
@@ -72,7 +73,7 @@ typelibsdir = $(libdir)/girepository-1.0/
 typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
 
 GtkChamplain-@CHAMPLAIN_API_VERSION@.typelib: GtkChamplain-@CHAMPLAIN_API_VERSION@.gir $(INTROSPECTION_COMPILER)
-	$(QUIET_GEN)$(DEBUG) $(INTROSPECTION_COMPILER) --includedir=$(srcdir) --includedir=. --includedir=$(top_builddir)/champlain $(INTROSPECTION_COMPILER_OPTS) $< -o $(builddir)/$(@F)
+	$(AM_V_GEN)$(DEBUG) $(INTROSPECTION_COMPILER) --includedir=$(srcdir) --includedir=. --includedir=$(top_builddir)/champlain $(INTROSPECTION_COMPILER_OPTS) $< -o $(builddir)/$(@F)
 
 CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
 endif

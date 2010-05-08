@@ -25,7 +25,6 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 # Checks for programs.
 AC_PROG_CC
 AM_PROG_CC_C_O
-AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 
 # Checks for libraries.
 LIBRARY_VERSION=0:0:0
@@ -56,6 +55,8 @@ PKG_CHECK_MODULES(DEPS,
 )
 AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
+
+AM_PATH_GLIB_2_0(2.16.0,,gobject gthread gio)
 
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)

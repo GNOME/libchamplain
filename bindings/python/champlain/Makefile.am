@@ -56,14 +56,14 @@ codegen_register = \
 	--register $(PYGTKDEFS)/pango-types.defs
 
 pychamplain.c: pychamplain.override pychamplain.defs
-	$(PYGOBJECTCODEGEN)		\
+	$(AM_V_GEN)$(PYGOBJECTCODEGEN)		\
 		$(codegen_register)	\
 		--prefix champlain	\
 		--override pychamplain.override		\
 		pychamplain.defs > $@
 
 pychamplainmemphis.c: pychamplainmemphis.override pychamplainmemphis.defs
-	$(PYGOBJECTCODEGEN)		\
+	$(AM_V_GEN)$(PYGOBJECTCODEGEN)		\
 		$(codegen_register)	\
 		--register $(PYMEMPHISDEFS)/memphis-types.defs	\
 		--register pychamplain.defs	\

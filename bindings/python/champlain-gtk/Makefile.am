@@ -40,7 +40,7 @@ champlaingtk_la_LDFLAGS =					\
 	-module -avoid-version
 
 pychamplaingtk.c: pychamplaingtk.override pychamplaingtk.defs
-	$(PYGOBJECTCODEGEN)				\
+	$(AM_V_GEN)$(PYGOBJECTCODEGEN)				\
 		--prefix champlain 			\
 		--register $(PYDEFS)/gdk-types.defs 	\
 		--register $(PYDEFS)/gtk-types.defs 	\

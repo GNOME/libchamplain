@@ -32,6 +32,7 @@
 #include "champlain-debug.h"
 #include "champlain-bounding-box.h"
 #include "champlain-enum-types.h"
+#include "champlain-tile.h"
 
 #include <memphis/memphis.h>
 

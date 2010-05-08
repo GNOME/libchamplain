@@ -4,17 +4,13 @@ BUILT_SOURCES = \
 	champlain-marshal.c \
 	champlain-enum-types.h \
 	champlain-enum-types.c \
-	stamp-enum-types \
 	champlain-version.h \
 	champlain-features.h
 
-champlain-features.h:
-	cd $(top_builddir) && ./config.status src/$@
+champlain-features.h: $(top_builddir)/config.status
+	$(AM_V_GEN) ( cd $(top_builddir) && ./config.status champlain/$@ )
 
 CLEANFILES = $(BUILT_SOURCES)
-
-CHAMPLAIN_MARSHAL = champlain-marshal
-CHAMPLAIN_MARSHAL_LIST = champlain-marshal.list
 
 lib_LTLIBRARIES = libchamplain-@CHAMPLAIN_API_VERSION@.la
 
@@ -62,7 +58,7 @@ memphis_sources = \
 endif
 
 libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
-	$(CHAMPLAIN_MARSHAL_LIST) 	\
+	champlain-marshal.list	 	\
 	$(BUILT_SOURCES) 		\
 	$(libchamplain_headers)		\
 	$(memphis_sources)		\
@@ -133,53 +129,31 @@ AM_CPPFLAGS = 				\
 	-DCHAMPLAIN_COMPILATION 	\
 	$(WARN_CFLAGS)
 
-EXTRA_DIST = $(CHAMPLAIN_MARSHAL_LIST)
+EXTRA_DIST = champlain-marshal.list \
+	champlain-enum-types.h.in \
+	champlain-enum-types.c.in
 
-champlain-marshal.h: $(CHAMPLAIN_MARSHAL_LIST)
-	@GLIB_GENMARSHAL@ --header --prefix=cpl_marshal $< > $(CHAMPLAIN_MARSHAL).h
+champlain-marshal.h: champlain-marshal.list
+	$(AM_V_GEN) ( $(GLIB_GENMARSHAL) --header --prefix=cpl_marshal champlain-marshal.list > champlain-marshal.tmp \
+	&& mv champlain-marshal.tmp champlain-marshal.h ) \
+	|| ( rm -f champlain-marshal.tmp && exit 1 )
 
-champlain-marshal.c: $(CHAMPLAIN_MARSHAL_LIST)
-	@GLIB_GENMARSHAL@ --body --prefix=cpl_marshal $< > $(CHAMPLAIN_MARSHAL).c
+champlain-marshal.c: champlain-marshal.h
+	$(AM_V_GEN) ( (echo '#include "champlain-marshal.h"'; $(GLIB_GENMARSHAL) --prefix=cpl_marshal $(srcdir)/champlain-marshal.list --body) > champlain-marshal.tmp \
+	&& mv champlain-marshal.tmp champlain-marshal.c ) \
+	|| ( rm -f champlain-marshal.tmp && exit 1 )
 
-champlain-enum-types.h: stamp-enum-types
-	@true
+champlain-enum-types.h: $(libchamplain_headers)
+	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template champlain-enum-types.h.in \
+		$(libchamplain_headers) ) > champlain-enum-types.h.tmp \
+	&& mv champlain-enum-types.h.tmp champlain-enum-types.h \
+	|| rm -f champlain-enum-type.h.tmp
 
-stamp-enum-types: $(libchamplain_headers) Makefile
-	(cd $(srcdir) \
-	&& glib-mkenums \
-			--fhead "#ifndef __CHAMPLAIN_ENUM_TYPES_H__\n" \
-			--fhead "#define __CHAMPLAIN_ENUM_TYPES_H__ 1\n\n" \
-			--fhead "#include <glib-object.h>\n\n" \
-			--fhead "G_BEGIN_DECLS\n\n" \
-			--ftail "G_END_DECLS\n\n" \
-			--ftail "#endif /* __CHAMPLAIN_ENUM_TYPES_H__ */\n" \
-			--fprod "#include <champlain/@filename@>\n" \
-			--eprod "#define CHAMPLAIN_TYPE_@ENUMSHORT@ @enum_name@_get_type()\n" \
-			--eprod "GType @enum_name@_get_type (void);\n" \
-		$(libchamplain_headers) ) > xgen-gth \
-	&& (cmp -s xgen-gth champlain-enum-type.h || cp xgen-gth champlain-enum-types.h) \
-	&& rm -f xgen-gth \
-	&& echo timestamp > $(@F)
-
-champlain-enum-types.c: $(libchamplain_headers) Makefile
-	(cd $(srcdir) \
-	&& glib-mkenums \
-			--fhead "#include <config.h>\n" \
-			--fhead "#include <glib-object.h>\n" \
-			--fhead "#include \"champlain-enum-types.h\"\n\n" \
-			--fprod "\n/* enumerations from \"@filename@\" */" \
-	--vhead "static const G@Type@Value _@enum_name@_values[] = {" \
-			--vprod "  { @VALUENAME@, \"@VALUENAME@\", \"@valuenick@\" }," \
-			--vtail "  { 0, NULL, NULL }\n};\n\n" \
-			--vtail "GType\n@enum_name@_get_type (void)\n{\n" \
-			--vtail "  static GType type = 0;\n\n" \
-			--vtail "  if (!type)\n" \
-			--vtail "    type = g_@type@_register_static (\"@EnumName@\", _@enum_name@_values);\n\n" \
-			--vtail "  return type;\n}\n\n" \
-		$(libchamplain_headers) ) > xgen-gtc \
-	&& cp xgen-gtc $(@F) \
-	&& rm -f xgen-gtc
-
+champlain-enum-types.c: $(libchamplain_headers) champlain-enum-types.h
+	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template champlain-enum-types.c.in \
+		$(libchamplain_headers) ) > champlain-enum-types.c.tmp \
+	&& mv champlain-enum-types.c.tmp champlain-enum-types.c \
+	|| rm -f champlain-enum-type.c.tmp
 
 if HAVE_INTROSPECTION
 
@@ -190,7 +164,7 @@ endif
 BUILT_GIRSOURCES =
 
 Champlain-@CHAMPLAIN_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libchamplain-@CHAMPLAIN_API_VERSION@.la
-	$(QUIET_GEN)$(INTROSPECTION_SCANNER) -v \
+	$(AM_V_GEN)$(INTROSPECTION_SCANNER) -v \
 	--namespace Champlain --nsversion=@CHAMPLAIN_API_VERSION@ \
 	--strip-prefix=Champlain \
 	$(DEPS_CFLAGS) \

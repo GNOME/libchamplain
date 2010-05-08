@@ -1,8 +1,5 @@
 NULL =
 
-GLIB_GENMARSHAL = `pkg-config --variable=glib_genmarshal glib-2.0`
-GLIB_MKENUMS = `pkg-config --variable=glib_mkenums glib-2.0`
-
 INCLUDES = \
 	-I$(top_srcdir) 		\
 	-DPREFIX=\""$(prefix)"\" 	\
@@ -49,16 +46,16 @@ source_c = \
 tidy-marshal.h: stamp-tidy-marshal.h
 	@true
 stamp-tidy-marshal.h: Makefile tidy-marshal.list
-	$(GLIB_GENMARSHAL) \
+	$(AM_V_GEN) $(GLIB_GENMARSHAL) \
 		--prefix=_tidy_marshal \
 		--header \
 	$(srcdir)/tidy-marshal.list > xgen-tmh && \
 	(cmp -s xgen-tmh tidy-marshal.h || cp -f xgen-tmh tidy-marshal.h) && \
 	rm -f xgen-tmh && \
-	echo timestamp > $(@F)
+	echo timestamp > $(@F) 
 
 tidy-marshal.c: Makefile tidy-marshal.list
-	(echo "#include \"tidy-marshal.h\"" ; \
+	$(AM_V_GEN) ( echo "#include \"tidy-marshal.h\"" ; \
 	 $(GLIB_GENMARSHAL) \
 		--prefix=_tidy_marshal \
 		--body \
@@ -69,15 +66,15 @@ tidy-marshal.c: Makefile tidy-marshal.list
 tidy-enum-types.h: stamp-tidy-enum-types.h Makefile
 	@true
 stamp-tidy-enum-types.h: $(source_h) tidy-enum-types.h.in
-	( $(GLIB_MKENUMS) \
+	$(AM_V_GEN) ( $(GLIB_MKENUMS) \
 	    --template $(srcdir)/tidy-enum-types.h.in \
 	  $(source_h) ) >> xgen-teth && \
 	(cmp xgen-teth tidy-enum-types.h || cp xgen-teth tidy-enum-types.h) && \
 	rm -f xgen-teth && \
-	echo timestamp > $(@F)
+	echo timestamp > $(@F) 
 
 tidy-enum-types.c: stamp-tidy-enum-types.h tidy-enum-types.c.in
-	( $(GLIB_MKENUMS) \
+	$(AM_V_GEN) ( $(GLIB_MKENUMS) \
 	    --template $(srcdir)/tidy-enum-types.c.in \
 	  $(source_h) ) >> xgen-tetc && \
 	cp xgen-tetc tidy-enum-types.c && \

@@ -31,6 +31,7 @@
 #include "champlain-debug.h"
 #include "champlain-bounding-box.h"
 #include "champlain-enum-types.h"
+#include "champlain-tile.h"
 
 G_DEFINE_TYPE (ChamplainMapDataSource, champlain_map_data_source, G_TYPE_INITIALLY_UNOWNED)
 

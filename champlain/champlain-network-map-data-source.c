@@ -35,6 +35,7 @@
 #include "champlain-bounding-box.h"
 #include "champlain-enum-types.h"
 #include "champlain-version.h"
+#include "champlain-tile.h"
 
 #include <memphis/memphis.h>
 #ifdef HAVE_LIBSOUP_GNOME
