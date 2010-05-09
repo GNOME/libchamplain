@@ -219,6 +219,20 @@ AC_ARG_ENABLE(vala,
   AC_HELP_STRING([--enable-vala],[Include vala champlain (and champlain-gtk)]),
     enable_vala=$enableval, enable_vala=no )
 
+if test x$enable_vala = xyes; then
+  AM_PROG_VALAC([0.8.0])
+
+  LAUNCHER_PACKAGES="--pkg clutter-1.0 --pkg champlain-0.4"
+  PKG_CHECK_MODULES(LAUNCHER,
+  [
+    glib-2.0,
+    clutter-1.0
+  ])
+  AC_SUBST(LAUNCHER_CFLAGS)
+  AC_SUBST(LAUNCHER_LIBS)
+  AC_SUBST(LAUNCHER_PACKAGES)
+fi
+
 AM_CONDITIONAL(ENABLE_VALA, test "x$enable_vala" = "xyes")
 
 # -----------------------------------------------------------
@@ -249,6 +263,7 @@ AC_CONFIG_FILES([Makefile
                  bindings/vala/Makefile
                  bindings/vala/champlain/Makefile
                  bindings/vala/champlain-gtk/Makefile
+                 bindings/vala/demos/Makefile
                  bindings/Makefile])
 AC_OUTPUT
 
