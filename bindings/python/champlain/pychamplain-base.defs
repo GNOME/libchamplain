@@ -143,6 +143,15 @@
   )
 )
 
+(define-enum Unit
+  (in-module "Champlain")
+  (c-name "ChamplainUnit")
+  (values
+    '("km" "CHAMPLAIN_UNIT_KM")
+    '("miles" "CHAMPLAIN_UNIT_MILES")
+  )
+)
+
 (define-enum SelectionMode
   (in-module "Champlain")
   (c-name "ChamplainSelectionMode")
@@ -150,15 +159,6 @@
     '("none" "CHAMPLAIN_SELECTION_NONE")
     '("single" "CHAMPLAIN_SELECTION_SINGLE")
     '("multiple" "CHAMPLAIN_SELECTION_MULTIPLE")
-  )
-)
-
-(define-enum Unit
-  (in-module "Champlain")
-  (c-name "ChamplainUnit")
-  (values
-    '("km" "CHAMPLAIN_UNIT_KM")
-    '("miles" "CHAMPLAIN_UNIT_MILES")
   )
 )
 
@@ -1586,12 +1586,6 @@
   (of-object "ChamplainTile")
   (c-name "champlain_tile_get_modified_time")
   (return-type "const-GTimeVal*")
-)
-
-(define-method get_modified_time_string
-  (of-object "ChamplainTile")
-  (c-name "champlain_tile_get_modified_time_string")
-  (return-type "gchar*")
 )
 
 (define-method get_etag
