@@ -76,7 +76,7 @@ expand_content_files=
 # Only needed if you are using gtkdoc-scangobj to dynamically query widget
 # signals and properties.
 # e.g. GTKDOC_CFLAGS=-I$(top_srcdir) -I$(top_builddir) $(GTK_DEBUG_FLAGS)
-# e.g.
+# e.g. GTKDOC_LIBS=$(top_builddir)/gtk/$(gtktargetlib)
 GTKDOC_CFLAGS=$(DEPS_CFLAGS) -I$(top_srcdir) -I$(top_builddir)
 GTKDOC_LIBS=$(DEPS_LIBS) $(top_builddir)/champlain/libchamplain-0.5.la
 

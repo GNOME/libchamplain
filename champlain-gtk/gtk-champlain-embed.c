@@ -302,6 +302,8 @@ mouse_button_cb (GtkWidget *widget,
 /**
  * gtk_champlain_embed_new:
  *
+ * Creates an instance of #GtkChamplainEmbed.
+ *
  * Return value: a new #GtkChamplainEmbed ready to be used as a #GtkWidget.
  *
  * Since: 0.4
@@ -315,6 +317,8 @@ gtk_champlain_embed_new ()
 /**
  * gtk_champlain_embed_get_view:
  * @embed: a #ChamplainView, the map view to embed
+ *
+ * Gets a #ChamplainView from the #GtkChamplainEmbed object.
  *
  * Return value: a #ChamplainView ready to be used
  *

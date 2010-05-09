@@ -5,15 +5,14 @@ GtkChamplainEmbed
 gtk_champlain_embed_new
 gtk_champlain_embed_get_view
 <SUBSECTION Standard>
+GTK_TYPE_CHAMPLAIN_EMBED
 GTK_CHAMPLAIN_EMBED
 GTK_CHAMPLAIN_IS_EMBED
-CHAMPLAIN_TYPE_EMBED
 gtk_champlain_embed_get_type
 GTK_CHAMPLAIN_EMBED_CLASS
 GTK_CHAMPLAIN_IS_EMBED_CLASS
 GTK_CHAMPLAIN_EMBED_GET_CLASS
 <SUBSECTION Private>
-GTK_TYPE_CHAMPLAIN_EMBED
 GtkChamplainEmbedClass
 GtkChamplainEmbedPrivate
 </SECTION>
