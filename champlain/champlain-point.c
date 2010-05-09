@@ -21,7 +21,7 @@
 
 /**
  * SECTION:champlain-point
- * @short_description: A base struct to store a latitude and longitude.
+ * @short_description: A base struct to store a latitude and longitude
  *
  * A base struct to store a latitude and longitude.
  *

@@ -18,7 +18,7 @@
 
 /**
  * SECTION:champlain-local-map-data-source
- * @short_description: Loads local map data for #ChamplainMemphisTileSource.
+ * @short_description: Loads local map data for #ChamplainMemphisTileSource
  *
  * This map data source loads local <ulink role="online-location"
  * url="http://wiki.openstreetmap.org/wiki/.osm">

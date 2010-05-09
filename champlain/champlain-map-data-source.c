@@ -18,7 +18,7 @@
 
 /**
  * SECTION:champlain-map-data-source
- * @short_description: Base class for map data sources.
+ * @short_description: Base class for map data sources
  *
  * ChamplainMapDataSource provides the interface for
  *  #ChamplainMemphisTileSource to aquire map data.

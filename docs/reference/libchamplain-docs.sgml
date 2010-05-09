@@ -40,40 +40,63 @@
     </legalnotice>
   </bookinfo>
 
-  <chapter>
-    <title>I. View API Reference</title>
+  <part>
+    <title>Core API Reference</title>
     <xi:include href="xml/champlain-view.xml"/>
-    <xi:include href="xml/champlain-layer.xml"/>
-    <xi:include href="xml/champlain-selection-layer.xml"/>
-    <xi:include href="xml/champlain-base-marker.xml"/>
-    <xi:include href="xml/champlain-marker.xml"/>
-    <xi:include href="xml/champlain-polygon.xml"/>
-    <xi:include href="xml/champlain-point.xml"/>
-  </chapter>
-  <chapter>
-    <title>II. Map Source API Reference</title>
-    <xi:include href="xml/champlain-map-source-factory.xml"/>
-    <xi:include href="xml/champlain-map-source.xml"/>
     <xi:include href="xml/champlain-tile.xml"/>
-    <xi:include href="xml/champlain-map-source-chain.xml"/>
-    <xi:include href="xml/champlain-tile-source.xml"/>
-    <xi:include href="xml/champlain-tile-cache.xml"/>
-    <xi:include href="xml/champlain-network-tile-source.xml"/>
-    <xi:include href="xml/champlain-memphis-tile-source.xml"/>
-    <xi:include href="xml/champlain-error-tile-source.xml"/>
-    <xi:include href="xml/champlain-file-cache.xml"/>
-  </chapter>
-  <chapter>
-    <title>III. Map Data Source API Reference</title>
+  </part>
+  <part>
+    <title>Layers, Markers and Polygons</title>
+    <chapter>
+      <title>Layers</title>
+      <xi:include href="xml/champlain-layer.xml"/>
+      <xi:include href="xml/champlain-selection-layer.xml"/>
+    </chapter>
+    <chapter>
+      <title>Markers</title>
+      <xi:include href="xml/champlain-base-marker.xml"/>
+      <xi:include href="xml/champlain-marker.xml"/>
+    </chapter>
+    <chapter>
+      <title>Polygons</title>
+      <xi:include href="xml/champlain-polygon.xml"/>
+      <xi:include href="xml/champlain-point.xml"/>
+    </chapter>
+  </part>
+  <part>
+    <title>Map Source API Reference</title>
+    <xi:include href="xml/champlain-map-source.xml"/>
+    <chapter>
+      <title>Tile Sources</title>
+      <xi:include href="xml/champlain-tile-source.xml"/>
+      <xi:include href="xml/champlain-network-tile-source.xml"/>
+      <xi:include href="xml/champlain-error-tile-source.xml"/>
+      <xi:include href="xml/champlain-memphis-tile-source.xml"/>
+    </chapter>
+    <chapter>
+      <title>Tile Caches</title>
+      <xi:include href="xml/champlain-tile-cache.xml"/>
+      <xi:include href="xml/champlain-file-cache.xml"/>
+    </chapter>
+    <chapter>
+      <title>Map Source Utilities</title>
+      <xi:include href="xml/champlain-map-source-chain.xml"/>
+      <xi:include href="xml/champlain-map-source-factory.xml"/>
+      <xi:include href="xml/champlain-map-source-desc.xml"/>
+    </chapter>
+  </part>
+  <part>
+    <title>Map Data Source API Reference</title>
     <xi:include href="xml/champlain-map-data-source.xml"/>
     <xi:include href="xml/champlain-local-map-data-source.xml"/>
     <xi:include href="xml/champlain-network-map-data-source.xml"/>
     <xi:include href="xml/champlain-bounding-box.xml"/>
-  </chapter>
-  <chapter>
-    <title>IV. Utility API Reference</title>
+  </part>
+  <part>
+    <title>Utility API Reference</title>
     <xi:include href="xml/champlain-version.xml"/>
-  </chapter>
+  </part>
+  
   <index>
     <title>Index</title>
   </index>
@@ -88,18 +111,6 @@
 
   <index role="0.2">
     <title>Index of new symbols in 0.2</title>
-  </index>
-
-  <index role="0.2.2">
-    <title>Index of new symbols in 0.2.2</title>
-  </index>
-
-  <index role="0.2.7">
-    <title>Index of new symbols in 0.2.7</title>
-  </index>
-
-  <index role="0.2.8">
-    <title>Index of new symbols in 0.2.8</title>
   </index>
 
   <index role="0.4">
