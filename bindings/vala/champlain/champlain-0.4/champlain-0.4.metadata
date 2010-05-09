@@ -3,3 +3,7 @@ champlain_view_get_coords_at.lat is_out="1"
 champlain_view_get_coords_at.lon is_out="1"
 champlain_view_get_coords_from_event.lat is_out="1"
 champlain_view_get_coords_from_event.lon is_out="1"
+
+champlain_marker_new_with_text.font nullable="1"
+champlain_marker_new_with_text.text_color nullable="1"
+champlain_marker_new_with_text.marker_color nullable="1"

@@ -146,7 +146,7 @@ namespace Champlain {
 		[CCode (type = "ClutterActor*", has_construct_function = false)]
 		public Marker.with_image (Clutter.Actor actor);
 		[CCode (type = "ClutterActor*", has_construct_function = false)]
-		public Marker.with_text (string text, string font, Clutter.Color text_color, Clutter.Color marker_color);
+		public Marker.with_text (string text, string? font, Clutter.Color? text_color, Clutter.Color? marker_color);
 		public Pango.Alignment alignment { get; set; }
 		public Clutter.Color color { get; set; }
 		public bool draw_background { get; set; }
