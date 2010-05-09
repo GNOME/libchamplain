@@ -18,7 +18,7 @@
 
 /**
  * SECTION:champlain-local-map-data-source
- * @short_description: Loads local map data for #ChamplainMemphisMapSource.
+ * @short_description: Loads local map data for #ChamplainMemphisTileSource.
  *
  * This map data source loads local <ulink role="online-location"
  * url="http://wiki.openstreetmap.org/wiki/.osm">
@@ -129,7 +129,9 @@ champlain_local_map_data_source_init (ChamplainLocalMapDataSource *self)
 /**
  * champlain_local_map_data_source_new:
  *
- * Returns: a new ChamplainLocalMapDataSource.
+ * Creates a new instance of #ChamplainLocalMapDataSource.
+ *
+ * Returns: a new #ChamplainLocalMapDataSource.
  *
  * Since: 0.6
  */

@@ -18,7 +18,7 @@
 
 /**
  * SECTION:champlain-network-map-data-source
- * @short_description: Downloads map data for #ChamplainMemphisMapSource.
+ * @short_description: Downloads map data for #ChamplainMemphisTileSource.
  *
  * This map data source downloads the map data from an OpenStreetMap API
  * server. It supports protocol version 0.5 and 0.6.
@@ -220,6 +220,8 @@ champlain_network_map_data_source_init (ChamplainNetworkMapDataSource *self)
 /**
  * champlain_network_map_data_source_new:
  *
+ * Creates an instance of #ChamplainNetworkMapDataSource.
+ *
  * Returns: a new #ChamplainNetworkMapDataSource
  *
  * Since: 0.6
@@ -347,6 +349,8 @@ champlain_network_map_data_source_load_map_data (
 /**
  * champlain_network_map_data_source_get_api_uri:
  * @map_data_source: a #ChamplainNetworkMapDataSource
+ *
+ * Gets the URI of the API server.
  *
  * Returns: the URI of the API server.
  *

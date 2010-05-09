@@ -30,7 +30,7 @@
  *
  * Apart from being a base class of all map sources, #ChamplainMapSource
  * also supports cooperation of multiple map sources by arranging them into
- * chains. Every map source has the #ChamplainMapSource::next-source property
+ * chains. Every map source has the #ChamplainMapSource:next-source property
  * that determines the next map source in the chain. When a function of
  * a #ChamplainMapSource object is invoked, the map source may decide to
  * delegate the work to the next map source in the chain by invoking the

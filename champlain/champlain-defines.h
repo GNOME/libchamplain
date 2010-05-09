@@ -24,32 +24,10 @@
 #define CHAMPLAIN_DEFINES_H
 
 #define CHAMPLAIN_API __attribute__((visibility("default")))
-#define CHAMPLAIN_OBSOLETE_API CHAMPLAIN_API __attribute__((deprecated))
 
 typedef struct _ChamplainView ChamplainView;
 typedef struct _ChamplainViewClass ChamplainViewClass;
 
 typedef struct _ChamplainMapSource ChamplainMapSource;
-
-#define CHAMPLAIN_PARAM_READABLE     \
-        (G_PARAM_READABLE |     \
-         G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
-
-#define CHAMPLAIN_PARAM_READWRITE    \
-        (G_PARAM_READABLE | G_PARAM_WRITABLE | \
-         G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
-
-typedef enum
-{
-  CHAMPLAIN_STATE_NONE,
-  CHAMPLAIN_STATE_LOADING,
-  CHAMPLAIN_STATE_DONE
-} ChamplainState;
-
-typedef enum
-{
-  CHAMPLAIN_UNIT_KM,
-  CHAMPLAIN_UNIT_MILES,
-} ChamplainUnit;
 
 #endif

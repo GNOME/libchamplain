@@ -204,6 +204,8 @@ champlain_base_marker_init (ChamplainBaseMarker *marker)
 /**
  * champlain_base_marker_new:
  *
+ * Creates a new instance of #ChamplainBaseMarker.
+ *
  * Returns: a new #ChamplainBaseMarker ready to be used as a #ClutterActor.
  *
  * Since: 0.4
@@ -248,6 +250,8 @@ champlain_base_marker_set_position (ChamplainBaseMarker *marker,
  * champlain_base_marker_get_latitude:
  * @marker: a #ChamplainBaseMarker
  *
+ * Gets the latitude of the marker.
+ *
  * Returns: the latitude of the marker.
  *
  * Since: 0.6
@@ -262,6 +266,8 @@ gdouble champlain_base_marker_get_latitude (ChamplainBaseMarker *marker)
 /**
  * champlain_base_marker_get_longitude:
  * @marker: a #ChamplainBaseMarker
+ *
+ * Gets the longitude of the marker.
  *
  * Returns: the longitude of the marker.
  *
@@ -298,6 +304,8 @@ champlain_base_marker_set_highlighted (ChamplainBaseMarker *marker,
 /**
  * champlain_base_marker_get_highlighted:
  * @marker: a #ChamplainBaseMarker
+ *
+ * Checks whether the marker is highlighted.
  *
  * Returns: the highlighted or not state of the marker.
  *

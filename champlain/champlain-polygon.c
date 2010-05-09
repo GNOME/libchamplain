@@ -27,7 +27,7 @@
 
 #include "champlain-polygon.h"
 
-#include "champlain-defines.h"
+#include "champlain-private.h"
 #include "champlain-map-source.h"
 
 #include <clutter/clutter.h>
@@ -320,6 +320,8 @@ champlain_polygon_init (ChamplainPolygon *polygon)
 /**
  * champlain_polygon_new:
  *
+ * Create an instance of #ChamplainPolygon.
+ *
  * Returns: a new empty #ChamplainPolygon
  *
  * Since: 0.4
@@ -439,6 +441,8 @@ champlain_polygon_clear_points (ChamplainPolygon *polygon)
  * champlain_polygon_get_points:
  * @polygon: The polygon
  *
+ * Gets a list of polygon points.
+ *
  * Returns: a list of all points from the polygon, it shouldn't be freed.
  *
  * Since: 0.4
@@ -480,7 +484,7 @@ champlain_polygon_set_fill_color (ChamplainPolygon *polygon,
 }
 
 /**
- * champlain_polygon_set_stoke_color:
+ * champlain_polygon_set_stroke_color:
  * @polygon: The polygon
  * @color: The polygon's stroke color or NULL to reset to the
  *         default color. The color parameter is copied.
@@ -508,8 +512,10 @@ champlain_polygon_set_stroke_color (ChamplainPolygon *polygon,
 }
 
 /**
- * champlain_polygon_get_color:
+ * champlain_polygon_get_fill_color:
  * @polygon: The polygon
+ *
+ * Gets the polygon's fill color.
  *
  * Returns: the polygon's fill color.
  *
@@ -526,6 +532,8 @@ champlain_polygon_get_fill_color (ChamplainPolygon *polygon)
 /**
  * champlain_polygon_get_stroke_color:
  * @polygon: The polygon
+ *
+ * Gets the polygon's stroke color.
  *
  * Returns: the polygon's stroke color.
  *
@@ -562,6 +570,8 @@ champlain_polygon_set_stroke (ChamplainPolygon *polygon,
  * champlain_polygon_get_stroke:
  * @polygon: The polygon
  *
+ * Checks whether the polygon has a stroke.
+ *
  * Returns: TRUE if the polygon has a stroke, FALSE otherwise.
  *
  * Since: 0.4
@@ -596,6 +606,8 @@ champlain_polygon_set_fill (ChamplainPolygon *polygon,
 /**
  * champlain_polygon_get_fill:
  * @polygon: The polygon
+ *
+ * Checks whether the polygon is filled.
  *
  * Returns: TRUE if the polygon is filled, FALSE otherwise.
  *
@@ -632,6 +644,8 @@ champlain_polygon_set_stroke_width (ChamplainPolygon *polygon,
  * champlain_polygon_get_stroke_width:
  * @polygon: The polygon
  *
+ * Gets the width of the stroke.
+ *
  * Returns: the width of the stroke
  *
  * Since: 0.4
@@ -667,6 +681,8 @@ champlain_polygon_set_mark_points (ChamplainPolygon *polygon,
 /**
  * champlain_polygon_get_mark_points:
  * @polygon: The polygon
+ *
+ * Checks whether the polygon points are marked.
  *
  * Returns: wether points in polygon gets marked for extra visibility.
  *

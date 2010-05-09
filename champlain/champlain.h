@@ -21,11 +21,6 @@
 
 #define __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 
-#define CHAMPLAIN_MIN_LAT -90
-#define CHAMPLAIN_MAX_LAT 90
-#define CHAMPLAIN_MIN_LONG -180
-#define CHAMPLAIN_MAX_LONG 180
-
 #include <glib.h>
 
 #include "champlain/champlain-features.h"

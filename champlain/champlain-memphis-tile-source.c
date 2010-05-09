@@ -261,6 +261,8 @@ champlain_memphis_tile_source_init (ChamplainMemphisTileSource *tile_source)
  * @projection: the map source's projection
  * @map_data_source: a #ChamplainMapDataSource
  *
+ * Creates a new instance of ChamplainMemphisTileSource.
+ *
  * Returns: a new ChamplainMemphisTileSource.
  *
  * Since: 0.6
@@ -608,6 +610,8 @@ champlain_memphis_tile_source_set_map_data_source (
  * champlain_memphis_tile_source_get_map_data_source:
  * @tile_source: a #ChamplainMemphisTileSource
  *
+ * Gets the assigned #ChamplainMapDataSource.
+ *
  * Returns: the #ChamplainMapDataSource.
  *
  * Since: 0.6
@@ -624,6 +628,8 @@ champlain_memphis_tile_source_get_map_data_source (
 /**
  * champlain_memphis_tile_source_get_background_color:
  * @tile_source: a #ChamplainMemphisTileSource
+ *
+ * Gets the background color of the map.
  *
  * Returns: the background color of the map as a newly-allocated
  * #ClutterColor.
@@ -703,6 +709,8 @@ champlain_memphis_tile_source_set_rule (ChamplainMemphisTileSource *tile_source,
  * @tile_source: a #ChamplainMemphisTileSource
  * @id: an id string
  *
+ * Gets the requested #MemphisRule.
+ *
  * Returns: the requested #MemphisRule or NULL if none is found.
  *
  * Since: 0.6
@@ -726,6 +734,8 @@ champlain_memphis_tile_source_get_rule (ChamplainMemphisTileSource *tile_source,
 /**
  * champlain_memphis_tile_source_get_rule_ids:
  * @tile_source: a #ChamplainMemphisTileSource
+ *
+ * Get a list of rule id's.
  *
  * Returns: a #GList of id strings of the form:
  * key1|key2|...|keyN:value1|value2|...|valueM

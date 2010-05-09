@@ -326,6 +326,8 @@ champlain_tile_init (ChamplainTile *self)
 /**
  * champlain_tile_new:
  *
+ * Creates an instance of #ChamplainTile.
+ *
  * Returns: a new #ChamplainTile
  *
  * Since: 0.4
@@ -339,6 +341,8 @@ champlain_tile_new (void)
 /**
  * champlain_tile_get_x:
  * @self: the #ChamplainTile
+ *
+ * Gets the tile's x position.
  *
  * Returns: the tile's x position
  *
@@ -356,6 +360,8 @@ champlain_tile_get_x (ChamplainTile *self)
  * champlain_tile_get_y:
  * @self: the #ChamplainTile
  *
+ * Gets the tile's y position.
+ *
  * Returns: the tile's y position
  *
  * Since: 0.4
@@ -371,6 +377,8 @@ champlain_tile_get_y (ChamplainTile *self)
 /**
  * champlain_tile_get_zoom_level:
  * @self: the #ChamplainTile
+ *
+ * Gets the tile's zoom level.
  *
  * Returns: the tile's zoom level
  *
@@ -388,6 +396,8 @@ champlain_tile_get_zoom_level (ChamplainTile *self)
  * champlain_tile_get_size:
  * @self: the #ChamplainTile
  *
+ * Gets the tile's size.
+ *
  * Returns: the tile's size in pixels
  *
  * Since: 0.4
@@ -403,6 +413,8 @@ champlain_tile_get_size (ChamplainTile *self)
 /**
  * champlain_tile_get_state:
  * @self: the #ChamplainTile
+ *
+ * Gets the current state of tile loading.
  *
  * Returns: the tile's #ChamplainState
  *
@@ -563,6 +575,8 @@ champlain_tile_set_state (ChamplainTile *self,
  * @size: the size in pixels
  * @zoom_level: the zoom level
  *
+ * Creates an instance of #ChamplainTile.
+ *
  * Returns: a #ChamplainTile
  *
  * Since: 0.4
@@ -580,6 +594,8 @@ champlain_tile_new_full (gint x,
 /**
  * champlain_tile_get_modified_time:
  * @self: the #ChamplainTile
+ *
+ * Gets the tile's last modified time.
  *
  * Returns: the tile's last modified time
  *
@@ -616,38 +632,10 @@ champlain_tile_set_modified_time (ChamplainTile *self,
 }
 
 /**
- * champlain_tile_get_modified_time_string:
- * @self: the #ChamplainTile
- *
- * Returns: the tile's modified time as a string (formated as per RFC 1123)
- *
- * Since: 0.4
- */
-gchar *
-champlain_tile_get_modified_time_string (ChamplainTile *self)
-{
-  g_return_val_if_fail (CHAMPLAIN_TILE (self), NULL);
-
-  ChamplainTilePrivate *priv = self->priv;
-
-  if (priv->modified_time == NULL)
-    return NULL;
-
-  struct tm *other_time = gmtime (&priv->modified_time->tv_sec);
-  char value [100];
-
-#ifdef G_OS_WIN32
-  strftime (value, 100, "%a, %d %b %Y %H:%M:%S %Z", other_time);
-#else
-  strftime (value, 100, "%a, %d %b %Y %T %Z", other_time);
-#endif
-
-  return g_strdup (value);
-}
-
-/**
  * champlain_tile_get_etag:
  * @self: the #ChamplainTile
+ *
+ * Gets the tile's ETag.
  *
  * Returns: the tile's ETag
  *
@@ -714,6 +702,8 @@ champlain_tile_set_content (ChamplainTile *self,
  * champlain_tile_get_content:
  * @self: the #ChamplainTile
  *
+ * Gets the tile's content actor.
+ *
  * Returns: the tile's content, this actor will change each time the tile's content changes.
  * You should not unref this content, it is owned by the tile.
  *
@@ -730,6 +720,8 @@ champlain_tile_get_content (ChamplainTile *self)
 /**
  * champlain_tile_get_fade_in:
  * @self: the #ChamplainTile
+ *
+ * Checks whether the tile should fade in.
  *
  * Returns: the return value determines whether the tile should fade in when loading.
  *

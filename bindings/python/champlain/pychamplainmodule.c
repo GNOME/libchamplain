@@ -44,11 +44,6 @@ initchamplain (void)
     PyModule_AddObject(m, "MAP_SOURCE_MFF_RELIEF", Py_BuildValue("s", 
         CHAMPLAIN_MAP_SOURCE_MFF_RELIEF));
 
-    PyModule_AddObject(m, "MIN_LAT", Py_BuildValue("i", CHAMPLAIN_MIN_LAT));
-    PyModule_AddObject(m, "MAX_LAT", Py_BuildValue("i", CHAMPLAIN_MAX_LAT));
-    PyModule_AddObject(m, "MIN_LONG", Py_BuildValue("i", CHAMPLAIN_MIN_LONG));
-    PyModule_AddObject(m, "MAX_LONG", Py_BuildValue("i", CHAMPLAIN_MAX_LONG));
-
     if (PyErr_Occurred ()) {
         PyErr_Print();
         Py_FatalError ("can't initialise module champlain");

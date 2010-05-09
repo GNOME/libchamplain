@@ -108,6 +108,11 @@ static guint signals[LAST_SIGNAL] = { 0, };
                                                  level < champlain_map_source_get_min_zoom_level (priv->map_source) || \
                                                  level > champlain_map_source_get_max_zoom_level (priv->map_source))
 
+#define CHAMPLAIN_MIN_LAT -90
+#define CHAMPLAIN_MAX_LAT 90
+#define CHAMPLAIN_MIN_LONG -180
+#define CHAMPLAIN_MAX_LONG 180
+
 /* Between state values for go_to */
 typedef struct {
   ChamplainView *view;
@@ -1707,6 +1712,8 @@ finger_scroll_key_press_cb (ClutterActor *actor,
 /**
  * champlain_view_new:
  *
+ * Creates an instance of #ChamplainView.
+ *
  * Returns: a new #ChamplainView ready to be used as a #ClutterActor.
  *
  * Since: 0.4
@@ -2125,6 +2132,8 @@ champlain_view_remove_layer (ChamplainView *view,
  * @lat: a variable where to put the latitude of the event
  * @lon: a variable where to put the longitude of the event
  *
+ * Gets coordinates from button-press-event and button-release-event signals.
+ *
  * Returns: the latitude, longitude coordinates for the given ClutterEvent.
  *
  * Since: 0.2.8
@@ -2188,8 +2197,10 @@ champlain_view_get_coords_from_event (ChamplainView *view,
  * @lat: a variable where to put the latitude of the event
  * @lon: a variable where to put the longitude of the event
  *
- * Returns: the latitude, longitude coordinates for the given x, y position in
- * the view.  Use if you get coordinates from GtkEvents for example.
+ * Gets latitude and longitude for the given x, y position in
+ * the view. Use if you get coordinates from GtkEvents for example.
+ *
+ * Returns: TRUE when successful.
  *
  * Since: 0.4
  */
@@ -2773,7 +2784,7 @@ champlain_view_ensure_visible (ChamplainView *view,
 /**
  * champlain_view_ensure_markers_visible:
  * @view: a #ChamplainView
- * @markers: a NULL terminated array of #ChamplainMarkers
+ * @markers: a NULL terminated array of #ChamplainMarker elements
  * @animate: a #gboolean
  *
  * Changes the map's zoom level and center to make sure those markers are
@@ -2877,6 +2888,8 @@ view_set_zoom_level_at (ChamplainView *view,
  * champlain_view_get_zoom_level:
  * @view: The view
  *
+ * Gets the view's current zoom level.
+ *
  * Returns: the view's current zoom level.
  *
  * Since: 0.4
@@ -2893,7 +2906,9 @@ champlain_view_get_zoom_level (ChamplainView *view)
  * champlain_view_get_min_zoom_level:
  * @view: The view
  *
- * Returns: the view's minimal zoom level allowed.
+ * Gets the view's minimal allowed zoom level.
+ *
+ * Returns: the view's minimal allowed zoom level.
  *
  * Since: 0.4
  */
@@ -2909,7 +2924,9 @@ champlain_view_get_min_zoom_level (ChamplainView *view)
  * champlain_view_get_max_zoom_level:
  * @view: The view
  *
- * Returns: the view's maximal zoom level allowed.
+ * Gets the view's maximal allowed zoom level.
+ *
+ * Returns: the view's maximal allowed zoom level.
  *
  * Since: 0.4
  */
@@ -2924,6 +2941,8 @@ champlain_view_get_max_zoom_level (ChamplainView *view)
 /**
  * champlain_view_get_map_source:
  * @view: The view
+ *
+ * Gets the view's current map source.
  *
  * Returns: the view's current map source. If you need to keep a reference to the
  * map source then you have to call #g_object_ref.
@@ -2941,6 +2960,8 @@ champlain_view_get_map_source (ChamplainView *view)
 /**
  * champlain_view_get_decel_rate:
  * @view: The view
+ *
+ * Gets the view's deceleration rate.
  *
  * Returns: the view's deceleration rate.
  *
@@ -2960,6 +2981,8 @@ champlain_view_get_decel_rate (ChamplainView *view)
  * champlain_view_get_scroll_mode:
  * @view: The view
  *
+ * Gets the view's scroll mode behaviour.
+ *
  * Returns: the view's scroll mode behaviour.
  *
  * Since: 0.4
@@ -2976,7 +2999,9 @@ champlain_view_get_scroll_mode (ChamplainView *view)
  * champlain_view_get_keep_center_on_resize:
  * @view: The view
  *
- * Returns: TRUE if the view keeps the center or resize, FALSE otherwise.
+ * Checks whether to keep the center on resize
+ *
+ * Returns: TRUE if the view keeps the center on resize, FALSE otherwise.
  *
  * Since: 0.4
  */
@@ -2991,6 +3016,8 @@ champlain_view_get_keep_center_on_resize (ChamplainView *view)
 /**
  * champlain_view_get_show_license:
  * @view: The view
+ *
+ * Checks whether the view displays the license.
  *
  * Returns: TRUE if the view displays the license, FALSE otherwise.
  *
@@ -3007,6 +3034,8 @@ champlain_view_get_show_license (ChamplainView *view)
 /**
  * champlain_view_get_license_text:
  * @view: The view
+ *
+ * Gets the additional license text.
  *
  * Returns: the additional license text
  *
@@ -3025,6 +3054,8 @@ champlain_view_get_license_text (ChamplainView *view)
  * champlain_view_get_show_scale:
  * @view: The view
  *
+ * Checks whether the view displays the scale.
+ *
  * Returns: TRUE if the view displays the scale, FALSE otherwise.
  *
  * Since: 0.4.3
@@ -3040,6 +3071,8 @@ champlain_view_get_show_scale (ChamplainView *view)
 /**
  * champlain_view_get_max_scale_width:
  * @view: The view
+ *
+ * Gets the maximal scale width.
  *
  * Returns: The max scale width in pixels.
  *
@@ -3057,6 +3090,8 @@ champlain_view_get_max_scale_width (ChamplainView *view)
  * champlain_view_get_scale_unit:
  * @view: The view
  *
+ * Gets the unit used by the scale.
+ *
  * Returns: The unit used by the scale
  *
  * Since: 0.4.3
@@ -3072,6 +3107,8 @@ champlain_view_get_scale_unit (ChamplainView *view)
 /**
  * champlain_view_get_zoom_on_double_click:
  * @view: The view
+ *
+ * Checks whether the view zooms on double click.
  *
  * Returns: TRUE if the view zooms on double click, FALSE otherwise.
  *

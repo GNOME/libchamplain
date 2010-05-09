@@ -113,9 +113,8 @@ G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CHAMPLAIN_TYPE_BASE_MARKER);
 static void draw_marker (ChamplainMarker *marker);
 
 /**
- * champlain_marker_set_hightlight_color:
+ * champlain_marker_set_highlight_color:
  * @color: a #ClutterColor
- *
  *
  * Changes the highlight color, this is to ensure a better integration with
  * the desktop, this is automatically done by GtkChamplainEmbed.
@@ -132,7 +131,9 @@ champlain_marker_set_highlight_color (ClutterColor *color)
 }
 
 /**
- * champlain_marker_get_hightlight_color:
+ * champlain_marker_get_highlight_color:
+ *
+ * Gets the highlight color.
  *
  * Returns: the highlight color. Should not be freed.
  *
@@ -145,9 +146,8 @@ champlain_marker_get_highlight_color ()
 }
 
 /**
- * champlain_marker_set_hightlight_text_color:
+ * champlain_marker_set_highlight_text_color:
  * @color: a #ClutterColor
- *
  *
  * Changes the highlight text color, this is to ensure a better integration with
  * the desktop, this is automatically done by GtkChamplainEmbed.
@@ -164,7 +164,9 @@ champlain_marker_set_highlight_text_color (ClutterColor *color)
 }
 
 /**
- * champlain_marker_get_hightlight_text_color:
+ * champlain_marker_get_highlight_text_color:
+ *
+ * Gets the highlight text color.
  *
  * Returns: the highlight text color. Should not be freed.
  *
@@ -821,6 +823,8 @@ champlain_marker_init (ChamplainMarker *marker)
 /**
  * champlain_marker_new:
  *
+ * Creates a new instance of #ChamplainMarker.
+ *
  * Returns: a new #ChamplainMarker ready to be used as a #ClutterActor.
  *
  * Since: 0.2
@@ -837,6 +841,8 @@ champlain_marker_new (void)
  * @font: the font to use to draw the text, for example "Courrier Bold 11", can be NULL
  * @text_color: a #ClutterColor, the color of the text, can be NULL
  * @marker_color: a #ClutterColor, the color of the marker, can be NULL
+ *
+ * Creates a new instance of #ChamplainMarker with text value.
  *
  * Returns: a new #ChamplainMarker with a drawn marker containing the given text.
  *
@@ -868,6 +874,8 @@ champlain_marker_new_with_text (const gchar *text,
  * champlain_marker_new_with_image:
  * @actor: The actor of the image.
  *
+ * Creates a new instance of #ChamplainMarker with image.
+ *
  * Returns: a new #ChamplainMarker with a drawn marker containing the given
  * image.
  *
@@ -889,6 +897,8 @@ champlain_marker_new_with_image (ClutterActor *actor)
  * champlain_marker_new_from_file:
  * @filename: The filename of the image.
  * @error: Return location for an error.
+ *
+ * Creates a new instance of #ChamplainMarker with image loaded from file.
  *
  * Returns: a new #ChamplainMarker with a drawn marker containing the given
  * image.
@@ -917,6 +927,8 @@ champlain_marker_new_from_file (const gchar *filename,
  * champlain_marker_new_full:
  * @text: The text
  * @actor: The image
+ *
+ * Creates a new instance of #ChamplainMarker consisting of a custom #ClutterActor.
  *
  * Returns: a new #ChamplainMarker with a drawn marker containing the given
  * image.
@@ -1256,6 +1268,8 @@ champlain_marker_set_draw_background (ChamplainMarker *marker,
  * champlain_marker_get_image:
  * @marker: The marker
  *
+ * Get the marker's image.
+ *
  * Returns: the marker's image.
  *
  * Since: 0.4
@@ -1271,6 +1285,8 @@ champlain_marker_get_image (ChamplainMarker *marker)
 /**
  * champlain_marker_get_use_markup:
  * @marker: The marker
+ *
+ * Check whether the marker uses markup.
  *
  * Returns: if the marker's text contains markup.
  *
@@ -1288,6 +1304,8 @@ champlain_marker_get_use_markup (ChamplainMarker *marker)
  * champlain_marker_get_text:
  * @marker: The marker
  *
+ * Get the marker's text.
+ *
  * Returns: the marker's text.
  *
  * Since: 0.4
@@ -1303,6 +1321,8 @@ champlain_marker_get_text (ChamplainMarker *marker)
 /**
  * champlain_marker_get_alignment:
  * @marker: The marker
+ *
+ * Get the marker's text alignment.
  *
  * Returns: the marker's text alignment.
  *
@@ -1320,6 +1340,8 @@ champlain_marker_get_alignment (ChamplainMarker *marker)
  * champlain_marker_get_color:
  * @marker: The marker
  *
+ * Gets the marker's color.
+ *
  * Returns: the marker's color.
  *
  * Since: 0.4
@@ -1335,6 +1357,8 @@ champlain_marker_get_color (ChamplainMarker *marker)
 /**
  * champlain_marker_get_text_color:
  * @marker: The marker
+ *
+ * Gets the marker's text color.
  *
  * Returns: the marker's text color.
  *
@@ -1352,6 +1376,8 @@ champlain_marker_get_text_color (ChamplainMarker *marker)
  * champlain_marker_get_font_name:
  * @marker: The marker
  *
+ * Gets the marker's font name.
+ *
  * Returns: the marker's font name.
  *
  * Since: 0.4
@@ -1367,6 +1393,8 @@ champlain_marker_get_font_name (ChamplainMarker *marker)
 /**
  * champlain_marker_get_wrap:
  * @marker: The marker
+ *
+ * Check whether the marker text wraps.
  *
  * Returns: if the marker's text wraps.
  *
@@ -1384,6 +1412,8 @@ champlain_marker_get_wrap (ChamplainMarker *marker)
  * champlain_marker_get_wrap_mode:
  * @marker: The marker
  *
+ * Get the marker's text wrap mode.
+ *
  * Returns: the marker's text wrap mode.
  *
  * Since: 0.4
@@ -1399,6 +1429,8 @@ champlain_marker_get_wrap_mode (ChamplainMarker *marker)
 /**
  * champlain_marker_get_ellipsize:
  * @marker: The marker
+ *
+ * Get the marker's text ellipsize mode.
  *
  * Returns: the marker's text ellipsize mode.
  *
@@ -1416,7 +1448,9 @@ champlain_marker_get_ellipsize (ChamplainMarker *marker)
  * champlain_marker_get_single_line_mode:
  * @marker: The marker
  *
- * Returns: the marker's text single side mode.
+ * Checks the marker's single line mode.
+ *
+ * Returns: the marker's text single line mode.
  *
  * Since: 0.4
  */
@@ -1431,6 +1465,8 @@ champlain_marker_get_single_line_mode (ChamplainMarker *marker)
 /**
  * champlain_marker_get_draw_background:
  * @marker: The marker
+ *
+ * Checks whether the marker has a background.
  *
  * Returns: if the marker's has a background.
  *

@@ -27,6 +27,13 @@
 
 typedef struct _ChamplainPoint ChamplainPoint;
 
+/**
+ * ChamplainPoint:
+ * @lat: latitude
+ * @lon: longitude
+ *
+ * A base struct to store a latitude and longitude.
+ */
 struct _ChamplainPoint
 {
   double lat;

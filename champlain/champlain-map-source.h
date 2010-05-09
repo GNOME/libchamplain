@@ -39,6 +39,12 @@ typedef struct _ChamplainMapSourcePrivate ChamplainMapSourcePrivate;
 
 typedef struct _ChamplainMapSourceClass ChamplainMapSourceClass;
 
+/**
+ * ChamplainMapProjection:
+ * @CHAMPLAIN_MAP_PROJECTION_MERCATOR: Currently the only supported projection
+ *
+ * Projections supported by the library.
+ */
 typedef enum
 {
   CHAMPLAIN_MAP_PROJECTION_MERCATOR

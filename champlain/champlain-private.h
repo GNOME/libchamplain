@@ -42,4 +42,12 @@ typedef struct
   gint height;
 } ChamplainRectangle;
 
+#define CHAMPLAIN_PARAM_READABLE     \
+        (G_PARAM_READABLE |     \
+         G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
+
+#define CHAMPLAIN_PARAM_READWRITE    \
+        (G_PARAM_READABLE | G_PARAM_WRITABLE | \
+         G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
+
 #endif

@@ -56,6 +56,20 @@ typedef enum {
   CHAMPLAIN_SCROLL_MODE_KINETIC
 } ChamplainScrollMode;
 
+
+/**
+ * ChamplainUnit:
+ * @CHAMPLAIN_UNIT_KM: kilometers
+ * @CHAMPLAIN_UNIT_MILES: miles
+ *
+ * Units used by the scale.
+ */
+typedef enum
+{
+  CHAMPLAIN_UNIT_KM,
+  CHAMPLAIN_UNIT_MILES,
+} ChamplainUnit;
+
 struct _ChamplainView
 {
   ClutterGroup group;
@@ -103,8 +117,7 @@ void champlain_view_set_map_source (ChamplainView *view,
     ChamplainMapSource *map_source);
 void champlain_view_set_size (ChamplainView *view,
     guint width,
-    guint height)
-    CHAMPLAIN_OBSOLETE_API;
+    guint height);
 void champlain_view_set_decel_rate (ChamplainView *view,
     gdouble rate);
 void champlain_view_set_scroll_mode (ChamplainView *view,

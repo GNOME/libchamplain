@@ -21,7 +21,10 @@
 
 /**
  * SECTION:champlain-bounding-box
- * @short_description: A basic struct to describe a bounding box
+ * @short_description: A basic struct to describe a bounding box.
+ *
+ * A basic struct to describe a bounding box.
+ *
  */
 
 #include "champlain-bounding-box.h"

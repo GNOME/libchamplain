@@ -484,7 +484,7 @@ ChamplainFileCache* champlain_file_cache_new_full (guint size_limit,
 
 /**
  * champlain_file_cache_get_size_limit:
- * @file_cache: a #ChamplainCache
+ * @file_cache: a #ChamplainFileCache
  *
  * Gets the cache size limit in bytes.
  *
@@ -502,7 +502,7 @@ champlain_file_cache_get_size_limit (ChamplainFileCache *file_cache)
 
 /**
  * champlain_file_cache_get_cache_dir:
- * @file_cache: a #ChamplainCache
+ * @file_cache: a #ChamplainFileCache
  *
  * Gets the directory where the cache database is stored.
  *
@@ -520,7 +520,7 @@ champlain_file_cache_get_cache_dir (ChamplainFileCache *file_cache)
 
 /**
  * champlain_file_cache_set_size_limit:
- * @file_cache: a #ChamplainCache
+ * @file_cache: a #ChamplainFileCache
  * @size_limit: the cache limit in bytes
  *
  * Sets the cache size limit in bytes.
@@ -962,7 +962,7 @@ purge_on_idle (gpointer data)
 
 /**
  * champlain_file_cache_purge_on_idle:
- * @file_cache: a #ChamplainCache
+ * @file_cache: a #ChamplainFileCache
  *
  * Purge the cache from the less popular tiles until cache's size limit is reached.
  * This is a non blocking call as the purge will happen when the application is idle
@@ -978,7 +978,7 @@ champlain_file_cache_purge_on_idle (ChamplainFileCache *file_cache)
 
 /**
  * champlain_file_cache_purge:
- * @file_cache: a #ChamplainCache
+ * @file_cache: a #ChamplainFileCache
  *
  * Purge the cache from the less popular tiles until cache's size limit is reached.
  *

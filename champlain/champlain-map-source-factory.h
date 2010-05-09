@@ -70,24 +70,64 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
     ChamplainMapSourceDesc *desc, ChamplainMapSourceConstructor constructor,
     gpointer data);
 
-#ifdef CHAMPLAIN_HAS_MAEMO
+#ifndef CHAMPLAIN_HAS_MAEMO
+/**
+ * CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK:
+ *
+ * OpenStreetMap Mapnik
+ */
+#define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm-mapnik"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER:
+ *
+ * OpenStreetMap Osmarender
+ */
+#define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "osm-osmarender"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP:
+ *
+ * OpenStreetMap Cycle Map
+ */
+#define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "osm-cyclemap"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP:
+ *
+ * OpenStreetMap Transport Map
+ */
+#define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "osm-transportmap"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OAM:
+ *
+ * OpenAerialMap
+ */
+#define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
+/**
+ * CHAMPLAIN_MAP_SOURCE_MFF_RELIEF:
+ *
+ * Maps for Free Relief
+ */
+#define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "mff-relief"
+#else
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap I"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap II"
 #define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "OpenCycleMap"
 #define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "Public Transport"
 #define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
 #define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "MapsForFree Relief"
-#else
-#define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm-mapnik"
-#define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "osm-osmarender"
-#define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "osm-cyclemap"
-#define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "osm-transportmap"
-#define CHAMPLAIN_MAP_SOURCE_OAM "oam"
-#define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "mff-relief"
 #endif
 
 #ifdef CHAMPLAIN_HAS_MEMPHIS
+/**
+ * CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL:
+ *
+ * OpenStreetMap Memphis Local Map
+ */
 #define CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL "memphis-local"
+/**
+ * CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK:
+ *
+ * OpenStreetMap Memphis Network Map
+ */
 #define CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK "memphis-network"
 #endif
 

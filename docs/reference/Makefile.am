@@ -24,7 +24,7 @@ SCANGOBJ_OPTIONS=--type-init-func 'g_type_init(); g_thread_init(NULL)'
 
 # Extra options to supply to gtkdoc-scan.
 # e.g. SCAN_OPTIONS=--deprecated-guards="GTK_DISABLE_DEPRECATED"
-SCAN_OPTIONS=--deprecated-guards="CHAMPLAIN_OBSOLETE_API" --rebuild-types
+SCAN_OPTIONS=--rebuild-types
 
 # Extra options to supply to gtkdoc-mkdb.
 # e.g. MKDB_OPTIONS=--sgml-mode --output-format=xml
@@ -40,9 +40,9 @@ MKHTML_OPTIONS=
 # Extra options to supply to gtkdoc-fixref. Not normally needed.
 # e.g. FIXXREF_OPTIONS=--extra-dir=../gdk-pixbuf/html --extra-dir=../gdk/html
 FIXXREF_OPTIONS= \
-        --extra-dir=$(PREFIX)/share/gtk-doc/html/gobject \
-        --extra-dir=$(PREFIX)/share/gtk-doc/html/glib \
-        --extra-dir=$(PREFIX)/share/gtk-doc/html/clutter
+	--extra-dir=$(PREFIX)/share/gtk-doc/html/gobject \
+	--extra-dir=$(PREFIX)/share/gtk-doc/html/glib \
+	--extra-dir=$(PREFIX)/share/gtk-doc/html/clutter
 
 # Used for dependencies. The docs will be rebuilt if any of these change.
 # e.g. HFILE_GLOB=$(top_srcdir)/gtk/*.h
@@ -56,8 +56,8 @@ EXTRA_HFILES=
 
 # Header files to ignore when scanning. Use base file name, no paths
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES= champlain-debug.h champlain-defines.h champlain-enum-types.h champlain-private.h \
-	champlain.h
+IGNORE_HFILES= champlain-debug.h champlain-enum-types.h champlain-private.h \
+	champlain.h champlain-marshal.h champlain-defines.h champlain-features.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png
@@ -76,7 +76,7 @@ expand_content_files=
 # Only needed if you are using gtkdoc-scangobj to dynamically query widget
 # signals and properties.
 # e.g. GTKDOC_CFLAGS=-I$(top_srcdir) -I$(top_builddir) $(GTK_DEBUG_FLAGS)
-# e.g. 
+# e.g.
 GTKDOC_CFLAGS=$(DEPS_CFLAGS) -I$(top_srcdir) -I$(top_builddir)
 GTKDOC_LIBS=$(DEPS_LIBS) $(top_builddir)/champlain/libchamplain-0.5.la
 

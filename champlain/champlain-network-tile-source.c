@@ -641,6 +641,29 @@ finish:
   g_object_unref (map_source);
 }
 
+static gchar *
+get_modified_time_string (ChamplainTile *tile)
+{
+  const GTimeVal *time;
+  g_return_val_if_fail (CHAMPLAIN_TILE (tile), NULL);
+
+  time = champlain_tile_get_modified_time(tile);
+
+  if (time == NULL)
+    return NULL;
+
+  struct tm *other_time = gmtime (&time->tv_sec);
+  char value [100];
+
+#ifdef G_OS_WIN32
+  strftime (value, 100, "%a, %d %b %Y %H:%M:%S %Z", other_time);
+#else
+  strftime (value, 100, "%a, %d %b %Y %T %Z", other_time);
+#endif
+
+  return g_strdup (value);
+}
+
 static void
 fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile)
@@ -669,7 +692,7 @@ fill_tile (ChamplainMapSource *map_source,
           /* validate tile */
 
           const gchar *etag = champlain_tile_get_etag (tile);
-          gchar *date = champlain_tile_get_modified_time_string (tile);
+          gchar *date = get_modified_time_string (tile);
 
           /* If an etag is available, only use it.
            * OSM servers seems to send now as the modified time for all tiles

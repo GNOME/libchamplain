@@ -21,7 +21,10 @@
 
 /**
  * SECTION:champlain-map-source-desc
- * @short_description: A basic struct to describe map sources
+ * @short_description: A basic struct to describe map sources.
+ *
+ * A basic struct to describe map sources.
+ *
  */
 
 #include "champlain-map-source-desc.h"
@@ -119,6 +122,8 @@ champlain_map_source_desc_free (ChamplainMapSourceDesc *desc)
 
 /**
  * champlain_map_source_desc_new:
+ *
+ * Creates a new instance of #ChamplainMapSourceDesc.
  *
  * Returns: a newly allocated #ChamplainMapSourceDesc to be freed with #champlain_map_source_desc_free
  *

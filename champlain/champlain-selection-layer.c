@@ -31,7 +31,7 @@
 
 #include "champlain-selection-layer.h"
 
-#include "champlain-defines.h"
+#include "champlain-private.h"
 #include "champlain-base-marker.h"
 #include "champlain-enum-types.h"
 
@@ -111,7 +111,7 @@ champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
   object_class->set_property = champlain_selection_layer_set_property;
 
   /**
-  * ChamplainView:selection-mode:
+  * ChamplainSelectionLayer:selection-mode:
   *
   * Determines the type of selection that will be performed.
   *
@@ -255,6 +255,8 @@ champlain_selection_layer_init (ChamplainSelectionLayer *self)
 /**
  * champlain_selection_layer_new:
  *
+ * Creates an instance of #ChamplainSelectionLayer.
+ *
  * Returns: a new #ChamplainSelectionLayer ready to be used as a #ClutterContainer for the markers.
  *
  * Since: 0.4
@@ -291,6 +293,8 @@ champlain_selection_layer_get_selected (ChamplainSelectionLayer *layer)
  * champlain_selection_layer_get_selected_markers:
  * @layer: a #ChamplainSelectionLayer
  *
+ * Gets the list of selected markers.
+ *
  * Returns: the list of selected #ChamplainBaseMarker or NULL if none is selected.
  * You shouldn't free that list.
  *
@@ -305,6 +309,8 @@ champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer)
 /**
  * champlain_selection_layer_count_selected_markers:
  * @layer: a #ChamplainSelectionLayer
+ *
+ * Gets the number of selected markers.
  *
  * Returns: the number of selected #ChamplainBaseMarker
  *
@@ -435,6 +441,8 @@ champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
  * @layer: a #ChamplainSelectionLayer
  * @marker: a #ChamplainBaseMarker
  *
+ * Checks whether the marker is selected.
+ *
  * Returns: whether the marker is selected or not.
  *
  * Since: 0.4
@@ -485,6 +493,8 @@ champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer,
 /**
  * champlain_selection_layer_get_selection_mode:
  * @layer: a #ChamplainSelectionLayer
+ *
+ * Gets the selection mode of the layer.
  *
  * Returns: the selection mode of the layer.
  *

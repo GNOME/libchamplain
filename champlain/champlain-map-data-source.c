@@ -21,7 +21,7 @@
  * @short_description: Base class for map data sources.
  *
  * ChamplainMapDataSource provides the interface for
- *  #ChamplainMemphisMapSource to aquire map data.
+ *  #ChamplainMemphisTileSource to aquire map data.
  *
  */
 
@@ -193,6 +193,8 @@ champlain_map_data_source_init (ChamplainMapDataSource *self)
 /**
  * champlain_map_data_source_get_map_data:
  * @data_source: a #ChamplainMapDataSource
+ *
+ * Gets the #MemphisMap of the data source.
  *
  * Returns: the #MemphisMap of the data source or NULL.
  *

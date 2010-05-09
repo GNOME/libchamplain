@@ -45,6 +45,21 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainTilePrivate ChamplainTilePrivate;
 
+/**
+ * ChamplainState:
+ * @CHAMPLAIN_STATE_NONE: Initial or undefined state
+ * @CHAMPLAIN_STATE_LOADING: Tile is loading
+ * @CHAMPLAIN_STATE_DONE: Tile loading finished
+ *
+ * Tile loading state.
+ */
+typedef enum
+{
+  CHAMPLAIN_STATE_NONE,
+  CHAMPLAIN_STATE_LOADING,
+  CHAMPLAIN_STATE_DONE
+} ChamplainState;
+
 typedef struct _ChamplainTile        ChamplainTile;
 typedef struct _ChamplainTileClass   ChamplainTileClass;
 
@@ -73,7 +88,6 @@ guint champlain_tile_get_size (ChamplainTile *self);
 ChamplainState champlain_tile_get_state (ChamplainTile *self);
 ClutterActor * champlain_tile_get_content (ChamplainTile *self);
 const GTimeVal * champlain_tile_get_modified_time (ChamplainTile *self);
-gchar * champlain_tile_get_modified_time_string (ChamplainTile *self);
 const gchar * champlain_tile_get_etag (ChamplainTile *self);
 gboolean champlain_tile_get_fade_in (ChamplainTile *self);
 

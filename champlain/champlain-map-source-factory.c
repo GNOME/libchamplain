@@ -323,6 +323,8 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 /**
  * champlain_map_source_factory_dup_default:
  *
+ * A method to obtain the singleton object.
+ *
  * Returns: the singleton #ChamplainMapSourceFactory, it should be freed
  * using #g_object_unref when not needed.
  *
@@ -337,6 +339,8 @@ champlain_map_source_factory_dup_default (void)
 /**
  * champlain_map_source_factory_dup_list:
  * @factory: the Factory
+ *
+ * Get the list of registered map sources.
  *
  * Returns: the list of registered map sources, the items should not be freed,
  * the list should be freed with #g_slist_free.
@@ -354,11 +358,11 @@ champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *factory)
  * @factory: the Factory
  * @id: the wanted map source id
  *
- * Returns: a ready to use #ChamplainMapSource matching the given name, returns
- * NULL is none match.
- *
  * The id should not contain any character that can't be in a filename as it
  * will be used as the cache directory name for that map source.
+ *
+ * Returns: a ready to use #ChamplainMapSource matching the given name, returns
+ * NULL is none match.
  *
  * Since: 0.4
  */
@@ -385,6 +389,8 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  * champlain_map_source_factory_create_cached_source:
  * @factory: the Factory
  * @id: the wanted map source id
+ *
+ * Creates a cached map source.
  *
  * Returns: a ready to use #ChamplainMapSourceChain consisting of
  * #ChamplainFileCache, #ChamplainMapSource matching the given name, and

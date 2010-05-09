@@ -21,7 +21,10 @@
 
 /**
  * SECTION:champlain-point
- * @short_description: A base struct to store a latitude and longitude
+ * @short_description: A base struct to store a latitude and longitude.
+ *
+ * A base struct to store a latitude and longitude.
+ *
  */
 
 #include "champlain-point.h"
@@ -81,6 +84,8 @@ champlain_point_free (ChamplainPoint *point)
  * champlain_point_new:
  * @lat: the latitude
  * @lon: the longitude
+ *
+ * Creates an instance of #ChamplainPoint.
  *
  * Return value: a newly allocated #ChamplainPoint to be freed with #champlain_point_free
  *
