@@ -651,3 +651,62 @@ _wrap_champlain_file_cache_new_full(PyObject *self, PyObject *args, PyObject *kw
     /* pygobject_new handles NULL checking */
     return pygobject_new((GObject *)ret);
 }
+
+%%
+override ChamplainMapSource__proxy_do_get_projection kwargs
+static ChamplainMapProjection
+_wrap_ChamplainMapSource__proxy_do_get_projection(ChamplainMapSource *self)
+{
+    PyGILState_STATE __py_state;
+    PyObject *py_self;
+    ChamplainMapProjection retval;
+    PyObject *py_retval;
+    PyObject *py_method;
+    
+    __py_state = pyg_gil_state_ensure();
+    py_self = pygobject_new((GObject *) self);
+    if (!py_self) {
+        if (PyErr_Occurred())
+            PyErr_Print();
+        pyg_gil_state_release(__py_state);
+        return retval;
+    }
+    
+    
+    py_method = PyObject_GetAttrString(py_self, "do_get_projection");
+    if (!py_method) {
+        if (PyErr_Occurred())
+            PyErr_Print();
+        Py_DECREF(py_self);
+        pyg_gil_state_release(__py_state);
+        return retval;
+    }
+    py_retval = PyObject_CallObject(py_method, NULL);
+    if (!py_retval) {
+        if (PyErr_Occurred())
+            PyErr_Print();
+        Py_XDECREF(py_retval);
+        Py_DECREF(py_method);
+        Py_DECREF(py_self);
+        pyg_gil_state_release(__py_state);
+        return retval;
+    }
+    py_retval = Py_BuildValue("(N)", py_retval);
+    if (!PyArg_ParseTuple(py_retval, "O", &retval)) {
+        if (PyErr_Occurred())
+            PyErr_Print();
+        Py_XDECREF(py_retval);
+        Py_DECREF(py_method);
+        Py_DECREF(py_self);
+        pyg_gil_state_release(__py_state);
+        return retval;
+    }
+    
+    
+    Py_XDECREF(py_retval);
+    Py_DECREF(py_method);
+    Py_DECREF(py_self);
+    pyg_gil_state_release(__py_state);
+    
+    return retval;
+}
