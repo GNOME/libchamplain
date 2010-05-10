@@ -394,25 +394,22 @@ get_filename (ChamplainNetworkMapSource *source,
 #endif
 }
 
-static ClutterActor *error_actor = NULL;
+static CoglHandle error_tex = NULL;
 
 static void
 create_error_tile (ChamplainTile* tile)
 {
-  ClutterActor *clone;
+  ClutterActor *actor;
 
-  if (!error_actor)
+  if (!error_tex)
     {
       guint size;
-      ClutterActor *actor;
       cairo_t *cr;
       cairo_pattern_t *pat;
-      ClutterActor *stage;
 
       size = champlain_tile_get_size (tile);
       actor = clutter_cairo_texture_new (size, size);
       cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (actor));
-      stage = clutter_stage_get_default ();
 
       /* draw a linear gray to white pattern */
       pat = cairo_pattern_create_linear (size / 2.0, 0.0,  size, size / 2.0);
@@ -436,13 +433,17 @@ create_error_tile (ChamplainTile* tile)
 
       cairo_destroy (cr);
 
-      clutter_actor_show (actor);
-      clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
-      error_actor = actor;
+      error_tex = clutter_texture_get_cogl_texture (CLUTTER_TEXTURE (actor));
+      cogl_handle_ref (error_tex);
+
+      g_object_ref_sink (actor);
+      g_object_unref (actor);
     }
 
-  clone = clutter_clone_new (error_actor);
-  champlain_tile_set_content (tile, clone, TRUE);
+  actor = clutter_texture_new ();
+  clutter_texture_set_cogl_texture (CLUTTER_TEXTURE (actor),
+                                    error_tex);
+  champlain_tile_set_content (tile, actor, TRUE);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 }
 
