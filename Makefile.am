@@ -48,7 +48,5 @@ all: $(other_pcfiles)
 # Have the demos build at the end as they depend on optional parts
 SUBDIRS += docs demos bindings
 
-DIST_SUBDIRS = tidy champlain champlain-gtk docs demos bindings
-
 ChangeLog: Makefile.am
 	git log --pretty=short > ChangeLog
