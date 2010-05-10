@@ -6,41 +6,41 @@ interactive maps.
 
 libchamplain requires:
 
-  * Clutter >= 1.0
-  * Glib >= 2.10
-  * Cairo >= 1.4
-  * Gio >= 2.16
-  * Gdk >= 2.10
-  * Sqlite >= 3.0
+  * glib >= 2.10
+  * gio >= 2.16
+  * gdk >= 2.10
+  * clutter >= 1.0
+  * cairo >= 1.4
+  * sqlite >= 3.0
+  * libsoup >= 2.4.1
 
 If you are building libchamplain-gtk, you will also need:
 
-  * Gtk >= 2.12
-  * Clutter-Gtk >= 0.10
+  * gtk >= 2.12
+  * clutter-gtk >= 0.10
+
+If you are building libchamplain with local rendering support, you will
+also need:
+
+  *  libmemphis >= 0.2.1
 
 If you are building the Python bindings, you will also need:
 
-  * PyGtk >= 2.0
-  * PyGobject >= 2.0
-  * PyClutter >= 1.0
-  * PyClutterGtk >= 0.9
+  * pygtk >= 2.12
+  * pycobject >= 2.10
+  * pyclutter >= 1.0
 
-If you are building the C# bindings, you will also need:
+and optionally:
 
-  * gacutil
-  * GAPI >= 2.12
-  * GAPI-codegen
-  * GAPI-fixup
+  * pyclutter-gtk >= 0.10
+  * pymemphis >= 0.2
 
-If you are building the C# bindings, you will also need:
+The usual rules for building apply -
 
-  * gacutil
-  * GAPI >= 2.12
-  * GAPI-codegen
-  * GAPI-fixup
-  * Gtk-sharp >= 2.12
-  * Clutter-sharp >= 1.0
-  * Clutter-Gtk-sharp >= 0.10
+configure; make; sudo make install; sudo ldconfig
+
+should do the right thing. For more details consult the INSTALL file in this 
+directory.
 
 The official website is:
    http://projects.gnome.org/libchamplain
