@@ -66,8 +66,9 @@ IDT_COMPILE_WARNINGS
 # Check for libsoup, use libsoup-gnome if available
 # -----------------------------------------------------------
 PKG_CHECK_MODULES(SOUP_GNOME, libsoup-gnome-2.4 >= 2.26, [
-    SOUP=SOUP_GNOME
     have_soup_gnome="yes"
+    SOUP_CFLAGS=$SOUP_GNOME_CFLAGS
+    SOUP_LIBS=$SOUP_GNOME_LIBS
     SOUP_DEP="libsoup-gnome-2.4"
     AC_DEFINE(HAVE_LIBSOUP_GNOME,1,[libsoup gnome integration])
     ], have_soup_gnome="no")
