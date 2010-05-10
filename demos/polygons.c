@@ -121,7 +121,6 @@ main (int argc,
   champlain_polygon_append_point (polygon, 45.4151, -73.1218);
   champlain_polygon_set_stroke_width (polygon, 5.0);
   champlain_view_add_polygon (CHAMPLAIN_VIEW (actor), polygon);
-  g_object_unref (G_OBJECT (polygon));
 
   /* draw a polygon */
   polygon = champlain_polygon_new ();
@@ -133,7 +132,6 @@ main (int argc,
   g_object_set (polygon, "closed-path", TRUE, NULL);
   g_object_set (polygon, "fill", TRUE, NULL);
   champlain_view_add_polygon (CHAMPLAIN_VIEW (actor), polygon);
-  g_object_unref (G_OBJECT (polygon));
 
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (actor), "zoom-level", 8,
