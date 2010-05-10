@@ -745,7 +745,7 @@ champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
   ClutterActor *cairo_texture;
   cairo_t *cr;
 
-  if (!priv->visible)
+  if (!priv->visible || width == 0 || height == 0)
     return;
 
   clutter_group_remove_all (CLUTTER_GROUP (polygon));
