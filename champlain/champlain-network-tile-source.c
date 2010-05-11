@@ -398,7 +398,7 @@ champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_so
                   NULL);
 
   if (uri)
-    g_object_unref (uri);
+    soup_uri_free (uri);
 
   g_object_notify (G_OBJECT (tile_source), "proxy-uri");
 }
