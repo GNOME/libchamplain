@@ -25,6 +25,8 @@
 
 #include <glib-object.h>
 
+G_BEGIN_DECLS
+
 typedef struct _ChamplainPoint ChamplainPoint;
 
 /**
@@ -50,5 +52,7 @@ void champlain_point_free (ChamplainPoint *point);
 
 ChamplainPoint * champlain_point_new (gdouble lat,
     gdouble lon);
+
+G_END_DECLS
 
 #endif

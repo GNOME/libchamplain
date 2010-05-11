@@ -26,6 +26,8 @@
 #include <gtk/gtk.h>
 #include <champlain/champlain.h>
 
+G_BEGIN_DECLS
+
 #define GTK_TYPE_CHAMPLAIN_EMBED     (gtk_champlain_embed_get_type())
 #define GTK_CHAMPLAIN_EMBED(obj)     (G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbed))
 #define GTK_CHAMPLAIN_EMBED_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST((klass),  GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbedClass))
@@ -56,5 +58,7 @@ GType gtk_champlain_embed_get_type (void);
 
 GtkWidget *gtk_champlain_embed_new (void);
 ChamplainView *gtk_champlain_embed_get_view (GtkChamplainEmbed* embed);
+
+G_END_DECLS
 
 #endif
