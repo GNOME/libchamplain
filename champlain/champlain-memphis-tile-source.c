@@ -552,6 +552,7 @@ champlain_memphis_tile_source_load_rules (
           memphis_rule_set_load_from_data (priv->rules, default_rules,
                                            strlen (default_rules), NULL);
           g_static_rw_lock_writer_unlock (&MemphisLock);
+          g_error_free (err);
           return;
        }
     }
