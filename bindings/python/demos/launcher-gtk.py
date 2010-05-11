@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import gobject
-import gtk
+
+import champlaingtk # must be the first to be imported
 import champlain
-import champlaingtk
+import gtk
 
 from markers import create_marker_layer
 

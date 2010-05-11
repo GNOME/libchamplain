@@ -9,6 +9,7 @@ headers
 %%
 modulename champlain
 %%
+import cluttergtk.Embed as PyClutterGtkEmbed_Type
 import gtk.Alignment as PyGtkAlignment_Type
 import clutter.Actor as PyClutterActor_Type
 import clutter.Group as PyClutterGroup_Type
