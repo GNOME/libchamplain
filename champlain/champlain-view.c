@@ -1193,12 +1193,16 @@ button_release_cb (ClutterActor *actor,
 
   for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->user_layers)); i++)
     {
-      ChamplainSelectionLayer *layer = CHAMPLAIN_SELECTION_LAYER (clutter_group_get_nth_child (CLUTTER_GROUP (priv->user_layers), i));
+      ClutterActor *actor = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (priv->user_layers), i));
 
-      if (layer && champlain_selection_layer_count_selected_markers (layer ) > 0)
+      if (actor && CHAMPLAIN_IS_SELECTION_LAYER (actor))
         {
-          champlain_selection_layer_unselect_all (layer);
-          found = TRUE;
+          ChamplainSelectionLayer *layer = CHAMPLAIN_SELECTION_LAYER (actor);
+          if (champlain_selection_layer_count_selected_markers (layer) > 0)
+            {
+              champlain_selection_layer_unselect_all (layer);
+              found = TRUE;
+            }
         }
     }
 
