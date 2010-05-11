@@ -80,6 +80,7 @@ EXTRA_DIST =			\
 	pychamplain.h		\
 	pychamplainmemphis.override	\
 	pychamplainmemphis-boxed-types.defs	\
+	pychamplainmemphis-constructors.defs	\
 	pychamplainmemphis-base.defs	\
 	pychamplainmemphis.defs	\
 	pychamplainmemphis.h
