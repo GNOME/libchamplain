@@ -60,7 +60,7 @@ GType champlain_base_marker_get_type (void);
 ClutterActor *champlain_base_marker_new (void);
 
 void champlain_base_marker_set_position (ChamplainBaseMarker *marker,
-    gdouble longitude, gdouble latitude);
+    gdouble latitude, gdouble longitude);
 gdouble champlain_base_marker_get_latitude (ChamplainBaseMarker *marker);
 gdouble champlain_base_marker_get_longitude (ChamplainBaseMarker *marker);
 void champlain_base_marker_set_highlighted (ChamplainBaseMarker *marker,
