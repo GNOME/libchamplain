@@ -255,8 +255,6 @@ init_cache  (ChamplainFileCache *file_cache)
   gchar *error_msg = NULL;
   gint error;
 
-  g_print ("init! '%d'\n", champlain_tile_cache_get_persistent (tile_cache));
-
   if (champlain_tile_cache_get_persistent (tile_cache))
     {
       priv->real_cache_dir = g_strdup (priv->cache_dir);
