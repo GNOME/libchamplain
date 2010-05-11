@@ -22,6 +22,10 @@
 #include <champlain/champlain-memphis.h>
 #include <champlain-gtk/champlain-gtk.h>
 #include <clutter-gtk/clutter-gtk.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/socket.h>
 
 #define N_COLS 2
 #define COL_ID 0
@@ -668,14 +672,6 @@ void list_item_selected_cb (GtkTreeView *tree_view,
 
       g_free (id);
     }
-}
-
-static gboolean
-delete_window (GtkWidget *widget,
-               GdkEvent  *event,
-               gpointer   user_data)
-{
-  gtk_main_quit ();
 }
 
 int
