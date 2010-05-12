@@ -34,7 +34,7 @@ G_DEFINE_TYPE (ChamplainErrorTileSource, champlain_error_tile_source, CHAMPLAIN_
 
 struct _ChamplainErrorTileSourcePrivate
 {
-  ClutterActor *error_actor;
+  CoglHandle error_tex;
 };
 
 static void fill_tile (ChamplainMapSource *map_source,
@@ -43,6 +43,14 @@ static void fill_tile (ChamplainMapSource *map_source,
 static void
 champlain_error_tile_source_dispose (GObject *object)
 {
+  ChamplainErrorTileSourcePrivate *priv = CHAMPLAIN_ERROR_TILE_SOURCE (object)->priv;
+
+  if (priv->error_tex)
+    {
+      cogl_handle_unref (priv->error_tex);
+      priv->error_tex = NULL;
+    }
+
   G_OBJECT_CLASS (champlain_error_tile_source_parent_class)->dispose (object);
 }
 
@@ -73,7 +81,7 @@ champlain_error_tile_source_init (ChamplainErrorTileSource *error_source)
 
   error_source->priv = priv;
 
-  priv->error_actor = NULL;
+  priv->error_tex = NULL;
 }
 
 /**
@@ -112,15 +120,14 @@ fill_tile (ChamplainMapSource *map_source,
 
   size = champlain_map_source_get_tile_size (map_source);
 
-  if (!priv->error_actor)
+  if (!priv->error_tex)
     {
       cairo_t *cr;
       cairo_pattern_t *pat;
-      ClutterActor *stage;
+      ClutterActor *tmp_actor;
 
-      priv->error_actor = clutter_cairo_texture_new (size, size);
-      cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (priv->error_actor));
-      stage = clutter_stage_get_default ();
+      tmp_actor = clutter_cairo_texture_new (size, size);
+      cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (tmp_actor));
 
       /* draw a linear gray to white pattern */
       pat = cairo_pattern_create_linear (size / 2.0, 0.0,  size, size / 2.0);
@@ -144,12 +151,15 @@ fill_tile (ChamplainMapSource *map_source,
 
       cairo_destroy (cr);
 
-      clutter_container_add_actor (CLUTTER_CONTAINER (stage), priv->error_actor);
-      clutter_actor_hide (priv->error_actor);
+      priv->error_tex = clutter_texture_get_cogl_texture (CLUTTER_TEXTURE (tmp_actor));
+      cogl_handle_ref (priv->error_tex);
+
+      g_object_ref_sink (tmp_actor);
+      g_object_unref (tmp_actor);
     }
 
-  clone = clutter_clone_new (priv->error_actor);
-
+  clone = clutter_texture_new ();
+  clutter_texture_set_cogl_texture (CLUTTER_TEXTURE (clone), priv->error_tex);
   champlain_tile_set_content (tile, clone);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 }
