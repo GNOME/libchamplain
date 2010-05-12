@@ -654,6 +654,7 @@ tile_loaded_cb (ClutterTexture *texture,
       int sql_rc = SQLITE_OK;
 
       /* Retrieve etag */
+      sqlite3_reset (priv->stmt_select);
       sql_rc = sqlite3_bind_text (priv->stmt_select, 1, filename, -1, SQLITE_STATIC);
       if (sql_rc == SQLITE_ERROR)
         {
@@ -700,7 +701,6 @@ load_next:
     champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
 
 cleanup:
-  sqlite3_reset (priv->stmt_select);
   g_free (filename);
   g_object_unref (map_source);
 }
@@ -883,8 +883,8 @@ on_tile_filled (ChamplainTileCache *tile_cache,
   filename = get_filename (file_cache, tile);
 
   DEBUG ("popularity of %s", filename);
-  sqlite3_reset (priv->stmt_update);
 
+  sqlite3_reset (priv->stmt_update);
   sql_rc = sqlite3_bind_text (priv->stmt_update, 1, filename, -1, SQLITE_STATIC);
   if (sql_rc != SQLITE_OK)
     {
