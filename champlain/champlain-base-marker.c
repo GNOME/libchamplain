@@ -347,7 +347,6 @@ void
 champlain_base_marker_animate_in_with_delay (ChamplainBaseMarker *marker,
     guint delay)
 {
-  ClutterAnimation *animation;
   ClutterTimeline *timeline;
   gfloat y;
 
@@ -361,10 +360,9 @@ champlain_base_marker_animate_in_with_delay (ChamplainBaseMarker *marker,
 
   timeline = clutter_timeline_new (1000);
   clutter_timeline_set_delay (timeline, delay);
-  animation = clutter_actor_animate_with_timeline (CLUTTER_ACTOR (marker),
+  clutter_actor_animate_with_timeline (CLUTTER_ACTOR (marker),
       CLUTTER_EASE_OUT_BOUNCE, timeline, "opacity", 255, "y", y,
       "scale-x", 1.0, "scale-y", 1.0, NULL);
-  timeline = clutter_animation_get_timeline (animation);
 }
 
 /**
@@ -429,7 +427,6 @@ champlain_base_marker_animate_out_with_delay (ChamplainBaseMarker *marker,
   animation = clutter_actor_animate_with_timeline (CLUTTER_ACTOR (marker),
       CLUTTER_EASE_IN_BACK, timeline, "opacity", 0, "y", y - 100,
       "scale-x", 2.0, "scale-y", 2.0, NULL);
-  timeline = clutter_animation_get_timeline (animation);
   g_signal_connect (animation, "completed",
       G_CALLBACK (on_animation_completed), marker);
 }

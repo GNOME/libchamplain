@@ -193,7 +193,8 @@ image_downloaded_cb (SoupSession *session,
   clutter_actor_show_all (marker);
 
 cleanup:
-  g_object_unref (marker_data->layer);
+  if (marker_data)
+    g_object_unref (marker_data->layer);
   g_free (marker_data);
   g_free (url);
 

@@ -1032,7 +1032,7 @@ champlain_file_cache_purge (ChamplainFileCache *file_cache)
   rc = sqlite3_step (stmt);
   while (rc == SQLITE_ROW && current_size > priv->size_limit)
     {
-      const char *filename = sqlite3_column_text (stmt, 0);
+      const char *filename;
       guint size;
 
       filename = sqlite3_column_text (stmt, 0);
@@ -1072,7 +1072,7 @@ delete_dir_recursive (GFile *parent)
   GFile *child;
 
   enumerator = g_file_enumerate_children (parent, "*",
-                                          G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, NULL);
+                                          G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &error);
 
   if (!enumerator)
     {

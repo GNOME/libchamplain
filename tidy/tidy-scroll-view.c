@@ -76,10 +76,10 @@ static void
 tidy_scroll_view_dispose (GObject *object)
 {
   TidyScrollViewPrivate *priv = TIDY_SCROLL_VIEW (object)->priv;
-  
+
   if (priv->child)
     clutter_container_remove_actor (CLUTTER_CONTAINER (object), priv->child);
-  
+
   G_OBJECT_CLASS (tidy_scroll_view_parent_class)->dispose (object);
 }
 
@@ -93,7 +93,7 @@ static void
 tidy_scroll_view_paint (ClutterActor *actor)
 {
   TidyScrollViewPrivate *priv = TIDY_SCROLL_VIEW (actor)->priv;
-  
+
   if (priv->child && CLUTTER_ACTOR_IS_VISIBLE (priv->child))
     clutter_actor_paint (priv->child);
 }
@@ -103,7 +103,7 @@ tidy_scroll_view_pick (ClutterActor *actor, const ClutterColor *color)
 {
   /* Chain up so we get a bounding box pained (if we are reactive) */
   CLUTTER_ACTOR_CLASS (tidy_scroll_view_parent_class)->pick (actor, color);
-  
+
   /* Trigger pick on children */
   tidy_scroll_view_paint (actor);
 }
@@ -116,17 +116,17 @@ tidy_scroll_view_get_preferred_width (ClutterActor *actor,
 {
 
   TidyScrollViewPrivate *priv = TIDY_SCROLL_VIEW (actor)->priv;
-  
+
   if (!priv->child)
     return;
-  
+
 
   /* Our natural width is the natural width of the child */
   clutter_actor_get_preferred_width (priv->child,
                                      for_height,
                                      NULL,
                                      natural_width_p);
-  
+
 }
 
 static void
@@ -137,10 +137,10 @@ tidy_scroll_view_get_preferred_height (ClutterActor *actor,
 {
 
   TidyScrollViewPrivate *priv = TIDY_SCROLL_VIEW (actor)->priv;
-  
+
   if (!priv->child)
     return;
-  
+
 
   /* Our natural height is the natural height of the child */
   clutter_actor_get_preferred_height (priv->child,
@@ -192,13 +192,13 @@ tidy_scroll_view_class_init (TidyScrollViewClass *klass)
   object_class->set_property = tidy_scroll_view_set_property;
   object_class->dispose= tidy_scroll_view_dispose;
   object_class->finalize = tidy_scroll_view_finalize;
-  
+
   actor_class->paint = tidy_scroll_view_paint;
   actor_class->pick = tidy_scroll_view_pick;
   actor_class->get_preferred_width = tidy_scroll_view_get_preferred_width;
   actor_class->get_preferred_height = tidy_scroll_view_get_preferred_height;
   actor_class->allocate = tidy_scroll_view_allocate;
-  
+
   g_object_class_install_property (object_class,
                                    PROP_CHILD,
                                    g_param_spec_object ("child",
@@ -211,8 +211,7 @@ tidy_scroll_view_class_init (TidyScrollViewClass *klass)
 static void
 tidy_scroll_view_init (TidyScrollView *self)
 {
-  TidyScrollViewPrivate *priv = self->priv = SCROLL_VIEW_PRIVATE (self);
-  
+  self->priv = SCROLL_VIEW_PRIVATE (self);
 }
 
 static void
@@ -221,7 +220,7 @@ tidy_scroll_view_add_actor (ClutterContainer *container,
 {
   TidyScrollView *self = TIDY_SCROLL_VIEW (container);
   TidyScrollViewPrivate *priv = self->priv;
-  
+
   if (priv->child)
     {
       g_warning ("Attempting to add an actor of type %s to "
@@ -236,19 +235,18 @@ tidy_scroll_view_add_actor (ClutterContainer *container,
         {
           priv->child = actor;
           clutter_actor_set_parent (actor, CLUTTER_ACTOR (container));
-          
+
           /* Notify that child has been set */
           g_signal_emit_by_name (container, "actor-added", priv->child);
           g_object_notify (G_OBJECT (container), "child");
- 		
+
           clutter_actor_queue_relayout (CLUTTER_ACTOR (container));
         }
       else
         {
-          g_warning ("Attempting to add an actor of type %s to "
+          g_warning ("Attempting to add an actor to "
                      "a TidyScrollView, but the actor does "
-                     "not implement TidyScrollable.",
-                     g_type_name (G_OBJECT_TYPE (actor)));
+                     "not implement TidyScrollable.");
         }
     }
 }
@@ -258,12 +256,12 @@ tidy_scroll_view_remove_actor (ClutterContainer *container,
                                ClutterActor     *actor)
 {
   TidyScrollViewPrivate *priv = TIDY_SCROLL_VIEW (container)->priv;
-  
+
   if (actor == priv->child)
     {
       g_object_ref (priv->child);
-      
-      
+
+
       clutter_actor_unparent (priv->child);
 
       g_signal_emit_by_name (container, "actor-removed", priv->child);
@@ -332,10 +330,10 @@ ClutterActor *
 tidy_scroll_view_get_child (TidyScrollView *scroll)
 {
   TidyScrollViewPrivate *priv;
-  
+
   g_return_val_if_fail (TIDY_IS_SCROLL_VIEW (scroll), NULL);
-  
+
   priv = scroll->priv;
-  
+
   return priv->child;
 }

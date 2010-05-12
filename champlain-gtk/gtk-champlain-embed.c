@@ -152,9 +152,6 @@ gtk_champlain_embed_dispose (GObject *object)
 static void
 gtk_champlain_embed_finalize (GObject *object)
 {
-  GtkChamplainEmbed *embed = GTK_CHAMPLAIN_EMBED (object);
-  GtkChamplainEmbedPrivate *priv = embed->priv;
-
   G_OBJECT_CLASS (gtk_champlain_embed_parent_class)->finalize (object);
 }
 

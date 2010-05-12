@@ -118,7 +118,6 @@ main (int argc,
   clutter_actor_set_reactive (button, TRUE);
   clutter_actor_set_position (button, total_width, 0);
   clutter_actor_get_size (button, &width, NULL);
-  total_width += width + PADDING;
   g_signal_connect (button, "button-release-event",
       G_CALLBACK (zoom_out),
       actor);

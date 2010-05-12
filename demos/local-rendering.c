@@ -803,7 +803,6 @@ main (int argc,
   GtkWidget *tree_view, *scrolled;
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
-  GtkTreeSelection *selection;
 
   store = gtk_list_store_new (1, G_TYPE_STRING);
 
@@ -816,7 +815,7 @@ main (int argc,
   gtk_tree_view_append_column (GTK_TREE_VIEW (tree_view), column);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (tree_view), FALSE);
 
-  selection = gtk_tree_view_get_selection (GTK_TREE_VIEW(tree_view));
+  gtk_tree_view_get_selection (GTK_TREE_VIEW(tree_view));
   g_signal_connect (tree_view, "row-activated", G_CALLBACK(list_item_selected_cb), view);
 
   scrolled = gtk_scrolled_window_new (NULL, NULL);
