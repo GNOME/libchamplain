@@ -236,7 +236,7 @@ champlain_map_source_get_next_source (ChamplainMapSource *map_source)
 }
 
 static
-void reload_tiles_cb (ChamplainMapSource *orig, ChamplainMapSource *self)
+void reload_tiles_cb (G_GNUC_UNUSED ChamplainMapSource *orig, ChamplainMapSource *self)
 {
   /* propagate the signal up the chain */
   g_signal_emit_by_name (self, "reload-tiles", NULL);
@@ -604,7 +604,7 @@ gdouble
 champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source,
     guint zoom_level,
     gdouble latitude,
-    gdouble longitude)
+    G_GNUC_UNUSED gdouble longitude)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0.0);
 

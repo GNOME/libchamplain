@@ -60,7 +60,7 @@ pixbuf_new_from_message (SoupMessage *message,
 
   gdk_pixbuf_loader_write (
       loader,
-      message->response_body->data,
+      (guchar *)message->response_body->data,
       message->response_body->length,
       error);
   if (*error != NULL)

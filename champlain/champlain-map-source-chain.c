@@ -224,7 +224,7 @@ fill_tile (ChamplainMapSource *map_source,
 
 static void
 on_set_next_source (ChamplainMapSource *map_source,
-    ChamplainMapSource *old_next_source,
+    G_GNUC_UNUSED ChamplainMapSource *old_next_source,
     ChamplainMapSource *new_next_source)
 {
   ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
@@ -258,7 +258,7 @@ assign_cache_of_next_source_sequence (ChamplainMapSourceChain *source_chain,
 }
 
 static void
-reload_tiles_cb (ChamplainMapSource *map_source,
+reload_tiles_cb (G_GNUC_UNUSED ChamplainMapSource *map_source,
     ChamplainMapSourceChain *source_chain)
 {
   /* propagate the signal from the chain that is inside champlain_map_source_chain */

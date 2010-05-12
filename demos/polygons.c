@@ -21,8 +21,8 @@
 #define PADDING 10
 
 static gboolean
-zoom_in (ClutterActor *actor,
-    ClutterButtonEvent *event,
+zoom_in (G_GNUC_UNUSED ClutterActor *actor,
+    G_GNUC_UNUSED ClutterButtonEvent *event,
     ChamplainView * view)
 {
   champlain_view_zoom_in (view);
@@ -30,8 +30,8 @@ zoom_in (ClutterActor *actor,
 }
 
 static gboolean
-zoom_out (ClutterActor *actor,
-    ClutterButtonEvent *event,
+zoom_out (G_GNUC_UNUSED ClutterActor *actor,
+    G_GNUC_UNUSED ClutterButtonEvent *event,
     ChamplainView * view)
 {
   champlain_view_zoom_out (view);

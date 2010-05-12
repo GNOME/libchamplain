@@ -294,7 +294,7 @@ ChamplainMemphisTileSource* champlain_memphis_tile_source_new_full (const gchar 
 
 static void
 map_data_changed_cb (ChamplainMapDataSource *map_data_source,
-     GParamSpec *gobject,
+     G_GNUC_UNUSED GParamSpec *gobject,
      ChamplainMemphisTileSource *tile_source)
 {
   g_assert (CHAMPLAIN_IS_MAP_DATA_SOURCE (map_data_source) &&
@@ -417,7 +417,7 @@ cleanup:
 
 static void
 memphis_worker_thread (gpointer worker_data,
-    gpointer user_data)
+    G_GNUC_UNUSED gpointer user_data)
 {
   WorkerThreadData *data = (WorkerThreadData *)worker_data;
   ChamplainMemphisTileSource *tile_source = CHAMPLAIN_MEMPHIS_TILE_SOURCE (data->map_source);

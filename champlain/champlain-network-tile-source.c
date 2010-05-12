@@ -490,7 +490,7 @@ get_tile_uri (ChamplainNetworkTileSource *tile_source,
 }
 
 static void
-tile_destroyed_cb (ChamplainTile *tile,
+tile_destroyed_cb (G_GNUC_UNUSED ChamplainTile *tile,
     TileDestroyedCbData *data)
 {
   if (data->map_source && data->msg)
@@ -504,7 +504,7 @@ tile_destroyed_cb (ChamplainTile *tile,
 
 static void
 destroy_cb_data (TileDestroyedCbData *data,
-    GClosure *closure)
+    G_GNUC_UNUSED GClosure *closure)
 {
   if (data->map_source)
     g_object_remove_weak_pointer(G_OBJECT (data->map_source), (gpointer*)&data->map_source);
@@ -513,7 +513,7 @@ destroy_cb_data (TileDestroyedCbData *data,
 }
 
 static void
-tile_loaded_cb (SoupSession *session,
+tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
     SoupMessage *msg,
     gpointer user_data)
 {

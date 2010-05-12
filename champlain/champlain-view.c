@@ -361,7 +361,7 @@ update_viewport (ChamplainView *view,
 }
 
 static void
-panning_completed (TidyFingerScroll *scroll,
+panning_completed (G_GNUC_UNUSED TidyFingerScroll *scroll,
     ChamplainView *view)
 {
   gfloat x, y;
@@ -373,7 +373,7 @@ panning_completed (TidyFingerScroll *scroll,
 }
 
 static gboolean
-scroll_event (ClutterActor *actor,
+scroll_event (G_GNUC_UNUSED ClutterActor *actor,
     ClutterScrollEvent *event,
     ChamplainView *view)
 {
@@ -410,14 +410,14 @@ marker_reposition_cb (ChamplainMarker *marker,
 
 static void
 notify_marker_reposition_cb (ChamplainMarker *marker,
-    GParamSpec *arg1,
+    G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainView *view)
 {
   marker_reposition_cb (marker, view);
 }
 
 static void
-layer_add_marker_cb (ClutterGroup *layer,
+layer_add_marker_cb (G_GNUC_UNUSED ClutterGroup *layer,
     ChamplainMarker *marker,
     ChamplainView *view)
 {
@@ -471,7 +471,7 @@ redraw_polygon_on_idle (PolygonRedrawContext *ctx)
 
 static void
 notify_polygon_cb (ChamplainPolygon *polygon,
-    GParamSpec *arg1,
+    G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
@@ -851,7 +851,7 @@ champlain_view_realize (ClutterActor *actor)
  */
 static void
 champlain_view_get_preferred_width (ClutterActor *actor,
-    gfloat for_height,
+    G_GNUC_UNUSED gfloat for_height,
     gfloat *min_width,
     gfloat *nat_width)
 {
@@ -867,7 +867,7 @@ champlain_view_get_preferred_width (ClutterActor *actor,
 
 static void
 champlain_view_get_preferred_height (ClutterActor *actor,
-    gfloat for_width,
+    G_GNUC_UNUSED gfloat for_width,
     gfloat *min_height,
     gfloat *nat_height)
 {
@@ -1180,7 +1180,7 @@ create_license (ChamplainView *view)
 }
 
 static gboolean
-button_release_cb (ClutterActor *actor,
+button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
     ClutterEvent *event,
     ChamplainView *view)
 {
@@ -1516,8 +1516,8 @@ perform_update_cb (ChamplainView *view)
 }
 
 static void
-viewport_pos_changed_cb (GObject *gobject,
-    GParamSpec *arg1,
+viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
+    G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
@@ -1582,7 +1582,7 @@ update_license (ChamplainView *view)
 }
 
 static gboolean
-finger_scroll_button_press_cb (ClutterActor *actor,
+finger_scroll_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
     ClutterButtonEvent *event,
     ChamplainView *view)
 {
@@ -1678,7 +1678,7 @@ champlain_view_scroll_down (ChamplainView* view)
 
 
 static gboolean
-finger_scroll_key_press_cb (ClutterActor *actor,
+finger_scroll_key_press_cb (G_GNUC_UNUSED ClutterActor *actor,
     ClutterKeyEvent *event,
     ChamplainView *view)
 {
@@ -1830,8 +1830,8 @@ champlain_view_center_on (ChamplainView *view,
 }
 
 static void
-timeline_new_frame (ClutterTimeline *timeline,
-    gint frame_num,
+timeline_new_frame (G_GNUC_UNUSED ClutterTimeline *timeline,
+    G_GNUC_UNUSED gint frame_num,
     GoToContext *ctx)
 {
   gdouble alpha;
@@ -1848,7 +1848,7 @@ timeline_new_frame (ClutterTimeline *timeline,
 }
 
 static void
-timeline_completed (ClutterTimeline *timeline,
+timeline_completed (G_GNUC_UNUSED ClutterTimeline *timeline,
                     ChamplainView *view)
 {
   champlain_view_stop_go_to (view);
@@ -2400,7 +2400,7 @@ view_position_tile (ChamplainView* view,
 }
 
 static void
-view_reload_tiles_cb (ChamplainMapSource *map_source,
+view_reload_tiles_cb (G_GNUC_UNUSED ChamplainMapSource *map_source,
     ChamplainView* view)
 {
   clutter_group_remove_all (CLUTTER_GROUP (view->priv->map_layer));
@@ -2429,7 +2429,7 @@ tile_destroyed_cb (GObject *gobject,
 
 static void
 tile_state_notify (GObject *gobject,
-    GParamSpec *pspec,
+    G_GNUC_UNUSED GParamSpec *pspec,
     gpointer data)
 {
   view_update_state (CHAMPLAIN_VIEW (data), CHAMPLAIN_TILE (gobject));

@@ -121,7 +121,7 @@ champlain_map_data_source_finalize (GObject *object)
 }
 
 static MemphisMap *
-champlain_map_data_source_real_get_map_data (ChamplainMapDataSource *self)
+champlain_map_data_source_real_get_map_data (G_GNUC_UNUSED ChamplainMapDataSource *self)
 {
   g_error ("Should not be reached");
   return NULL;

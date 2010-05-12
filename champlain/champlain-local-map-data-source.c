@@ -48,7 +48,7 @@ struct _ChamplainLocalMapDataSourcePrivate {
 static void
 champlain_local_map_data_source_get_property (GObject *object,
     guint property_id,
-    GValue *value,
+    G_GNUC_UNUSED GValue *value,
     GParamSpec *pspec)
 {
   switch (property_id)
@@ -61,7 +61,7 @@ champlain_local_map_data_source_get_property (GObject *object,
 static void
 champlain_local_map_data_source_set_property (GObject *object,
     guint property_id,
-    const GValue *value,
+    G_GNUC_UNUSED const GValue *value,
     GParamSpec *pspec)
 {
   switch (property_id)

@@ -788,8 +788,8 @@ champlain_marker_queue_redraw (ChamplainMarker *marker)
 
 static void
 notify_highlighted (GObject *gobject,
-    GParamSpec *pspec,
-    gpointer user_data)
+    G_GNUC_UNUSED GParamSpec *pspec,
+    G_GNUC_UNUSED gpointer user_data)
 {
   champlain_marker_queue_redraw (CHAMPLAIN_MARKER (gobject));
 }

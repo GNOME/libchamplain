@@ -41,7 +41,7 @@ marker_button_release_cb (ClutterActor *actor,
 */
 
 ChamplainLayer *
-create_marker_layer (ChamplainView *view)
+create_marker_layer (G_GNUC_UNUSED ChamplainView *view)
 {
   ClutterActor *marker;
   ChamplainLayer *layer;

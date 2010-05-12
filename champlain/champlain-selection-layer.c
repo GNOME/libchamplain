@@ -220,7 +220,7 @@ marker_clicked_cb (ClutterActor *actor,
 static void
 layer_add_cb (ClutterGroup *layer,
     ClutterActor *actor,
-    gpointer data)
+    G_GNUC_UNUSED gpointer data)
 {
   ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
 
@@ -233,7 +233,7 @@ layer_add_cb (ClutterGroup *layer,
 static void
 layer_remove_cb (ClutterGroup *layer,
     ClutterActor *actor,
-    gpointer data)
+    G_GNUC_UNUSED gpointer data)
 {
   g_signal_handlers_disconnect_by_func (G_OBJECT (actor),
       G_CALLBACK (marker_clicked_cb), layer);

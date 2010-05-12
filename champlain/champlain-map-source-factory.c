@@ -89,7 +89,7 @@ static ChamplainMapSource * champlain_map_source_new_memphis (
 static void
 champlain_map_source_factory_get_property (GObject *object,
     guint prop_id,
-    GValue *value,
+    G_GNUC_UNUSED GValue *value,
     GParamSpec *pspec)
 {
   //ChamplainMapSourceFactory *map_source_factory = CHAMPLAIN_MAP_SOURCE_FACTORY(object);
@@ -105,7 +105,7 @@ champlain_map_source_factory_get_property (GObject *object,
 static void
 champlain_map_source_factory_set_property (GObject *object,
     guint prop_id,
-    const GValue *value,
+    G_GNUC_UNUSED const GValue *value,
     GParamSpec *pspec)
 {
   //ChamplainMapSourceFactory *map_source_factory = CHAMPLAIN_MAP_SOURCE_FACTORY(object);
@@ -455,7 +455,7 @@ champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
 
 static ChamplainMapSource *
 champlain_map_source_new_generic (
-    ChamplainMapSourceDesc *desc, gpointer user_data)
+    ChamplainMapSourceDesc *desc, G_GNUC_UNUSED gpointer user_data)
 {
   return CHAMPLAIN_MAP_SOURCE (champlain_network_tile_source_new_full (
       desc->id,
@@ -472,7 +472,7 @@ champlain_map_source_new_generic (
 #ifdef CHAMPLAIN_HAS_MEMPHIS
 static ChamplainMapSource *
 champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
-    gpointer user_data)
+    G_GNUC_UNUSED gpointer user_data)
 {
   ChamplainMapDataSource *map_data_source;
 

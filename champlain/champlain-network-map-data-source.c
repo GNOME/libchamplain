@@ -233,7 +233,7 @@ champlain_network_map_data_source_new (void)
 }
 
 static void
-load_map_data_cb (SoupSession *session, SoupMessage *msg,
+load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
     gpointer user_data)
 {
   ChamplainNetworkMapDataSource *self =

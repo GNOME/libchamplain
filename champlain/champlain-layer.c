@@ -63,7 +63,7 @@ static void layer_remove_cb (ClutterGroup *layer,
 static void
 champlain_layer_get_property (GObject *object,
     guint property_id,
-    GValue *value,
+    G_GNUC_UNUSED GValue *value,
     GParamSpec *pspec)
 {
   //ChamplainLayer *self = CHAMPLAIN_LAYER (object);
@@ -77,7 +77,7 @@ champlain_layer_get_property (GObject *object,
 static void
 champlain_layer_set_property (GObject *object,
     guint property_id,
-    const GValue *value,
+    G_GNUC_UNUSED const GValue *value,
     GParamSpec *pspec)
 {
   //ChamplainLayer *self = CHAMPLAIN_LAYER (object);
@@ -149,7 +149,7 @@ reorder_marker (ClutterGroup *layer,
 
 static void
 marker_position_notify (GObject *gobject,
-    GParamSpec *pspec,
+    G_GNUC_UNUSED GParamSpec *pspec,
     gpointer user_data)
 {
   reorder_marker (CLUTTER_GROUP (user_data), CHAMPLAIN_BASE_MARKER (gobject));
@@ -158,7 +158,7 @@ marker_position_notify (GObject *gobject,
 static void
 layer_add_cb (ClutterGroup *layer,
     ClutterActor *actor,
-    gpointer data)
+    G_GNUC_UNUSED gpointer data)
 {
   ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
   reorder_marker (layer, marker);
@@ -170,7 +170,7 @@ layer_add_cb (ClutterGroup *layer,
 static void
 layer_remove_cb (ClutterGroup *layer,
     ClutterActor *actor,
-    gpointer data)
+    G_GNUC_UNUSED gpointer data)
 {
   g_signal_handlers_disconnect_by_func (G_OBJECT (actor),
       G_CALLBACK (marker_position_notify), layer);

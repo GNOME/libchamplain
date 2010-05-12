@@ -395,7 +395,7 @@ on_idle (ChamplainBaseMarker* marker)
 }
 
 static void
-on_animation_completed (ClutterAnimation* animation,
+on_animation_completed (G_GNUC_UNUSED ClutterAnimation* animation,
     ChamplainBaseMarker *marker)
 {
   g_idle_add ((GSourceFunc) on_idle, marker);

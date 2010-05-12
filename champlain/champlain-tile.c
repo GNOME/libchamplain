@@ -509,7 +509,7 @@ champlain_tile_set_size (ChamplainTile *self,
 }
 
 static void
-fade_in_completed (ClutterAnimation *animation, ChamplainTile *self)
+fade_in_completed (G_GNUC_UNUSED ClutterAnimation *animation, ChamplainTile *self)
 {
   if (clutter_group_get_n_children (CLUTTER_GROUP (self)) > 1)
     clutter_actor_destroy (clutter_group_get_nth_child (CLUTTER_GROUP (self), 0));
