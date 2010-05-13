@@ -155,50 +155,44 @@ champlain-enum-types.c: $(libchamplain_headers) champlain-enum-types.h
 	&& mv champlain-enum-types.c.tmp champlain-enum-types.c \
 	|| rm -f champlain-enum-type.c.tmp
 
+
+
 if HAVE_INTROSPECTION
 
+-include $(INTROSPECTION_MAKEFILE)
+INTROSPECTION_GIRS =
+INTROSPECTION_SCANNER_ARGS = 
+INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
+
 if ENABLE_MEMPHIS
-memphis_gir_include = --include=Memphis-0.2
+memphis_gir_include = Memphis-0.2
 endif
 
-BUILT_GIRSOURCES =
+Champlain-@CHAMPLAIN_API_VERSION@.gir: libchamplain-@CHAMPLAIN_API_VERSION@.la
+Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_NAMESPACE = Champlain
+Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_SCANNERFLAGS = --strip-prefix=Champlain
+Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_VERSION = @CHAMPLAIN_API_VERSION@
+Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_LIBS = libchamplain-@CHAMPLAIN_API_VERSION@.la
+Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_PACKAGES = gobject-2.0 gtk+-2.0
+Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_FILES = \
+	$(libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES) \
+	$(libchamplain_include_HEADERS)
+Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_INCLUDES = Clutter-1.0 Gtk-2.0 $(memphis_gir_include)
+Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_CFLAGS = \
+	$(DEPS_CFLAGS) $(SOUP_CFLAGS) $(MEMPHIS_CFLAGS) \
+	-I$(top_srcdir)/tidy -I$(top_srcdir) \
+	-DCHAMPLAIN_COMPILATION
 
-Champlain-@CHAMPLAIN_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libchamplain-@CHAMPLAIN_API_VERSION@.la
-	$(AM_V_GEN)$(INTROSPECTION_SCANNER) -v \
-	--namespace Champlain --nsversion=@CHAMPLAIN_API_VERSION@ \
-	--strip-prefix=Champlain \
-	$(DEPS_CFLAGS) \
-	$(SOUP_CFLAGS) \
-	$(MEMPHIS_CFLAGS) \
-	-I$(top_srcdir)/tidy		\
-	-I$(top_srcdir)			\
-	-DCHAMPLAIN_COMPILATION 	\
-	--add-include-path=$(builddir) \
-	--c-include="$(libchamplain_include_HEADERS)" \
-	--include=Clutter-1.0 \
-	--include=Gtk-2.0 \
-	$(memphis_gir_include) \
-	--library=champlain-@CHAMPLAIN_API_VERSION@ \
-	--libtool="$(LIBTOOL)" \
-	--output $@ \
-	--pkg gobject-2.0 \
-	--pkg gtk+-2.0 \
-	$(addprefix $(srcdir)/,$(libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES)) \
-	$(addprefix $(srcdir)/,$(libchamplain_include_HEADERS))
+INTROSPECTION_GIRS += Champlain-@CHAMPLAIN_API_VERSION@.gir
 
-BUILT_GIRSOURCES += Champlain-@CHAMPLAIN_API_VERSION@.gir
-
-# INTROSPECTION_GIRDIR/INTROSPECTION_TYPELIBDIR aren't the right place to
-# install anything - we need to install inside our prefix.
 girdir = $(datadir)/gir-1.0
-gir_DATA = $(BUILT_GIRSOURCES)
+dist_gir_DATA = $(INTROSPECTION_GIRS)
 
-typelibsdir = $(libdir)/girepository-1.0/
-typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
+typelibdir = $(libdir)/girepository-1.0
+typelib_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
 
-Champlain-@CHAMPLAIN_API_VERSION@.typelib: Champlain-@CHAMPLAIN_API_VERSION@.gir $(INTROSPECTION_COMPILER)
-	$(QUIET_GEN)$(DEBUG) $(INTROSPECTION_COMPILER) --includedir=$(srcdir) --includedir=. $(INTROSPECTION_COMPILER_OPTS) $< -o $(builddir)/$(@F)
+CLEANFILES += $(dist_gir_DATA) $(typelib_DATA)
 
-CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
 endif
+
 

@@ -38,42 +38,35 @@ AM_LDFLAGS = $(GTK_LIBS) -export-symbols-regex ^gtk_champlain_.*
 EXTRA_DIST = champlain-gtk-marshal.list
 
 if HAVE_INTROSPECTION
-BUILT_GIRSOURCES =
 
-GtkChamplain-@CHAMPLAIN_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
-	$(AM_V_GEN)$(INTROSPECTION_SCANNER) -v \
-	--namespace GtkChamplain --nsversion=@CHAMPLAIN_API_VERSION@ \
-	--strip-prefix=GtkChamplain \
-	$(GTK_CFLAGS) \
-	$(SOUP_CFLAGS) \
-	-I$(top_srcdir)			\
-	-DCHAMPLAIN_COMPILATION 	\
-	-DCHAMPLAIN_GTK_COMPILATION 	\
-	--add-include-path=$(top_builddir)/champlain \
-	--c-include="$(libchamplain_include_HEADERS)" \
-	--include=Champlain-0.5 \
-	--include=Clutter-1.0 \
-	--include=Gtk-2.0 \
-	--library=champlain-gtk-@CHAMPLAIN_API_VERSION@ \
-	--libtool="$(LIBTOOL)" \
-	--output $@ \
-	--pkg gobject-2.0 \
-	--pkg gtk+-2.0 \
-	$(addprefix $(srcdir)/,$(libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_SOURCES)) \
-	$(addprefix $(srcdir)/,$(libchamplain_include_HEADERS))
+-include $(INTROSPECTION_MAKEFILE)
+INTROSPECTION_GIRS =
+INTROSPECTION_SCANNER_ARGS = --add-include-path=$(top_builddir)/champlain
+INTROSPECTION_COMPILER_ARGS = 
 
-BUILT_GIRSOURCES += GtkChamplain-@CHAMPLAIN_API_VERSION@.gir
+GtkChamplain-@CHAMPLAIN_API_VERSION@.gir: libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
+GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_NAMESPACE = GtkChamplain
+GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_VERSION = @CHAMPLAIN_API_VERSION@
+GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_LIBS = libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
+GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_PACKAGES = gobject-2.0 gtk+-2.0
+GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_FILES = \
+	$(libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_SOURCES) \
+	$(libchamplain_include_HEADERS)
+GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_SCANNERFLAGS = --strip-prefix=GtkChamplain
+GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_INCLUDES = Clutter-1.0 Gtk-2.0 Champlain-@CHAMPLAIN_API_VERSION@
+GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_CFLAGS = \
+	$(DEPS_CFLAGS) $(SOUP_CFLAGS) $(GTK_CFLAGS) \
+	-I$(top_srcdir) \
+	-DCHAMPLAIN_COMPILATION -DCHAMPLAIN_GTK_COMPILATION
 
-# INTROSPECTION_GIRDIR/INTROSPECTION_TYPELIBDIR aren't the right place to
-# install anything - we need to install inside our prefix.
+INTROSPECTION_GIRS += GtkChamplain-@CHAMPLAIN_API_VERSION@.gir
+
 girdir = $(datadir)/gir-1.0
-gir_DATA = $(BUILT_GIRSOURCES)
+dist_gir_DATA = $(INTROSPECTION_GIRS)
 
-typelibsdir = $(libdir)/girepository-1.0/
-typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
+typelibdir = $(libdir)/girepository-1.0
+typelib_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
 
-GtkChamplain-@CHAMPLAIN_API_VERSION@.typelib: GtkChamplain-@CHAMPLAIN_API_VERSION@.gir $(INTROSPECTION_COMPILER)
-	$(AM_V_GEN)$(DEBUG) $(INTROSPECTION_COMPILER) --includedir=$(srcdir) --includedir=. --includedir=$(top_builddir)/champlain $(INTROSPECTION_COMPILER_OPTS) $< -o $(builddir)/$(@F)
+CLEANFILES += $(dist_gir_DATA) $(typelib_DATA)
 
-CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
 endif
