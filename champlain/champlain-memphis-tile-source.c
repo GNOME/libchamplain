@@ -54,13 +54,13 @@
 /* Tuning parameters */
 #define MAX_THREADS 4
 
-const gchar default_rules[] =
-  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
-  <rules version=\"0.1\" background=\"#ffffff\">\
-    <rule e=\"way\" k=\"highway\" v=\"*\">\
-      <line color=\"#000000\" width=\"1.0\"/>\
-    </rule>\
-  </rules>";
+const gchar default_rules[] = 
+  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+  "<rules version=\"0.1\" background=\"#ffffff\">"
+    "<rule e=\"way\" k=\"highway\" v=\"*\">"
+      "<line color=\"#000000\" width=\"1.0\"/>"
+    "</rule>"
+  "</rules>";
 
 enum
 {
