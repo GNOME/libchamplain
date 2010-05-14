@@ -141,7 +141,7 @@ champlain_map_source_factory_constructor (GType type,
           (type, n_construct_params, construct_params);
 
       instance = CHAMPLAIN_MAP_SOURCE_FACTORY (retval);
-      g_object_add_weak_pointer (retval, (gpointer) &instance);
+      g_object_add_weak_pointer (retval, (gpointer *) &instance);
     }
   else
     {
