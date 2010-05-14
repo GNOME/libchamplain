@@ -42,16 +42,18 @@ if HAVE_INTROSPECTION
 -include $(INTROSPECTION_MAKEFILE)
 INTROSPECTION_GIRS =
 INTROSPECTION_SCANNER_ARGS = --add-include-path=$(top_builddir)/champlain
-INTROSPECTION_COMPILER_ARGS = 
+INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
+
+introspection_sources = \
+	$(libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_SOURCES) \
+	$(libchamplain_include_HEADERS)
 
 GtkChamplain-@CHAMPLAIN_API_VERSION@.gir: libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_NAMESPACE = GtkChamplain
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_VERSION = @CHAMPLAIN_API_VERSION@
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_LIBS = libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_PACKAGES = gobject-2.0 gtk+-2.0
-GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_FILES = \
-	$(libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_SOURCES) \
-	$(libchamplain_include_HEADERS)
+GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_SCANNERFLAGS = --strip-prefix=GtkChamplain
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_INCLUDES = Clutter-1.0 Gtk-2.0 Champlain-@CHAMPLAIN_API_VERSION@
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_CFLAGS = \

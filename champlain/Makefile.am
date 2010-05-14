@@ -161,8 +161,11 @@ if HAVE_INTROSPECTION
 
 -include $(INTROSPECTION_MAKEFILE)
 INTROSPECTION_GIRS =
-INTROSPECTION_SCANNER_ARGS = 
+INTROSPECTION_SCANNER_ARGS =
 INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
+introspection_sources = \
+	$(libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES) \
+	$(libchamplain_include_HEADERS)
 
 if ENABLE_MEMPHIS
 memphis_gir_include = Memphis-0.2
@@ -174,9 +177,7 @@ Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_SCANNERFLAGS = --strip-prefix=Champla
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_VERSION = @CHAMPLAIN_API_VERSION@
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_LIBS = libchamplain-@CHAMPLAIN_API_VERSION@.la
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_PACKAGES = gobject-2.0 gtk+-2.0
-Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_FILES = \
-	$(libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES) \
-	$(libchamplain_include_HEADERS)
+Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_INCLUDES = Clutter-1.0 Gtk-2.0 $(memphis_gir_include)
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_CFLAGS = \
 	$(DEPS_CFLAGS) $(SOUP_CFLAGS) $(MEMPHIS_CFLAGS) \
