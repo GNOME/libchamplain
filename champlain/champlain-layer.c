@@ -39,18 +39,9 @@
 
 G_DEFINE_TYPE (ChamplainLayer, champlain_layer, CLUTTER_TYPE_GROUP)
 
-#define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_LAYER, ChamplainLayerPrivate))
-
 enum
 {
   PROP_0
-};
-
-typedef struct _ChamplainLayerPrivate ChamplainLayerPrivate;
-
-struct _ChamplainLayerPrivate {
-  gpointer spacer;
 };
 
 static void layer_add_cb (ClutterGroup *layer,
@@ -89,12 +80,24 @@ champlain_layer_set_property (GObject *object,
 }
 
 static void
+champlain_layer_dispose (GObject *object)
+{
+  G_OBJECT_CLASS (champlain_layer_parent_class)->dispose (object);
+}
+
+static void
+champlain_layer_finalize (GObject *object)
+{
+  G_OBJECT_CLASS (champlain_layer_parent_class)->finalize (object);
+}
+
+static void
 champlain_layer_class_init (ChamplainLayerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainLayerPrivate));
-
+  object_class->finalize = champlain_layer_finalize;
+  object_class->dispose = champlain_layer_dispose;
   object_class->get_property = champlain_layer_get_property;
   object_class->set_property = champlain_layer_set_property;
 }

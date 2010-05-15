@@ -451,7 +451,10 @@ layer_add_marker_cb (G_GNUC_UNUSED ClutterGroup *layer,
   g_signal_connect (marker, "notify::longitude",
       G_CALLBACK (notify_marker_reposition_cb), view);
 
-  g_idle_add (marker_reposition, view);
+  g_idle_add_full (G_PRIORITY_DEFAULT,
+                   (GSourceFunc)marker_reposition,
+                   g_object_ref (view),
+                   (GDestroyNotify)g_object_unref);
 }
 
 static void
@@ -811,6 +814,14 @@ champlain_view_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
 }
 
+static void
+champlain_view_finalize (GObject *object)
+{
+  DEBUG_LOG()
+
+  G_OBJECT_CLASS (champlain_view_parent_class)->finalize (object);
+}
+
 static gboolean
 _update_idle_cb (ChamplainView *view)
 {
@@ -945,6 +956,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
   GObjectClass *object_class = G_OBJECT_CLASS (champlainViewClass);
   object_class->dispose = champlain_view_dispose;
+  object_class->finalize = champlain_view_finalize;
   object_class->get_property = champlain_view_get_property;
   object_class->set_property = champlain_view_set_property;
 
@@ -2213,7 +2225,10 @@ champlain_view_add_layer (ChamplainView *view,
       CLUTTER_ACTOR (layer));
   clutter_actor_raise_top (CLUTTER_ACTOR (layer));
 
-  g_idle_add (marker_reposition, view);
+  g_idle_add_full (G_PRIORITY_DEFAULT,
+                   (GSourceFunc)marker_reposition,
+                   g_object_ref (view),
+                   (GDestroyNotify)g_object_unref);
 
   g_signal_connect_after (layer, "actor-added",
       G_CALLBACK (layer_add_marker_cb), view);

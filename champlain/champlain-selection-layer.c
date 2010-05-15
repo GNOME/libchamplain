@@ -101,12 +101,26 @@ champlain_selection_layer_set_property (GObject *object,
 }
 
 static void
+champlain_selection_layer_dispose (GObject *object)
+{
+  G_OBJECT_CLASS (champlain_selection_layer_parent_class)->dispose (object);
+}
+
+static void
+champlain_selection_layer_finalize (GObject *object)
+{
+  G_OBJECT_CLASS (champlain_selection_layer_parent_class)->finalize (object);
+}
+
+static void
 champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   g_type_class_add_private (klass, sizeof (ChamplainSelectionLayerPrivate));
 
+  object_class->finalize = champlain_selection_layer_finalize;
+  object_class->dispose = champlain_selection_layer_dispose;
   object_class->get_property = champlain_selection_layer_get_property;
   object_class->set_property = champlain_selection_layer_set_property;
 
@@ -143,6 +157,7 @@ static void
 marker_select (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
 {
+
   /* Add selection */
   g_object_ref (marker);
   g_object_set (marker, "highlighted", TRUE, NULL);

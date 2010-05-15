@@ -136,6 +136,12 @@ champlain_base_marker_set_property (GObject *object,
 }
 
 static void
+champlain_base_marker_dispose (GObject *object)
+{
+  G_OBJECT_CLASS (champlain_base_marker_parent_class)->dispose (object);
+}
+
+static void
 champlain_base_marker_finalize (GObject *object)
 {
   G_OBJECT_CLASS (champlain_base_marker_parent_class)->finalize (object);
@@ -148,6 +154,7 @@ champlain_base_marker_class_init (ChamplainBaseMarkerClass *marker_class)
 
   GObjectClass *object_class = G_OBJECT_CLASS (marker_class);
   object_class->finalize = champlain_base_marker_finalize;
+  object_class->dispose = champlain_base_marker_dispose;
   object_class->get_property = champlain_base_marker_get_property;
   object_class->set_property = champlain_base_marker_set_property;
 
@@ -396,7 +403,10 @@ static void
 on_animation_completed (G_GNUC_UNUSED ClutterAnimation* animation,
     ChamplainBaseMarker *marker)
 {
-  g_idle_add ((GSourceFunc) on_idle, marker);
+  g_idle_add_full (G_PRIORITY_DEFAULT,
+                   (GSourceFunc)on_idle,
+                   g_object_ref (marker),
+                   (GDestroyNotify)g_object_unref);
 }
 
 /**
