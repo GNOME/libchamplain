@@ -659,7 +659,7 @@ _wrap_ChamplainMapSource__proxy_do_get_projection(ChamplainMapSource *self)
 {
     PyGILState_STATE __py_state;
     PyObject *py_self;
-    ChamplainMapProjection retval;
+    ChamplainMapProjection retval = CHAMPLAIN_MAP_PROJECTION_MERCATOR;
     PyObject *py_retval;
     PyObject *py_method;
     
