@@ -42,7 +42,7 @@ if HAVE_INTROSPECTION
 -include $(INTROSPECTION_MAKEFILE)
 INTROSPECTION_GIRS =
 INTROSPECTION_SCANNER_ARGS = --add-include-path=$(top_builddir)/champlain
-INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
+INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir) --includedir=$(top_builddir)/champlain 
 
 introspection_sources = \
 	$(libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_SOURCES) \
