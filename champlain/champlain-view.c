@@ -503,6 +503,9 @@ redraw_polygon_on_idle (PolygonRedrawContext *ctx)
         priv->viewport_size.y + priv->anchor.y);
 
   priv->polygon_redraw_id = 0;
+
+  g_object_unref (ctx->view);
+  g_object_unref (ctx->polygon);
   // ctx is freed by g_idle_add_full
   return FALSE;
 }
@@ -521,9 +524,8 @@ notify_polygon_cb (ChamplainPolygon *polygon,
     return;
 
   ctx = g_new0 (PolygonRedrawContext, 1);
-  ctx->view = view;
-  ctx->polygon = polygon;
-  g_object_add_weak_pointer (G_OBJECT (polygon), (gpointer *) &ctx->polygon);
+  ctx->view = g_object_ref (view);
+  ctx->polygon = g_object_ref (polygon);
 
   priv->polygon_redraw_id = g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
       (GSourceFunc) redraw_polygon_on_idle, ctx, g_free);
