@@ -2410,15 +2410,16 @@ view_load_visible_tiles (ChamplainView *view)
   max_y_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
 
   if (x_end > max_x_end)
-    {
-      x_end = max_x_end;
-      x_count = x_end - x_first;
-    }
+    x_end = max_x_end;
   if (y_end > max_y_end)
-    {
-      y_end = max_y_end;
-      y_count = y_end - y_first;
-    }
+    y_end = max_y_end;
+  if (x_first > max_x_end)
+    x_first = max_x_end;
+  if (y_first > max_y_end)
+    y_first = max_y_end;
+
+  x_count = x_end - x_first;
+  y_count = y_end - y_first;
 
   DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_end, y_end);
 
