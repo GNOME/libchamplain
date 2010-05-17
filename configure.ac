@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 m4_define([champlain_major_version], [0])
 m4_define([champlain_minor_version], [5])
-m4_define([champlain_micro_version], [1])
+m4_define([champlain_micro_version], [2])
 m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
 m4_define([champlain_api_version],
@@ -27,7 +27,7 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 
 # Checks for libraries.
-LIBRARY_VERSION=0:0:0
+LIBRARY_VERSION=1:0:0
 CHAMPLAIN_API_VERSION=champlain_api_version
 CHAMPLAIN_API_VERSION_NORM=champlain_major_version[_]champlain_minor_version
 CHAMPLAIN_MAJOR_VERSION=champlain_major_version

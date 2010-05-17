@@ -1,3 +1,26 @@
+libchamplain 0.5.2 (2010-05-18)
+===============================
+
+Unstable release
+GObject-introspection and Python (Victor Godoy Poluceno) bindings 
+are in a working state (without local rendering support yet).
+
+Changes:
+* libchamplain has a new maintainer: Jiří Techet
+* Different tile reference management eliminating tile leaks 
+  (Jiří Techet)
+* General performance improvements (Jiří Techet)
+* Tile download cancellation when tile not displayed any more
+  (Jiří Techet)
+* Build process improvements, libmemphis dependency made optional,
+  documentation updates (Jiří Techet)
+* Removal of unmaintained mono bindings, removal of perl bindings 
+  (will be distributed separately) 
+* New demo using introspection written in javascript (Simon Wenner)
+* Many bugfixes and cleanups - for details see ChangeLog 
+  (Pierre-Luc Beaudoin, Jiří Techet, Emmanuel Rodriguez, Rob Bradford, 
+   Fridrich Štrba, Simon Wenner, Brian Cameron, Lorenzo Masini)
+
 libchamplain 0.5.1 (2010-01-25)
 ===============================
 
