@@ -7,7 +7,6 @@ m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
 m4_define([champlain_api_version],
           [champlain_major_version.champlain_minor_version])
-# if the API changes, set to 0
 AC_PREREQ(2.61)
 AC_INIT([libchamplain],
         [champlain_version],
@@ -26,7 +25,13 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 AC_PROG_CC
 AM_PROG_CC_C_O
 
-# Checks for libraries.
+# Before making a release, the LIBRARY_VERSION string should be modified.
+# The string is of the form C:R:A.
+# - If interfaces have been changed or added, but binary compatibility has
+#   been preserved, change to C+1:0:A+1
+# - If binary compatibility has been broken (eg removed or changed interfaces)
+#   change to C+1:0:0
+# - If the interface is the same as the previous version, change to C:R+1:A
 LIBRARY_VERSION=1:0:0
 CHAMPLAIN_API_VERSION=champlain_api_version
 CHAMPLAIN_API_VERSION_NORM=champlain_major_version[_]champlain_minor_version
@@ -44,6 +49,8 @@ AC_SUBST(CHAMPLAIN_VERSION)
 AC_SUBST(CHAMPLAIN_MAJORMINOR)
 
 AC_SUBST(LIBRARY_VERSION)
+
+# Checks for libraries.
 
 PKG_CHECK_MODULES(DEPS,
   [   glib-2.0 >= 2.16
