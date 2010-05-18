@@ -145,6 +145,14 @@ champlain_tile_set_property (GObject *object,
 static void
 champlain_tile_dispose (GObject *object)
 {
+  ChamplainTilePrivate *priv = CHAMPLAIN_TILE (object)->priv;
+
+  if (priv->content_actor)
+    {
+      g_object_unref (priv->content_actor);
+      priv->content_actor = NULL;
+    }
+
   G_OBJECT_CLASS (champlain_tile_parent_class)->dispose (object);
 }
 
@@ -508,13 +516,6 @@ champlain_tile_set_size (ChamplainTile *self,
   g_object_notify (G_OBJECT (self), "size");
 }
 
-static void
-fade_in_completed (G_GNUC_UNUSED ClutterAnimation *animation, ChamplainTile *self)
-{
-  if (clutter_group_get_n_children (CLUTTER_GROUP (self)) > 1)
-    clutter_actor_destroy (clutter_group_get_nth_child (CLUTTER_GROUP (self), 0));
-}
-
 /**
  * champlain_tile_set_state:
  * @self: the #ChamplainTile
@@ -538,15 +539,12 @@ champlain_tile_set_state (ChamplainTile *self,
   if (state == CHAMPLAIN_STATE_DONE && priv->content_actor &&
       clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
     {
-      clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->content_actor);
-
-      ClutterAnimation *animation;
-
       clutter_actor_set_opacity (priv->content_actor, 0);
+      clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->content_actor);
 
       if (priv->fade_in)
         {
-          animation = clutter_actor_animate (priv->content_actor,
+          clutter_actor_animate (priv->content_actor,
               CLUTTER_EASE_IN_CUBIC,
               500,
               "opacity", 255,
@@ -554,14 +552,12 @@ champlain_tile_set_state (ChamplainTile *self,
         }
       else
         {
-          animation = clutter_actor_animate (priv->content_actor,
+          clutter_actor_animate (priv->content_actor,
               CLUTTER_LINEAR,
               150,
               "opacity", 255,
               NULL);
         }
-
-      g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), self);
     }
 
   priv->state = state;
@@ -689,11 +685,10 @@ champlain_tile_set_content (ChamplainTile *self,
 
   ChamplainTilePrivate *priv = self->priv;
 
-  if (priv->content_actor &&
-      clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
+  if (priv->content_actor)
     clutter_actor_destroy (priv->content_actor);
 
-  priv->content_actor = actor;
+  priv->content_actor = g_object_ref_sink (actor);
 
   g_object_notify (G_OBJECT (self), "content");
 }
