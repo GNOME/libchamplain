@@ -1,9 +1,12 @@
-noinst_PROGRAMS = launcher animated-marker polygons url-marker
+noinst_PROGRAMS = minimal launcher animated-marker polygons url-marker
 
 INCLUDES = -I$(top_srcdir)
 
 AM_CPPFLAGS = $(DEPS_CFLAGS) $(WARN_CFLAGS)
 AM_LDFLAGS = $(DEPS_LIBS)
+
+minimal_SOURCES = minimal.c
+minimal_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 
 launcher_SOURCES = launcher.c markers.c
 launcher_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
@@ -19,6 +22,13 @@ url_marker_CPPFLAGS = $(DEPS_CFLAGS) $(SOUP_CFLAGS)
 url_marker_LDADD = $(SOUP_LIBS) $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 
 if ENABLE_GTK
+noinst_PROGRAMS += minimal-gtk
+minimal_gtk_SOURCES = minimal-gtk.c
+minimal_gtk_CPPFLAGS = $(GTK_CFLAGS)
+minimal_gtk_LDADD = $(GTK_LIBS) $(DEPS_LIBS) \
+		../champlain-gtk/libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la \
+		../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
+
 noinst_PROGRAMS += launcher-gtk
 launcher_gtk_SOURCES = launcher-gtk.c markers.c
 launcher_gtk_CPPFLAGS = $(GTK_CFLAGS)
@@ -36,8 +46,5 @@ local_rendering_LDADD = $(GTK_LIBS) $(MEMPHIS_LIBS) $(DEPS_LIBS) \
 endif
 endif
 
-EXTRA_DIST = markers.h
+EXTRA_DIST = markers.h launcher.js
 
-if HAVE_INTROSPECTION
-EXTRA_DIST += launcher.js
-endif
