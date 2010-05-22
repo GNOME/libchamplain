@@ -29,6 +29,7 @@
 #define COL_NAME 1
 
 static ChamplainPolygon *polygon;
+static gboolean destroying = FALSE;
 
 /*
  * Terminate the main loop.
@@ -36,6 +37,7 @@ static ChamplainPolygon *polygon;
 static void
 on_destroy (GtkWidget *widget, gpointer data)
 {
+  destroying = TRUE;
   gtk_main_quit ();
 }
 
@@ -115,16 +117,17 @@ view_state_changed (ChamplainView *view,
 {
   ChamplainState state;
 
+  if (destroying)
+    return;
+
   g_object_get (G_OBJECT (view), "state", &state, NULL);
   if (state == CHAMPLAIN_STATE_LOADING)
     {
       gtk_image_set_from_stock (image, GTK_STOCK_NETWORK, GTK_ICON_SIZE_BUTTON);
-      g_print("STATE: loading\n");
     }
   else
     {
       gtk_image_clear (image);
-      g_print("STATE: done\n");
     }
 }
 
