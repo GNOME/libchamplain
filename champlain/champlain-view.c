@@ -2329,6 +2329,9 @@ view_load_visible_tiles (ChamplainView *view)
   gint size;
   ChamplainZoomLevel *level;
 
+  if (!priv->map)
+    return;
+
   viewport.x += priv->anchor.x;
   viewport.y += priv->anchor.y;
 
