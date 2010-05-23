@@ -47,6 +47,7 @@ GtkChamplain-0.4.gir: $(INTROSPECTION_SCANNER) libchamplain-gtk-0.4.la
 	$(SOUP_CFLAGS) \
 	-I$(top_srcdir)			\
 	-DCHAMPLAIN_COMPILATION 	\
+	-DCHAMPLAIN_GTK_COMPILATION 	\
 	--add-include-path=$(top_builddir)/champlain \
 	--c-include="$(libchamplain_include_HEADERS)" \
 	--include=Champlain-0.4 \
