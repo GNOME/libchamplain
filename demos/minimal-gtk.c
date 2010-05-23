@@ -26,7 +26,7 @@
 int
 main (int argc, char *argv[])
 {
-  GtkWidget *window, *widget, *vbox;
+  GtkWidget *window, *widget;
 
   /* initialize threads and clutter */
   g_thread_init (NULL);
@@ -47,9 +47,7 @@ main (int argc, char *argv[])
   champlain_view_center_on(CHAMPLAIN_VIEW(view), 45.466, -73.75);
 
   /* insert it into the widget you wish */
-  vbox = gtk_vbox_new(FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), widget, TRUE, TRUE, 0);
-  gtk_container_add (GTK_CONTAINER (window), vbox);
+  gtk_container_add (GTK_CONTAINER (window), widget);
 
   /* show everything */
   gtk_widget_show_all (window);
