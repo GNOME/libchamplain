@@ -222,6 +222,10 @@ AC_ARG_ENABLE(vala,
 if test x$enable_vala = xyes; then
   AM_PROG_VALAC([0.8.0])
 
+  if test "x$VALAC" = "x" ; then
+    AC_MSG_ERROR([Cannot find the "valac" compiler in your PATH])
+  fi
+
   LAUNCHER_PACKAGES="--pkg clutter-1.0 --pkg champlain-0.4"
   PKG_CHECK_MODULES(LAUNCHER,
   [
