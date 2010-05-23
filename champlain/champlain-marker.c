@@ -822,6 +822,8 @@ champlain_marker_init (ChamplainMarker *marker)
   priv->ellipsize = PANGO_ELLIPSIZE_NONE;
   priv->draw_background = TRUE;
   priv->redraw_id = 0;
+  priv->shadow = NULL;
+  priv->text_actor = NULL;
 
   g_signal_connect (marker, "notify::highlighted", G_CALLBACK (notify_highlighted), NULL);
 }
