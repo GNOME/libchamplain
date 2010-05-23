@@ -330,7 +330,7 @@ update_viewport (ChamplainView *view,
     g_object_notify (G_OBJECT (view), "latitude");
 }
 
-static void 
+static void
 panning_completed (TidyFingerScroll *scroll,
                    ChamplainView *view)
 {
@@ -430,7 +430,7 @@ draw_polygon (ChamplainView *view, ChamplainPolygon *polygon)
   cairo_t *cr;
   ChamplainViewPrivate *priv = view->priv;
 
-  if (polygon->priv->visible == FALSE)
+  if (polygon->priv->actor == NULL || polygon->priv->visible == FALSE)
     return;
 
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (polygon->priv->actor));
@@ -633,7 +633,7 @@ champlain_view_get_property (GObject *object,
             CLAMP (priv->longitude, CHAMPLAIN_MIN_LONG, CHAMPLAIN_MAX_LONG));
         break;
       case PROP_LATITUDE:
-        g_value_set_double (value, 
+        g_value_set_double (value,
             CLAMP (priv->latitude, CHAMPLAIN_MIN_LAT, CHAMPLAIN_MAX_LAT));
         break;
       case PROP_ZOOM_LEVEL:
