@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
- 
+
 #if !defined (__CHAMPLAIN_GTK_CHAMPLAIN_GTK_H_INSIDE__) && !defined (CHAMPLAIN_GTK_COMPILATION)
 #error "Only <champlain/champlain.h> can be included directly."
 #endif
@@ -25,6 +25,8 @@
 
 #include <gtk/gtk.h>
 #include <champlain/champlain.h>
+
+G_BEGIN_DECLS
 
 #define GTK_TYPE_CHAMPLAIN_EMBED     (gtk_champlain_embed_get_type())
 #define GTK_CHAMPLAIN_EMBED(obj)     (G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbed))
@@ -61,5 +63,7 @@ ChamplainView *gtk_champlain_embed_get_view (GtkChamplainEmbed* embed);
 GtkWidget *champlain_view_embed_new (ChamplainView *view) G_GNUC_DEPRECATED;
 ChamplainView *champlain_view_embed_get_view (GtkChamplainEmbed* embed) G_GNUC_DEPRECATED;
 void champlain_view_embed_set_view (GtkChamplainEmbed *embed, ChamplainView *view) G_GNUC_DEPRECATED;
+
+G_END_DECLS
 
 #endif

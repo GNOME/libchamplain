@@ -29,6 +29,8 @@
 #include <glib.h>
 #include <clutter/clutter.h>
 
+G_BEGIN_DECLS
+
 struct _Map
 {
   ChamplainZoomLevel *current_level;
@@ -57,5 +59,7 @@ gboolean map_zoom_to (Map *map,
 void map_load_level(Map *map,
     ChamplainMapSource *map_source,
     gint zoom_level);
+
+G_END_DECLS
 
 #endif
