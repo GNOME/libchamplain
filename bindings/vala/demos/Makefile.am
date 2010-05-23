@@ -5,6 +5,7 @@ launcher_SOURCES = \
 	markers.vala
 
 INCLUDES = \
+	-I$(top_srcdir) \
 	$(LAUNCHER_CFLAGS)
 
 VALAFLAGS = \
