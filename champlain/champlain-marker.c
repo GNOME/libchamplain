@@ -283,22 +283,71 @@ champlain_marker_set_property (GObject *object,
 }
 
 static void
+champlain_marker_dispose (GObject *object)
+{
+  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER (object)->priv;
+
+  if (priv->background)
+    {
+      g_object_unref (priv->background);
+      priv->background = NULL;
+    }
+
+  if (priv->shadow)
+    {
+      g_object_unref (priv->shadow);
+      priv->shadow = NULL;
+    }
+
+  if (priv->text_actor)
+    {
+      g_object_unref (priv->text_actor);
+      priv->text_actor = NULL;
+    }
+
+  if (priv->image)
+    {
+      g_object_unref (priv->image);
+      priv->image = NULL;
+    }
+
+  if (priv->attributes)
+    {
+      pango_attr_list_unref (priv->attributes);
+      priv->attributes = NULL;
+    }
+
+  G_OBJECT_CLASS (champlain_marker_parent_class)->dispose (object);
+}
+
+static void
 champlain_marker_finalize (GObject *object)
 {
-  ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
-  ChamplainMarkerPrivate *priv = marker->priv;
+  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER (object)->priv;
 
-  if (priv->text != NULL)
-    g_free (priv->text);
-  priv->text = NULL;
+  if (priv->text)
+    {
+      g_free (priv->text);
+      priv->text = NULL;
+    }
 
-  if (priv->image != NULL)
-    g_object_unref (priv->image);
-  priv->image = NULL;
+  if (priv->font_name)
+    {
+      g_free (priv->font_name);
+      priv->font_name = NULL;
+    }
 
-  if (priv->background != NULL)
-    g_object_unref (priv->background);
-  priv->background = NULL;
+  if (priv->color)
+    {
+      clutter_color_free (priv->color);
+      priv->color = NULL;
+    }
+
+  if (priv->text_color)
+    {
+      clutter_color_free (priv->text_color);
+      priv->text_color = NULL;
+    }
 
   if (priv->redraw_id)
     {
@@ -316,6 +365,7 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
 
   GObjectClass *object_class = G_OBJECT_CLASS (markerClass);
   object_class->finalize = champlain_marker_finalize;
+  object_class->dispose = champlain_marker_dispose;
   object_class->get_property = champlain_marker_get_property;
   object_class->set_property = champlain_marker_set_property;
 
@@ -764,6 +814,8 @@ champlain_marker_init (ChamplainMarker *marker)
   priv->ellipsize = PANGO_ELLIPSIZE_NONE;
   priv->draw_background = TRUE;
   priv->redraw_id = 0;
+  priv->shadow = NULL;
+  priv->text_actor = NULL;
 
   g_signal_connect (marker, "notify::highlighted", G_CALLBACK (notify_highlighted), NULL);
 }
