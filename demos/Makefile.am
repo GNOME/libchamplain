@@ -46,5 +46,5 @@ local_rendering_LDADD = $(GTK_LIBS) $(MEMPHIS_LIBS) $(DEPS_LIBS) \
 endif
 endif
 
-EXTRA_DIST = markers.h launcher.js
+EXTRA_DIST = markers.h launcher.js default-rules.xml high-contrast.xml las_palmas.osm
 
