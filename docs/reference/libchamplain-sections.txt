@@ -1,6 +1,7 @@
 <SECTION>
 <FILE>champlain-map-source</FILE>
 <TITLE>ChamplainMapSource</TITLE>
+ChamplainMapSource
 ChamplainMapProjection
 champlain_map_source_get_id
 champlain_map_source_get_name
@@ -29,7 +30,6 @@ CHAMPLAIN_MAP_SOURCE_CLASS
 CHAMPLAIN_IS_MAP_SOURCE_CLASS
 CHAMPLAIN_MAP_SOURCE_GET_CLASS
 <SUBSECTION Private>
-ChamplainMapSource
 ChamplainMapSourceClass
 ChamplainMapSourcePrivate
 </SECTION>
@@ -50,6 +50,7 @@ CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR
 <SECTION>
 <FILE>champlain-marker</FILE>
 <TITLE>ChamplainMarker</TITLE>
+ChamplainMarker
 champlain_marker_new
 champlain_marker_new_with_text
 champlain_marker_new_with_image
