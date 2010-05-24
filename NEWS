@@ -1,3 +1,16 @@
+libchamplain 0.6 (2010-05-25)
+===============================
+
+Stable release
+GObject-introspection and Python (Victor Godoy Poluceno) bindings 
+are in a working state (without local rendering support yet).
+
+Changes:
+* Add dummy ChangeLog file (Łukasz Jernaś)
+* Fix a problem on some machines when tiles are being destroyed (Jiří Techet)
+* Add minimal demos (Jiří Techet)
+* Some other minor fixes (Jiří Techet)
+
 libchamplain 0.5.2 (2010-05-18)
 ===============================
 
