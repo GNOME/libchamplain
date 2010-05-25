@@ -193,6 +193,37 @@ AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
 GOBJECT_INTROSPECTION_CHECK([0.6.3])
 
 # -----------------------------------------------------------
+# Enable vala (default to "no")
+# -----------------------------------------------------------
+
+AC_PATH_PROG(VAPIGEN, vapigen, vapigen)
+AC_SUBST(VAPIGEN)
+
+AC_ARG_ENABLE(vala,
+  AC_HELP_STRING([--enable-vala],[Include vala champlain (and champlain-gtk)]),
+    enable_vala=$enableval, enable_vala=no )
+
+if test x$enable_vala = xyes; then
+  AM_PROG_VALAC([0.8.0])
+
+  if test "x$VALAC" = "x" ; then
+    AC_MSG_ERROR([Cannot find the "valac" compiler in your PATH])
+  fi
+
+  LAUNCHER_PACKAGES="--pkg clutter-1.0 --pkg champlain-0.6"
+  PKG_CHECK_MODULES(LAUNCHER,
+  [
+    glib-2.0,
+    clutter-1.0
+  ])
+  AC_SUBST(LAUNCHER_CFLAGS)
+  AC_SUBST(LAUNCHER_LIBS)
+  AC_SUBST(LAUNCHER_PACKAGES)
+fi
+
+AM_CONDITIONAL(ENABLE_VALA, test "x$enable_vala" = "xyes")
+
+# -----------------------------------------------------------
 # Generate features header file
 # -----------------------------------------------------------
 
@@ -238,6 +269,10 @@ AC_CONFIG_FILES([Makefile
                  bindings/python/champlain/Makefile
                  bindings/python/champlain-gtk/Makefile
                  bindings/python/demos/Makefile
+                 bindings/vala/Makefile
+                 bindings/vala/champlain/Makefile
+                 bindings/vala/champlain-gtk/Makefile
+                 bindings/vala/demos/Makefile
                  champlain-memphis.pc
                  champlain-memphis-uninstalled.pc])
 AC_CONFIG_FILES([bindings/python/update-binding.sh],
@@ -259,6 +294,7 @@ echo "  Memphis source: ${enable_memphis}"
 echo ""
 echo "Bindings:"
 echo "       Python bindings: ${enable_python}"
+echo "       Vala bindings: ${enable_vala}"
 echo " gobject-introspection: ${enable_introspection}"
 echo ""
 
