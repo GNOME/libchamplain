@@ -1,25 +1,6 @@
 <?xml version="1.0"?>
 <api version="1.0">
 	<namespace name="GtkChamplain">
-		<function name="champlain_view_embed_get_view" symbol="champlain_view_embed_get_view">
-			<return-type type="ChamplainView*"/>
-			<parameters>
-				<parameter name="embed" type="GtkChamplainEmbed*"/>
-			</parameters>
-		</function>
-		<function name="champlain_view_embed_new" symbol="champlain_view_embed_new">
-			<return-type type="GtkWidget*"/>
-			<parameters>
-				<parameter name="view" type="ChamplainView*"/>
-			</parameters>
-		</function>
-		<function name="champlain_view_embed_set_view" symbol="champlain_view_embed_set_view">
-			<return-type type="void"/>
-			<parameters>
-				<parameter name="embed" type="GtkChamplainEmbed*"/>
-				<parameter name="view" type="ChamplainView*"/>
-			</parameters>
-		</function>
 		<object name="GtkChamplainEmbed" parent="GtkAlignment" type-name="GtkChamplainEmbed" get-type="gtk_champlain_embed_get_type">
 			<implements>
 				<interface name="AtkImplementor"/>
