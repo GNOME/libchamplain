@@ -8,6 +8,35 @@
 				<parameter name="data" type="gpointer"/>
 			</parameters>
 		</callback>
+		<boxed name="ChamplainBoundingBox" type-name="ChamplainBoundingBox" get-type="champlain_bounding_box_get_type">
+			<method name="copy" symbol="champlain_bounding_box_copy">
+				<return-type type="ChamplainBoundingBox*"/>
+				<parameters>
+					<parameter name="bbox" type="ChamplainBoundingBox*"/>
+				</parameters>
+			</method>
+			<method name="free" symbol="champlain_bounding_box_free">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="bbox" type="ChamplainBoundingBox*"/>
+				</parameters>
+			</method>
+			<method name="get_center" symbol="champlain_bounding_box_get_center">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="bbox" type="ChamplainBoundingBox*"/>
+					<parameter name="lat" type="gdouble*"/>
+					<parameter name="lon" type="gdouble*"/>
+				</parameters>
+			</method>
+			<constructor name="new" symbol="champlain_bounding_box_new">
+				<return-type type="ChamplainBoundingBox*"/>
+			</constructor>
+			<field name="left" type="gdouble"/>
+			<field name="bottom" type="gdouble"/>
+			<field name="right" type="gdouble"/>
+			<field name="top" type="gdouble"/>
+		</boxed>
 		<boxed name="ChamplainMapSourceDesc" type-name="ChamplainMapSourceDesc" get-type="champlain_map_source_desc_get_type">
 			<method name="copy" symbol="champlain_map_source_desc_copy">
 				<return-type type="ChamplainMapSourceDesc*"/>
@@ -72,10 +101,8 @@
 		</enum>
 		<enum name="ChamplainState" type-name="ChamplainState" get-type="champlain_state_get_type">
 			<member name="CHAMPLAIN_STATE_NONE" value="0"/>
-			<member name="CHAMPLAIN_STATE_INIT" value="1"/>
-			<member name="CHAMPLAIN_STATE_LOADING" value="2"/>
-			<member name="CHAMPLAIN_STATE_VALIDATING_CACHE" value="3"/>
-			<member name="CHAMPLAIN_STATE_DONE" value="4"/>
+			<member name="CHAMPLAIN_STATE_LOADING" value="1"/>
+			<member name="CHAMPLAIN_STATE_DONE" value="2"/>
 		</enum>
 		<enum name="ChamplainUnit" type-name="ChamplainUnit" get-type="champlain_unit_get_type">
 			<member name="CHAMPLAIN_UNIT_KM" value="0"/>
@@ -118,6 +145,18 @@
 					<parameter name="marker" type="ChamplainBaseMarker*"/>
 				</parameters>
 			</method>
+			<method name="get_latitude" symbol="champlain_base_marker_get_latitude">
+				<return-type type="gdouble"/>
+				<parameters>
+					<parameter name="marker" type="ChamplainBaseMarker*"/>
+				</parameters>
+			</method>
+			<method name="get_longitude" symbol="champlain_base_marker_get_longitude">
+				<return-type type="gdouble"/>
+				<parameters>
+					<parameter name="marker" type="ChamplainBaseMarker*"/>
+				</parameters>
+			</method>
 			<constructor name="new" symbol="champlain_base_marker_new">
 				<return-type type="ClutterActor*"/>
 			</constructor>
@@ -132,66 +171,67 @@
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="marker" type="ChamplainBaseMarker*"/>
-					<parameter name="longitude" type="gdouble"/>
 					<parameter name="latitude" type="gdouble"/>
+					<parameter name="longitude" type="gdouble"/>
 				</parameters>
 			</method>
 			<property name="highlighted" type="gboolean" readable="1" writable="1" construct="0" construct-only="0"/>
 			<property name="latitude" type="gdouble" readable="1" writable="1" construct="0" construct-only="0"/>
 			<property name="longitude" type="gdouble" readable="1" writable="1" construct="0" construct-only="0"/>
 		</object>
-		<object name="ChamplainCache" parent="GObject" type-name="ChamplainCache" get-type="champlain_cache_get_type">
-			<method name="dup_default" symbol="champlain_cache_dup_default">
-				<return-type type="ChamplainCache*"/>
-			</method>
-			<method name="fill_tile" symbol="champlain_cache_fill_tile">
-				<return-type type="gboolean"/>
+		<object name="ChamplainErrorTileSource" parent="ChamplainTileSource" type-name="ChamplainErrorTileSource" get-type="champlain_error_tile_source_get_type">
+			<constructor name="new_full" symbol="champlain_error_tile_source_new_full">
+				<return-type type="ChamplainErrorTileSource*"/>
 				<parameters>
-					<parameter name="self" type="ChamplainCache*"/>
-					<parameter name="tile" type="ChamplainTile*"/>
+					<parameter name="tile_size" type="guint"/>
+				</parameters>
+			</constructor>
+		</object>
+		<object name="ChamplainFileCache" parent="ChamplainTileCache" type-name="ChamplainFileCache" get-type="champlain_file_cache_get_type">
+			<method name="get_cache_dir" symbol="champlain_file_cache_get_cache_dir">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="file_cache" type="ChamplainFileCache*"/>
 				</parameters>
 			</method>
-			<method name="get_size_limit" symbol="champlain_cache_get_size_limit">
+			<method name="get_size_limit" symbol="champlain_file_cache_get_size_limit">
 				<return-type type="guint"/>
 				<parameters>
-					<parameter name="self" type="ChamplainCache*"/>
+					<parameter name="file_cache" type="ChamplainFileCache*"/>
 				</parameters>
 			</method>
-			<method name="purge" symbol="champlain_cache_purge">
+			<constructor name="new" symbol="champlain_file_cache_new">
+				<return-type type="ChamplainFileCache*"/>
+			</constructor>
+			<constructor name="new_full" symbol="champlain_file_cache_new_full">
+				<return-type type="ChamplainFileCache*"/>
+				<parameters>
+					<parameter name="size_limit" type="guint"/>
+					<parameter name="cache_dir" type="gchar*"/>
+					<parameter name="persistent" type="gboolean"/>
+				</parameters>
+			</constructor>
+			<method name="purge" symbol="champlain_file_cache_purge">
 				<return-type type="void"/>
 				<parameters>
-					<parameter name="self" type="ChamplainCache*"/>
+					<parameter name="file_cache" type="ChamplainFileCache*"/>
 				</parameters>
 			</method>
-			<method name="purge_on_idle" symbol="champlain_cache_purge_on_idle">
+			<method name="purge_on_idle" symbol="champlain_file_cache_purge_on_idle">
 				<return-type type="void"/>
 				<parameters>
-					<parameter name="self" type="ChamplainCache*"/>
+					<parameter name="file_cache" type="ChamplainFileCache*"/>
 				</parameters>
 			</method>
-			<method name="set_size_limit" symbol="champlain_cache_set_size_limit">
+			<method name="set_size_limit" symbol="champlain_file_cache_set_size_limit">
 				<return-type type="void"/>
 				<parameters>
-					<parameter name="self" type="ChamplainCache*"/>
+					<parameter name="file_cache" type="ChamplainFileCache*"/>
 					<parameter name="size_limit" type="guint"/>
 				</parameters>
 			</method>
-			<method name="tile_is_expired" symbol="champlain_cache_tile_is_expired">
-				<return-type type="gboolean"/>
-				<parameters>
-					<parameter name="self" type="ChamplainCache*"/>
-					<parameter name="tile" type="ChamplainTile*"/>
-				</parameters>
-			</method>
-			<method name="update_tile" symbol="champlain_cache_update_tile">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="ChamplainCache*"/>
-					<parameter name="tile" type="ChamplainTile*"/>
-					<parameter name="filesize" type="guint"/>
-				</parameters>
-			</method>
-			<property name="size-limit" type="guint" readable="1" writable="1" construct="0" construct-only="0"/>
+			<property name="cache-dir" type="char*" readable="1" writable="1" construct="0" construct-only="1"/>
+			<property name="size-limit" type="guint" readable="1" writable="1" construct="1" construct-only="0"/>
 		</object>
 		<object name="ChamplainLayer" parent="ClutterGroup" type-name="ChamplainLayer" get-type="champlain_layer_get_type">
 			<implements>
@@ -252,7 +292,23 @@
 				</parameters>
 			</method>
 		</object>
-		<object name="ChamplainMapSource" parent="GObject" type-name="ChamplainMapSource" get-type="champlain_map_source_get_type">
+		<object name="ChamplainLocalMapDataSource" parent="ChamplainMapDataSource" type-name="ChamplainLocalMapDataSource" get-type="champlain_local_map_data_source_get_type">
+			<method name="load_map_data" symbol="champlain_local_map_data_source_load_map_data">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="map_data_source" type="ChamplainLocalMapDataSource*"/>
+					<parameter name="map_path" type="gchar*"/>
+				</parameters>
+			</method>
+			<constructor name="new" symbol="champlain_local_map_data_source_new">
+				<return-type type="ChamplainLocalMapDataSource*"/>
+			</constructor>
+		</object>
+		<object name="ChamplainMapDataSource" parent="GInitiallyUnowned" type-name="ChamplainMapDataSource" get-type="champlain_map_data_source_get_type">
+			<property name="bounding-box" type="ChamplainBoundingBox*" readable="1" writable="1" construct="0" construct-only="0"/>
+			<property name="state" type="ChamplainState" readable="1" writable="1" construct="0" construct-only="0"/>
+		</object>
+		<object name="ChamplainMapSource" parent="GInitiallyUnowned" type-name="ChamplainMapSource" get-type="champlain_map_source_get_type">
 			<method name="fill_tile" symbol="champlain_map_source_fill_tile">
 				<return-type type="void"/>
 				<parameters>
@@ -264,7 +320,7 @@
 				<return-type type="guint"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="zoom_level" type="gint"/>
+					<parameter name="zoom_level" type="guint"/>
 				</parameters>
 			</method>
 			<method name="get_id" symbol="champlain_map_source_get_id">
@@ -277,7 +333,7 @@
 				<return-type type="gdouble"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="zoom_level" type="gint"/>
+					<parameter name="zoom_level" type="guint"/>
 					<parameter name="y" type="guint"/>
 				</parameters>
 			</method>
@@ -297,33 +353,39 @@
 				<return-type type="gdouble"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="zoom_level" type="gint"/>
+					<parameter name="zoom_level" type="guint"/>
 					<parameter name="x" type="guint"/>
 				</parameters>
 			</method>
 			<method name="get_max_zoom_level" symbol="champlain_map_source_get_max_zoom_level">
-				<return-type type="gint"/>
+				<return-type type="guint"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
 				</parameters>
 			</method>
 			<method name="get_meters_per_pixel" symbol="champlain_map_source_get_meters_per_pixel">
-				<return-type type="gfloat"/>
+				<return-type type="gdouble"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="zoom_level" type="gint"/>
+					<parameter name="zoom_level" type="guint"/>
 					<parameter name="latitude" type="gdouble"/>
 					<parameter name="longitude" type="gdouble"/>
 				</parameters>
 			</method>
 			<method name="get_min_zoom_level" symbol="champlain_map_source_get_min_zoom_level">
-				<return-type type="gint"/>
+				<return-type type="guint"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
 				</parameters>
 			</method>
 			<method name="get_name" symbol="champlain_map_source_get_name">
 				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</method>
+			<method name="get_next_source" symbol="champlain_map_source_get_next_source">
+				<return-type type="ChamplainMapSource*"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
 				</parameters>
@@ -338,7 +400,7 @@
 				<return-type type="guint"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="zoom_level" type="gint"/>
+					<parameter name="zoom_level" type="guint"/>
 				</parameters>
 			</method>
 			<method name="get_tile_size" symbol="champlain_map_source_get_tile_size">
@@ -351,7 +413,7 @@
 				<return-type type="guint"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="zoom_level" type="gint"/>
+					<parameter name="zoom_level" type="guint"/>
 					<parameter name="longitude" type="gdouble"/>
 				</parameters>
 			</method>
@@ -359,53 +421,24 @@
 				<return-type type="guint"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="zoom_level" type="gint"/>
+					<parameter name="zoom_level" type="guint"/>
 					<parameter name="latitude" type="gdouble"/>
 				</parameters>
 			</method>
-			<method name="set_id" symbol="champlain_map_source_set_id">
+			<method name="set_next_source" symbol="champlain_map_source_set_next_source">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="id" type="gchar*"/>
+					<parameter name="next_source" type="ChamplainMapSource*"/>
 				</parameters>
 			</method>
-			<method name="set_license" symbol="champlain_map_source_set_license">
+			<property name="next-source" type="ChamplainMapSource*" readable="1" writable="1" construct="0" construct-only="0"/>
+			<signal name="reload-tiles" when="LAST">
 				<return-type type="void"/>
 				<parameters>
-					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="license" type="gchar*"/>
+					<parameter name="object" type="ChamplainMapSource*"/>
 				</parameters>
-			</method>
-			<method name="set_license_uri" symbol="champlain_map_source_set_license_uri">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="license_uri" type="gchar*"/>
-				</parameters>
-			</method>
-			<method name="set_name" symbol="champlain_map_source_set_name">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="name" type="gchar*"/>
-				</parameters>
-			</method>
-			<method name="set_projection" symbol="champlain_map_source_set_projection">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="map_source" type="ChamplainMapSource*"/>
-					<parameter name="projection" type="ChamplainMapProjection"/>
-				</parameters>
-			</method>
-			<property name="id" type="char*" readable="1" writable="1" construct="1" construct-only="0"/>
-			<property name="license" type="char*" readable="1" writable="1" construct="1" construct-only="0"/>
-			<property name="license-uri" type="char*" readable="1" writable="1" construct="1" construct-only="0"/>
-			<property name="max-zoom-level" type="guint" readable="1" writable="1" construct="1" construct-only="0"/>
-			<property name="min-zoom-level" type="guint" readable="1" writable="1" construct="1" construct-only="0"/>
-			<property name="name" type="char*" readable="1" writable="1" construct="1" construct-only="0"/>
-			<property name="projection" type="ChamplainMapProjection" readable="1" writable="1" construct="1" construct-only="0"/>
-			<property name="tile-size" type="guint" readable="1" writable="1" construct="1" construct-only="0"/>
+			</signal>
 			<vfunc name="fill_tile">
 				<return-type type="void"/>
 				<parameters>
@@ -413,9 +446,90 @@
 					<parameter name="tile" type="ChamplainTile*"/>
 				</parameters>
 			</vfunc>
+			<vfunc name="get_id">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_license">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_license_uri">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_max_zoom_level">
+				<return-type type="guint"/>
+				<parameters>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_min_zoom_level">
+				<return-type type="guint"/>
+				<parameters>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_name">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_projection">
+				<return-type type="ChamplainMapProjection"/>
+				<parameters>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_tile_size">
+				<return-type type="guint"/>
+				<parameters>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="on_set_next_source">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+					<parameter name="next_source" type="ChamplainMapSource*"/>
+					<parameter name="new_next_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</vfunc>
+		</object>
+		<object name="ChamplainMapSourceChain" parent="ChamplainMapSource" type-name="ChamplainMapSourceChain" get-type="champlain_map_source_chain_get_type">
+			<constructor name="new" symbol="champlain_map_source_chain_new">
+				<return-type type="ChamplainMapSourceChain*"/>
+			</constructor>
+			<method name="pop" symbol="champlain_map_source_chain_pop">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="source_chain" type="ChamplainMapSourceChain*"/>
+				</parameters>
+			</method>
+			<method name="push" symbol="champlain_map_source_chain_push">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="source_chain" type="ChamplainMapSourceChain*"/>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+				</parameters>
+			</method>
 		</object>
 		<object name="ChamplainMapSourceFactory" parent="GObject" type-name="ChamplainMapSourceFactory" get-type="champlain_map_source_factory_get_type">
 			<method name="create" symbol="champlain_map_source_factory_create">
+				<return-type type="ChamplainMapSource*"/>
+				<parameters>
+					<parameter name="factory" type="ChamplainMapSourceFactory*"/>
+					<parameter name="id" type="gchar*"/>
+				</parameters>
+			</method>
+			<method name="create_cached_source" symbol="champlain_map_source_factory_create_cached_source">
 				<return-type type="ChamplainMapSource*"/>
 				<parameters>
 					<parameter name="factory" type="ChamplainMapSourceFactory*"/>
@@ -684,18 +798,120 @@
 				</parameters>
 			</vfunc>
 		</object>
-		<object name="ChamplainNetworkMapSource" parent="ChamplainMapSource" type-name="ChamplainNetworkMapSource" get-type="champlain_network_map_source_get_type">
-			<method name="get_tile_uri" symbol="champlain_network_map_source_get_tile_uri">
-				<return-type type="gchar*"/>
+		<object name="ChamplainMemphisTileSource" parent="ChamplainTileSource" type-name="ChamplainMemphisTileSource" get-type="champlain_memphis_tile_source_get_type">
+			<method name="get_background_color" symbol="champlain_memphis_tile_source_get_background_color">
+				<return-type type="ClutterColor*"/>
 				<parameters>
-					<parameter name="source" type="ChamplainNetworkMapSource*"/>
-					<parameter name="x" type="gint"/>
-					<parameter name="y" type="gint"/>
-					<parameter name="z" type="gint"/>
+					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
 				</parameters>
 			</method>
-			<constructor name="new_full" symbol="champlain_network_map_source_new_full">
-				<return-type type="ChamplainNetworkMapSource*"/>
+			<method name="get_map_data_source" symbol="champlain_memphis_tile_source_get_map_data_source">
+				<return-type type="ChamplainMapDataSource*"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
+				</parameters>
+			</method>
+			<method name="get_rule_ids" symbol="champlain_memphis_tile_source_get_rule_ids">
+				<return-type type="GList*"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
+				</parameters>
+			</method>
+			<method name="load_rules" symbol="champlain_memphis_tile_source_load_rules">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
+					<parameter name="rules_path" type="gchar*"/>
+				</parameters>
+			</method>
+			<constructor name="new_full" symbol="champlain_memphis_tile_source_new_full">
+				<return-type type="ChamplainMemphisTileSource*"/>
+				<parameters>
+					<parameter name="id" type="gchar*"/>
+					<parameter name="name" type="gchar*"/>
+					<parameter name="license" type="gchar*"/>
+					<parameter name="license_uri" type="gchar*"/>
+					<parameter name="min_zoom" type="guint"/>
+					<parameter name="max_zoom" type="guint"/>
+					<parameter name="tile_size" type="guint"/>
+					<parameter name="projection" type="ChamplainMapProjection"/>
+					<parameter name="map_data_source" type="ChamplainMapDataSource*"/>
+				</parameters>
+			</constructor>
+			<method name="remove_rule" symbol="champlain_memphis_tile_source_remove_rule">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
+					<parameter name="id" type="gchar*"/>
+				</parameters>
+			</method>
+			<method name="set_background_color" symbol="champlain_memphis_tile_source_set_background_color">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
+					<parameter name="color" type="ClutterColor*"/>
+				</parameters>
+			</method>
+			<method name="set_map_data_source" symbol="champlain_memphis_tile_source_set_map_data_source">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
+					<parameter name="map_data_source" type="ChamplainMapDataSource*"/>
+				</parameters>
+			</method>
+			<property name="map-data-source" type="ChamplainMapDataSource*" readable="1" writable="1" construct="1" construct-only="0"/>
+		</object>
+		<object name="ChamplainNetworkMapDataSource" parent="ChamplainMapDataSource" type-name="ChamplainNetworkMapDataSource" get-type="champlain_network_map_data_source_get_type">
+			<method name="get_api_uri" symbol="champlain_network_map_data_source_get_api_uri">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="map_data_source" type="ChamplainNetworkMapDataSource*"/>
+				</parameters>
+			</method>
+			<method name="load_map_data" symbol="champlain_network_map_data_source_load_map_data">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="map_data_source" type="ChamplainNetworkMapDataSource*"/>
+					<parameter name="bound_left" type="gdouble"/>
+					<parameter name="bound_bottom" type="gdouble"/>
+					<parameter name="bound_right" type="gdouble"/>
+					<parameter name="bound_top" type="gdouble"/>
+				</parameters>
+			</method>
+			<constructor name="new" symbol="champlain_network_map_data_source_new">
+				<return-type type="ChamplainNetworkMapDataSource*"/>
+			</constructor>
+			<method name="set_api_uri" symbol="champlain_network_map_data_source_set_api_uri">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="map_data_source" type="ChamplainNetworkMapDataSource*"/>
+					<parameter name="api_uri" type="gchar*"/>
+				</parameters>
+			</method>
+			<property name="api-uri" type="char*" readable="1" writable="1" construct="0" construct-only="0"/>
+			<property name="proxy-uri" type="char*" readable="1" writable="1" construct="0" construct-only="0"/>
+		</object>
+		<object name="ChamplainNetworkTileSource" parent="ChamplainTileSource" type-name="ChamplainNetworkTileSource" get-type="champlain_network_tile_source_get_type">
+			<method name="get_offline" symbol="champlain_network_tile_source_get_offline">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainNetworkTileSource*"/>
+				</parameters>
+			</method>
+			<method name="get_proxy_uri" symbol="champlain_network_tile_source_get_proxy_uri">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainNetworkTileSource*"/>
+				</parameters>
+			</method>
+			<method name="get_uri_format" symbol="champlain_network_tile_source_get_uri_format">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainNetworkTileSource*"/>
+				</parameters>
+			</method>
+			<constructor name="new_full" symbol="champlain_network_tile_source_new_full">
+				<return-type type="ChamplainNetworkTileSource*"/>
 				<parameters>
 					<parameter name="id" type="gchar*"/>
 					<parameter name="name" type="gchar*"/>
@@ -708,10 +924,24 @@
 					<parameter name="uri_format" type="gchar*"/>
 				</parameters>
 			</constructor>
-			<method name="set_uri_format" symbol="champlain_network_map_source_set_uri_format">
+			<method name="set_offline" symbol="champlain_network_tile_source_set_offline">
 				<return-type type="void"/>
 				<parameters>
-					<parameter name="source" type="ChamplainNetworkMapSource*"/>
+					<parameter name="tile_source" type="ChamplainNetworkTileSource*"/>
+					<parameter name="offline" type="gboolean"/>
+				</parameters>
+			</method>
+			<method name="set_proxy_uri" symbol="champlain_network_tile_source_set_proxy_uri">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainNetworkTileSource*"/>
+					<parameter name="proxy_uri" type="gchar*"/>
+				</parameters>
+			</method>
+			<method name="set_uri_format" symbol="champlain_network_tile_source_set_uri_format">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainNetworkTileSource*"/>
 					<parameter name="uri_format" type="gchar*"/>
 				</parameters>
 			</method>
@@ -719,7 +949,11 @@
 			<property name="proxy-uri" type="char*" readable="1" writable="1" construct="0" construct-only="0"/>
 			<property name="uri-format" type="char*" readable="1" writable="1" construct="1" construct-only="0"/>
 		</object>
-		<object name="ChamplainPolygon" parent="GObject" type-name="ChamplainPolygon" get-type="champlain_polygon_get_type">
+		<object name="ChamplainPolygon" parent="ClutterGroup" type-name="ChamplainPolygon" get-type="champlain_polygon_get_type">
+			<implements>
+				<interface name="ClutterScriptable"/>
+				<interface name="ClutterContainer"/>
+			</implements>
 			<method name="append_point" symbol="champlain_polygon_append_point">
 				<return-type type="ChamplainPoint*"/>
 				<parameters>
@@ -732,6 +966,18 @@
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="polygon" type="ChamplainPolygon*"/>
+				</parameters>
+			</method>
+			<method name="draw_polygon" symbol="champlain_polygon_draw_polygon">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="polygon" type="ChamplainPolygon*"/>
+					<parameter name="map_source" type="ChamplainMapSource*"/>
+					<parameter name="zoom_level" type="guint"/>
+					<parameter name="width" type="gfloat"/>
+					<parameter name="height" type="gfloat"/>
+					<parameter name="shift_x" type="gfloat"/>
+					<parameter name="shift_y" type="gfloat"/>
 				</parameters>
 			</method>
 			<method name="get_fill" symbol="champlain_polygon_get_fill">
@@ -938,13 +1184,11 @@
 				</parameters>
 			</signal>
 		</object>
-		<object name="ChamplainTile" parent="GObject" type-name="ChamplainTile" get-type="champlain_tile_get_type">
-			<method name="get_actor" symbol="champlain_tile_get_actor">
-				<return-type type="ClutterActor*"/>
-				<parameters>
-					<parameter name="self" type="ChamplainTile*"/>
-				</parameters>
-			</method>
+		<object name="ChamplainTile" parent="ClutterGroup" type-name="ChamplainTile" get-type="champlain_tile_get_type">
+			<implements>
+				<interface name="ClutterScriptable"/>
+				<interface name="ClutterContainer"/>
+			</implements>
 			<method name="get_content" symbol="champlain_tile_get_content">
 				<return-type type="ClutterActor*"/>
 				<parameters>
@@ -957,20 +1201,14 @@
 					<parameter name="self" type="ChamplainTile*"/>
 				</parameters>
 			</method>
-			<method name="get_filename" symbol="champlain_tile_get_filename">
-				<return-type type="gchar*"/>
+			<method name="get_fade_in" symbol="champlain_tile_get_fade_in">
+				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="ChamplainTile*"/>
 				</parameters>
 			</method>
 			<method name="get_modified_time" symbol="champlain_tile_get_modified_time">
 				<return-type type="GTimeVal*"/>
-				<parameters>
-					<parameter name="self" type="ChamplainTile*"/>
-				</parameters>
-			</method>
-			<method name="get_modified_time_string" symbol="champlain_tile_get_modified_time_string">
-				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="ChamplainTile*"/>
 				</parameters>
@@ -983,12 +1221,6 @@
 			</method>
 			<method name="get_state" symbol="champlain_tile_get_state">
 				<return-type type="ChamplainState"/>
-				<parameters>
-					<parameter name="self" type="ChamplainTile*"/>
-				</parameters>
-			</method>
-			<method name="get_uri" symbol="champlain_tile_get_uri">
-				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="ChamplainTile*"/>
 				</parameters>
@@ -1028,7 +1260,6 @@
 				<parameters>
 					<parameter name="self" type="ChamplainTile*"/>
 					<parameter name="actor" type="ClutterActor*"/>
-					<parameter name="fade_in" type="gboolean"/>
 				</parameters>
 			</method>
 			<method name="set_etag" symbol="champlain_tile_set_etag">
@@ -1038,11 +1269,11 @@
 					<parameter name="etag" type="gchar*"/>
 				</parameters>
 			</method>
-			<method name="set_filename" symbol="champlain_tile_set_filename">
+			<method name="set_fade_in" symbol="champlain_tile_set_fade_in">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="ChamplainTile*"/>
-					<parameter name="filename" type="gchar*"/>
+					<parameter name="fade_in" type="gboolean"/>
 				</parameters>
 			</method>
 			<method name="set_modified_time" symbol="champlain_tile_set_modified_time">
@@ -1066,13 +1297,6 @@
 					<parameter name="state" type="ChamplainState"/>
 				</parameters>
 			</method>
-			<method name="set_uri" symbol="champlain_tile_set_uri">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="ChamplainTile*"/>
-					<parameter name="uri" type="gchar*"/>
-				</parameters>
-			</method>
 			<method name="set_x" symbol="champlain_tile_set_x">
 				<return-type type="void"/>
 				<parameters>
@@ -1094,16 +1318,161 @@
 					<parameter name="zoom_level" type="gint"/>
 				</parameters>
 			</method>
-			<property name="actor" type="ClutterActor*" readable="1" writable="0" construct="0" construct-only="0"/>
 			<property name="content" type="ClutterActor*" readable="1" writable="1" construct="0" construct-only="0"/>
 			<property name="etag" type="char*" readable="1" writable="1" construct="0" construct-only="0"/>
-			<property name="filename" type="char*" readable="1" writable="1" construct="0" construct-only="0"/>
+			<property name="fade-in" type="gboolean" readable="1" writable="1" construct="0" construct-only="0"/>
 			<property name="size" type="guint" readable="1" writable="1" construct="0" construct-only="0"/>
 			<property name="state" type="ChamplainState" readable="1" writable="1" construct="0" construct-only="0"/>
-			<property name="uri" type="char*" readable="1" writable="1" construct="0" construct-only="0"/>
 			<property name="x" type="gint" readable="1" writable="1" construct="0" construct-only="0"/>
 			<property name="y" type="gint" readable="1" writable="1" construct="0" construct-only="0"/>
 			<property name="zoom-level" type="gint" readable="1" writable="1" construct="0" construct-only="0"/>
+		</object>
+		<object name="ChamplainTileCache" parent="ChamplainMapSource" type-name="ChamplainTileCache" get-type="champlain_tile_cache_get_type">
+			<method name="clean" symbol="champlain_tile_cache_clean">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_cache" type="ChamplainTileCache*"/>
+				</parameters>
+			</method>
+			<method name="get_persistent" symbol="champlain_tile_cache_get_persistent">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="tile_cache" type="ChamplainTileCache*"/>
+				</parameters>
+			</method>
+			<method name="on_tile_filled" symbol="champlain_tile_cache_on_tile_filled">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_cache" type="ChamplainTileCache*"/>
+					<parameter name="tile" type="ChamplainTile*"/>
+				</parameters>
+			</method>
+			<method name="refresh_tile_time" symbol="champlain_tile_cache_refresh_tile_time">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_cache" type="ChamplainTileCache*"/>
+					<parameter name="tile" type="ChamplainTile*"/>
+				</parameters>
+			</method>
+			<method name="store_tile" symbol="champlain_tile_cache_store_tile">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_cache" type="ChamplainTileCache*"/>
+					<parameter name="tile" type="ChamplainTile*"/>
+					<parameter name="contents" type="gchar*"/>
+					<parameter name="size" type="gsize"/>
+				</parameters>
+			</method>
+			<property name="persistent-cache" type="gboolean" readable="1" writable="1" construct="0" construct-only="1"/>
+			<vfunc name="clean">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_cache" type="ChamplainTileCache*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="on_tile_filled">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_cache" type="ChamplainTileCache*"/>
+					<parameter name="tile" type="ChamplainTile*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="refresh_tile_time">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_cache" type="ChamplainTileCache*"/>
+					<parameter name="tile" type="ChamplainTile*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="store_tile">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_cache" type="ChamplainTileCache*"/>
+					<parameter name="tile" type="ChamplainTile*"/>
+					<parameter name="contents" type="gchar*"/>
+					<parameter name="size" type="gsize"/>
+				</parameters>
+			</vfunc>
+		</object>
+		<object name="ChamplainTileSource" parent="ChamplainMapSource" type-name="ChamplainTileSource" get-type="champlain_tile_source_get_type">
+			<method name="get_cache" symbol="champlain_tile_source_get_cache">
+				<return-type type="ChamplainTileCache*"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainTileSource*"/>
+				</parameters>
+			</method>
+			<method name="set_cache" symbol="champlain_tile_source_set_cache">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainTileSource*"/>
+					<parameter name="cache" type="ChamplainTileCache*"/>
+				</parameters>
+			</method>
+			<method name="set_id" symbol="champlain_tile_source_set_id">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainTileSource*"/>
+					<parameter name="id" type="gchar*"/>
+				</parameters>
+			</method>
+			<method name="set_license" symbol="champlain_tile_source_set_license">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainTileSource*"/>
+					<parameter name="license" type="gchar*"/>
+				</parameters>
+			</method>
+			<method name="set_license_uri" symbol="champlain_tile_source_set_license_uri">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainTileSource*"/>
+					<parameter name="license_uri" type="gchar*"/>
+				</parameters>
+			</method>
+			<method name="set_max_zoom_level" symbol="champlain_tile_source_set_max_zoom_level">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainTileSource*"/>
+					<parameter name="zoom_level" type="guint"/>
+				</parameters>
+			</method>
+			<method name="set_min_zoom_level" symbol="champlain_tile_source_set_min_zoom_level">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainTileSource*"/>
+					<parameter name="zoom_level" type="guint"/>
+				</parameters>
+			</method>
+			<method name="set_name" symbol="champlain_tile_source_set_name">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainTileSource*"/>
+					<parameter name="name" type="gchar*"/>
+				</parameters>
+			</method>
+			<method name="set_projection" symbol="champlain_tile_source_set_projection">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainTileSource*"/>
+					<parameter name="projection" type="ChamplainMapProjection"/>
+				</parameters>
+			</method>
+			<method name="set_tile_size" symbol="champlain_tile_source_set_tile_size">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainTileSource*"/>
+					<parameter name="tile_size" type="guint"/>
+				</parameters>
+			</method>
+			<property name="cache" type="ChamplainTileCache*" readable="1" writable="1" construct="0" construct-only="0"/>
+			<property name="id" type="char*" readable="1" writable="1" construct="1" construct-only="0"/>
+			<property name="license" type="char*" readable="1" writable="1" construct="1" construct-only="0"/>
+			<property name="license-uri" type="char*" readable="1" writable="1" construct="1" construct-only="0"/>
+			<property name="max-zoom-level" type="guint" readable="1" writable="1" construct="1" construct-only="0"/>
+			<property name="min-zoom-level" type="guint" readable="1" writable="1" construct="1" construct-only="0"/>
+			<property name="name" type="char*" readable="1" writable="1" construct="1" construct-only="0"/>
+			<property name="projection" type="ChamplainMapProjection" readable="1" writable="1" construct="1" construct-only="0"/>
+			<property name="tile-size" type="guint" readable="1" writable="1" construct="1" construct-only="0"/>
 		</object>
 		<object name="ChamplainView" parent="ClutterGroup" type-name="ChamplainView" get-type="champlain_view_get_type">
 			<implements>
@@ -1413,117 +1782,19 @@
 				</parameters>
 			</signal>
 		</object>
-		<object name="ChamplainZoomLevel" parent="GObject" type-name="ChamplainZoomLevel" get-type="champlain_zoom_level_get_type">
-			<method name="add_tile" symbol="champlain_zoom_level_add_tile">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-					<parameter name="tile" type="ChamplainTile*"/>
-				</parameters>
-			</method>
-			<method name="get_actor" symbol="champlain_zoom_level_get_actor">
-				<return-type type="ClutterActor*"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-				</parameters>
-			</method>
-			<method name="get_height" symbol="champlain_zoom_level_get_height">
-				<return-type type="guint"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-				</parameters>
-			</method>
-			<method name="get_nth_tile" symbol="champlain_zoom_level_get_nth_tile">
-				<return-type type="ChamplainTile*"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-					<parameter name="index" type="guint"/>
-				</parameters>
-			</method>
-			<method name="get_width" symbol="champlain_zoom_level_get_width">
-				<return-type type="guint"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-				</parameters>
-			</method>
-			<method name="get_zoom_level" symbol="champlain_zoom_level_get_zoom_level">
-				<return-type type="gint"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-				</parameters>
-			</method>
-			<constructor name="new" symbol="champlain_zoom_level_new">
-				<return-type type="ChamplainZoomLevel*"/>
-			</constructor>
-			<method name="remove_tile" symbol="champlain_zoom_level_remove_tile">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-					<parameter name="tile" type="ChamplainTile*"/>
-				</parameters>
-			</method>
-			<method name="set_height" symbol="champlain_zoom_level_set_height">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-					<parameter name="height" type="guint"/>
-				</parameters>
-			</method>
-			<method name="set_width" symbol="champlain_zoom_level_set_width">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-					<parameter name="width" type="guint"/>
-				</parameters>
-			</method>
-			<method name="set_zoom_level" symbol="champlain_zoom_level_set_zoom_level">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-					<parameter name="zoom_level" type="gint"/>
-				</parameters>
-			</method>
-			<method name="tile_count" symbol="champlain_zoom_level_tile_count">
-				<return-type type="guint"/>
-				<parameters>
-					<parameter name="self" type="ChamplainZoomLevel*"/>
-				</parameters>
-			</method>
-			<property name="actor" type="ClutterActor*" readable="1" writable="0" construct="0" construct-only="0"/>
-			<property name="height" type="guint" readable="1" writable="1" construct="0" construct-only="0"/>
-			<property name="width" type="guint" readable="1" writable="1" construct="0" construct-only="0"/>
-			<property name="zoom-level" type="gint" readable="1" writable="1" construct="0" construct-only="0"/>
-			<signal name="tile-added" when="LAST">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="object" type="ChamplainZoomLevel*"/>
-					<parameter name="p0" type="ChamplainTile*"/>
-				</parameters>
-			</signal>
-			<signal name="tile-removed" when="LAST">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="object" type="ChamplainZoomLevel*"/>
-					<parameter name="p0" type="ChamplainTile*"/>
-				</parameters>
-			</signal>
-		</object>
+		<constant name="CHAMPLAIN_HAS_MEMPHIS" type="int" value="1"/>
 		<constant name="CHAMPLAIN_MAJOR_VERSION" type="int" value="0"/>
-		<constant name="CHAMPLAIN_MAP_SOURCE_MFF_RELIEF" type="char*" value="MapsForFree Relief"/>
+		<constant name="CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL" type="char*" value="memphis-local"/>
+		<constant name="CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK" type="char*" value="memphis-network"/>
+		<constant name="CHAMPLAIN_MAP_SOURCE_MFF_RELIEF" type="char*" value="mff-relief"/>
 		<constant name="CHAMPLAIN_MAP_SOURCE_OAM" type="char*" value="OpenAerialMap"/>
-		<constant name="CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP" type="char*" value="OpenCycleMap"/>
-		<constant name="CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK" type="char*" value="OpenStreetMap I"/>
-		<constant name="CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER" type="char*" value="OpenStreetMap II"/>
-		<constant name="CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP" type="char*" value="Public Transport"/>
-		<constant name="CHAMPLAIN_MAX_LAT" type="int" value="90"/>
-		<constant name="CHAMPLAIN_MAX_LONG" type="int" value="180"/>
-		<constant name="CHAMPLAIN_MICRO_VERSION" type="int" value="5"/>
-		<constant name="CHAMPLAIN_MINOR_VERSION" type="int" value="4"/>
-		<constant name="CHAMPLAIN_MIN_LAT" type="int" value="-90"/>
-		<constant name="CHAMPLAIN_MIN_LONG" type="int" value="-180"/>
-		<constant name="CHAMPLAIN_PARAM_READABLE" type="int" value="0"/>
-		<constant name="CHAMPLAIN_PARAM_READWRITE" type="int" value="0"/>
+		<constant name="CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP" type="char*" value="osm-cyclemap"/>
+		<constant name="CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK" type="char*" value="osm-mapnik"/>
+		<constant name="CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER" type="char*" value="osm-osmarender"/>
+		<constant name="CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP" type="char*" value="osm-transportmap"/>
+		<constant name="CHAMPLAIN_MICRO_VERSION" type="int" value="0"/>
+		<constant name="CHAMPLAIN_MINOR_VERSION" type="int" value="6"/>
 		<constant name="CHAMPLAIN_VERSION_HEX" type="int" value="0"/>
-		<constant name="CHAMPLAIN_VERSION_S" type="char*" value="0.4.5"/>
+		<constant name="CHAMPLAIN_VERSION_S" type="char*" value="0.6.0"/>
 	</namespace>
 </api>

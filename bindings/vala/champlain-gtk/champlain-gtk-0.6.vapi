@@ -10,10 +10,4 @@ namespace GtkChamplain {
 		[NoAccessorMethod]
 		public Champlain.View champlain_view { owned get; }
 	}
-	[CCode (cname = "champlain_view_embed_get_view", cheader_filename = "champlain-gtk/champlain-gtk.h")]
-	public static unowned Champlain.View champlain_view_embed_get_view (GtkChamplain.Embed embed);
-	[CCode (cname = "champlain_view_embed_new", cheader_filename = "champlain-gtk/champlain-gtk.h")]
-	public static unowned Gtk.Widget champlain_view_embed_new (Champlain.View view);
-	[CCode (cname = "champlain_view_embed_set_view", cheader_filename = "champlain-gtk/champlain-gtk.h")]
-	public static void champlain_view_embed_set_view (GtkChamplain.Embed embed, Champlain.View view);
 }
