@@ -305,8 +305,20 @@
 			</constructor>
 		</object>
 		<object name="ChamplainMapDataSource" parent="GInitiallyUnowned" type-name="ChamplainMapDataSource" get-type="champlain_map_data_source_get_type">
+			<method name="get_map_data" symbol="champlain_map_data_source_get_map_data">
+				<return-type type="MemphisMap*"/>
+				<parameters>
+					<parameter name="data_source" type="ChamplainMapDataSource*"/>
+				</parameters>
+			</method>
 			<property name="bounding-box" type="ChamplainBoundingBox*" readable="1" writable="1" construct="0" construct-only="0"/>
 			<property name="state" type="ChamplainState" readable="1" writable="1" construct="0" construct-only="0"/>
+			<vfunc name="get_map_data">
+				<return-type type="MemphisMap*"/>
+				<parameters>
+					<parameter name="data_source" type="ChamplainMapDataSource*"/>
+				</parameters>
+			</vfunc>
 		</object>
 		<object name="ChamplainMapSource" parent="GInitiallyUnowned" type-name="ChamplainMapSource" get-type="champlain_map_source_get_type">
 			<method name="fill_tile" symbol="champlain_map_source_fill_tile">
@@ -811,6 +823,13 @@
 					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
 				</parameters>
 			</method>
+			<method name="get_rule" symbol="champlain_memphis_tile_source_get_rule">
+				<return-type type="MemphisRule*"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
+					<parameter name="id" type="gchar*"/>
+				</parameters>
+			</method>
 			<method name="get_rule_ids" symbol="champlain_memphis_tile_source_get_rule_ids">
 				<return-type type="GList*"/>
 				<parameters>
@@ -857,6 +876,13 @@
 				<parameters>
 					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
 					<parameter name="map_data_source" type="ChamplainMapDataSource*"/>
+				</parameters>
+			</method>
+			<method name="set_rule" symbol="champlain_memphis_tile_source_set_rule">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="tile_source" type="ChamplainMemphisTileSource*"/>
+					<parameter name="rule" type="MemphisRule*"/>
 				</parameters>
 			</method>
 			<property name="map-data-source" type="ChamplainMapDataSource*" readable="1" writable="1" construct="1" construct-only="0"/>
