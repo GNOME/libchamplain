@@ -73,6 +73,7 @@ namespace Champlain {
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class MapDataSource : GLib.InitiallyUnowned {
+		public virtual unowned Memphis.Map get_map_data ();
 		[NoAccessorMethod]
 		public Champlain.BoundingBox bounding_box { owned get; set; }
 		[NoAccessorMethod]
@@ -198,11 +199,13 @@ namespace Champlain {
 		public MemphisTileSource.full (string id, string name, string license, string license_uri, uint min_zoom, uint max_zoom, uint tile_size, Champlain.MapProjection projection, Champlain.MapDataSource map_data_source);
 		public Clutter.Color get_background_color ();
 		public unowned Champlain.MapDataSource get_map_data_source ();
+		public unowned Memphis.Rule get_rule (string id);
 		public unowned GLib.List get_rule_ids ();
 		public void load_rules (string rules_path);
 		public void remove_rule (string id);
 		public void set_background_color (Clutter.Color color);
 		public void set_map_data_source (Champlain.MapDataSource map_data_source);
+		public void set_rule (Memphis.Rule rule);
 		public Champlain.MapDataSource map_data_source { get; set construct; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
