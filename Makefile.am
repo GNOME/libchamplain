@@ -31,7 +31,7 @@ endif
 pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
 
-DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc --enable-gtk --enable-python --enable-memphis --enable-introspection
+DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc --enable-gtk --enable-python --enable-introspection
 
 EXTRA_DIST = \
 	champlain-gtk.pc.in \
