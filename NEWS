@@ -1,3 +1,17 @@
+libchamplain 0.4.6 (2010-06-01)
+===============================
+
+Stable release
+GObject-introspection, Python (Victor Godoy Poluceno), Perl
+(Emmanuel Rodriguez), Vala (Tomaž Vajngerl) bindings are in a working state.
+
+Changes:
+* Vala bindings (Tomaž Vajngerl)
+* Demo and fixes for Vala bindings (Simon Wenner)
+* Fix crash when rendering polygons (Jiří Techet)
+* Use a better mechanism for error tile (Rob Bradford)
+* Various minor fixes (Jiří Techet, Koop Mast)
+
 libchamplain 0.4.5 (2010-03-10)
 ===============================
 
