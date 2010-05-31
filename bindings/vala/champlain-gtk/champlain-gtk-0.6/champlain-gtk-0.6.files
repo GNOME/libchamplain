@@ -1,2 +1,2 @@
-lib/libchamplain-gtk-0.6.so
-include/libchamplain-gtk-0.6/
+../../../champlain-gtk/.libs/libchamplain-gtk-0.6.so
+../../../champlain-gtk/

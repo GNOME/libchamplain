@@ -4,4 +4,8 @@ if ENABLE_GTK
   SUBDIRS += champlain-gtk
 endif
 
-DIST_SUBDIRS = champlain champlain-gtk demos
+if ENABLE_MEMPHIS
+  SUBDIRS += champlain-memphis
+endif
+
+DIST_SUBDIRS = champlain champlain-gtk champlain-memphis demos

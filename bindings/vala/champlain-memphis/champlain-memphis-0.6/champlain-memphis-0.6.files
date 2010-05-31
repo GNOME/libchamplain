@@ -1,0 +1,8 @@
+../../../champlain/.libs/libchamplain-0.6.so
+../../../champlain/champlain-memphis.h
+../../../champlain/champlain-memphis-tile-source.h
+../../../champlain/champlain-map-data-source.h
+../../../champlain/champlain-local-map-data-source.h
+../../../champlain/champlain-network-map-data-source.h
+../../../champlain/champlain-bounding-box.h
+
