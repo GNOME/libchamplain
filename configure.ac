@@ -271,6 +271,7 @@ AC_CONFIG_FILES([Makefile
                  bindings/python/demos/Makefile
                  bindings/vala/Makefile
                  bindings/vala/champlain/Makefile
+                 bindings/vala/champlain-memphis/Makefile
                  bindings/vala/champlain-gtk/Makefile
                  bindings/vala/demos/Makefile
                  champlain-memphis.pc

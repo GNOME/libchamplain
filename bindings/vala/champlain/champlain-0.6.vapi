@@ -21,18 +21,6 @@ namespace Champlain {
 		[NoAccessorMethod]
 		public double longitude { get; set; }
 	}
-	[Compact]
-	[CCode (copy_function = "champlain_bounding_box_copy", type_id = "CHAMPLAIN_TYPE_BOUNDING_BOX", cheader_filename = "champlain/champlain.h")]
-	public class BoundingBox {
-		public double bottom;
-		public double left;
-		public double right;
-		public double top;
-		[CCode (has_construct_function = false)]
-		public BoundingBox ();
-		public unowned Champlain.BoundingBox copy ();
-		public void get_center (double lat, double lon);
-	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class ErrorTileSource : Champlain.TileSource {
 		[CCode (has_construct_function = false)]
@@ -64,20 +52,6 @@ namespace Champlain {
 		public void remove_marker (Champlain.BaseMarker marker);
 		public void show ();
 		public void show_all_markers ();
-	}
-	[CCode (cheader_filename = "champlain/champlain.h")]
-	public class LocalMapDataSource : Champlain.MapDataSource {
-		[CCode (has_construct_function = false)]
-		public LocalMapDataSource ();
-		public void load_map_data (string map_path);
-	}
-	[CCode (cheader_filename = "champlain/champlain.h")]
-	public class MapDataSource : GLib.InitiallyUnowned {
-		public virtual unowned Memphis.Map get_map_data ();
-		[NoAccessorMethod]
-		public Champlain.BoundingBox bounding_box { owned get; set; }
-		[NoAccessorMethod]
-		public Champlain.State state { get; set; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class MapSource : GLib.InitiallyUnowned {
@@ -192,32 +166,6 @@ namespace Champlain {
 		public bool use_markup { get; set; }
 		public bool wrap { get; set; }
 		public Pango.WrapMode wrap_mode { get; set; }
-	}
-	[CCode (cheader_filename = "champlain/champlain.h")]
-	public class MemphisTileSource : Champlain.TileSource {
-		[CCode (has_construct_function = false)]
-		public MemphisTileSource.full (string id, string name, string license, string license_uri, uint min_zoom, uint max_zoom, uint tile_size, Champlain.MapProjection projection, Champlain.MapDataSource map_data_source);
-		public Clutter.Color get_background_color ();
-		public unowned Champlain.MapDataSource get_map_data_source ();
-		public unowned Memphis.Rule get_rule (string id);
-		public unowned GLib.List get_rule_ids ();
-		public void load_rules (string rules_path);
-		public void remove_rule (string id);
-		public void set_background_color (Clutter.Color color);
-		public void set_map_data_source (Champlain.MapDataSource map_data_source);
-		public void set_rule (Memphis.Rule rule);
-		public Champlain.MapDataSource map_data_source { get; set construct; }
-	}
-	[CCode (cheader_filename = "champlain/champlain.h")]
-	public class NetworkMapDataSource : Champlain.MapDataSource {
-		[CCode (has_construct_function = false)]
-		public NetworkMapDataSource ();
-		public unowned string get_api_uri ();
-		public void load_map_data (double bound_left, double bound_bottom, double bound_right, double bound_top);
-		public void set_api_uri (string api_uri);
-		public string api_uri { get; set; }
-		[NoAccessorMethod]
-		public string proxy_uri { owned get; set; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class NetworkTileSource : Champlain.TileSource {
@@ -432,36 +380,34 @@ namespace Champlain {
 		public bool zoom_on_double_click { get; set; }
 		public virtual signal void animation_completed ();
 	}
-	[CCode (cprefix = "CHAMPLAIN_MAP_PROJECTION_", cheader_filename = "champlain/champlain.h")]
+	[CCode (cprefix = "CHAMPLAIN_MAP_PROJECTION_", has_type_id = false, cheader_filename = "champlain/champlain.h")]
 	public enum MapProjection {
 		MERCATOR
 	}
-	[CCode (cprefix = "CHAMPLAIN_SCROLL_MODE_", cheader_filename = "champlain/champlain.h")]
+	[CCode (cprefix = "CHAMPLAIN_SCROLL_MODE_", has_type_id = false, cheader_filename = "champlain/champlain.h")]
 	public enum ScrollMode {
 		PUSH,
 		KINETIC
 	}
-	[CCode (cprefix = "CHAMPLAIN_SELECTION_", cheader_filename = "champlain/champlain.h")]
+	[CCode (cprefix = "CHAMPLAIN_SELECTION_", has_type_id = false, cheader_filename = "champlain/champlain.h")]
 	public enum SelectionMode {
 		NONE,
 		SINGLE,
 		MULTIPLE
 	}
-	[CCode (cprefix = "CHAMPLAIN_STATE_", cheader_filename = "champlain/champlain.h")]
+	[CCode (cprefix = "CHAMPLAIN_STATE_", has_type_id = false, cheader_filename = "champlain/champlain.h")]
 	public enum State {
 		NONE,
 		LOADING,
 		DONE
 	}
-	[CCode (cprefix = "CHAMPLAIN_UNIT_", cheader_filename = "champlain/champlain.h")]
+	[CCode (cprefix = "CHAMPLAIN_UNIT_", has_type_id = false, cheader_filename = "champlain/champlain.h")]
 	public enum Unit {
 		KM,
 		MILES
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public delegate unowned Champlain.MapSource MapSourceConstructor (Champlain.MapSourceDesc desc);
-	[CCode (cheader_filename = "champlain/champlain.h")]
-	public const int HAS_MEMPHIS;
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public const int MAJOR_VERSION;
 	[CCode (cheader_filename = "champlain/champlain.h")]
