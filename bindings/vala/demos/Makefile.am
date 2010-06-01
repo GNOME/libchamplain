@@ -6,12 +6,12 @@ launcher_SOURCES = \
 
 INCLUDES = \
 	-I$(top_srcdir) \
-	$(LAUNCHER_CFLAGS)
+	$(DEPS_CFLAGS)
 
 VALAFLAGS = \
 	--vapidir=$(srcdir)/../champlain \
-	$(LAUNCHER_PACKAGES)
+	--pkg clutter-1.0 --pkg champlain-@CHAMPLAIN_API_VERSION@
 
 launcher_LDADD = \
-	$(LAUNCHER_LIBS) \
-	$(top_builddir)/champlain/libchamplain-0.6.la
+	$(DEPS_LIBS) \
+	$(top_builddir)/champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la

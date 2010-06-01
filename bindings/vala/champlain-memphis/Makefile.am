@@ -6,8 +6,7 @@
 vapidir = $(datadir)/vala/vapi
 
 dist_vapi_DATA = \
-	champlain-memphis-0.6.vapi \
-	champlain-memphis-0.6.deps \
+	champlain-memphis-@CHAMPLAIN_API_VERSION@.vapi \
+	champlain-memphis-@CHAMPLAIN_API_VERSION@.deps \
 	$(NULL)
 
-EXTRA_DIST = champlain-memphis-0.6.vapi
