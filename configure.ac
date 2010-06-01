@@ -203,22 +203,12 @@ AC_ARG_ENABLE(vala,
   AC_HELP_STRING([--enable-vala],[Include vala champlain (and champlain-gtk)]),
     enable_vala=$enableval, enable_vala=no )
 
-if test x$enable_vala = xyes; then
+if test "x$enable_vala" = "xyes"; then
   AM_PROG_VALAC([0.8.0])
 
   if test "x$VALAC" = "x" ; then
     AC_MSG_ERROR([Cannot find the "valac" compiler in your PATH])
   fi
-
-  LAUNCHER_PACKAGES="--pkg clutter-1.0 --pkg champlain-0.6"
-  PKG_CHECK_MODULES(LAUNCHER,
-  [
-    glib-2.0,
-    clutter-1.0
-  ])
-  AC_SUBST(LAUNCHER_CFLAGS)
-  AC_SUBST(LAUNCHER_LIBS)
-  AC_SUBST(LAUNCHER_PACKAGES)
 fi
 
 AM_CONDITIONAL(ENABLE_VALA, test "x$enable_vala" = "xyes")
@@ -271,13 +261,21 @@ AC_CONFIG_FILES([Makefile
                  bindings/python/demos/Makefile
                  bindings/vala/Makefile
                  bindings/vala/champlain/Makefile
+                 bindings/vala/champlain/create.sh
                  bindings/vala/champlain-memphis/Makefile
+                 bindings/vala/champlain-memphis/create.sh
                  bindings/vala/champlain-gtk/Makefile
+                 bindings/vala/champlain-gtk/create.sh
                  bindings/vala/demos/Makefile
                  champlain-memphis.pc
                  champlain-memphis-uninstalled.pc])
 AC_CONFIG_FILES([bindings/python/update-binding.sh],
-                [chmod +x bindings/python/update-binding.sh])
+                [
+                 chmod +x bindings/python/update-binding.sh
+                 chmod +x bindings/vala/champlain/create.sh
+                 chmod +x bindings/vala/champlain-gtk/create.sh
+                 chmod +x bindings/vala/champlain-memphis/create.sh
+                ])
 AC_OUTPUT
 
 echo ""

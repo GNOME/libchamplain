@@ -6,8 +6,7 @@
 vapidir = $(datadir)/vala/vapi
 
 dist_vapi_DATA = \
-	champlain-gtk-0.6.vapi \
-	champlain-gtk-0.6.deps \
+	champlain-gtk-@CHAMPLAIN_API_VERSION@.vapi \
+	champlain-gtk-@CHAMPLAIN_API_VERSION@.deps \
 	$(NULL)
 
-EXTRA_DIST = champlain-gtk-0.6.vapi
