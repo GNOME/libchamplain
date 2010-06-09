@@ -181,8 +181,8 @@
   (c-name "champlain_base_marker_set_position")
   (return-type "none")
   (parameters
-    '("gdouble" "longitude")
     '("gdouble" "latitude")
+    '("gdouble" "longitude")
   )
 )
 
