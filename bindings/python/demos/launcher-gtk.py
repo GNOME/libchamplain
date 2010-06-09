@@ -21,6 +21,13 @@ class LauncherGTK:
         embed.set_size_request(640, 480)
 
         self.view = embed.get_view()
+        self.view.set_reactive(True)
+        self.view.connect('button-release-event', self.mouse_click_cb, self.view)
+
+        self.view.set_property('scroll-mode', champlain.SCROLL_MODE_KINETIC)
+        self.view.set_property('zoom-level', 5)
+        self.view.set_property('license-text', "Don't eat cereals with orange juice\nIt tastes bad")
+        self.view.set_property('show-scale', True)
 
         self.layer = create_marker_layer(self.view)
         self.view.add_layer(self.layer)
@@ -75,6 +82,10 @@ class LauncherGTK:
         self.spinbutton.set_value(5)
         bbox.add(self.spinbutton)
 
+        button = gtk.Image()
+        self.view.connect("notify::state", self.view_state_changed, button)
+        bbox.pack_end(button, False, False, 0)        
+
         vbox.pack_start(bbox, expand=False, fill=False)
         vbox.add(embed)
 
@@ -97,6 +108,11 @@ class LauncherGTK:
             self.polygon.hide()    
             self.layer.animate_out_all_markers()
 
+    def mouse_click_cb(self, actor, event, view):
+        lat, lon = view.get_coords_from_event(event)
+        print "Mouse click at: %f %f" % (lat, lon)
+        return True
+
     def zoom_changed(self, widget):
         self.view.set_property("zoom-level", self.spinbutton.get_value_as_int())
 
@@ -109,6 +125,13 @@ class LauncherGTK:
 
     def map_zoom_changed(self, widget, value):
         self.spinbutton.set_value(self.view.get_property("zoom-level"))
+
+    def view_state_changed(self, view, paramspec, image):
+        state = view.get_property("state")
+        if state == champlain.STATE_LOADING:
+            image.set_from_stock(gtk.STOCK_NETWORK, gtk.ICON_SIZE_BUTTON)
+        else:
+            image.clear()
 
 
 if __name__ == "__main__":
