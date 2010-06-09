@@ -13,8 +13,7 @@ import gobject
 MARKER_SIZE = 10
 MARKER_COLOR = [0.1,0.1,0.9,1.0]
 
-POSITION = [45.528178, -73.563788]
-SCREEN_SIZE = [640, 480]
+SCREEN_SIZE = [800, 600]
 
 class AnimatedMarker(champlain.Marker) :
     """The AnimatedMarker will extend the champlain.Marker class"""
@@ -79,7 +78,19 @@ class AnimatedMarker(champlain.Marker) :
         
     def start_animation(self) :
         self.timeline.start()
-        
+    
+
+lat = 45.466
+lon = -73.75
+    
+def gps_callback(view, marker):
+    global lat, lon
+    lat += 0.005
+    lon += 0.005
+    view.center_on(lat, lon)
+    marker.set_position(lat, lon)
+    return True
+
 
 def main() :
     gobject.threads_init()
@@ -91,7 +102,7 @@ def main() :
     #Starting the animation, that's what we want after all !
     marker.start_animation()
     #Set marker position on the map
-    marker.set_position(*POSITION)
+    marker.set_position(lat, lon)
     
     stage.set_size(*SCREEN_SIZE)
     actor.set_size(*SCREEN_SIZE)
@@ -102,9 +113,11 @@ def main() :
     layer.add(marker)
 
     # Finish initialising the map view
-    actor.set_property("zoom-level", 5)
+    actor.set_property("zoom-level", 12)
     actor.set_property("scroll-mode", champlain.SCROLL_MODE_KINETIC)
-    actor.center_on(*POSITION)
+    actor.center_on(lat, lon)
+
+    gobject.timeout_add(1000, gps_callback, actor, marker)
     
     stage.show()
     
