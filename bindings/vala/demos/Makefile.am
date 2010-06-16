@@ -15,3 +15,4 @@ VALAFLAGS = \
 launcher_LDADD = \
 	$(DEPS_LIBS) \
 	$(top_builddir)/champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
+

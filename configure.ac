@@ -193,17 +193,17 @@ AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
 GOBJECT_INTROSPECTION_CHECK([0.6.3])
 
 # -----------------------------------------------------------
-# Enable vala (default to "no")
+# Enable vala demos (default to "no")
 # -----------------------------------------------------------
 
 AC_PATH_PROG(VAPIGEN, vapigen, vapigen)
 AC_SUBST(VAPIGEN)
 
 AC_ARG_ENABLE(vala,
-  AC_HELP_STRING([--enable-vala],[Include vala champlain (and champlain-gtk)]),
-    enable_vala=$enableval, enable_vala=no )
+  AC_HELP_STRING([--enable-vala-demos],[Build vala bindings demos]),
+    enable_vala_demos=$enableval, enable_vala_demos=no )
 
-if test "x$enable_vala" = "xyes"; then
+if test "x$enable_vala_demos" = "xyes"; then
   AM_PROG_VALAC([0.8.0])
 
   if test "x$VALAC" = "x" ; then
@@ -211,7 +211,7 @@ if test "x$enable_vala" = "xyes"; then
   fi
 fi
 
-AM_CONDITIONAL(ENABLE_VALA, test "x$enable_vala" = "xyes")
+AM_CONDITIONAL(ENABLE_VALA_DEMOS, test "x$enable_vala_demos" = "xyes")
 
 # -----------------------------------------------------------
 # Generate features header file
@@ -293,7 +293,7 @@ echo "  Memphis source: ${enable_memphis}"
 echo ""
 echo "Bindings:"
 echo "       Python bindings: ${enable_python}"
-echo "       Vala bindings: ${enable_vala}"
+echo "       Vala bindings: yes"
 echo " gobject-introspection: ${enable_introspection}"
 echo ""
 
