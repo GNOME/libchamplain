@@ -1,3 +1,17 @@
+libchamplain 0.6.1 (2010-06-26)
+===============================
+
+Stable release
+GObject-introspection, Vala (Tomaž Vajngerl) and Python (Victor Godoy Poluceno) 
+bindings are in a working state.
+
+Changes:
+* New Vala bindings (Tomaž Vajngerl)
+* Updated Python bindings (Victor Godoy Poluceno)
+* Do not distribute gir files (Yaakov Selkowitz)
+* Minimal libchamplain usage demos (Jiří Techet)
+* Minor fixes and improvements (Jiří Techet)
+
 libchamplain 0.6 (2010-05-25)
 ===============================
 
