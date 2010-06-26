@@ -199,7 +199,7 @@ GOBJECT_INTROSPECTION_CHECK([0.6.3])
 AC_PATH_PROG(VAPIGEN, vapigen, vapigen)
 AC_SUBST(VAPIGEN)
 
-AC_ARG_ENABLE(vala,
+AC_ARG_ENABLE(vala-demos,
   AC_HELP_STRING([--enable-vala-demos],[Build vala bindings demos]),
     enable_vala_demos=$enableval, enable_vala_demos=no )
 
