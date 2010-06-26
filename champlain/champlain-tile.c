@@ -52,6 +52,15 @@ enum
   PROP_FADE_IN
 };
 
+enum
+{
+  /* normal signals */
+  RENDER_COMPLETE,
+  LAST_SIGNAL
+};
+
+static guint champlain_tile_signals[LAST_SIGNAL] = { 0, };
+
 struct _ChamplainTilePrivate {
   gint x; /* The x position on the map (in pixels) */
   gint y; /* The y position on the map (in pixels) */
@@ -310,6 +319,12 @@ champlain_tile_class_init (ChamplainTileClass *klass)
           "Tile should fade in",
           FALSE,
           G_PARAM_READWRITE));
+
+  champlain_tile_signals[RENDER_COMPLETE] =
+    g_signal_new ("render-complete", G_OBJECT_CLASS_TYPE (object_class),
+                  G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                  g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE,
+                  1, G_TYPE_POINTER);
 }
 
 static void
@@ -536,30 +551,6 @@ champlain_tile_set_state (ChamplainTile *self,
   if (state == priv->state)
     return;
 
-  if (state == CHAMPLAIN_STATE_DONE && priv->content_actor &&
-      clutter_actor_get_parent (priv->content_actor) != CLUTTER_ACTOR (self))
-    {
-      clutter_actor_set_opacity (priv->content_actor, 0);
-      clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->content_actor);
-
-      if (priv->fade_in)
-        {
-          clutter_actor_animate (priv->content_actor,
-              CLUTTER_EASE_IN_CUBIC,
-              500,
-              "opacity", 255,
-              NULL);
-        }
-      else
-        {
-          clutter_actor_animate (priv->content_actor,
-              CLUTTER_LINEAR,
-              150,
-              "opacity", 255,
-              NULL);
-        }
-    }
-
   priv->state = state;
   g_object_notify (G_OBJECT (self), "state");
 }
@@ -692,6 +683,53 @@ champlain_tile_set_content (ChamplainTile *self,
 
   g_object_notify (G_OBJECT (self), "content");
 }
+
+
+static void
+fade_in_completed (G_GNUC_UNUSED ClutterAnimation *animation, ChamplainTile *self)
+{
+  if (clutter_group_get_n_children (CLUTTER_GROUP (self)) > 1)
+    clutter_actor_destroy (clutter_group_get_nth_child (CLUTTER_GROUP (self), 0));
+}
+
+
+void
+champlain_tile_display_content (ChamplainTile *self)
+{
+  g_return_if_fail (CHAMPLAIN_TILE (self));
+
+  ChamplainTilePrivate *priv = self->priv;
+  ClutterAnimation *animation;
+
+  if (!priv->content_actor)
+    return;
+
+  clutter_actor_set_opacity (priv->content_actor, 0);
+  clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->content_actor);
+
+  if (priv->fade_in)
+    {
+      animation = clutter_actor_animate (priv->content_actor,
+          CLUTTER_EASE_IN_CUBIC,
+          500,
+          "opacity", 255,
+          NULL);
+    }
+  else
+    {
+      animation = clutter_actor_animate (priv->content_actor,
+          CLUTTER_LINEAR,
+          150,
+          "opacity", 255,
+          NULL);
+    }
+
+  g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), self);
+
+  g_object_unref (priv->content_actor);
+  priv->content_actor = NULL;
+}
+
 
 /**
  * champlain_tile_get_content:

@@ -89,6 +89,12 @@ typedef struct
 typedef struct
 {
   ChamplainMapSource *map_source;
+  gchar *etag;
+} TileRenderedCallbackData;
+
+typedef struct
+{
+  ChamplainMapSource *map_source;
   SoupMessage *msg;
 } TileDestroyedCbData;
 
@@ -512,6 +518,40 @@ destroy_cb_data (TileDestroyedCbData *data,
   g_free (data);
 }
 
+
+static void
+tile_rendered_cb (ChamplainTile *tile, ChamplainRenderCallbackData *data, TileRenderedCallbackData *user_data)
+{
+  ChamplainMapSource *map_source = user_data->map_source;
+  ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE(map_source);
+  ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
+  gchar *etag = user_data->etag;
+
+  if (!data->error)
+    {
+      if (etag != NULL)
+        champlain_tile_set_etag (tile, etag);
+
+      if (tile_cache)
+        champlain_tile_cache_store_tile (tile_cache, tile, data->data, data->size);
+
+      champlain_tile_set_fade_in (tile, TRUE);
+      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+      champlain_tile_display_content (tile);
+    }
+  else
+    {
+      if (next_source)
+        champlain_map_source_fill_tile (next_source, tile);
+    }
+
+  g_object_unref (map_source);
+  g_free (user_data);
+  g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, data);
+}
+
+
 static void
 tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
     SoupMessage *msg,
@@ -523,10 +563,10 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
   ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
   ChamplainTile *tile = callback_data->tile;
-  GdkPixbufLoader* loader = NULL;
-  GError *error = NULL;
-  ClutterActor *actor;
   const gchar *etag;
+  TileRenderedCallbackData *data;
+  ChamplainRenderer *renderer;
+
 
   if (tile)
     g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer*)&callback_data->tile);
@@ -564,80 +604,33 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
       goto load_next;
     }
 
-  /* Load the data from the http response */
-  loader = gdk_pixbuf_loader_new ();
-  if (!gdk_pixbuf_loader_write (loader,
-                                (const guchar *) msg->response_body->data,
-                                msg->response_body->length,
-                                &error))
-    {
-      if (error)
-        {
-          g_warning ("Unable to load the pixbuf: %s", error->message);
-          g_error_free (error);
-        }
-
-      goto load_next;
-    }
-
-  gdk_pixbuf_loader_close (loader, &error);
-  if (error)
-    {
-      g_warning ("Unable to close the pixbuf loader: %s", error->message);
-      g_error_free (error);
-      goto load_next;
-    }
-
   /* Verify if the server sent an etag and save it */
   etag = soup_message_headers_get (msg->response_headers, "ETag");
   DEBUG ("Received ETag %s", etag);
 
-  if (etag != NULL)
-    champlain_tile_set_etag (tile, etag);
+  data = g_new (TileRenderedCallbackData, 1);
+  data->map_source = map_source;
+  data->etag = g_strdup(etag);
 
-  if (tile_cache)
-    champlain_tile_cache_store_tile (tile_cache, tile, msg->response_body->data, msg->response_body->length);
+  renderer = champlain_map_source_get_renderer (map_source);
 
-  /* Load the image into clutter */
-  GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
-  actor = clutter_texture_new ();
-  if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
-           gdk_pixbuf_get_pixels (pixbuf),
-           gdk_pixbuf_get_has_alpha (pixbuf),
-           gdk_pixbuf_get_width (pixbuf),
-           gdk_pixbuf_get_height (pixbuf),
-           gdk_pixbuf_get_rowstride (pixbuf),
-           gdk_pixbuf_get_bits_per_sample (pixbuf) *
-           gdk_pixbuf_get_n_channels (pixbuf) / 8,
-           0, &error))
-    {
-      if (error)
-        {
-          g_warning ("Unable to transfer to clutter: %s", error->message);
-          g_error_free (error);
-        }
+  g_signal_connect (tile, "render-complete", G_CALLBACK (tile_rendered_cb), data);
 
-      g_object_unref (actor);
-      goto load_next;
-    }
+  champlain_renderer_set_data (renderer, msg->response_body->data, msg->response_body->length);
+  champlain_renderer_render (renderer, tile);
 
-  champlain_tile_set_fade_in (tile, TRUE);
-  champlain_tile_set_content (tile, actor);
-
-  goto finish;
+  return;
 
 load_next:
-  if (loader)
-    g_object_unref (loader);
   if (next_source)
     champlain_map_source_fill_tile (next_source, tile);
   g_object_unref (map_source);
   return;
 
 finish:
-  if (loader)
-    g_object_unref (loader);
+  champlain_tile_set_fade_in (tile, TRUE);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+  champlain_tile_display_content (tile);
   g_object_unref (map_source);
 }
 
@@ -687,7 +680,7 @@ fill_tile (ChamplainMapSource *map_source,
 
       msg = soup_message_new (SOUP_METHOD_GET, uri);
 
-      if (champlain_tile_get_content (tile))
+      if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADED)
         {
           /* validate tile */
 

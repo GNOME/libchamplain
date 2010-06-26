@@ -50,6 +50,7 @@ static guint get_min_zoom_level (ChamplainMapSource *map_source);
 static guint get_max_zoom_level (ChamplainMapSource *map_source);
 static guint get_tile_size (ChamplainMapSource *map_source);
 static ChamplainMapProjection get_projection (ChamplainMapSource *map_source);
+static void reload_tiles_cb (ChamplainTileCache *tile_cache, G_GNUC_UNUSED gpointer data);
 
 static void
 champlain_tile_cache_get_property (GObject *object,
@@ -161,6 +162,17 @@ champlain_tile_cache_init (ChamplainTileCache *tile_cache)
   tile_cache->priv = priv;
 
   priv->persistent = TRUE;
+  g_signal_connect (tile_cache, "reload-tiles",
+      G_CALLBACK (reload_tiles_cb), NULL);
+}
+
+static
+void reload_tiles_cb (ChamplainTileCache *tile_cache, G_GNUC_UNUSED gpointer data)
+{
+  g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
+
+  if (!champlain_tile_cache_get_persistent (tile_cache))
+    champlain_tile_cache_clean (tile_cache);
 }
 
 /**

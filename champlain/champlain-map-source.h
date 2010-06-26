@@ -25,6 +25,7 @@
 
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-tile.h>
+#include <champlain/champlain-renderer.h>
 
 G_BEGIN_DECLS
 
@@ -83,6 +84,10 @@ GType champlain_map_source_get_type (void);
 ChamplainMapSource *champlain_map_source_get_next_source (ChamplainMapSource *map_source);
 void champlain_map_source_set_next_source (ChamplainMapSource *map_source,
     ChamplainMapSource *next_source);
+
+ChamplainRenderer *champlain_map_source_get_renderer (ChamplainMapSource *map_source);
+void champlain_map_source_set_renderer (ChamplainMapSource *map_source,
+    ChamplainRenderer *renderer);
 
 const gchar * champlain_map_source_get_id (ChamplainMapSource *map_source);
 const gchar * champlain_map_source_get_name (ChamplainMapSource *map_source);

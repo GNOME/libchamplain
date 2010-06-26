@@ -630,6 +630,7 @@ tile_loaded_cb (ClutterTexture *texture,
     }
 
   champlain_tile_set_content (tile, actor);
+  champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADED);
 
   /* Retrieve modification time */
   file = g_file_new_for_path (filename);
@@ -689,16 +690,19 @@ tile_loaded_cb (ClutterTexture *texture,
     {
       /* Tile loaded and no validation needed - done */
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+      champlain_tile_display_content (tile);
       goto cleanup;
     }
 
 load_next:
   if (CHAMPLAIN_IS_MAP_SOURCE(next_source))
     champlain_map_source_fill_tile (next_source, tile);
-  else if (champlain_tile_get_content (tile) &&
-           champlain_tile_get_state (tile) != CHAMPLAIN_STATE_DONE)
+  else if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADED)
+  {
     /* if we have some content, use the tile even if it wasn't validated */
     champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+    champlain_tile_display_content (tile);
+  }
 
 cleanup:
   g_free (filename);
@@ -712,7 +716,7 @@ fill_tile (ChamplainMapSource *map_source,
   g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (map_source));
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
 
-  if (!champlain_tile_get_content (tile))
+  if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADED)
     {
       ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(map_source);
       TileLoadedCallbackData *callback_data;

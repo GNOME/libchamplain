@@ -19,7 +19,7 @@
 
 #include <gtk/gtk.h>
 #include <champlain/champlain.h>
-#include <champlain/champlain-memphis.h>
+#include <champlain/champlain-memphis-renderer.h>
 #include <champlain-gtk/champlain-gtk.h>
 #include <clutter-gtk/clutter-gtk.h>
 #include <string.h>
@@ -45,7 +45,7 @@ static GtkWidget *polycolor, *polyminz, *polymaxz;
 static GtkWidget *linecolor, *linesize, *lineminz, *linemaxz;
 static GtkWidget *bordercolor, *bordersize, *borderminz, *bordermaxz;
 static GtkWidget *textcolor, *textsize, *textminz, *textmaxz;
-static MemphisRule *current_rule = NULL;
+static ChamplainMemphisRule *current_rule = NULL;
 
 static ChamplainMapSource *tile_source = NULL;
 
@@ -76,54 +76,29 @@ static void color_clutter_to_gdk (const ClutterColor *clutter_color,
 }
 
 static void
-data_source_state_changed (ChamplainView *view,
-                           GParamSpec *gobject,
+data_source_state_changed (ChamplainNetworkBboxTileSource *source,
                            GtkImage *image)
 {
-  ChamplainState state;
-
-  g_object_get (G_OBJECT (view), "state", &state, NULL);
-  if (state == CHAMPLAIN_STATE_LOADING)
-    {
-      gtk_image_set_from_stock (image, GTK_STOCK_NETWORK, GTK_ICON_SIZE_BUTTON);
-      g_print ("NET DATA SOURCE STATE: loading\n");
-    }
-  else
-    {
-      gtk_image_clear (image);
-      g_print ("NET DATA SOURCE STATE: done\n");
-    }
+  gtk_image_clear (image);
+  g_print ("NET DATA SOURCE STATE: done\n");
+  g_signal_handlers_disconnect_by_func (source,
+                                        data_source_state_changed,
+                                        image);
 }
 
 static void
-load_local_map_data (ChamplainMapSource *source)
+load_network_map_data (ChamplainNetworkBboxTileSource *source, ChamplainView *view)
 {
-  ChamplainLocalMapDataSource *map_data_source;
-
-  map_data_source = CHAMPLAIN_LOCAL_MAP_DATA_SOURCE (
-                      champlain_memphis_tile_source_get_map_data_source (
-                        CHAMPLAIN_MEMPHIS_TILE_SOURCE (source)));
-
-  champlain_local_map_data_source_load_map_data (map_data_source,
-      maps[map_index]);
-}
-
-static void
-load_network_map_data (ChamplainMapSource *source, ChamplainView *view)
-{
-  ChamplainNetworkMapDataSource *map_data_source;
   gdouble lat, lon;
 
-  map_data_source = CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (
-                      champlain_memphis_tile_source_get_map_data_source (
-                        CHAMPLAIN_MEMPHIS_TILE_SOURCE (source)));
-
-  g_signal_connect (map_data_source, "notify::state", G_CALLBACK (data_source_state_changed),
+  g_signal_connect (source, "data-loaded", G_CALLBACK (data_source_state_changed),
                     map_data_state_img);
 
+  gtk_image_set_from_stock (GTK_IMAGE (map_data_state_img), GTK_STOCK_NETWORK, GTK_ICON_SIZE_BUTTON);
+  g_print ("NET DATA SOURCE STATE: loading\n");
   g_object_get (G_OBJECT (view), "latitude", &lat, "longitude", &lon, NULL);
 
-  champlain_network_map_data_source_load_map_data (map_data_source,
+  champlain_network_bbox_tile_source_load_map_data (source,
       lon - 0.008, lat - 0.008, lon + 0.008, lat + 0.008);
 }
 
@@ -135,12 +110,12 @@ load_rules_into_gui (ChamplainView *view)
   GtkTreeIter iter;
   GdkColor gdk_color;
   ClutterColor *clutter_color;
+  ChamplainMemphisRenderer *renderer;
 
-  ids = champlain_memphis_tile_source_get_rule_ids (
-          CHAMPLAIN_MEMPHIS_TILE_SOURCE(tile_source));
+  renderer = CHAMPLAIN_MEMPHIS_RENDERER ( champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (tile_source)));
+  ids = champlain_memphis_renderer_get_rule_ids (renderer);
 
-  clutter_color = champlain_memphis_tile_source_get_background_color (
-                    CHAMPLAIN_MEMPHIS_TILE_SOURCE(tile_source));
+  clutter_color = champlain_memphis_renderer_get_background_color (renderer);
 
   color_clutter_to_gdk (clutter_color, &gdk_color);
   clutter_color_free (clutter_color);
@@ -171,9 +146,9 @@ rule_window_close_cb (GtkWidget *widget, gpointer data)
 }
 
 static void
-rule_apply_cb (GtkWidget *widget, ChamplainMemphisTileSource *source)
+rule_apply_cb (GtkWidget *widget, ChamplainMemphisRenderer *renderer)
 {
-  MemphisRule *rule = current_rule;
+  ChamplainMemphisRule *rule = current_rule;
   GdkColor color;
 
   if (rule->polygon)
@@ -216,11 +191,11 @@ rule_apply_cb (GtkWidget *widget, ChamplainMemphisTileSource *source)
       rule->text->z_max = gtk_spin_button_get_value (GTK_SPIN_BUTTON (textmaxz));
     }
 
-  champlain_memphis_tile_source_set_rule (source, rule);
+  champlain_memphis_renderer_set_rule (renderer, rule);
 }
 
 GtkWidget *
-gtk_memphis_prop_new (gint type, MemphisRuleAttr *attr)
+gtk_memphis_prop_new (gint type, ChamplainMemphisRuleAttr *attr)
 {
   GtkWidget *hbox, *cb, *sb1, *sb2, *sb3;
   GdkColor gcolor;
@@ -278,8 +253,8 @@ gtk_memphis_prop_new (gint type, MemphisRuleAttr *attr)
 }
 
 static void
-create_rule_edit_window (MemphisRule *rule, gchar* id,
-                         ChamplainMemphisTileSource *source)
+create_rule_edit_window (ChamplainMemphisRule *rule, gchar* id,
+                         ChamplainMemphisRenderer *renderer)
 {
   GtkWidget *label, *table, *props, *button;
 
@@ -300,11 +275,11 @@ create_rule_edit_window (MemphisRule *rule, gchar* id,
   gtk_table_set_row_spacings (GTK_TABLE (table), 8);
   label = gtk_label_new (NULL);
 
-  if (rule->type == MEMPHIS_RULE_TYPE_WAY)
+  if (rule->type == CHAMPLAIN_MEMPHIS_RULE_TYPE_WAY)
     gtk_label_set_markup (GTK_LABEL (label), "<b>Way properties</b>");
-  else if (rule->type == MEMPHIS_RULE_TYPE_NODE)
+  else if (rule->type == CHAMPLAIN_MEMPHIS_RULE_TYPE_NODE)
     gtk_label_set_markup (GTK_LABEL (label), "<b>Node properties</b>");
-  else if (rule->type == MEMPHIS_RULE_TYPE_RELATION)
+  else if (rule->type == CHAMPLAIN_MEMPHIS_RULE_TYPE_RELATION)
     gtk_label_set_markup (GTK_LABEL (label), "<b>Relation properties</b>");
   else
     gtk_label_set_markup (GTK_LABEL (label), "<b>Unknown type</b>");
@@ -348,7 +323,7 @@ create_rule_edit_window (MemphisRule *rule, gchar* id,
                     G_CALLBACK (rule_window_close_cb), NULL);
   button = gtk_button_new_from_stock (GTK_STOCK_APPLY);
   g_signal_connect (G_OBJECT (button), "clicked",
-                    G_CALLBACK (rule_apply_cb), source);
+                    G_CALLBACK (rule_apply_cb), renderer);
   gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
 
   GtkWidget *mainbox = gtk_vbox_new (FALSE, 0);
@@ -362,17 +337,18 @@ create_rule_edit_window (MemphisRule *rule, gchar* id,
 static void
 zoom_to_map_data (GtkWidget *widget, ChamplainView *view)
 {
-  ChamplainMapDataSource *data_source;
+  ChamplainMemphisRenderer *renderer;
   ChamplainBoundingBox *bbox;
   gdouble lat, lon;
 
-  data_source = champlain_memphis_tile_source_get_map_data_source (CHAMPLAIN_MEMPHIS_TILE_SOURCE(tile_source));
-  g_object_get (G_OBJECT (data_source), "bounding-box", &bbox, NULL);
+  renderer = CHAMPLAIN_MEMPHIS_RENDERER ( champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (tile_source)));
+  g_object_get (G_OBJECT (renderer), "bounding-box", &bbox, NULL);
   champlain_bounding_box_get_center (bbox, &lat, &lon);
 
   champlain_view_center_on (CHAMPLAIN_VIEW(view), lat, lon);
   champlain_view_set_zoom_level (CHAMPLAIN_VIEW(view), 15);
 }
+
 
 static void
 request_osm_data_cb (GtkWidget *widget, ChamplainView *view)
@@ -382,13 +358,8 @@ request_osm_data_cb (GtkWidget *widget, ChamplainView *view)
 
   if (g_strcmp0 (champlain_map_source_get_id (tile_source), "memphis-network") == 0)
     {
-      ChamplainNetworkMapDataSource *data_source =
-        CHAMPLAIN_NETWORK_MAP_DATA_SOURCE (
-          champlain_memphis_tile_source_get_map_data_source (
-            CHAMPLAIN_MEMPHIS_TILE_SOURCE(tile_source)));
-
-      champlain_network_map_data_source_load_map_data (data_source,
-          lon - 0.008, lat - 0.008, lon + 0.008, lat + 0.008);
+      ChamplainNetworkBboxTileSource *source = CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (tile_source);
+      load_network_map_data (source, view);
     }
 }
 
@@ -401,11 +372,13 @@ bg_color_set_cb (GtkColorButton *widget, ChamplainView *view)
 
   if (strncmp (champlain_map_source_get_id (tile_source), "memphis", 7) == 0)
     {
+      ChamplainMemphisRenderer *renderer;
       ClutterColor clutter_color;
       color_gdk_to_clutter (&gdk_color, &clutter_color);
 
-      champlain_memphis_tile_source_set_background_color (
-        CHAMPLAIN_MEMPHIS_TILE_SOURCE (tile_source), &clutter_color);
+      renderer = CHAMPLAIN_MEMPHIS_RENDERER ( champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (tile_source)));
+
+      champlain_memphis_renderer_set_background_color (renderer, &clutter_color);
     }
 }
 
@@ -414,9 +387,9 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
 {
   gchar* id;
   ChamplainMapSource *source;
-  ChamplainLocalMapDataSource *data;
   GtkTreeIter iter;
   GtkTreeModel *model;
+  ChamplainMemphisRenderer *renderer;
 
   if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (widget), &iter))
     return;
@@ -427,6 +400,7 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
 
   ChamplainMapSourceFactory *factory = champlain_map_source_factory_dup_default ();
   source = champlain_map_source_factory_create (factory, id);
+  renderer = CHAMPLAIN_MEMPHIS_RENDERER ( champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (source)));
 
   if (source != NULL)
     {
@@ -436,9 +410,8 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
 
       if (g_strcmp0 (id, "memphis-local") == 0)
         {
-          champlain_memphis_tile_source_load_rules (
-            CHAMPLAIN_MEMPHIS_TILE_SOURCE (source), rules[rules_index]);
-          load_local_map_data (source);
+          champlain_memphis_renderer_load_rules (renderer, rules[rules_index]);
+          champlain_file_tile_source_load_map_data (CHAMPLAIN_FILE_TILE_SOURCE (source), maps[map_index]);
           gtk_widget_hide_all (memphis_box);
           gtk_widget_set_no_show_all (memphis_box, FALSE);
           gtk_widget_set_no_show_all (memphis_local_box, FALSE);
@@ -447,9 +420,8 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
         }
       else if (g_strcmp0 (id, "memphis-network") == 0)
         {
-          champlain_memphis_tile_source_load_rules (
-            CHAMPLAIN_MEMPHIS_TILE_SOURCE (source), rules[rules_index]);
-          load_network_map_data (source, view);
+          champlain_memphis_renderer_load_rules (renderer, rules[rules_index]);
+          load_network_map_data (CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (source), view);
           gtk_widget_hide_all (memphis_box);
           gtk_widget_set_no_show_all (memphis_box, FALSE);
           gtk_widget_set_no_show_all (memphis_local_box, TRUE);
@@ -500,7 +472,7 @@ map_data_changed (GtkWidget *widget, ChamplainView *view)
   map_index = index;
 
   if (g_strcmp0 (champlain_map_source_get_id (tile_source), "memphis-local") == 0)
-    load_local_map_data (tile_source);
+    champlain_file_tile_source_load_map_data (CHAMPLAIN_FILE_TILE_SOURCE (tile_source), maps[map_index]);
 }
 
 static void
@@ -518,9 +490,10 @@ rules_changed (GtkWidget *widget, ChamplainView *view)
 
   if (strncmp (champlain_map_source_get_id (tile_source), "memphis", 7) == 0)
     {
-      champlain_memphis_tile_source_load_rules (
-        CHAMPLAIN_MEMPHIS_TILE_SOURCE (tile_source),
-        file);
+      ChamplainMemphisRenderer *renderer;
+
+      renderer = CHAMPLAIN_MEMPHIS_RENDERER ( champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (tile_source)));
+      champlain_memphis_renderer_load_rules (renderer, file);
       load_rules_into_gui (view);
     }
 }
@@ -656,19 +629,23 @@ void list_item_selected_cb (GtkTreeView *tree_view,
   GtkTreeModel *model;
   char *id;
   GtkTreeSelection *selection = gtk_tree_view_get_selection (tree_view);
-  MemphisRule *rule;
+  ChamplainMemphisRule *rule;
 
   if (rule_edit_window != NULL)
     return;
 
   if (gtk_tree_selection_get_selected (selection, &model, &iter))
     {
+      ChamplainMemphisRenderer *renderer;
+
+      renderer = CHAMPLAIN_MEMPHIS_RENDERER ( champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (tile_source)));
+
       gtk_tree_model_get (model, &iter, 0, &id, -1);
 
-      rule = champlain_memphis_tile_source_get_rule (CHAMPLAIN_MEMPHIS_TILE_SOURCE(tile_source), id);
+      rule = champlain_memphis_renderer_get_rule (renderer, id);
 
       if (rule != NULL)
-        create_rule_edit_window (rule, id, CHAMPLAIN_MEMPHIS_TILE_SOURCE(tile_source));
+        create_rule_edit_window (rule, id, renderer);
 
       g_free (id);
     }

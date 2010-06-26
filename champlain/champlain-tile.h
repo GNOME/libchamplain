@@ -57,6 +57,7 @@ typedef enum
 {
   CHAMPLAIN_STATE_NONE,
   CHAMPLAIN_STATE_LOADING,
+  CHAMPLAIN_STATE_LOADED,
   CHAMPLAIN_STATE_DONE
 } ChamplainState;
 
@@ -72,6 +73,17 @@ struct _ChamplainTile {
 struct _ChamplainTileClass {
   ClutterGroupClass parent_class;
 };
+
+typedef struct _ChamplainRenderCallbackData ChamplainRenderCallbackData;
+
+
+struct _ChamplainRenderCallbackData
+{
+  gboolean error;
+  const gchar *data;
+  guint size;
+};
+
 
 GType champlain_tile_get_type (void);
 
@@ -109,6 +121,8 @@ void champlain_tile_set_modified_time (ChamplainTile *self,
     const GTimeVal *time);
 void champlain_tile_set_fade_in (ChamplainTile *self,
     gboolean fade_in);
+
+void champlain_tile_display_content (ChamplainTile *self);
 
 G_END_DECLS
 

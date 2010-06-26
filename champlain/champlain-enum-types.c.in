@@ -1,5 +1,8 @@
 /*** BEGIN file-header ***/
 #include "champlain.h"
+#ifdef CHAMPLAIN_HAS_MEMPHIS
+#include "champlain-memphis-renderer.h"
+#endif
 /*** END file-header ***/
 
 /*** BEGIN file-production ***/

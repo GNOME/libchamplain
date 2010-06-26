@@ -110,11 +110,11 @@ fill_tile (ChamplainMapSource *map_source,
   ClutterActor *clone;
   guint size;
 
-  if (champlain_tile_get_content (tile))
+  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADED)
   {
     /* cache is just validating tile - don't generate error tile in this case - instead use what we have */
-    if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_DONE)
-      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+    champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+    champlain_tile_display_content (tile);
     return;
   }
 
@@ -162,4 +162,5 @@ fill_tile (ChamplainMapSource *map_source,
   clutter_texture_set_cogl_texture (CLUTTER_TEXTURE (clone), priv->error_tex);
   champlain_tile_set_content (tile, clone);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+  champlain_tile_display_content (tile);
 }

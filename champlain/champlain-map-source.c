@@ -69,6 +69,7 @@ enum
 {
   PROP_0,
   PROP_NEXT_SOURCE,
+  PROP_RENDERER,
 };
 
 static guint champlain_map_source_signals[LAST_SIGNAL] = { 0, };
@@ -76,8 +77,10 @@ static guint champlain_map_source_signals[LAST_SIGNAL] = { 0, };
 struct _ChamplainMapSourcePrivate
 {
   ChamplainMapSource *next_source;
+  ChamplainRenderer *renderer;
 
   gulong sig_handler_id;
+  gulong renderer_sig_handler_id;
 };
 
 static void reload_tiles_cb (ChamplainMapSource *orig, ChamplainMapSource *self);
@@ -98,6 +101,9 @@ champlain_map_source_get_property (GObject *object,
     case PROP_NEXT_SOURCE:
       g_value_set_object (value, priv->next_source);
       break;
+    case PROP_RENDERER:
+      g_value_set_object (value, priv->renderer);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -117,6 +123,10 @@ champlain_map_source_set_property (GObject *object,
       champlain_map_source_set_next_source (map_source,
                                             g_value_get_object (value));
       break;
+    case PROP_RENDERER:
+      champlain_map_source_set_renderer (map_source,
+                                         g_value_get_object (value));
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -132,6 +142,13 @@ champlain_map_source_dispose (GObject *object)
       g_object_unref (priv->next_source);
 
       priv->next_source = NULL;
+    }
+
+  if (priv->renderer)
+    {
+      g_object_unref (priv->renderer);
+
+      priv->renderer = NULL;
     }
 
   G_OBJECT_CLASS (champlain_map_source_parent_class)->dispose (object);
@@ -191,6 +208,20 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
   g_object_class_install_property (object_class, PROP_NEXT_SOURCE, pspec);
 
   /**
+  * ChamplainMapSource:renderer:
+  *
+  * Renderer used to render tiles.
+  *
+  * Since: 0.8
+  */
+  pspec = g_param_spec_object ("renderer",
+                               "Tile renderer",
+                               "Tile renderer used to render tiles",
+                               CHAMPLAIN_TYPE_RENDERER,
+                               G_PARAM_READWRITE);
+  g_object_class_install_property (object_class, PROP_RENDERER, pspec);
+
+  /**
   * ChamplainMapSource::reload-tiles:
   * @map_source: the #ChamplainMapSource that received the signal
   *
@@ -214,7 +245,9 @@ champlain_map_source_init (ChamplainMapSource *map_source)
   map_source->priv = priv;
 
   priv->next_source = NULL;
+  priv->renderer = NULL;
   priv->sig_handler_id = 0;
+  priv->renderer_sig_handler_id = 0;
 }
 
 /**
@@ -233,6 +266,24 @@ champlain_map_source_get_next_source (ChamplainMapSource *map_source)
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), NULL);
 
   return map_source->priv->next_source;
+}
+
+/**
+ * champlain_map_source_get_renderer:
+ * @map_source: a #ChamplainMapSource
+ *
+ * Get the renderer used to render tiles.
+ *
+ * Returns: the renderer.
+ *
+ * Since: 0.8
+ */
+ChamplainRenderer *
+champlain_map_source_get_renderer (ChamplainMapSource *map_source)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), NULL);
+
+  return map_source->priv->renderer;
 }
 
 static
@@ -293,6 +344,41 @@ champlain_map_source_set_next_source (ChamplainMapSource *map_source,
   priv->next_source = next_source;
 
   g_object_notify (G_OBJECT (map_source), "next-source");
+}
+
+/**
+ * champlain_map_source_set_renderer:
+ * @map_source: a #ChamplainMapSource
+ * @renderer: the renderer used for tile rendering
+ *
+ * Sets the renderer used to render tiles.
+ *
+ * Since: 0.8
+ */
+void
+champlain_map_source_set_renderer (ChamplainMapSource *map_source,
+    ChamplainRenderer *renderer)
+{
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
+  g_return_if_fail (CHAMPLAIN_IS_RENDERER (renderer));
+
+  ChamplainMapSourcePrivate *priv = map_source->priv;
+
+  if (priv->renderer != NULL)
+    {
+      if (g_signal_handler_is_connected (priv->renderer, priv->renderer_sig_handler_id))
+        g_signal_handler_disconnect (priv->renderer, priv->renderer_sig_handler_id);
+
+      g_object_unref (priv->renderer);
+    }
+
+  g_object_ref_sink (renderer);
+  priv->renderer = renderer;
+
+  priv->renderer_sig_handler_id = g_signal_connect (renderer, "reload-tiles",
+      G_CALLBACK (reload_tiles_cb), map_source);
+
+  g_object_notify (G_OBJECT (map_source), "renderer");
 }
 
 /**

@@ -42,6 +42,11 @@
 #include "champlain/champlain-error-tile-source.h"
 #include "champlain/champlain-map-source-factory.h"
 #include "champlain/champlain-version.h"
+#include "champlain/champlain-bounding-box.h"
+#include "champlain/champlain-file-tile-source.h"
+#include "champlain/champlain-network-bbox-tile-source.h"
+#include "champlain/champlain-renderer.h"
+#include "champlain/champlain-image-renderer.h"
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 

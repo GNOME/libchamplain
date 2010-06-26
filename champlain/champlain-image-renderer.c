@@ -1,0 +1,171 @@
+/*
+ * Copyright (C) 2010 Jiri Techet <techet@gmail.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include "champlain-image-renderer.h"
+#include <gdk/gdk.h>
+//#include <clutter/clutter.h>
+
+G_DEFINE_TYPE(ChamplainImageRenderer, champlain_image_renderer, CHAMPLAIN_TYPE_RENDERER)
+
+#define GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererPrivate))
+
+struct _ChamplainImageRendererPrivate
+{
+  gchar *data;
+  guint size;
+};
+
+static void set_data (ChamplainRenderer *renderer, const gchar *data, guint size);
+static void render (ChamplainRenderer *renderer, ChamplainTile *tile);
+
+
+static void
+champlain_image_renderer_dispose (GObject *object)
+{
+  G_OBJECT_CLASS (champlain_image_renderer_parent_class)->dispose (object);
+}
+
+
+static void
+champlain_image_renderer_finalize (GObject *object)
+{
+  ChamplainImageRendererPrivate *priv = GET_PRIVATE (object);
+
+  g_free (priv->data);
+
+  G_OBJECT_CLASS (champlain_image_renderer_parent_class)->finalize (object);
+}
+
+
+static void champlain_image_renderer_class_init(ChamplainImageRendererClass *klass)
+{
+  GObjectClass* object_class = G_OBJECT_CLASS (klass);
+  ChamplainRendererClass *renderer_class = CHAMPLAIN_RENDERER_CLASS (klass);
+
+  g_type_class_add_private (klass, sizeof (ChamplainImageRendererPrivate));
+
+  object_class->finalize = champlain_image_renderer_finalize;
+  object_class->dispose = champlain_image_renderer_dispose;
+
+  renderer_class->set_data = set_data;
+  renderer_class->render = render;
+}
+
+
+static void champlain_image_renderer_init(ChamplainImageRenderer *self)
+{
+  ChamplainImageRendererPrivate *priv = GET_PRIVATE (self);
+
+  self->priv = priv;
+
+  priv->data = NULL;
+}
+
+
+ChamplainImageRenderer *champlain_image_renderer_new(void)
+{
+    return g_object_new (CHAMPLAIN_TYPE_IMAGE_RENDERER, NULL);
+}
+
+
+static void set_data (ChamplainRenderer *renderer, const gchar *data, guint size)
+{
+  ChamplainImageRendererPrivate *priv = GET_PRIVATE (renderer);
+
+  if (priv->data)
+    g_free (priv->data);
+
+  priv->data = g_memdup (data, size);
+  priv->size = size;
+}
+
+
+static void render (ChamplainRenderer *renderer, ChamplainTile *tile)
+{
+  ChamplainImageRendererPrivate *priv = GET_PRIVATE (renderer);
+  ChamplainRenderCallbackData callback_data;
+  GdkPixbufLoader* loader = NULL;
+  GError *error = NULL;
+  ClutterActor *actor = NULL;
+  GdkPixbuf* pixbuf;
+
+  callback_data.error = FALSE;
+
+  loader = gdk_pixbuf_loader_new ();
+  if (!gdk_pixbuf_loader_write (loader,
+                                (const guchar *) priv->data,
+                                priv->size,
+                                &error))
+    {
+      if (error)
+        {
+          g_warning ("Unable to load the pixbuf: %s", error->message);
+          g_error_free (error);
+        }
+
+      goto error;
+    }
+
+  gdk_pixbuf_loader_close (loader, &error);
+  if (error)
+    {
+      g_warning ("Unable to close the pixbuf loader: %s", error->message);
+      g_error_free (error);
+      goto error;
+    }
+
+  /* Load the image into clutter */
+  pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+  actor = clutter_texture_new ();
+  if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
+           gdk_pixbuf_get_pixels (pixbuf),
+           gdk_pixbuf_get_has_alpha (pixbuf),
+           gdk_pixbuf_get_width (pixbuf),
+           gdk_pixbuf_get_height (pixbuf),
+           gdk_pixbuf_get_rowstride (pixbuf),
+           gdk_pixbuf_get_bits_per_sample (pixbuf) *
+           gdk_pixbuf_get_n_channels (pixbuf) / 8,
+           0, &error))
+    {
+      if (error)
+        {
+          g_warning ("Unable to transfer to clutter: %s", error->message);
+          g_error_free (error);
+        }
+
+      g_object_unref (actor);
+      actor = NULL;
+      goto error;
+    }
+
+  goto finish;
+
+error:
+  callback_data.error = TRUE;
+
+finish:
+  callback_data.data = priv->data;
+  callback_data.size = priv->size;
+
+  champlain_tile_set_content (tile, actor);
+
+  g_signal_emit_by_name (tile, "render-complete", &callback_data);
+
+  if (loader)
+    g_object_unref (loader);
+}

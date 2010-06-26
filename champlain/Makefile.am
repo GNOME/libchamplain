@@ -16,12 +16,7 @@ lib_LTLIBRARIES = libchamplain-@CHAMPLAIN_API_VERSION@.la
 
 if ENABLE_MEMPHIS
 memphis_headers = \
-        champlain-memphis.h \
-        champlain-memphis-tile-source.h \
-        champlain-map-data-source.h     \
-        champlain-local-map-data-source.h       \
-        champlain-network-map-data-source.h     \
-        champlain-bounding-box.h
+	champlain-memphis-renderer.h
 endif
 
 libchamplain_headers = \
@@ -46,15 +41,16 @@ libchamplain_headers = \
 	champlain-map-source-desc.h	\
 	champlain-polygon.h		\
 	champlain-version.h		\
-	champlain-features.h
+	champlain-features.h	\
+	champlain-renderer.h	\
+	champlain-image-renderer.h	\
+	champlain-file-tile-source.h	\
+	champlain-network-bbox-tile-source.h	\
+	champlain-bounding-box.h
 
 if ENABLE_MEMPHIS
 memphis_sources = \
-        champlain-memphis-tile-source.c		\
-        champlain-map-data-source.c		\
-        champlain-local-map-data-source.c	\
-        champlain-network-map-data-source.c	\
-        champlain-bounding-box.c
+	champlain-memphis-renderer.c
 endif
 
 libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
@@ -79,7 +75,12 @@ libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	champlain-map-source-factory.c	\
 	champlain-map-source-desc.c	\
 	champlain-point.c		\
-	champlain-polygon.c
+	champlain-polygon.c		\
+	champlain-renderer.c	\
+	champlain-image-renderer.c	\
+	champlain-file-tile-source.c	\
+	champlain-network-bbox-tile-source.c	\
+	champlain-bounding-box.c
 
 noinst_HEADERS = \
 	champlain-debug.h  		\
@@ -108,7 +109,12 @@ libchamplain_include_HEADERS = \
 	champlain-marker.h		\
 	champlain-polygon.h		\
 	champlain-version.h		\
-	champlain-features.h
+	champlain-features.h	\
+	champlain-renderer.h	\
+	champlain-image-renderer.h	\
+	champlain-file-tile-source.h	\
+	champlain-network-bbox-tile-source.h	\
+	champlain-bounding-box.h
 
 libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS) ../tidy/libtidy-1.0.la
 

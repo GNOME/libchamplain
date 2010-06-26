@@ -2566,7 +2566,8 @@ tile_destroyed_cb (GObject *gobject,
   ChamplainTile *tile = CHAMPLAIN_TILE (gobject);
   ChamplainViewPrivate *priv = view->priv;
 
-  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING)
+  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING ||
+      champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADED)
     {
       priv->tiles_loading--;
       if (priv->tiles_loading == 0)

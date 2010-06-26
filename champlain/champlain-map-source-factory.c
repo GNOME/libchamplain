@@ -40,7 +40,7 @@
 
 #include "champlain.h"
 #ifdef CHAMPLAIN_HAS_MEMPHIS
-#include "champlain-memphis.h"
+#include "champlain-memphis-renderer.h"
 #endif
 #include "champlain-file-cache.h"
 #include "champlain-defines.h"
@@ -51,6 +51,8 @@
 #include "champlain-network-tile-source.h"
 #include "champlain-map-source-chain.h"
 #include "champlain-error-tile-source.h"
+#include "champlain-image-renderer.h"
+#include "champlain-file-tile-source.h"
 
 #include <glib.h>
 #include <string.h>
@@ -457,7 +459,10 @@ static ChamplainMapSource *
 champlain_map_source_new_generic (
     ChamplainMapSourceDesc *desc, G_GNUC_UNUSED gpointer user_data)
 {
-  return CHAMPLAIN_MAP_SOURCE (champlain_network_tile_source_new_full (
+  ChamplainMapSource *map_source;
+  ChamplainImageRenderer *renderer;
+
+  map_source = CHAMPLAIN_MAP_SOURCE (champlain_network_tile_source_new_full (
       desc->id,
       desc->name,
       desc->license,
@@ -467,6 +472,11 @@ champlain_map_source_new_generic (
       256,
       desc->projection,
       desc->uri_format));
+
+  renderer = champlain_image_renderer_new();
+  champlain_map_source_set_renderer(map_source, CHAMPLAIN_RENDERER(renderer));
+
+  return map_source;
 }
 
 #ifdef CHAMPLAIN_HAS_MEMPHIS
@@ -474,33 +484,38 @@ static ChamplainMapSource *
 champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
     G_GNUC_UNUSED gpointer user_data)
 {
-  ChamplainMapDataSource *map_data_source;
+  ChamplainMapSource *map_source;
+  ChamplainMemphisRenderer *renderer;
 
   if (g_strcmp0 (desc->id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL) == 0)
     {
-      map_data_source = CHAMPLAIN_MAP_DATA_SOURCE (champlain_local_map_data_source_new ());
-
-      /* Abuse the uri_format field to store an initial data path (optional) */
-      if (desc->uri_format && g_strcmp0 (desc->uri_format, "") != 0)
-        champlain_local_map_data_source_load_map_data (
-            CHAMPLAIN_LOCAL_MAP_DATA_SOURCE (map_data_source),
-            desc->uri_format);
+      map_source = CHAMPLAIN_MAP_SOURCE (champlain_file_tile_source_new_full (
+          desc->id,
+          desc->name,
+          desc->license,
+          desc->license_uri,
+          desc->min_zoom_level,
+          desc->max_zoom_level,
+          256,
+          desc->projection));
     }
-  else if (g_strcmp0 (desc->id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK) == 0)
-      map_data_source = CHAMPLAIN_MAP_DATA_SOURCE (champlain_network_map_data_source_new ());
   else
-    return NULL;
+    {
+      map_source = CHAMPLAIN_MAP_SOURCE (champlain_network_bbox_tile_source_new_full (
+          desc->id,
+          desc->name,
+          desc->license,
+          desc->license_uri,
+          desc->min_zoom_level,
+          desc->max_zoom_level,
+          256,
+          desc->projection));
+    }
 
-  return CHAMPLAIN_MAP_SOURCE (champlain_memphis_tile_source_new_full (
-      desc->id,
-      desc->name,
-      desc->license,
-      desc->license_uri,
-      desc->min_zoom_level,
-      desc->max_zoom_level,
-      256,
-      desc->projection,
-      map_data_source));
+  renderer = champlain_memphis_renderer_new_full (256);
+  champlain_map_source_set_renderer(map_source, CHAMPLAIN_RENDERER(renderer));
+
+  return map_source;
 }
 #endif
 
