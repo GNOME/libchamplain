@@ -35,7 +35,6 @@ libchamplain_headers = \
 	champlain-tile-source.h		\
 	champlain-tile-cache.h		\
 	champlain-network-tile-source.h	\
-	champlain-error-tile-source.h	\
 	champlain-file-cache.h		\
 	champlain-map-source-factory.h	\
 	champlain-map-source-desc.h	\
@@ -44,7 +43,9 @@ libchamplain_headers = \
 	champlain-features.h	\
 	champlain-renderer.h	\
 	champlain-image-renderer.h	\
+	champlain-error-tile-renderer.h	\
 	champlain-file-tile-source.h	\
+	champlain-null-tile-source.h	\
 	champlain-network-bbox-tile-source.h	\
 	champlain-bounding-box.h
 
@@ -70,7 +71,6 @@ libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	champlain-tile-source.c		\
 	champlain-tile-cache.c		\
 	champlain-network-tile-source.c	\
-	champlain-error-tile-source.c	\
 	champlain-file-cache.c		\
 	champlain-map-source-factory.c	\
 	champlain-map-source-desc.c	\
@@ -78,7 +78,9 @@ libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	champlain-polygon.c		\
 	champlain-renderer.c	\
 	champlain-image-renderer.c	\
+	champlain-error-tile-renderer.c	\
 	champlain-file-tile-source.c	\
+	champlain-null-tile-source.c	\
 	champlain-network-bbox-tile-source.c	\
 	champlain-bounding-box.c
 
@@ -100,7 +102,6 @@ libchamplain_include_HEADERS = \
 	champlain-tile-source.h		\
 	champlain-tile-cache.h		\
 	champlain-network-tile-source.h	\
-	champlain-error-tile-source.h	\
 	champlain-file-cache.h		\
 	champlain-map-source-factory.h	\
 	champlain-map-source-desc.h	\
@@ -112,7 +113,9 @@ libchamplain_include_HEADERS = \
 	champlain-features.h	\
 	champlain-renderer.h	\
 	champlain-image-renderer.h	\
+	champlain-error-tile-renderer.h	\
 	champlain-file-tile-source.h	\
+	champlain-null-tile-source.h	\
 	champlain-network-bbox-tile-source.h	\
 	champlain-bounding-box.h
 

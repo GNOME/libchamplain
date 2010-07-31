@@ -39,7 +39,7 @@
 #include "champlain/champlain-tile-cache.h"
 #include "champlain/champlain-network-tile-source.h"
 #include "champlain/champlain-file-cache.h"
-#include "champlain/champlain-error-tile-source.h"
+#include "champlain/champlain-null-tile-source.h"
 #include "champlain/champlain-map-source-factory.h"
 #include "champlain/champlain-version.h"
 #include "champlain/champlain-bounding-box.h"
@@ -47,6 +47,7 @@
 #include "champlain/champlain-network-bbox-tile-source.h"
 #include "champlain/champlain-renderer.h"
 #include "champlain/champlain-image-renderer.h"
+#include "champlain/champlain-error-tile-renderer.h"
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 

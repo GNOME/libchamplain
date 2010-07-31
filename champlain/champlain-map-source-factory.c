@@ -50,7 +50,7 @@
 #include "champlain-private.h"
 #include "champlain-network-tile-source.h"
 #include "champlain-map-source-chain.h"
-#include "champlain-error-tile-source.h"
+#include "champlain-error-tile-renderer.h"
 #include "champlain-image-renderer.h"
 #include "champlain-file-tile-source.h"
 
@@ -400,7 +400,8 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  *
  * Since: 0.6
  */
-ChamplainMapSource * champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *factory,
+ChamplainMapSource *
+champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *factory,
     const gchar *id)
 {
   ChamplainMapSourceChain *source_chain;
@@ -412,7 +413,7 @@ ChamplainMapSource * champlain_map_source_factory_create_cached_source (Champlai
   tile_source = champlain_map_source_factory_create (factory, id);
 
   tile_size = champlain_map_source_get_tile_size (tile_source);
-  error_source = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
+  error_source = champlain_map_source_factory_create_error_source (factory, tile_size);
 
   file_cache = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new ());
 
@@ -423,6 +424,22 @@ ChamplainMapSource * champlain_map_source_factory_create_cached_source (Champlai
 
   return CHAMPLAIN_MAP_SOURCE(source_chain);
 }
+
+
+ChamplainMapSource *
+champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *factory,
+    guint tile_size)
+{
+  ChamplainMapSource *null_source;
+  ChamplainRenderer *renderer;
+
+  null_source = CHAMPLAIN_MAP_SOURCE (champlain_null_tile_source_new ());
+  renderer = CHAMPLAIN_RENDERER (champlain_error_tile_renderer_new (tile_size));
+  champlain_map_source_set_renderer (null_source, renderer);
+
+  return null_source;
+}
+
 
 /**
  * champlain_map_source_factory_register:

@@ -342,7 +342,7 @@ tile_rendered_cb (ChamplainTile *tile,
 
   if (!data->error)
     {
-      if (tile_cache)
+      if (tile_cache && data->data)
         champlain_tile_cache_store_tile (tile_cache, tile, data->data, data->size);
 
       champlain_tile_set_fade_in (tile, TRUE);

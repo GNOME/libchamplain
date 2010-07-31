@@ -439,7 +439,7 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
       source_chain = champlain_map_source_chain_new ();
 
       tile_size = champlain_map_source_get_tile_size (tile_source);
-      src = CHAMPLAIN_MAP_SOURCE(champlain_error_tile_source_new_full (tile_size));
+      src = champlain_map_source_factory_create_error_source (factory, tile_size);
 
       champlain_map_source_chain_push (source_chain, src);
       champlain_map_source_chain_push (source_chain, tile_source);
