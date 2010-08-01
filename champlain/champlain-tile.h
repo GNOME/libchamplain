@@ -27,7 +27,7 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_TILE champlain_tile_get_type()
+#define CHAMPLAIN_TYPE_TILE champlain_tile_get_type ()
 
 #define CHAMPLAIN_TILE(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_TILE, ChamplainTile))
@@ -62,16 +62,18 @@ typedef enum
   CHAMPLAIN_STATE_DONE
 } ChamplainState;
 
-typedef struct _ChamplainTile        ChamplainTile;
-typedef struct _ChamplainTileClass   ChamplainTileClass;
+typedef struct _ChamplainTile ChamplainTile;
+typedef struct _ChamplainTileClass ChamplainTileClass;
 
-struct _ChamplainTile {
+struct _ChamplainTile
+{
   ClutterGroup parent;
 
   ChamplainTilePrivate *priv;
 };
 
-struct _ChamplainTileClass {
+struct _ChamplainTileClass
+{
   ClutterGroupClass parent_class;
 };
 
@@ -88,8 +90,8 @@ struct _ChamplainRenderCallbackData
 
 GType champlain_tile_get_type (void);
 
-ChamplainTile* champlain_tile_new (void);
-ChamplainTile* champlain_tile_new_full (gint x,
+ChamplainTile *champlain_tile_new (void);
+ChamplainTile *champlain_tile_new_full (gint x,
     gint y,
     guint size,
     gint zoom_level);
@@ -99,9 +101,9 @@ gint champlain_tile_get_y (ChamplainTile *self);
 gint champlain_tile_get_zoom_level (ChamplainTile *self);
 guint champlain_tile_get_size (ChamplainTile *self);
 ChamplainState champlain_tile_get_state (ChamplainTile *self);
-ClutterActor * champlain_tile_get_content (ChamplainTile *self);
-const GTimeVal * champlain_tile_get_modified_time (ChamplainTile *self);
-const gchar * champlain_tile_get_etag (ChamplainTile *self);
+ClutterActor *champlain_tile_get_content (ChamplainTile *self);
+const GTimeVal *champlain_tile_get_modified_time (ChamplainTile *self);
+const gchar *champlain_tile_get_etag (ChamplainTile *self);
 gboolean champlain_tile_get_fade_in (ChamplainTile *self);
 
 void champlain_tile_set_x (ChamplainTile *self,
@@ -115,7 +117,7 @@ void champlain_tile_set_size (ChamplainTile *self,
 void champlain_tile_set_state (ChamplainTile *self,
     ChamplainState state);
 void champlain_tile_set_content (ChamplainTile *self,
-    ClutterActor* actor);
+    ClutterActor *actor);
 void champlain_tile_set_etag (ChamplainTile *self,
     const gchar *etag);
 void champlain_tile_set_modified_time (ChamplainTile *self,
@@ -128,4 +130,3 @@ void champlain_tile_display_content (ChamplainTile *self);
 G_END_DECLS
 
 #endif /* CHAMPLAIN_MAP_TILE_H */
-

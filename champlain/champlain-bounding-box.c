@@ -45,6 +45,7 @@ champlain_bounding_box_get_type (void)
   return type;
 }
 
+
 /**
  * champlain_bounding_box_new:
  *
@@ -60,6 +61,7 @@ champlain_bounding_box_new (void)
 {
   return g_slice_new (ChamplainBoundingBox);
 }
+
 
 /**
  * champlain_bounding_box_copy:
@@ -81,6 +83,7 @@ champlain_bounding_box_copy (const ChamplainBoundingBox *bbox)
   return NULL;
 }
 
+
 /**
  * champlain_bounding_box_free:
  * @bbox: a #ChamplainBoundingBox
@@ -98,6 +101,7 @@ champlain_bounding_box_free (ChamplainBoundingBox *bbox)
 
   g_slice_free (ChamplainBoundingBox, bbox);
 }
+
 
 /**
  * champlain_bounding_box_get_center:

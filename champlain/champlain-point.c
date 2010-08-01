@@ -44,6 +44,7 @@ champlain_point_get_type (void)
   return type;
 }
 
+
 /**
  * champlain_point_copy:
  * @point: a #ChamplainPoint
@@ -64,6 +65,7 @@ champlain_point_copy (const ChamplainPoint *point)
   return NULL;
 }
 
+
 /**
  * champlain_point_free:
  * @point: a #ChamplainPoint
@@ -79,6 +81,7 @@ champlain_point_free (ChamplainPoint *point)
   if (G_LIKELY (point != NULL))
     g_slice_free (ChamplainPoint, point);
 }
+
 
 /**
  * champlain_point_new:

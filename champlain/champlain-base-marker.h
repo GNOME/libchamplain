@@ -30,22 +30,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_BASE_MARKER champlain_base_marker_get_type()
+#define CHAMPLAIN_TYPE_BASE_MARKER champlain_base_marker_get_type ()
 
 #define CHAMPLAIN_BASE_MARKER(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_BASE_MARKER, ChamplainBaseMarker))
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_BASE_MARKER, ChamplainBaseMarker))
 
 #define CHAMPLAIN_BASE_MARKER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_BASE_MARKER, ChamplainBaseMarkerClass))
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_BASE_MARKER, ChamplainBaseMarkerClass))
 
 #define CHAMPLAIN_IS_BASE_MARKER(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_BASE_MARKER))
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_BASE_MARKER))
 
 #define CHAMPLAIN_IS_BASE_MARKER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE((klass),  CHAMPLAIN_TYPE_BASE_MARKER))
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_BASE_MARKER))
 
 #define CHAMPLAIN_BASE_MARKER_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS((obj),  CHAMPLAIN_TYPE_BASE_MARKER, ChamplainBaseMarkerClass))
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_BASE_MARKER, ChamplainBaseMarkerClass))
 
 typedef struct _ChamplainBaseMarkerPrivate ChamplainBaseMarkerPrivate;
 
@@ -70,7 +70,8 @@ GType champlain_base_marker_get_type (void);
 ClutterActor *champlain_base_marker_new (void);
 
 void champlain_base_marker_set_position (ChamplainBaseMarker *marker,
-    gdouble latitude, gdouble longitude);
+    gdouble latitude,
+    gdouble longitude);
 gdouble champlain_base_marker_get_latitude (ChamplainBaseMarker *marker);
 gdouble champlain_base_marker_get_longitude (ChamplainBaseMarker *marker);
 void champlain_base_marker_set_highlighted (ChamplainBaseMarker *marker,

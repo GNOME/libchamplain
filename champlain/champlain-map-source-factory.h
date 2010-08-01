@@ -33,22 +33,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY champlain_map_source_factory_get_type()
+#define CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY champlain_map_source_factory_get_type ()
 
 #define CHAMPLAIN_MAP_SOURCE_FACTORY(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, ChamplainMapSourceFactory))
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, ChamplainMapSourceFactory))
 
 #define CHAMPLAIN_MAP_SOURCE_FACTORY_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, ChamplainMapSourceFactoryClass))
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, ChamplainMapSourceFactoryClass))
 
 #define CHAMPLAIN_IS_MAP_SOURCE_FACTORY(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY))
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY))
 
 #define CHAMPLAIN_IS_MAP_SOURCE_FACTORY_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE((klass),  CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY))
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY))
 
 #define CHAMPLAIN_MAP_SOURCE_FACTORY_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS((obj),  CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, ChamplainMapSourceFactoryClass))
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, ChamplainMapSourceFactoryClass))
 
 typedef struct _ChamplainMapSourceFactory ChamplainMapSourceFactory;
 typedef struct _ChamplainMapSourceFactoryClass ChamplainMapSourceFactoryClass;
@@ -67,20 +67,20 @@ struct _ChamplainMapSourceFactoryClass
 
 GType champlain_map_source_factory_get_type (void);
 
-ChamplainMapSourceFactory * champlain_map_source_factory_dup_default (void);
+ChamplainMapSourceFactory *champlain_map_source_factory_dup_default (void);
 
-GSList * champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *factory);
+GSList *champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *factory);
 
-ChamplainMapSource * champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
+ChamplainMapSource *champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
     const gchar *id);
-ChamplainMapSource * champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *factory,
+ChamplainMapSource *champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *factory,
     const gchar *id);
-ChamplainMapSource * champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *factory,
+ChamplainMapSource *champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *factory,
     guint tile_size);
 
-gboolean
-champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
-    ChamplainMapSourceDesc *desc, ChamplainMapSourceConstructor constructor,
+gboolean champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
+    ChamplainMapSourceDesc *desc,
+    ChamplainMapSourceConstructor constructor,
     gpointer data);
 
 #ifndef CHAMPLAIN_HAS_MAEMO

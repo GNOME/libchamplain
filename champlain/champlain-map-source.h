@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 
 #define CHAMPLAIN_MAP_SOURCE(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSource))
-  
+
 #define CHAMPLAIN_MAP_SOURCE_CLASS(klass) \
   (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
 
@@ -72,21 +72,21 @@ struct _ChamplainMapSourceClass
 {
   GInitiallyUnownedClass parent_class;
 
-  const gchar * (*get_id) (ChamplainMapSource *map_source);
-  const gchar * (*get_name) (ChamplainMapSource *map_source);
-  const gchar * (*get_license) (ChamplainMapSource *map_source);
-  const gchar * (*get_license_uri) (ChamplainMapSource *map_source);
-  guint (*get_min_zoom_level) (ChamplainMapSource *map_source);
-  guint (*get_max_zoom_level) (ChamplainMapSource *map_source);
-  guint (*get_tile_size) (ChamplainMapSource *map_source);
-  ChamplainMapProjection (*get_projection) (ChamplainMapSource *map_source);
+  const gchar * (*get_id)(ChamplainMapSource *map_source);
+  const gchar * (*get_name)(ChamplainMapSource *map_source);
+  const gchar * (*get_license)(ChamplainMapSource *map_source);
+  const gchar * (*get_license_uri)(ChamplainMapSource *map_source);
+  guint (*get_min_zoom_level)(ChamplainMapSource *map_source);
+  guint (*get_max_zoom_level)(ChamplainMapSource *map_source);
+  guint (*get_tile_size)(ChamplainMapSource *map_source);
+  ChamplainMapProjection (*get_projection)(ChamplainMapSource *map_source);
 
-  void (*fill_tile) (ChamplainMapSource *map_source,
-                     ChamplainTile *tile);
+  void (*fill_tile)(ChamplainMapSource *map_source,
+      ChamplainTile *tile);
 
-  void (*on_set_next_source) (ChamplainMapSource *map_source,
-                              ChamplainMapSource *next_source,
-                              ChamplainMapSource *new_next_source);
+  void (*on_set_next_source)(ChamplainMapSource *map_source,
+      ChamplainMapSource *next_source,
+      ChamplainMapSource *new_next_source);
 };
 
 GType champlain_map_source_get_type (void);
@@ -99,10 +99,10 @@ ChamplainRenderer *champlain_map_source_get_renderer (ChamplainMapSource *map_so
 void champlain_map_source_set_renderer (ChamplainMapSource *map_source,
     ChamplainRenderer *renderer);
 
-const gchar * champlain_map_source_get_id (ChamplainMapSource *map_source);
-const gchar * champlain_map_source_get_name (ChamplainMapSource *map_source);
-const gchar * champlain_map_source_get_license (ChamplainMapSource *map_source);
-const gchar * champlain_map_source_get_license_uri (ChamplainMapSource *map_source);
+const gchar *champlain_map_source_get_id (ChamplainMapSource *map_source);
+const gchar *champlain_map_source_get_name (ChamplainMapSource *map_source);
+const gchar *champlain_map_source_get_license (ChamplainMapSource *map_source);
+const gchar *champlain_map_source_get_license_uri (ChamplainMapSource *map_source);
 guint champlain_map_source_get_min_zoom_level (ChamplainMapSource *map_source);
 guint champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source);
 guint champlain_map_source_get_tile_size (ChamplainMapSource *map_source);
@@ -135,4 +135,3 @@ void champlain_map_source_fill_tile (ChamplainMapSource *map_source,
 G_END_DECLS
 
 #endif /* _CHAMPLAIN_MAP_SOURCE_H_ */
-

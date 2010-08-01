@@ -44,6 +44,7 @@ champlain_map_source_desc_get_type (void)
   return type;
 }
 
+
 /**
  * champlain_map_source_desc_copy:
  * @desc: a #ChamplainMapSourceDesc
@@ -60,6 +61,7 @@ ChamplainMapSourceDesc *
 champlain_map_source_desc_copy (const ChamplainMapSourceDesc *desc)
 {
   ChamplainMapSourceDesc *dest = NULL;
+
   if (G_UNLIKELY (desc == NULL))
     return NULL;
 
@@ -79,11 +81,12 @@ champlain_map_source_desc_copy (const ChamplainMapSourceDesc *desc)
   if (G_LIKELY (desc->uri_format != NULL))
     dest->uri_format = g_strdup (desc->uri_format);
 
-  // Can't make a copy of obscure pointer data
+  /* Can't make a copy of obscure pointer data */
   dest->data = desc->data;
 
   return dest;
 }
+
 
 /**
  * champlain_map_source_desc_free:
@@ -98,7 +101,6 @@ champlain_map_source_desc_copy (const ChamplainMapSourceDesc *desc)
 void
 champlain_map_source_desc_free (ChamplainMapSourceDesc *desc)
 {
-
   if (G_UNLIKELY (desc == NULL))
     return;
 
@@ -119,6 +121,7 @@ champlain_map_source_desc_free (ChamplainMapSourceDesc *desc)
 
   g_slice_free (ChamplainMapSourceDesc, desc);
 }
+
 
 /**
  * champlain_map_source_desc_new:

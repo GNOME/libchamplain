@@ -61,13 +61,13 @@ struct _ChamplainTileCacheClass
 {
   ChamplainMapSourceClass parent_class;
 
-  void (*store_tile) (ChamplainTileCache *tile_cache,
+  void (*store_tile)(ChamplainTileCache *tile_cache,
       ChamplainTile *tile,
       const gchar *contents,
       gsize size);
-  void (*refresh_tile_time) (ChamplainTileCache *tile_cache,
+  void (*refresh_tile_time)(ChamplainTileCache *tile_cache,
       ChamplainTile *tile);
-  void (*on_tile_filled) (ChamplainTileCache *tile_cache,
+  void (*on_tile_filled)(ChamplainTileCache *tile_cache,
       ChamplainTile *tile);
 };
 
@@ -85,4 +85,3 @@ void champlain_tile_cache_on_tile_filled (ChamplainTileCache *tile_cache,
 G_END_DECLS
 
 #endif /* _CHAMPLAIN_TILE_CACHE_H_ */
-

@@ -57,13 +57,14 @@ champlain_layer_get_property (GObject *object,
     G_GNUC_UNUSED GValue *value,
     GParamSpec *pspec)
 {
-  //ChamplainLayer *self = CHAMPLAIN_LAYER (object);
+  /* ChamplainLayer *self = CHAMPLAIN_LAYER (object); */
   switch (property_id)
     {
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
 }
+
 
 static void
 champlain_layer_set_property (GObject *object,
@@ -71,13 +72,14 @@ champlain_layer_set_property (GObject *object,
     G_GNUC_UNUSED const GValue *value,
     GParamSpec *pspec)
 {
-  //ChamplainLayer *self = CHAMPLAIN_LAYER (object);
+  /* ChamplainLayer *self = CHAMPLAIN_LAYER (object); */
   switch (property_id)
     {
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
 }
+
 
 static void
 champlain_layer_dispose (GObject *object)
@@ -85,11 +87,13 @@ champlain_layer_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_layer_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_layer_finalize (GObject *object)
 {
   G_OBJECT_CLASS (champlain_layer_parent_class)->finalize (object);
 }
+
 
 static void
 champlain_layer_class_init (ChamplainLayerClass *klass)
@@ -102,6 +106,7 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
   object_class->set_property = champlain_layer_set_property;
 }
 
+
 static void
 champlain_layer_init (ChamplainLayer *self)
 {
@@ -110,6 +115,7 @@ champlain_layer_init (ChamplainLayer *self)
   g_signal_connect_after (G_OBJECT (self), "actor-removed",
       G_CALLBACK (layer_remove_cb), NULL);
 }
+
 
 /* This callback serves to keep the markers ordered by their latitude.
  * Markers that are up north on the map should be lowered in the list so that
@@ -132,10 +138,10 @@ reorder_marker (ClutterGroup *layer,
     {
       ChamplainBaseMarker *prev_marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (layer, i));
 
-      if (prev_marker == (ChamplainBaseMarker*) marker)
+      if (prev_marker == (ChamplainBaseMarker *) marker)
         continue;
 
-      g_object_get(G_OBJECT(prev_marker), "latitude", &tmp_y, NULL);
+      g_object_get (G_OBJECT (prev_marker), "latitude", &tmp_y, NULL);
       tmp_y = 90 - tmp_y;
 
       if (y < tmp_y && tmp_y < low_y)
@@ -146,9 +152,10 @@ reorder_marker (ClutterGroup *layer,
     }
 
   if (lowest)
-    clutter_container_lower_child (CLUTTER_CONTAINER(layer),
+    clutter_container_lower_child (CLUTTER_CONTAINER (layer),
         CLUTTER_ACTOR (marker), CLUTTER_ACTOR (lowest));
 }
+
 
 static void
 marker_position_notify (GObject *gobject,
@@ -158,17 +165,20 @@ marker_position_notify (GObject *gobject,
   reorder_marker (CLUTTER_GROUP (user_data), CHAMPLAIN_BASE_MARKER (gobject));
 }
 
+
 static void
 layer_add_cb (ClutterGroup *layer,
     ClutterActor *actor,
     G_GNUC_UNUSED gpointer data)
 {
   ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+
   reorder_marker (layer, marker);
 
   g_signal_connect (G_OBJECT (marker), "notify::latitude",
       G_CALLBACK (marker_position_notify), layer);
 }
+
 
 static void
 layer_remove_cb (ClutterGroup *layer,
@@ -178,6 +188,7 @@ layer_remove_cb (ClutterGroup *layer,
   g_signal_handlers_disconnect_by_func (G_OBJECT (actor),
       G_CALLBACK (marker_position_notify), layer);
 }
+
 
 /**
  * champlain_layer_new:
@@ -193,6 +204,7 @@ champlain_layer_new ()
 {
   return g_object_new (CHAMPLAIN_TYPE_LAYER, NULL);
 }
+
 
 /**
  * champlain_layer_add_marker:
@@ -213,6 +225,7 @@ champlain_layer_add_marker (ChamplainLayer *layer,
   clutter_container_add_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
 }
 
+
 /**
  * champlain_layer_remove_marker:
  * @layer: a #ChamplainLayer
@@ -232,6 +245,7 @@ champlain_layer_remove_marker (ChamplainLayer *layer,
   clutter_container_remove_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
 }
 
+
 /**
  * champlain_layer_show:
  * @layer: a #ChamplainLayer
@@ -248,6 +262,7 @@ champlain_layer_show (ChamplainLayer *layer)
   clutter_actor_show (CLUTTER_ACTOR (layer));
 }
 
+
 /**
  * champlain_layer_hide:
  * @layer: a #ChamplainLayer
@@ -263,6 +278,7 @@ champlain_layer_hide (ChamplainLayer *layer)
 
   clutter_actor_hide (CLUTTER_ACTOR (layer));
 }
+
 
 /**
  * champlain_layer_animate_in_all_markers:
@@ -289,6 +305,7 @@ champlain_layer_animate_in_all_markers (ChamplainLayer *layer)
     }
 }
 
+
 /**
  * champlain_layer_animate_out_all_markers:
  * @layer: a #ChamplainLayer
@@ -314,6 +331,7 @@ champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
     }
 }
 
+
 /**
  * champlain_layer_show_all_markers:
  * @layer: a #ChamplainLayer
@@ -336,6 +354,7 @@ champlain_layer_show_all_markers (ChamplainLayer *layer)
       clutter_actor_show (marker);
     }
 }
+
 
 /**
  * champlain_layer_hide_all_markers:

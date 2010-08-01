@@ -21,7 +21,7 @@
 int
 main (int argc, char *argv[])
 {
-  ClutterActor* actor, *stage;
+  ClutterActor *actor, *stage;
 
   g_thread_init (NULL);
   clutter_init (&argc, &argv);
@@ -38,6 +38,6 @@ main (int argc, char *argv[])
   clutter_main ();
 
   clutter_actor_destroy (actor);
-    
+
   return 0;
 }

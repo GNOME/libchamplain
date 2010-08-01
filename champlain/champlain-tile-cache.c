@@ -30,10 +30,10 @@
 G_DEFINE_TYPE (ChamplainTileCache, champlain_tile_cache, CHAMPLAIN_TYPE_MAP_SOURCE)
 
 #define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_TILE_CACHE, ChamplainTileCachePrivate))
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_TILE_CACHE, ChamplainTileCachePrivate))
 
 
-static const gchar *get_id (ChamplainMapSource *map_source);
+static const gchar *get_id (ChamplainMapSource * map_source);
 static const gchar *get_name (ChamplainMapSource *map_source);
 static const gchar *get_license (ChamplainMapSource *map_source);
 static const gchar *get_license_uri (ChamplainMapSource *map_source);
@@ -49,22 +49,25 @@ champlain_tile_cache_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_tile_cache_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_tile_cache_finalize (GObject *object)
 {
   G_OBJECT_CLASS (champlain_tile_cache_parent_class)->finalize (object);
 }
 
+
 static void
-champlain_tile_cache_constructed  (GObject *object)
+champlain_tile_cache_constructed (GObject *object)
 {
   G_OBJECT_CLASS (champlain_tile_cache_parent_class)->constructed (object);
 }
 
+
 static void
 champlain_tile_cache_class_init (ChamplainTileCacheClass *klass)
 {
-  GObjectClass* object_class = G_OBJECT_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ChamplainMapSourceClass *map_source_class = CHAMPLAIN_MAP_SOURCE_CLASS (klass);
   ChamplainTileCacheClass *tile_cache_class = CHAMPLAIN_TILE_CACHE_CLASS (klass);
 
@@ -87,6 +90,7 @@ champlain_tile_cache_class_init (ChamplainTileCacheClass *klass)
   tile_cache_class->on_tile_filled = NULL;
   tile_cache_class->store_tile = NULL;
 }
+
 
 static void
 champlain_tile_cache_init (ChamplainTileCache *tile_cache)
@@ -116,6 +120,7 @@ champlain_tile_cache_store_tile (ChamplainTileCache *tile_cache,
   CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->store_tile (tile_cache, tile, contents, size);
 }
 
+
 /**
  * champlain_tile_cache_refresh_tile_time:
  * @tile_cache: a #ChamplainTileCache
@@ -133,6 +138,7 @@ champlain_tile_cache_refresh_tile_time (ChamplainTileCache *tile_cache,
 
   CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->refresh_tile_time (tile_cache, tile);
 }
+
 
 /**
  * champlain_tile_cache_on_tile_filled:
@@ -158,6 +164,7 @@ champlain_tile_cache_on_tile_filled (ChamplainTileCache *tile_cache,
   CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->on_tile_filled (tile_cache, tile);
 }
 
+
 static const gchar *
 get_id (ChamplainMapSource *map_source)
 {
@@ -169,6 +176,7 @@ get_id (ChamplainMapSource *map_source)
 
   return champlain_map_source_get_id (next_source);
 }
+
 
 static const gchar *
 get_name (ChamplainMapSource *map_source)
@@ -182,6 +190,7 @@ get_name (ChamplainMapSource *map_source)
   return champlain_map_source_get_name (next_source);
 }
 
+
 static const gchar *
 get_license (ChamplainMapSource *map_source)
 {
@@ -193,6 +202,7 @@ get_license (ChamplainMapSource *map_source)
 
   return champlain_map_source_get_license (next_source);
 }
+
 
 static const gchar *
 get_license_uri (ChamplainMapSource *map_source)
@@ -206,6 +216,7 @@ get_license_uri (ChamplainMapSource *map_source)
   return champlain_map_source_get_license_uri (next_source);
 }
 
+
 static guint
 get_min_zoom_level (ChamplainMapSource *map_source)
 {
@@ -217,6 +228,7 @@ get_min_zoom_level (ChamplainMapSource *map_source)
 
   return champlain_map_source_get_min_zoom_level (next_source);
 }
+
 
 static guint
 get_max_zoom_level (ChamplainMapSource *map_source)
@@ -230,6 +242,7 @@ get_max_zoom_level (ChamplainMapSource *map_source)
   return champlain_map_source_get_max_zoom_level (next_source);
 }
 
+
 static guint
 get_tile_size (ChamplainMapSource *map_source)
 {
@@ -241,6 +254,7 @@ get_tile_size (ChamplainMapSource *map_source)
 
   return champlain_map_source_get_tile_size (next_source);
 }
+
 
 static ChamplainMapProjection
 get_projection (ChamplainMapSource *map_source)

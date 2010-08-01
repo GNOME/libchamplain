@@ -31,7 +31,7 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_POLYGON champlain_polygon_get_type()
+#define CHAMPLAIN_TYPE_POLYGON champlain_polygon_get_type ()
 
 #define CHAMPLAIN_POLYGON(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_POLYGON, ChamplainPolygon))
@@ -50,27 +50,29 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainPolygonPrivate ChamplainPolygonPrivate;
 
-typedef struct _ChamplainPolygon        ChamplainPolygon;
-typedef struct _ChamplainPolygonClass   ChamplainPolygonClass;
+typedef struct _ChamplainPolygon ChamplainPolygon;
+typedef struct _ChamplainPolygonClass ChamplainPolygonClass;
 
-struct _ChamplainPolygon {
+struct _ChamplainPolygon
+{
   ClutterGroup parent;
 
   ChamplainPolygonPrivate *priv;
 };
 
-struct _ChamplainPolygonClass {
+struct _ChamplainPolygonClass
+{
   ClutterGroupClass parent_class;
 };
 
 GType champlain_polygon_get_type (void);
 
-ChamplainPolygon * champlain_polygon_new (void);
+ChamplainPolygon *champlain_polygon_new (void);
 
-ChamplainPoint * champlain_polygon_append_point (ChamplainPolygon *polygon,
+ChamplainPoint *champlain_polygon_append_point (ChamplainPolygon *polygon,
     gdouble lat,
     gdouble lon);
-ChamplainPoint * champlain_polygon_insert_point (ChamplainPolygon *polygon,
+ChamplainPoint *champlain_polygon_insert_point (ChamplainPolygon *polygon,
     gdouble lat,
     gdouble lon,
     gint pos);
@@ -83,8 +85,8 @@ void champlain_polygon_set_fill_color (ChamplainPolygon *polygon,
     const ClutterColor *color);
 void champlain_polygon_set_stroke_color (ChamplainPolygon *polygon,
     const ClutterColor *color);
-ClutterColor * champlain_polygon_get_fill_color (ChamplainPolygon *polygon);
-ClutterColor * champlain_polygon_get_stroke_color (ChamplainPolygon *polygon);
+ClutterColor *champlain_polygon_get_fill_color (ChamplainPolygon *polygon);
+ClutterColor *champlain_polygon_get_stroke_color (ChamplainPolygon *polygon);
 
 gboolean champlain_polygon_get_fill (ChamplainPolygon *polygon);
 void champlain_polygon_set_fill (ChamplainPolygon *polygon,

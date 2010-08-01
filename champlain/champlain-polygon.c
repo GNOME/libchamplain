@@ -34,10 +34,11 @@
 #include <glib.h>
 #include <math.h>
 
-static ClutterColor DEFAULT_FILL_COLOR = {0xcc, 0x00, 0x00, 0xaa};
-static ClutterColor DEFAULT_STROKE_COLOR = {0xa4, 0x00, 0x00, 0xff};
+static ClutterColor DEFAULT_FILL_COLOR = { 0xcc, 0x00, 0x00, 0xaa };
+static ClutterColor DEFAULT_STROKE_COLOR = { 0xa4, 0x00, 0x00, 0xff };
 
-struct _ChamplainPolygonPrivate {
+struct _ChamplainPolygonPrivate
+{
   GList *points;
   gboolean closed_path;
   ClutterColor *stroke_color;
@@ -77,34 +78,43 @@ champlain_polygon_get_property (GObject *object,
 
   switch (property_id)
     {
-      case PROP_CLOSED_PATH:
-        g_value_set_boolean (value, priv->closed_path);
-        break;
-      case PROP_FILL:
-        g_value_set_boolean (value, priv->fill);
-        break;
-      case PROP_STROKE:
-        g_value_set_boolean (value, priv->stroke);
-        break;
-      case PROP_FILL_COLOR:
-        clutter_value_set_color (value, priv->fill_color);
-        break;
-      case PROP_STROKE_COLOR:
-        clutter_value_set_color (value, priv->stroke_color);
-        break;
-      case PROP_STROKE_WIDTH:
-        g_value_set_double (value, priv->stroke_width);
-        break;
-      case PROP_VISIBLE:
-        g_value_set_boolean (value, priv->visible);
-        break;
-      case PROP_MARK_POINTS:
-        g_value_set_boolean (value, priv->mark_points);
-        break;
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    case PROP_CLOSED_PATH:
+      g_value_set_boolean (value, priv->closed_path);
+      break;
+
+    case PROP_FILL:
+      g_value_set_boolean (value, priv->fill);
+      break;
+
+    case PROP_STROKE:
+      g_value_set_boolean (value, priv->stroke);
+      break;
+
+    case PROP_FILL_COLOR:
+      clutter_value_set_color (value, priv->fill_color);
+      break;
+
+    case PROP_STROKE_COLOR:
+      clutter_value_set_color (value, priv->stroke_color);
+      break;
+
+    case PROP_STROKE_WIDTH:
+      g_value_set_double (value, priv->stroke_width);
+      break;
+
+    case PROP_VISIBLE:
+      g_value_set_boolean (value, priv->visible);
+      break;
+
+    case PROP_MARK_POINTS:
+      g_value_set_boolean (value, priv->mark_points);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
 }
+
 
 static void
 champlain_polygon_set_property (GObject *object,
@@ -116,49 +126,59 @@ champlain_polygon_set_property (GObject *object,
 
   switch (property_id)
     {
-      case PROP_CLOSED_PATH:
-        priv->closed_path = g_value_get_boolean (value);
-        break;
-      case PROP_FILL:
-        champlain_polygon_set_fill (CHAMPLAIN_POLYGON (object),
-            g_value_get_boolean (value));
-        break;
-      case PROP_STROKE:
-        champlain_polygon_set_stroke (CHAMPLAIN_POLYGON (object),
-            g_value_get_boolean (value));
-        break;
-      case PROP_FILL_COLOR:
-        champlain_polygon_set_fill_color (CHAMPLAIN_POLYGON (object),
-            clutter_value_get_color (value));
-        break;
-      case PROP_STROKE_COLOR:
-        champlain_polygon_set_stroke_color (CHAMPLAIN_POLYGON (object),
-            clutter_value_get_color (value));
-        break;
-      case PROP_STROKE_WIDTH:
-        champlain_polygon_set_stroke_width (CHAMPLAIN_POLYGON (object),
-            g_value_get_double (value));
-        break;
-      case PROP_VISIBLE:
-        if (g_value_get_boolean (value))
-            champlain_polygon_show (CHAMPLAIN_POLYGON (object));
-        else
-            champlain_polygon_hide (CHAMPLAIN_POLYGON (object));
-        break;
-      case PROP_MARK_POINTS:
-        champlain_polygon_set_mark_points (CHAMPLAIN_POLYGON (object),
-            g_value_get_boolean (value));
-        break;
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    case PROP_CLOSED_PATH:
+      priv->closed_path = g_value_get_boolean (value);
+      break;
+
+    case PROP_FILL:
+      champlain_polygon_set_fill (CHAMPLAIN_POLYGON (object),
+          g_value_get_boolean (value));
+      break;
+
+    case PROP_STROKE:
+      champlain_polygon_set_stroke (CHAMPLAIN_POLYGON (object),
+          g_value_get_boolean (value));
+      break;
+
+    case PROP_FILL_COLOR:
+      champlain_polygon_set_fill_color (CHAMPLAIN_POLYGON (object),
+          clutter_value_get_color (value));
+      break;
+
+    case PROP_STROKE_COLOR:
+      champlain_polygon_set_stroke_color (CHAMPLAIN_POLYGON (object),
+          clutter_value_get_color (value));
+      break;
+
+    case PROP_STROKE_WIDTH:
+      champlain_polygon_set_stroke_width (CHAMPLAIN_POLYGON (object),
+          g_value_get_double (value));
+      break;
+
+    case PROP_VISIBLE:
+      if (g_value_get_boolean (value))
+        champlain_polygon_show (CHAMPLAIN_POLYGON (object));
+      else
+        champlain_polygon_hide (CHAMPLAIN_POLYGON (object));
+      break;
+
+    case PROP_MARK_POINTS:
+      champlain_polygon_set_mark_points (CHAMPLAIN_POLYGON (object),
+          g_value_get_boolean (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
 }
+
 
 static void
 champlain_polygon_dispose (GObject *object)
 {
   G_OBJECT_CLASS (champlain_polygon_parent_class)->dispose (object);
 }
+
 
 static void
 champlain_polygon_finalize (GObject *object)
@@ -167,6 +187,7 @@ champlain_polygon_finalize (GObject *object)
 
   G_OBJECT_CLASS (champlain_polygon_parent_class)->finalize (object);
 }
+
 
 static void
 champlain_polygon_class_init (ChamplainPolygonClass *klass)
@@ -181,12 +202,12 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
   object_class->finalize = champlain_polygon_finalize;
 
   /**
-  * ChamplainPolygon:close-path:
-  *
-  * The shape is a closed path
-  *
-  * Since: 0.4
-  */
+   * ChamplainPolygon:close-path:
+   *
+   * The shape is a closed path
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class,
       PROP_CLOSED_PATH,
       g_param_spec_boolean ("closed-path",
@@ -195,12 +216,12 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainPolygon:fill:
-  *
-  * The shape should be filled
-  *
-  * Since: 0.4
-  */
+   * ChamplainPolygon:fill:
+   *
+   * The shape should be filled
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class,
       PROP_FILL,
       g_param_spec_boolean ("fill",
@@ -209,12 +230,12 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainPolygon:stroke:
-  *
-  * The shape should be stroked
-  *
-  * Since: 0.4
-  */
+   * ChamplainPolygon:stroke:
+   *
+   * The shape should be stroked
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class,
       PROP_STROKE,
       g_param_spec_boolean ("stroke",
@@ -223,27 +244,27 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
           TRUE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainPolygon:stroke-color:
-  *
-  * The polygon's stroke color
-  *
-  * Since: 0.4
-  */
+   * ChamplainPolygon:stroke-color:
+   *
+   * The polygon's stroke color
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class,
       PROP_STROKE_COLOR,
       clutter_param_spec_color ("stroke-color",
-        "Stroke Color",
-        "The polygon's stroke color",
-        &DEFAULT_STROKE_COLOR,
-        CHAMPLAIN_PARAM_READWRITE));
+          "Stroke Color",
+          "The polygon's stroke color",
+          &DEFAULT_STROKE_COLOR,
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainPolygon:text-color:
-  *
-  * The polygon's fill color
-  *
-  * Since: 0.4
-  */
+   * ChamplainPolygon:text-color:
+   *
+   * The polygon's fill color
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class,
       PROP_FILL_COLOR,
       clutter_param_spec_color ("fill-color",
@@ -253,12 +274,12 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainPolygon:stroke-width:
-  *
-  * The polygon's stroke width (in pixels)
-  *
-  * Since: 0.4
-  */
+   * ChamplainPolygon:stroke-width:
+   *
+   * The polygon's stroke width (in pixels)
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class,
       PROP_STROKE_WIDTH,
       g_param_spec_double ("stroke-width",
@@ -269,12 +290,12 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainPolygon:mark-points:
-  *
-  * Wether the polygons points should be marked for extra visibility.
-  *
-  * Since: 0.4.3
-  */
+   * ChamplainPolygon:mark-points:
+   *
+   * Wether the polygons points should be marked for extra visibility.
+   *
+   * Since: 0.4.3
+   */
   g_object_class_install_property (object_class,
       PROP_MARK_POINTS,
       g_param_spec_boolean ("mark-points",
@@ -284,12 +305,12 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainPolygon:visible:
-  *
-  * Wether the polygon is visible
-  *
-  * Since: 0.4
-  */
+   * ChamplainPolygon:visible:
+   *
+   * Wether the polygon is visible
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class,
       PROP_VISIBLE,
       g_param_spec_boolean ("visible",
@@ -298,6 +319,7 @@ champlain_polygon_class_init (ChamplainPolygonClass *klass)
           TRUE,
           CHAMPLAIN_PARAM_READWRITE));
 }
+
 
 static void
 champlain_polygon_init (ChamplainPolygon *polygon)
@@ -317,6 +339,7 @@ champlain_polygon_init (ChamplainPolygon *polygon)
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
 }
 
+
 /**
  * champlain_polygon_new:
  *
@@ -331,6 +354,7 @@ champlain_polygon_new ()
 {
   return g_object_new (CHAMPLAIN_TYPE_POLYGON, NULL);
 }
+
 
 /**
  * champlain_polygon_append_point:
@@ -359,6 +383,7 @@ champlain_polygon_append_point (ChamplainPolygon *polygon,
   g_object_notify (G_OBJECT (polygon), "visible");
   return point;
 }
+
 
 /**
  * champlain_polygon_insert_point:
@@ -390,6 +415,7 @@ champlain_polygon_insert_point (ChamplainPolygon *polygon,
   return point;
 }
 
+
 /**
  * champlain_polygon_remove_point:
  * @polygon: a #ChamplainPolygon
@@ -411,6 +437,7 @@ champlain_polygon_remove_point (ChamplainPolygon *polygon,
   g_object_notify (G_OBJECT (polygon), "visible");
 }
 
+
 /**
  * champlain_polygon_clear_points:
  * @polygon: The polygon
@@ -428,14 +455,15 @@ champlain_polygon_clear_points (ChamplainPolygon *polygon)
 
   GList *next = priv->points;
   while (next != NULL)
-  {
-    champlain_point_free (next->data);
-    next = g_list_next (next);
-  }
+    {
+      champlain_point_free (next->data);
+      next = g_list_next (next);
+    }
   g_list_free (priv->points);
   priv->points = NULL;
   g_object_notify (G_OBJECT (polygon), "visible");
 }
+
 
 /**
  * champlain_polygon_get_points:
@@ -454,6 +482,7 @@ champlain_polygon_get_points (ChamplainPolygon *polygon)
 
   return polygon->priv->points;
 }
+
 
 /**
  * champlain_polygon_set_fill_color:
@@ -483,6 +512,7 @@ champlain_polygon_set_fill_color (ChamplainPolygon *polygon,
   g_object_notify (G_OBJECT (polygon), "fill-color");
 }
 
+
 /**
  * champlain_polygon_set_stroke_color:
  * @polygon: The polygon
@@ -511,6 +541,7 @@ champlain_polygon_set_stroke_color (ChamplainPolygon *polygon,
   g_object_notify (G_OBJECT (polygon), "stroke-color");
 }
 
+
 /**
  * champlain_polygon_get_fill_color:
  * @polygon: The polygon
@@ -529,6 +560,7 @@ champlain_polygon_get_fill_color (ChamplainPolygon *polygon)
   return polygon->priv->fill_color;
 }
 
+
 /**
  * champlain_polygon_get_stroke_color:
  * @polygon: The polygon
@@ -546,6 +578,7 @@ champlain_polygon_get_stroke_color (ChamplainPolygon *polygon)
 
   return polygon->priv->stroke_color;
 }
+
 
 /**
  * champlain_polygon_set_stroke:
@@ -566,6 +599,7 @@ champlain_polygon_set_stroke (ChamplainPolygon *polygon,
   g_object_notify (G_OBJECT (polygon), "stroke");
 }
 
+
 /**
  * champlain_polygon_get_stroke:
  * @polygon: The polygon
@@ -583,6 +617,7 @@ champlain_polygon_get_stroke (ChamplainPolygon *polygon)
 
   return polygon->priv->stroke;
 }
+
 
 /**
  * champlain_polygon_set_fill:
@@ -603,6 +638,7 @@ champlain_polygon_set_fill (ChamplainPolygon *polygon,
   g_object_notify (G_OBJECT (polygon), "fill");
 }
 
+
 /**
  * champlain_polygon_get_fill:
  * @polygon: The polygon
@@ -620,6 +656,7 @@ champlain_polygon_get_fill (ChamplainPolygon *polygon)
 
   return polygon->priv->fill;
 }
+
 
 /**
  * champlain_polygon_set_stroke_width:
@@ -640,6 +677,7 @@ champlain_polygon_set_stroke_width (ChamplainPolygon *polygon,
   g_object_notify (G_OBJECT (polygon), "stroke-width");
 }
 
+
 /**
  * champlain_polygon_get_stroke_width:
  * @polygon: The polygon
@@ -657,6 +695,7 @@ champlain_polygon_get_stroke_width (ChamplainPolygon *polygon)
 
   return polygon->priv->stroke_width;
 }
+
 
 /**
  * champlain_polygon_set_mark_points:
@@ -678,6 +717,7 @@ champlain_polygon_set_mark_points (ChamplainPolygon *polygon,
   g_object_notify (G_OBJECT (polygon), "mark-points");
 }
 
+
 /**
  * champlain_polygon_get_mark_points:
  * @polygon: The polygon
@@ -695,6 +735,7 @@ champlain_polygon_get_mark_points (ChamplainPolygon *polygon)
 
   return polygon->priv->mark_points;
 }
+
 
 /**
  * champlain_polygon_show:
@@ -714,6 +755,7 @@ champlain_polygon_show (ChamplainPolygon *polygon)
   g_object_notify (G_OBJECT (polygon), "visible");
 }
 
+
 /**
  * champlain_polygon_hide:
  * @polygon: The polygon
@@ -731,6 +773,7 @@ champlain_polygon_hide (ChamplainPolygon *polygon)
   clutter_actor_hide (CLUTTER_ACTOR (polygon));
   g_object_notify (G_OBJECT (polygon), "visible");
 }
+
 
 void
 champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
@@ -763,7 +806,7 @@ champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
   GList *list = g_list_first (priv->points);
   while (list != NULL)
     {
-      ChamplainPoint *point = (ChamplainPoint*) list->data;
+      ChamplainPoint *point = (ChamplainPoint *) list->data;
       gfloat x, y;
 
       x = champlain_map_source_get_x (map_source, zoom_level, point->lon);
@@ -806,7 +849,7 @@ champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
       GList *list = g_list_first (priv->points);
       while (list != NULL)
         {
-          ChamplainPoint *point = (ChamplainPoint*) list->data;
+          ChamplainPoint *point = (ChamplainPoint *) list->data;
           gfloat x, y;
 
           x = champlain_map_source_get_x (map_source, zoom_level, point->lon);

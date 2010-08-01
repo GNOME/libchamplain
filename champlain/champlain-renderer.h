@@ -27,25 +27,25 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_RENDERER champlain_renderer_get_type()
+#define CHAMPLAIN_TYPE_RENDERER champlain_renderer_get_type ()
 
 #define CHAMPLAIN_RENDERER(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_RENDERER, ChamplainRenderer))
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_RENDERER, ChamplainRenderer))
 
 #define CHAMPLAIN_RENDERER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST((klass), CHAMPLAIN_TYPE_RENDERER, ChamplainRendererClass))
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_RENDERER, ChamplainRendererClass))
 
 #define CHAMPLAIN_IS_RENDERER(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_RENDERER))
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_RENDERER))
 
 #define CHAMPLAIN_IS_RENDERER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE((klass), CHAMPLAIN_TYPE_RENDERER))
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_RENDERER))
 
 #define CHAMPLAIN_RENDERER_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS((obj), CHAMPLAIN_TYPE_RENDERER, ChamplainRendererClass))
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_RENDERER, ChamplainRendererClass))
 
-typedef struct _ChamplainRenderer      ChamplainRenderer;
-typedef struct _ChamplainRendererClass    ChamplainRendererClass;
+typedef struct _ChamplainRenderer ChamplainRenderer;
+typedef struct _ChamplainRendererClass ChamplainRendererClass;
 
 struct _ChamplainRenderer
 {
@@ -56,14 +56,20 @@ struct _ChamplainRendererClass
 {
   GObjectClass parent_class;
 
-  void (*set_data) (ChamplainRenderer *renderer, const gchar *data, guint size);
-  void (*render) (ChamplainRenderer *renderer, ChamplainTile *tile);
+  void (*set_data)(ChamplainRenderer *renderer,
+      const gchar *data,
+      guint size);
+  void (*render)(ChamplainRenderer *renderer,
+      ChamplainTile *tile);
 };
 
-GType    champlain_renderer_get_type    (void);
+GType champlain_renderer_get_type (void);
 
-void champlain_renderer_set_data (ChamplainRenderer *renderer, const gchar *data, guint size);
-void champlain_renderer_render (ChamplainRenderer *renderer, ChamplainTile *tile);
+void champlain_renderer_set_data (ChamplainRenderer *renderer,
+    const gchar *data,
+    guint size);
+void champlain_renderer_render (ChamplainRenderer *renderer,
+    ChamplainTile *tile);
 
 G_END_DECLS
 

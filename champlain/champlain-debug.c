@@ -52,16 +52,19 @@ debug_set_flags (ChamplainDebugFlags new_flags)
   flags |= new_flags;
 }
 
+
 void
 champlain_debug_set_flags (const gchar *flags_string)
 {
   guint nkeys;
 
-  for (nkeys = 0; keys[nkeys].value; nkeys++);
+  for (nkeys = 0; keys[nkeys].value; nkeys++)
+    ;
 
   if (flags_string)
-      debug_set_flags (g_parse_debug_string (flags_string, keys, nkeys));
+    debug_set_flags (g_parse_debug_string (flags_string, keys, nkeys));
 }
+
 
 gboolean
 champlain_debug_flag_is_set (ChamplainDebugFlags flag)
@@ -69,10 +72,11 @@ champlain_debug_flag_is_set (ChamplainDebugFlags flag)
   return (flag & flags) != 0;
 }
 
+
 void
 champlain_debug (ChamplainDebugFlags flag,
-               const gchar *format,
-               ...)
+    const gchar *format,
+    ...)
 {
   if (flag & flags)
     {
@@ -83,6 +87,7 @@ champlain_debug (ChamplainDebugFlags flag,
     }
 }
 
+
 #else
 
 gboolean
@@ -91,15 +96,17 @@ champlain_debug_flag_is_set (ChamplainDebugFlags flag)
   return FALSE;
 }
 
+
 void
 champlain_debug (ChamplainDebugFlags flag, const gchar *format, ...)
 {
 }
+
 
 void
 champlain_debug_set_flags (const gchar *flags_string)
 {
 }
 
-#endif /* ENABLE_DEBUG */
 
+#endif /* ENABLE_DEBUG */

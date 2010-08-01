@@ -23,7 +23,7 @@
 #ifndef CHAMPLAIN_DEFINES_H
 #define CHAMPLAIN_DEFINES_H
 
-#define CHAMPLAIN_API __attribute__((visibility("default")))
+#define CHAMPLAIN_API __attribute__((visibility ("default")))
 
 typedef struct _ChamplainView ChamplainView;
 typedef struct _ChamplainViewClass ChamplainViewClass;

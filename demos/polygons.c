@@ -23,20 +23,22 @@
 static gboolean
 zoom_in (G_GNUC_UNUSED ClutterActor *actor,
     G_GNUC_UNUSED ClutterButtonEvent *event,
-    ChamplainView * view)
+    ChamplainView *view)
 {
   champlain_view_zoom_in (view);
   return TRUE;
 }
 
+
 static gboolean
 zoom_out (G_GNUC_UNUSED ClutterActor *actor,
     G_GNUC_UNUSED ClutterButtonEvent *event,
-    ChamplainView * view)
+    ChamplainView *view)
 {
   champlain_view_zoom_out (view);
   return TRUE;
 }
+
 
 static ClutterActor *
 make_button (char *text)
@@ -63,11 +65,12 @@ make_button (char *text)
   return button;
 }
 
+
 int
 main (int argc,
     char *argv[])
 {
-  ClutterActor* actor, *stage, *buttons, *button;
+  ClutterActor *actor, *stage, *buttons, *button;
   ChamplainPolygon *polygon;
   gfloat width, total_width = 0;;
 

@@ -31,7 +31,7 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_MEMPHIS_RENDERER champlain_memphis_renderer_get_type()
+#define CHAMPLAIN_TYPE_MEMPHIS_RENDERER champlain_memphis_renderer_get_type ()
 
 #define CHAMPLAIN_MEMPHIS_RENDERER(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_MEMPHIS_RENDERER, ChamplainMemphisRenderer))
@@ -50,13 +50,15 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainMemphisRendererPrivate ChamplainMemphisRendererPrivate;
 
-typedef struct {
+typedef struct
+{
   ChamplainRenderer parent;
 
   ChamplainMemphisRendererPrivate *priv;
 } ChamplainMemphisRenderer;
 
-typedef struct {
+typedef struct
+{
   ChamplainRendererClass parent_class;
 } ChamplainMemphisRendererClass;
 
@@ -64,7 +66,8 @@ typedef struct {
 typedef struct _ChamplainMemphisRule ChamplainMemphisRule;
 typedef struct _ChamplainMemphisRuleAttr ChamplainMemphisRuleAttr;
 
-struct _ChamplainMemphisRuleAttr {
+struct _ChamplainMemphisRuleAttr
+{
   guint8 z_min;
   guint8 z_max;
   guint8 color_red;
@@ -75,14 +78,16 @@ struct _ChamplainMemphisRuleAttr {
   gdouble size;
 };
 
-typedef enum {
+typedef enum
+{
   CHAMPLAIN_MEMPHIS_RULE_TYPE_UNKNOWN,
   CHAMPLAIN_MEMPHIS_RULE_TYPE_NODE,
   CHAMPLAIN_MEMPHIS_RULE_TYPE_WAY,
   CHAMPLAIN_MEMPHIS_RULE_TYPE_RELATION
 } ChamplainMemphisRuleType;
 
-struct _ChamplainMemphisRule {
+struct _ChamplainMemphisRule
+{
   gchar **keys;
   gchar **values;
   ChamplainMemphisRuleType type;
@@ -94,27 +99,27 @@ struct _ChamplainMemphisRule {
 
 GType champlain_memphis_renderer_get_type (void);
 
-ChamplainMemphisRenderer* champlain_memphis_renderer_new_full (guint tile_size);
+ChamplainMemphisRenderer *champlain_memphis_renderer_new_full (guint tile_size);
 
 void champlain_memphis_renderer_load_rules (
     ChamplainMemphisRenderer *renderer,
     const gchar *rules_path);
 
-ClutterColor * champlain_memphis_renderer_get_background_color (
+ClutterColor *champlain_memphis_renderer_get_background_color (
     ChamplainMemphisRenderer *renderer);
 
 void champlain_memphis_renderer_set_background_color (
     ChamplainMemphisRenderer *renderer,
     const ClutterColor *color);
 
-GList * champlain_memphis_renderer_get_rule_ids (
+GList *champlain_memphis_renderer_get_rule_ids (
     ChamplainMemphisRenderer *renderer);
 
 void champlain_memphis_renderer_set_rule (
     ChamplainMemphisRenderer *renderer,
     ChamplainMemphisRule *rule);
 
-ChamplainMemphisRule * champlain_memphis_renderer_get_rule (
+ChamplainMemphisRule *champlain_memphis_renderer_get_rule (
     ChamplainMemphisRenderer *renderer,
     const gchar *id);
 
@@ -124,12 +129,10 @@ void champlain_memphis_renderer_remove_rule (
 
 ChamplainBoundingBox *champlain_memphis_renderer_get_bounding_box (ChamplainMemphisRenderer *renderer);
 
-void
-champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *self,
+void champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *self,
     guint size);
 
-guint
-champlain_memphis_renderer_get_tile_size (ChamplainMemphisRenderer *self);
+guint champlain_memphis_renderer_get_tile_size (ChamplainMemphisRenderer *self);
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 

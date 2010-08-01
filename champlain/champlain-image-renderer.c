@@ -19,7 +19,7 @@
 #include "champlain-image-renderer.h"
 #include <gdk/gdk.h>
 
-G_DEFINE_TYPE(ChamplainImageRenderer, champlain_image_renderer, CHAMPLAIN_TYPE_RENDERER)
+G_DEFINE_TYPE (ChamplainImageRenderer, champlain_image_renderer, CHAMPLAIN_TYPE_RENDERER)
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererPrivate))
@@ -30,8 +30,11 @@ struct _ChamplainImageRendererPrivate
   guint size;
 };
 
-static void set_data (ChamplainRenderer *renderer, const gchar *data, guint size);
-static void render (ChamplainRenderer *renderer, ChamplainTile *tile);
+static void set_data (ChamplainRenderer *renderer,
+    const gchar *data,
+    guint size);
+static void render (ChamplainRenderer *renderer,
+    ChamplainTile *tile);
 
 
 static void
@@ -52,9 +55,10 @@ champlain_image_renderer_finalize (GObject *object)
 }
 
 
-static void champlain_image_renderer_class_init(ChamplainImageRendererClass *klass)
+static void
+champlain_image_renderer_class_init (ChamplainImageRendererClass *klass)
 {
-  GObjectClass* object_class = G_OBJECT_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ChamplainRendererClass *renderer_class = CHAMPLAIN_RENDERER_CLASS (klass);
 
   g_type_class_add_private (klass, sizeof (ChamplainImageRendererPrivate));
@@ -67,7 +71,8 @@ static void champlain_image_renderer_class_init(ChamplainImageRendererClass *kla
 }
 
 
-static void champlain_image_renderer_init(ChamplainImageRenderer *self)
+static void
+champlain_image_renderer_init (ChamplainImageRenderer *self)
 {
   ChamplainImageRendererPrivate *priv = GET_PRIVATE (self);
 
@@ -77,13 +82,15 @@ static void champlain_image_renderer_init(ChamplainImageRenderer *self)
 }
 
 
-ChamplainImageRenderer *champlain_image_renderer_new(void)
+ChamplainImageRenderer *
+champlain_image_renderer_new (void)
 {
-    return g_object_new (CHAMPLAIN_TYPE_IMAGE_RENDERER, NULL);
+  return g_object_new (CHAMPLAIN_TYPE_IMAGE_RENDERER, NULL);
 }
 
 
-static void set_data (ChamplainRenderer *renderer, const gchar *data, guint size)
+static void
+set_data (ChamplainRenderer *renderer, const gchar *data, guint size)
 {
   ChamplainImageRendererPrivate *priv = GET_PRIVATE (renderer);
 
@@ -95,22 +102,23 @@ static void set_data (ChamplainRenderer *renderer, const gchar *data, guint size
 }
 
 
-static void render (ChamplainRenderer *renderer, ChamplainTile *tile)
+static void
+render (ChamplainRenderer *renderer, ChamplainTile *tile)
 {
   ChamplainImageRendererPrivate *priv = GET_PRIVATE (renderer);
   ChamplainRenderCallbackData callback_data;
-  GdkPixbufLoader* loader = NULL;
+  GdkPixbufLoader *loader = NULL;
   GError *error = NULL;
   ClutterActor *actor = NULL;
-  GdkPixbuf* pixbuf;
+  GdkPixbuf *pixbuf;
 
   callback_data.error = FALSE;
 
   loader = gdk_pixbuf_loader_new ();
   if (!gdk_pixbuf_loader_write (loader,
-                                (const guchar *) priv->data,
-                                priv->size,
-                                &error))
+          (const guchar *) priv->data,
+          priv->size,
+          &error))
     {
       if (error)
         {
@@ -133,14 +141,14 @@ static void render (ChamplainRenderer *renderer, ChamplainTile *tile)
   pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
   actor = clutter_texture_new ();
   if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
-           gdk_pixbuf_get_pixels (pixbuf),
-           gdk_pixbuf_get_has_alpha (pixbuf),
-           gdk_pixbuf_get_width (pixbuf),
-           gdk_pixbuf_get_height (pixbuf),
-           gdk_pixbuf_get_rowstride (pixbuf),
-           gdk_pixbuf_get_bits_per_sample (pixbuf) *
-           gdk_pixbuf_get_n_channels (pixbuf) / 8,
-           0, &error))
+          gdk_pixbuf_get_pixels (pixbuf),
+          gdk_pixbuf_get_has_alpha (pixbuf),
+          gdk_pixbuf_get_width (pixbuf),
+          gdk_pixbuf_get_height (pixbuf),
+          gdk_pixbuf_get_rowstride (pixbuf),
+          gdk_pixbuf_get_bits_per_sample (pixbuf) *
+          gdk_pixbuf_get_n_channels (pixbuf) / 8,
+          0, &error))
     {
       if (error)
         {

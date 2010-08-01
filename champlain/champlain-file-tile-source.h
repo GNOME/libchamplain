@@ -30,7 +30,7 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_FILE_TILE_SOURCE champlain_file_tile_source_get_type()
+#define CHAMPLAIN_TYPE_FILE_TILE_SOURCE champlain_file_tile_source_get_type ()
 
 #define CHAMPLAIN_FILE_TILE_SOURCE(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_FILE_TILE_SOURCE, ChamplainFileTileSource))
@@ -49,18 +49,19 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainFileTileSourcePrivate ChamplainFileTileSourcePrivate;
 
-typedef struct {
+typedef struct
+{
   ChamplainTileSource parent;
 } ChamplainFileTileSource;
 
-typedef struct {
+typedef struct
+{
   ChamplainTileSourceClass parent_class;
 } ChamplainFileTileSourceClass;
 
 GType champlain_file_tile_source_get_type (void);
 
-ChamplainFileTileSource*
-champlain_file_tile_source_new_full (const gchar *id,
+ChamplainFileTileSource *champlain_file_tile_source_new_full (const gchar *id,
     const gchar *name,
     const gchar *license,
     const gchar *license_uri,

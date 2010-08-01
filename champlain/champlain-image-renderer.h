@@ -28,22 +28,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_IMAGE_RENDERER champlain_image_renderer_get_type()
+#define CHAMPLAIN_TYPE_IMAGE_RENDERER champlain_image_renderer_get_type ()
 
 #define CHAMPLAIN_IMAGE_RENDERER(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRenderer))
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRenderer))
 
 #define CHAMPLAIN_IMAGE_RENDERER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST((klass), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererClass))
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererClass))
 
 #define CHAMPLAIN_IS_IMAGE_RENDERER(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER))
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER))
 
 #define CHAMPLAIN_IS_IMAGE_RENDERER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE((klass), CHAMPLAIN_TYPE_IMAGE_RENDERER))
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_IMAGE_RENDERER))
 
 #define CHAMPLAIN_IMAGE_RENDERER_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererClass))
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererClass))
 
 typedef struct _ChamplainImageRendererPrivate ChamplainImageRendererPrivate;
 
@@ -64,7 +64,7 @@ struct _ChamplainImageRendererClass
 
 GType champlain_image_renderer_get_type (void);
 
-ChamplainImageRenderer* champlain_image_renderer_new (void);
+ChamplainImageRenderer *champlain_image_renderer_new (void);
 
 G_END_DECLS
 

@@ -31,7 +31,7 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_LAYER champlain_layer_get_type()
+#define CHAMPLAIN_TYPE_LAYER champlain_layer_get_type ()
 
 #define CHAMPLAIN_LAYER(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_LAYER, ChamplainLayer))
@@ -48,20 +48,22 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_LAYER_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_LAYER, ChamplainLayerClass))
 
-typedef struct _ChamplainLayer      ChamplainLayer;
+typedef struct _ChamplainLayer ChamplainLayer;
 typedef struct _ChamplainLayerClass ChamplainLayerClass;
 
-struct _ChamplainLayer {
+struct _ChamplainLayer
+{
   ClutterGroup parent;
 };
 
-struct _ChamplainLayerClass {
+struct _ChamplainLayerClass
+{
   ClutterGroupClass parent_class;
 };
 
 GType champlain_layer_get_type (void);
 
-ChamplainLayer* champlain_layer_new (void);
+ChamplainLayer *champlain_layer_new (void);
 
 void champlain_layer_show (ChamplainLayer *layer);
 void champlain_layer_hide (ChamplainLayer *layer);

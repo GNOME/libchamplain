@@ -24,37 +24,40 @@
 static gboolean
 map_view_button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
     ClutterButtonEvent *event,
-    ChamplainView * view)
+    ChamplainView *view)
 {
   gdouble lat, lon;
 
   if (event->button != 1 || event->click_count > 1)
     return FALSE;
 
-  if (champlain_view_get_coords_from_event (view, (ClutterEvent*)event, &lat,
-         &lon))
-    g_print("Map clicked at %f, %f \n", lat, lon);
+  if (champlain_view_get_coords_from_event (view, (ClutterEvent *) event, &lat,
+          &lon))
+    g_print ("Map clicked at %f, %f \n", lat, lon);
 
   return TRUE;
 }
 
+
 static gboolean
 zoom_in (G_GNUC_UNUSED ClutterActor *actor,
     G_GNUC_UNUSED ClutterButtonEvent *event,
-    ChamplainView * view)
+    ChamplainView *view)
 {
   champlain_view_zoom_in (view);
   return TRUE;
 }
 
+
 static gboolean
 zoom_out (G_GNUC_UNUSED ClutterActor *actor,
     G_GNUC_UNUSED ClutterButtonEvent *event,
-    ChamplainView * view)
+    ChamplainView *view)
 {
   champlain_view_zoom_out (view);
   return TRUE;
 }
+
 
 static ClutterActor *
 make_button (char *text)
@@ -81,11 +84,12 @@ make_button (char *text)
   return button;
 }
 
+
 int
 main (int argc,
     char *argv[])
 {
-  ClutterActor* actor, *stage, *buttons, *button;
+  ClutterActor *actor, *stage, *buttons, *button;
   ChamplainLayer *layer;
   gfloat width, total_width = 0;
 
@@ -137,7 +141,7 @@ main (int argc,
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (actor), "zoom-level", 12,
       "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC, NULL);
-  champlain_view_center_on(CHAMPLAIN_VIEW(actor), 45.466, -73.75);
+  champlain_view_center_on (CHAMPLAIN_VIEW (actor), 45.466, -73.75);
 
   clutter_actor_show (stage);
   clutter_main ();

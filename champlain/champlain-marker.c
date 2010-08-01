@@ -52,11 +52,11 @@
 
 #define DEFAULT_FONT_NAME "Sans 11"
 
-static ClutterColor SELECTED_COLOR = {0x00, 0x33, 0xcc, 0xff};
-static ClutterColor SELECTED_TEXT_COLOR = {0xff, 0xff, 0xff, 0xff};
+static ClutterColor SELECTED_COLOR = { 0x00, 0x33, 0xcc, 0xff };
+static ClutterColor SELECTED_TEXT_COLOR = { 0xff, 0xff, 0xff, 0xff };
 
-static ClutterColor DEFAULT_COLOR = {0x33, 0x33, 0x33, 0xff};
-static ClutterColor DEFAULT_TEXT_COLOR = {0xee, 0xee, 0xee, 0xff};
+static ClutterColor DEFAULT_COLOR = { 0x33, 0x33, 0x33, 0xff };
+static ClutterColor DEFAULT_TEXT_COLOR = { 0xee, 0xee, 0xee, 0xff };
 
 enum
 {
@@ -82,7 +82,7 @@ enum
   PROP_DRAW_BACKGROUND
 };
 
-//static guint champlain_marker_signals[LAST_SIGNAL] = { 0, };
+/* static guint champlain_marker_signals[LAST_SIGNAL] = { 0, }; */
 
 struct _ChamplainMarkerPrivate
 {
@@ -109,7 +109,7 @@ struct _ChamplainMarkerPrivate
 G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CHAMPLAIN_TYPE_BASE_MARKER);
 
 #define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
 
 static void draw_marker (ChamplainMarker *marker);
 
@@ -131,6 +131,7 @@ champlain_marker_set_highlight_color (ClutterColor *color)
   SELECTED_COLOR.alpha = color->alpha;
 }
 
+
 /**
  * champlain_marker_get_highlight_color:
  *
@@ -145,6 +146,7 @@ champlain_marker_get_highlight_color ()
 {
   return &SELECTED_COLOR;
 }
+
 
 /**
  * champlain_marker_set_highlight_text_color:
@@ -164,6 +166,7 @@ champlain_marker_set_highlight_text_color (ClutterColor *color)
   SELECTED_TEXT_COLOR.alpha = color->alpha;
 }
 
+
 /**
  * champlain_marker_get_highlight_text_color:
  *
@@ -179,56 +182,70 @@ champlain_marker_get_highlight_text_color ()
   return &SELECTED_TEXT_COLOR;
 }
 
+
 static void
 champlain_marker_get_property (GObject *object,
     guint prop_id,
     GValue *value,
     GParamSpec *pspec)
 {
-    ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER (object)->priv;
+  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER (object)->priv;
 
-    switch (prop_id)
-      {
-        case PROP_TEXT:
-          g_value_set_string (value, priv->text);
-          break;
-        case PROP_IMAGE:
-          g_value_set_object (value, priv->image);
-          break;
-        case PROP_USE_MARKUP:
-          g_value_set_boolean (value, priv->use_markup);
-          break;
-        case PROP_ALIGNMENT:
-          g_value_set_enum (value, priv->alignment);
-          break;
-        case PROP_COLOR:
-          clutter_value_set_color (value, priv->color);
-          break;
-        case PROP_TEXT_COLOR:
-          clutter_value_set_color (value, priv->text_color);
-          break;
-        case PROP_FONT_NAME:
-          g_value_set_string (value, priv->font_name);
-          break;
-        case PROP_WRAP:
-          g_value_set_boolean (value, priv->wrap);
-          break;
-        case PROP_WRAP_MODE:
-          g_value_set_enum (value, priv->wrap_mode);
-          break;
-        case PROP_DRAW_BACKGROUND:
-          g_value_set_boolean (value, priv->draw_background);
-          break;
-        case PROP_ELLIPSIZE:
-          g_value_set_enum (value, priv->ellipsize);
-          break;
-        case PROP_SINGLE_LINE_MODE:
-          g_value_set_enum (value, priv->single_line_mode);
-          break;
-        default:
-          G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      }
+  switch (prop_id)
+    {
+    case PROP_TEXT:
+      g_value_set_string (value, priv->text);
+      break;
+
+    case PROP_IMAGE:
+      g_value_set_object (value, priv->image);
+      break;
+
+    case PROP_USE_MARKUP:
+      g_value_set_boolean (value, priv->use_markup);
+      break;
+
+    case PROP_ALIGNMENT:
+      g_value_set_enum (value, priv->alignment);
+      break;
+
+    case PROP_COLOR:
+      clutter_value_set_color (value, priv->color);
+      break;
+
+    case PROP_TEXT_COLOR:
+      clutter_value_set_color (value, priv->text_color);
+      break;
+
+    case PROP_FONT_NAME:
+      g_value_set_string (value, priv->font_name);
+      break;
+
+    case PROP_WRAP:
+      g_value_set_boolean (value, priv->wrap);
+      break;
+
+    case PROP_WRAP_MODE:
+      g_value_set_enum (value, priv->wrap_mode);
+      break;
+
+    case PROP_DRAW_BACKGROUND:
+      g_value_set_boolean (value, priv->draw_background);
+      break;
+
+    case PROP_ELLIPSIZE:
+      g_value_set_enum (value, priv->ellipsize);
+      break;
+
+    case PROP_SINGLE_LINE_MODE:
+      g_value_set_enum (value, priv->single_line_mode);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
 }
+
 
 static void
 champlain_marker_set_property (GObject *object,
@@ -236,50 +253,63 @@ champlain_marker_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-    ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
+  ChamplainMarker *marker = CHAMPLAIN_MARKER (object);
 
-    switch (prop_id)
+  switch (prop_id)
     {
-      case PROP_TEXT:
-        champlain_marker_set_text (marker, g_value_get_string (value));
-        break;
-      case PROP_IMAGE:
-        champlain_marker_set_image (marker, g_value_get_object (value));
-        break;
-      case PROP_USE_MARKUP:
-        champlain_marker_set_use_markup (marker, g_value_get_boolean (value));
-        break;
-      case PROP_ALIGNMENT:
-        champlain_marker_set_alignment (marker, g_value_get_enum (value));
-        break;
-      case PROP_COLOR:
-        champlain_marker_set_color (marker, clutter_value_get_color (value));
-        break;
-      case PROP_TEXT_COLOR:
-        champlain_marker_set_text_color (marker, clutter_value_get_color (value));
-        break;
-      case PROP_FONT_NAME:
-        champlain_marker_set_font_name (marker, g_value_get_string (value));
-        break;
-      case PROP_WRAP:
-        champlain_marker_set_wrap (marker, g_value_get_boolean (value));
-        break;
-      case PROP_WRAP_MODE:
-        champlain_marker_set_wrap_mode (marker, g_value_get_enum (value));
-        break;
-      case PROP_ELLIPSIZE:
-        champlain_marker_set_ellipsize (marker, g_value_get_enum (value));
-        break;
-      case PROP_DRAW_BACKGROUND:
-        champlain_marker_set_draw_background (marker, g_value_get_boolean (value));
-        break;
-      case PROP_SINGLE_LINE_MODE:
-        champlain_marker_set_single_line_mode (marker, g_value_get_boolean (value));
-        break;
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    case PROP_TEXT:
+      champlain_marker_set_text (marker, g_value_get_string (value));
+      break;
+
+    case PROP_IMAGE:
+      champlain_marker_set_image (marker, g_value_get_object (value));
+      break;
+
+    case PROP_USE_MARKUP:
+      champlain_marker_set_use_markup (marker, g_value_get_boolean (value));
+      break;
+
+    case PROP_ALIGNMENT:
+      champlain_marker_set_alignment (marker, g_value_get_enum (value));
+      break;
+
+    case PROP_COLOR:
+      champlain_marker_set_color (marker, clutter_value_get_color (value));
+      break;
+
+    case PROP_TEXT_COLOR:
+      champlain_marker_set_text_color (marker, clutter_value_get_color (value));
+      break;
+
+    case PROP_FONT_NAME:
+      champlain_marker_set_font_name (marker, g_value_get_string (value));
+      break;
+
+    case PROP_WRAP:
+      champlain_marker_set_wrap (marker, g_value_get_boolean (value));
+      break;
+
+    case PROP_WRAP_MODE:
+      champlain_marker_set_wrap_mode (marker, g_value_get_enum (value));
+      break;
+
+    case PROP_ELLIPSIZE:
+      champlain_marker_set_ellipsize (marker, g_value_get_enum (value));
+      break;
+
+    case PROP_DRAW_BACKGROUND:
+      champlain_marker_set_draw_background (marker, g_value_get_boolean (value));
+      break;
+
+    case PROP_SINGLE_LINE_MODE:
+      champlain_marker_set_single_line_mode (marker, g_value_get_boolean (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
+
 
 static void
 champlain_marker_dispose (GObject *object)
@@ -319,6 +349,7 @@ champlain_marker_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_marker_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_marker_finalize (GObject *object)
 {
@@ -357,6 +388,7 @@ champlain_marker_finalize (GObject *object)
   G_OBJECT_CLASS (champlain_marker_parent_class)->finalize (object);
 }
 
+
 static void
 champlain_marker_class_init (ChamplainMarkerClass *markerClass)
 {
@@ -370,148 +402,148 @@ champlain_marker_class_init (ChamplainMarkerClass *markerClass)
 
   markerClass->draw_marker = draw_marker;
   /**
-  * ChamplainMarker:text:
-  *
-  * The text of the marker
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:text:
+   *
+   * The text of the marker
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_TEXT,
       g_param_spec_string ("text", "Text", "The text of the marker",
           "", CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:image:
-  *
-  * The image of the marker
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:image:
+   *
+   * The image of the marker
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_IMAGE,
       g_param_spec_object ("image", "Image", "The image of the marker",
           CLUTTER_TYPE_ACTOR, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:use-markup:
-  *
-  * If the marker's text uses markup
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:use-markup:
+   *
+   * If the marker's text uses markup
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_USE_MARKUP,
       g_param_spec_boolean ("use-markup", "Use Markup", "The text uses markup",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:alignment:
-  *
-  * The marker's alignment
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:alignment:
+   *
+   * The marker's alignment
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_ALIGNMENT,
       g_param_spec_enum ("alignment", "Alignment", "The marker's alignment",
           PANGO_TYPE_ALIGNMENT, PANGO_ALIGN_LEFT, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:color:
-  *
-  * The marker's color
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:color:
+   *
+   * The marker's color
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_COLOR,
       clutter_param_spec_color ("color", "Color", "The marker's color",
           &DEFAULT_COLOR, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:text-color:
-  *
-  * The marker's text color
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:text-color:
+   *
+   * The marker's text color
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_TEXT_COLOR,
       clutter_param_spec_color ("text-color", "Text Color", "The marker's text color",
           &DEFAULT_TEXT_COLOR, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:font-name:
-  *
-  * The marker's text font name
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:font-name:
+   *
+   * The marker's text font name
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_FONT_NAME,
       g_param_spec_string ("font-name", "Font Name", "The marker's text font name",
           "Sans 11", CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:wrap:
-  *
-  * If the marker's text wrap is set
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:wrap:
+   *
+   * If the marker's text wrap is set
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_WRAP,
       g_param_spec_boolean ("wrap", "Wrap", "The marker's text wrap",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:wrap-mode:
-  *
-  * The marker's text wrap mode
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:wrap-mode:
+   *
+   * The marker's text wrap mode
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_WRAP_MODE,
       g_param_spec_enum ("wrap-mode", "Wrap Mode", "The marker's text wrap mode",
           PANGO_TYPE_WRAP_MODE, PANGO_WRAP_WORD, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:ellipsize:
-  *
-  * The marker's ellipsize mode
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:ellipsize:
+   *
+   * The marker's ellipsize mode
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_ELLIPSIZE,
       g_param_spec_enum ("ellipsize", "Ellipsize Mode", "The marker's text ellipsize mode",
           PANGO_TYPE_ELLIPSIZE_MODE, PANGO_ELLIPSIZE_NONE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:draw-background:
-  *
-  * If the marker has a background
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:draw-background:
+   *
+   * If the marker has a background
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_DRAW_BACKGROUND,
       g_param_spec_boolean ("draw-background", "Draw Background", "The marker has a background",
           TRUE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainMarker:single-line-mode:
-  *
-  * If the marker is in single line mode
-  *
-  * Since: 0.4
-  */
+   * ChamplainMarker:single-line-mode:
+   *
+   * If the marker is in single line mode
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_SINGLE_LINE_MODE,
       g_param_spec_boolean ("single-line-mode", "Single Line Mode", "The marker's single line mode",
           TRUE, CHAMPLAIN_PARAM_READWRITE));
-
 }
+
 
 #define RADIUS 10
 #define PADDING (RADIUS / 2)
 
 static void
 draw_box (cairo_t *cr,
-   gint width,
-   gint height,
-   gint point,
-   gboolean mirror)
+    gint width,
+    gint height,
+    gint point,
+    gboolean mirror)
 {
   if (mirror)
     {
@@ -538,14 +570,14 @@ draw_box (cairo_t *cr,
       cairo_arc (cr, RADIUS, RADIUS, RADIUS - 1, M_PI, 3 * M_PI / 2.0);
       cairo_close_path (cr);
     }
-
 }
+
 
 static void
 draw_shadow (ChamplainMarker *marker,
-   gint width,
-   gint height,
-   gint point)
+    gint width,
+    gint height,
+    gint point)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
   ClutterActor *shadow = NULL;
@@ -578,7 +610,7 @@ draw_shadow (ChamplainMarker *marker,
 
   cairo_destroy (cr);
 
-  clutter_actor_set_position (shadow, 0, height / 2.0 );
+  clutter_actor_set_position (shadow, 0, height / 2.0);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (marker), shadow);
 
@@ -647,6 +679,7 @@ draw_background (ChamplainMarker *marker,
 
   priv->background = g_object_ref (bg);
 }
+
 
 static void
 draw_marker (ChamplainMarker *marker)
@@ -720,21 +753,21 @@ draw_marker (ChamplainMarker *marker)
       draw_background (marker, total_width, total_height, point);
     }
   else
-  {
-    if (priv->background != NULL)
-      {
-        clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
-        g_object_unref (G_OBJECT (priv->background));
-        priv->background = NULL;
-      }
+    {
+      if (priv->background != NULL)
+        {
+          clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->background);
+          g_object_unref (G_OBJECT (priv->background));
+          priv->background = NULL;
+        }
 
-    if (priv->shadow != NULL)
-      {
-        clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->shadow);
-        g_object_unref (G_OBJECT (priv->shadow));
-        priv->shadow = NULL;
-      }
-  }
+      if (priv->shadow != NULL)
+        {
+          clutter_container_remove_actor (CLUTTER_CONTAINER (marker), priv->shadow);
+          g_object_unref (G_OBJECT (priv->shadow));
+          priv->shadow = NULL;
+        }
+    }
 
   if (priv->text_actor != NULL && priv->background != NULL)
     clutter_actor_raise (priv->text_actor, priv->background);
@@ -742,12 +775,12 @@ draw_marker (ChamplainMarker *marker)
     clutter_actor_raise (priv->image, priv->background);
 
   if (priv->draw_background)
-  {
-    if (priv->alignment == PANGO_ALIGN_RIGHT)
-      clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), total_width, total_height + point);
-    else
-      clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, total_height + point);
-  }
+    {
+      if (priv->alignment == PANGO_ALIGN_RIGHT)
+        clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), total_width, total_height + point);
+      else
+        clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), 0, total_height + point);
+    }
   else if (priv->image != NULL)
     clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker),
         clutter_actor_get_width (priv->image) / 2.0 + PADDING,
@@ -758,14 +791,17 @@ draw_marker (ChamplainMarker *marker)
         clutter_actor_get_height (priv->text_actor) / 2.0);
 }
 
+
 static gboolean
 redraw_on_idle (gpointer gobject)
 {
   ChamplainMarker *marker = CHAMPLAIN_MARKER (gobject);
+
   CHAMPLAIN_MARKER_GET_CLASS (gobject)->draw_marker (marker);
   marker->priv->redraw_id = 0;
   return FALSE;
 }
+
 
 /**
  * champlain_marker_queue_redraw:
@@ -786,12 +822,13 @@ champlain_marker_queue_redraw (ChamplainMarker *marker)
   if (!priv->redraw_id)
     {
       priv->redraw_id =
-          g_idle_add_full (G_PRIORITY_DEFAULT,
-                           (GSourceFunc)redraw_on_idle,
-                           g_object_ref (marker),
-                           (GDestroyNotify)g_object_unref);
+        g_idle_add_full (G_PRIORITY_DEFAULT,
+            (GSourceFunc) redraw_on_idle,
+            g_object_ref (marker),
+            (GDestroyNotify) g_object_unref);
     }
 }
+
 
 static void
 notify_highlighted (GObject *gobject,
@@ -800,6 +837,7 @@ notify_highlighted (GObject *gobject,
 {
   champlain_marker_queue_redraw (CHAMPLAIN_MARKER (gobject));
 }
+
 
 static void
 champlain_marker_init (ChamplainMarker *marker)
@@ -829,6 +867,7 @@ champlain_marker_init (ChamplainMarker *marker)
   g_signal_connect (marker, "notify::highlighted", G_CALLBACK (notify_highlighted), NULL);
 }
 
+
 /**
  * champlain_marker_new:
  *
@@ -843,6 +882,7 @@ champlain_marker_new (void)
 {
   return CLUTTER_ACTOR (g_object_new (CHAMPLAIN_TYPE_MARKER, NULL));
 }
+
 
 /**
  * champlain_marker_new_with_text:
@@ -879,6 +919,7 @@ champlain_marker_new_with_text (const gchar *text,
   return CLUTTER_ACTOR (marker);
 }
 
+
 /**
  * champlain_marker_new_with_image:
  * @actor: The actor of the image.
@@ -894,6 +935,7 @@ ClutterActor *
 champlain_marker_new_with_image (ClutterActor *actor)
 {
   ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
+
   if (actor != NULL)
     {
       champlain_marker_set_image (marker, actor);
@@ -901,6 +943,7 @@ champlain_marker_new_with_image (ClutterActor *actor)
 
   return CLUTTER_ACTOR (marker);
 }
+
 
 /**
  * champlain_marker_new_from_file:
@@ -932,6 +975,7 @@ champlain_marker_new_from_file (const gchar *filename,
   return CLUTTER_ACTOR (marker);
 }
 
+
 /**
  * champlain_marker_new_full:
  * @text: The text
@@ -949,6 +993,7 @@ champlain_marker_new_full (const gchar *text,
     ClutterActor *actor)
 {
   ChamplainMarker *marker = CHAMPLAIN_MARKER (champlain_marker_new ());
+
   if (actor != NULL)
     {
       champlain_marker_set_image (marker, actor);
@@ -957,6 +1002,7 @@ champlain_marker_new_full (const gchar *text,
 
   return CLUTTER_ACTOR (marker);
 }
+
 
 /**
  * champlain_marker_set_text:
@@ -981,6 +1027,7 @@ champlain_marker_set_text (ChamplainMarker *marker,
   priv->text = g_strdup (text);
   champlain_marker_queue_redraw (marker);
 }
+
 
 /**
  * champlain_marker_set_image:
@@ -1014,6 +1061,7 @@ champlain_marker_set_image (ChamplainMarker *marker,
   champlain_marker_queue_redraw (marker);
 }
 
+
 /**
  * champlain_marker_set_use_markup:
  * @marker: The marker
@@ -1034,6 +1082,7 @@ champlain_marker_set_use_markup (ChamplainMarker *marker,
   champlain_marker_queue_redraw (marker);
 }
 
+
 /**
  * champlain_marker_set_alignment:
  * @marker: The marker
@@ -1053,6 +1102,7 @@ champlain_marker_set_alignment (ChamplainMarker *marker,
   g_object_notify (G_OBJECT (marker), "alignment");
   champlain_marker_queue_redraw (marker);
 }
+
 
 /**
  * champlain_marker_set_color:
@@ -1083,6 +1133,7 @@ champlain_marker_set_color (ChamplainMarker *marker,
   champlain_marker_queue_redraw (marker);
 }
 
+
 /**
  * champlain_marker_set_text_color:
  * @marker: The marker
@@ -1111,6 +1162,7 @@ champlain_marker_set_text_color (ChamplainMarker *marker,
   g_object_notify (G_OBJECT (marker), "text-color");
   champlain_marker_queue_redraw (marker);
 }
+
 
 /**
  * champlain_marker_set_font_name:
@@ -1141,6 +1193,7 @@ champlain_marker_set_font_name (ChamplainMarker *marker,
   champlain_marker_queue_redraw (marker);
 }
 
+
 /**
  * champlain_marker_set_wrap:
  * @marker: The marker
@@ -1161,6 +1214,7 @@ champlain_marker_set_wrap (ChamplainMarker *marker,
   champlain_marker_queue_redraw (marker);
 }
 
+
 /**
  * champlain_marker_set_wrap_mode:
  * @marker: The marker
@@ -1180,6 +1234,7 @@ champlain_marker_set_wrap_mode (ChamplainMarker *marker,
   g_object_notify (G_OBJECT (marker), "wrap");
   champlain_marker_queue_redraw (marker);
 }
+
 
 /**
  * champlain_marker_set_attributes:
@@ -1210,6 +1265,7 @@ champlain_marker_set_attributes (ChamplainMarker *marker,
   champlain_marker_queue_redraw (marker);
 }
 
+
 /**
  * champlain_marker_set_ellipsize:
  * @marker: The marker
@@ -1229,6 +1285,8 @@ champlain_marker_set_ellipsize (ChamplainMarker *marker,
   g_object_notify (G_OBJECT (marker), "ellipsize");
   champlain_marker_queue_redraw (marker);
 }
+
+
 /**
  * champlain_marker_set_single_line_mode:
  * @marker: The marker
@@ -1250,6 +1308,7 @@ champlain_marker_set_single_line_mode (ChamplainMarker *marker,
   champlain_marker_queue_redraw (marker);
 }
 
+
 /**
  * champlain_marker_set_draw_background:
  * @marker: The marker
@@ -1270,6 +1329,7 @@ champlain_marker_set_draw_background (ChamplainMarker *marker,
   champlain_marker_queue_redraw (marker);
 }
 
+
 /**
  * champlain_marker_get_image:
  * @marker: The marker
@@ -1287,6 +1347,7 @@ champlain_marker_get_image (ChamplainMarker *marker)
 
   return marker->priv->image;
 }
+
 
 /**
  * champlain_marker_get_use_markup:
@@ -1306,6 +1367,7 @@ champlain_marker_get_use_markup (ChamplainMarker *marker)
   return marker->priv->use_markup;
 }
 
+
 /**
  * champlain_marker_get_text:
  * @marker: The marker
@@ -1323,6 +1385,7 @@ champlain_marker_get_text (ChamplainMarker *marker)
 
   return marker->priv->text;
 }
+
 
 /**
  * champlain_marker_get_alignment:
@@ -1342,6 +1405,7 @@ champlain_marker_get_alignment (ChamplainMarker *marker)
   return marker->priv->alignment;
 }
 
+
 /**
  * champlain_marker_get_color:
  * @marker: The marker
@@ -1359,6 +1423,7 @@ champlain_marker_get_color (ChamplainMarker *marker)
 
   return marker->priv->color;
 }
+
 
 /**
  * champlain_marker_get_text_color:
@@ -1378,6 +1443,7 @@ champlain_marker_get_text_color (ChamplainMarker *marker)
   return marker->priv->text_color;
 }
 
+
 /**
  * champlain_marker_get_font_name:
  * @marker: The marker
@@ -1395,6 +1461,7 @@ champlain_marker_get_font_name (ChamplainMarker *marker)
 
   return marker->priv->font_name;
 }
+
 
 /**
  * champlain_marker_get_wrap:
@@ -1414,6 +1481,7 @@ champlain_marker_get_wrap (ChamplainMarker *marker)
   return marker->priv->wrap;
 }
 
+
 /**
  * champlain_marker_get_wrap_mode:
  * @marker: The marker
@@ -1431,6 +1499,7 @@ champlain_marker_get_wrap_mode (ChamplainMarker *marker)
 
   return marker->priv->wrap_mode;
 }
+
 
 /**
  * champlain_marker_get_ellipsize:
@@ -1450,6 +1519,7 @@ champlain_marker_get_ellipsize (ChamplainMarker *marker)
   return marker->priv->ellipsize;
 }
 
+
 /**
  * champlain_marker_get_single_line_mode:
  * @marker: The marker
@@ -1468,6 +1538,7 @@ champlain_marker_get_single_line_mode (ChamplainMarker *marker)
   return marker->priv->single_line_mode;
 }
 
+
 /**
  * champlain_marker_get_draw_background:
  * @marker: The marker
@@ -1485,4 +1556,3 @@ champlain_marker_get_draw_background (ChamplainMarker *marker)
 
   return marker->priv->draw_background;
 }
-

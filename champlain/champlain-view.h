@@ -36,22 +36,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_VIEW champlain_view_get_type()
+#define CHAMPLAIN_TYPE_VIEW champlain_view_get_type ()
 
 #define CHAMPLAIN_VIEW(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_VIEW, ChamplainView))
-  
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_VIEW, ChamplainView))
+
 #define CHAMPLAIN_VIEW_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_VIEW, ChamplainViewClass))
-  
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_VIEW, ChamplainViewClass))
+
 #define CHAMPLAIN_IS_VIEW(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_VIEW))
-  
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_VIEW))
+
 #define CHAMPLAIN_IS_VIEW_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE((klass),  CHAMPLAIN_TYPE_VIEW))
-  
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_VIEW))
+
 #define CHAMPLAIN_VIEW_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS((obj),  CHAMPLAIN_TYPE_VIEW, ChamplainViewClass))
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewClass))
 
 typedef struct _ChamplainViewPrivate ChamplainViewPrivate;
 
@@ -62,7 +62,8 @@ typedef struct _ChamplainViewPrivate ChamplainViewPrivate;
  *
  * Type of scrolling.
  */
-typedef enum {
+typedef enum
+{
   CHAMPLAIN_SCROLL_MODE_PUSH,
   CHAMPLAIN_SCROLL_MODE_KINETIC
 } ChamplainScrollMode;
@@ -167,12 +168,12 @@ gboolean champlain_view_get_coords_at (ChamplainView *view,
 gint champlain_view_get_zoom_level (ChamplainView *view);
 gint champlain_view_get_min_zoom_level (ChamplainView *view);
 gint champlain_view_get_max_zoom_level (ChamplainView *view);
-ChamplainMapSource* champlain_view_get_map_source (ChamplainView *view);
+ChamplainMapSource *champlain_view_get_map_source (ChamplainView *view);
 gdouble champlain_view_get_decel_rate (ChamplainView *view);
 ChamplainScrollMode champlain_view_get_scroll_mode (ChamplainView *view);
 gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
 gboolean champlain_view_get_show_license (ChamplainView *view);
-const gchar * champlain_view_get_license_text (ChamplainView *view);
+const gchar *champlain_view_get_license_text (ChamplainView *view);
 gboolean champlain_view_get_show_scale (ChamplainView *view);
 guint champlain_view_get_max_scale_width (ChamplainView *view);
 ChamplainUnit champlain_view_get_scale_unit (ChamplainView *view);

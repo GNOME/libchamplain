@@ -28,8 +28,8 @@
 /*
 static gboolean
 marker_button_release_cb (ClutterActor *actor,
-                          ClutterButtonEvent *event,
-                          ChamplainView * view)
+    ClutterButtonEvent *event,
+    ChamplainView * view)
 {
   if (event->button != 1 || event->click_count > 1)
     return FALSE;
@@ -50,7 +50,7 @@ create_marker_layer (G_GNUC_UNUSED ChamplainView *view)
   layer = champlain_selection_layer_new ();
 
   marker = champlain_marker_new_with_text ("Montréal\n<span size=\"xx-small\">Québec</span>",
-      "Serif 14", NULL, NULL);
+        "Serif 14", NULL, NULL);
   champlain_marker_set_use_markup (CHAMPLAIN_MARKER (marker), TRUE);
   champlain_marker_set_alignment (CHAMPLAIN_MARKER (marker), PANGO_ALIGN_RIGHT);
   champlain_marker_set_color (CHAMPLAIN_MARKER (marker), &orange);
@@ -65,8 +65,8 @@ create_marker_layer (G_GNUC_UNUSED ChamplainView *view)
 
   clutter_actor_set_reactive (marker, TRUE);
   g_signal_connect_after (marker, "button-release-event",
-      G_CALLBACK (marker_button_release_cb), view);
-  */
+    G_CALLBACK (marker_button_release_cb), view);
+   */
 
   marker = champlain_marker_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-generic.png", NULL);
   champlain_marker_set_text (CHAMPLAIN_MARKER (marker), "New York");

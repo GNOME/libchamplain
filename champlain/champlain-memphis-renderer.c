@@ -60,9 +60,9 @@
 const gchar default_rules[] =
   "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
   "<rules version=\"0.1\" background=\"#ffffff\">"
-    "<rule e=\"way\" k=\"highway\" v=\"*\">"
-      "<line color=\"#000000\" width=\"1.0\"/>"
-    "</rule>"
+  "<rule e=\"way\" k=\"highway\" v=\"*\">"
+  "<line color=\"#000000\" width=\"1.0\"/>"
+  "</rule>"
   "</rules>";
 
 enum
@@ -72,9 +72,13 @@ enum
   PROP_BOUNDING_BOX
 };
 
-static void render (ChamplainRenderer *renderer, ChamplainTile *tile);
-static void set_data (ChamplainRenderer *renderer, const gchar *data, guint size);
-static void set_bounding_box (ChamplainMemphisRenderer *renderer, ChamplainBoundingBox *bbox);
+static void render (ChamplainRenderer *renderer,
+    ChamplainTile *tile);
+static void set_data (ChamplainRenderer *renderer,
+    const gchar *data,
+    guint size);
+static void set_bounding_box (ChamplainMemphisRenderer *renderer,
+    ChamplainBoundingBox *bbox);
 
 
 G_DEFINE_TYPE (ChamplainMemphisRenderer, champlain_memphis_renderer, CHAMPLAIN_TYPE_RENDERER)
@@ -109,9 +113,9 @@ struct _WorkerThreadData
 GStaticRWLock MemphisLock = G_STATIC_RW_LOCK_INIT;
 
 
-static void memphis_worker_thread (gpointer data, gpointer user_data);
-void argb_to_rgba (guchar *data,
-    guint size);
+static void memphis_worker_thread (gpointer data,
+    gpointer user_data);
+
 
 static void
 champlain_memphis_renderer_get_property (GObject *object,
@@ -123,16 +127,19 @@ champlain_memphis_renderer_get_property (GObject *object,
 
   switch (property_id)
     {
-      case PROP_TILE_SIZE:
-        g_value_set_uint (value, champlain_memphis_renderer_get_tile_size (renderer));
-        break;
-      case PROP_BOUNDING_BOX:
-        g_value_set_boxed (value, champlain_memphis_renderer_get_bounding_box (renderer));
-        break;
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    case PROP_TILE_SIZE:
+      g_value_set_uint (value, champlain_memphis_renderer_get_tile_size (renderer));
+      break;
+
+    case PROP_BOUNDING_BOX:
+      g_value_set_boxed (value, champlain_memphis_renderer_get_bounding_box (renderer));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
 }
+
 
 static void
 champlain_memphis_renderer_set_property (GObject *object,
@@ -144,21 +151,24 @@ champlain_memphis_renderer_set_property (GObject *object,
 
   switch (property_id)
     {
-      case PROP_TILE_SIZE:
-        champlain_memphis_renderer_set_tile_size (renderer, g_value_get_uint (value));
-        break;
-      case PROP_BOUNDING_BOX:
-        set_bounding_box (renderer, g_value_get_boxed (value));
-        break;
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    case PROP_TILE_SIZE:
+      champlain_memphis_renderer_set_tile_size (renderer, g_value_get_uint (value));
+      break;
+
+    case PROP_BOUNDING_BOX:
+      set_bounding_box (renderer, g_value_get_boxed (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
 }
+
 
 static void
 champlain_memphis_renderer_dispose (GObject *object)
 {
-  ChamplainMemphisRenderer *renderer = CHAMPLAIN_MEMPHIS_RENDERER(object);
+  ChamplainMemphisRenderer *renderer = CHAMPLAIN_MEMPHIS_RENDERER (object);
   ChamplainMemphisRendererPrivate *priv = renderer->priv;
 
   if (priv->thpool)
@@ -180,10 +190,11 @@ champlain_memphis_renderer_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_memphis_renderer_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_memphis_renderer_finalize (GObject *object)
 {
-  ChamplainMemphisRenderer *renderer = CHAMPLAIN_MEMPHIS_RENDERER(object);
+  ChamplainMemphisRenderer *renderer = CHAMPLAIN_MEMPHIS_RENDERER (object);
   ChamplainMemphisRendererPrivate *priv = renderer->priv;
 
   champlain_bounding_box_free (priv->bbox);
@@ -219,26 +230,26 @@ champlain_memphis_renderer_class_init (ChamplainMemphisRendererClass *klass)
           G_PARAM_READWRITE));
 
   /*
-  * ChamplainMapDataSource:bounding-box:
-  *
-  * The bounding box of the area that contains map data.
-  *
-  * Since: 0.6
-  */
+   * ChamplainMapDataSource:bounding-box:
+   *
+   * The bounding box of the area that contains map data.
+   *
+   * Since: 0.6
+   */
   g_object_class_install_property (object_class,
       PROP_BOUNDING_BOX,
       g_param_spec_boxed ("bounding-box",
-        "Bounding Box",
-        "The bounding box of the renderer",
-        CHAMPLAIN_TYPE_BOUNDING_BOX,
-        G_PARAM_READWRITE));
-
+          "Bounding Box",
+          "The bounding box of the renderer",
+          CHAMPLAIN_TYPE_BOUNDING_BOX,
+          G_PARAM_READWRITE));
 }
+
 
 static void
 champlain_memphis_renderer_init (ChamplainMemphisRenderer *renderer)
 {
-  ChamplainMemphisRendererPrivate *priv = GET_PRIVATE(renderer);
+  ChamplainMemphisRendererPrivate *priv = GET_PRIVATE (renderer);
 
   renderer->priv = priv;
 
@@ -254,24 +265,29 @@ champlain_memphis_renderer_init (ChamplainMemphisRenderer *renderer)
   priv->bbox = NULL;
 }
 
-ChamplainMemphisRenderer* champlain_memphis_renderer_new_full (guint tile_size)
+
+ChamplainMemphisRenderer *
+champlain_memphis_renderer_new_full (guint tile_size)
 {
   return g_object_new (CHAMPLAIN_TYPE_MEMPHIS_RENDERER, "tile-size", tile_size, NULL);
 }
 
 
 /*
-Transform ARGB (Cairo) to RGBA (GdkPixbuf). RGBA is actualy reversed in
-memory, so the transformation is ARGB -> ABGR (i.e. swapping B and R)
-*/
-void argb_to_rgba (guchar *data,
+ * Transform ARGB (Cairo) to RGBA (GdkPixbuf). RGBA is actualy reversed in
+ * memory, so the transformation is ARGB -> ABGR (i.e. swapping B and R)
+ */
+static void
+argb_to_rgba (guchar *data,
     guint size)
 {
   guint32 *ptr;
-  guint32 *endptr = (guint32 *)data + size / 4;
-  for (ptr = (guint32 *)data; ptr < endptr; ptr++)
+  guint32 *endptr = (guint32 *) data + size / 4;
+
+  for (ptr = (guint32 *) data; ptr < endptr; ptr++)
     *ptr = (*ptr & 0xFF00FF00) ^ ((*ptr & 0xFF0000) >> 16) ^ ((*ptr & 0xFF) << 16);
 }
+
 
 static gboolean
 tile_loaded_cb (gpointer worker_data)
@@ -279,18 +295,18 @@ tile_loaded_cb (gpointer worker_data)
   WorkerThreadData *data = (WorkerThreadData *) worker_data;
   ChamplainTile *tile = data->tile;
   cairo_surface_t *cst = data->cst;
-  ChamplainRenderer *renderer = CHAMPLAIN_RENDERER(data->renderer);
+  ChamplainRenderer *renderer = CHAMPLAIN_RENDERER (data->renderer);
   ChamplainRenderCallbackData callback_data;
   cairo_t *cr_clutter;
   ClutterActor *actor;
   guint size = data->size;
   GError *error = NULL;
-  GdkPixbuf * pixbuf = NULL;
+  GdkPixbuf *pixbuf = NULL;
   gchar *buffer = NULL;
   gsize buffer_size;
 
   if (tile)
-    g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer*)&data->tile);
+    g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &data->tile);
 
   g_free (data);
 
@@ -317,8 +333,8 @@ tile_loaded_cb (gpointer worker_data)
       cairo_image_surface_get_stride (cst) * cairo_image_surface_get_height (cst));
 
   pixbuf = gdk_pixbuf_new_from_data (cairo_image_surface_get_data (cst),
-               GDK_COLORSPACE_RGB, TRUE, 8, size, size,
-               cairo_image_surface_get_stride (cst), NULL, NULL);
+      GDK_COLORSPACE_RGB, TRUE, 8, size, size,
+      cairo_image_surface_get_stride (cst), NULL, NULL);
 
   if (!gdk_pixbuf_save_to_buffer (pixbuf, &buffer, &buffer_size, "png", &error, NULL))
     goto error;
@@ -348,20 +364,21 @@ finish:
   return FALSE;
 }
 
+
 static void
 memphis_worker_thread (gpointer worker_data,
     G_GNUC_UNUSED gpointer user_data)
 {
-  WorkerThreadData *data = (WorkerThreadData *)worker_data;
+  WorkerThreadData *data = (WorkerThreadData *) worker_data;
   ChamplainMemphisRenderer *renderer = CHAMPLAIN_MEMPHIS_RENDERER (data->renderer);
   gboolean has_data = TRUE;
 
   data->cst = NULL;
 
-// uncomment when libmemphis works correctly
-//  g_static_rw_lock_reader_lock (&MemphisLock);
-//  has_data = memphis_renderer_tile_has_data (renderer->priv->renderer, data->x, data->y, data->z);
-//  g_static_rw_lock_reader_unlock (&MemphisLock);
+/* uncomment when libmemphis works correctly */
+/*  g_static_rw_lock_reader_lock (&MemphisLock);
+ *  has_data = memphis_renderer_tile_has_data (renderer->priv->renderer, data->x, data->y, data->z);
+ *  g_static_rw_lock_reader_unlock (&MemphisLock); */
 
   if (has_data)
     {
@@ -383,9 +400,10 @@ memphis_worker_thread (gpointer worker_data,
   clutter_threads_add_idle_full (G_PRIORITY_DEFAULT, tile_loaded_cb, data, NULL);
 }
 
+
 static void
 render (ChamplainRenderer *renderer,
-  ChamplainTile *tile)
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_RENDERER (renderer));
 
@@ -394,8 +412,8 @@ render (ChamplainRenderer *renderer,
   WorkerThreadData *data;
 
   DEBUG ("Render tile (%u, %u, %u)", champlain_tile_get_x (tile),
-         champlain_tile_get_y (tile),
-         champlain_tile_get_zoom_level (tile));
+      champlain_tile_get_y (tile),
+      champlain_tile_get_zoom_level (tile));
 
   data = g_new (WorkerThreadData, 1);
   data->x = champlain_tile_get_x (tile);
@@ -405,7 +423,7 @@ render (ChamplainRenderer *renderer,
   data->tile = tile;
   data->renderer = renderer;
 
-  g_object_add_weak_pointer (G_OBJECT (tile), (gpointer*)&data->tile);
+  g_object_add_weak_pointer (G_OBJECT (tile), (gpointer *) &data->tile);
   g_object_ref (renderer);
 
   g_thread_pool_push (priv->thpool, data, &error);
@@ -415,9 +433,10 @@ render (ChamplainRenderer *renderer,
       g_error_free (error);
       g_free (data);
       g_object_unref (renderer);
-      g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer*)&data->tile);
+      g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &data->tile);
     }
 }
+
 
 static void
 set_data (ChamplainRenderer *renderer,
@@ -429,6 +448,7 @@ set_data (ChamplainRenderer *renderer,
   GError *err = NULL;
 
   MemphisMap *map = memphis_map_new ();
+
   memphis_map_load_from_data (map, data, size, &err);
 
   DEBUG ("BBox data received");
@@ -456,6 +476,7 @@ set_data (ChamplainRenderer *renderer,
       "reload-tiles", NULL);
 }
 
+
 /*
  * champlain_memphis_renderer_load_rules:
  * @renderer: a #ChamplainMemphisRenderer
@@ -475,7 +496,7 @@ champlain_memphis_renderer_load_rules (
   ChamplainMemphisRendererPrivate *priv = renderer->priv;
   GError *err = NULL;
 
-  // TODO: Remove test when memphis handles invalid paths properly
+  /* TODO: Remove test when memphis handles invalid paths properly */
   if (!g_file_test (rules_path, G_FILE_TEST_EXISTS))
     {
       g_critical ("Error: \"%s\" does not exist.", rules_path);
@@ -487,18 +508,18 @@ champlain_memphis_renderer_load_rules (
     {
       memphis_rule_set_load_from_file (priv->rules, rules_path, &err);
       if (err != NULL)
-       {
+        {
           g_critical ("Can't load rules file: \"%s\"", err->message);
           memphis_rule_set_load_from_data (priv->rules, default_rules,
-                                           strlen (default_rules), NULL);
+              strlen (default_rules), NULL);
           g_static_rw_lock_writer_unlock (&MemphisLock);
           g_error_free (err);
           return;
-       }
+        }
     }
   else
     memphis_rule_set_load_from_data (priv->rules, default_rules,
-                                     strlen (default_rules), NULL);
+        strlen (default_rules), NULL);
 
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
@@ -538,6 +559,7 @@ champlain_memphis_renderer_get_background_color (
   return clutter_color_copy (&color);
 }
 
+
 /*
  * champlain_memphis_renderer_set_background_color:
  * @renderer: a #ChamplainMemphisRenderer
@@ -556,7 +578,7 @@ champlain_memphis_renderer_set_background_color (
 
   g_static_rw_lock_writer_lock (&MemphisLock);
   memphis_rule_set_set_bg_color (renderer->priv->rules, color->red,
-                                 color->green, color->blue, color->alpha);
+      color->green, color->blue, color->alpha);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
   g_signal_emit_by_name (CHAMPLAIN_RENDERER (renderer),
@@ -579,15 +601,16 @@ champlain_memphis_renderer_set_rule (ChamplainMemphisRenderer *renderer,
     ChamplainMemphisRule *rule)
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_RENDERER (renderer) &&
-                    MEMPHIS_RULE (rule));
+      MEMPHIS_RULE (rule));
 
   g_static_rw_lock_writer_lock (&MemphisLock);
-  memphis_rule_set_set_rule (renderer->priv->rules, (MemphisRule *)rule);
+  memphis_rule_set_set_rule (renderer->priv->rules, (MemphisRule *) rule);
   g_static_rw_lock_writer_unlock (&MemphisLock);
 
   g_signal_emit_by_name (CHAMPLAIN_RENDERER (renderer),
       "reload-tiles", NULL);
 }
+
 
 /*
  * champlain_memphis_renderer_get_rule:
@@ -605,7 +628,7 @@ champlain_memphis_renderer_get_rule (ChamplainMemphisRenderer *renderer,
     const gchar *id)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MEMPHIS_RENDERER (renderer) &&
-                        id != NULL, NULL);
+      id != NULL, NULL);
 
   MemphisRule *rule;
 
@@ -615,6 +638,7 @@ champlain_memphis_renderer_get_rule (ChamplainMemphisRenderer *renderer,
 
   return (ChamplainMemphisRule *) rule;
 }
+
 
 /*
  * champlain_memphis_renderer_get_rule_ids:
@@ -643,6 +667,7 @@ champlain_memphis_renderer_get_rule_ids (ChamplainMemphisRenderer *renderer)
   return list;
 }
 
+
 /*
  * champlain_memphis_renderer_remove_rule:
  * @renderer: a #ChamplainMemphisRenderer
@@ -652,7 +677,8 @@ champlain_memphis_renderer_get_rule_ids (ChamplainMemphisRenderer *renderer)
  *
  * Since: 0.6
  */
-void champlain_memphis_renderer_remove_rule (
+void
+champlain_memphis_renderer_remove_rule (
     ChamplainMemphisRenderer *renderer,
     const gchar *id)
 {
@@ -665,6 +691,7 @@ void champlain_memphis_renderer_remove_rule (
   g_signal_emit_by_name (CHAMPLAIN_RENDERER (renderer),
       "reload-tiles", NULL);
 }
+
 
 void
 champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *renderer,
@@ -683,6 +710,7 @@ champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *renderer,
   g_object_notify (G_OBJECT (renderer), "tile-size");
 }
 
+
 guint
 champlain_memphis_renderer_get_tile_size (ChamplainMemphisRenderer *renderer)
 {
@@ -690,6 +718,7 @@ champlain_memphis_renderer_get_tile_size (ChamplainMemphisRenderer *renderer)
 
   return renderer->priv->tile_size;
 }
+
 
 ChamplainBoundingBox *
 champlain_memphis_renderer_get_bounding_box (ChamplainMemphisRenderer *renderer)
@@ -701,6 +730,7 @@ champlain_memphis_renderer_get_bounding_box (ChamplainMemphisRenderer *renderer)
   return priv->bbox;
 }
 
+
 static void
 set_bounding_box (ChamplainMemphisRenderer *renderer, ChamplainBoundingBox *bbox)
 {
@@ -711,5 +741,3 @@ set_bounding_box (ChamplainMemphisRenderer *renderer, ChamplainBoundingBox *bbox
   champlain_bounding_box_free (priv->bbox);
   priv->bbox = champlain_bounding_box_copy (bbox);
 }
-
-

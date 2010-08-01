@@ -65,7 +65,7 @@ struct _ChamplainNetworkTileSourceClass
 
 GType champlain_network_tile_source_get_type (void);
 
-ChamplainNetworkTileSource* champlain_network_tile_source_new_full (const gchar *id,
+ChamplainNetworkTileSource *champlain_network_tile_source_new_full (const gchar *id,
     const gchar *name,
     const gchar *license,
     const gchar *license_uri,
@@ -76,7 +76,7 @@ ChamplainNetworkTileSource* champlain_network_tile_source_new_full (const gchar 
     const gchar *uri_format,
     ChamplainRenderer *renderer);
 
-const gchar * champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *tile_source);
+const gchar *champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *tile_source);
 void champlain_network_tile_source_set_uri_format (ChamplainNetworkTileSource *tile_source,
     const gchar *uri_format);
 
@@ -84,7 +84,7 @@ gboolean champlain_network_tile_source_get_offline (ChamplainNetworkTileSource *
 void champlain_network_tile_source_set_offline (ChamplainNetworkTileSource *tile_source,
     gboolean offline);
 
-const gchar * champlain_network_tile_source_get_proxy_uri (ChamplainNetworkTileSource *tile_source);
+const gchar *champlain_network_tile_source_get_proxy_uri (ChamplainNetworkTileSource *tile_source);
 void champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_source,
     const gchar *proxy_uri);
 

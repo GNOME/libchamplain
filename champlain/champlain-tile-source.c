@@ -30,7 +30,7 @@
 
 G_DEFINE_TYPE (ChamplainTileSource, champlain_tile_source, CHAMPLAIN_TYPE_MAP_SOURCE);
 
-#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_TILE_SOURCE, ChamplainTileSourcePrivate))
+#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_TILE_SOURCE, ChamplainTileSourcePrivate))
 
 enum
 {
@@ -81,34 +81,44 @@ champlain_tile_source_get_property (GObject *object,
     case PROP_ID:
       g_value_set_string (value, priv->id);
       break;
+
     case PROP_NAME:
       g_value_set_string (value, priv->name);
       break;
+
     case PROP_LICENSE:
       g_value_set_string (value, priv->license);
       break;
+
     case PROP_LICENSE_URI:
       g_value_set_string (value, priv->license_uri);
       break;
+
     case PROP_MIN_ZOOM_LEVEL:
       g_value_set_uint (value, priv->min_zoom_level);
       break;
+
     case PROP_MAX_ZOOM_LEVEL:
       g_value_set_uint (value, priv->max_zoom_level);
       break;
+
     case PROP_TILE_SIZE:
       g_value_set_uint (value, priv->tile_size);
       break;
+
     case PROP_MAP_PROJECTION:
       g_value_set_enum (value, priv->map_projection);
       break;
+
     case PROP_CACHE:
       g_value_set_object (value, priv->cache);
       break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
+
 
 static void
 champlain_tile_source_set_property (GObject *object,
@@ -123,42 +133,52 @@ champlain_tile_source_set_property (GObject *object,
     case PROP_ID:
       champlain_tile_source_set_id (tile_source,
           g_value_get_string (value));
+
     case PROP_NAME:
       champlain_tile_source_set_name (tile_source,
           g_value_get_string (value));
       break;
+
     case PROP_LICENSE:
       champlain_tile_source_set_license (tile_source,
           g_value_get_string (value));
       break;
+
     case PROP_LICENSE_URI:
       champlain_tile_source_set_license_uri (tile_source,
           g_value_get_string (value));
       break;
+
     case PROP_MIN_ZOOM_LEVEL:
       champlain_tile_source_set_min_zoom_level (tile_source,
           g_value_get_uint (value));
       break;
+
     case PROP_MAX_ZOOM_LEVEL:
       champlain_tile_source_set_max_zoom_level (tile_source,
           g_value_get_uint (value));
       break;
+
     case PROP_TILE_SIZE:
       champlain_tile_source_set_tile_size (tile_source,
           g_value_get_uint (value));
       break;
+
     case PROP_MAP_PROJECTION:
       champlain_tile_source_set_projection (tile_source,
           g_value_get_enum (value));
       break;
+
     case PROP_CACHE:
       champlain_tile_source_set_cache (tile_source,
           g_value_get_object (value));
       break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
+
 
 static void
 champlain_tile_source_dispose (GObject *object)
@@ -175,6 +195,7 @@ champlain_tile_source_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_tile_source_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_tile_source_finalize (GObject *object)
 {
@@ -188,17 +209,19 @@ champlain_tile_source_finalize (GObject *object)
   G_OBJECT_CLASS (champlain_tile_source_parent_class)->finalize (object);
 }
 
+
 static void
-champlain_tile_source_constructed  (GObject *object)
+champlain_tile_source_constructed (GObject *object)
 {
   G_OBJECT_CLASS (champlain_tile_source_parent_class)->constructed (object);
 }
+
 
 static void
 champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
 {
   ChamplainMapSourceClass *map_source_class = CHAMPLAIN_MAP_SOURCE_CLASS (klass);
-  GObjectClass* object_class = G_OBJECT_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GParamSpec *pspec;
 
   g_type_class_add_private (klass, sizeof (ChamplainTileSourcePrivate));
@@ -221,12 +244,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   map_source_class->fill_tile = NULL;
 
   /**
-  * ChamplainTileSource:id:
-  *
-  * The name of the tile source
-  *
-  * Since: 0.4
-  */
+   * ChamplainTileSource:id:
+   *
+   * The name of the tile source
+   *
+   * Since: 0.4
+   */
   pspec = g_param_spec_string ("id",
       "Id",
       "The id of the tile source",
@@ -235,12 +258,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_ID, pspec);
 
   /**
-  * ChamplainTileSource:name:
-  *
-  * The name of the tile source
-  *
-  * Since: 0.4
-  */
+   * ChamplainTileSource:name:
+   *
+   * The name of the tile source
+   *
+   * Since: 0.4
+   */
   pspec = g_param_spec_string ("name",
       "Name",
       "The name of the tile source",
@@ -249,12 +272,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_NAME, pspec);
 
   /**
-  * ChamplainTileSource:license:
-  *
-  * The usage license of the tile source
-  *
-  * Since: 0.4
-  */
+   * ChamplainTileSource:license:
+   *
+   * The usage license of the tile source
+   *
+   * Since: 0.4
+   */
   pspec = g_param_spec_string ("license",
       "License",
       "The usage license of the tile source",
@@ -263,12 +286,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_LICENSE, pspec);
 
   /**
-  * ChamplainTileSource:license-uri:
-  *
-  * The usage license's uri for more information
-  *
-  * Since: 0.4
-  */
+   * ChamplainTileSource:license-uri:
+   *
+   * The usage license's uri for more information
+   *
+   * Since: 0.4
+   */
   pspec = g_param_spec_string ("license-uri",
       "License-uri",
       "The usage license's uri for more information",
@@ -277,12 +300,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_LICENSE_URI, pspec);
 
   /**
-  * ChamplainTileSource:min-zoom-level:
-  *
-  * The minimum zoom level
-  *
-  * Since: 0.4
-  */
+   * ChamplainTileSource:min-zoom-level:
+   *
+   * The minimum zoom level
+   *
+   * Since: 0.4
+   */
   pspec = g_param_spec_uint ("min-zoom-level",
       "Minimum Zoom Level",
       "The minimum zoom level",
@@ -293,12 +316,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_MIN_ZOOM_LEVEL, pspec);
 
   /**
-  * ChamplainTileSource:max-zoom-level:
-  *
-  * The maximum zoom level
-  *
-  * Since: 0.4
-  */
+   * ChamplainTileSource:max-zoom-level:
+   *
+   * The maximum zoom level
+   *
+   * Since: 0.4
+   */
   pspec = g_param_spec_uint ("max-zoom-level",
       "Maximum Zoom Level",
       "The maximum zoom level",
@@ -309,12 +332,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_MAX_ZOOM_LEVEL, pspec);
 
   /**
-  * ChamplainTileSource:tile-size:
-  *
-  * The tile size of the tile source
-  *
-  * Since: 0.4
-  */
+   * ChamplainTileSource:tile-size:
+   *
+   * The tile size of the tile source
+   *
+   * Since: 0.4
+   */
   pspec = g_param_spec_uint ("tile-size",
       "Tile Size",
       "The tile size",
@@ -325,12 +348,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_TILE_SIZE, pspec);
 
   /**
-  * ChamplainTileSource:projection
-  *
-  * The map projection of the tile source
-  *
-  * Since: 0.4
-  */
+   * ChamplainTileSource:projection
+   *
+   * The map projection of the tile source
+   *
+   * Since: 0.4
+   */
   pspec = g_param_spec_enum ("projection",
       "Projection",
       "The map projection",
@@ -340,12 +363,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_MAP_PROJECTION, pspec);
 
   /**
-  * ChamplainTileSource:cache
-  *
-  * The cache used for tile storage
-  *
-  * Since: 0.6
-  */
+   * ChamplainTileSource:cache
+   *
+   * The cache used for tile storage
+   *
+   * Since: 0.6
+   */
   pspec = g_param_spec_object ("cache",
       "Cache",
       "Cache used for tile sorage",
@@ -354,10 +377,11 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_CACHE, pspec);
 }
 
+
 static void
 champlain_tile_source_init (ChamplainTileSource *tile_source)
 {
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE(tile_source);
+  ChamplainTileSourcePrivate *priv = GET_PRIVATE (tile_source);
 
   tile_source->priv = priv;
 
@@ -371,6 +395,7 @@ champlain_tile_source_init (ChamplainTileSource *tile_source)
   priv->tile_size = 0;
   priv->map_projection = CHAMPLAIN_MAP_PROJECTION_MERCATOR;
 }
+
 
 /**
  * champlain_tile_source_get_cache:
@@ -389,6 +414,7 @@ champlain_tile_source_get_cache (ChamplainTileSource *tile_source)
 
   return tile_source->priv->cache;
 }
+
 
 /**
  * champlain_tile_source_set_cache:
@@ -422,6 +448,7 @@ champlain_tile_source_set_cache (ChamplainTileSource *tile_source,
   g_object_notify (G_OBJECT (tile_source), "cache");
 }
 
+
 static const gchar *
 get_id (ChamplainMapSource *map_source)
 {
@@ -429,6 +456,7 @@ get_id (ChamplainMapSource *map_source)
 
   return CHAMPLAIN_TILE_SOURCE (map_source)->priv->id;
 }
+
 
 static const gchar *
 get_name (ChamplainMapSource *map_source)
@@ -438,6 +466,7 @@ get_name (ChamplainMapSource *map_source)
   return CHAMPLAIN_TILE_SOURCE (map_source)->priv->name;
 }
 
+
 static const gchar *
 get_license (ChamplainMapSource *map_source)
 {
@@ -445,6 +474,7 @@ get_license (ChamplainMapSource *map_source)
 
   return CHAMPLAIN_TILE_SOURCE (map_source)->priv->license;
 }
+
 
 static const gchar *
 get_license_uri (ChamplainMapSource *map_source)
@@ -454,6 +484,7 @@ get_license_uri (ChamplainMapSource *map_source)
   return CHAMPLAIN_TILE_SOURCE (map_source)->priv->license_uri;
 }
 
+
 static guint
 get_min_zoom_level (ChamplainMapSource *map_source)
 {
@@ -461,6 +492,7 @@ get_min_zoom_level (ChamplainMapSource *map_source)
 
   return CHAMPLAIN_TILE_SOURCE (map_source)->priv->min_zoom_level;
 }
+
 
 static guint
 get_max_zoom_level (ChamplainMapSource *map_source)
@@ -470,6 +502,7 @@ get_max_zoom_level (ChamplainMapSource *map_source)
   return CHAMPLAIN_TILE_SOURCE (map_source)->priv->max_zoom_level;
 }
 
+
 static guint
 get_tile_size (ChamplainMapSource *map_source)
 {
@@ -478,6 +511,7 @@ get_tile_size (ChamplainMapSource *map_source)
   return CHAMPLAIN_TILE_SOURCE (map_source)->priv->tile_size;
 }
 
+
 static ChamplainMapProjection
 get_projection (ChamplainMapSource *map_source)
 {
@@ -485,6 +519,7 @@ get_projection (ChamplainMapSource *map_source)
 
   return CHAMPLAIN_TILE_SOURCE (map_source)->priv->map_projection;
 }
+
 
 /**
  * champlain_tile_source_set_id:
@@ -509,6 +544,7 @@ champlain_tile_source_set_id (ChamplainTileSource *tile_source,
   g_object_notify (G_OBJECT (tile_source), "id");
 }
 
+
 /**
  * champlain_tile_source_set_name:
  * @tile_source: a #ChamplainTileSource
@@ -531,6 +567,7 @@ champlain_tile_source_set_name (ChamplainTileSource *tile_source,
 
   g_object_notify (G_OBJECT (tile_source), "name");
 }
+
 
 /**
  * champlain_tile_source_set_license:
@@ -555,6 +592,7 @@ champlain_tile_source_set_license (ChamplainTileSource *tile_source,
   g_object_notify (G_OBJECT (tile_source), "license");
 }
 
+
 /**
  * champlain_tile_source_set_license_uri:
  * @tile_source: a #ChamplainTileSource
@@ -578,6 +616,7 @@ champlain_tile_source_set_license_uri (ChamplainTileSource *tile_source,
   g_object_notify (G_OBJECT (tile_source), "license-uri");
 }
 
+
 /**
  * champlain_tile_source_set_min_zoom_level:
  * @tile_source: a #ChamplainTileSource
@@ -597,6 +636,7 @@ champlain_tile_source_set_min_zoom_level (ChamplainTileSource *tile_source,
 
   g_object_notify (G_OBJECT (tile_source), "min-zoom-level");
 }
+
 
 /**
  * champlain_tile_source_set_max_zoom_level:
@@ -618,6 +658,7 @@ champlain_tile_source_set_max_zoom_level (ChamplainTileSource *tile_source,
   g_object_notify (G_OBJECT (tile_source), "max-zoom-level");
 }
 
+
 /**
  * champlain_tile_source_set_tile_size:
  * @tile_source: a #ChamplainTileSource
@@ -637,6 +678,7 @@ champlain_tile_source_set_tile_size (ChamplainTileSource *tile_source,
 
   g_object_notify (G_OBJECT (tile_source), "tile-size");
 }
+
 
 /**
  * champlain_tile_source_set_projection:

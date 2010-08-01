@@ -24,7 +24,7 @@
 /* The marker is drawn with cairo.  It is composed of 1 static filled circle
  * and 1 stroked circle animated as an echo.
  */
-static ClutterActor*
+static ClutterActor *
 create_marker ()
 {
   ClutterActor *marker;
@@ -95,6 +95,7 @@ create_marker ()
   return marker;
 }
 
+
 double lat = 45.466;
 double lon = -73.75;
 
@@ -114,10 +115,11 @@ gps_callback (GpsCallbackData *data)
   return TRUE;
 }
 
+
 int
 main (int argc, char *argv[])
 {
-  ClutterActor* actor, *marker, *stage;
+  ClutterActor *actor, *marker, *stage;
   ChamplainLayer *layer;
   GpsCallbackData callback_data;
 

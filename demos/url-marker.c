@@ -21,7 +21,8 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 /* The data needed for constructing a marker */
-typedef struct {
+typedef struct
+{
   ChamplainLayer *layer;
   gdouble latitude;
   gdouble longitude;
@@ -35,7 +36,7 @@ typedef struct {
  *
  * The GdkPixbuf has to be freed with g_object_unref.
  */
-static GdkPixbuf*
+static GdkPixbuf *
 pixbuf_new_from_message (SoupMessage *message,
     GError **error)
 {
@@ -48,9 +49,9 @@ pixbuf_new_from_message (SoupMessage *message,
 
   /*  Use a pixbuf loader that can load images of the same mime-type as the
       message.
-  */
+   */
   mime_type = soup_message_headers_get (message->response_headers,
-      "Content-Type");
+        "Content-Type");
   loader = gdk_pixbuf_loader_new_with_mime_type (mime_type, error);
   if (loader != NULL)
     pixbuf_is_open = TRUE;
@@ -60,7 +61,7 @@ pixbuf_new_from_message (SoupMessage *message,
 
   gdk_pixbuf_loader_write (
       loader,
-      (guchar *)message->response_body->data,
+      (guchar *) message->response_body->data,
       message->response_body->length,
       error);
   if (*error != NULL)
@@ -78,13 +79,14 @@ pixbuf_new_from_message (SoupMessage *message,
 
 cleanup:
   if (pixbuf_is_open)
-      gdk_pixbuf_loader_close (loader, NULL);
+    gdk_pixbuf_loader_close (loader, NULL);
 
   if (loader != NULL)
-      g_object_unref (G_OBJECT (loader));
+    g_object_unref (G_OBJECT (loader));
 
   return pixbuf;
 }
+
 
 /**
  * Transforms a GdkPixbuf into a ClutterTexture.
@@ -96,7 +98,7 @@ cleanup:
  *
  * The ClutterActor has to be freed with clutter_actor_destroy.
  */
-static ClutterActor*
+static ClutterActor *
 texture_new_from_pixbuf (GdkPixbuf *pixbuf, GError **error)
 {
   ClutterActor *texture = NULL;
@@ -115,14 +117,14 @@ texture_new_from_pixbuf (GdkPixbuf *pixbuf, GError **error)
 
   texture = clutter_texture_new ();
   success = clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (texture),
-      data,
-      has_alpha,
-      width,
-      height,
-      rowstride,
-      (has_alpha ? 4 : 3),
-      flags,
-      error);
+        data,
+        has_alpha,
+        width,
+        height,
+        rowstride,
+        (has_alpha ? 4 : 3),
+        flags,
+        error);
 
   if (!success)
     {
@@ -132,6 +134,7 @@ texture_new_from_pixbuf (GdkPixbuf *pixbuf, GError **error)
 
   return texture;
 }
+
 
 /**
  * Called when an image has been downloaded. This callback will transform the
@@ -161,7 +164,7 @@ image_downloaded_cb (SoupSession *session,
   /* Deal only with finished messages */
   uri = soup_message_get_uri (message);
   url = soup_uri_to_string (uri, FALSE);
-  if (! SOUP_STATUS_IS_SUCCESSFUL (message->status_code))
+  if (!SOUP_STATUS_IS_SUCCESSFUL (message->status_code))
     {
       g_print ("Download of %s failed with error code %d\n", url,
           message->status_code);
@@ -180,7 +183,7 @@ image_downloaded_cb (SoupSession *session,
   if (error != NULL)
     {
       g_print ("Failed to convert %s into a texture: %s\n", url,
-        error->message);
+          error->message);
       goto cleanup;
     }
 
@@ -208,6 +211,7 @@ cleanup:
     clutter_actor_destroy (CLUTTER_ACTOR (texture));
 }
 
+
 /**
  * Creates a marker at the given position with an image that's downloaded from
  * the given URL.
@@ -223,7 +227,7 @@ create_marker_from_url (ChamplainLayer *layer,
   SoupMessage *message;
   MarkerData *data;
 
-  data = g_new0(MarkerData, 1);
+  data = g_new0 (MarkerData, 1);
   data->layer = g_object_ref (layer);
   data->latitude = latitude;
   data->longitude = longitude;
@@ -231,6 +235,7 @@ create_marker_from_url (ChamplainLayer *layer,
   message = soup_message_new ("GET", url);
   soup_session_queue_message (session, message, image_downloaded_cb, data);
 }
+
 
 int
 main (int argc, char *argv[])

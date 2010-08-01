@@ -63,12 +63,12 @@ enum
   PROP_HIGHLIGHTED,
 };
 
-//static guint champlain_base_marker_signals[LAST_SIGNAL] = { 0, };
+/* static guint champlain_base_marker_signals[LAST_SIGNAL] = { 0, }; */
 
 G_DEFINE_TYPE (ChamplainBaseMarker, champlain_base_marker, CLUTTER_TYPE_GROUP);
 
 #define CHAMPLAIN_BASE_MARKER_GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_BASE_MARKER, ChamplainBaseMarkerPrivate))
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_BASE_MARKER, ChamplainBaseMarkerPrivate))
 
 struct _ChamplainBaseMarkerPrivate
 {
@@ -83,24 +83,28 @@ champlain_base_marker_get_property (GObject *object,
     GValue *value,
     GParamSpec *pspec)
 {
-    ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (object);
-    ChamplainBaseMarkerPrivate *priv = base_marker->priv;
+  ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (object);
+  ChamplainBaseMarkerPrivate *priv = base_marker->priv;
 
-    switch (prop_id)
-      {
-        case PROP_LONGITUDE:
-          g_value_set_double (value, priv->lon);
-          break;
-        case PROP_LATITUDE:
-          g_value_set_double (value, priv->lat);
-          break;
-        case PROP_HIGHLIGHTED:
-          g_value_set_boolean (value, priv->highlighted);
-          break;
-        default:
-          G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      }
+  switch (prop_id)
+    {
+    case PROP_LONGITUDE:
+      g_value_set_double (value, priv->lon);
+      break;
+
+    case PROP_LATITUDE:
+      g_value_set_double (value, priv->lat);
+      break;
+
+    case PROP_HIGHLIGHTED:
+      g_value_set_boolean (value, priv->highlighted);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
 }
+
 
 static void
 champlain_base_marker_set_property (GObject *object,
@@ -108,33 +112,37 @@ champlain_base_marker_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-    ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (object);
-    ChamplainBaseMarkerPrivate *priv = base_marker->priv;
+  ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (object);
+  ChamplainBaseMarkerPrivate *priv = base_marker->priv;
 
-    switch (prop_id)
+  switch (prop_id)
     {
-      case PROP_LONGITUDE:
-        {
-          gdouble lon = g_value_get_double (value);
-          champlain_base_marker_set_position (base_marker, priv->lat, lon);
-          break;
-        }
-      case PROP_LATITUDE:
-        {
-          gdouble lat = g_value_get_double (value);
-          champlain_base_marker_set_position (base_marker, lat, priv->lon);
-          break;
-        }
-      case PROP_HIGHLIGHTED:
-        {
-          gboolean bvalue = g_value_get_boolean (value);
-          champlain_base_marker_set_highlighted (base_marker, bvalue);
-          break;
-        }
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    case PROP_LONGITUDE:
+    {
+      gdouble lon = g_value_get_double (value);
+      champlain_base_marker_set_position (base_marker, priv->lat, lon);
+      break;
+    }
+
+    case PROP_LATITUDE:
+    {
+      gdouble lat = g_value_get_double (value);
+      champlain_base_marker_set_position (base_marker, lat, priv->lon);
+      break;
+    }
+
+    case PROP_HIGHLIGHTED:
+    {
+      gboolean bvalue = g_value_get_boolean (value);
+      champlain_base_marker_set_highlighted (base_marker, bvalue);
+      break;
+    }
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
+
 
 static void
 champlain_base_marker_dispose (GObject *object)
@@ -142,11 +150,13 @@ champlain_base_marker_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_base_marker_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_base_marker_finalize (GObject *object)
 {
   G_OBJECT_CLASS (champlain_base_marker_parent_class)->finalize (object);
 }
+
 
 static void
 champlain_base_marker_class_init (ChamplainBaseMarkerClass *marker_class)
@@ -160,41 +170,42 @@ champlain_base_marker_class_init (ChamplainBaseMarkerClass *marker_class)
   object_class->set_property = champlain_base_marker_set_property;
 
   /**
-  * ChamplainBaseMarker:longitude:
-  *
-  * The longitude coordonate of the map
-  *
-  * Since: 0.4
-  */
+   * ChamplainBaseMarker:longitude:
+   *
+   * The longitude coordonate of the map
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_LONGITUDE,
       g_param_spec_double ("longitude", "Longitude",
           "The longitude coordonate of the base_marker",
           -180.0f, 180.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainBaseMarker:latitude:
-  *
-  * The latitude coordonate of the map
-  *
-  * Since: 0.4
-  */
+   * ChamplainBaseMarker:latitude:
+   *
+   * The latitude coordonate of the map
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_LATITUDE,
       g_param_spec_double ("latitude", "Latitude",
           "The latitude coordonate of the base_marker",
           -90.0f, 90.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainBaseMarker:highlighted:
-  *
-  * The highlighted state of the marker
-  *
-  * Since: 0.4
-  */
+   * ChamplainBaseMarker:highlighted:
+   *
+   * The highlighted state of the marker
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class, PROP_HIGHLIGHTED,
       g_param_spec_boolean ("highlighted", "Highlighted",
           "The highlighted stated of the marker",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 }
+
 
 static void
 champlain_base_marker_init (ChamplainBaseMarker *marker)
@@ -228,6 +239,7 @@ champlain_base_marker_new (void)
   return CLUTTER_ACTOR (base_marker);
 }
 
+
 /**
  * champlain_base_marker_set_position:
  * @marker: a #ChamplainBaseMarker
@@ -254,6 +266,7 @@ champlain_base_marker_set_position (ChamplainBaseMarker *marker,
   g_object_notify (G_OBJECT (marker), "longitude");
 }
 
+
 /**
  * champlain_base_marker_get_latitude:
  * @marker: a #ChamplainBaseMarker
@@ -264,12 +277,14 @@ champlain_base_marker_set_position (ChamplainBaseMarker *marker,
  *
  * Since: 0.6
  */
-gdouble champlain_base_marker_get_latitude (ChamplainBaseMarker *marker)
+gdouble
+champlain_base_marker_get_latitude (ChamplainBaseMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker), 0.0);
 
   return marker->priv->lat;
 }
+
 
 /**
  * champlain_base_marker_get_longitude:
@@ -281,12 +296,14 @@ gdouble champlain_base_marker_get_latitude (ChamplainBaseMarker *marker)
  *
  * Since: 0.6
  */
-gdouble champlain_base_marker_get_longitude (ChamplainBaseMarker *marker)
+gdouble
+champlain_base_marker_get_longitude (ChamplainBaseMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker), 0.0);
 
   return marker->priv->lon;
 }
+
 
 /**
  * champlain_base_marker_set_highlighted:
@@ -309,6 +326,7 @@ champlain_base_marker_set_highlighted (ChamplainBaseMarker *marker,
   g_object_notify (G_OBJECT (marker), "highlighted");
 }
 
+
 /**
  * champlain_base_marker_get_highlighted:
  * @marker: a #ChamplainBaseMarker
@@ -327,6 +345,7 @@ champlain_base_marker_get_highlighted (ChamplainBaseMarker *marker)
   return marker->priv->highlighted;
 }
 
+
 /**
  * champlain_base_marker_animate_in:
  * @marker: The marker
@@ -340,6 +359,7 @@ champlain_base_marker_animate_in (ChamplainBaseMarker *marker)
 {
   champlain_base_marker_animate_in_with_delay (marker, 0);
 }
+
 
 /**
  * champlain_base_marker_animate_in_with_delay :
@@ -373,6 +393,7 @@ champlain_base_marker_animate_in_with_delay (ChamplainBaseMarker *marker,
       "scale-x", 1.0, "scale-y", 1.0, NULL);
 }
 
+
 /**
  * champlain_base_marker_animate_out:
  * @marker: The marker
@@ -387,8 +408,9 @@ champlain_base_marker_animate_out (ChamplainBaseMarker *marker)
   champlain_base_marker_animate_out_with_delay (marker, 0);
 }
 
+
 static gboolean
-on_idle (ChamplainBaseMarker* marker)
+on_idle (ChamplainBaseMarker *marker)
 {
   /* Notify the view that the position changed so that the marker's
    * position is reset, it has to happen on idle as Clutter seems to
@@ -400,15 +422,17 @@ on_idle (ChamplainBaseMarker* marker)
   return FALSE;
 }
 
+
 static void
-on_animation_completed (G_GNUC_UNUSED ClutterAnimation* animation,
+on_animation_completed (G_GNUC_UNUSED ClutterAnimation *animation,
     ChamplainBaseMarker *marker)
 {
   g_idle_add_full (G_PRIORITY_DEFAULT,
-                   (GSourceFunc)on_idle,
-                   g_object_ref (marker),
-                   (GDestroyNotify)g_object_unref);
+      (GSourceFunc) on_idle,
+      g_object_ref (marker),
+      (GDestroyNotify) g_object_unref);
 }
+
 
 /**
  * champlain_base_marker_animate_out_with_delay :

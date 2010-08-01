@@ -46,11 +46,11 @@ GType champlain_point_get_type (void) G_GNUC_CONST;
 #define CHAMPLAIN_TYPE_POINT (champlain_point_get_type ())
 #define CHAMPLAIN_POINT(x) ((ChamplainPoint *) (x))
 
-ChamplainPoint * champlain_point_copy (const ChamplainPoint *point);
+ChamplainPoint *champlain_point_copy (const ChamplainPoint *point);
 
 void champlain_point_free (ChamplainPoint *point);
 
-ChamplainPoint * champlain_point_new (gdouble lat,
+ChamplainPoint *champlain_point_new (gdouble lat,
     gdouble lon);
 
 G_END_DECLS

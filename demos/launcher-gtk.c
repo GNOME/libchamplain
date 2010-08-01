@@ -41,13 +41,13 @@ on_destroy (GtkWidget *widget, gpointer data)
   gtk_main_quit ();
 }
 
+
 static void
 toggle_layer (GtkToggleButton *widget,
-              ClutterActor *layer)
+    ClutterActor *layer)
 {
-  if(gtk_toggle_button_get_active(widget))
+  if (gtk_toggle_button_get_active (widget))
     {
-
       champlain_polygon_show (polygon);
       champlain_layer_animate_in_all_markers (CHAMPLAIN_LAYER (layer));
     }
@@ -58,22 +58,24 @@ toggle_layer (GtkToggleButton *widget,
     }
 }
 
+
 gboolean
 mouse_click_cb (ClutterActor *actor, ClutterEvent *event, gpointer data)
 {
-    gdouble lat, lon;
+  gdouble lat, lon;
 
-    champlain_view_get_coords_from_event (CHAMPLAIN_VIEW (data), event, &lat, &lon);
-    g_print ("Mouse click at: %f  %f\n", lat, lon);
+  champlain_view_get_coords_from_event (CHAMPLAIN_VIEW (data), event, &lat, &lon);
+  g_print ("Mouse click at: %f  %f\n", lat, lon);
 
-    return TRUE;
+  return TRUE;
 }
+
 
 static void
 map_source_changed (GtkWidget *widget,
-                    ChamplainView *view)
+    ChamplainView *view)
 {
-  gchar* id;
+  gchar *id;
   ChamplainMapSource *source;
   GtkTreeIter iter;
   GtkTreeModel *model;
@@ -92,28 +94,33 @@ map_source_changed (GtkWidget *widget,
   g_object_unref (factory);
 }
 
+
 static void
 zoom_changed (GtkSpinButton *spinbutton,
-              ChamplainView *view)
+    ChamplainView *view)
 {
-  gint zoom = gtk_spin_button_get_value_as_int(spinbutton);
-  g_object_set(G_OBJECT(view), "zoom-level", zoom, NULL);
+  gint zoom = gtk_spin_button_get_value_as_int (spinbutton);
+
+  g_object_set (G_OBJECT (view), "zoom-level", zoom, NULL);
 }
+
 
 static void
 map_zoom_changed (ChamplainView *view,
-                  GParamSpec *gobject,
-                  GtkSpinButton *spinbutton)
+    GParamSpec *gobject,
+    GtkSpinButton *spinbutton)
 {
   gint zoom;
-  g_object_get(G_OBJECT(view), "zoom-level", &zoom, NULL);
-  gtk_spin_button_set_value(spinbutton, zoom);
+
+  g_object_get (G_OBJECT (view), "zoom-level", &zoom, NULL);
+  gtk_spin_button_set_value (spinbutton, zoom);
 }
+
 
 static void
 view_state_changed (ChamplainView *view,
-                    GParamSpec *gobject,
-                    GtkImage *image)
+    GParamSpec *gobject,
+    GtkImage *image)
 {
   ChamplainState state;
 
@@ -131,19 +138,22 @@ view_state_changed (ChamplainView *view,
     }
 }
 
+
 static void
 zoom_in (GtkWidget *widget,
-         ChamplainView *view)
+    ChamplainView *view)
 {
-  champlain_view_zoom_in(view);
+  champlain_view_zoom_in (view);
 }
+
 
 static void
 zoom_out (GtkWidget *widget,
-          ChamplainView *view)
+    ChamplainView *view)
 {
-  champlain_view_zoom_out(view);
+  champlain_view_zoom_out (view);
 }
+
 
 static void
 build_combo_box (GtkComboBox *box)
@@ -156,25 +166,25 @@ build_combo_box (GtkComboBox *box)
   GtkCellRenderer *cell;
 
   store = gtk_tree_store_new (N_COLS, G_TYPE_STRING, /* id */
-      G_TYPE_STRING, /* name */
-      -1);
+        G_TYPE_STRING, /* name */
+        -1);
 
   factory = champlain_map_source_factory_dup_default ();
   sources = champlain_map_source_factory_dup_list (factory);
 
   iter = sources;
   while (iter != NULL)
-  {
-    ChamplainMapSourceDesc *desc;
+    {
+      ChamplainMapSourceDesc *desc;
 
-    desc = (ChamplainMapSourceDesc*) iter->data;
+      desc = (ChamplainMapSourceDesc *) iter->data;
 
-    gtk_tree_store_append (store, &parent, NULL );
-    gtk_tree_store_set (store, &parent, COL_ID, desc->id,
-        COL_NAME, desc->name, -1);
+      gtk_tree_store_append (store, &parent, NULL);
+      gtk_tree_store_set (store, &parent, COL_ID, desc->id,
+          COL_NAME, desc->name, -1);
 
-    iter = g_slist_next (iter);
-  }
+      iter = g_slist_next (iter);
+    }
 
   g_slist_free (sources);
   g_object_unref (factory);
@@ -184,12 +194,13 @@ build_combo_box (GtkComboBox *box)
   cell = gtk_cell_renderer_text_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (box), cell, FALSE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (box), cell,
-      "text", COL_NAME, NULL );
+      "text", COL_NAME, NULL);
 }
+
 
 int
 main (int argc,
-      char *argv[])
+    char *argv[])
 {
   GtkWidget *window;
   GtkWidget *widget, *vbox, *bbox, *button, *viewport;
@@ -215,7 +226,7 @@ main (int argc,
   g_signal_connect (G_OBJECT (window), "destroy", G_CALLBACK (on_destroy),
       NULL);
 
-  vbox = gtk_vbox_new(FALSE, 10);
+  vbox = gtk_vbox_new (FALSE, 10);
 
   widget = gtk_champlain_embed_new ();
   view = gtk_champlain_embed_get_view (GTK_CHAMPLAIN_EMBED (widget));
@@ -229,10 +240,10 @@ main (int argc,
       "license-text", "Don't eat cereals with orange juice\nIt tastes bad",
       "show-scale", TRUE,
       NULL);
-  champlain_view_center_on(CHAMPLAIN_VIEW(view), 45.466, -73.75);
+  champlain_view_center_on (CHAMPLAIN_VIEW (view), 45.466, -73.75);
 
   layer = create_marker_layer (view);
-  champlain_view_add_layer(view, layer);
+  champlain_view_add_layer (view, layer);
   champlain_layer_hide_all_markers (CHAMPLAIN_LAYER (layer));
 
   polygon = champlain_polygon_new ();
@@ -255,7 +266,7 @@ main (int argc,
 
   gtk_widget_set_size_request (widget, 640, 480);
 
-  bbox =  gtk_hbox_new (FALSE, 10);
+  bbox = gtk_hbox_new (FALSE, 10);
   button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_IN);
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_in), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
@@ -264,7 +275,7 @@ main (int argc,
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_out), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
-  button = gtk_toggle_button_new_with_label  ("Markers");
+  button = gtk_toggle_button_new_with_label ("Markers");
   g_signal_connect (button, "toggled", G_CALLBACK (toggle_layer), layer);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
@@ -274,7 +285,7 @@ main (int argc,
   g_signal_connect (button, "changed", G_CALLBACK (map_source_changed), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
-  button = gtk_spin_button_new_with_range(0, 20, 1);
+  button = gtk_spin_button_new_with_range (0, 20, 1);
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (button),
       champlain_view_get_zoom_level (view));
   g_signal_connect (button, "changed", G_CALLBACK (zoom_changed), view);
@@ -303,4 +314,3 @@ main (int argc,
 
   return 0;
 }
-

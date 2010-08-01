@@ -43,8 +43,8 @@ main (int argc, char *argv[])
 
   ChamplainView *view = gtk_champlain_embed_get_view (GTK_CHAMPLAIN_EMBED (widget));
   g_object_set (G_OBJECT (view), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
-          "zoom-level", 5, NULL);
-  champlain_view_center_on(CHAMPLAIN_VIEW(view), 45.466, -73.75);
+      "zoom-level", 5, NULL);
+  champlain_view_center_on (CHAMPLAIN_VIEW (view), 45.466, -73.75);
 
   /* insert it into the widget you wish */
   gtk_container_add (GTK_CONTAINER (window), widget);

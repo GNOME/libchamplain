@@ -26,7 +26,7 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_NETWORK_BBOX_TILE_SOURCE champlain_network_bbox_tile_source_get_type()
+#define CHAMPLAIN_TYPE_NETWORK_BBOX_TILE_SOURCE champlain_network_bbox_tile_source_get_type ()
 
 #define CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_NETWORK_BBOX_TILE_SOURCE, ChamplainNetworkBboxTileSource))
@@ -45,19 +45,21 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainNetworkBboxTileSourcePrivate ChamplainNetworkBboxTileSourcePrivate;
 
-typedef struct {
+typedef struct
+{
   ChamplainTileSource parent;
 
   ChamplainNetworkBboxTileSourcePrivate *priv;
 } ChamplainNetworkBboxTileSource;
 
-typedef struct {
+typedef struct
+{
   ChamplainTileSourceClass parent_class;
 } ChamplainNetworkBboxTileSourceClass;
 
 GType champlain_network_bbox_tile_source_get_type (void);
 
-ChamplainNetworkBboxTileSource* champlain_network_bbox_tile_source_new_full (const gchar *id,
+ChamplainNetworkBboxTileSource *champlain_network_bbox_tile_source_new_full (const gchar *id,
     const gchar *name,
     const gchar *license,
     const gchar *license_uri,
@@ -74,7 +76,7 @@ void champlain_network_bbox_tile_source_load_map_data (
     gdouble bound_right,
     gdouble bound_top);
 
-const gchar * champlain_network_bbox_tile_source_get_api_uri (
+const gchar *champlain_network_bbox_tile_source_get_api_uri (
     ChamplainNetworkBboxTileSource *map_data_source);
 
 void champlain_network_bbox_tile_source_set_api_uri (

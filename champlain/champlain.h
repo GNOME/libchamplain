@@ -25,29 +25,35 @@
 #include <glib.h>
 
 #include "champlain/champlain-features.h"
-
 #include "champlain/champlain-defines.h"
+#include "champlain/champlain-enum-types.h"
+#include "champlain/champlain-version.h"
+
 #include "champlain/champlain-layer.h"
 #include "champlain/champlain-selection-layer.h"
+#include "champlain/champlain-point.h"
 #include "champlain/champlain-base-marker.h"
 #include "champlain/champlain-marker.h"
 #include "champlain/champlain-view.h"
-#include "champlain/champlain-enum-types.h"
-#include "champlain/champlain-point.h"
+#include "champlain/champlain-bounding-box.h"
+
 #include "champlain/champlain-map-source.h"
-#include "champlain/champlain-map-source-chain.h"
 #include "champlain/champlain-tile-source.h"
 #include "champlain/champlain-tile-cache.h"
-#include "champlain/champlain-memory-cache.h"
-#include "champlain/champlain-network-tile-source.h"
-#include "champlain/champlain-file-cache.h"
-#include "champlain/champlain-null-tile-source.h"
-#include "champlain/champlain-map-source-factory.h"
-#include "champlain/champlain-version.h"
-#include "champlain/champlain-bounding-box.h"
-#include "champlain/champlain-file-tile-source.h"
-#include "champlain/champlain-network-bbox-tile-source.h"
 #include "champlain/champlain-renderer.h"
+
+#include "champlain/champlain-map-source-factory.h"
+
+#include "champlain/champlain-map-source-chain.h"
+
+#include "champlain/champlain-network-tile-source.h"
+#include "champlain/champlain-network-bbox-tile-source.h"
+#include "champlain/champlain-file-tile-source.h"
+#include "champlain/champlain-null-tile-source.h"
+
+#include "champlain/champlain-memory-cache.h"
+#include "champlain/champlain-file-cache.h"
+
 #include "champlain/champlain-image-renderer.h"
 #include "champlain/champlain-error-tile-renderer.h"
 

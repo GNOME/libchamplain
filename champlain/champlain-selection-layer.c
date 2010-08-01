@@ -58,7 +58,8 @@ enum
 
 static guint signals[LAST_SIGNAL] = { 0, };
 
-struct _ChamplainSelectionLayerPrivate {
+struct _ChamplainSelectionLayerPrivate
+{
   ChamplainSelectionMode mode;
   GList *selection;
 };
@@ -74,13 +75,15 @@ champlain_selection_layer_get_property (GObject *object,
 
   switch (property_id)
     {
-      case PROP_SELECTION_MODE:
-        g_value_set_enum (value, priv->mode);
-        break;
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    case PROP_SELECTION_MODE:
+      g_value_set_enum (value, priv->mode);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
 }
+
 
 static void
 champlain_selection_layer_set_property (GObject *object,
@@ -92,13 +95,15 @@ champlain_selection_layer_set_property (GObject *object,
 
   switch (property_id)
     {
-      case PROP_SELECTION_MODE:
-        champlain_selection_layer_set_selection_mode (self, g_value_get_enum (value));
-        break;
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    case PROP_SELECTION_MODE:
+      champlain_selection_layer_set_selection_mode (self, g_value_get_enum (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
 }
+
 
 static void
 champlain_selection_layer_dispose (GObject *object)
@@ -106,11 +111,13 @@ champlain_selection_layer_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_selection_layer_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_selection_layer_finalize (GObject *object)
 {
   G_OBJECT_CLASS (champlain_selection_layer_parent_class)->finalize (object);
 }
+
 
 static void
 champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
@@ -125,39 +132,39 @@ champlain_selection_layer_class_init (ChamplainSelectionLayerClass *klass)
   object_class->set_property = champlain_selection_layer_set_property;
 
   /**
-  * ChamplainSelectionLayer:selection-mode:
-  *
-  * Determines the type of selection that will be performed.
-  *
-  * Since: 0.4
-  */
+   * ChamplainSelectionLayer:selection-mode:
+   *
+   * Determines the type of selection that will be performed.
+   *
+   * Since: 0.4
+   */
   g_object_class_install_property (object_class,
       PROP_SELECTION_MODE,
       g_param_spec_enum ("selection-mode",
-           "Selection Mode",
-           "Determines the type of selection that will be performed.",
-           CHAMPLAIN_TYPE_SELECTION_MODE,
-           CHAMPLAIN_SELECTION_SINGLE,
-           CHAMPLAIN_PARAM_READWRITE));
+          "Selection Mode",
+          "Determines the type of selection that will be performed.",
+          CHAMPLAIN_TYPE_SELECTION_MODE,
+          CHAMPLAIN_SELECTION_SINGLE,
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
-  * ChamplainSelectionLayer::changed
-  *
-  * The changed signal is emitted when the selected marker(s) change.
-  *
-  * Since: 0.4.1
-  */
+   * ChamplainSelectionLayer::changed
+   *
+   * The changed signal is emitted when the selected marker(s) change.
+   *
+   * Since: 0.4.1
+   */
   signals[CHANGED] =
-      g_signal_new ("changed", G_OBJECT_CLASS_TYPE (object_class),
-          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-          g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+    g_signal_new ("changed", G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 }
+
 
 static void
 marker_select (ChamplainSelectionLayer *layer,
     ChamplainBaseMarker *marker)
 {
-
   /* Add selection */
   g_object_ref (marker);
   g_object_set (marker, "highlighted", TRUE, NULL);
@@ -165,6 +172,7 @@ marker_select (ChamplainSelectionLayer *layer,
 
   g_signal_emit_by_name (layer, "changed", NULL);
 }
+
 
 static void
 api_select (ChamplainSelectionLayer *layer,
@@ -187,6 +195,7 @@ api_select (ChamplainSelectionLayer *layer,
   else if (layer->priv->mode == CHAMPLAIN_SELECTION_MULTIPLE)
     marker_select (layer, marker);
 }
+
 
 static void
 mouse_select (ChamplainSelectionLayer *layer,
@@ -219,18 +228,19 @@ mouse_select (ChamplainSelectionLayer *layer,
     }
 }
 
+
 static gboolean
 marker_clicked_cb (ClutterActor *actor,
     ClutterButtonEvent *event,
     gpointer user_data)
 {
-
   mouse_select (CHAMPLAIN_SELECTION_LAYER (user_data),
       CHAMPLAIN_BASE_MARKER (actor),
       (event->modifier_state & CLUTTER_CONTROL_MASK));
 
   return TRUE;
 }
+
 
 static void
 layer_add_cb (ClutterGroup *layer,
@@ -245,6 +255,7 @@ layer_add_cb (ClutterGroup *layer,
       G_CALLBACK (marker_clicked_cb), layer);
 }
 
+
 static void
 layer_remove_cb (ClutterGroup *layer,
     ClutterActor *actor,
@@ -253,6 +264,7 @@ layer_remove_cb (ClutterGroup *layer,
   g_signal_handlers_disconnect_by_func (G_OBJECT (actor),
       G_CALLBACK (marker_clicked_cb), layer);
 }
+
 
 static void
 champlain_selection_layer_init (ChamplainSelectionLayer *self)
@@ -266,6 +278,7 @@ champlain_selection_layer_init (ChamplainSelectionLayer *self)
   g_signal_connect_after (G_OBJECT (self), "actor-removed",
       G_CALLBACK (layer_remove_cb), NULL);
 }
+
 
 /**
  * champlain_selection_layer_new:
@@ -281,6 +294,7 @@ champlain_selection_layer_new ()
 {
   return g_object_new (CHAMPLAIN_TYPE_SELECTION_LAYER, NULL);
 }
+
 
 /**
  * champlain_selection_layer_get_selected:
@@ -304,6 +318,7 @@ champlain_selection_layer_get_selected (ChamplainSelectionLayer *layer)
   return NULL;
 }
 
+
 /**
  * champlain_selection_layer_get_selected_markers:
  * @layer: a #ChamplainSelectionLayer
@@ -320,6 +335,7 @@ champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer)
 {
   return layer->priv->selection;
 }
+
 
 /**
  * champlain_selection_layer_count_selected_markers:
@@ -339,6 +355,7 @@ champlain_selection_layer_count_selected_markers (ChamplainSelectionLayer *layer
   return g_list_length (layer->priv->selection);
 }
 
+
 /**
  * champlain_selection_layer_select:
  * @layer: a #ChamplainSelectionLayer
@@ -357,6 +374,7 @@ champlain_selection_layer_select (ChamplainSelectionLayer *layer,
 
   api_select (layer, marker);
 }
+
 
 /**
  * champlain_selection_layer_unselect_all:
@@ -385,6 +403,7 @@ champlain_selection_layer_unselect_all (ChamplainSelectionLayer *layer)
   g_signal_emit_by_name (layer, "changed", NULL);
 }
 
+
 /**
  * champlain_selection_layer_select_all:
  * @layer: a #ChamplainSelectionLayer
@@ -408,18 +427,19 @@ champlain_selection_layer_select_all (ChamplainSelectionLayer *layer)
   if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
     return;
 
-  n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer) );
+  n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
   for (; i < n_children; ++i)
     {
       ClutterActor *actor = clutter_group_get_nth_child (
           CLUTTER_GROUP (layer), i);
-      if (CHAMPLAIN_IS_BASE_MARKER (actor) )
+      if (CHAMPLAIN_IS_BASE_MARKER (actor))
         {
           ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
           api_select (layer, marker);
         }
     }
 }
+
 
 /**
  * champlain_selection_layer_unselect:
@@ -451,6 +471,7 @@ champlain_selection_layer_unselect (ChamplainSelectionLayer *layer,
     }
 }
 
+
 /**
  * champlain_selection_layer_marker_is_selected:
  * @layer: a #ChamplainSelectionLayer
@@ -474,6 +495,7 @@ champlain_selection_layer_marker_is_selected (ChamplainSelectionLayer *layer,
   selection = g_list_find (layer->priv->selection, marker);
   return selection != NULL;
 }
+
 
 /**
  * champlain_selection_layer_set_selection_mode:
@@ -504,6 +526,7 @@ champlain_selection_layer_set_selection_mode (ChamplainSelectionLayer *layer,
 
   g_object_notify (G_OBJECT (layer), "selection-mode");
 }
+
 
 /**
  * champlain_selection_layer_get_selection_mode:

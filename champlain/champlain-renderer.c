@@ -18,7 +18,7 @@
 
 #include "champlain-renderer.h"
 
-G_DEFINE_TYPE(ChamplainRenderer, champlain_renderer, G_TYPE_OBJECT)
+G_DEFINE_TYPE (ChamplainRenderer, champlain_renderer, G_TYPE_OBJECT)
 
 enum
 {
@@ -35,6 +35,7 @@ champlain_renderer_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_renderer_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_renderer_finalize (GObject *object)
 {
@@ -42,9 +43,10 @@ champlain_renderer_finalize (GObject *object)
 }
 
 
-static void champlain_renderer_class_init(ChamplainRendererClass *klass)
+static void
+champlain_renderer_class_init (ChamplainRendererClass *klass)
 {
-  GObjectClass* object_class = G_OBJECT_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = champlain_renderer_finalize;
   object_class->dispose = champlain_renderer_dispose;
@@ -53,14 +55,17 @@ static void champlain_renderer_class_init(ChamplainRendererClass *klass)
   klass->render = NULL;
 
   champlain_renderer_signals[RELOAD_TILES] =
-  g_signal_new ("reload-tiles", G_OBJECT_CLASS_TYPE (object_class),
-                G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                g_cclosure_marshal_VOID__VOID, G_TYPE_NONE,
-                0, NULL);
+    g_signal_new ("reload-tiles", G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE,
+        0, NULL);
 }
 
 
-void champlain_renderer_set_data (ChamplainRenderer *renderer, const gchar *data, guint size)
+void
+champlain_renderer_set_data (ChamplainRenderer *renderer,
+    const gchar *data, 
+    guint size)
 {
   g_return_if_fail (CHAMPLAIN_IS_RENDERER (renderer));
 
@@ -68,7 +73,9 @@ void champlain_renderer_set_data (ChamplainRenderer *renderer, const gchar *data
 }
 
 
-void champlain_renderer_render (ChamplainRenderer *renderer, ChamplainTile *tile)
+void
+champlain_renderer_render (ChamplainRenderer *renderer,
+    ChamplainTile *tile)
 {
   g_return_if_fail (CHAMPLAIN_IS_RENDERER (renderer));
 
@@ -76,8 +83,7 @@ void champlain_renderer_render (ChamplainRenderer *renderer, ChamplainTile *tile
 }
 
 
-static void champlain_renderer_init(ChamplainRenderer *self)
+static void
+champlain_renderer_init (ChamplainRenderer *self)
 {
 }
-
-

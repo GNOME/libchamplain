@@ -63,10 +63,11 @@ enum
   PROP_PROXY_URI
 };
 
-struct _ChamplainNetworkBboxTileSourcePrivate {
+struct _ChamplainNetworkBboxTileSourcePrivate
+{
   gchar *api_uri;
   gchar *proxy_uri;
-  SoupSession * soup_session;
+  SoupSession *soup_session;
 };
 
 static guint champlain_network_bbox_tile_source_signals[LAST_SIGNAL] = { 0, };
@@ -82,22 +83,25 @@ champlain_network_bbox_tile_source_get_property (GObject *object,
     GParamSpec *pspec)
 {
   ChamplainNetworkBboxTileSource *self =
-      CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (object);
+    CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (object);
   ChamplainNetworkBboxTileSourcePrivate *priv = self->priv;
 
   switch (property_id)
     {
-      case PROP_API_URI:
-        g_value_set_string (value,
-            champlain_network_bbox_tile_source_get_api_uri (self));
-        break;
-      case PROP_PROXY_URI:
-        g_value_set_string (value, priv->proxy_uri);
-        break;
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    case PROP_API_URI:
+      g_value_set_string (value,
+          champlain_network_bbox_tile_source_get_api_uri (self));
+      break;
+
+    case PROP_PROXY_URI:
+      g_value_set_string (value, priv->proxy_uri);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
 }
+
 
 static void
 champlain_network_bbox_tile_source_set_property (GObject *object,
@@ -106,33 +110,36 @@ champlain_network_bbox_tile_source_set_property (GObject *object,
     GParamSpec *pspec)
 {
   ChamplainNetworkBboxTileSource *self =
-      CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (object);
+    CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (object);
   ChamplainNetworkBboxTileSourcePrivate *priv = self->priv;
 
   switch (property_id)
     {
-      case PROP_API_URI:
-        champlain_network_bbox_tile_source_set_api_uri (self,
-            g_value_get_string (value));
-        break;
-      case PROP_PROXY_URI:
-        g_free (priv->proxy_uri);
+    case PROP_API_URI:
+      champlain_network_bbox_tile_source_set_api_uri (self,
+          g_value_get_string (value));
+      break;
 
-        priv->proxy_uri = g_value_dup_string (value);
-        if (priv->soup_session)
-          g_object_set (G_OBJECT (priv->soup_session), "proxy-uri",
-              soup_uri_new (priv->proxy_uri), NULL);
-        break;
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+    case PROP_PROXY_URI:
+      g_free (priv->proxy_uri);
+
+      priv->proxy_uri = g_value_dup_string (value);
+      if (priv->soup_session)
+        g_object_set (G_OBJECT (priv->soup_session), "proxy-uri",
+            soup_uri_new (priv->proxy_uri), NULL);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
 }
+
 
 static void
 champlain_network_bbox_tile_source_dispose (GObject *object)
 {
   ChamplainNetworkBboxTileSource *self =
-      CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (object);
+    CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (object);
   ChamplainNetworkBboxTileSourcePrivate *priv = self->priv;
 
   if (priv->soup_session != NULL)
@@ -144,11 +151,12 @@ champlain_network_bbox_tile_source_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_network_bbox_tile_source_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_network_bbox_tile_source_finalize (GObject *object)
 {
   ChamplainNetworkBboxTileSource *self =
-      CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (object);
+    CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (object);
   ChamplainNetworkBboxTileSourcePrivate *priv = self->priv;
 
   g_free (priv->api_uri);
@@ -156,6 +164,7 @@ champlain_network_bbox_tile_source_finalize (GObject *object)
 
   G_OBJECT_CLASS (champlain_network_bbox_tile_source_parent_class)->finalize (object);
 }
+
 
 static void
 champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceClass *klass)
@@ -173,41 +182,42 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
   map_source_class->fill_tile = fill_tile;
 
   /*
-  * ChamplainNetworkBboxTileSource:api-uri:
-  *
-  * The URI of an OpenStreetMap API server
-  *
-  * Since: 0.6
-  */
+   * ChamplainNetworkBboxTileSource:api-uri:
+   *
+   * The URI of an OpenStreetMap API server
+   *
+   * Since: 0.6
+   */
   g_object_class_install_property (object_class,
       PROP_API_URI,
       g_param_spec_string ("api_uri",
-        "API URI",
-        "The API URI of an OpenStreetMap server",
-        "http://www.informationfreeway.org/api/0.6",
-        G_PARAM_READWRITE));
+          "API URI",
+          "The API URI of an OpenStreetMap server",
+          "http://www.informationfreeway.org/api/0.6",
+          G_PARAM_READWRITE));
 
   /*
-  * ChamplainNetworkBboxTileSource:proxy-uri:
-  *
-  * The proxy URI to use to access network
-  *
-  * Since: 0.6
-  */
+   * ChamplainNetworkBboxTileSource:proxy-uri:
+   *
+   * The proxy URI to use to access network
+   *
+   * Since: 0.6
+   */
   g_object_class_install_property (object_class,
       PROP_PROXY_URI,
       g_param_spec_string ("proxy-uri",
-        "Proxy URI",
-        "The proxy URI to use to access network",
-        "",
-        G_PARAM_READWRITE));
+          "Proxy URI",
+          "The proxy URI to use to access network",
+          "",
+          G_PARAM_READWRITE));
 
   champlain_network_bbox_tile_source_signals[DATA_LOADED] =
     g_signal_new ("data-loaded", G_OBJECT_CLASS_TYPE (object_class),
-                  G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                  g_cclosure_marshal_VOID__VOID, G_TYPE_NONE,
-                  0, NULL);
+        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE,
+        0, NULL);
 }
+
 
 static void
 champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
@@ -225,10 +235,11 @@ champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
       SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
 #endif
       NULL);
-      g_object_set (G_OBJECT (priv->soup_session),
-          "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
-          "max-conns-per-host", 2, NULL);
+  g_object_set (G_OBJECT (priv->soup_session),
+      "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
+      "max-conns-per-host", 2, NULL);
 }
+
 
 /*
  * champlain_network_bbox_tile_source_new:
@@ -240,7 +251,7 @@ champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
  * Since: 0.6
  */
 
-ChamplainNetworkBboxTileSource*
+ChamplainNetworkBboxTileSource *
 champlain_network_bbox_tile_source_new_full (const gchar *id,
     const gchar *name,
     const gchar *license,
@@ -251,7 +262,8 @@ champlain_network_bbox_tile_source_new_full (const gchar *id,
     ChamplainMapProjection projection,
     ChamplainRenderer *renderer)
 {
-  ChamplainNetworkBboxTileSource * source;
+  ChamplainNetworkBboxTileSource *source;
+
   source = g_object_new (CHAMPLAIN_TYPE_NETWORK_BBOX_TILE_SOURCE, "id", id,
       "name", name,
       "license", license,
@@ -265,12 +277,13 @@ champlain_network_bbox_tile_source_new_full (const gchar *id,
   return source;
 }
 
+
 static void
 load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
     gpointer user_data)
 {
   ChamplainNetworkBboxTileSource *self =
-      CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (user_data);
+    CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (user_data);
   ChamplainRenderer *renderer;
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
@@ -283,9 +296,10 @@ load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
 
   g_signal_emit_by_name (self, "data-loaded", NULL);
 
-  renderer =  champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (self));
+  renderer = champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (self));
   champlain_renderer_set_data (renderer, msg->response_body->data, msg->response_body->length);
 }
+
 
 /*
  * champlain_network_bbox_tile_source_load_map_data:
@@ -334,12 +348,13 @@ champlain_network_bbox_tile_source_load_map_data (
   soup_session_queue_message (priv->soup_session, msg, load_map_data_cb, self);
 }
 
+
 static void
 tile_rendered_cb (ChamplainTile *tile,
     ChamplainRenderCallbackData *data,
     ChamplainMapSource *map_source)
 {
-  ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE(map_source);
+  ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE (map_source);
   ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
@@ -358,6 +373,7 @@ tile_rendered_cb (ChamplainTile *tile,
   g_object_unref (map_source);
   g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, map_source);
 }
+
 
 static void
 fill_tile (ChamplainMapSource *map_source,
@@ -379,6 +395,7 @@ fill_tile (ChamplainMapSource *map_source,
   champlain_renderer_render (renderer, tile);
 }
 
+
 /*
  * champlain_network_bbox_tile_source_get_api_uri:
  * @map_data_source: a #ChamplainNetworkBboxTileSource
@@ -397,6 +414,7 @@ champlain_network_bbox_tile_source_get_api_uri (
 
   return self->priv->api_uri;
 }
+
 
 /*
  * champlain_network_bbox_tile_source_set_api_uri:

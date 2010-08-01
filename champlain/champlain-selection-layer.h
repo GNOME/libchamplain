@@ -32,7 +32,7 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_SELECTION_LAYER champlain_selection_layer_get_type()
+#define CHAMPLAIN_TYPE_SELECTION_LAYER champlain_selection_layer_get_type ()
 
 #define CHAMPLAIN_SELECTION_LAYER(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_SELECTION_LAYER, ChamplainSelectionLayer))
@@ -59,30 +59,33 @@ typedef struct _ChamplainSelectionLayerPrivate ChamplainSelectionLayerPrivate;
  *
  * Selection mode
  */
-typedef enum {
+typedef enum
+{
   CHAMPLAIN_SELECTION_NONE,
   CHAMPLAIN_SELECTION_SINGLE,
   CHAMPLAIN_SELECTION_MULTIPLE
 } ChamplainSelectionMode;
 
-typedef struct _ChamplainSelectionLayer      ChamplainSelectionLayer;
+typedef struct _ChamplainSelectionLayer ChamplainSelectionLayer;
 typedef struct _ChamplainSelectionLayerClass ChamplainSelectionLayerClass;
 
-struct _ChamplainSelectionLayer {
+struct _ChamplainSelectionLayer
+{
   ChamplainLayer parent;
 
   ChamplainSelectionLayerPrivate *priv;
 };
 
-struct _ChamplainSelectionLayerClass {
+struct _ChamplainSelectionLayerClass
+{
   ChamplainLayerClass parent_class;
 };
 
 GType champlain_selection_layer_get_type (void);
 
-ChamplainLayer * champlain_selection_layer_new (void);
+ChamplainLayer *champlain_selection_layer_new (void);
 
-ChamplainBaseMarker * champlain_selection_layer_get_selected (ChamplainSelectionLayer *layer);
+ChamplainBaseMarker *champlain_selection_layer_get_selected (ChamplainSelectionLayer *layer);
 const GList *champlain_selection_layer_get_selected_markers (ChamplainSelectionLayer *layer);
 guint champlain_selection_layer_count_selected_markers (ChamplainSelectionLayer *layer);
 

@@ -46,11 +46,13 @@ champlain_file_tile_source_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_file_tile_source_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_file_tile_source_finalize (GObject *object)
 {
   G_OBJECT_CLASS (champlain_file_tile_source_parent_class)->finalize (object);
 }
+
 
 static void
 champlain_file_tile_source_class_init (ChamplainFileTileSourceClass *klass)
@@ -64,10 +66,12 @@ champlain_file_tile_source_class_init (ChamplainFileTileSourceClass *klass)
   map_source_class->fill_tile = fill_tile;
 }
 
+
 static void
 champlain_file_tile_source_init (ChamplainFileTileSource *self)
 {
 }
+
 
 /*
  * champlain_file_tile_source_new:
@@ -78,7 +82,7 @@ champlain_file_tile_source_init (ChamplainFileTileSource *self)
  *
  * Since: 0.6
  */
-ChamplainFileTileSource*
+ChamplainFileTileSource *
 champlain_file_tile_source_new_full (const gchar *id,
     const gchar *name,
     const gchar *license,
@@ -89,16 +93,17 @@ champlain_file_tile_source_new_full (const gchar *id,
     ChamplainMapProjection projection,
     ChamplainRenderer *renderer)
 {
-  ChamplainFileTileSource * source;
-  source = g_object_new (CHAMPLAIN_TYPE_FILE_TILE_SOURCE, 
+  ChamplainFileTileSource *source;
+
+  source = g_object_new (CHAMPLAIN_TYPE_FILE_TILE_SOURCE,
       "id", id,
-      "name", name, 
-      "license", license, 
+      "name", name,
+      "license", license,
       "license-uri", license_uri,
-      "min-zoom-level", min_zoom, 
+      "min-zoom-level", min_zoom,
       "max-zoom-level", max_zoom,
-      "tile-size", tile_size, 
-      "projection", projection, 
+      "tile-size", tile_size,
+      "projection", projection,
       "renderer", renderer,
       NULL);
   return source;
@@ -130,17 +135,18 @@ champlain_file_tile_source_load_map_data (ChamplainFileTileSource *self,
       return;
     }
 
-  renderer =  champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (self));
+  renderer = champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (self));
   champlain_renderer_set_data (renderer, data, length);
   g_free (data);
 }
+
 
 static void
 tile_rendered_cb (ChamplainTile *tile,
     ChamplainRenderCallbackData *data,
     ChamplainMapSource *map_source)
 {
-  ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE(map_source);
+  ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE (map_source);
   ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
@@ -159,6 +165,7 @@ tile_rendered_cb (ChamplainTile *tile,
   g_object_unref (map_source);
   g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, map_source);
 }
+
 
 static void
 fill_tile (ChamplainMapSource *map_source,

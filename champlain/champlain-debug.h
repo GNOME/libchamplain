@@ -41,8 +41,9 @@ typedef enum
 } ChamplainDebugFlags;
 
 gboolean champlain_debug_flag_is_set (ChamplainDebugFlags flag);
-void champlain_debug (ChamplainDebugFlags flag, const gchar *format, ...)
-    G_GNUC_PRINTF (2, 3);
+void champlain_debug (ChamplainDebugFlags flag,
+    const gchar *format,
+    ...) G_GNUC_PRINTF (2, 3);
 void champlain_debug_set_flags (const gchar *flags_string);
 G_END_DECLS
 
@@ -71,7 +72,7 @@ G_END_DECLS
 
 #undef DEBUG
 #define DEBUG(format, ...) \
-  champlain_debug (DEBUG_FLAG, "%s: " format, G_STRFUNC, ##__VA_ARGS__)
+  champlain_debug (DEBUG_FLAG, "%s: " format, G_STRFUNC, ## __VA_ARGS__)
 
 #undef DEBUGGING
 #define DEBUGGING champlain_debug_flag_is_set (DEBUG_FLAG)

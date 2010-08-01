@@ -44,11 +44,12 @@ typedef struct _ChamplainMapSourceDesc ChamplainMapSourceDesc;
  *
  * Since: 0.4
  */
-typedef ChamplainMapSource * (*ChamplainMapSourceConstructor) (
-    ChamplainMapSourceDesc *desc, gpointer data);
+typedef ChamplainMapSource * (*ChamplainMapSourceConstructor)
+  (ChamplainMapSourceDesc *desc, gpointer data);
+
 #define CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR (f) ((ChamplainMapSourceConstructor) (f))
 
-#define CHAMPLAIN_MAP_SOURCE_DESC(obj)     ((ChamplainMapSourceDesc *) (obj))
+#define CHAMPLAIN_MAP_SOURCE_DESC(obj) ((ChamplainMapSourceDesc *) (obj))
 
 /**
  * ChamplainMapSourceDesc:
@@ -67,7 +68,8 @@ typedef ChamplainMapSource * (*ChamplainMapSourceConstructor) (
  *
  * Since: 0.4
  */
-struct _ChamplainMapSourceDesc {
+struct _ChamplainMapSourceDesc
+{
   gchar *id;
   gchar *name;
   gchar *license;
@@ -83,11 +85,11 @@ struct _ChamplainMapSourceDesc {
 GType champlain_map_source_desc_get_type (void) G_GNUC_CONST;
 #define CHAMPLAIN_TYPE_MAP_SOURCE_DESC (champlain_map_source_desc_get_type ())
 
-ChamplainMapSourceDesc * champlain_map_source_desc_copy (const ChamplainMapSourceDesc *desc);
+ChamplainMapSourceDesc *champlain_map_source_desc_copy (const ChamplainMapSourceDesc *desc);
 
 void champlain_map_source_desc_free (ChamplainMapSourceDesc *desc);
 
-ChamplainMapSourceDesc * champlain_map_source_desc_new (void);
+ChamplainMapSourceDesc *champlain_map_source_desc_new (void);
 
 G_END_DECLS
 

@@ -42,7 +42,8 @@ typedef struct _ChamplainBoundingBox ChamplainBoundingBox;
  *
  * Since: 0.6
  */
-struct _ChamplainBoundingBox {
+struct _ChamplainBoundingBox
+{
   gdouble left;
   gdouble bottom;
   gdouble right;
@@ -52,9 +53,9 @@ struct _ChamplainBoundingBox {
 GType champlain_bounding_box_get_type (void) G_GNUC_CONST;
 #define CHAMPLAIN_TYPE_BOUNDING_BOX (champlain_bounding_box_get_type ())
 
-ChamplainBoundingBox * champlain_bounding_box_new (void);
+ChamplainBoundingBox *champlain_bounding_box_new (void);
 
-ChamplainBoundingBox * champlain_bounding_box_copy (const ChamplainBoundingBox *bbox);
+ChamplainBoundingBox *champlain_bounding_box_copy (const ChamplainBoundingBox *bbox);
 
 void champlain_bounding_box_free (ChamplainBoundingBox *bbox);
 

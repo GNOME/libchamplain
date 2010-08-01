@@ -30,22 +30,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_MARKER champlain_marker_get_type()
+#define CHAMPLAIN_TYPE_MARKER champlain_marker_get_type ()
 
 #define CHAMPLAIN_MARKER(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarker))
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarker))
 
 #define CHAMPLAIN_MARKER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_MARKER, ChamplainMarkerClass))
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerClass))
 
 #define CHAMPLAIN_IS_MARKER(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_MARKER))
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_MARKER))
 
 #define CHAMPLAIN_IS_MARKER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE((klass),  CHAMPLAIN_TYPE_MARKER))
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MARKER))
 
 #define CHAMPLAIN_MARKER_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS((obj),  CHAMPLAIN_TYPE_MARKER, ChamplainMarkerClass))
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerClass))
 
 typedef struct _ChamplainMarkerPrivate ChamplainMarkerPrivate;
 
@@ -63,7 +63,7 @@ struct _ChamplainMarkerClass
 {
   ChamplainBaseMarkerClass parent_class;
 
-  void (* draw_marker) (ChamplainMarker *marker);
+  void (*draw_marker)(ChamplainMarker *marker);
 };
 
 GType champlain_marker_get_type (void);
@@ -71,7 +71,9 @@ GType champlain_marker_get_type (void);
 ClutterActor *champlain_marker_new (void);
 
 ClutterActor *champlain_marker_new_with_text (const gchar *text,
-    const gchar *font, ClutterColor *text_color, ClutterColor *marker_color);
+    const gchar *font,
+    ClutterColor *text_color,
+    ClutterColor *marker_color);
 
 ClutterActor *champlain_marker_new_with_image (ClutterActor *actor);
 
@@ -109,12 +111,12 @@ void champlain_marker_set_draw_background (ChamplainMarker *marker,
     gboolean background);
 
 gboolean champlain_marker_get_use_markup (ChamplainMarker *marker);
-const gchar * champlain_marker_get_text (ChamplainMarker *marker);
-ClutterActor * champlain_marker_get_image (ChamplainMarker *marker);
+const gchar *champlain_marker_get_text (ChamplainMarker *marker);
+ClutterActor *champlain_marker_get_image (ChamplainMarker *marker);
 PangoAlignment champlain_marker_get_alignment (ChamplainMarker *marker);
-ClutterColor * champlain_marker_get_color (ChamplainMarker *marker);
-ClutterColor * champlain_marker_get_text_color (ChamplainMarker *marker);
-const gchar * champlain_marker_get_font_name (ChamplainMarker *marker);
+ClutterColor *champlain_marker_get_color (ChamplainMarker *marker);
+ClutterColor *champlain_marker_get_text_color (ChamplainMarker *marker);
+const gchar *champlain_marker_get_font_name (ChamplainMarker *marker);
 gboolean champlain_marker_get_wrap (ChamplainMarker *marker);
 PangoWrapMode champlain_marker_get_wrap_mode (ChamplainMarker *marker);
 PangoEllipsizeMode champlain_marker_get_ellipsize (ChamplainMarker *marker);
@@ -122,10 +124,10 @@ gboolean champlain_marker_get_single_line_mode (ChamplainMarker *marker);
 gboolean champlain_marker_get_draw_background (ChamplainMarker *marker);
 
 void champlain_marker_set_highlight_color (ClutterColor *color);
-const ClutterColor * champlain_marker_get_highlight_color (void);
+const ClutterColor *champlain_marker_get_highlight_color (void);
 
 void champlain_marker_set_highlight_text_color (ClutterColor *color);
-const ClutterColor * champlain_marker_get_highlight_text_color (void);
+const ClutterColor *champlain_marker_get_highlight_text_color (void);
 
 void champlain_marker_queue_redraw (ChamplainMarker *marker);
 
