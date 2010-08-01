@@ -18,11 +18,11 @@
 
 #include "champlain-image-renderer.h"
 #include <gdk/gdk.h>
-//#include <clutter/clutter.h>
 
 G_DEFINE_TYPE(ChamplainImageRenderer, champlain_image_renderer, CHAMPLAIN_TYPE_RENDERER)
 
-#define GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererPrivate))
+#define GET_PRIVATE(o) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererPrivate))
 
 struct _ChamplainImageRendererPrivate
 {

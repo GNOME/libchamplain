@@ -36,10 +36,9 @@
 
 G_DEFINE_TYPE (ChamplainFileTileSource, champlain_file_tile_source, CHAMPLAIN_TYPE_TILE_SOURCE)
 
-
-
 static void fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile);
+
 
 static void
 champlain_file_tile_source_dispose (GObject *object)

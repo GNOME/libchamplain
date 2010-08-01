@@ -20,14 +20,6 @@
 
 G_DEFINE_TYPE(ChamplainRenderer, champlain_renderer, G_TYPE_OBJECT)
 
-//#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_RENDERER, ChamplainRenderer))
-
-
-//struct _ChamplainRendererPrivate
-//{
-    /* add your private declarations here */
-//};
-
 enum
 {
   /* normal signals */

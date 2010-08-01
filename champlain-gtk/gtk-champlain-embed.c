@@ -53,7 +53,8 @@ enum
 
 //static guint gtk_champlain_embed_embed_signals[LAST_SIGNAL] = { 0, };
 
-#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbedPrivate))
+#define GET_PRIVATE(obj) \
+  (G_TYPE_INSTANCE_GET_PRIVATE((obj), GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbedPrivate))
 
 struct _GtkChamplainEmbedPrivate
 {

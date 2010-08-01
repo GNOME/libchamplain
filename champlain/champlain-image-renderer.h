@@ -28,12 +28,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_IMAGE_RENDERER            (champlain_image_renderer_get_type())
-#define CHAMPLAIN_IMAGE_RENDERER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRenderer))
-#define CHAMPLAIN_IMAGE_RENDERER_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererClass))
-#define CHAMPLAIN_IS_IMAGE_RENDERER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER))
-#define CHAMPLAIN_IS_IMAGE_RENDERER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), CHAMPLAIN_TYPE_IMAGE_RENDERER))
-#define CHAMPLAIN_IMAGE_RENDERER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererClass))
+#define CHAMPLAIN_TYPE_IMAGE_RENDERER champlain_image_renderer_get_type()
+
+#define CHAMPLAIN_IMAGE_RENDERER(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRenderer))
+
+#define CHAMPLAIN_IMAGE_RENDERER_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST((klass), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererClass))
+
+#define CHAMPLAIN_IS_IMAGE_RENDERER(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER))
+
+#define CHAMPLAIN_IS_IMAGE_RENDERER_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE((klass), CHAMPLAIN_TYPE_IMAGE_RENDERER))
+
+#define CHAMPLAIN_IMAGE_RENDERER_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS((obj), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererClass))
 
 typedef struct _ChamplainImageRendererPrivate ChamplainImageRendererPrivate;
 
@@ -51,8 +61,6 @@ struct _ChamplainImageRendererClass
 {
   ChamplainRendererClass parent_class;
 };
-
-// returns ClutterActor * - the user provides the tile as client data
 
 GType champlain_image_renderer_get_type (void);
 

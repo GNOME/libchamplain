@@ -29,7 +29,8 @@
 
 G_DEFINE_TYPE (ChamplainTileCache, champlain_tile_cache, CHAMPLAIN_TYPE_MAP_SOURCE)
 
-#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_TILE_CACHE, ChamplainTileCachePrivate))
+#define GET_PRIVATE(obj) \
+  (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_TILE_CACHE, ChamplainTileCachePrivate))
 
 
 static const gchar *get_id (ChamplainMapSource *map_source);

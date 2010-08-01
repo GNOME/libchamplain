@@ -110,11 +110,13 @@ enum
 #define PADDING 10
 static guint signals[LAST_SIGNAL] = { 0, };
 
-#define GET_PRIVATE(obj)     (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
-#define ZOOM_LEVEL_OUT_OF_RANGE(priv, level)    (level < priv->min_zoom_level || \
-                                                 level > priv->max_zoom_level || \
-                                                 level < champlain_map_source_get_min_zoom_level (priv->map_source) || \
-                                                 level > champlain_map_source_get_max_zoom_level (priv->map_source))
+#define GET_PRIVATE(obj) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
+#define ZOOM_LEVEL_OUT_OF_RANGE(priv, level) \
+  (level < priv->min_zoom_level || \
+   level > priv->max_zoom_level || \
+   level < champlain_map_source_get_min_zoom_level (priv->map_source) || \
+   level > champlain_map_source_get_max_zoom_level (priv->map_source))
 
 #define CHAMPLAIN_MIN_LAT -90
 #define CHAMPLAIN_MAX_LAT 90

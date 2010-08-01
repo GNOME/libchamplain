@@ -27,7 +27,8 @@
 
 G_DEFINE_TYPE (ChamplainMemoryCache, champlain_memory_cache, CHAMPLAIN_TYPE_TILE_CACHE);
 
-#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MEMORY_CACHE, ChamplainMemoryCachePrivate))
+#define GET_PRIVATE(obj) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MEMORY_CACHE, ChamplainMemoryCachePrivate))
 
 enum
 {

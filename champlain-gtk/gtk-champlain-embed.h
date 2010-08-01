@@ -28,12 +28,23 @@
 
 G_BEGIN_DECLS
 
-#define GTK_TYPE_CHAMPLAIN_EMBED     (gtk_champlain_embed_get_type())
-#define GTK_CHAMPLAIN_EMBED(obj)     (G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbed))
-#define GTK_CHAMPLAIN_EMBED_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST((klass),  GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbedClass))
-#define GTK_CHAMPLAIN_IS_EMBED(obj)  (G_TYPE_CHECK_INSTANCE_TYPE((obj), GTK_TYPE_CHAMPLAIN_EMBED))
-#define GTK_CHAMPLAIN_IS_EMBED_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass),  GTK_TYPE_CHAMPLAIN_EMBED))
-#define GTK_CHAMPLAIN_EMBED_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj),  GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbedClass))
+#define GTK_TYPE_CHAMPLAIN_EMBED \
+  (gtk_champlain_embed_get_type())
+
+#define GTK_CHAMPLAIN_EMBED(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbed))
+
+#define GTK_CHAMPLAIN_EMBED_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST((klass),  GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbedClass))
+
+#define GTK_CHAMPLAIN_IS_EMBED(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE((obj), GTK_TYPE_CHAMPLAIN_EMBED))
+
+#define GTK_CHAMPLAIN_IS_EMBED_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE((klass),  GTK_TYPE_CHAMPLAIN_EMBED))
+
+#define GTK_CHAMPLAIN_EMBED_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS((obj),  GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbedClass))
 
 typedef struct _GtkChamplainEmbedPrivate GtkChamplainEmbedPrivate;
 

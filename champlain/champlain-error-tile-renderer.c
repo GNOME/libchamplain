@@ -21,7 +21,8 @@
 
 G_DEFINE_TYPE (ChamplainErrorTileRenderer, champlain_error_tile_renderer, CHAMPLAIN_TYPE_RENDERER)
 
-#define GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_ERROR_TILE_RENDERER, ChamplainErrorTileRendererPrivate))
+#define GET_PRIVATE(o) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_ERROR_TILE_RENDERER, ChamplainErrorTileRendererPrivate))
 
 struct _ChamplainErrorTileRendererPrivate
 {

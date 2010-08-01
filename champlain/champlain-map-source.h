@@ -29,12 +29,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_MAP_SOURCE             (champlain_map_source_get_type ())
-#define CHAMPLAIN_MAP_SOURCE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSource))
-#define CHAMPLAIN_MAP_SOURCE_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
-#define CHAMPLAIN_IS_MAP_SOURCE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_MAP_SOURCE))
-#define CHAMPLAIN_IS_MAP_SOURCE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MAP_SOURCE))
-#define CHAMPLAIN_MAP_SOURCE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
+#define CHAMPLAIN_TYPE_MAP_SOURCE champlain_map_source_get_type ()
+
+#define CHAMPLAIN_MAP_SOURCE(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSource))
+  
+#define CHAMPLAIN_MAP_SOURCE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
+
+#define CHAMPLAIN_IS_MAP_SOURCE(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_MAP_SOURCE))
+
+#define CHAMPLAIN_IS_MAP_SOURCE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MAP_SOURCE))
+
+#define CHAMPLAIN_MAP_SOURCE_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourceClass))
 
 typedef struct _ChamplainMapSourcePrivate ChamplainMapSourcePrivate;
 

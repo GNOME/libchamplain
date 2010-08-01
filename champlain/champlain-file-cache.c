@@ -40,7 +40,8 @@
 
 G_DEFINE_TYPE (ChamplainFileCache, champlain_file_cache, CHAMPLAIN_TYPE_TILE_CACHE);
 
-#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_FILE_CACHE, ChamplainFileCachePrivate))
+#define GET_PRIVATE(obj) \
+  (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_FILE_CACHE, ChamplainFileCachePrivate))
 
 enum
 {

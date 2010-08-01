@@ -28,12 +28,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_MEMORY_CACHE             (champlain_memory_cache_get_type ())
-#define CHAMPLAIN_MEMORY_CACHE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_MEMORY_CACHE, ChamplainMemoryCache))
-#define CHAMPLAIN_MEMORY_CACHE_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_MEMORY_CACHE, ChamplainMemoryCacheClass))
-#define CHAMPLAIN_IS_MEMORY_CACHE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_MEMORY_CACHE))
-#define CHAMPLAIN_IS_MEMORY_CACHE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MEMORY_CACHE))
-#define CHAMPLAIN_MEMORY_CACHE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MEMORY_CACHE, ChamplainMemoryCacheClass))
+#define CHAMPLAIN_TYPE_MEMORY_CACHE champlain_memory_cache_get_type ()
+
+#define CHAMPLAIN_MEMORY_CACHE(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_MEMORY_CACHE, ChamplainMemoryCache))
+
+#define CHAMPLAIN_MEMORY_CACHE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_MEMORY_CACHE, ChamplainMemoryCacheClass))
+
+#define CHAMPLAIN_IS_MEMORY_CACHE(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_MEMORY_CACHE))
+
+#define CHAMPLAIN_IS_MEMORY_CACHE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MEMORY_CACHE))
+
+#define CHAMPLAIN_MEMORY_CACHE_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MEMORY_CACHE, ChamplainMemoryCacheClass))
 
 typedef struct _ChamplainMemoryCachePrivate ChamplainMemoryCachePrivate;
 
@@ -61,7 +71,6 @@ void champlain_memory_cache_set_size_limit (ChamplainMemoryCache *memory_cache,
     guint size_limit);
 
 void champlain_memory_cache_clean (ChamplainMemoryCache *memory_cache);
-
 
 G_END_DECLS
 

@@ -36,7 +36,8 @@
 
 G_DEFINE_TYPE (ChamplainMapSourceChain, champlain_map_source_chain, CHAMPLAIN_TYPE_MAP_SOURCE);
 
-#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MAP_SOURCE_CHAIN, ChamplainMapSourceChainPrivate))
+#define GET_PRIVATE(obj) \
+  (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_MAP_SOURCE_CHAIN, ChamplainMapSourceChainPrivate))
 
 struct _ChamplainMapSourceChainPrivate
 {

@@ -30,12 +30,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_MARKER     (champlain_marker_get_type())
-#define CHAMPLAIN_MARKER(obj)     (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarker))
-#define CHAMPLAIN_MARKER_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_MARKER, ChamplainMarkerClass))
-#define CHAMPLAIN_IS_MARKER(obj)  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_MARKER))
-#define CHAMPLAIN_IS_MARKER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass),  CHAMPLAIN_TYPE_MARKER))
-#define CHAMPLAIN_MARKER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj),  CHAMPLAIN_TYPE_MARKER, ChamplainMarkerClass))
+#define CHAMPLAIN_TYPE_MARKER champlain_marker_get_type()
+
+#define CHAMPLAIN_MARKER(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarker))
+
+#define CHAMPLAIN_MARKER_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST((klass),  CHAMPLAIN_TYPE_MARKER, ChamplainMarkerClass))
+
+#define CHAMPLAIN_IS_MARKER(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CHAMPLAIN_TYPE_MARKER))
+
+#define CHAMPLAIN_IS_MARKER_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE((klass),  CHAMPLAIN_TYPE_MARKER))
+
+#define CHAMPLAIN_MARKER_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS((obj),  CHAMPLAIN_TYPE_MARKER, ChamplainMarkerClass))
 
 typedef struct _ChamplainMarkerPrivate ChamplainMarkerPrivate;
 

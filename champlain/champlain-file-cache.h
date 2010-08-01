@@ -29,12 +29,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_FILE_CACHE             (champlain_file_cache_get_type ())
-#define CHAMPLAIN_FILE_CACHE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_FILE_CACHE, ChamplainFileCache))
-#define CHAMPLAIN_FILE_CACHE_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_FILE_CACHE, ChamplainFileCacheClass))
-#define CHAMPLAIN_IS_FILE_CACHE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_FILE_CACHE))
-#define CHAMPLAIN_IS_FILE_CACHE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_FILE_CACHE))
-#define CHAMPLAIN_FILE_CACHE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_FILE_CACHE, ChamplainFileCacheClass))
+#define CHAMPLAIN_TYPE_FILE_CACHE champlain_file_cache_get_type ()
+
+#define CHAMPLAIN_FILE_CACHE(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_FILE_CACHE, ChamplainFileCache))
+
+#define CHAMPLAIN_FILE_CACHE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_FILE_CACHE, ChamplainFileCacheClass))
+
+#define CHAMPLAIN_IS_FILE_CACHE(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_FILE_CACHE))
+
+#define CHAMPLAIN_IS_FILE_CACHE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_FILE_CACHE))
+
+#define CHAMPLAIN_FILE_CACHE_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_FILE_CACHE, ChamplainFileCacheClass))
 
 typedef struct _ChamplainFileCachePrivate ChamplainFileCachePrivate;
 
