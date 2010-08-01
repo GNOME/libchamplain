@@ -357,21 +357,6 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
 }
 
 /**
- * champlain_file_cache_new:
- *
- * Default constructor of #ChamplainFileCache.
- *
- * Returns: a constructed cache of maximal size 100000000 B inside
- * ~/.cache/champlain.
- *
- * Since: 0.6
- */
-ChamplainFileCache* champlain_file_cache_new (void)
-{
-  return CHAMPLAIN_FILE_CACHE (g_object_new (CHAMPLAIN_TYPE_FILE_CACHE, NULL));
-}
-
-/**
  * champlain_file_cache_new_full:
  * @size_limit: maximal size of the cache in bytes
  * @cache_dir: the directory where the cache is created. For temporary caches
@@ -385,11 +370,15 @@ ChamplainFileCache* champlain_file_cache_new (void)
  * Since: 0.6
  */
 ChamplainFileCache* champlain_file_cache_new_full (guint size_limit,
-    const gchar *cache_dir)
+    const gchar *cache_dir,
+    ChamplainRenderer *renderer)
 {
   ChamplainFileCache * cache;
-  cache = g_object_new (CHAMPLAIN_TYPE_FILE_CACHE, "size-limit", size_limit,
-              "cache-dir", cache_dir, NULL);
+  cache = g_object_new (CHAMPLAIN_TYPE_FILE_CACHE, 
+      "size-limit", size_limit,
+      "cache-dir", cache_dir, 
+      "renderer", renderer,
+      NULL);
   return cache;
 }
 

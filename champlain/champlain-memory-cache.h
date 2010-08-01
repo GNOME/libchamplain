@@ -54,8 +54,7 @@ struct _ChamplainMemoryCacheClass
 
 GType champlain_memory_cache_get_type (void);
 
-ChamplainMemoryCache *champlain_memory_cache_new (void);
-ChamplainMemoryCache *champlain_memory_cache_new_full (guint size_limit);
+ChamplainMemoryCache *champlain_memory_cache_new_full (guint size_limit, ChamplainRenderer *renderer);
 
 guint champlain_memory_cache_get_size_limit (ChamplainMemoryCache *memory_cache);
 void champlain_memory_cache_set_size_limit (ChamplainMemoryCache *memory_cache,

@@ -63,7 +63,8 @@ ChamplainNetworkTileSource* champlain_network_tile_source_new_full (const gchar 
     guint max_zoom,
     guint tile_size,
     ChamplainMapProjection projection,
-    const gchar *uri_format);
+    const gchar *uri_format,
+    ChamplainRenderer *renderer);
 
 const gchar * champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *tile_source);
 void champlain_network_tile_source_set_uri_format (ChamplainNetworkTileSource *tile_source,

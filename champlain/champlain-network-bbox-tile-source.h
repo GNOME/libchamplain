@@ -63,7 +63,8 @@ ChamplainNetworkBboxTileSource* champlain_network_bbox_tile_source_new_full (con
     guint min_zoom,
     guint max_zoom,
     guint tile_size,
-    ChamplainMapProjection projection);
+    ChamplainMapProjection projection,
+    ChamplainRenderer *renderer);
 
 void champlain_network_bbox_tile_source_load_map_data (
     ChamplainNetworkBboxTileSource *map_data_source,

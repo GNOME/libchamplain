@@ -297,14 +297,22 @@ champlain_network_tile_source_new_full (const gchar *id,
     guint max_zoom,
     guint tile_size,
     ChamplainMapProjection projection,
-    const gchar *uri_format)
+    const gchar *uri_format,
+    ChamplainRenderer *renderer)
 {
   ChamplainNetworkTileSource * source;
-  source = g_object_new (CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE, "id", id,
-      "name", name, "license", license, "license-uri", license_uri,
-      "min-zoom-level", min_zoom, "max-zoom-level", max_zoom,
-      "tile-size", tile_size, "projection", projection,
-      "uri-format", uri_format, NULL);
+  source = g_object_new (CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE, 
+      "id", id,
+      "name", name, 
+      "license", license, 
+      "license-uri", license_uri,
+      "min-zoom-level", min_zoom, 
+      "max-zoom-level", max_zoom,
+      "tile-size", tile_size, 
+      "projection", projection,
+      "uri-format", uri_format,
+      "renderer", renderer, 
+      NULL);
   return source;
 }
 

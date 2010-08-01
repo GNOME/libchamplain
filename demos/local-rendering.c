@@ -444,7 +444,7 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
       champlain_map_source_chain_push (source_chain, src);
       champlain_map_source_chain_push (source_chain, tile_source);
 
-      src = CHAMPLAIN_MAP_SOURCE(champlain_memory_cache_new_full (100));
+      src = CHAMPLAIN_MAP_SOURCE(champlain_memory_cache_new_full (100, CHAMPLAIN_RENDERER (champlain_image_renderer_new ())));
       champlain_map_source_set_renderer (src, CHAMPLAIN_RENDERER (champlain_image_renderer_new ()));
 
       champlain_map_source_chain_push (source_chain, src);

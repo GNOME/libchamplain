@@ -66,7 +66,8 @@ champlain_file_tile_source_new_full (const gchar *id,
     guint min_zoom,
     guint max_zoom,
     guint tile_size,
-    ChamplainMapProjection projection);
+    ChamplainMapProjection projection,
+    ChamplainRenderer *renderer);
 
 void champlain_file_tile_source_load_map_data (
     ChamplainFileTileSource *map_data_source,

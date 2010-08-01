@@ -409,13 +409,15 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
   ChamplainMapSource *error_source;
   ChamplainMapSource *file_cache;
   guint tile_size;
+  ChamplainRenderer *renderer;
 
   tile_source = champlain_map_source_factory_create (factory, id);
 
   tile_size = champlain_map_source_get_tile_size (tile_source);
   error_source = champlain_map_source_factory_create_error_source (factory, tile_size);
 
-  file_cache = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new ());
+  renderer = CHAMPLAIN_RENDERER (champlain_image_renderer_new ());
+  file_cache = CHAMPLAIN_MAP_SOURCE(champlain_file_cache_new_full (100000000, NULL, renderer));
 
   source_chain = champlain_map_source_chain_new ();
   champlain_map_source_chain_push (source_chain, error_source);
@@ -433,9 +435,8 @@ champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *fac
   ChamplainMapSource *null_source;
   ChamplainRenderer *renderer;
 
-  null_source = CHAMPLAIN_MAP_SOURCE (champlain_null_tile_source_new ());
   renderer = CHAMPLAIN_RENDERER (champlain_error_tile_renderer_new (tile_size));
-  champlain_map_source_set_renderer (null_source, renderer);
+  null_source = CHAMPLAIN_MAP_SOURCE (champlain_null_tile_source_new_full (renderer));
 
   return null_source;
 }
@@ -477,8 +478,9 @@ champlain_map_source_new_generic (
     ChamplainMapSourceDesc *desc, G_GNUC_UNUSED gpointer user_data)
 {
   ChamplainMapSource *map_source;
-  ChamplainImageRenderer *renderer;
+  ChamplainRenderer *renderer;
 
+  renderer = CHAMPLAIN_RENDERER (champlain_image_renderer_new ());
   map_source = CHAMPLAIN_MAP_SOURCE (champlain_network_tile_source_new_full (
       desc->id,
       desc->name,
@@ -488,10 +490,8 @@ champlain_map_source_new_generic (
       desc->max_zoom_level,
       256,
       desc->projection,
-      desc->uri_format));
-
-  renderer = champlain_image_renderer_new();
-  champlain_map_source_set_renderer(map_source, CHAMPLAIN_RENDERER(renderer));
+      desc->uri_format,
+      renderer));
 
   return map_source;
 }
@@ -502,8 +502,9 @@ champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
     G_GNUC_UNUSED gpointer user_data)
 {
   ChamplainMapSource *map_source;
-  ChamplainMemphisRenderer *renderer;
+  ChamplainRenderer *renderer;
 
+  renderer = CHAMPLAIN_RENDERER (champlain_memphis_renderer_new_full (256));
   if (g_strcmp0 (desc->id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL) == 0)
     {
       map_source = CHAMPLAIN_MAP_SOURCE (champlain_file_tile_source_new_full (
@@ -514,7 +515,8 @@ champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
           desc->min_zoom_level,
           desc->max_zoom_level,
           256,
-          desc->projection));
+          desc->projection,
+          renderer));
     }
   else
     {
@@ -526,11 +528,9 @@ champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
           desc->min_zoom_level,
           desc->max_zoom_level,
           256,
-          desc->projection));
+          desc->projection,
+          renderer));
     }
-
-  renderer = champlain_memphis_renderer_new_full (256);
-  champlain_map_source_set_renderer(map_source, CHAMPLAIN_RENDERER(renderer));
 
   return map_source;
 }

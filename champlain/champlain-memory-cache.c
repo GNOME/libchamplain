@@ -162,19 +162,14 @@ champlain_memory_cache_class_init (ChamplainMemoryCacheClass *klass)
 
 
 ChamplainMemoryCache *
-champlain_memory_cache_new (void)
-{
-  return CHAMPLAIN_MEMORY_CACHE (g_object_new (CHAMPLAIN_TYPE_MEMORY_CACHE, NULL));
-}
-
-
-ChamplainMemoryCache *
-champlain_memory_cache_new_full (guint size_limit)
+champlain_memory_cache_new_full (guint size_limit,
+    ChamplainRenderer *renderer)
 {
   ChamplainMemoryCache *cache;
 
   cache = g_object_new (CHAMPLAIN_TYPE_MEMORY_CACHE,
       "size-limit", size_limit,
+      "renderer", renderer,
       NULL);
 
   return cache;

@@ -60,7 +60,7 @@ typedef struct
 
 GType champlain_null_tile_source_get_type (void);
 
-ChamplainNullTileSource *champlain_null_tile_source_new (void);
+ChamplainNullTileSource *champlain_null_tile_source_new_full (ChamplainRenderer *renderer);
 
 
 G_END_DECLS

@@ -73,11 +73,13 @@ champlain_null_tile_source_init (ChamplainNullTileSource *self)
  * Since: 0.8
  */
 ChamplainNullTileSource *
-champlain_null_tile_source_new (void)
+champlain_null_tile_source_new_full (ChamplainRenderer *renderer)
 {
   ChamplainNullTileSource *source;
 
-  source = g_object_new (CHAMPLAIN_TYPE_NULL_TILE_SOURCE, NULL);
+  source = g_object_new (CHAMPLAIN_TYPE_NULL_TILE_SOURCE, 
+      "renderer", renderer,
+      NULL);
   return source;
 }
 

@@ -247,7 +247,8 @@ champlain_network_bbox_tile_source_new_full (const gchar *id,
     guint min_zoom,
     guint max_zoom,
     guint tile_size,
-    ChamplainMapProjection projection)
+    ChamplainMapProjection projection,
+    ChamplainRenderer *renderer)
 {
   ChamplainNetworkBboxTileSource * source;
   source = g_object_new (CHAMPLAIN_TYPE_NETWORK_BBOX_TILE_SOURCE, "id", id,
@@ -258,6 +259,7 @@ champlain_network_bbox_tile_source_new_full (const gchar *id,
       "max-zoom-level", max_zoom,
       "tile-size", tile_size,
       "projection", projection,
+      "renderer", renderer,
       NULL);
   return source;
 }
