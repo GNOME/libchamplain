@@ -698,7 +698,7 @@ champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source,
   /* Width is in pixels. (1 px)
      m/px = radius_at_latitude / width_in_pixels
      k = radius of earth = 6 378.1 km
-     radius_at_latitude = 2π * k * sin (π/2-θ)
+     radius_at_latitude = 2pi * k * sin (pi/2-theta)
   */
 
   gdouble tile_size = champlain_map_source_get_tile_size (map_source);
