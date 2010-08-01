@@ -57,7 +57,7 @@ GType champlain_file_cache_get_type (void);
 
 ChamplainFileCache* champlain_file_cache_new (void);
 ChamplainFileCache* champlain_file_cache_new_full (guint size_limit,
-    const gchar *cache_dir, gboolean persistent);
+    const gchar *cache_dir);
 
 guint champlain_file_cache_get_size_limit (ChamplainFileCache *file_cache);
 void champlain_file_cache_set_size_limit (ChamplainFileCache *file_cache,

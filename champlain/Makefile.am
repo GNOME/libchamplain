@@ -34,6 +34,7 @@ libchamplain_headers = \
 	champlain-map-source-chain.h	\
 	champlain-tile-source.h		\
 	champlain-tile-cache.h		\
+	champlain-memory-cache.h		\
 	champlain-network-tile-source.h	\
 	champlain-file-cache.h		\
 	champlain-map-source-factory.h	\
@@ -70,6 +71,7 @@ libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	champlain-map-source-chain.c	\
 	champlain-tile-source.c		\
 	champlain-tile-cache.c		\
+	champlain-memory-cache.c		\
 	champlain-network-tile-source.c	\
 	champlain-file-cache.c		\
 	champlain-map-source-factory.c	\
@@ -101,6 +103,7 @@ libchamplain_include_HEADERS = \
 	champlain-map-source-chain.h	\
 	champlain-tile-source.h		\
 	champlain-tile-cache.h		\
+	champlain-memory-cache.h		\
 	champlain-network-tile-source.h	\
 	champlain-file-cache.h		\
 	champlain-map-source-factory.h	\

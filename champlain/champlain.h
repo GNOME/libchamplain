@@ -37,6 +37,7 @@
 #include "champlain/champlain-map-source-chain.h"
 #include "champlain/champlain-tile-source.h"
 #include "champlain/champlain-tile-cache.h"
+#include "champlain/champlain-memory-cache.h"
 #include "champlain/champlain-network-tile-source.h"
 #include "champlain/champlain-file-cache.h"
 #include "champlain/champlain-null-tile-source.h"

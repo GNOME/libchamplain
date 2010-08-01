@@ -22,8 +22,7 @@
  * @short_description: Stores and loads cached tiles from the file system
  *
  * #ChamplainFileCache is a map source that stores and retrieves tiles from the
- * file system. It can be temporary (deleted when the object is destroyed) or
- * permanent. Tiles most frequently loaded gain in "popularity". This popularity
+ * file system. Tiles most frequently loaded gain in "popularity". This popularity
  * is taken into account when purging the cache.
  */
 
@@ -55,14 +54,12 @@ struct _ChamplainFileCachePrivate
   guint size_limit;
   gchar *cache_dir;
 
-  gchar *real_cache_dir;
   sqlite3 *db;
   sqlite3_stmt *stmt_select;
   sqlite3_stmt *stmt_update;
 };
 
 static void finalize_sql (ChamplainFileCache *file_cache);
-static void delete_temp_cache (ChamplainFileCache *file_cache);
 static void init_cache  (ChamplainFileCache *file_cache);
 static gchar *get_filename (ChamplainFileCache *file_cache,
     ChamplainTile *tile);
@@ -70,7 +67,6 @@ static gboolean tile_is_expired (ChamplainFileCache *file_cache,
     ChamplainTile *tile);
 static void delete_tile (ChamplainFileCache *file_cache,
     const gchar *filename);
-static void delete_dir_recursive (GFile *parent);
 static gboolean create_cache_dir (const gchar *dir_name);
 
 static void fill_tile (ChamplainMapSource *map_source,
@@ -84,7 +80,6 @@ static void refresh_tile_time (ChamplainTileCache *tile_cache,
     ChamplainTile *tile);
 static void on_tile_filled (ChamplainTileCache *tile_cache,
     ChamplainTile *tile);
-static void clean (ChamplainTileCache *tile_cache);
 
 static void
 champlain_file_cache_get_property (GObject *object,
@@ -164,41 +159,16 @@ finalize_sql (ChamplainFileCache *file_cache)
     }
 }
 
-static void
-delete_temp_cache (ChamplainFileCache *file_cache)
-{
-  ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE(file_cache);
-  ChamplainFileCachePrivate *priv = file_cache->priv;
 
-  if (!champlain_tile_cache_get_persistent (tile_cache) && priv->real_cache_dir)
-    {
-      GFile *file = NULL;
-
-      /* delete the directory contents */
-      file = g_file_new_for_path (priv->real_cache_dir);
-      delete_dir_recursive (file);
-
-      /* delete the directory itself */
-      if (!g_file_delete (file, NULL, NULL))
-        g_warning ("Failed to remove temporary cache main directory");
-
-      g_object_unref (file);
-    }
-}
 
 static void
 champlain_file_cache_finalize (GObject *object)
 {
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(object);
-  ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE(file_cache);
   ChamplainFileCachePrivate *priv = file_cache->priv;
 
   finalize_sql (file_cache);
 
-  if (!champlain_tile_cache_get_persistent (tile_cache))
-    delete_temp_cache (file_cache);
-
-  g_free (priv->real_cache_dir);
   g_free (priv->cache_dir);
 
   G_OBJECT_CLASS (champlain_file_cache_parent_class)->finalize (object);
@@ -220,64 +190,18 @@ create_cache_dir (const gchar *dir_name)
   return TRUE;
 }
 
-#ifdef G_OS_WIN32
-#include <io.h>
-#include <glib/gstdio.h>
-static char *mkdtemp(char *template)
-{
-	gunichar2 *wtemplate;
-	gchar *tmpl;
-	if (!template)
-		return NULL;
-	wtemplate = g_utf8_to_utf16 (template, -1, NULL, NULL, NULL);
-	if (!_wmktemp (wtemplate)) {
-		g_free (wtemplate);
-		return NULL;
-	}
-	tmpl = g_utf16_to_utf8 (wtemplate, -1, NULL, NULL, NULL);
-	g_free (wtemplate);
-	if ((strlen (template) != strlen (tmpl)) || g_mkdir (tmpl, 0700)) {
-		g_free (tmpl);
-		return NULL;
-	}
-	strcpy (template,tmpl);
-	g_free (tmpl);
-	return template;
-}
-#endif
 
 static void
 init_cache  (ChamplainFileCache *file_cache)
 {
-  ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE(file_cache);
   ChamplainFileCachePrivate *priv = file_cache->priv;
   gchar *filename = NULL;
   gchar *error_msg = NULL;
   gint error;
 
-  if (champlain_tile_cache_get_persistent (tile_cache))
-    {
-      priv->real_cache_dir = g_strdup (priv->cache_dir);
-      g_return_if_fail (create_cache_dir (priv->real_cache_dir));
-    }
-  else
-    {
-      /* Create temporary directory for non-persistent caches */
-      gchar *tmplate = NULL;
+  g_return_if_fail (create_cache_dir (priv->cache_dir));
 
-      tmplate = g_build_filename (priv->cache_dir, "champlain-XXXXXX", NULL);
-
-      priv->real_cache_dir = mkdtemp (tmplate);
-
-      if (!priv->real_cache_dir)
-        {
-          g_warning ("Failed to create filename for temporary cache: template '%s'", tmplate);
-          g_free (tmplate);
-          return;
-        }
-    }
-
-  filename = g_build_filename (priv->real_cache_dir,
+  filename = g_build_filename (priv->cache_dir,
                                "cache.db", NULL);
   error = sqlite3_open_v2 (filename, &priv->db,
                            SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
@@ -343,23 +267,17 @@ static void
 champlain_file_cache_constructed (GObject *object)
 {
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(object);
-  ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE(file_cache);
   ChamplainFileCachePrivate *priv = file_cache->priv;
 
   if (!priv->cache_dir)
     {
-      if (champlain_tile_cache_get_persistent (tile_cache))
-        {
 #ifdef CHAMPLAIN_HAS_MAEMO
-          priv->cache_dir = g_strdup ("/home/user/MyDocs/.Maps/");
+      priv->cache_dir = g_strdup ("/home/user/MyDocs/.Maps/");
 #else
-          priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S,
-                                g_get_user_cache_dir (),
-                                "champlain", NULL);
+      priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S,
+                            g_get_user_cache_dir (),
+                            "champlain", NULL);
 #endif
-        }
-      else
-        priv->cache_dir = g_strdup (g_get_tmp_dir ());
     }
 
   init_cache (file_cache);
@@ -419,7 +337,6 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
   tile_cache_class->store_tile = store_tile;
   tile_cache_class->refresh_tile_time = refresh_tile_time;
   tile_cache_class->on_tile_filled = on_tile_filled;
-  tile_cache_class->clean = clean;
 
   map_source_class->fill_tile = fill_tile;
 }
@@ -433,7 +350,7 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
 
   priv->cache_dir = NULL;
   priv->size_limit = 100000000;
-  priv->real_cache_dir = NULL;
+  priv->cache_dir = NULL;
   priv->db = NULL;
   priv->stmt_select = NULL;
   priv->stmt_update = NULL;
@@ -444,7 +361,7 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
  *
  * Default constructor of #ChamplainFileCache.
  *
- * Returns: a constructed permanent cache of maximal size 100000000 B inside
+ * Returns: a constructed cache of maximal size 100000000 B inside
  * ~/.cache/champlain.
  *
  * Since: 0.6
@@ -459,10 +376,7 @@ ChamplainFileCache* champlain_file_cache_new (void)
  * @size_limit: maximal size of the cache in bytes
  * @cache_dir: the directory where the cache is created. For temporary caches
  * one more directory with random name is created inside this directory.
- * When cache_dir == NULL, a cache in ~/.cache/champlain is used for permanent
- * caches and /tmp for temporary caches.
- * @persistent: if TRUE, the cache is persistent; otherwise the cache is
- * temporary and will be deleted when the cache object is destructed.
+ * When cache_dir == NULL, a cache in ~/.cache/champlain is used.
  *
  * Constructor of #ChamplainFileCache.
  *
@@ -471,12 +385,11 @@ ChamplainFileCache* champlain_file_cache_new (void)
  * Since: 0.6
  */
 ChamplainFileCache* champlain_file_cache_new_full (guint size_limit,
-    const gchar *cache_dir,
-    gboolean persistent)
+    const gchar *cache_dir)
 {
   ChamplainFileCache * cache;
   cache = g_object_new (CHAMPLAIN_TYPE_FILE_CACHE, "size-limit", size_limit,
-              "cache-dir", cache_dir, "persistent-cache", persistent, NULL);
+              "cache-dir", cache_dir, NULL);
   return cache;
 }
 
@@ -545,7 +458,7 @@ get_filename (ChamplainFileCache *file_cache,
 
   g_return_val_if_fail (CHAMPLAIN_IS_FILE_CACHE (file_cache), NULL);
   g_return_val_if_fail (CHAMPLAIN_IS_TILE (tile), NULL);
-  g_return_val_if_fail (priv->real_cache_dir, NULL);
+  g_return_val_if_fail (priv->cache_dir, NULL);
 
   ChamplainMapSource* map_source = CHAMPLAIN_MAP_SOURCE(file_cache);
 
@@ -553,7 +466,7 @@ get_filename (ChamplainFileCache *file_cache,
                                      "%s" G_DIR_SEPARATOR_S
                                      "%d" G_DIR_SEPARATOR_S
                                      "%d" G_DIR_SEPARATOR_S "%d.png",
-                                     priv->real_cache_dir,
+                                     priv->cache_dir,
                                      champlain_map_source_get_id (map_source),
                                      champlain_tile_get_zoom_level (tile),
                                      champlain_tile_get_x (tile),
@@ -784,9 +697,7 @@ refresh_tile_time (ChamplainTileCache *tile_cache,
   g_object_unref (info);
 
   if (CHAMPLAIN_IS_TILE_CACHE(next_source))
-    {
-      refresh_tile_time (CHAMPLAIN_TILE_CACHE(next_source), tile);
-    }
+    champlain_tile_cache_refresh_tile_time (CHAMPLAIN_TILE_CACHE(next_source), tile);
 }
 
 static void
@@ -863,7 +774,7 @@ store_tile (ChamplainTileCache *tile_cache,
 
 store_next:
   if (CHAMPLAIN_IS_TILE_CACHE(next_source))
-    store_tile (CHAMPLAIN_TILE_CACHE(next_source), tile, contents, size);
+    champlain_tile_cache_store_tile (CHAMPLAIN_TILE_CACHE(next_source), tile, contents, size);
 
   g_free (filename);
   g_free (path);
@@ -906,27 +817,9 @@ on_tile_filled (ChamplainTileCache *tile_cache,
 
 call_next:
   if (CHAMPLAIN_IS_TILE_CACHE(next_source))
-    on_tile_filled (CHAMPLAIN_TILE_CACHE(next_source), tile);
+    champlain_tile_cache_on_tile_filled (CHAMPLAIN_TILE_CACHE(next_source), tile);
 }
 
-static void
-clean (ChamplainTileCache *tile_cache)
-{
-  g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (tile_cache));
-
-  ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE(tile_cache);
-  ChamplainFileCachePrivate *priv = file_cache->priv;
-
-  g_return_if_fail (!champlain_tile_cache_get_persistent (tile_cache));
-
-  finalize_sql (file_cache);
-  delete_temp_cache (file_cache);
-
-  g_free (priv->real_cache_dir);
-  priv->real_cache_dir = NULL;
-
-  init_cache (file_cache);
-}
 
 static void
 delete_tile (ChamplainFileCache *file_cache, const gchar *filename)
@@ -1069,45 +962,4 @@ champlain_file_cache_purge (ChamplainFileCache *file_cache)
   sqlite3_free (query);
 }
 
-static void
-delete_dir_recursive (GFile *parent)
-{
-  g_return_if_fail (parent);
 
-  GError *error = NULL;
-  GFileEnumerator *enumerator;
-  GFileInfo *info;
-  GFile *child;
-
-  enumerator = g_file_enumerate_children (parent, "*",
-                                          G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &error);
-
-  if (!enumerator)
-    {
-      DEBUG ("Failed to create file enumerator in delete_dir_recursive: %s", error->message);
-      g_error_free (error);
-      return;
-    }
-
-  info = g_file_enumerator_next_file (enumerator, NULL, NULL);
-  while (info && !error)
-    {
-      child = g_file_get_child (parent, g_file_info_get_name (info));
-
-      if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
-        delete_dir_recursive (child);
-
-      error = NULL;
-      if (!g_file_delete (child, NULL, &error))
-        {
-          DEBUG ("Deleting tile from disk failed: %s", error->message);
-          g_error_free (error);
-        }
-
-      g_object_unref (child);
-      g_object_unref (info);
-      info = g_file_enumerator_next_file (enumerator, NULL, NULL);
-    }
-
-  g_file_enumerator_close (enumerator, NULL, NULL);
-}

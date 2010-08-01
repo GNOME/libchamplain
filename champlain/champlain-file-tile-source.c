@@ -149,7 +149,7 @@ tile_rendered_cb (ChamplainTile *tile,
     champlain_map_source_fill_tile (next_source, tile);
 
   g_object_unref (map_source);
-  g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, data);
+  g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, map_source);
 }
 
 static void

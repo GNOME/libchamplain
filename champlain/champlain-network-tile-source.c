@@ -548,7 +548,7 @@ tile_rendered_cb (ChamplainTile *tile, ChamplainRenderCallbackData *data, TileRe
 
   g_object_unref (map_source);
   g_free (user_data);
-  g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, data);
+  g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, user_data);
 }
 
 

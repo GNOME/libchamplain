@@ -31,16 +31,6 @@ G_DEFINE_TYPE (ChamplainTileCache, champlain_tile_cache, CHAMPLAIN_TYPE_MAP_SOUR
 
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE((obj), CHAMPLAIN_TYPE_TILE_CACHE, ChamplainTileCachePrivate))
 
-enum
-{
-  PROP_0,
-  PROP_PERSISTENT_CACHE
-};
-
-struct _ChamplainTileCachePrivate
-{
-  gboolean persistent;
-};
 
 static const gchar *get_id (ChamplainMapSource *map_source);
 static const gchar *get_name (ChamplainMapSource *map_source);
@@ -50,43 +40,7 @@ static guint get_min_zoom_level (ChamplainMapSource *map_source);
 static guint get_max_zoom_level (ChamplainMapSource *map_source);
 static guint get_tile_size (ChamplainMapSource *map_source);
 static ChamplainMapProjection get_projection (ChamplainMapSource *map_source);
-static void reload_tiles_cb (ChamplainTileCache *tile_cache, G_GNUC_UNUSED gpointer data);
 
-static void
-champlain_tile_cache_get_property (GObject *object,
-    guint property_id,
-    GValue *value,
-    GParamSpec *pspec)
-{
-  ChamplainTileCache *tile_cache = CHAMPLAIN_TILE_CACHE (object);
-
-  switch (property_id)
-    {
-    case PROP_PERSISTENT_CACHE:
-      g_value_set_boolean (value, champlain_tile_cache_get_persistent (tile_cache));
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-    }
-}
-
-static void
-champlain_tile_cache_set_property (GObject *object,
-    guint property_id,
-    const GValue *value,
-    GParamSpec *pspec)
-{
-  ChamplainTileCachePrivate *priv = CHAMPLAIN_TILE_CACHE (object)->priv;
-
-  switch (property_id)
-    {
-    case PROP_PERSISTENT_CACHE:
-      priv->persistent = g_value_get_boolean (value);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-    }
-}
 
 static void
 champlain_tile_cache_dispose (GObject *object)
@@ -112,14 +66,9 @@ champlain_tile_cache_class_init (ChamplainTileCacheClass *klass)
   GObjectClass* object_class = G_OBJECT_CLASS (klass);
   ChamplainMapSourceClass *map_source_class = CHAMPLAIN_MAP_SOURCE_CLASS (klass);
   ChamplainTileCacheClass *tile_cache_class = CHAMPLAIN_TILE_CACHE_CLASS (klass);
-  GParamSpec *pspec;
-
-  g_type_class_add_private (klass, sizeof (ChamplainTileCachePrivate));
 
   object_class->finalize = champlain_tile_cache_finalize;
   object_class->dispose = champlain_tile_cache_dispose;
-  object_class->get_property = champlain_tile_cache_get_property;
-  object_class->set_property = champlain_tile_cache_set_property;
   object_class->constructed = champlain_tile_cache_constructed;
 
   map_source_class->get_id = get_id;
@@ -136,62 +85,13 @@ champlain_tile_cache_class_init (ChamplainTileCacheClass *klass)
   tile_cache_class->refresh_tile_time = NULL;
   tile_cache_class->on_tile_filled = NULL;
   tile_cache_class->store_tile = NULL;
-  tile_cache_class->clean = NULL;
-
-  /**
-  * ChamplainTileCache:persistent-cache
-  *
-  * Determines whether the cache is persistent or temporary (cleaned upon
-  * destruction)
-  *
-  * Since: 0.6
-  */
-  pspec = g_param_spec_boolean ("persistent-cache",
-                                "Persistent Cache",
-                                "Specifies whether the cache is persistent",
-                                TRUE,
-                                G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
-  g_object_class_install_property (object_class, PROP_PERSISTENT_CACHE, pspec);
 }
 
 static void
 champlain_tile_cache_init (ChamplainTileCache *tile_cache)
 {
-  ChamplainTileCachePrivate *priv = GET_PRIVATE (tile_cache);
-
-  tile_cache->priv = priv;
-
-  priv->persistent = TRUE;
-  g_signal_connect (tile_cache, "reload-tiles",
-      G_CALLBACK (reload_tiles_cb), NULL);
 }
 
-static
-void reload_tiles_cb (ChamplainTileCache *tile_cache, G_GNUC_UNUSED gpointer data)
-{
-  g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
-
-  if (!champlain_tile_cache_get_persistent (tile_cache))
-    champlain_tile_cache_clean (tile_cache);
-}
-
-/**
- * champlain_tile_cache_get_persistent:
- * @tile_cache: a #ChamplainTileCache
- *
- * Gets cache persistency information.
- *
- * Returns: TRUE when the cache is persistent; FALSE otherwise.
- *
- * Since: 0.6
- */
-gboolean
-champlain_tile_cache_get_persistent (ChamplainTileCache *tile_cache)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache), FALSE);
-
-  return tile_cache->priv->persistent;
-}
 
 /**
  * champlain_tile_cache_store_tile:
@@ -255,23 +155,6 @@ champlain_tile_cache_on_tile_filled (ChamplainTileCache *tile_cache,
   g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
 
   CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->on_tile_filled (tile_cache, tile);
-}
-
-/**
- * champlain_tile_cache_clean:
- * @tile_cache: a #ChamplainTileCache
- *
- * Erases the contents of the cache. This function will fail when the cache is
- * not temporary.
- *
- * Since: 0.6
- */
-void
-champlain_tile_cache_clean (ChamplainTileCache *tile_cache)
-{
-  g_return_if_fail (CHAMPLAIN_IS_TILE_CACHE (tile_cache));
-
-  CHAMPLAIN_TILE_CACHE_GET_CLASS (tile_cache)->clean (tile_cache);
 }
 
 static const gchar *
