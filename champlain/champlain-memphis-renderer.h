@@ -26,8 +26,6 @@
 
 #include <champlain/champlain-tile-source.h>
 #include <champlain/champlain-bounding-box.h>
-// remove me
-//#include <memphis/memphis.h>
 
 #include <glib-object.h>
 

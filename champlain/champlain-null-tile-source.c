@@ -63,15 +63,6 @@ champlain_null_tile_source_init (ChamplainNullTileSource *self)
 }
 
 
-/*
- * champlain_null_tile_source_new:
- *
- * Creates a new instance of #ChamplainNullTileSource.
- *
- * Returns: a new #ChamplainNullTileSource.
- *
- * Since: 0.8
- */
 ChamplainNullTileSource *
 champlain_null_tile_source_new_full (ChamplainRenderer *renderer)
 {

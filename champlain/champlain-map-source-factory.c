@@ -90,37 +90,6 @@ static ChamplainMapSource * champlain_map_source_new_memphis (
     ChamplainMapSourceDesc *desc, gpointer user_data);
 #endif
 
-static void
-champlain_map_source_factory_get_property (GObject *object,
-    guint prop_id,
-    G_GNUC_UNUSED GValue *value,
-    GParamSpec *pspec)
-{
-  //ChamplainMapSourceFactory *map_source_factory = CHAMPLAIN_MAP_SOURCE_FACTORY(object);
-  //ChamplainMapSourceFactoryPrivate *priv = map_source_factory->priv;
-
-  switch (prop_id)
-    {
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
-    }
-}
-
-static void
-champlain_map_source_factory_set_property (GObject *object,
-    guint prop_id,
-    G_GNUC_UNUSED const GValue *value,
-    GParamSpec *pspec)
-{
-  //ChamplainMapSourceFactory *map_source_factory = CHAMPLAIN_MAP_SOURCE_FACTORY(object);
-  //ChamplainMapSourceFactoryPrivate *priv = map_source_factory->priv;
-
-  switch (prop_id)
-    {
-      default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
-    }
-}
 
 static void
 champlain_map_source_factory_finalize (GObject *object)
@@ -164,8 +133,6 @@ champlain_map_source_factory_class_init (ChamplainMapSourceFactoryClass *klass)
 
   object_class->constructor = champlain_map_source_factory_constructor;
   object_class->finalize = champlain_map_source_factory_finalize;
-  object_class->get_property = champlain_map_source_factory_get_property;
-  object_class->set_property = champlain_map_source_factory_set_property;
 }
 
 static

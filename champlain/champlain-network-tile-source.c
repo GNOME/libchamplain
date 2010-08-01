@@ -271,7 +271,7 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
 
 }
 
-/**
+/*
  * champlain_network_tile_source_new_full:
  * @id: the map source's id
  * @name: the map source's name

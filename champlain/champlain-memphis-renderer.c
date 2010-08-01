@@ -456,7 +456,7 @@ set_data (ChamplainRenderer *renderer,
       "reload-tiles", NULL);
 }
 
-/**
+/*
  * champlain_memphis_renderer_load_rules:
  * @renderer: a #ChamplainMemphisRenderer
  * @rules_path: a path to a rules file
