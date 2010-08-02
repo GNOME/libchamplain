@@ -1,3 +1,35 @@
+libchamplain 0.7.0 (2010-08-03)
+===============================
+
+Unstable release
+Bindings have not been updated yet.
+
+Changes:
+* Separation of map sources and renderers - map sources read data from somewhere
+  (file, network, ...), renderers generate tiles based on the data (Jiří Techet)
+* Add null tile source (a dummy data source not reading any data) and error
+  tile renderer (renderer always generating error tile). Remove error tile
+  source (Jiří Techet)
+* Get rid of non-persistent file tile cache and introduce memory cache -
+  temporary cache stored in memory only (Jiří Techet)
+* Whitespace cleanups - use uncrustify beautifier for this task and correct
+  problems manually (Jiří Techet)
+* Minor fixes and cleanups (Jiří Techet)
+  
+libchamplain 0.6.1 (2010-06-26)
+===============================
+
+Stable release
+GObject-introspection, Vala (Tomaž Vajngerl) and Python (Victor Godoy Poluceno) 
+bindings are in a working state.
+
+Changes:
+* New Vala bindings (Tomaž Vajngerl)
+* Updated Python bindings (Victor Godoy Poluceno)
+* Do not distribute gir files (Yaakov Selkowitz)
+* Minimal libchamplain usage demos (Jiří Techet)
+* Minor fixes and improvements (Jiří Techet)
+
 libchamplain 0.6 (2010-05-25)
 ===============================
 
