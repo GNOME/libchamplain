@@ -86,21 +86,32 @@ color_clutter_to_gdk (const ClutterColor *clutter_color,
 static void
 reload_tiles ()
 {
-  champlain_memory_cache_clean (memory_cache);
+  if (memory_cache)
+    champlain_memory_cache_clean (memory_cache);
   champlain_view_reload_tiles (champlain_view);
 }
 
 
 static void
 data_source_state_changed (ChamplainNetworkBboxTileSource *source,
+    GParamSpec *gobject,
     GtkImage *image)
 {
-  gtk_image_clear (image);
+  ChamplainState state;
+
+  g_object_get (G_OBJECT (source), "state", &state, NULL);
+  if (state == CHAMPLAIN_STATE_LOADING)
+    {
+      gtk_image_set_from_stock (image, GTK_STOCK_NETWORK, GTK_ICON_SIZE_BUTTON);
+      g_print ("NET DATA SOURCE STATE: loading\n");
+    }
+  else
+    {
+      gtk_image_clear (image);
+      g_print ("NET DATA SOURCE STATE: done\n");
+    }
+  
   reload_tiles ();
-  g_print ("NET DATA SOURCE STATE: done\n");
-  g_signal_handlers_disconnect_by_func (source,
-      data_source_state_changed,
-      image);
 }
 
 
@@ -109,11 +120,9 @@ load_network_map_data (ChamplainNetworkBboxTileSource *source, ChamplainView *vi
 {
   gdouble lat, lon;
 
-  g_signal_connect (source, "data-loaded", G_CALLBACK (data_source_state_changed),
+  g_signal_connect (source, "notify::state", G_CALLBACK (data_source_state_changed),
       map_data_state_img);
 
-  gtk_image_set_from_stock (GTK_IMAGE (map_data_state_img), GTK_STOCK_NETWORK, GTK_ICON_SIZE_BUTTON);
-  g_print ("NET DATA SOURCE STATE: loading\n");
   g_object_get (G_OBJECT (view), "latitude", &lat, "longitude", &lon, NULL);
 
   champlain_network_bbox_tile_source_load_map_data (source,

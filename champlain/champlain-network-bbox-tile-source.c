@@ -51,16 +51,10 @@ G_DEFINE_TYPE (ChamplainNetworkBboxTileSource, champlain_network_bbox_tile_sourc
 
 enum
 {
-  /* normal signals */
-  DATA_LOADED,
-  LAST_SIGNAL
-};
-
-enum
-{
   PROP_0,
   PROP_API_URI,
-  PROP_PROXY_URI
+  PROP_PROXY_URI,
+  PROP_STATE
 };
 
 struct _ChamplainNetworkBboxTileSourcePrivate
@@ -68,9 +62,8 @@ struct _ChamplainNetworkBboxTileSourcePrivate
   gchar *api_uri;
   gchar *proxy_uri;
   SoupSession *soup_session;
+  ChamplainState state;
 };
-
-static guint champlain_network_bbox_tile_source_signals[LAST_SIGNAL] = { 0, };
 
 static void fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile);
@@ -95,6 +88,10 @@ champlain_network_bbox_tile_source_get_property (GObject *object,
 
     case PROP_PROXY_URI:
       g_value_set_string (value, priv->proxy_uri);
+      break;
+
+    case PROP_STATE:
+      g_value_set_enum (value, priv->state);
       break;
 
     default:
@@ -127,6 +124,11 @@ champlain_network_bbox_tile_source_set_property (GObject *object,
       if (priv->soup_session)
         g_object_set (G_OBJECT (priv->soup_session), "proxy-uri",
             soup_uri_new (priv->proxy_uri), NULL);
+      break;
+
+    case PROP_STATE:
+      priv->state = g_value_get_enum (value);
+      g_object_notify (G_OBJECT (self), "state");
       break;
 
     default:
@@ -210,12 +212,23 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
           "The proxy URI to use to access network",
           "",
           G_PARAM_READWRITE));
-
-  champlain_network_bbox_tile_source_signals[DATA_LOADED] =
-    g_signal_new ("data-loaded", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE,
-        0, NULL);
+          
+  /*
+  * ChamplainMapDataSource:state:
+  *
+  * The map data source's state. Useful to know if the data source is loading
+  * or not.
+  *
+  * Since: 0.6
+  */
+  g_object_class_install_property (object_class,
+       PROP_STATE,
+       g_param_spec_enum ("state",
+           "map data source's state",
+           "The state of the map data source",
+           CHAMPLAIN_TYPE_STATE,
+           CHAMPLAIN_STATE_NONE,
+           G_PARAM_READWRITE));
 }
 
 
@@ -238,6 +251,8 @@ champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
   g_object_set (G_OBJECT (priv->soup_session),
       "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
       "max-conns-per-host", 2, NULL);
+      
+  priv->state = CHAMPLAIN_STATE_NONE;
 }
 
 
@@ -294,7 +309,7 @@ load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
       return;
     }
 
-  g_signal_emit_by_name (self, "data-loaded", NULL);
+  g_object_set (G_OBJECT (self), "state", CHAMPLAIN_STATE_DONE, NULL);
 
   renderer = champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (self));
   champlain_renderer_set_data (renderer, msg->response_body->data, msg->response_body->length);
@@ -344,6 +359,8 @@ champlain_network_bbox_tile_source_load_map_data (
   DEBUG ("Request BBox data: '%s'", url);
 
   g_free (url);
+  
+  g_object_set (G_OBJECT (self), "state", CHAMPLAIN_STATE_LOADING, NULL);
 
   soup_session_queue_message (priv->soup_session, msg, load_map_data_cb, self);
 }
