@@ -471,9 +471,6 @@ set_data (ChamplainRenderer *renderer,
       &bbox->right, &bbox->bottom);
   g_object_set (G_OBJECT (renderer), "bounding-box", bbox, NULL);
   champlain_bounding_box_free (bbox);
-
-  g_signal_emit_by_name (CHAMPLAIN_RENDERER (renderer),
-      "reload-tiles", NULL);
 }
 
 
@@ -522,9 +519,6 @@ champlain_memphis_renderer_load_rules (
         strlen (default_rules), NULL);
 
   g_static_rw_lock_writer_unlock (&MemphisLock);
-
-  g_signal_emit_by_name (CHAMPLAIN_RENDERER (renderer),
-      "reload-tiles", NULL);
 }
 
 
@@ -580,9 +574,6 @@ champlain_memphis_renderer_set_background_color (
   memphis_rule_set_set_bg_color (renderer->priv->rules, color->red,
       color->green, color->blue, color->alpha);
   g_static_rw_lock_writer_unlock (&MemphisLock);
-
-  g_signal_emit_by_name (CHAMPLAIN_RENDERER (renderer),
-      "reload-tiles", NULL);
 }
 
 
@@ -606,9 +597,6 @@ champlain_memphis_renderer_set_rule (ChamplainMemphisRenderer *renderer,
   g_static_rw_lock_writer_lock (&MemphisLock);
   memphis_rule_set_set_rule (renderer->priv->rules, (MemphisRule *) rule);
   g_static_rw_lock_writer_unlock (&MemphisLock);
-
-  g_signal_emit_by_name (CHAMPLAIN_RENDERER (renderer),
-      "reload-tiles", NULL);
 }
 
 
@@ -687,9 +675,6 @@ champlain_memphis_renderer_remove_rule (
   g_static_rw_lock_writer_lock (&MemphisLock);
   memphis_rule_set_remove_rule (renderer->priv->rules, id);
   g_static_rw_lock_writer_unlock (&MemphisLock);
-
-  g_signal_emit_by_name (CHAMPLAIN_RENDERER (renderer),
-      "reload-tiles", NULL);
 }
 
 

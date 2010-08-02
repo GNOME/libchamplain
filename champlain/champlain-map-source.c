@@ -61,34 +61,16 @@ G_DEFINE_TYPE (ChamplainMapSource, champlain_map_source, G_TYPE_INITIALLY_UNOWNE
 
 enum
 {
-  /* normal signals */
-  RELOAD_TILES,
-  LAST_SIGNAL
-};
-
-enum
-{
   PROP_0,
   PROP_NEXT_SOURCE,
   PROP_RENDERER,
 };
 
-static guint champlain_map_source_signals[LAST_SIGNAL] = { 0, };
-
 struct _ChamplainMapSourcePrivate
 {
   ChamplainMapSource *next_source;
   ChamplainRenderer *renderer;
-
-  gulong sig_handler_id;
-  gulong renderer_sig_handler_id;
 };
-
-static void reload_tiles_cb (ChamplainMapSource *orig,
-    ChamplainMapSource *self);
-static void on_set_next_source (ChamplainMapSource *map_source,
-    ChamplainMapSource *old_next_source,
-    ChamplainMapSource *new_next_source);
 
 static void
 champlain_map_source_get_property (GObject *object,
@@ -202,7 +184,6 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
   klass->get_projection = NULL;
 
   klass->fill_tile = NULL;
-  klass->on_set_next_source = on_set_next_source;
 
   /**
    * ChamplainMapSource:next-source:
@@ -231,21 +212,6 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
       CHAMPLAIN_TYPE_RENDERER,
       G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_RENDERER, pspec);
-
-  /**
-   * ChamplainMapSource::reload-tiles:
-   * @map_source: the #ChamplainMapSource that received the signal
-   *
-   * The ChamplainMapSource::reload-tiles signal is emitted when the map source
-   * changed its style or data
-   *
-   * Since: 0.6
-   */
-  champlain_map_source_signals[RELOAD_TILES] =
-    g_signal_new ("reload-tiles", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE,
-        0, NULL);
 }
 
 
@@ -258,8 +224,6 @@ champlain_map_source_init (ChamplainMapSource *map_source)
 
   priv->next_source = NULL;
   priv->renderer = NULL;
-  priv->sig_handler_id = 0;
-  priv->renderer_sig_handler_id = 0;
 }
 
 
@@ -301,35 +265,6 @@ champlain_map_source_get_renderer (ChamplainMapSource *map_source)
 }
 
 
-static void
-reload_tiles_cb (G_GNUC_UNUSED ChamplainMapSource *orig, ChamplainMapSource *self)
-{
-  /* propagate the signal up the chain */
-  g_signal_emit_by_name (self, "reload-tiles", NULL);
-}
-
-
-static void
-on_set_next_source (ChamplainMapSource *map_source,
-    ChamplainMapSource *old_next_source,
-    ChamplainMapSource *new_next_source)
-{
-  ChamplainMapSourcePrivate *priv = map_source->priv;
-
-  if (old_next_source)
-    {
-      if (g_signal_handler_is_connected (old_next_source, priv->sig_handler_id))
-        g_signal_handler_disconnect (old_next_source, priv->sig_handler_id);
-    }
-
-  if (new_next_source)
-    {
-      priv->sig_handler_id = g_signal_connect (new_next_source, "reload-tiles",
-          G_CALLBACK (reload_tiles_cb), map_source);
-    }
-}
-
-
 /**
  * champlain_map_source_set_next_source:
  * @map_source: a #ChamplainMapSource
@@ -346,8 +281,6 @@ champlain_map_source_set_next_source (ChamplainMapSource *map_source,
   g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
 
   ChamplainMapSourcePrivate *priv = map_source->priv;
-
-  CHAMPLAIN_MAP_SOURCE_GET_CLASS (map_source)->on_set_next_source (map_source, priv->next_source, next_source);
 
   if (priv->next_source != NULL)
     g_object_unref (priv->next_source);
@@ -384,18 +317,10 @@ champlain_map_source_set_renderer (ChamplainMapSource *map_source,
   ChamplainMapSourcePrivate *priv = map_source->priv;
 
   if (priv->renderer != NULL)
-    {
-      if (g_signal_handler_is_connected (priv->renderer, priv->renderer_sig_handler_id))
-        g_signal_handler_disconnect (priv->renderer, priv->renderer_sig_handler_id);
-
-      g_object_unref (priv->renderer);
-    }
+    g_object_unref (priv->renderer);
 
   g_object_ref_sink (renderer);
   priv->renderer = renderer;
-
-  priv->renderer_sig_handler_id = g_signal_connect (renderer, "reload-tiles",
-      G_CALLBACK (reload_tiles_cb), map_source);
 
   g_object_notify (G_OBJECT (map_source), "renderer");
 }

@@ -251,8 +251,6 @@ static void update_scale (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
 static void view_position_tile (ChamplainView *view,
     ChamplainTile *tile);
-static void view_reload_tiles_cb (ChamplainMapSource *map_source,
-    ChamplainView *view);
 static void view_update_state (ChamplainView *view,
     ChamplainTile *tile);
 static void view_update_anchor (ChamplainView *view,
@@ -1650,9 +1648,6 @@ champlain_view_init (ChamplainView *view)
 
   priv->state = CHAMPLAIN_STATE_DONE;
   g_object_notify (G_OBJECT (view), "state");
-
-  g_signal_connect (priv->map_source, "reload-tiles",
-      G_CALLBACK (view_reload_tiles_cb), view);
 }
 
 
@@ -2651,9 +2646,8 @@ view_position_tile (ChamplainView *view,
 }
 
 
-static void
-view_reload_tiles_cb (G_GNUC_UNUSED ChamplainMapSource *map_source,
-    ChamplainView *view)
+void
+champlain_view_reload_tiles (ChamplainView *view)
 {
   DEBUG_LOG ()
 
@@ -2772,9 +2766,6 @@ champlain_view_set_map_source (ChamplainView *view,
 
   update_license (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
-
-  g_signal_connect (priv->map_source, "reload-tiles",
-      G_CALLBACK (view_reload_tiles_cb), view);
 
   g_object_notify (G_OBJECT (view), "map-source");
 }

@@ -20,15 +20,6 @@
 
 G_DEFINE_TYPE (ChamplainRenderer, champlain_renderer, G_TYPE_OBJECT)
 
-enum
-{
-  /* normal signals */
-  RELOAD_TILES,
-  LAST_SIGNAL
-};
-
-static guint champlain_renderer_signals[LAST_SIGNAL] = { 0, };
-
 static void
 champlain_renderer_dispose (GObject *object)
 {
@@ -53,12 +44,6 @@ champlain_renderer_class_init (ChamplainRendererClass *klass)
 
   klass->set_data = NULL;
   klass->render = NULL;
-
-  champlain_renderer_signals[RELOAD_TILES] =
-    g_signal_new ("reload-tiles", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE,
-        0, NULL);
 }
 
 

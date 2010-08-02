@@ -184,6 +184,8 @@ void champlain_view_add_polygon (ChamplainView *view,
 void champlain_view_remove_polygon (ChamplainView *view,
     ChamplainPolygon *polygon);
 
+void champlain_view_reload_tiles (ChamplainView *view);
+
 G_END_DECLS
 
 #endif

@@ -43,7 +43,6 @@ struct _ChamplainMapSourceChainPrivate
 {
   ChamplainMapSource *stack_top;
   ChamplainMapSource *stack_bottom;
-  gulong sig_handler_id;
 };
 
 static const gchar *get_id (ChamplainMapSource *map_source);
@@ -56,9 +55,8 @@ static guint get_tile_size (ChamplainMapSource *map_source);
 
 static void fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile);
-static void on_set_next_source (ChamplainMapSource *map_source,
-    ChamplainMapSource *old_next_source,
-    ChamplainMapSource *new_next_source);
+static void on_set_next_source_cb (ChamplainMapSourceChain *source_chain,
+    G_GNUC_UNUSED gpointer user_data);
 
 
 static void
@@ -101,7 +99,6 @@ champlain_map_source_chain_class_init (ChamplainMapSourceChainClass *klass)
   map_source_class->get_tile_size = get_tile_size;
 
   map_source_class->fill_tile = fill_tile;
-  map_source_class->on_set_next_source = on_set_next_source;
 }
 
 
@@ -114,6 +111,9 @@ champlain_map_source_chain_init (ChamplainMapSourceChain *source_chain)
 
   priv->stack_top = NULL;
   priv->stack_bottom = NULL;
+  
+  g_signal_connect (source_chain, "notify::next-source",
+      G_CALLBACK (on_set_next_source_cb), NULL);
 }
 
 
@@ -247,17 +247,19 @@ fill_tile (ChamplainMapSource *map_source,
 
 
 static void
-on_set_next_source (ChamplainMapSource *map_source,
-    G_GNUC_UNUSED ChamplainMapSource *old_next_source,
-    ChamplainMapSource *new_next_source)
+on_set_next_source_cb (ChamplainMapSourceChain *source_chain,
+    G_GNUC_UNUSED gpointer user_data)
 {
-  ChamplainMapSourceChain *source_chain = CHAMPLAIN_MAP_SOURCE_CHAIN (map_source);
-  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
-
   g_return_if_fail (source_chain);
 
+  ChamplainMapSourceChainPrivate *priv = source_chain->priv;
+  ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE (source_chain);
+  ChamplainMapSource *next_source;
+  
+  next_source = champlain_map_source_get_next_source (map_source);
+
   if (priv->stack_bottom)
-    champlain_map_source_set_next_source (priv->stack_bottom, new_next_source);
+    champlain_map_source_set_next_source (priv->stack_bottom, next_source);
 }
 
 
@@ -272,22 +274,14 @@ assign_cache_of_next_source_sequence (ChamplainMapSourceChain *source_chain,
   do
     {
       map_source = champlain_map_source_get_next_source (map_source);
-    } while (CHAMPLAIN_IS_TILE_CACHE (map_source));
+    } 
+  while (CHAMPLAIN_IS_TILE_CACHE (map_source));
 
   while (CHAMPLAIN_IS_TILE_SOURCE (map_source) && map_source != chain_next_source)
     {
       champlain_tile_source_set_cache (CHAMPLAIN_TILE_SOURCE (map_source), tile_cache);
       map_source = champlain_map_source_get_next_source (map_source);
     }
-}
-
-
-static void
-reload_tiles_cb (G_GNUC_UNUSED ChamplainMapSource *map_source,
-    ChamplainMapSourceChain *source_chain)
-{
-  /* propagate the signal from the chain that is inside champlain_map_source_chain */
-  g_signal_emit_by_name (source_chain, "reload-tiles", NULL);
 }
 
 
@@ -328,9 +322,6 @@ champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain,
     }
   else
     {
-      if (g_signal_handler_is_connected (priv->stack_top, priv->sig_handler_id))
-        g_signal_handler_disconnect (priv->stack_top, priv->sig_handler_id);
-
       champlain_map_source_set_next_source (map_source, priv->stack_top);
       priv->stack_top = map_source;
 
@@ -340,9 +331,6 @@ champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain,
           assign_cache_of_next_source_sequence (source_chain, priv->stack_top, tile_cache);
         }
     }
-
-  priv->sig_handler_id = g_signal_connect (priv->stack_top, "reload-tiles",
-      G_CALLBACK (reload_tiles_cb), source_chain);
 }
 
 
@@ -363,9 +351,6 @@ champlain_map_source_chain_pop (ChamplainMapSourceChain *source_chain)
 
   g_return_if_fail (priv->stack_top);
 
-  if (g_signal_handler_is_connected (priv->stack_top, priv->sig_handler_id))
-    g_signal_handler_disconnect (priv->stack_top, priv->sig_handler_id);
-
   if (CHAMPLAIN_IS_TILE_CACHE (priv->stack_top))
     {
       ChamplainTileCache *tile_cache = NULL;
@@ -385,12 +370,6 @@ champlain_map_source_chain_pop (ChamplainMapSourceChain *source_chain)
     }
   else
     priv->stack_top = next_source;
-
-  if (priv->stack_top)
-    {
-      priv->sig_handler_id = g_signal_connect (priv->stack_top, "reload-tiles",
-          G_CALLBACK (reload_tiles_cb), source_chain);
-    }
 
   g_object_unref (old_stack_top);
 }

@@ -83,10 +83,6 @@ struct _ChamplainMapSourceClass
 
   void (*fill_tile)(ChamplainMapSource *map_source,
       ChamplainTile *tile);
-
-  void (*on_set_next_source)(ChamplainMapSource *map_source,
-      ChamplainMapSource *next_source,
-      ChamplainMapSource *new_next_source);
 };
 
 GType champlain_map_source_get_type (void);

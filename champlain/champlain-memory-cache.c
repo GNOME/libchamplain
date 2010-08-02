@@ -177,23 +177,11 @@ champlain_memory_cache_new_full (guint size_limit,
 
 
 static void
-reload_tiles_cb (ChamplainMemoryCache *memory_cache, G_GNUC_UNUSED gpointer data)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MEMORY_CACHE (memory_cache));
-
-  champlain_memory_cache_clean (memory_cache);
-}
-
-
-static void
 champlain_memory_cache_init (ChamplainMemoryCache *memory_cache)
 {
   ChamplainMemoryCachePrivate *priv = GET_PRIVATE (memory_cache);
 
   memory_cache->priv = priv;
-
-  g_signal_connect (memory_cache, "reload-tiles",
-      G_CALLBACK (reload_tiles_cb), NULL);
 
   priv->queue = g_queue_new ();
 }
