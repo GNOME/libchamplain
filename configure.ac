@@ -255,10 +255,6 @@ AC_CONFIG_FILES([Makefile
                  champlain-gtk-uninstalled.pc
                  champlain-gtk/Makefile
                  bindings/Makefile
-                 bindings/python/Makefile
-                 bindings/python/champlain/Makefile
-                 bindings/python/champlain-gtk/Makefile
-                 bindings/python/demos/Makefile
                  bindings/vala/Makefile
                  bindings/vala/champlain/Makefile
                  bindings/vala/champlain/create.sh
@@ -277,6 +273,10 @@ AC_CONFIG_FILES([bindings/python/update-binding.sh],
                  chmod +x bindings/vala/champlain-memphis/create.sh
                 ])
 AC_OUTPUT
+#                 bindings/python/Makefile
+#                 bindings/python/champlain/Makefile
+#                 bindings/python/champlain-gtk/Makefile
+#                 bindings/python/demos/Makefile
 
 echo ""
 echo " libchamplain $VERSION"
