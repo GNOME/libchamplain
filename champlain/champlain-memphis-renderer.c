@@ -308,7 +308,7 @@ tile_loaded_cb (gpointer worker_data)
   if (tile)
     g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &data->tile);
 
-  g_free (data);
+  g_slice_free (WorkerThreadData, data);
 
   if (!tile)
     {
@@ -415,7 +415,7 @@ render (ChamplainRenderer *renderer,
       champlain_tile_get_y (tile),
       champlain_tile_get_zoom_level (tile));
 
-  data = g_new (WorkerThreadData, 1);
+  data = g_slice_new (WorkerThreadData);
   data->x = champlain_tile_get_x (tile);
   data->y = champlain_tile_get_y (tile);
   data->z = champlain_tile_get_zoom_level (tile);
@@ -431,7 +431,7 @@ render (ChamplainRenderer *renderer,
     {
       g_error ("Thread pool error: %s", error->message);
       g_error_free (error);
-      g_free (data);
+      g_slice_free (WorkerThreadData, data);
       g_object_unref (renderer);
       g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &data->tile);
     }

@@ -2075,7 +2075,7 @@ champlain_view_stop_go_to (ChamplainView *view)
 
   g_signal_emit_by_name (view, "animation-completed::go-to", NULL);
 
-  g_free (priv->goto_context);
+  g_slice_free (GoToContext, priv->goto_context);
   priv->goto_context = NULL;
 }
 
@@ -2128,7 +2128,7 @@ champlain_view_go_to_with_duration (ChamplainView *view,
 
   champlain_view_stop_go_to (view);
 
-  ctx = g_new0 (GoToContext, 1);
+  ctx = g_slice_new (GoToContext);
   ctx->from_latitude = priv->latitude;
   ctx->from_longitude = priv->longitude;
   ctx->to_latitude = latitude;
@@ -2521,7 +2521,7 @@ view_load_visible_tiles (ChamplainView *view)
 
   DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_end, y_end);
 
-  tile_map = g_new0 (gboolean, x_count * y_count);
+  tile_map = g_slice_alloc0 (sizeof (gboolean) * x_count * y_count);
 
   /* Get rid of old tiles first */
   children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
@@ -2575,7 +2575,7 @@ view_load_visible_tiles (ChamplainView *view)
                  notify::state signal is connected  */
               champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
 
-              data = g_new (FillTileCallbackData, 1);
+              data = g_slice_new (FillTileCallbackData);
               data->tile = tile;
               data->map_source = priv->map_source;
 
@@ -2596,7 +2596,7 @@ view_load_visible_tiles (ChamplainView *view)
         arm_size++;
     }
 
-  g_free (tile_map);
+  g_slice_free1 (sizeof (gboolean) * x_count * y_count, tile_map);
 }
 
 
@@ -2614,7 +2614,7 @@ fill_tile_cb (FillTileCallbackData *data)
       champlain_map_source_fill_tile (map_source, tile);
     }
 
-  g_free (data);
+  g_slice_free (FillTileCallbackData, data);
   g_object_unref (map_source);
 
   return FALSE;

@@ -544,7 +544,7 @@ destroy_cb_data (TileDestroyedCbData *data,
   if (data->map_source)
     g_object_remove_weak_pointer (G_OBJECT (data->map_source), (gpointer *) &data->map_source);
 
-  g_free (data);
+  g_slice_free (TileDestroyedCbData, data);
 }
 
 
@@ -576,7 +576,7 @@ tile_rendered_cb (ChamplainTile *tile, ChamplainRenderCallbackData *data, TileRe
     }
 
   g_object_unref (map_source);
-  g_free (user_data);
+  g_slice_free (TileRenderedCallbackData, user_data);
   g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, user_data);
 }
 
@@ -600,7 +600,7 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
   if (tile)
     g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &callback_data->tile);
 
-  g_free (user_data);
+  g_slice_free (TileLoadedCallbackData, callback_data);
 
   DEBUG ("Got reply %d", msg->status_code);
 
@@ -637,7 +637,7 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
   etag = soup_message_headers_get (msg->response_headers, "ETag");
   DEBUG ("Received ETag %s", etag);
 
-  data = g_new (TileRenderedCallbackData, 1);
+  data = g_slice_new (TileRenderedCallbackData);
   data->map_source = map_source;
   data->etag = g_strdup (etag);
 
@@ -739,7 +739,7 @@ fill_tile (ChamplainMapSource *map_source,
           g_free (date);
         }
 
-      TileDestroyedCbData *tile_destroyed_cb_data = g_new (TileDestroyedCbData, 1);
+      TileDestroyedCbData *tile_destroyed_cb_data = g_slice_new (TileDestroyedCbData);
       tile_destroyed_cb_data->map_source = map_source;
       tile_destroyed_cb_data->msg = msg;
 
@@ -749,7 +749,7 @@ fill_tile (ChamplainMapSource *map_source,
       g_signal_connect_data (tile, "destroy", G_CALLBACK (tile_destroyed_cb),
           tile_destroyed_cb_data, (GClosureNotify) destroy_cb_data, 0);
 
-      callback_data = g_new (TileLoadedCallbackData, 1);
+      callback_data = g_slice_new (TileLoadedCallbackData);
       callback_data->tile = tile;
       callback_data->map_source = map_source;
 

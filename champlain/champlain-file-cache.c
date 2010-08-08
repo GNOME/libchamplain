@@ -535,7 +535,7 @@ tile_loaded_cb (ClutterTexture *texture,
   if (tile)
     g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &user_data->tile);
 
-  g_free (user_data);
+  g_slice_free (TileLoadedCallbackData, user_data);
 
   if (!tile)
     {
@@ -645,7 +645,7 @@ fill_tile (ChamplainMapSource *map_source,
       TileLoadedCallbackData *callback_data;
       ClutterTexture *texture;
 
-      callback_data = g_new (TileLoadedCallbackData, 1);
+      callback_data = g_slice_new (TileLoadedCallbackData);
       callback_data->tile = tile;
       callback_data->map_source = map_source;
       callback_data->filename = get_filename (file_cache, tile);

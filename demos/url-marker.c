@@ -198,7 +198,7 @@ image_downloaded_cb (SoupSession *session,
 cleanup:
   if (marker_data)
     g_object_unref (marker_data->layer);
-  g_free (marker_data);
+  g_slice_free (MarkerData, marker_data);
   g_free (url);
 
   if (error != NULL)
@@ -227,7 +227,7 @@ create_marker_from_url (ChamplainLayer *layer,
   SoupMessage *message;
   MarkerData *data;
 
-  data = g_new0 (MarkerData, 1);
+  data = g_slice_new (MarkerData);
   data->layer = g_object_ref (layer);
   data->latitude = latitude;
   data->longitude = longitude;

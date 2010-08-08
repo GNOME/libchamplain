@@ -249,7 +249,7 @@ delete_queue_member (QueueMember *member, gpointer user_data)
     {
       g_free (member->key);
       g_free (member->data);
-      g_free (member);
+      g_slice_free (QueueMember, member);
     }
 }
 
@@ -354,7 +354,7 @@ store_tile (ChamplainTileCache *tile_cache,
           delete_queue_member (member, NULL);
         }
 
-      member = g_new0 (QueueMember, 1);
+      member = g_slice_new (QueueMember);
       member->key = key.key;
       member->data = g_memdup (contents, size);
       member->size = size;
