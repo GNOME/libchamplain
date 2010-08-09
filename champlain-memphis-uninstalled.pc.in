@@ -8,4 +8,4 @@ Description: libmemphis support for libchamplain
 Version: @VERSION@
 Libs: ${abs_top_builddir}/champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 Cflags: -I${abs_top_srcdir} -I${abs_top_builddir}
-Requires: champlain-@CHAMPLAIN_API_VERSION@ memphis-0.2
+Requires: champlain-@CHAMPLAIN_API_VERSION@-uninstalled memphis-0.2
