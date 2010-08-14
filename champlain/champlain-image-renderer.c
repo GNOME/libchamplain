@@ -114,6 +114,9 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
 
   callback_data.error = FALSE;
 
+  if (!priv->data || priv->size == 0)
+    goto error;
+    
   loader = gdk_pixbuf_loader_new ();
   if (!gdk_pixbuf_loader_write (loader,
           (const guchar *) priv->data,
@@ -126,7 +129,6 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
           g_error_free (error);
         }
 
-      goto error;
     }
 
   gdk_pixbuf_loader_close (loader, &error);
@@ -170,7 +172,8 @@ finish:
   callback_data.data = priv->data;
   callback_data.size = priv->size;
 
-  champlain_tile_set_content (tile, actor);
+  if (actor)
+    champlain_tile_set_content (tile, actor);
 
   g_signal_emit_by_name (tile, "render-complete", &callback_data);
 
