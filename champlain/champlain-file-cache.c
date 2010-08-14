@@ -510,52 +510,43 @@ typedef struct
 {
   ChamplainMapSource *map_source;
   ChamplainTile *tile;
-  gchar *filename;
-  gulong handler;
-} TileLoadedCallbackData;
+} FileLoadedData;
 
 static void
-tile_loaded_cb (ClutterTexture *texture,
-    const GError *error,
-    TileLoadedCallbackData *user_data)
+tile_rendered_cb (ChamplainTile *tile,
+    ChamplainRenderCallbackData *data,
+    FileLoadedData *user_data)
 {
   ChamplainMapSource *map_source = user_data->map_source;
-  gchar *filename = user_data->filename;
-  ChamplainTile *tile = user_data->tile;
+  GFile *file;
   ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE (map_source);
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
   ChamplainFileCachePrivate *priv = file_cache->priv;
   GFileInfo *info = NULL;
-  GFile *file = NULL;
-  ClutterActor *actor = CLUTTER_ACTOR (texture);
   GTimeVal modified_time = { 0, };
+  gchar *filename = NULL;
 
-  g_signal_handler_disconnect (texture, user_data->handler);
-
-  if (tile)
-    g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &user_data->tile);
-
-  g_slice_free (TileLoadedCallbackData, user_data);
+  // this frees user_data
+  g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, user_data);
 
   if (!tile)
     {
       DEBUG ("Tile destroyed while loading");
-      if (!error && actor)
-        clutter_actor_destroy (actor);
       goto cleanup;
     }
 
-  if (error)
+  if (data->error)
     {
-      DEBUG ("Failed to load tile %s, error: %s", filename, error->message);
+      DEBUG ("Tile rendering failed: %s", filename);
       goto load_next;
     }
 
-  champlain_tile_set_content (tile, actor);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADED);
 
-  /* Retrieve modification time */
+  filename = get_filename (file_cache, tile);
   file = g_file_new_for_path (filename);
+
+  /* Retrieve modification time */
   info = g_file_query_info (file,
       G_FILE_ATTRIBUTE_TIME_MODIFIED,
       G_FILE_QUERY_INFO_NONE, NULL, NULL);
@@ -611,6 +602,7 @@ tile_loaded_cb (ClutterTexture *texture,
   else
     {
       /* Tile loaded and no validation needed - done */
+      champlain_tile_set_fade_in (tile, FALSE);
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
       champlain_tile_display_content (tile);
       goto cleanup;
@@ -628,7 +620,69 @@ load_next:
 
 cleanup:
   g_free (filename);
-  g_object_unref (map_source);
+}
+
+
+static void
+destroy_cb_data (FileLoadedData *data,
+    G_GNUC_UNUSED GClosure *closure)
+{
+  if (data->map_source)
+    g_object_remove_weak_pointer (G_OBJECT (data->map_source), (gpointer *) &data->map_source);
+    
+  if (data->tile)
+    g_object_remove_weak_pointer (G_OBJECT (data->tile), (gpointer *) &data->tile);
+
+  g_slice_free (FileLoadedData, data);
+}
+
+
+static void 
+file_loaded_cb (GFile *file,
+    GAsyncResult *res,
+    FileLoadedData *user_data) 
+{
+  gboolean ok;
+  gchar *contents;
+  gsize length;
+  GError *error = NULL;
+  ChamplainTile *tile = user_data->tile;
+  ChamplainMapSource *map_source = user_data->map_source;
+  ChamplainRenderer *renderer;
+  
+  ok = g_file_load_contents_finish (file, res, &contents, &length, NULL, &error);
+
+  if (!ok)
+    {
+      DEBUG ("Failed to load tile %s, error: %s", g_file_get_path(file), error->message);
+      contents = NULL;
+      length = 0;
+      g_error_free (error);
+    }
+  
+  g_object_unref (file);
+
+  if (!tile)
+    {
+      DEBUG ("Tile destroyed while loading");
+      // data already destroyed by destroy_cb_data
+      return;
+    }
+
+  if (!map_source)
+    {
+      DEBUG ("Map source destroyed while loading");
+      // this destros the data by destroy_cb_data
+      g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, user_data);
+      return;
+    }
+
+  renderer = champlain_map_source_get_renderer (map_source);
+
+  g_return_if_fail (CHAMPLAIN_IS_RENDERER (renderer));
+
+  champlain_renderer_set_data (renderer, contents, length);
+  champlain_renderer_render (renderer, tile);
 }
 
 
@@ -641,27 +695,25 @@ fill_tile (ChamplainMapSource *map_source,
 
   if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADED)
     {
-      ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE (map_source);
-      TileLoadedCallbackData *callback_data;
-      ClutterTexture *texture;
+      FileLoadedData *user_data;
+      gchar *filename;
+      GFile *file;
+      
+      filename = get_filename (CHAMPLAIN_FILE_CACHE (map_source), tile);
+      file = g_file_new_for_path (filename);
 
-      callback_data = g_slice_new (TileLoadedCallbackData);
-      callback_data->tile = tile;
-      callback_data->map_source = map_source;
-      callback_data->filename = get_filename (file_cache, tile);
+      user_data = g_slice_new (FileLoadedData);
+      user_data->tile = tile;
+      user_data->map_source = map_source;
 
-      DEBUG ("fill of %s", callback_data->filename);
+      g_object_add_weak_pointer (G_OBJECT (tile), (gpointer *) &user_data->tile);
+      g_object_add_weak_pointer (G_OBJECT (map_source), (gpointer *) &user_data->map_source);
 
-      g_object_add_weak_pointer (G_OBJECT (tile), (gpointer *) &callback_data->tile);
-      g_object_ref (map_source);
+      DEBUG ("fill of %s", filename);
 
-      /* Load the cached version */
-      texture = CLUTTER_TEXTURE (clutter_texture_new ());
-      callback_data->handler = g_signal_connect (texture, "load-finished",
-          G_CALLBACK (tile_loaded_cb),
-          callback_data);
-      clutter_texture_set_load_async (texture, TRUE);
-      clutter_texture_set_from_file (texture, callback_data->filename, NULL);
+      g_signal_connect_data (tile, "render-complete", G_CALLBACK (tile_rendered_cb),
+              user_data, (GClosureNotify) destroy_cb_data, 0);
+      g_file_load_contents_async (file, NULL, (GAsyncReadyCallback) file_loaded_cb, user_data);
     }
   else
     {
@@ -702,11 +754,12 @@ refresh_tile_time (ChamplainTileCache *tile_cache,
 
       g_file_info_set_modification_time (info, &now);
       g_file_set_attributes_from_info (file, info, G_FILE_QUERY_INFO_NONE, NULL, NULL);
-    }
+      
+      g_object_unref (info);
+   }
 
   g_object_unref (file);
-  g_object_unref (info);
-
+ 
   if (CHAMPLAIN_IS_TILE_CACHE (next_source))
     champlain_tile_cache_refresh_tile_time (CHAMPLAIN_TILE_CACHE (next_source), tile);
 }
