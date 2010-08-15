@@ -565,7 +565,7 @@ tile_rendered_cb (ChamplainTile *tile,
 
   /* Notify other caches that the tile has been filled */
   if (CHAMPLAIN_IS_TILE_CACHE (next_source))
-    on_tile_filled (CHAMPLAIN_TILE_CACHE (next_source), tile);
+    champlain_tile_cache_on_tile_filled (CHAMPLAIN_TILE_CACHE (next_source), tile);
 
   if (tile_is_expired (file_cache, tile))
     {

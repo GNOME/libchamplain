@@ -279,7 +279,7 @@ tile_rendered_cb (ChamplainTile *tile,
   if (!data->error)
     {
       if (CHAMPLAIN_IS_TILE_CACHE (next_source))
-        on_tile_filled (CHAMPLAIN_TILE_CACHE (next_source), tile);
+        champlain_tile_cache_on_tile_filled (CHAMPLAIN_TILE_CACHE (next_source), tile);
 
       champlain_tile_set_fade_in (tile, FALSE);
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
