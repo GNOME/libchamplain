@@ -365,6 +365,8 @@ store_tile (ChamplainTileCache *tile_cache,
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMORY_CACHE (tile_cache));
 
+  ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE (tile_cache);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
   ChamplainMemoryCache *memory_cache = CHAMPLAIN_MEMORY_CACHE (tile_cache);
   ChamplainMemoryCachePrivate *priv = memory_cache->priv;
   GList *link;
@@ -391,6 +393,9 @@ store_tile (ChamplainTileCache *tile_cache,
 
       g_queue_push_head (priv->queue, member);
     }
+    
+  if (CHAMPLAIN_IS_TILE_CACHE (next_source))
+    champlain_tile_cache_store_tile (CHAMPLAIN_TILE_CACHE (next_source), tile, contents, size);
 }
 
 
@@ -398,6 +403,13 @@ static void
 refresh_tile_time (ChamplainTileCache *tile_cache,
     ChamplainTile *tile)
 {
+  g_return_if_fail (CHAMPLAIN_IS_MEMORY_CACHE (tile_cache));
+
+  ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE (tile_cache);
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
+
+  if (CHAMPLAIN_IS_TILE_CACHE (next_source))
+    champlain_tile_cache_refresh_tile_time (CHAMPLAIN_TILE_CACHE (next_source), tile);
 }
 
 
