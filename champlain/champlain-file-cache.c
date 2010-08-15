@@ -519,9 +519,9 @@ tile_rendered_cb (ChamplainTile *tile,
 {
   ChamplainMapSource *map_source = user_data->map_source;
   GFile *file;
-  ChamplainFileCache *file_cache = CHAMPLAIN_FILE_CACHE (map_source);
-  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
-  ChamplainFileCachePrivate *priv = file_cache->priv;
+  ChamplainFileCache *file_cache;
+  ChamplainMapSource *next_source;
+  ChamplainFileCachePrivate *priv;
   GFileInfo *info = NULL;
   GTimeVal modified_time = { 0, };
   gchar *filename = NULL;
@@ -529,15 +529,19 @@ tile_rendered_cb (ChamplainTile *tile,
   // this frees user_data
   g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, user_data);
 
-  if (!tile)
+  if (!map_source)
     {
-      DEBUG ("Tile destroyed while loading");
-      goto cleanup;
+      DEBUG ("Map source destroyed while loading");
+      return;
     }
+
+  next_source = champlain_map_source_get_next_source (map_source);
+  file_cache = CHAMPLAIN_FILE_CACHE (map_source);
+  priv = file_cache->priv;
 
   if (data->error)
     {
-      DEBUG ("Tile rendering failed: %s", filename);
+      DEBUG ("Tile rendering failed");
       goto load_next;
     }
 
@@ -662,24 +666,24 @@ file_loaded_cb (GFile *file,
   
   g_object_unref (file);
 
-  if (!tile)
+  if (!tile || !map_source)
     {
-      DEBUG ("Tile destroyed while loading");
-      // data already destroyed by destroy_cb_data
-      return;
-    }
+      if (map_source)
+        g_object_remove_weak_pointer (G_OBJECT (map_source), (gpointer *) &user_data->map_source);
 
-  if (!map_source)
-    {
-      DEBUG ("Map source destroyed while loading");
-      // this destros the data by destroy_cb_data
-      g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, user_data);
+      if (tile)
+        g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &user_data->tile);
+
+      g_slice_free (FileLoadedData, user_data);
       return;
     }
 
   renderer = champlain_map_source_get_renderer (map_source);
 
   g_return_if_fail (CHAMPLAIN_IS_RENDERER (renderer));
+
+  g_signal_connect_data (tile, "render-complete", G_CALLBACK (tile_rendered_cb),
+          user_data, (GClosureNotify) destroy_cb_data, 0);
 
   champlain_renderer_set_data (renderer, contents, length);
   champlain_renderer_render (renderer, tile);
@@ -692,6 +696,8 @@ fill_tile (ChamplainMapSource *map_source,
 {
   g_return_if_fail (CHAMPLAIN_IS_FILE_CACHE (map_source));
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
+
+  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
   if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADED)
     {
@@ -711,17 +717,15 @@ fill_tile (ChamplainMapSource *map_source,
 
       DEBUG ("fill of %s", filename);
 
-      g_signal_connect_data (tile, "render-complete", G_CALLBACK (tile_rendered_cb),
-              user_data, (GClosureNotify) destroy_cb_data, 0);
       g_file_load_contents_async (file, NULL, (GAsyncReadyCallback) file_loaded_cb, user_data);
     }
-  else
+  else if (CHAMPLAIN_IS_MAP_SOURCE (next_source))
+    champlain_map_source_fill_tile (next_source, tile);
+  else if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADED)
     {
-      ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
-
-      /* Previous cache in the chain is validating its contents */
-      if (CHAMPLAIN_IS_MAP_SOURCE (next_source))
-        champlain_map_source_fill_tile (next_source, tile);
+      /* if we have some content, use the tile even if it wasn't validated */
+      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+      champlain_tile_display_content (tile);
     }
 }
 

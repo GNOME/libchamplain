@@ -254,27 +254,50 @@ delete_queue_member (QueueMember *member, gpointer user_data)
 }
 
 
+typedef struct
+{
+  ChamplainMapSource *map_source;
+} TileRenderedData;
+
+
 static void
 tile_rendered_cb (ChamplainTile *tile,
     ChamplainRenderCallbackData *data,
-    ChamplainMapSource *map_source)
+    TileRenderedData *user_data)
 {
-  ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
+  ChamplainMapSource *map_source = user_data->map_source;
+  ChamplainMapSource *next_source;
 
+  // frees user_data - must not be used later in the function
+  g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, map_source);
+  
+  if (!map_source)
+    return;
+
+  next_source = champlain_map_source_get_next_source (map_source);
+  
   if (!data->error)
     {
       if (CHAMPLAIN_IS_TILE_CACHE (next_source))
         on_tile_filled (CHAMPLAIN_TILE_CACHE (next_source), tile);
 
-      champlain_tile_set_fade_in (tile, TRUE);
+      champlain_tile_set_fade_in (tile, FALSE);
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
       champlain_tile_display_content (tile);
     }
-  else if (CHAMPLAIN_IS_MAP_SOURCE (next_source))
+  else if (next_source)
     champlain_map_source_fill_tile (next_source, tile);
+}
 
-  g_object_unref (map_source);
-  g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, map_source);
+
+static void
+destroy_cb_data (TileRenderedData *data,
+    G_GNUC_UNUSED GClosure *closure)
+{
+  if (data->map_source)
+    g_object_remove_weak_pointer (G_OBJECT (data->map_source), (gpointer *) &data->map_source);
+
+  g_slice_free (TileRenderedData, data);
 }
 
 
@@ -300,6 +323,7 @@ fill_tile (ChamplainMapSource *map_source,
       if (link)
         {
           QueueMember *member = link->data;
+          TileRenderedData *user_data;
 
           move_queue_member_to_head (priv->queue, link);
 
@@ -307,8 +331,14 @@ fill_tile (ChamplainMapSource *map_source,
 
           g_return_if_fail (CHAMPLAIN_IS_RENDERER (renderer));
 
-          g_object_ref (map_source);
-          g_signal_connect (tile, "render-complete", G_CALLBACK (tile_rendered_cb), map_source);
+          user_data = g_slice_new (TileRenderedData);
+          user_data->map_source = map_source;
+
+          g_object_add_weak_pointer (G_OBJECT (map_source), (gpointer *) &user_data->map_source);
+
+          g_signal_connect_data (tile, "render-complete", G_CALLBACK (tile_rendered_cb),
+                  user_data, (GClosureNotify) destroy_cb_data, 0);
+                  
           champlain_renderer_set_data (renderer, member->data, member->size);
           champlain_renderer_render (renderer, tile);
 

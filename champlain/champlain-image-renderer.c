@@ -128,7 +128,7 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
           g_warning ("Unable to load the pixbuf: %s", error->message);
           g_error_free (error);
         }
-
+      goto error;
     }
 
   gdk_pixbuf_loader_close (loader, &error);

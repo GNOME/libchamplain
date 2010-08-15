@@ -352,7 +352,8 @@ error:
   callback_data.size = 0;
 
 finish:
-  g_signal_emit_by_name (tile, "render-complete", &callback_data);
+  if (tile)
+    g_signal_emit_by_name (tile, "render-complete", &callback_data);
 
   if (pixbuf)
     g_object_unref (pixbuf);
