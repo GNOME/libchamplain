@@ -686,6 +686,7 @@ file_loaded_cb (GFile *file,
           user_data, (GClosureNotify) destroy_cb_data, 0);
 
   champlain_renderer_set_data (renderer, contents, length);
+  g_free (contents);
   champlain_renderer_render (renderer, tile);
 }
 
