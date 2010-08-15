@@ -385,6 +385,7 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
   ChamplainMapSourceChain *source_chain;
   ChamplainMapSource *tile_source;
   ChamplainMapSource *error_source;
+  ChamplainMapSource *memory_cache;
   ChamplainMapSource *file_cache;
   guint tile_size;
   ChamplainRenderer *renderer;
@@ -397,10 +398,14 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
   renderer = CHAMPLAIN_RENDERER (champlain_image_renderer_new ());
   file_cache = CHAMPLAIN_MAP_SOURCE (champlain_file_cache_new_full (100000000, NULL, renderer));
 
+  renderer = CHAMPLAIN_RENDERER (champlain_image_renderer_new ());
+  memory_cache = CHAMPLAIN_MAP_SOURCE (champlain_memory_cache_new_full (100, renderer));
+
   source_chain = champlain_map_source_chain_new ();
   champlain_map_source_chain_push (source_chain, error_source);
   champlain_map_source_chain_push (source_chain, tile_source);
   champlain_map_source_chain_push (source_chain, file_cache);
+  champlain_map_source_chain_push (source_chain, memory_cache);
 
   return CHAMPLAIN_MAP_SOURCE (source_chain);
 }
