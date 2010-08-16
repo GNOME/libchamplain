@@ -251,8 +251,6 @@ static void update_scale (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
 static void view_position_tile (ChamplainView *view,
     ChamplainTile *tile);
-static void view_update_state (ChamplainView *view,
-    ChamplainTile *tile);
 static void view_update_anchor (ChamplainView *view,
     gint x,
     gint y);
@@ -260,9 +258,9 @@ static gboolean view_set_zoom_level_at (ChamplainView *view,
     gint zoom_level,
     gint x,
     gint y);
-static void tile_state_notify (GObject *gobject,
-    GParamSpec *pspec,
-    gpointer data);
+static void tile_state_notify (ChamplainTile *tile,
+    G_GNUC_UNUSED GParamSpec *pspec,
+    ChamplainView *view);
 static void view_update_polygons (ChamplainView *view);
 static gboolean finger_scroll_key_press_cb (ClutterActor *actor,
     ClutterKeyEvent *event,
@@ -273,8 +271,6 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     guint duration);
 static gboolean perform_update_cb (ChamplainView *view);
 static gboolean fill_tile_cb (FillTileCallbackData *data);
-static void tile_destroyed_cb (GObject *gobject,
-    gpointer data);
 
 #define SCALE_HEIGHT  20
 #define SCALE_PADDING 10
@@ -2536,7 +2532,12 @@ view_load_visible_tiles (ChamplainView *view)
       if (tile_x < x_first || tile_x >= x_end ||
           tile_y < y_first || tile_y >= y_end ||
           zoom_level != priv->zoom_level)
-        clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
+        {
+          // inform map source to terminate loading the tile
+          if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_DONE)
+            champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+          clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
+        }
       else
         {
           tile_map[(tile_y - y_first) * x_count + (tile_x - x_first)] = TRUE;
@@ -2579,9 +2580,7 @@ view_load_visible_tiles (ChamplainView *view)
               data->tile = tile;
               data->map_source = priv->map_source;
 
-              g_signal_connect (tile, "destroy", G_CALLBACK (tile_destroyed_cb), view);
-
-              g_object_add_weak_pointer (G_OBJECT (tile), (gpointer *) &data->tile);
+              g_object_ref (tile);
               g_object_ref (priv->map_source);
 
               /* set priority high, otherwise tiles will be loaded after panning is done */
@@ -2608,14 +2607,11 @@ fill_tile_cb (FillTileCallbackData *data)
   ChamplainTile *tile = data->tile;
   ChamplainMapSource *map_source = data->map_source;
 
-  if (data->tile)
-    {
-      g_object_remove_weak_pointer (G_OBJECT (data->tile), (gpointer *) &data->tile);
-      champlain_map_source_fill_tile (map_source, tile);
-    }
+  champlain_map_source_fill_tile (map_source, tile);
 
   g_slice_free (FillTileCallbackData, data);
   g_object_unref (map_source);
+  g_object_unref (tile);
 
   return FALSE;
 }
@@ -2658,44 +2654,12 @@ champlain_view_reload_tiles (ChamplainView *view)
 
 
 static void
-tile_destroyed_cb (GObject *gobject,
-    gpointer data)
-{
-  DEBUG_LOG ()
-
-  ChamplainView *view = CHAMPLAIN_VIEW (data);
-  ChamplainTile *tile = CHAMPLAIN_TILE (gobject);
-  ChamplainViewPrivate *priv = view->priv;
-
-  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADING ||
-      champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADED)
-    {
-      priv->tiles_loading--;
-      if (priv->tiles_loading == 0)
-        {
-          priv->state = CHAMPLAIN_STATE_DONE;
-          g_object_notify (G_OBJECT (view), "state");
-        }
-    }
-}
-
-
-static void
-tile_state_notify (GObject *gobject,
+tile_state_notify (ChamplainTile *tile,
     G_GNUC_UNUSED GParamSpec *pspec,
-    gpointer data)
+    ChamplainView *view)
 {
   DEBUG_LOG ()
-
-  view_update_state (CHAMPLAIN_VIEW (data), CHAMPLAIN_TILE (gobject));
-}
-
-
-static void
-view_update_state (ChamplainView *view, ChamplainTile *tile)
-{
-  DEBUG_LOG ()
-
+  
   ChamplainState tile_state = champlain_tile_get_state (tile);
   ChamplainViewPrivate *priv = view->priv;
 

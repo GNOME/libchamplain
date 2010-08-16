@@ -526,14 +526,8 @@ tile_rendered_cb (ChamplainTile *tile,
   GTimeVal modified_time = { 0, };
   gchar *filename = NULL;
 
-  // this frees user_data
   g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, user_data);
-
-  if (!map_source)
-    {
-      DEBUG ("Map source destroyed while loading");
-      return;
-    }
+  g_slice_free (FileLoadedData, user_data);
 
   next_source = champlain_map_source_get_next_source (map_source);
   file_cache = CHAMPLAIN_FILE_CACHE (map_source);
@@ -624,20 +618,8 @@ load_next:
 
 cleanup:
   g_free (filename);
-}
-
-
-static void
-destroy_cb_data (FileLoadedData *data,
-    G_GNUC_UNUSED GClosure *closure)
-{
-  if (data->map_source)
-    g_object_remove_weak_pointer (G_OBJECT (data->map_source), (gpointer *) &data->map_source);
-    
-  if (data->tile)
-    g_object_remove_weak_pointer (G_OBJECT (data->tile), (gpointer *) &data->tile);
-
-  g_slice_free (FileLoadedData, data);
+  g_object_unref (tile);
+  g_object_unref (map_source);
 }
 
 
@@ -666,24 +648,11 @@ file_loaded_cb (GFile *file,
   
   g_object_unref (file);
 
-  if (!tile || !map_source)
-    {
-      if (map_source)
-        g_object_remove_weak_pointer (G_OBJECT (map_source), (gpointer *) &user_data->map_source);
-
-      if (tile)
-        g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &user_data->tile);
-
-      g_slice_free (FileLoadedData, user_data);
-      return;
-    }
-
   renderer = champlain_map_source_get_renderer (map_source);
 
   g_return_if_fail (CHAMPLAIN_IS_RENDERER (renderer));
 
-  g_signal_connect_data (tile, "render-complete", G_CALLBACK (tile_rendered_cb),
-          user_data, (GClosureNotify) destroy_cb_data, 0);
+  g_signal_connect (tile, "render-complete", G_CALLBACK (tile_rendered_cb), user_data);
 
   champlain_renderer_set_data (renderer, contents, length);
   g_free (contents);
@@ -712,9 +681,9 @@ fill_tile (ChamplainMapSource *map_source,
       user_data = g_slice_new (FileLoadedData);
       user_data->tile = tile;
       user_data->map_source = map_source;
-
-      g_object_add_weak_pointer (G_OBJECT (tile), (gpointer *) &user_data->tile);
-      g_object_add_weak_pointer (G_OBJECT (map_source), (gpointer *) &user_data->map_source);
+      
+      g_object_ref (tile);
+      g_object_ref (map_source);
 
       DEBUG ("fill of %s", filename);
 

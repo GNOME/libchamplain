@@ -84,7 +84,14 @@ struct _ChamplainNetworkTileSourcePrivate
 typedef struct
 {
   ChamplainMapSource *map_source;
+  SoupMessage *msg;
+} TileCancelledData;
+
+typedef struct
+{
+  ChamplainMapSource *map_source;
   ChamplainTile *tile;
+  TileCancelledData *cancelled_data;
 } TileLoadedData;
 
 typedef struct
@@ -93,14 +100,13 @@ typedef struct
   gchar *etag;
 } TileRenderedData;
 
-typedef struct
-{
-  ChamplainMapSource *map_source;
-  SoupMessage *msg;
-} TileDestroyedCbData;
 
 static void fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile);
+static void
+tile_state_notify (ChamplainTile *tile,
+    G_GNUC_UNUSED GParamSpec *pspec,
+    TileCancelledData *data);
 
 static gchar *get_tile_uri (ChamplainNetworkTileSource *source,
     gint x,
@@ -530,16 +536,11 @@ tile_rendered_cb (ChamplainTile *tile,
 {
   ChamplainMapSource *map_source = user_data->map_source;
   ChamplainMapSource *next_source;
-  gchar *etag;
+  gchar *etag = user_data->etag;
   
-  etag = g_strdup (user_data->etag);
-
-  // frees user_data - must not be used later in the function
-  g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, map_source);
+  g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, user_data);
+  g_slice_free (TileRenderedData, user_data);
   
-  if (!map_source)
-    return;
-
   next_source = champlain_map_source_get_next_source (map_source);
   
   if (!data->error)
@@ -561,20 +562,8 @@ tile_rendered_cb (ChamplainTile *tile,
     champlain_map_source_fill_tile (next_source, tile);
     
   g_free (etag);
-}
-
-
-static void
-destroy_render_complete_data (TileRenderedData *data,
-    G_GNUC_UNUSED GClosure *closure)
-{
-  if (data->map_source)
-    g_object_remove_weak_pointer (G_OBJECT (data->map_source), (gpointer *) &data->map_source);
-
-  if (data->etag)
-    g_free (data->etag);
-
-  g_slice_free (TileRenderedData, data);
+  g_object_unref (map_source);
+  g_object_unref (tile);  
 }
 
 
@@ -593,31 +582,16 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
   TileRenderedData *data;
   ChamplainRenderer *renderer;
 
-  if (tile)
-    g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &callback_data->tile);
-
-  if (map_source)
-    g_object_remove_weak_pointer (G_OBJECT (map_source), (gpointer *) &callback_data->map_source);
-
+  g_signal_handlers_disconnect_by_func (tile, tile_state_notify, callback_data->cancelled_data);
   g_slice_free (TileLoadedData, callback_data);
 
   DEBUG ("Got reply %d", msg->status_code);
 
-  if (!tile)
-    {
-      DEBUG ("Tile destroyed while loading");
-      return;
-    }
-  else if (msg->status_code == SOUP_STATUS_CANCELLED)
+  if (msg->status_code == SOUP_STATUS_CANCELLED)
     {
       DEBUG ("Download of tile %d, %d got cancelled",
           champlain_tile_get_x (tile), champlain_tile_get_y (tile));
-      return;
-    }
-  else if (!map_source)
-    {
-      DEBUG ("Map source destroyed");
-      return;
+      goto cleanup;
     }
 
   if (msg->status_code == SOUP_STATUS_NOT_MODIFIED)
@@ -648,10 +622,7 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
   data->map_source = map_source;
   data->etag = g_strdup (etag);
 
-  g_object_add_weak_pointer (G_OBJECT (map_source), (gpointer *) &data->map_source);
-
-  g_signal_connect_data (tile, "render-complete", G_CALLBACK (tile_rendered_cb),
-          data, (GClosureNotify) destroy_render_complete_data, 0);
+  g_signal_connect (tile, "render-complete", G_CALLBACK (tile_rendered_cb), data);
 
   champlain_renderer_set_data (renderer, msg->response_body->data, msg->response_body->length);
   champlain_renderer_render (renderer, tile);
@@ -661,17 +632,22 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
 load_next:
   if (next_source)
     champlain_map_source_fill_tile (next_source, tile);
-  return;
+
+  goto cleanup;
 
 finish:
   champlain_tile_set_fade_in (tile, TRUE);
   champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
   champlain_tile_display_content (tile);
+
+cleanup:
+  g_object_unref (tile);
+  g_object_unref (map_source);
 }
 
 
 static void
-destroy_cb_data (TileDestroyedCbData *data,
+destroy_cancelled_data (TileCancelledData *data,
     G_GNUC_UNUSED GClosure *closure)
 {
   if (data->map_source)
@@ -680,15 +656,16 @@ destroy_cb_data (TileDestroyedCbData *data,
   if (data->msg)
     g_object_remove_weak_pointer (G_OBJECT (data->msg), (gpointer *) &data->msg);
 
-  g_slice_free (TileDestroyedCbData, data);
+  g_slice_free (TileCancelledData, data);
 }
 
 
 static void
-tile_destroyed_cb (G_GNUC_UNUSED ChamplainTile *tile,
-    TileDestroyedCbData *data)
+tile_state_notify (ChamplainTile *tile,
+    G_GNUC_UNUSED GParamSpec *pspec,
+    TileCancelledData *data)
 {
-  if (data->map_source && data->msg)
+  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE && data->map_source && data->msg)
     {
       DEBUG ("Canceling tile download");
       ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE (data->map_source)->priv;
@@ -773,22 +750,23 @@ fill_tile (ChamplainMapSource *map_source,
           g_free (date);
         }
 
-      TileDestroyedCbData *tile_destroyed_cb_data = g_slice_new (TileDestroyedCbData);
-      tile_destroyed_cb_data->map_source = map_source;
-      tile_destroyed_cb_data->msg = msg;
+      TileCancelledData *tile_cancelled_data = g_slice_new (TileCancelledData);
+      tile_cancelled_data->map_source = map_source;
+      tile_cancelled_data->msg = msg;
 
-      g_object_add_weak_pointer (G_OBJECT (msg), (gpointer *) &tile_destroyed_cb_data->msg);
-      g_object_add_weak_pointer (G_OBJECT (map_source), (gpointer *) &tile_destroyed_cb_data->map_source);
+      g_object_add_weak_pointer (G_OBJECT (msg), (gpointer *) &tile_cancelled_data->msg);
+      g_object_add_weak_pointer (G_OBJECT (map_source), (gpointer *) &tile_cancelled_data->map_source);
 
-      g_signal_connect_data (tile, "destroy", G_CALLBACK (tile_destroyed_cb),
-          tile_destroyed_cb_data, (GClosureNotify) destroy_cb_data, 0);
+      g_signal_connect_data (tile, "notify::state", G_CALLBACK (tile_state_notify),
+          tile_cancelled_data, (GClosureNotify) destroy_cancelled_data, 0);
 
       callback_data = g_slice_new (TileLoadedData);
       callback_data->tile = tile;
       callback_data->map_source = map_source;
+      callback_data->cancelled_data = tile_cancelled_data;
 
-      g_object_add_weak_pointer (G_OBJECT (tile), (gpointer *) &callback_data->tile);
-      g_object_add_weak_pointer (G_OBJECT (map_source), (gpointer *) &callback_data->map_source);
+      g_object_ref (map_source);
+      g_object_ref (tile);
 
       soup_session_queue_message (priv->soup_session, msg,
           tile_loaded_cb,

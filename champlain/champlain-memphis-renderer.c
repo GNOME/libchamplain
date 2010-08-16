@@ -305,9 +305,6 @@ tile_loaded_cb (gpointer worker_data)
   gchar *buffer = NULL;
   gsize buffer_size;
 
-  if (tile)
-    g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &data->tile);
-
   g_slice_free (WorkerThreadData, data);
 
   if (!tile)
@@ -360,6 +357,7 @@ finish:
   if (cst)
     cairo_surface_destroy (cst);
   g_object_unref (renderer);
+  g_object_unref (tile);
   g_free (buffer);
 
   return FALSE;
@@ -424,7 +422,7 @@ render (ChamplainRenderer *renderer,
   data->tile = tile;
   data->renderer = renderer;
 
-  g_object_add_weak_pointer (G_OBJECT (tile), (gpointer *) &data->tile);
+  g_object_ref (tile);
   g_object_ref (renderer);
 
   g_thread_pool_push (priv->thpool, data, &error);
@@ -434,7 +432,7 @@ render (ChamplainRenderer *renderer,
       g_error_free (error);
       g_slice_free (WorkerThreadData, data);
       g_object_unref (renderer);
-      g_object_remove_weak_pointer (G_OBJECT (tile), (gpointer *) &data->tile);
+      g_object_unref (tile);
     }
 }
 
