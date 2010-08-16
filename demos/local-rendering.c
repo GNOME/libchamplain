@@ -481,6 +481,16 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
       src = champlain_map_source_factory_create_error_source (factory, tile_size);
 
       champlain_map_source_chain_push (source_chain, src);
+
+// uncomment to see the rendered map combined with normal map
+/*      
+      if (g_strcmp0 (id, "memphis-local") == 0 || g_strcmp0 (id, "memphis-network") == 0)
+        {
+          src = champlain_map_source_factory_create (factory, CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK);
+          champlain_map_source_chain_push (source_chain, src);
+        }
+*/
+
       champlain_map_source_chain_push (source_chain, tile_source);
 
       image_renderer = CHAMPLAIN_RENDERER (champlain_image_renderer_new ());

@@ -173,7 +173,7 @@ if test x$enable_python = xyes; then
   )
 
   if test "x$enable_memphis" = "xyes"; then
-    PKG_CHECK_MODULES(PYTHON_BINDING_MEMPHIS, [pymemphis-0.2 >= 0.2])
+    PKG_CHECK_MODULES(PYTHON_BINDING_MEMPHIS, [pymemphis-0.2 >= 0.2.1])
   fi
 
   if test "x$enable_gtk" = "xyes"; then
