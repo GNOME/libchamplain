@@ -136,12 +136,6 @@ gtk_champlain_embed_dispose (GObject *object)
   GtkChamplainEmbed *embed = GTK_CHAMPLAIN_EMBED (object);
   GtkChamplainEmbedPrivate *priv = embed->priv;
 
-  if (priv->view != NULL)
-    {
-      g_object_unref (priv->view);
-      priv->view = NULL;
-    }
-
   if (priv->cursor_hand_open != NULL)
     {
       gdk_cursor_unref (priv->cursor_hand_open);
@@ -203,12 +197,9 @@ set_view (GtkChamplainEmbed *embed,
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
 
   if (priv->view != NULL)
-    {
-      g_object_unref (priv->view);
-      clutter_container_remove_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
-    }
+    clutter_container_remove_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
 
-  priv->view = g_object_ref_sink (view);
+  priv->view = view;
   clutter_actor_set_size (CLUTTER_ACTOR (priv->view), priv->width, priv->height);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
