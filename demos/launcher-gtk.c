@@ -294,6 +294,7 @@ main (int argc,
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
   button = gtk_image_new ();
+  gtk_widget_set_size_request (button, 22, -1);
   g_signal_connect (view, "notify::state", G_CALLBACK (view_state_changed),
       button);
   gtk_box_pack_end (GTK_BOX (bbox), button, FALSE, FALSE, 0);
