@@ -979,7 +979,7 @@ champlain_file_cache_purge (ChamplainFileCache *file_cache)
       const char *filename;
       guint size;
 
-      filename = sqlite3_column_text (stmt, 0);
+      filename = (const char *) sqlite3_column_text (stmt, 0);
       size = sqlite3_column_int (stmt, 1);
       highest_popularity = sqlite3_column_int (stmt, 2);
       DEBUG ("Deleting %s of size %d", filename, size);
