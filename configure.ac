@@ -7,19 +7,24 @@ m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
 m4_define([champlain_api_version],
           [champlain_major_version.champlain_minor_version])
-AC_PREREQ(2.61)
+AC_PREREQ([2.64])
 AC_INIT([libchamplain],
         [champlain_version],
-        [http://bugzilla.gnome.org/simple-bug-guide.cgi?product=libchamplain])
+        [http://bugzilla.gnome.org/enter_bug.cgi?product=libchamplain],
+        [libchamplain],
+        [http://projects.gnome.org/libchamplain/])
 AC_CONFIG_SRCDIR([champlain/champlain.h])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([-Wno-portability])
-AC_LIBTOOL_DLOPEN
-AM_PROG_LIBTOOL
+
+LT_PREREQ([2.2.6])
+LT_INIT([dlopen])
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 # Checks for programs.
 AC_PROG_CC
@@ -69,7 +74,9 @@ AM_PATH_GLIB_2_0(2.16.0,,gobject gthread gio)
 
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
-IDT_COMPILE_WARNINGS
+
+GNOME_COMPILE_WARNINGS([maximum])
+GNOME_MAINTAINER_MODE_DEFINES
 
 # -----------------------------------------------------------
 # Check for libsoup, use libsoup-gnome if available
@@ -200,7 +207,7 @@ AC_PATH_PROG(VAPIGEN, vapigen, vapigen)
 AC_SUBST(VAPIGEN)
 
 AC_ARG_ENABLE(vala-demos,
-  AC_HELP_STRING([--enable-vala-demos],[Build vala bindings demos]),
+  AS_HELP_STRING([--enable-vala-demos],[Build vala bindings demos]),
     enable_vala_demos=$enableval, enable_vala_demos=no )
 
 if test "x$enable_vala_demos" = "xyes"; then
