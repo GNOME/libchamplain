@@ -262,9 +262,9 @@ tile_rendered_cb (ChamplainTile *tile,
   ChamplainMapSource *next_source;
 
   g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, map_source);
-  
+
   next_source = champlain_map_source_get_next_source (map_source);
-  
+
   if (!data->error)
     {
       if (CHAMPLAIN_IS_TILE_CACHE (next_source))
@@ -278,7 +278,7 @@ tile_rendered_cb (ChamplainTile *tile,
     champlain_map_source_fill_tile (next_source, tile);
 
   g_object_unref (map_source);
-  g_object_unref (tile);  
+  g_object_unref (tile);
 }
 
 
@@ -290,6 +290,9 @@ fill_tile (ChamplainMapSource *map_source,
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
 
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
+
+  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+    return;
 
   if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADED)
     {
@@ -315,7 +318,7 @@ fill_tile (ChamplainMapSource *map_source,
           g_object_ref (tile);
 
           g_signal_connect (tile, "render-complete", G_CALLBACK (tile_rendered_cb), map_source);
-                  
+
           champlain_renderer_set_data (renderer, member->data, member->size);
           champlain_renderer_render (renderer, tile);
 
@@ -370,7 +373,7 @@ store_tile (ChamplainTileCache *tile_cache,
 
       g_queue_push_head (priv->queue, member);
     }
-    
+
   if (CHAMPLAIN_IS_TILE_CACHE (next_source))
     champlain_tile_cache_store_tile (CHAMPLAIN_TILE_CACHE (next_source), tile, contents, size);
 }

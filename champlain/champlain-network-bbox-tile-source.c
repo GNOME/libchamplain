@@ -212,7 +212,7 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
           "The proxy URI to use to access network",
           "",
           G_PARAM_READWRITE));
-          
+
   /*
   * ChamplainMapDataSource:state:
   *
@@ -251,7 +251,7 @@ champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
   g_object_set (G_OBJECT (priv->soup_session),
       "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
       "max-conns-per-host", 2, NULL);
-      
+
   priv->state = CHAMPLAIN_STATE_NONE;
 }
 
@@ -359,7 +359,7 @@ champlain_network_bbox_tile_source_load_map_data (
   DEBUG ("Request BBox data: '%s'", url);
 
   g_free (url);
-  
+
   g_object_set (G_OBJECT (self), "state", CHAMPLAIN_STATE_LOADING, NULL);
 
   soup_session_queue_message (priv->soup_session, msg, load_map_data_cb, self);
@@ -374,14 +374,14 @@ tile_rendered_cb (ChamplainTile *tile,
   ChamplainMapSource *next_source;
 
   g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, map_source);
-  
+
   next_source = champlain_map_source_get_next_source (map_source);
-  
+
   if (!data->error)
     {
       ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE (map_source);
       ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
-      
+
       if (tile_cache && data->data)
         champlain_tile_cache_store_tile (tile_cache, tile, data->data, data->size);
 
@@ -405,6 +405,9 @@ fill_tile (ChamplainMapSource *map_source,
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
 
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
+
+  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+    return;
 
   if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADED)
     {

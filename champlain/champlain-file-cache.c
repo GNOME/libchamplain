@@ -623,10 +623,10 @@ cleanup:
 }
 
 
-static void 
+static void
 file_loaded_cb (GFile *file,
     GAsyncResult *res,
-    FileLoadedData *user_data) 
+    FileLoadedData *user_data)
 {
   gboolean ok;
   gchar *contents;
@@ -635,7 +635,7 @@ file_loaded_cb (GFile *file,
   ChamplainTile *tile = user_data->tile;
   ChamplainMapSource *map_source = user_data->map_source;
   ChamplainRenderer *renderer;
-  
+
   ok = g_file_load_contents_finish (file, res, &contents, &length, NULL, &error);
 
   if (!ok)
@@ -645,7 +645,7 @@ file_loaded_cb (GFile *file,
       length = 0;
       g_error_free (error);
     }
-  
+
   g_object_unref (file);
 
   renderer = champlain_map_source_get_renderer (map_source);
@@ -669,19 +669,22 @@ fill_tile (ChamplainMapSource *map_source,
 
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
 
+  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+    return;
+
   if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADED)
     {
       FileLoadedData *user_data;
       gchar *filename;
       GFile *file;
-      
+
       filename = get_filename (CHAMPLAIN_FILE_CACHE (map_source), tile);
       file = g_file_new_for_path (filename);
 
       user_data = g_slice_new (FileLoadedData);
       user_data->tile = tile;
       user_data->map_source = map_source;
-      
+
       g_object_ref (tile);
       g_object_ref (map_source);
 
@@ -728,12 +731,12 @@ refresh_tile_time (ChamplainTileCache *tile_cache,
 
       g_file_info_set_modification_time (info, &now);
       g_file_set_attributes_from_info (file, info, G_FILE_QUERY_INFO_NONE, NULL, NULL);
-      
+
       g_object_unref (info);
    }
 
   g_object_unref (file);
- 
+
   if (CHAMPLAIN_IS_TILE_CACHE (next_source))
     champlain_tile_cache_refresh_tile_time (CHAMPLAIN_TILE_CACHE (next_source), tile);
 }

@@ -83,14 +83,14 @@ tile_rendered_cb (ChamplainTile *tile,
   ChamplainMapSource *next_source;
 
   g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, map_source);
-  
+
   next_source = champlain_map_source_get_next_source (map_source);
-  
+
   if (!data->error)
     {
       ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE (map_source);
       ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
-      
+
       if (tile_cache && data->data)
         champlain_tile_cache_store_tile (tile_cache, tile, data->data, data->size);
 
@@ -102,7 +102,7 @@ tile_rendered_cb (ChamplainTile *tile,
     champlain_map_source_fill_tile (next_source, tile);
 
   g_object_unref (map_source);
-  g_object_unref (tile);  
+  g_object_unref (tile);
 }
 
 
@@ -114,6 +114,9 @@ fill_tile (ChamplainMapSource *map_source,
   g_return_if_fail (CHAMPLAIN_IS_TILE (tile));
 
   ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
+
+  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+    return;
 
   if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_LOADED)
     {

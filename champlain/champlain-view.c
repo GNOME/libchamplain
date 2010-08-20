@@ -1745,7 +1745,7 @@ finger_scroll_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
       event->button == 1 && event->click_count == 2)
     {
       gdouble lon, lat;
-      
+
       champlain_view_get_coords_from_event (view, (ClutterEvent *) event, &lat, &lon);
 
       champlain_view_stop_go_to (view);
@@ -1753,7 +1753,7 @@ finger_scroll_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
       priv->zoom_level = zoom_level;
 
       resize_viewport (view);
-      
+
       champlain_view_center_on (view, lat, lon);
 
       g_object_notify (G_OBJECT (view), "zoom-level");
@@ -2552,8 +2552,7 @@ view_load_visible_tiles (ChamplainView *view)
           zoom_level != priv->zoom_level)
         {
           // inform map source to terminate loading the tile
-          if (champlain_tile_get_state (tile) != CHAMPLAIN_STATE_DONE)
-            champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+          champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
           clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
         }
       else
@@ -2660,12 +2659,32 @@ view_position_tile (ChamplainView *view,
 }
 
 
+static void
+remove_all_tiles (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  ChamplainViewPrivate *priv = view->priv;
+  GList *children;
+
+  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
+  for (; children != NULL; children = g_list_next (children))
+    {
+      ChamplainTile *tile = CHAMPLAIN_TILE (children->data);
+
+      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
+    }
+  g_list_free (children);
+}
+
+
 void
 champlain_view_reload_tiles (ChamplainView *view)
 {
   DEBUG_LOG ()
 
-  clutter_group_remove_all (CLUTTER_GROUP (view->priv->map_layer));
+  remove_all_tiles (view);
 
   view_load_visible_tiles (view);
 }
@@ -2677,7 +2696,7 @@ tile_state_notify (ChamplainTile *tile,
     ChamplainView *view)
 {
   DEBUG_LOG ()
-  
+
   ChamplainState tile_state = champlain_tile_get_state (tile);
   ChamplainViewPrivate *priv = view->priv;
 
@@ -2744,7 +2763,7 @@ champlain_view_set_map_source (ChamplainView *view,
       g_object_notify (G_OBJECT (view), "zoom-level");
     }
 
-  clutter_group_remove_all (CLUTTER_GROUP (priv->map_layer));
+  remove_all_tiles (view);
 
   update_license (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);

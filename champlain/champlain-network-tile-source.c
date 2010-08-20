@@ -537,12 +537,12 @@ tile_rendered_cb (ChamplainTile *tile,
   ChamplainMapSource *map_source = user_data->map_source;
   ChamplainMapSource *next_source;
   gchar *etag = user_data->etag;
-  
+
   g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, user_data);
   g_slice_free (TileRenderedData, user_data);
-  
+
   next_source = champlain_map_source_get_next_source (map_source);
-  
+
   if (!data->error)
     {
       ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE (map_source);
@@ -560,10 +560,10 @@ tile_rendered_cb (ChamplainTile *tile,
     }
   else if (next_source)
     champlain_map_source_fill_tile (next_source, tile);
-    
+
   g_free (etag);
   g_object_unref (map_source);
-  g_object_unref (tile);  
+  g_object_unref (tile);
 }
 
 
@@ -652,7 +652,7 @@ destroy_cancelled_data (TileCancelledData *data,
 {
   if (data->map_source)
     g_object_remove_weak_pointer (G_OBJECT (data->map_source), (gpointer *) &data->map_source);
-    
+
   if (data->msg)
     g_object_remove_weak_pointer (G_OBJECT (data->msg), (gpointer *) &data->msg);
 
@@ -669,7 +669,6 @@ tile_state_notify (ChamplainTile *tile,
     {
       DEBUG ("Canceling tile download");
       ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE (data->map_source)->priv;
-
       soup_session_cancel_message (priv->soup_session, data->msg, SOUP_STATUS_CANCELLED);
     }
 }
@@ -709,6 +708,9 @@ fill_tile (ChamplainMapSource *map_source,
 
   ChamplainNetworkTileSource *tile_source = CHAMPLAIN_NETWORK_TILE_SOURCE (map_source);
   ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
+
+  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
+    return;
 
   if (!priv->offline)
     {
