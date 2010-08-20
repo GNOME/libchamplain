@@ -1739,9 +1739,27 @@ finger_scroll_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
+  guint zoom_level = priv->zoom_level + 1;
 
-  if (priv->zoom_on_double_click && event->button == 1 && event->click_count == 2)
-    return view_set_zoom_level_at (view, priv->zoom_level + 1, event->x, event->y);
+  if (!ZOOM_LEVEL_OUT_OF_RANGE (priv, zoom_level) && priv->zoom_on_double_click &&
+      event->button == 1 && event->click_count == 2)
+    {
+      gdouble lon, lat;
+      
+      champlain_view_get_coords_from_event (view, (ClutterEvent *) event, &lat, &lon);
+
+      champlain_view_stop_go_to (view);
+
+      priv->zoom_level = zoom_level;
+
+      resize_viewport (view);
+      
+      champlain_view_center_on (view, lat, lon);
+
+      g_object_notify (G_OBJECT (view), "zoom-level");
+
+      return TRUE;
+    }
 
   return FALSE; /* Propagate the event */
 }
