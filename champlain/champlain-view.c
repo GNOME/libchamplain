@@ -873,6 +873,10 @@ champlain_view_finalize (GObject *object)
 {
   DEBUG_LOG ()
 
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW (object)->priv;
+
+  g_free (priv->license_text);
+
   G_OBJECT_CLASS (champlain_view_parent_class)->finalize (object);
 }
 
@@ -2492,7 +2496,7 @@ view_load_visible_tiles (ChamplainView *view)
   ChamplainViewPrivate *priv = view->priv;
   ChamplainRectangle viewport = priv->viewport_size;
   gint size;
-  GList *children;
+  GList *children, *child;
   gint x_count, y_count, x_first, y_first, x_end, y_end, max_x_end, max_y_end;
   gboolean *tile_map;
   gint arm_size, arm_max, turn;
@@ -2539,9 +2543,9 @@ view_load_visible_tiles (ChamplainView *view)
 
   /* Get rid of old tiles first */
   children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
-  for (; children != NULL; children = g_list_next (children))
+  for (child = children; child != NULL; child = g_list_next (child))
     {
-      ChamplainTile *tile = CHAMPLAIN_TILE (children->data);
+      ChamplainTile *tile = CHAMPLAIN_TILE (child->data);
 
       gint tile_x = champlain_tile_get_x (tile);
       gint tile_y = champlain_tile_get_y (tile);
@@ -2665,12 +2669,12 @@ remove_all_tiles (ChamplainView *view)
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
-  GList *children;
+  GList *children, *child;
 
   children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
-  for (; children != NULL; children = g_list_next (children))
+  for (child = children; child != NULL; child = g_list_next (child))
     {
-      ChamplainTile *tile = CHAMPLAIN_TILE (children->data);
+      ChamplainTile *tile = CHAMPLAIN_TILE (child->data);
 
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));

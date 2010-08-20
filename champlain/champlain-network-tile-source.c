@@ -177,6 +177,7 @@ champlain_network_tile_source_dispose (GObject *object)
   if (priv->soup_session)
     {
       soup_session_abort (priv->soup_session);
+      g_object_unref (priv->soup_session);
       priv->soup_session = NULL;
     }
 
@@ -722,8 +723,8 @@ fill_tile (ChamplainMapSource *map_source,
           champlain_tile_get_x (tile),
           champlain_tile_get_y (tile),
           champlain_tile_get_zoom_level (tile));
-
       msg = soup_message_new (SOUP_METHOD_GET, uri);
+      g_free (uri);
 
       if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADED)
         {

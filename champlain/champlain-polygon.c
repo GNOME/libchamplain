@@ -183,7 +183,12 @@ champlain_polygon_dispose (GObject *object)
 static void
 champlain_polygon_finalize (GObject *object)
 {
+  ChamplainPolygonPrivate *priv = CHAMPLAIN_POLYGON (object)->priv;
+
   champlain_polygon_clear_points (CHAMPLAIN_POLYGON (object));
+
+  clutter_color_free (priv->stroke_color);
+  clutter_color_free (priv->fill_color);
 
   G_OBJECT_CLASS (champlain_polygon_parent_class)->finalize (object);
 }

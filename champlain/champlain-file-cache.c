@@ -640,7 +640,11 @@ file_loaded_cb (GFile *file,
 
   if (!ok)
     {
-      DEBUG ("Failed to load tile %s, error: %s", g_file_get_path(file), error->message);
+      gchar *path;
+
+      path = g_file_get_path(file);
+      DEBUG ("Failed to load tile %s, error: %s", path, error->message);
+      g_free (path);
       contents = NULL;
       length = 0;
       g_error_free (error);
@@ -680,6 +684,7 @@ fill_tile (ChamplainMapSource *map_source,
 
       filename = get_filename (CHAMPLAIN_FILE_CACHE (map_source), tile);
       file = g_file_new_for_path (filename);
+      g_free (filename);
 
       user_data = g_slice_new (FileLoadedData);
       user_data->tile = tile;
@@ -859,6 +864,7 @@ on_tile_filled (ChamplainTileCache *tile_cache,
     }
 
 call_next:
+  g_free (filename);
   if (CHAMPLAIN_IS_TILE_CACHE (next_source))
     champlain_tile_cache_on_tile_filled (CHAMPLAIN_TILE_CACHE (next_source), tile);
 }

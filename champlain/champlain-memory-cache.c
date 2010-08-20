@@ -114,6 +114,7 @@ champlain_memory_cache_finalize (GObject *object)
 {
   ChamplainMemoryCache *memory_cache = CHAMPLAIN_MEMORY_CACHE (object);
 
+  champlain_memory_cache_clean (memory_cache);
   g_queue_free (memory_cache->priv->queue);
 
   G_OBJECT_CLASS (champlain_memory_cache_parent_class)->finalize (object);
@@ -304,6 +305,7 @@ fill_tile (ChamplainMapSource *map_source,
 
       key.key = generate_queue_key (memory_cache, tile);
       link = g_queue_find_custom (priv->queue, &key, (GCompareFunc) compare_queue_members);
+      g_free (key.key);
       if (link)
         {
           QueueMember *member = link->data;
@@ -419,6 +421,7 @@ on_tile_filled (ChamplainTileCache *tile_cache,
 
   key.key = generate_queue_key (memory_cache, tile);
   link = g_queue_find_custom (priv->queue, &key, (GCompareFunc) compare_queue_members);
+  g_free (key.key);
   if (link)
     move_queue_member_to_head (priv->queue, link);
 
