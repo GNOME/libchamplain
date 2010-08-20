@@ -1,3 +1,15 @@
+libchamplain 0.4.7 (2010-08-20)
+===============================
+
+Stable release
+GObject-introspection, Python (Victor Godoy Poluceno), Perl
+(Emmanuel Rodriguez), Vala (Tomaž Vajngerl) bindings are in a working state.
+
+Changes:
+* In the previous release some generated python binding sources had zero size
+  which caused that the python bindings weren't working at all. This release
+  just repacks the distributed files correctly.
+
 libchamplain 0.4.6 (2010-06-01)
 ===============================
 

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 m4_define([champlain_major_version], [0])
 m4_define([champlain_minor_version], [4])
-m4_define([champlain_micro_version], [6])
+m4_define([champlain_micro_version], [7])
 m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
 m4_define([api_version],
@@ -11,7 +11,7 @@ m4_define([api_version],
 AC_PREREQ(2.61)
 AC_INIT([libchamplain],
         [champlain_version],
-        http://bugzilla.gnome.org/simple-bug-guide.cgi?product=libchamplain)
+        [https://bugzilla.gnome.org/enter_bug.cgi?product=libchamplain])
 AC_CONFIG_SRCDIR([champlain/champlain.h])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -31,7 +31,7 @@ AC_PATH_PROG(VAPIGEN, vapigen, vapigen)
 AC_SUBST(VAPIGEN)
 
 # Checks for libraries.
-LIBRARY_VERSION=3:3:3
+LIBRARY_VERSION=3:4:3
 # API_VERSION is used to generate pc files only
 API_VERSION=api_version
 CHAMPLAIN_MAJOR_VERSION=champlain_major_version
