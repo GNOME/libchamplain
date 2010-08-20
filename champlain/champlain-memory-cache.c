@@ -39,6 +39,7 @@ struct _ChamplainMemoryCachePrivate
 {
   guint size_limit;
   GQueue *queue;
+  GHashTable *hash_table;
 };
 
 typedef struct
@@ -116,6 +117,7 @@ champlain_memory_cache_finalize (GObject *object)
 
   champlain_memory_cache_clean (memory_cache);
   g_queue_free (memory_cache->priv->queue);
+  g_hash_table_destroy (memory_cache->priv->hash_table);
 
   G_OBJECT_CLASS (champlain_memory_cache_parent_class)->finalize (object);
 }
@@ -185,6 +187,7 @@ champlain_memory_cache_init (ChamplainMemoryCache *memory_cache)
   memory_cache->priv = priv;
 
   priv->queue = g_queue_new ();
+  priv->hash_table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 }
 
 
@@ -218,20 +221,14 @@ generate_queue_key (ChamplainMemoryCache *memory_cache,
   g_return_val_if_fail (CHAMPLAIN_IS_TILE (tile), NULL);
 
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE (memory_cache);
+  gchar *key;
 
-  gchar *filename = g_strdup_printf ("%d/%d/%d/%s",
+  key = g_strdup_printf ("%d/%d/%d/%s",
       champlain_tile_get_zoom_level (tile),
       champlain_tile_get_x (tile),
       champlain_tile_get_y (tile),
       champlain_map_source_get_id (map_source));
-  return filename;
-}
-
-
-static gint
-compare_queue_members (const QueueMember *a, const QueueMember *b)
-{
-  return g_strcmp0 (a->key, b->key);
+  return key;
 }
 
 
@@ -301,11 +298,11 @@ fill_tile (ChamplainMapSource *map_source,
       ChamplainMemoryCachePrivate *priv = memory_cache->priv;
       ChamplainRenderer *renderer;
       GList *link;
-      QueueMember key;
+      gchar *key;
 
-      key.key = generate_queue_key (memory_cache, tile);
-      link = g_queue_find_custom (priv->queue, &key, (GCompareFunc) compare_queue_members);
-      g_free (key.key);
+      key = generate_queue_key (memory_cache, tile);
+      link = g_hash_table_lookup (priv->hash_table, key);
+      g_free (key);
       if (link)
         {
           QueueMember *member = link->data;
@@ -352,12 +349,15 @@ store_tile (ChamplainTileCache *tile_cache,
   ChamplainMemoryCache *memory_cache = CHAMPLAIN_MEMORY_CACHE (tile_cache);
   ChamplainMemoryCachePrivate *priv = memory_cache->priv;
   GList *link;
-  QueueMember key;
+  gchar *key;
 
-  key.key = generate_queue_key (memory_cache, tile);
-  link = g_queue_find_custom (priv->queue, &key, (GCompareFunc) compare_queue_members);
+  key = generate_queue_key (memory_cache, tile);
+  link = g_hash_table_lookup (priv->hash_table, key);
   if (link)
-    move_queue_member_to_head (priv->queue, link);
+    {
+      move_queue_member_to_head (priv->queue, link);
+      g_free (key);
+    }
   else
     {
       QueueMember *member;
@@ -365,15 +365,17 @@ store_tile (ChamplainTileCache *tile_cache,
       if (priv->queue->length >= priv->size_limit)
         {
           member = g_queue_pop_tail (priv->queue);
+          g_hash_table_remove (priv->hash_table, member->key);
           delete_queue_member (member, NULL);
         }
 
       member = g_slice_new (QueueMember);
-      member->key = key.key;
+      member->key = key;
       member->data = g_memdup (contents, size);
       member->size = size;
 
       g_queue_push_head (priv->queue, member);
+      g_hash_table_insert (priv->hash_table, g_strdup (key), g_queue_peek_head_link (priv->queue));
     }
 
   if (CHAMPLAIN_IS_TILE_CACHE (next_source))
@@ -402,6 +404,8 @@ champlain_memory_cache_clean (ChamplainMemoryCache *memory_cache)
 
   g_queue_foreach (priv->queue, (GFunc) delete_queue_member, NULL);
   g_queue_clear (priv->queue);
+  g_hash_table_destroy (memory_cache->priv->hash_table);
+  priv->hash_table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 }
 
 
@@ -417,11 +421,11 @@ on_tile_filled (ChamplainTileCache *tile_cache,
   ChamplainMemoryCache *memory_cache = CHAMPLAIN_MEMORY_CACHE (tile_cache);
   ChamplainMemoryCachePrivate *priv = memory_cache->priv;
   GList *link;
-  QueueMember key;
+  gchar *key;
 
-  key.key = generate_queue_key (memory_cache, tile);
-  link = g_queue_find_custom (priv->queue, &key, (GCompareFunc) compare_queue_members);
-  g_free (key.key);
+  key = generate_queue_key (memory_cache, tile);
+  link = g_hash_table_lookup (priv->hash_table, key);
+  g_free (key);
   if (link)
     move_queue_member_to_head (priv->queue, link);
 
