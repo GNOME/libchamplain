@@ -18,7 +18,7 @@
 
 #include "champlain-renderer.h"
 
-G_DEFINE_TYPE (ChamplainRenderer, champlain_renderer, G_TYPE_OBJECT)
+G_DEFINE_TYPE (ChamplainRenderer, champlain_renderer, G_TYPE_INITIALLY_UNOWNED)
 
 static void
 champlain_renderer_dispose (GObject *object)
@@ -49,7 +49,7 @@ champlain_renderer_class_init (ChamplainRendererClass *klass)
 
 void
 champlain_renderer_set_data (ChamplainRenderer *renderer,
-    const gchar *data, 
+    const gchar *data,
     guint size)
 {
   g_return_if_fail (CHAMPLAIN_IS_RENDERER (renderer));

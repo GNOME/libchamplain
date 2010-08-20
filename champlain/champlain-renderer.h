@@ -49,12 +49,12 @@ typedef struct _ChamplainRendererClass ChamplainRendererClass;
 
 struct _ChamplainRenderer
 {
-  GObject parent;
+  GInitiallyUnowned parent;
 };
 
 struct _ChamplainRendererClass
 {
-  GObjectClass parent_class;
+  GInitiallyUnownedClass parent_class;
 
   void (*set_data)(ChamplainRenderer *renderer,
       const gchar *data,
