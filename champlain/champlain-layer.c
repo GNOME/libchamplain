@@ -117,43 +117,17 @@ champlain_layer_init (ChamplainLayer *self)
 }
 
 
-/* This callback serves to keep the markers ordered by their latitude.
+/* This serves to keep the markers ordered by their latitude.
  * Markers that are up north on the map should be lowered in the list so that
  * they are drawn the first. This is to make the illusion of a semi-3d plane
  * where the most north you are, the farther you are.
  */
 static void
-reorder_marker (ClutterGroup *layer,
-    ChamplainBaseMarker *marker)
+set_marker_depth(GObject *marker)
 {
-  guint i;
-  gdouble y, tmp_y, low_y;
-  ChamplainBaseMarker *lowest = NULL;
-
-  g_object_get (G_OBJECT (marker), "latitude", &y, NULL);
-  y = 90 - y;
-  low_y = G_MAXDOUBLE;
-
-  for (i = 0; i < clutter_group_get_n_children (layer); i++)
-    {
-      ChamplainBaseMarker *prev_marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (layer, i));
-
-      if (prev_marker == (ChamplainBaseMarker *) marker)
-        continue;
-
-      g_object_get (G_OBJECT (prev_marker), "latitude", &tmp_y, NULL);
-      tmp_y = 90 - tmp_y;
-
-      if (y < tmp_y && tmp_y < low_y)
-        {
-          lowest = prev_marker;
-          low_y = tmp_y;
-        }
-    }
-
-  if (lowest)
-    clutter_container_lower_child (CLUTTER_CONTAINER (layer),
-        CLUTTER_ACTOR (marker), CLUTTER_ACTOR (lowest));
+  gdouble lat;
+  g_object_get (G_OBJECT (marker), "latitude", &lat, NULL);
+  clutter_actor_set_depth(CLUTTER_ACTOR(marker), 90.0 - lat);
 }
 
 
@@ -162,7 +136,7 @@ marker_position_notify (GObject *gobject,
     G_GNUC_UNUSED GParamSpec *pspec,
     gpointer user_data)
 {
-  reorder_marker (CLUTTER_GROUP (user_data), CHAMPLAIN_BASE_MARKER (gobject));
+  set_marker_depth(gobject);
 }
 
 
@@ -173,7 +147,7 @@ layer_add_cb (ClutterGroup *layer,
 {
   ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
 
-  reorder_marker (layer, marker);
+  set_marker_depth(G_OBJECT(actor));
 
   g_signal_connect (G_OBJECT (marker), "notify::latitude",
       G_CALLBACK (marker_position_notify), layer);
