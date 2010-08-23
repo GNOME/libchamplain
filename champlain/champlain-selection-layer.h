@@ -51,6 +51,9 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainSelectionLayerPrivate ChamplainSelectionLayerPrivate;
 
+typedef struct _ChamplainSelectionLayer ChamplainSelectionLayer;
+typedef struct _ChamplainSelectionLayerClass ChamplainSelectionLayerClass;
+
 /**
  * ChamplainSelectionMode:
  * @CHAMPLAIN_SELECTION_NONE: No marker can be selected.
@@ -65,9 +68,6 @@ typedef enum
   CHAMPLAIN_SELECTION_SINGLE,
   CHAMPLAIN_SELECTION_MULTIPLE
 } ChamplainSelectionMode;
-
-typedef struct _ChamplainSelectionLayer ChamplainSelectionLayer;
-typedef struct _ChamplainSelectionLayerClass ChamplainSelectionLayerClass;
 
 struct _ChamplainSelectionLayer
 {

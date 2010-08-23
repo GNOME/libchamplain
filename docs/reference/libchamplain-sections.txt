@@ -21,6 +21,8 @@ champlain_map_source_get_meters_per_pixel
 champlain_map_source_fill_tile
 champlain_map_source_get_next_source
 champlain_map_source_set_next_source
+champlain_map_source_get_renderer
+champlain_map_source_set_renderer
 <SUBSECTION Standard>
 CHAMPLAIN_MAP_SOURCE
 CHAMPLAIN_IS_MAP_SOURCE
@@ -37,6 +39,7 @@ ChamplainMapSourcePrivate
 <SECTION>
 <FILE>champlain-map-source-desc</FILE>
 <TITLE>ChamplainMapSourceDesc</TITLE>
+ChamplainMapSourceDesc
 champlain_map_source_desc_copy
 champlain_map_source_desc_free
 champlain_map_source_desc_new
@@ -173,6 +176,7 @@ champlain_view_get_coords_from_event
 champlain_view_get_coords_at
 champlain_view_add_polygon
 champlain_view_remove_polygon
+champlain_view_reload_tiles
 <SUBSECTION Standard>
 CHAMPLAIN_VIEW
 CHAMPLAIN_IS_VIEW
@@ -211,8 +215,67 @@ ChamplainNetworkTileSourcePrivate
 </SECTION>
 
 <SECTION>
+<FILE>champlain-file-tile-source</FILE>
+<TITLE>ChamplainFileTileSource</TITLE>
+ChamplainFileTileSource
+champlain_file_tile_source_new_full
+champlain_file_tile_source_load_map_data
+<SUBSECTION Standard>
+CHAMPLAIN_FILE_TILE_SOURCE
+CHAMPLAIN_IS_FILE_TILE_SOURCE
+CHAMPLAIN_TYPE_FILE_TILE_SOURCE
+champlain_file_tile_source_get_type
+CHAMPLAIN_FILE_TILE_SOURCE_CLASS
+CHAMPLAIN_IS_FILE_TILE_SOURCE_CLASS
+CHAMPLAIN_FILE_TILE_SOURCE_GET_CLASS
+<SUBSECTION Private>
+ChamplainFileTileSourceClass
+ChamplainFileTileSourcePrivate
+</SECTION>
+
+<SECTION>
+<FILE>champlain-network-bbox-tile-source</FILE>
+<TITLE>ChamplainNetworkBboxTileSource</TITLE>
+ChamplainNetworkBboxTileSource
+champlain_network_bbox_tile_source_new_full
+champlain_network_bbox_tile_source_load_map_data
+champlain_network_bbox_tile_source_get_api_uri
+champlain_network_bbox_tile_source_set_api_uri
+<SUBSECTION Standard>
+CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE
+CHAMPLAIN_IS_NETWORK_BBOX_TILE_SOURCE
+CHAMPLAIN_TYPE_NETWORK_BBOX_TILE_SOURCE
+champlain_network_bbox_tile_source_get_type
+CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE_CLASS
+CHAMPLAIN_IS_NETWORK_BBOX_TILE_SOURCE_CLASS
+CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE_GET_CLASS
+<SUBSECTION Private>
+ChamplainNetworkBboxTileSourceClass
+ChamplainNetworkBboxTileSourcePrivate
+</SECTION>
+
+<SECTION>
+<FILE>champlain-null-tile-source</FILE>
+<TITLE>ChamplainNullTileSource</TITLE>
+ChamplainNullTileSource
+champlain_null_tile_source_new_full
+<SUBSECTION Standard>
+CHAMPLAIN_NULL_TILE_SOURCE
+CHAMPLAIN_IS_NULL_TILE_SOURCE
+CHAMPLAIN_TYPE_NULL_TILE_SOURCE
+champlain_null_tile_source_get_type
+CHAMPLAIN_NULL_TILE_SOURCE_CLASS
+CHAMPLAIN_IS_NULL_TILE_SOURCE_CLASS
+CHAMPLAIN_NULL_TILE_SOURCE_GET_CLASS
+<SUBSECTION Private>
+ChamplainNullTileSourceClass
+ChamplainNullTileSourcePrivate
+</SECTION>
+
+<SECTION>
 <FILE>champlain-tile</FILE>
 <TITLE>ChamplainTile</TITLE>
+ChamplainRenderCallbackData
 ChamplainState
 ChamplainTile
 champlain_tile_new
@@ -235,6 +298,7 @@ champlain_tile_get_modified_time
 champlain_tile_set_content
 champlain_tile_set_etag
 champlain_tile_set_modified_time
+champlain_tile_display_content
 <SUBSECTION Standard>
 CHAMPLAIN_TILE
 CHAMPLAIN_IS_TILE
@@ -302,11 +366,9 @@ champlain_point_get_type
 <FILE>champlain-tile-cache</FILE>
 <TITLE>ChamplainTileCache</TITLE>
 ChamplainTileCache
-champlain_tile_cache_get_persistent
 champlain_tile_cache_store_tile
 champlain_tile_cache_refresh_tile_time
 champlain_tile_cache_on_tile_filled
-champlain_tile_cache_clean
 <SUBSECTION Standard>
 CHAMPLAIN_TILE_CACHE
 CHAMPLAIN_IS_TILE_CACHE
@@ -324,12 +386,11 @@ ChamplainTileCachePrivate
 <FILE>champlain-map-source-factory</FILE>
 <TITLE>ChamplainMapSourceFactory</TITLE>
 ChamplainMapSourceFactory
-ChamplainMapSourceDesc
-ChamplainMapSourceConstructor
 champlain_map_source_factory_dup_default
 champlain_map_source_factory_dup_list
 champlain_map_source_factory_create
 champlain_map_source_factory_create_cached_source
+champlain_map_source_factory_create_error_source
 champlain_map_source_factory_register
 CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK
 CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER
@@ -420,91 +481,6 @@ ChamplainSelectionLayerPrivate
 </SECTION>
 
 <SECTION>
-<FILE>champlain-memphis-tile-source</FILE>
-<TITLE>ChamplainMemphisTileSource</TITLE>
-ChamplainMemphisTileSource
-champlain_memphis_tile_source_new_full
-champlain_memphis_tile_source_load_rules
-champlain_memphis_tile_source_set_background_color
-champlain_memphis_tile_source_get_background_color
-champlain_memphis_tile_source_set_map_data_source
-champlain_memphis_tile_source_get_map_data_source
-champlain_memphis_tile_source_set_rule
-champlain_memphis_tile_source_get_rule
-champlain_memphis_tile_source_remove_rule
-champlain_memphis_tile_source_get_rule_ids
-<SUBSECTION Standard>
-CHAMPLAIN_MEMPHIS_TILE_SOURCE
-CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE
-CHAMPLAIN_TYPE_MEMPHIS_TILE_SOURCE
-champlain_memphis_tile_source_get_type
-CHAMPLAIN_MEMPHIS_TILE_SOURCE_CLASS
-CHAMPLAIN_IS_MEMPHIS_TILE_SOURCE_CLASS
-CHAMPLAIN_MEMPHIS_TILE_SOURCE_GET_CLASS
-<SUBSECTION Private>
-ChamplainMemphisTileSourceClass
-ChamplainMemphisTileSourcePrivate
-</SECTION>
-
-<SECTION>
-<FILE>champlain-map-data-source</FILE>
-<TITLE>ChamplainMapDataSource</TITLE>
-ChamplainMapDataSource
-champlain_map_data_source_get_map_data
-<SUBSECTION Standard>
-CHAMPLAIN_MAP_DATA_SOURCE
-CHAMPLAIN_IS_MAP_DATA_SOURCE
-CHAMPLAIN_TYPE_MAP_DATA_SOURCE
-champlain_map_data_source_get_type
-CHAMPLAIN_MAP_DATA_SOURCE_CLASS
-CHAMPLAIN_IS_MAP_DATA_SOURCE_CLASS
-CHAMPLAIN_MAP_DATA_SOURCE_GET_CLASS
-<SUBSECTION Private>
-ChamplainMapDataSourceClass
-ChamplainMapDataSourcePrivate
-</SECTION>
-
-<SECTION>
-<FILE>champlain-local-map-data-source</FILE>
-<TITLE>ChamplainLocalMapDataSource</TITLE>
-ChamplainLocalMapDataSource
-champlain_local_map_data_source_new
-champlain_local_map_data_source_load_map_data
-<SUBSECTION Standard>
-CHAMPLAIN_LOCAL_MAP_DATA_SOURCE
-CHAMPLAIN_IS_LOCAL_MAP_DATA_SOURCE
-CHAMPLAIN_TYPE_LOCAL_MAP_DATA_SOURCE
-champlain_local_map_data_source_get_type
-CHAMPLAIN_LOCAL_MAP_DATA_SOURCE_CLASS
-CHAMPLAIN_IS_LOCAL_MAP_DATA_SOURCE_CLASS
-CHAMPLAIN_LOCAL_MAP_DATA_SOURCE_GET_CLASS
-<SUBSECTION Private>
-ChamplainLocalMapDataSourceClass
-ChamplainLocalMapDataSourcePrivate
-</SECTION>
-
-<SECTION>
-<FILE>champlain-network-map-data-source</FILE>
-<TITLE>ChamplainNetworkMapDataSource</TITLE>
-ChamplainNetworkMapDataSource
-champlain_network_map_data_source_new
-champlain_network_map_data_source_load_map_data
-champlain_network_map_data_source_set_api_uri
-champlain_network_map_data_source_get_api_uri
-<SUBSECTION Standard>
-CHAMPLAIN_NETWORK_MAP_DATA_SOURCE
-CHAMPLAIN_IS_NETWORK_MAP_DATA_SOURCE
-CHAMPLAIN_TYPE_NETWORK_MAP_DATA_SOURCE
-champlain_network_map_data_source_get_type
-CHAMPLAIN_NETWORK_MAP_DATA_SOURCE_CLASS
-CHAMPLAIN_IS_NETWORK_MAP_DATA_SOURCE_CLASS
-CHAMPLAIN_NETWORK_MAP_DATA_SOURCE_GET_CLASS
-<SUBSECTION Private>
-ChamplainNetworkMapDataSourceClass
-ChamplainNetworkMapDataSourcePrivate
-</SECTION>
-
-<SECTION>
 <FILE>champlain-bounding-box</FILE>
 <TITLE>ChamplainBoundingBox</TITLE>
 ChamplainBoundingBox
@@ -566,28 +542,9 @@ ChamplainTileSourcePrivate
 </SECTION>
 
 <SECTION>
-<FILE>champlain-error-tile-source</FILE>
-<TITLE>ChamplainErrorTileSource</TITLE>
-ChamplainErrorTileSource
-champlain_error_tile_source_new_full
-<SUBSECTION Standard>
-CHAMPLAIN_ERROR_TILE_SOURCE
-CHAMPLAIN_IS_ERROR_TILE_SOURCE
-CHAMPLAIN_TYPE_ERROR_TILE_SOURCE
-champlain_error_tile_source_get_type
-CHAMPLAIN_ERROR_TILE_SOURCE_CLASS
-CHAMPLAIN_IS_ERROR_TILE_SOURCE_CLASS
-CHAMPLAIN_ERROR_TILE_SOURCE_GET_CLASS
-<SUBSECTION Private>
-ChamplainErrorTileSourceClass
-ChamplainErrorTileSourcePrivate
-</SECTION>
-
-<SECTION>
 <FILE>champlain-file-cache</FILE>
 <TITLE>ChamplainFileCache</TITLE>
 ChamplainFileCache
-champlain_file_cache_new
 champlain_file_cache_new_full
 champlain_file_cache_set_size_limit
 champlain_file_cache_get_size_limit
@@ -605,4 +562,112 @@ CHAMPLAIN_FILE_CACHE_GET_CLASS
 <SUBSECTION Private>
 ChamplainFileCacheClass
 ChamplainFileCachePrivate
+</SECTION>
+
+<SECTION>
+<FILE>champlain-memory-cache</FILE>
+<TITLE>ChamplainMemoryCache</TITLE>
+ChamplainMemoryCache
+champlain_memory_cache_new_full
+champlain_memory_cache_get_size_limit
+champlain_memory_cache_set_size_limit
+champlain_memory_cache_clean
+<SUBSECTION Standard>
+CHAMPLAIN_MEMORY_CACHE
+CHAMPLAIN_IS_MEMORY_CACHE
+CHAMPLAIN_TYPE_MEMORY_CACHE
+champlain_memory_cache_get_type
+CHAMPLAIN_MEMORY_CACHE_CLASS
+CHAMPLAIN_IS_MEMORY_CACHE_CLASS
+CHAMPLAIN_MEMORY_CACHE_GET_CLASS
+<SUBSECTION Private>
+ChamplainMemoryCacheClass
+ChamplainMemoryCachePrivate
+</SECTION>
+
+<SECTION>
+<FILE>champlain-renderer</FILE>
+<TITLE>ChamplainRenderer</TITLE>
+ChamplainRenderer
+champlain_renderer_set_data
+champlain_renderer_render
+<SUBSECTION Standard>
+CHAMPLAIN_RENDERER
+CHAMPLAIN_IS_RENDERER
+CHAMPLAIN_TYPE_RENDERER
+champlain_renderer_get_type
+CHAMPLAIN_RENDERER_CLASS
+CHAMPLAIN_IS_RENDERER_CLASS
+CHAMPLAIN_RENDERER_GET_CLASS
+<SUBSECTION Private>
+ChamplainRendererClass
+</SECTION>
+
+<SECTION>
+<FILE>champlain-error-tile-renderer</FILE>
+<TITLE>ChamplainErrorTileRenderer</TITLE>
+ChamplainErrorTileRenderer
+champlain_error_tile_renderer_new
+champlain_error_tile_renderer_set_tile_size
+champlain_error_tile_renderer_get_tile_size
+<SUBSECTION Standard>
+CHAMPLAIN_ERROR_TILE_RENDERER
+CHAMPLAIN_IS_ERROR_TILE_RENDERER
+CHAMPLAIN_TYPE_ERROR_TILE_RENDERER
+champlain_error_tile_renderer_get_type
+CHAMPLAIN_ERROR_TILE_RENDERER_CLASS
+CHAMPLAIN_IS_ERROR_TILE_RENDERER_CLASS
+CHAMPLAIN_ERROR_TILE_RENDERER_GET_CLASS
+<SUBSECTION Private>
+ChamplainErrorTileRendererClass
+ChamplainErrorTileRendererPrivate
+</SECTION>
+
+<SECTION>
+<FILE>champlain-image-renderer</FILE>
+<TITLE>ChamplainImageRenderer</TITLE>
+ChamplainImageRenderer
+champlain_image_renderer_new
+<SUBSECTION Standard>
+CHAMPLAIN_IMAGE_RENDERER
+CHAMPLAIN_IS_IMAGE_RENDERER
+CHAMPLAIN_TYPE_IMAGE_RENDERER
+champlain_image_renderer_get_type
+CHAMPLAIN_IMAGE_RENDERER_CLASS
+CHAMPLAIN_IS_IMAGE_RENDERER_CLASS
+CHAMPLAIN_IMAGE_RENDERER_GET_CLASS
+<SUBSECTION Private>
+ChamplainImageRendererClass
+ChamplainImageRendererPrivate
+</SECTION>
+
+<SECTION>
+<FILE>champlain-memphis-renderer</FILE>
+<TITLE>ChamplainMemphisRenderer</TITLE>
+ChamplainMemphisRenderer
+ChamplainMemphisRule
+ChamplainMemphisRuleAttr
+ChamplainMemphisRuleType
+champlain_memphis_renderer_new_full
+champlain_memphis_renderer_load_rules
+champlain_memphis_renderer_get_background_color
+champlain_memphis_renderer_set_background_color
+champlain_memphis_renderer_get_rule_ids
+champlain_memphis_renderer_set_rule
+champlain_memphis_renderer_get_rule
+champlain_memphis_renderer_remove_rule
+champlain_memphis_renderer_get_bounding_box
+champlain_memphis_renderer_set_tile_size
+champlain_memphis_renderer_get_tile_size
+<SUBSECTION Standard>
+CHAMPLAIN_MEMPHIS_RENDERER
+CHAMPLAIN_IS_MEMPHIS_RENDERER
+CHAMPLAIN_TYPE_MEMPHIS_RENDERER
+champlain_memphis_renderer_get_type
+CHAMPLAIN_MEMPHIS_RENDERER_CLASS
+CHAMPLAIN_IS_MEMPHIS_RENDERER_CLASS
+CHAMPLAIN_MEMPHIS_RENDERER_GET_CLASS
+<SUBSECTION Private>
+ChamplainMemphisRendererClass
+ChamplainMemphisRendererPrivate
 </SECTION>

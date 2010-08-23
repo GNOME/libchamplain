@@ -23,10 +23,10 @@
  * This map source simplifies creation of map chains by providing two
  * functions for their creation and modification in a stack-like manner:
  * champlain_map_source_chain_push() and champlain_map_source_chain_pop().
- * For instance, to create a chain consisting of #ChamplainFileCache,
- * #ChamplainNetworkTileSource and #ChamplainErrorTileSource, the map
+ * For instance, to create a chain consisting of #ChamplainMemoryCache, 
+ * #ChamplainFileCache and #ChamplainNetworkTileSource, the map
  * sources have to be pushed into the chain in the reverse order starting
- * from #ChamplainErrorTileSource. After its creation, #ChamplainMapSourceChain
+ * from #ChamplainNetworkTileSource. After its creation, #ChamplainMapSourceChain
  * behaves as a chain of map sources it contains.
  */
 

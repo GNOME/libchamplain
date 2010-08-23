@@ -344,6 +344,16 @@ champlain_tile_class_init (ChamplainTileClass *klass)
           FALSE,
           G_PARAM_READWRITE));
 
+  /**
+   * ChamplainTile::render-complete:
+   * @self: a #ChamplainTile
+   * @calback_data: a #ChamplainRenderCallbackData struct
+   * 
+   * The #ChamplainTile::render-complete signal is emitted when rendering of the tile is
+   * completed by the renderer.
+   *
+   * Since: 0.8
+   */
   champlain_tile_signals[RENDER_COMPLETE] =
     g_signal_new ("render-complete", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
@@ -705,7 +715,8 @@ champlain_tile_set_etag (ChamplainTile *self,
  * @self: the #ChamplainTile
  * @actor: the new content
  *
- * Sets the tile's content
+ * Sets the tile's content. To also disppay the tile, you have to call
+ * champlain_tile_display_content() in addition.
  *
  * Since: 0.4
  */
@@ -735,6 +746,14 @@ fade_in_completed (G_GNUC_UNUSED ClutterAnimation *animation, ChamplainTile *sel
 }
 
 
+/**
+ * champlain_tile_display_content:
+ * @self: the #ChamplainTile
+ *
+ * Displays the tile's content.
+ *
+ * Since: 0.8
+ */
 void
 champlain_tile_display_content (ChamplainTile *self)
 {

@@ -16,6 +16,14 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-error-tile-renderer
+ * @short_description: A renderer that renders error tiles independently of input data
+ *
+ * #ChamplainErrorTileRenderer always renders error tiles (tiles that indicate that the real tile could
+ * not be loaded) no matter what input data is used.
+ */
+
 #include "champlain-error-tile-renderer.h"
 #include <gdk/gdk.h>
 
@@ -119,6 +127,13 @@ champlain_error_tile_renderer_class_init (ChamplainErrorTileRendererClass *klass
   object_class->finalize = champlain_error_tile_renderer_finalize;
   object_class->dispose = champlain_error_tile_renderer_dispose;
 
+  /**
+   * ChamplainErrorTileRenderer:tile-size:
+   *
+   * The size of the rendered tile.
+   *
+   * Since: 0.8
+   */
   g_object_class_install_property (object_class,
       PROP_TILE_SIZE,
       g_param_spec_uint ("tile-size",
@@ -145,6 +160,16 @@ champlain_error_tile_renderer_init (ChamplainErrorTileRenderer *self)
 }
 
 
+/**
+ * champlain_error_tile_renderer_new:
+ * @tile_size: the size of the rendered error tile
+ *
+ * Constructor of a #ChamplainErrorTileRenderer.
+ *
+ * Returns: a constructed #ChamplainErrorTileRenderer
+ *
+ * Since: 0.8
+ */
 ChamplainErrorTileRenderer *
 champlain_error_tile_renderer_new (guint tile_size)
 {
@@ -155,6 +180,7 @@ champlain_error_tile_renderer_new (guint tile_size)
 static void
 set_data (ChamplainRenderer *renderer, const gchar *data, guint size)
 {
+  /* always render the error tile no matter what data is set */
 }
 
 
@@ -228,6 +254,15 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
 }
 
 
+/**
+ * champlain_error_tile_renderer_set_tile_size:
+ * @renderer: a #ChamplainErrorTileRenderer
+ * @size: the size of the rendered error tiles
+ *
+ * Sets the size of the rendered error tile.
+ *
+ * Since: 0.8
+ */
 void
 champlain_error_tile_renderer_set_tile_size (ChamplainErrorTileRenderer *renderer,
     guint size)
@@ -240,6 +275,16 @@ champlain_error_tile_renderer_set_tile_size (ChamplainErrorTileRenderer *rendere
 }
 
 
+/**
+ * champlain_error_tile_renderer_get_tile_size:
+ * @renderer: a #ChamplainErrorTileRenderer
+ *
+ * Gets the size of the rendered error tiles.
+ *
+ * Returns: the size of the rendered error tiles
+ *
+ * Since: 0.8
+ */
 guint
 champlain_error_tile_renderer_get_tile_size (ChamplainErrorTileRenderer *renderer)
 {

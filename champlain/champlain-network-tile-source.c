@@ -19,11 +19,11 @@
 
 /**
  * SECTION:champlain-network-tile-source
- * @short_description: A map source that downloads tiles from a web server
+ * @short_description: A map source that downloads tile data from a web server
  *
- * This object is specialized for map tiles that can be downloaded
+ * This class is specialized for map tiles that can be downloaded
  * from a web server.  This includes all web based map services such as
- * OpenStreetMap, Google Maps, Yahoo Maps and more.  This object contains
+ * OpenStreetMap, Google Maps, Yahoo Maps and more.  This class contains
  * all mechanisms necessary to download tiles.
  *
  * Some preconfigured network map sources are built-in this library,
@@ -288,7 +288,7 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
 }
 
 
-/*
+/**
  * champlain_network_tile_source_new_full:
  * @id: the map source's id
  * @name: the map source's name
@@ -299,10 +299,11 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
  * @tile_size: the map source's tile size (in pixels)
  * @projection: the map source's projection
  * @uri_format: the URI to fetch the tiles from, see #champlain_network_tile_source_set_uri_format
+ * @renderer: the #ChamplainRenderer used to render tiles
  *
  * Constructor of #ChamplainNetworkTileSource.
  *
- * Returns: a constructed #ChamplainNetworkTileSource
+ * Returns: a constructed #ChamplainNetworkTileSource object
  *
  * Since: 0.4
  */

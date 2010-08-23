@@ -70,31 +70,34 @@
       <title>Tile Sources</title>
       <xi:include href="xml/champlain-tile-source.xml"/>
       <xi:include href="xml/champlain-network-tile-source.xml"/>
-      <xi:include href="xml/champlain-error-tile-source.xml"/>
-      <xi:include href="xml/champlain-memphis-tile-source.xml"/>
+      <xi:include href="xml/champlain-null-tile-source.xml"/>
+      <xi:include href="xml/champlain-file-tile-source.xml"/>
+      <xi:include href="xml/champlain-network-bbox-tile-source.xml"/>
     </chapter>
     <chapter>
       <title>Tile Caches</title>
       <xi:include href="xml/champlain-tile-cache.xml"/>
       <xi:include href="xml/champlain-file-cache.xml"/>
+      <xi:include href="xml/champlain-memory-cache.xml"/>
+    </chapter>
+    <chapter>
+      <title>Renderers</title>
+      <xi:include href="xml/champlain-renderer.xml"/>
+      <xi:include href="xml/champlain-image-renderer.xml"/>
+      <xi:include href="xml/champlain-memphis-renderer.xml"/>
+      <xi:include href="xml/champlain-error-tile-renderer.xml"/>
     </chapter>
     <chapter>
       <title>Map Source Utilities</title>
       <xi:include href="xml/champlain-map-source-chain.xml"/>
       <xi:include href="xml/champlain-map-source-factory.xml"/>
-      <xi:include href="xml/champlain-map-source-desc.xml"/>
     </chapter>
   </part>
   <part>
-    <title>Map Data Source API Reference</title>
-    <xi:include href="xml/champlain-map-data-source.xml"/>
-    <xi:include href="xml/champlain-local-map-data-source.xml"/>
-    <xi:include href="xml/champlain-network-map-data-source.xml"/>
-    <xi:include href="xml/champlain-bounding-box.xml"/>
-  </part>
-  <part>
-    <title>Utility API Reference</title>
+    <title>Others</title>
     <xi:include href="xml/champlain-version.xml"/>
+    <xi:include href="xml/champlain-map-source-desc.xml"/>
+    <xi:include href="xml/champlain-bounding-box.xml"/>
   </part>
   
   <index>
@@ -119,5 +122,9 @@
 
   <index role="0.6">
     <title>Index of new symbols in 0.6</title>
+  </index>
+
+  <index role="0.8">
+    <title>Index of new symbols in 0.8</title>
   </index>
 </book>

@@ -1277,7 +1277,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   /**
    * ChamplainView::animation-completed:
    *
-   * The ::animation-completed signal is emitted when any animation in the view
+   * The #ChamplainView::animation-completed signal is emitted when any animation in the view
    * ends.  This is a detailed signal.  For example, if you want to be signaled
    * only for go-to animation, you should connect to
    * "animation-completed::go-to".
@@ -2683,6 +2683,14 @@ remove_all_tiles (ChamplainView *view)
 }
 
 
+/**
+ * champlain_view_reload_tiles:
+ * @view: a #ChamplainView
+ *
+ * Reloads all visible tiles.
+ *
+ * Since: 0.8
+ */
 void
 champlain_view_reload_tiles (ChamplainView *view)
 {

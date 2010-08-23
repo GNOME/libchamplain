@@ -15,6 +15,14 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+/**
+ * SECTION:champlain-renderer
+ * @short_description: A base class of renderers
+ *
+ * A renderer is used to render tiles textures. A tile is rendered based on
+ * the provided data - this can be arbitrary data the given renderer understands
+ * (e.g. raw bitmap data, vector xml map representation and so on).
+ */
 
 #include "champlain-renderer.h"
 
@@ -47,6 +55,16 @@ champlain_renderer_class_init (ChamplainRendererClass *klass)
 }
 
 
+/**
+ * champlain_renderer_set_data:
+ * @renderer: a #ChamplainRenderer
+ * @data: data used for tile rendering
+ * @size: size of the data in bytes
+ *
+ * Sets the data which is used to render tiles by the renderer.
+ *
+ * Since: 0.8
+ */
 void
 champlain_renderer_set_data (ChamplainRenderer *renderer,
     const gchar *data,
@@ -58,6 +76,18 @@ champlain_renderer_set_data (ChamplainRenderer *renderer,
 }
 
 
+/**
+ * champlain_renderer_render:
+ * @renderer: a #ChamplainRenderer
+ * @tile: the tile to render
+ *
+ * Renders the texture for the provided tile and calls champlain_tile_set_content()
+ * to set the content of the tile. When the rendering is finished, the renderer
+ * emits the #ChamplainTile::render-complete signal. The tile has to be displayed manually by 
+ * calling champlain_tile_display_content().
+ *
+ * Since: 0.8
+ */
 void
 champlain_renderer_render (ChamplainRenderer *renderer,
     ChamplainTile *tile)

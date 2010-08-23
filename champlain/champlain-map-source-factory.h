@@ -50,9 +50,10 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_MAP_SOURCE_FACTORY_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, ChamplainMapSourceFactoryClass))
 
+typedef struct _ChamplainMapSourceFactoryPrivate ChamplainMapSourceFactoryPrivate;
+
 typedef struct _ChamplainMapSourceFactory ChamplainMapSourceFactory;
 typedef struct _ChamplainMapSourceFactoryClass ChamplainMapSourceFactoryClass;
-typedef struct _ChamplainMapSourceFactoryPrivate ChamplainMapSourceFactoryPrivate;
 
 struct _ChamplainMapSourceFactory
 {

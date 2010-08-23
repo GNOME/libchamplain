@@ -21,7 +21,7 @@
  * SECTION:champlain-file-cache
  * @short_description: Stores and loads cached tiles from the file system
  *
- * #ChamplainFileCache is a map source that stores and retrieves tiles from the
+ * #ChamplainFileCache is a cache that stores and retrieves tiles from the
  * file system. Tiles most frequently loaded gain in "popularity". This popularity
  * is taken into account when purging the cache.
  */
@@ -374,12 +374,13 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
  * @cache_dir: the directory where the cache is created. For temporary caches
  * one more directory with random name is created inside this directory.
  * When cache_dir == NULL, a cache in ~/.cache/champlain is used.
+ * @renderer: the #ChamplainRenderer used for tiles rendering
  *
  * Constructor of #ChamplainFileCache.
  *
  * Returns: a constructed #ChamplainFileCache
  *
- * Since: 0.6
+ * Since: 0.8
  */
 ChamplainFileCache *
 champlain_file_cache_new_full (guint size_limit,

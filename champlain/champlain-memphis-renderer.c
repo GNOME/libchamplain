@@ -17,19 +17,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/*
- * SECTION:champlain-memphis-tile-source
- * @short_description: A map source that draws tiles locally
+/**
+ * SECTION:champlain-memphis-renderer
+ * @short_description: A renderer that renders tiles from OSM vector XML data
  *
  * The #ChamplainMemphisRenderer uses the rendering library
  * <ulink role="online-location" url="https://trac.openstreetmap.ch/trac/memphis/">
- * LibMemphis</ulink> to draw <ulink role="online-location" url="http://www.openstreetmap.org/">
+ * LibMemphis</ulink> to render tiles based on <ulink role="online-location" url="http://www.openstreetmap.org/">
  * OpenStreetMap</ulink> data. Tiles are rendered in separate threads.
  * It supports zoom levels 12 to 18.
- *
- * The map data is supplied by a #ChamplainMapDataSource.
- * #ChamplainLocalMapDataSource loads data from a local OSM file.
- * #ChamplainNetworkMapDataSource uses the OSM API to download data chunks.
  *
  * The output of the renderer can be configured with a Memphis rules XML file.
  * (TODO: link to the specification) The default rules only show
@@ -229,12 +225,12 @@ champlain_memphis_renderer_class_init (ChamplainMemphisRendererClass *klass)
           256,
           G_PARAM_READWRITE));
 
-  /*
-   * ChamplainMapDataSource:bounding-box:
+  /**
+   * ChamplainMemphisRenderer:bounding-box:
    *
    * The bounding box of the area that contains map data.
    *
-   * Since: 0.6
+   * Since: 0.8
    */
   g_object_class_install_property (object_class,
       PROP_BOUNDING_BOX,
@@ -266,6 +262,16 @@ champlain_memphis_renderer_init (ChamplainMemphisRenderer *renderer)
 }
 
 
+/**
+ * champlain_memphis_renderer_new_full:
+ * @tile_size: the size of the rendered error tile
+ *
+ * Constructor of a #ChamplainMemphisRenderer.
+ *
+ * Returns: a constructed #ChamplainMemphisRenderer object
+ *
+ * Since: 0.8
+ */
 ChamplainMemphisRenderer *
 champlain_memphis_renderer_new_full (guint tile_size)
 {
@@ -472,14 +478,14 @@ set_data (ChamplainRenderer *renderer,
 }
 
 
-/*
+/**
  * champlain_memphis_renderer_load_rules:
  * @renderer: a #ChamplainMemphisRenderer
  * @rules_path: a path to a rules file
  *
  * Loads a Memphis rules file.
  *
- * Since: 0.6
+ * Since: 0.8
  */
 void
 champlain_memphis_renderer_load_rules (
@@ -520,7 +526,7 @@ champlain_memphis_renderer_load_rules (
 }
 
 
-/*
+/**
  * champlain_memphis_renderer_get_background_color:
  * @renderer: a #ChamplainMemphisRenderer
  *
@@ -529,7 +535,7 @@ champlain_memphis_renderer_load_rules (
  * Returns: the background color of the map as a newly-allocated
  * #ClutterColor.
  *
- * Since: 0.6
+ * Since: 0.8
  */
 ClutterColor *
 champlain_memphis_renderer_get_background_color (
@@ -552,14 +558,14 @@ champlain_memphis_renderer_get_background_color (
 }
 
 
-/*
+/**
  * champlain_memphis_renderer_set_background_color:
  * @renderer: a #ChamplainMemphisRenderer
  * @color: a #ClutterColor
  *
  * Sets the background color of the map from a #ClutterColor.
  *
- * Since: 0.6
+ * Since: 0.8
  */
 void
 champlain_memphis_renderer_set_background_color (
@@ -575,15 +581,15 @@ champlain_memphis_renderer_set_background_color (
 }
 
 
-/*
+/**
  * champlain_memphis_renderer_set_rule:
  * @renderer: a #ChamplainMemphisRenderer
- * @rule: a #MemphisRule
+ * @rule: a #ChamplainMemphisRule
  *
  * Edits or adds a #ChamplainMemphisRule to the rules-set. New rules are appended
- *  to the list.
+ * to the list.
  *
- * Since: 0.6
+ * Since: 0.8
  */
 void
 champlain_memphis_renderer_set_rule (ChamplainMemphisRenderer *renderer,
@@ -598,7 +604,7 @@ champlain_memphis_renderer_set_rule (ChamplainMemphisRenderer *renderer,
 }
 
 
-/*
+/**
  * champlain_memphis_renderer_get_rule:
  * @renderer: a #ChamplainMemphisRenderer
  * @id: an id string
@@ -607,7 +613,7 @@ champlain_memphis_renderer_set_rule (ChamplainMemphisRenderer *renderer,
  *
  * Returns: the requested #ChamplainMemphisRule or NULL if none is found.
  *
- * Since: 0.6
+ * Since: 0.8
  */
 ChamplainMemphisRule *
 champlain_memphis_renderer_get_rule (ChamplainMemphisRenderer *renderer,
@@ -626,7 +632,7 @@ champlain_memphis_renderer_get_rule (ChamplainMemphisRenderer *renderer,
 }
 
 
-/*
+/**
  * champlain_memphis_renderer_get_rule_ids:
  * @renderer: a #ChamplainMemphisRenderer
  *
@@ -637,7 +643,7 @@ champlain_memphis_renderer_get_rule (ChamplainMemphisRenderer *renderer,
  *
  * Example: "waterway:river|stream|canal"
  *
- * Since: 0.6
+ * Since: 0.8
  */
 GList *
 champlain_memphis_renderer_get_rule_ids (ChamplainMemphisRenderer *renderer)
@@ -654,14 +660,14 @@ champlain_memphis_renderer_get_rule_ids (ChamplainMemphisRenderer *renderer)
 }
 
 
-/*
+/**
  * champlain_memphis_renderer_remove_rule:
  * @renderer: a #ChamplainMemphisRenderer
  * @id: an id string
  *
  * Removes the rule with the given id.
  *
- * Since: 0.6
+ * Since: 0.8
  */
 void
 champlain_memphis_renderer_remove_rule (
@@ -676,6 +682,15 @@ champlain_memphis_renderer_remove_rule (
 }
 
 
+/**
+ * champlain_memphis_renderer_set_tile_size:
+ * @renderer: a #ChamplainMemphisRenderer
+ * @size: the size of the rendered tiles
+ *
+ * Sets the size of the rendered tiles.
+ *
+ * Since: 0.8
+ */
 void
 champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *renderer,
     guint size)
@@ -694,6 +709,16 @@ champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *renderer,
 }
 
 
+/**
+ * champlain_memphis_renderer_get_tile_size:
+ * @renderer: a #ChamplainMemphisRenderer
+ *
+ * Gets the size of the rendered tiles.
+ *
+ * Returns: the size of the rendered tiles
+ *
+ * Since: 0.8
+ */
 guint
 champlain_memphis_renderer_get_tile_size (ChamplainMemphisRenderer *renderer)
 {
@@ -703,6 +728,16 @@ champlain_memphis_renderer_get_tile_size (ChamplainMemphisRenderer *renderer)
 }
 
 
+/**
+ * champlain_memphis_renderer_get_bounding_box:
+ * @renderer: a #ChamplainMemphisRenderer
+ *
+ * Gets the bounding box of the area for which map data is available.
+ *
+ * Returns: the bounding box
+ *
+ * Since: 0.8
+ */
 ChamplainBoundingBox *
 champlain_memphis_renderer_get_bounding_box (ChamplainMemphisRenderer *renderer)
 {

@@ -373,8 +373,8 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  * Creates a cached map source.
  *
  * Returns: a ready to use #ChamplainMapSourceChain consisting of
- * #ChamplainFileCache, #ChamplainMapSource matching the given name, and
- * #ChamplainErrorTileSource.
+ * #ChamplainMemoryCache, #ChamplainFileCache, #ChamplainMapSource matching the given name, and
+ * an error tile source created with champlain_map_source_factory_create_error_source ().
  *
  * Since: 0.6
  */
@@ -411,6 +411,17 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
 }
 
 
+/**
+ * champlain_map_source_factory_create_error_source:
+ * @factory: the Factory
+ * @tile_size: the size of the error tile
+ *
+ * Creates a map source generating error tiles.
+ *
+ * Returns: a ready to use map source generating error tiles.
+ *
+ * Since: 0.8
+ */
 ChamplainMapSource *
 champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *factory,
     guint tile_size)

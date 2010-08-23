@@ -45,17 +45,20 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainNetworkBboxTileSourcePrivate ChamplainNetworkBboxTileSourcePrivate;
 
-typedef struct
+typedef struct _ChamplainNetworkBboxTileSource ChamplainNetworkBboxTileSource;
+typedef struct _ChamplainNetworkBboxTileSourceClass ChamplainNetworkBboxTileSourceClass;
+
+struct _ChamplainNetworkBboxTileSource
 {
   ChamplainTileSource parent;
 
   ChamplainNetworkBboxTileSourcePrivate *priv;
-} ChamplainNetworkBboxTileSource;
+};
 
-typedef struct
+struct _ChamplainNetworkBboxTileSourceClass
 {
   ChamplainTileSourceClass parent_class;
-} ChamplainNetworkBboxTileSourceClass;
+};
 
 GType champlain_network_bbox_tile_source_get_type (void);
 

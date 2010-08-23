@@ -50,22 +50,60 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainMemphisRendererPrivate ChamplainMemphisRendererPrivate;
 
-typedef struct
-{
-  ChamplainRenderer parent;
-
-  ChamplainMemphisRendererPrivate *priv;
-} ChamplainMemphisRenderer;
-
-typedef struct
-{
-  ChamplainRendererClass parent_class;
-} ChamplainMemphisRendererClass;
-
+typedef struct _ChamplainMemphisRenderer ChamplainMemphisRenderer;
+typedef struct _ChamplainMemphisRendererClass ChamplainMemphisRendererClass;
 
 typedef struct _ChamplainMemphisRule ChamplainMemphisRule;
 typedef struct _ChamplainMemphisRuleAttr ChamplainMemphisRuleAttr;
 
+/**
+ * ChamplainMemphisRuleType:
+ * @CHAMPLAIN_MEMPHIS_RULE_TYPE_UNKNOWN: MEMPHIS_RULE_TYPE_UNKNOWN
+ * @CHAMPLAIN_MEMPHIS_RULE_TYPE_NODE: MEMPHIS_RULE_TYPE_NODE
+ * @CHAMPLAIN_MEMPHIS_RULE_TYPE_WAY: MEMPHIS_RULE_TYPE_WAY
+ * @CHAMPLAIN_MEMPHIS_RULE_TYPE_RELATION: MEMPHIS_RULE_TYPE_RELATION
+ * 
+ * A wrapper of the MemphisRuleType union. For details see the libmemphis 
+ * documentation.
+ *
+ * Since: 0.8
+ */
+typedef enum
+{
+  CHAMPLAIN_MEMPHIS_RULE_TYPE_UNKNOWN,
+  CHAMPLAIN_MEMPHIS_RULE_TYPE_NODE,
+  CHAMPLAIN_MEMPHIS_RULE_TYPE_WAY,
+  CHAMPLAIN_MEMPHIS_RULE_TYPE_RELATION
+} ChamplainMemphisRuleType;
+
+struct _ChamplainMemphisRenderer
+{
+  ChamplainRenderer parent;
+
+  ChamplainMemphisRendererPrivate *priv;
+};
+
+struct _ChamplainMemphisRendererClass
+{
+  ChamplainRendererClass parent_class;
+};
+
+/**
+ * ChamplainMemphisRuleAttr:
+ * @z_min: z_min
+ * @z_max: z_max
+ * @color_red: color_red
+ * @color_green: color_green
+ * @color_blue: color_blue
+ * @color_alpha: color_alpha
+ * @style: style
+ * @size: size
+ * 
+ * A wrapper of the MemphisRuleAttr structure. For details see the libmemphis 
+ * documentation.
+ *
+ * Since: 0.8
+ */
 struct _ChamplainMemphisRuleAttr
 {
   guint8 z_min;
@@ -78,14 +116,21 @@ struct _ChamplainMemphisRuleAttr
   gdouble size;
 };
 
-typedef enum
-{
-  CHAMPLAIN_MEMPHIS_RULE_TYPE_UNKNOWN,
-  CHAMPLAIN_MEMPHIS_RULE_TYPE_NODE,
-  CHAMPLAIN_MEMPHIS_RULE_TYPE_WAY,
-  CHAMPLAIN_MEMPHIS_RULE_TYPE_RELATION
-} ChamplainMemphisRuleType;
-
+/**
+ * ChamplainMemphisRule:
+ * @keys: keys
+ * @values: values
+ * @type: type
+ * @polygon: polygon
+ * @line: line
+ * @border: border
+ * @text: text
+ * 
+ * A wrapper of the MemphisRule structure. For details see the libmemphis 
+ * documentation.
+ *
+ * Since: 0.8
+ */
 struct _ChamplainMemphisRule
 {
   gchar **keys;
@@ -129,10 +174,10 @@ void champlain_memphis_renderer_remove_rule (
 
 ChamplainBoundingBox *champlain_memphis_renderer_get_bounding_box (ChamplainMemphisRenderer *renderer);
 
-void champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *self,
+void champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *renderer,
     guint size);
 
-guint champlain_memphis_renderer_get_tile_size (ChamplainMemphisRenderer *self);
+guint champlain_memphis_renderer_get_tile_size (ChamplainMemphisRenderer *renderer);
 
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 

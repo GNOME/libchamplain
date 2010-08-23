@@ -44,28 +44,16 @@ FIXXREF_OPTIONS=
 # Used for dependencies. The docs will be rebuilt if any of these change.
 # e.g. HFILE_GLOB=$(top_srcdir)/gtk/*.h
 # e.g. CFILE_GLOB=$(top_srcdir)/gtk/*.c
-HFILE_GLOB=
-CFILE_GLOB=
+HFILE_GLOB=$(top_srcdir)/champlain/*.h
+CFILE_GLOB=$(top_srcdir)/champlain/*.c
 
 # Extra header to include when scanning, which are not under DOC_SOURCE_DIR
 # e.g. EXTRA_HFILES=$(top_srcdir}/contrib/extra.h
 EXTRA_HFILES=
 
-if ENABLE_MEMPHIS
-ignored_headers=
-else
-ignored_headers= \
-	champlain-memphis.h \
-	champlain-memphis-tile-source.h \
-	champlain-map-data-source.h \
-	champlain-local-map-data-source.h \
-	champlain-network-map-data-source.h \
-	champlain-bounding-box.h 
-endif
-
 # Header files to ignore when scanning. Use base file name, no paths
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES= $(ignored_headers) champlain-debug.h champlain-enum-types.h champlain-private.h \
+IGNORE_HFILES= champlain-debug.h champlain-enum-types.h champlain-private.h \
 	champlain.h champlain-marshal.h champlain-defines.h champlain-features.h
 
 # Images to copy into HTML directory.

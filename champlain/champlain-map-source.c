@@ -38,15 +38,16 @@
 
  * To undertand the concept of chains, consider for instance a chain
  * consisting of #ChamplainFileCache whose next source is
- * #ChamplainNetworkTileSource whose next source is #ChamplainErrorTileSource.
+ * #ChamplainNetworkTileSource whose next source is an error tile source
+ * created with champlain_map_source_factory_create_error_source ().
  * When champlain_map_source_fill_tile() is called on the first object of the
  * chain, #ChamplainFileCache, the cache checks whether it contains the
  * requested tile in its database. If it does, it returns the tile; otherwise,
  * it calls champlain_map_source_fill_tile() on the next source in the chain
  * (#ChamplainNetworkTileSource). The network tile source loads the tile
  * from the network. When successful, it returns the tile; otherwise it requests
- * the tile from the next source in the chain (#ChamplainErrorTileSource).
- * #ChamplainErrorTileSource always generates an error tile, no matter what
+ * the tile from the next source in the chain (error tile source).
+ * The error tile source always generates an error tile, no matter what
  * its next source is.
  */
 
@@ -202,7 +203,7 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
   /**
    * ChamplainMapSource:renderer:
    *
-   * Renderer used to render tiles.
+   * Renderer used for tiles rendering.
    *
    * Since: 0.8
    */
@@ -250,7 +251,7 @@ champlain_map_source_get_next_source (ChamplainMapSource *map_source)
  * champlain_map_source_get_renderer:
  * @map_source: a #ChamplainMapSource
  *
- * Get the renderer used to render tiles.
+ * Get the renderer used for tiles rendering.
  *
  * Returns: the renderer.
  *
@@ -301,9 +302,9 @@ champlain_map_source_set_next_source (ChamplainMapSource *map_source,
 /**
  * champlain_map_source_set_renderer:
  * @map_source: a #ChamplainMapSource
- * @renderer: the renderer used for tile rendering
+ * @renderer: the renderer
  *
- * Sets the renderer used to render tiles.
+ * Sets the renderer used for tiles rendering.
  *
  * Since: 0.8
  */

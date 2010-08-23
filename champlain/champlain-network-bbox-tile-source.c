@@ -17,16 +17,16 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/*
- * SECTION:champlain-network-map-data-source
- * @short_description: Downloads map data for #ChamplainMemphisTileSource
+/**
+ * SECTION:champlain-network-bbox-tile-source
+ * @short_description: A map source that loads tile data from an OpenStreetMap API
+ * server
  *
- * This map data source downloads the map data from an OpenStreetMap API
+ * This map source source downloads the map data from an OpenStreetMap API
  * server. It supports protocol version 0.5 and 0.6.
  *
  * <ulink role="online-location" url="http://wiki.openstreetmap.org/wiki/API">
  * http://wiki.openstreetmap.org/wiki/API</ulink>
- *
  */
 
 #include "champlain-network-bbox-tile-source.h"
@@ -183,12 +183,12 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
   ChamplainMapSourceClass *map_source_class = CHAMPLAIN_MAP_SOURCE_CLASS (klass);
   map_source_class->fill_tile = fill_tile;
 
-  /*
+  /**
    * ChamplainNetworkBboxTileSource:api-uri:
    *
    * The URI of an OpenStreetMap API server
    *
-   * Since: 0.6
+   * Since: 0.8
    */
   g_object_class_install_property (object_class,
       PROP_API_URI,
@@ -198,12 +198,12 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
           "http://www.informationfreeway.org/api/0.6",
           G_PARAM_READWRITE));
 
-  /*
+  /**
    * ChamplainNetworkBboxTileSource:proxy-uri:
    *
    * The proxy URI to use to access network
    *
-   * Since: 0.6
+   * Since: 0.8
    */
   g_object_class_install_property (object_class,
       PROP_PROXY_URI,
@@ -213,13 +213,13 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
           "",
           G_PARAM_READWRITE));
 
-  /*
-  * ChamplainMapDataSource:state:
+  /**
+  * ChamplainNetworkBboxTileSource:state:
   *
-  * The map data source's state. Useful to know if the data source is loading
+  * The map source's state. Useful to know if the data source is loading
   * or not.
   *
-  * Since: 0.6
+  * Since: 0.8
   */
   g_object_class_install_property (object_class,
        PROP_STATE,
@@ -256,16 +256,24 @@ champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
 }
 
 
-/*
- * champlain_network_bbox_tile_source_new:
+/**
+ * champlain_network_bbox_tile_source_new_full:
+ * @id: the map source's id
+ * @name: the map source's name
+ * @license: the map source's license
+ * @license_uri: the map source's license URI
+ * @min_zoom: the map source's minimum zoom level
+ * @max_zoom: the map source's maximum zoom level
+ * @tile_size: the map source's tile size (in pixels)
+ * @projection: the map source's projection
+ * @renderer: the #ChamplainRenderer used to render tiles
  *
- * Creates an instance of #ChamplainNetworkBboxTileSource.
+ * Constructor of #ChamplainNetworkBboxTileSource.
  *
- * Returns: a new #ChamplainNetworkBboxTileSource
+ * Returns: a constructed #ChamplainNetworkBboxTileSource object
  *
- * Since: 0.6
+ * Since: 0.8
  */
-
 ChamplainNetworkBboxTileSource *
 champlain_network_bbox_tile_source_new_full (const gchar *id,
     const gchar *name,
@@ -316,7 +324,7 @@ load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
 }
 
 
-/*
+/**
  * champlain_network_bbox_tile_source_load_map_data:
  * @map_data_source: a #ChamplainNetworkBboxTileSource
  * @bound_left: the left bound in degree
@@ -332,7 +340,7 @@ load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
  * url="http://api.openstreetmap.org/api/capabilities">
  * http://api.openstreetmap.org/api/capabilities</ulink>
  *
- * Since: 0.6
+ * Since: 0.8
  */
 void
 champlain_network_bbox_tile_source_load_map_data (
@@ -435,7 +443,7 @@ fill_tile (ChamplainMapSource *map_source,
 }
 
 
-/*
+/**
  * champlain_network_bbox_tile_source_get_api_uri:
  * @map_data_source: a #ChamplainNetworkBboxTileSource
  *
@@ -443,7 +451,7 @@ fill_tile (ChamplainMapSource *map_source,
  *
  * Returns: the URI of the API server.
  *
- * Since: 0.6
+ * Since: 0.8
  */
 const gchar *
 champlain_network_bbox_tile_source_get_api_uri (
@@ -455,14 +463,14 @@ champlain_network_bbox_tile_source_get_api_uri (
 }
 
 
-/*
+/**
  * champlain_network_bbox_tile_source_set_api_uri:
  * @map_data_source: a #ChamplainNetworkBboxTileSource
  * @api_uri: an URI of an API server
  *
  * Sets the URI of the API server.
  *
- * Since: 0.6
+ * Since: 0.8
  */
 void
 champlain_network_bbox_tile_source_set_api_uri (

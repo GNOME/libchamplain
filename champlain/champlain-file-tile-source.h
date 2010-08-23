@@ -49,15 +49,18 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainFileTileSourcePrivate ChamplainFileTileSourcePrivate;
 
-typedef struct
+typedef struct _ChamplainFileTileSource ChamplainFileTileSource;
+typedef struct _ChamplainFileTileSourceClass ChamplainFileTileSourceClass;
+
+struct _ChamplainFileTileSource
 {
   ChamplainTileSource parent;
-} ChamplainFileTileSource;
+};
 
-typedef struct
+struct _ChamplainFileTileSourceClass
 {
   ChamplainTileSourceClass parent_class;
-} ChamplainFileTileSourceClass;
+};
 
 GType champlain_file_tile_source_get_type (void);
 
@@ -72,7 +75,7 @@ ChamplainFileTileSource *champlain_file_tile_source_new_full (const gchar *id,
     ChamplainRenderer *renderer);
 
 void champlain_file_tile_source_load_map_data (
-    ChamplainFileTileSource *map_data_source,
+    ChamplainFileTileSource *self,
     const gchar *map_path);
 
 G_END_DECLS

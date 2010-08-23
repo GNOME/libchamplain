@@ -16,6 +16,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-null-tile-source
+ * @short_description: A tile source that doesn't load map data from anywhere
+ *
+ * This map source does not provide any input data to the associated renderer.
+ * This can be useful in situations when the tile can be rendered independently
+ * of any input such as in the case of the #ChamplainErrorTileRenderer.
+ */
+
 #include "champlain-null-tile-source.h"
 
 #include "champlain-debug.h"
@@ -63,6 +72,16 @@ champlain_null_tile_source_init (ChamplainNullTileSource *self)
 }
 
 
+/**
+ * champlain_null_tile_source_new_full:
+ * @renderer: the #ChamplainRenderer used to render tiles
+ *
+ * Constructor of #ChamplainNullTileSource.
+ *
+ * Returns: a constructed #ChamplainNullTileSource object
+ *
+ * Since: 0.8
+ */
 ChamplainNullTileSource *
 champlain_null_tile_source_new_full (ChamplainRenderer *renderer)
 {

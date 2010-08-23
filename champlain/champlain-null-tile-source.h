@@ -48,15 +48,18 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainNullTileSourcePrivate ChamplainNullTileSourcePrivate;
 
-typedef struct
+typedef struct _ChamplainNullTileSource ChamplainNullTileSource;
+typedef struct _ChamplainNullTileSourceClass ChamplainNullTileSourceClass;
+
+struct _ChamplainNullTileSource
 {
   ChamplainTileSource parent;
-} ChamplainNullTileSource;
+};
 
-typedef struct
+struct _ChamplainNullTileSourceClass
 {
   ChamplainTileSourceClass parent_class;
-} ChamplainNullTileSourceClass;
+};
 
 GType champlain_null_tile_source_get_type (void);
 

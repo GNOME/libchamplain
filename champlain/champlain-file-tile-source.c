@@ -17,14 +17,13 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/*
- * SECTION:champlain-local-map-data-source
- * @short_description: Loads local map data for #ChamplainMemphisTileSource
+/**
+ * SECTION:champlain-file-tile-source
+ * @short_description: A map source that loads tile data from a file
  *
- * This map data source loads local <ulink role="online-location"
+ * This tile source loads local <ulink role="online-location"
  * url="http://wiki.openstreetmap.org/wiki/.osm">
  * OpenStreetMap XML data files</ulink> (*.osm).
- *
  */
 
 #include "champlain-file-tile-source.h"
@@ -73,14 +72,23 @@ champlain_file_tile_source_init (ChamplainFileTileSource *self)
 }
 
 
-/*
- * champlain_file_tile_source_new:
+/**
+ * champlain_file_tile_source_new_full:
+ * @id: the map source's id
+ * @name: the map source's name
+ * @license: the map source's license
+ * @license_uri: the map source's license URI
+ * @min_zoom: the map source's minimum zoom level
+ * @max_zoom: the map source's maximum zoom level
+ * @tile_size: the map source's tile size (in pixels)
+ * @projection: the map source's projection
+ * @renderer: the #ChamplainRenderer used to render tiles
  *
- * Creates a new instance of #ChamplainFileTileSource.
+ * Constructor of #ChamplainFileTileSource.
  *
- * Returns: a new #ChamplainFileTileSource.
+ * Returns: a constructed #ChamplainFileTileSource object
  *
- * Since: 0.6
+ * Since: 0.8
  */
 ChamplainFileTileSource *
 champlain_file_tile_source_new_full (const gchar *id,
@@ -110,14 +118,14 @@ champlain_file_tile_source_new_full (const gchar *id,
 }
 
 
-/*
+/**
  * champlain_file_tile_source_load_map_data:
- * @map_data_source: a #ChamplainFileTileSource
+ * @self: a #ChamplainFileTileSource
  * @map_path: a path to a map data file
  *
  * Loads the OpenStreetMap XML file at the given path.
  *
- * Since: 0.6
+ * Since: 0.8
  */
 void
 champlain_file_tile_source_load_map_data (ChamplainFileTileSource *self,

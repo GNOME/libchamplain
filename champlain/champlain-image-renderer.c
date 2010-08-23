@@ -16,6 +16,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-image-renderer
+ * @short_description: A renderer that renders tiles from binary image data
+ *
+ * #ChamplainImageRenderer renders tiles from binary image data. The rendering
+ * is performed using #GdkPixbufLoader so the set of supported image
+ * formats is equal to the set of formats supported by #GdkPixbufLoader.
+ */
+
 #include "champlain-image-renderer.h"
 #include <gdk/gdk.h>
 
@@ -82,6 +91,15 @@ champlain_image_renderer_init (ChamplainImageRenderer *self)
 }
 
 
+/**
+ * champlain_image_renderer_new:
+ *
+ * Constructor of #ChamplainImageRenderer.
+ *
+ * Returns: a constructed #ChamplainImageRenderer object
+ *
+ * Since: 0.8
+ */
 ChamplainImageRenderer *
 champlain_image_renderer_new (void)
 {

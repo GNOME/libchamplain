@@ -16,6 +16,16 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-memory-cache
+ * @short_description: Stores and loads cached tiles from the memory
+ *
+ * #ChamplainMemoryCache is a cache that stores and retrieves tiles from the
+ * memory. The cache contents is not preserved between application restarts
+ * so this cache serves mostly as a quick access temporary cache to the
+ * most recently used tiles. 
+ */
+
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_CACHE
 #include "champlain-debug.h"
 
@@ -138,18 +148,16 @@ champlain_memory_cache_class_init (ChamplainMemoryCacheClass *klass)
   object_class->get_property = champlain_memory_cache_get_property;
   object_class->set_property = champlain_memory_cache_set_property;
 
-  /*
+  /**
    * ChamplainMemoryCache:size-limit:
    *
-   * The cache size limit in bytes.
+   * The maximal number of tiles that are stored in the cache.
    *
-   * Note: this new value will not be applied until you call #champlain_cache_purge
-   *
-   * Since: 0.4
+   * Since: 0.8
    */
   pspec = g_param_spec_uint ("size-limit",
       "Size Limit",
-      "The cache's size limit (Mb)",
+      "Maximal number of stored tiles",
       1,
       G_MAXINT,
       100,
@@ -164,6 +172,17 @@ champlain_memory_cache_class_init (ChamplainMemoryCacheClass *klass)
 }
 
 
+/**
+ * champlain_memory_cache_new_full:
+ * @size_limit: maximal number of tiles stored in the cache
+ * @renderer: the #ChamplainRenderer used for tiles rendering
+ *
+ * Constructor of #ChamplainMemoryCache.
+ *
+ * Returns: a constructed #ChamplainMemoryCache
+ *
+ * Since: 0.8
+ */
 ChamplainMemoryCache *
 champlain_memory_cache_new_full (guint size_limit,
     ChamplainRenderer *renderer)
@@ -191,6 +210,16 @@ champlain_memory_cache_init (ChamplainMemoryCache *memory_cache)
 }
 
 
+/**
+ * champlain_memory_cache_get_size_limit:
+ * @memory_cache: a #ChamplainMemoryCache
+ *
+ * Gets the maximal number of tiles stored in the cache.
+ *
+ * Returns: maximal number of stored tiles
+ *
+ * Since: 0.8
+ */
 guint
 champlain_memory_cache_get_size_limit (ChamplainMemoryCache *memory_cache)
 {
@@ -200,6 +229,15 @@ champlain_memory_cache_get_size_limit (ChamplainMemoryCache *memory_cache)
 }
 
 
+/**
+ * champlain_memory_cache_set_size_limit:
+ * @memory_cache: a #ChamplainMemoryCache
+ * @size_limit: maximal number of tiles stored in the cache
+ *
+ * Sets the maximal number of tiles stored in the cache.
+ *
+ * Since: 0.8
+ */
 void
 champlain_memory_cache_set_size_limit (ChamplainMemoryCache *memory_cache,
     guint size_limit)
@@ -397,6 +435,14 @@ refresh_tile_time (ChamplainTileCache *tile_cache,
 }
 
 
+/**
+ * champlain_memory_cache_clean:
+ * @memory_cache: a #ChamplainMemoryCache
+ *
+ * Cleans the contents of the cache.
+ *
+ * Since: 0.8
+ */
 void
 champlain_memory_cache_clean (ChamplainMemoryCache *memory_cache)
 {

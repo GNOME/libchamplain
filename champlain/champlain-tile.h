@@ -46,11 +46,16 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainTilePrivate ChamplainTilePrivate;
 
+typedef struct _ChamplainTile ChamplainTile;
+typedef struct _ChamplainTileClass ChamplainTileClass;
+
 /**
  * ChamplainState:
  * @CHAMPLAIN_STATE_NONE: Initial or undefined state
  * @CHAMPLAIN_STATE_LOADING: Tile is loading
- * @CHAMPLAIN_STATE_DONE: Tile loading finished
+ * @CHAMPLAIN_STATE_LOADED: Tile is loaded but not yet displayed
+ * @CHAMPLAIN_STATE_DONE: Tile loading finished. Also used to inform map sources
+ *     that tile loading has been cancelled.
  *
  * Tile loading state.
  */
@@ -62,8 +67,22 @@ typedef enum
   CHAMPLAIN_STATE_DONE
 } ChamplainState;
 
-typedef struct _ChamplainTile ChamplainTile;
-typedef struct _ChamplainTileClass ChamplainTileClass;
+/**
+ * ChamplainRenderCallbackData:
+ * @error: TRUE if there was an error during tile rendering
+ * @data: the data used for tile rendering
+ * @size: the size of the data
+ *
+ * Used by the #ChamplainTile::render-complete signal.
+ *
+ * Since: 0.8
+ */
+struct _ChamplainRenderCallbackData
+{
+  gboolean error;
+  const gchar *data;
+  guint size;
+};
 
 struct _ChamplainTile
 {
@@ -75,16 +94,6 @@ struct _ChamplainTile
 struct _ChamplainTileClass
 {
   ClutterGroupClass parent_class;
-};
-
-typedef struct _ChamplainRenderCallbackData ChamplainRenderCallbackData;
-
-
-struct _ChamplainRenderCallbackData
-{
-  gboolean error;
-  const gchar *data;
-  guint size;
 };
 
 
