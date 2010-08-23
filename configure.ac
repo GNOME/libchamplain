@@ -5,8 +5,9 @@ m4_define([champlain_minor_version], [7])
 m4_define([champlain_micro_version], [0])
 m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
+m4_define([champlain_minor_api_version], [m4_eval(champlain_minor_version + champlain_minor_version%2)])
 m4_define([champlain_api_version],
-          [champlain_major_version.champlain_minor_version])
+          [champlain_major_version.champlain_minor_api_version])
 AC_PREREQ([2.64])
 AC_INIT([libchamplain],
         [champlain_version],
@@ -18,13 +19,12 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([-Wno-portability])
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 LT_PREREQ([2.2.6])
 LT_INIT([dlopen])
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
-
-ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 # Checks for programs.
 AC_PROG_CC
@@ -39,7 +39,7 @@ AM_PROG_CC_C_O
 # - If the interface is the same as the previous version, change to C:R+1:A
 LIBRARY_VERSION=0:0:0
 CHAMPLAIN_API_VERSION=champlain_api_version
-CHAMPLAIN_API_VERSION_NORM=champlain_major_version[_]champlain_minor_version
+CHAMPLAIN_API_VERSION_NORM=champlain_major_version[_]champlain_minor_api_version
 CHAMPLAIN_MAJOR_VERSION=champlain_major_version
 CHAMPLAIN_MINOR_VERSION=champlain_minor_version
 CHAMPLAIN_MICRO_VERSION=champlain_micro_version

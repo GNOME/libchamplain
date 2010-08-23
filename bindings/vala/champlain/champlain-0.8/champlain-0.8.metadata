@@ -7,3 +7,7 @@ champlain_view_get_coords_from_event.lon is_out="1"
 champlain_marker_new_with_text.font nullable="1"
 champlain_marker_new_with_text.text_color nullable="1"
 champlain_marker_new_with_text.marker_color nullable="1"
+
+champlain_bounding_box_get_center.lat is_out="1"
+champlain_bounding_box_get_center.lon is_out="1"
+

@@ -1,4 +1,4 @@
-../../../champlain/.libs/libchamplain-0.7.so
+../../../champlain/.libs/libchamplain-0.8.so
 ../../../champlain/champlain.h
 ../../../champlain/champlain-defines.h
 ../../../champlain/champlain-point.h
@@ -13,9 +13,16 @@
 ../../../champlain/champlain-tile-source.h
 ../../../champlain/champlain-tile-cache.h
 ../../../champlain/champlain-network-tile-source.h
-../../../champlain/champlain-error-tile-source.h
+../../../champlain/champlain-null-tile-source.h
+../../../champlain/champlain-file-tile-source.h
+../../../champlain/champlain-network-bbox-tile-source.h
 ../../../champlain/champlain-file-cache.h
+../../../champlain/champlain-memory-cache.h
+../../../champlain/champlain-renderer.h
+../../../champlain/champlain-image-renderer.h
+../../../champlain/champlain-error-tile-renderer.h
 ../../../champlain/champlain-map-source-factory.h
 ../../../champlain/champlain-map-source-desc.h
 ../../../champlain/champlain-polygon.h
 ../../../champlain/champlain-version.h
+../../../champlain/champlain-bounding-box.h
