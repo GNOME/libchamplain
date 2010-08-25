@@ -1,6 +1,6 @@
 SUBDIRS = tidy champlain
 
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 pcfiles = champlain-@CHAMPLAIN_API_VERSION@.pc
 other_pcfiles = champlain-@CHAMPLAIN_API_VERSION@-uninstalled.pc
