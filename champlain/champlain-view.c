@@ -2723,7 +2723,8 @@ tile_state_notify (ChamplainTile *tile,
     }
   else if (tile_state == CHAMPLAIN_STATE_DONE)
     {
-      priv->tiles_loading--;
+      if (priv->tiles_loading > 0)
+        priv->tiles_loading--;
       if (priv->tiles_loading == 0)
         {
           priv->state = CHAMPLAIN_STATE_DONE;
