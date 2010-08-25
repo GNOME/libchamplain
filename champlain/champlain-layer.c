@@ -123,11 +123,13 @@ champlain_layer_init (ChamplainLayer *self)
  * where the most north you are, the farther you are.
  */
 static void
-set_marker_depth(GObject *marker)
+set_marker_depth (GObject *marker)
 {
-  gdouble lat;
+  gdouble lat, z;
+  
   g_object_get (G_OBJECT (marker), "latitude", &lat, NULL);
-  clutter_actor_set_depth(CLUTTER_ACTOR(marker), 90.0 - lat);
+  z = (lat >= 0) ? 90.0 - lat : 90.0 + lat;
+  clutter_actor_set_depth (CLUTTER_ACTOR (marker), z);
 }
 
 
@@ -136,7 +138,7 @@ marker_position_notify (GObject *gobject,
     G_GNUC_UNUSED GParamSpec *pspec,
     gpointer user_data)
 {
-  set_marker_depth(gobject);
+  set_marker_depth (gobject);
 }
 
 
@@ -147,7 +149,7 @@ layer_add_cb (ClutterGroup *layer,
 {
   ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
 
-  set_marker_depth(G_OBJECT(actor));
+  set_marker_depth (G_OBJECT(actor));
 
   g_signal_connect (G_OBJECT (marker), "notify::latitude",
       G_CALLBACK (marker_position_notify), layer);
