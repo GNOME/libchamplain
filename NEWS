@@ -1,3 +1,25 @@
+libchamplain 0.7.1 (2010-08-26)
+===============================
+
+Unstable release
+Bindings have not been updated yet.
+
+Changes:
+* Fix #623043 champlain.pc file has too much requires (Laurent Bigonville)
+* Layer speedup by using clutter functions for marker ordering (Russell Strong)
+* Use the renderer to render cached tiles (Jiří Techet)
+* Fixed crashes caused by improper tile loading termination (Jiří Techet)
+* Fixed many memory leaks (Jiří Techet)
+* Use memory cache in addition to file cache by default (Jiří Techet)
+* Use memphis_renderer_tile_has_data() as it works with libmemphis 0.2.1 
+  (Jiří Techet)
+* On double click center to the clicked area (Jiří Techet)
+* Make ChamplainRenderer inherit from GInitiallyUnowned (Jiří Techet)
+* Access the elements in memory cache directly, not sequentially (Jiří Techet)
+* Updated documentation (Jiří Techet)
+* Use stable api version in soname also in development releases (Jiří Techet)
+* Minor fixes and cleanups (Jiří Techet)
+
 libchamplain 0.7.0 (2010-08-03)
 ===============================
 
@@ -92,6 +114,32 @@ Additions:
 * New map source infrastructure (à la Pipe and Filter) (Jiří Techet)
 * ChamplainPolygon and ChamplainMapSource inherit from GInitiallyUnowned
 
+libchamplain 0.4.7 (2010-08-20)
+===============================
+
+Stable release
+GObject-introspection, Python (Victor Godoy Poluceno), Perl
+(Emmanuel Rodriguez), Vala (Tomaž Vajngerl) bindings are in a working state.
+
+Changes:
+* In the previous release some generated python binding sources had zero size
+  which caused that the python bindings weren't working at all. This release
+  just repacks the distributed files correctly.
+
+libchamplain 0.4.6 (2010-06-01)
+===============================
+
+Stable release
+GObject-introspection, Python (Victor Godoy Poluceno), Perl
+(Emmanuel Rodriguez), Vala (Tomaž Vajngerl) bindings are in a working state.
+
+Changes:
+* Vala bindings (Tomaž Vajngerl)
+* Demo and fixes for Vala bindings (Simon Wenner)
+* Fix crash when rendering polygons (Jiří Techet)
+* Use a better mechanism for error tile (Rob Bradford)
+* Various minor fixes (Jiří Techet, Koop Mast)
+
 libchamplain 0.4.5 (2010-03-10)
 ===============================
 
@@ -132,23 +180,6 @@ Fixes:
   order (Jason Woofenden)
 * Limit the number of times notify::latitude and notify::longitude are emited
   (Pierre-Luc Beaudoin)
-
-libchamplain 0.4.3 (2010-01-09)
-===============================
-
-Additions:
-* A scale (Tollef Fog Heen and Pierre-Luc Beaudoin)
-* User configurable additional license text to view
-* An option to highligh points in Polygons (Andreas Henriksson)
-
-Fixes:
-* Also report as loading when validating the cache
-* Debian Bug #555082: fix linking with gold (Laurent Bigonville)
-* 604784: SIGSEGV in function cairo_set_operator
-* Fix segfault when polygon has been delete before redraw
-* Make queue_redraw visible to subclasses
-* Some memory usage improvements by reusing images already loaded
-* Don't eat clicks on the map when using ChamplainSelectionLayer
 
 libchamplain 0.4.3 (2010-01-09)
 ===============================
