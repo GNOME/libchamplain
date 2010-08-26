@@ -41,9 +41,8 @@
   </bookinfo>
 
   <part>
-    <title>Core API Reference</title>
+    <title>Basic API</title>
     <xi:include href="xml/champlain-view.xml"/>
-    <xi:include href="xml/champlain-tile.xml"/>
   </part>
   <part>
     <title>Layers, Markers and Polygons</title>
@@ -64,7 +63,7 @@
     </chapter>
   </part>
   <part>
-    <title>Map Source API Reference</title>
+    <title>Map Source API</title>
     <xi:include href="xml/champlain-map-source.xml"/>
     <chapter>
       <title>Tile Sources</title>
@@ -81,23 +80,24 @@
       <xi:include href="xml/champlain-memory-cache.xml"/>
     </chapter>
     <chapter>
-      <title>Renderers</title>
-      <xi:include href="xml/champlain-renderer.xml"/>
-      <xi:include href="xml/champlain-image-renderer.xml"/>
-      <xi:include href="xml/champlain-memphis-renderer.xml"/>
-      <xi:include href="xml/champlain-error-tile-renderer.xml"/>
-    </chapter>
-    <chapter>
       <title>Map Source Utilities</title>
       <xi:include href="xml/champlain-map-source-chain.xml"/>
       <xi:include href="xml/champlain-map-source-factory.xml"/>
     </chapter>
   </part>
   <part>
+    <title>Renderer API</title>
+    <xi:include href="xml/champlain-renderer.xml"/>
+    <xi:include href="xml/champlain-image-renderer.xml"/>
+    <xi:include href="xml/champlain-memphis-renderer.xml"/>
+    <xi:include href="xml/champlain-error-tile-renderer.xml"/>
+  </part>
+  <part>
     <title>Others</title>
-    <xi:include href="xml/champlain-version.xml"/>
+    <xi:include href="xml/champlain-tile.xml"/>
     <xi:include href="xml/champlain-map-source-desc.xml"/>
     <xi:include href="xml/champlain-bounding-box.xml"/>
+    <xi:include href="xml/champlain-version.xml"/>
   </part>
   
   <index>
