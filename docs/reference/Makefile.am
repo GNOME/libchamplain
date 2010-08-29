@@ -51,9 +51,15 @@ CFILE_GLOB=$(top_srcdir)/champlain/*.c
 # e.g. EXTRA_HFILES=$(top_srcdir}/contrib/extra.h
 EXTRA_HFILES=
 
+if ENABLE_MEMPHIS
+ignored_headers=
+else
+ignored_headers=champlain-memphis-renderer.h
+endif
+
 # Header files to ignore when scanning. Use base file name, no paths
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES= champlain-debug.h champlain-enum-types.h champlain-private.h \
+IGNORE_HFILES= $(ignored_headers) champlain-debug.h champlain-enum-types.h champlain-private.h \
 	champlain.h champlain-marshal.h champlain-defines.h champlain-features.h
 
 # Images to copy into HTML directory.
