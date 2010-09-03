@@ -1,135 +1,124 @@
+BUILT_SOURCES = champlain-version.h
+CLEANFILES = $(BUILT_SOURCES)
+DISTCLEANFILES =
+EXTRA_DIST = champlain-version.h.in
 
-BUILT_SOURCES = \
-	champlain-marshal.h \
-	champlain-marshal.c \
-	champlain-enum-types.h \
-	champlain-enum-types.c \
-	champlain-version.h \
-	champlain-features.h
+
+if ENABLE_MEMPHIS
+memphis_headers = \
+	$(srcdir)/champlain-memphis-renderer.h
+endif
+
+libchamplain_headers_public = 				\
+	$(memphis_headers)				\
+	$(srcdir)/champlain-version.h 			\
+	$(srcdir)/champlain.h 				\
+	$(srcdir)/champlain-defines.h			\
+	$(srcdir)/champlain-point.h			\
+	$(srcdir)/champlain-view.h			\
+	$(srcdir)/champlain-layer.h 			\
+	$(srcdir)/champlain-selection-layer.h 		\
+	$(srcdir)/champlain-base-marker.h		\
+	$(srcdir)/champlain-marker.h			\
+	$(srcdir)/champlain-tile.h			\
+	$(srcdir)/champlain-map-source.h		\
+	$(srcdir)/champlain-map-source-chain.h		\
+	$(srcdir)/champlain-tile-source.h		\
+	$(srcdir)/champlain-tile-cache.h		\
+	$(srcdir)/champlain-memory-cache.h		\
+	$(srcdir)/champlain-network-tile-source.h	\
+	$(srcdir)/champlain-file-cache.h		\
+	$(srcdir)/champlain-map-source-factory.h	\
+	$(srcdir)/champlain-map-source-desc.h		\
+	$(srcdir)/champlain-polygon.h			\
+	$(srcdir)/champlain-renderer.h			\
+	$(srcdir)/champlain-image-renderer.h		\
+	$(srcdir)/champlain-error-tile-renderer.h	\
+	$(srcdir)/champlain-file-tile-source.h		\
+	$(srcdir)/champlain-null-tile-source.h		\
+	$(srcdir)/champlain-network-bbox-tile-source.h	\
+	$(srcdir)/champlain-bounding-box.h
+
+libchamplain_headers_private =	\
+	$(srcdir)/champlain-debug.h	\
+	$(srcdir)/champlain-private.h
+
+
+if ENABLE_MEMPHIS
+memphis_sources =		\
+	$(srcdir)/champlain-memphis-renderer.c
+endif
+
+libchamplain_sources =					\
+	$(memphis_sources)				\
+	$(srcdir)/champlain-debug.c 			\
+	$(srcdir)/champlain-view.c 			\
+	$(srcdir)/champlain-layer.c 			\
+	$(srcdir)/champlain-selection-layer.c 		\
+	$(srcdir)/champlain-base-marker.c 		\
+	$(srcdir)/champlain-marker.c 			\
+	$(srcdir)/champlain-tile.c			\
+	$(srcdir)/champlain-map-source.c		\
+	$(srcdir)/champlain-map-source-chain.c		\
+	$(srcdir)/champlain-tile-source.c		\
+	$(srcdir)/champlain-tile-cache.c		\
+	$(srcdir)/champlain-memory-cache.c		\
+	$(srcdir)/champlain-network-tile-source.c	\
+	$(srcdir)/champlain-file-cache.c		\
+	$(srcdir)/champlain-map-source-factory.c	\
+	$(srcdir)/champlain-map-source-desc.c		\
+	$(srcdir)/champlain-point.c			\
+	$(srcdir)/champlain-polygon.c			\
+	$(srcdir)/champlain-renderer.c			\
+	$(srcdir)/champlain-image-renderer.c		\
+	$(srcdir)/champlain-error-tile-renderer.c	\
+	$(srcdir)/champlain-file-tile-source.c		\
+	$(srcdir)/champlain-null-tile-source.c		\
+	$(srcdir)/champlain-network-bbox-tile-source.c	\
+	$(srcdir)/champlain-bounding-box.c
 
 champlain-features.h: $(top_builddir)/config.status
 	$(AM_V_GEN) ( cd $(top_builddir) && ./config.status champlain/$@ )
 
-CLEANFILES = $(BUILT_SOURCES)
+BUILT_SOURCES += champlain-features.h
+CLEANFILES += champlain-features.h
 
-lib_LTLIBRARIES = libchamplain-@CHAMPLAIN_API_VERSION@.la
+# glib-genmarshal rules
+glib_marshal_list = champlain-marshal.list
+glib_marshal_prefix = _champlain_marshal
+include $(top_srcdir)/build/Makefile.am.marshal
 
-if ENABLE_MEMPHIS
-memphis_headers = \
-	champlain-memphis-renderer.h
-endif
+# glib-mkenums rules
+glib_enum_h = champlain-enum-types.h
+glib_enum_c = champlain-enum-types.c
+glib_enum_headers = $(libchamplain_headers_public)
+include $(top_srcdir)/build/Makefile.am.enums
 
-libchamplain_headers = \
-	$(memphis_headers)		\
-	champlain.h 			\
-	champlain-defines.h		\
-	champlain-point.h		\
-	champlain-view.h		\
-	champlain-layer.h 		\
-	champlain-selection-layer.h 	\
-	champlain-base-marker.h		\
-	champlain-marker.h		\
-	champlain-tile.h		\
-	champlain-map-source.h		\
-	champlain-map-source-chain.h	\
-	champlain-tile-source.h		\
-	champlain-tile-cache.h		\
-	champlain-memory-cache.h		\
-	champlain-network-tile-source.h	\
-	champlain-file-cache.h		\
-	champlain-map-source-factory.h	\
-	champlain-map-source-desc.h	\
-	champlain-polygon.h		\
-	champlain-version.h		\
+libchamplain_headers_built = 	\
 	champlain-features.h	\
-	champlain-renderer.h	\
-	champlain-image-renderer.h	\
-	champlain-error-tile-renderer.h	\
-	champlain-file-tile-source.h	\
-	champlain-null-tile-source.h	\
-	champlain-network-bbox-tile-source.h	\
-	champlain-bounding-box.h
+	champlain-enum-types.h	\
+	champlain-marshal.h
 
-if ENABLE_MEMPHIS
-memphis_sources = \
-	champlain-memphis-renderer.c
-endif
+libchamplain_sources_built = 	\
+	champlain-enum-types.c	\
+	champlain-marshal.c
+
 
 libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
-	champlain-marshal.list	 	\
-	$(BUILT_SOURCES) 		\
-	$(libchamplain_headers)		\
-	$(memphis_sources)		\
-	champlain-debug.c 		\
-	champlain-view.c 		\
-	champlain-layer.c 		\
-	champlain-selection-layer.c 	\
-	champlain-base-marker.c 	\
-	champlain-marker.c 		\
-	champlain-tile.c		\
-	champlain-map-source.c		\
-	champlain-map-source-chain.c	\
-	champlain-tile-source.c		\
-	champlain-tile-cache.c		\
-	champlain-memory-cache.c		\
-	champlain-network-tile-source.c	\
-	champlain-file-cache.c		\
-	champlain-map-source-factory.c	\
-	champlain-map-source-desc.c	\
-	champlain-point.c		\
-	champlain-polygon.c		\
-	champlain-renderer.c	\
-	champlain-image-renderer.c	\
-	champlain-error-tile-renderer.c	\
-	champlain-file-tile-source.c	\
-	champlain-null-tile-source.c	\
-	champlain-network-bbox-tile-source.c	\
-	champlain-bounding-box.c
+	$(libchamplain_headers_public)	\
+	$(libchamplain_headers_private)	\
+	$(libchamplain_sources)
 
-noinst_HEADERS = \
-	champlain-debug.h  		\
-	champlain-private.h
+nodist_libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
+	$(libchamplain_headers_built)	\
+	$(libchamplain_sources_built)
 
-libchamplain_include_HEADERS = \
-	$(memphis_headers)		\
-	champlain.h 			\
-	champlain-view.h 		\
-	champlain-defines.h 		\
-	champlain-point.h 		\
-	champlain-enum-types.h		\
-	champlain-layer.h 		\
-	champlain-selection-layer.h 	\
-	champlain-map-source.h		\
-	champlain-map-source-chain.h	\
-	champlain-tile-source.h		\
-	champlain-tile-cache.h		\
-	champlain-memory-cache.h		\
-	champlain-network-tile-source.h	\
-	champlain-file-cache.h		\
-	champlain-map-source-factory.h	\
-	champlain-map-source-desc.h	\
-	champlain-tile.h		\
-	champlain-base-marker.h		\
-	champlain-marker.h		\
-	champlain-polygon.h		\
-	champlain-version.h		\
-	champlain-features.h	\
-	champlain-renderer.h	\
-	champlain-image-renderer.h	\
-	champlain-error-tile-renderer.h	\
-	champlain-file-tile-source.h	\
-	champlain-null-tile-source.h	\
-	champlain-network-bbox-tile-source.h	\
-	champlain-bounding-box.h
+libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS) $(top_builddir)/tidy/libtidy-1.0.la
 
-libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS) ../tidy/libtidy-1.0.la
-
-libchamplain_includedir = $(includedir)/libchamplain-@CHAMPLAIN_API_VERSION@/champlain
-
-libchamplain_@CHAMPLAIN_API_VERSION@_la_LDFLAGS = -version-info $(LIBRARY_VERSION) \
+libchamplain_@CHAMPLAIN_API_VERSION@_la_LDFLAGS = \
+	-version-info $(LIBRARY_VERSION)\
 	-no-undefined 			\
-	-export-symbols-regex		\
-	^champlain_.*
+	-export-symbols-regex ^champlain_.*
 
 AM_CPPFLAGS = 				\
 	$(DEPS_CFLAGS)			\
@@ -141,32 +130,14 @@ AM_CPPFLAGS = 				\
 	-DCHAMPLAIN_COMPILATION 	\
 	$(WARN_CFLAGS)
 
-EXTRA_DIST = champlain-marshal.list \
-	champlain-enum-types.h.in \
-	champlain-enum-types.c.in
 
-champlain-marshal.h: champlain-marshal.list
-	$(AM_V_GEN) ( $(GLIB_GENMARSHAL) --header --prefix=cpl_marshal champlain-marshal.list > champlain-marshal.tmp \
-	&& mv champlain-marshal.tmp champlain-marshal.h ) \
-	|| ( rm -f champlain-marshal.tmp && exit 1 )
+lib_LTLIBRARIES = libchamplain-@CHAMPLAIN_API_VERSION@.la
 
-champlain-marshal.c: champlain-marshal.h
-	$(AM_V_GEN) ( (echo '#include "champlain-marshal.h"'; $(GLIB_GENMARSHAL) --prefix=cpl_marshal $(srcdir)/champlain-marshal.list --body) > champlain-marshal.tmp \
-	&& mv champlain-marshal.tmp champlain-marshal.c ) \
-	|| ( rm -f champlain-marshal.tmp && exit 1 )
+libchamplaindir = $(includedir)/libchamplain-@CHAMPLAIN_API_VERSION@/champlain
 
-champlain-enum-types.h: $(libchamplain_headers)
-	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template champlain-enum-types.h.in \
-		$(libchamplain_headers) ) > champlain-enum-types.h.tmp \
-	&& mv champlain-enum-types.h.tmp champlain-enum-types.h \
-	|| rm -f champlain-enum-type.h.tmp
+libchamplain_HEADERS = $(libchamplain_headers_public)
 
-champlain-enum-types.c: $(libchamplain_headers) champlain-enum-types.h
-	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template champlain-enum-types.c.in \
-		$(libchamplain_headers) ) > champlain-enum-types.c.tmp \
-	&& mv champlain-enum-types.c.tmp champlain-enum-types.c \
-	|| rm -f champlain-enum-type.c.tmp
-
+nodist_libchamplain_HEADERS = $(libchamplain_headers_built)
 
 
 if HAVE_INTROSPECTION
@@ -174,10 +145,8 @@ if HAVE_INTROSPECTION
 -include $(INTROSPECTION_MAKEFILE)
 INTROSPECTION_GIRS =
 INTROSPECTION_SCANNER_ARGS =
-INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
-introspection_sources = \
-	$(libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES) \
-	$(libchamplain_include_HEADERS)
+INTROSPECTION_COMPILER_ARGS =
+introspection_sources = $(libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES)
 
 if ENABLE_MEMPHIS
 memphis_gir_include = Memphis-0.2
@@ -189,11 +158,11 @@ Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_SCANNERFLAGS = --strip-prefix=Champla
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_VERSION = @CHAMPLAIN_API_VERSION@
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_LIBS = libchamplain-@CHAMPLAIN_API_VERSION@.la
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_PACKAGES = gobject-2.0 gtk+-2.0
-Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
+Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_FILES = $(introspection_sources)
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_INCLUDES = Clutter-1.0 Gtk-2.0 $(memphis_gir_include)
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_CFLAGS = \
 	$(DEPS_CFLAGS) $(SOUP_CFLAGS) $(MEMPHIS_CFLAGS) \
-	-I$(top_srcdir)/tidy -I$(top_srcdir) \
+	-I$(top_srcdir)/tidy -I$(top_srcdir) -I$(top_builddir) \
 	-DCHAMPLAIN_COMPILATION
 
 INTROSPECTION_GIRS += Champlain-@CHAMPLAIN_API_VERSION@.gir
@@ -207,5 +176,3 @@ typelib_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
 CLEANFILES += $(gir_DATA) $(typelib_DATA)
 
 endif
-
-

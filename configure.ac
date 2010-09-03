@@ -246,6 +246,7 @@ CHAMPLAIN_CONFIG_COMMANDS([champlain/champlain-features.h],
 # ----------------------------------------------------------
 
 AC_CONFIG_FILES([Makefile
+                 build/Makefile
                  champlain/Makefile
                  champlain/champlain-version.h
                  demos/Makefile
