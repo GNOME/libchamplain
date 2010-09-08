@@ -2,7 +2,7 @@
 
 [CCode (cprefix = "Champlain", lower_case_cprefix = "champlain_")]
 namespace Champlain {
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain-memphis-renderer.h")]
 	public class MemphisRenderer : Champlain.Renderer {
 		[CCode (has_construct_function = false)]
 		public MemphisRenderer.full (uint tile_size);
