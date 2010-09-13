@@ -154,7 +154,6 @@ endif
 
 Champlain-@CHAMPLAIN_API_VERSION@.gir: libchamplain-@CHAMPLAIN_API_VERSION@.la
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_NAMESPACE = Champlain
-Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_SCANNERFLAGS = --strip-prefix=Champlain
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_VERSION = @CHAMPLAIN_API_VERSION@
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_LIBS = libchamplain-@CHAMPLAIN_API_VERSION@.la
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_PACKAGES = gobject-2.0 gtk+-2.0
