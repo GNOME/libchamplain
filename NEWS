@@ -1,3 +1,18 @@
+libchamplain 0.7.2 (2010-09-17)
+===============================
+
+Unstable release
+Python bindings have not been updated yet.
+
+Changes:
+* Added missing header file for vala bindings generation (Lorenzo Masini)
+* Big makefile cleanup - should fix a problem when some generated sources
+  were distributed and libchamplain did not compile because of different
+  settings (Jiří Techet)
+* Fixed documentation creation when compiled without memphis (Jiří Techet)
+* --strip-prefix option removed for instrospection generation to be compatible
+  with newer gir scanners (Jiří Techet)
+
 libchamplain 0.7.1 (2010-08-26)
 ===============================
 
