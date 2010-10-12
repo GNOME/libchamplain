@@ -1,5 +1,0 @@
-;; -*- scheme -*-
-
-(include "pychamplainmemphis-base.defs")
-(include "pychamplainmemphis-boxed-types.defs")
-(include "pychamplainmemphis-constructors.defs")
