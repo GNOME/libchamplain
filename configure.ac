@@ -59,7 +59,7 @@ AC_SUBST(LIBRARY_VERSION)
 PKG_CHECK_MODULES(DEPS,
   [   glib-2.0 >= 2.16
       gobject-2.0 >= 2.10
-      gdk-2.0 >= 2.10
+      gdk-3.0 >= 2.90
       clutter-1.0 >= 1.0
       cairo >= 1.4
       gio-2.0 >= 2.16
@@ -132,8 +132,8 @@ AC_ARG_ENABLE(gtk,
 
 if test x$enable_gtk = xyes; then
   PKG_CHECK_MODULES(GTK,
-    [   gtk+-2.0 >= 2.12
-        clutter-gtk-0.10 >= 0.10
+    [   gtk+-3.0 >= 2.90
+        clutter-gtk-1.0 >= 0.90
     ]
   )
   AC_SUBST(GTK_CFLAGS)
