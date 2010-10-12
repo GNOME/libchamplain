@@ -162,43 +162,6 @@ AC_SUBST(MEMPHIS_LIBS)
 AM_CONDITIONAL(ENABLE_MEMPHIS, test "x$enable_memphis" = "xyes")
 
 # -----------------------------------------------------------
-# Enable Python bindings
-# -----------------------------------------------------------
-
-AC_ARG_ENABLE(python,
-  AS_HELP_STRING([--enable-python],[Build python bindings]),
-    enable_python=$enableval, enable_python=no )
-
-if test x$enable_python = xyes; then
-  PKG_CHECK_MODULES(PYTHON_BINDING,
-   [
-      pygtk-2.0 >= 2.12
-      pygobject-2.0 >= 2.10
-      pyclutter-1.0 >= 1.0
-   ]
-  )
-
-  if test "x$enable_memphis" = "xyes"; then
-    PKG_CHECK_MODULES(PYTHON_BINDING_MEMPHIS, [pymemphis-0.2 >= 0.2.1])
-  fi
-
-  if test "x$enable_gtk" = "xyes"; then
-    PKG_CHECK_MODULES(PYTHON_BINDING_GTK, [pyclutter-gtk-0.10 >= 0.10])
-  fi
-
-  AC_CHECK_PROGS([PYGOBJECTCODEGEN], [pygobject-codegen-2.0 pygtk-codegen-2.0], [no])
-
-  if test "PYGOBJECTCODEGEN" = "xno"; then
-     AC_MSG_ERROR([Could not find pygobject-codegen-2.0 or pygtk-codegen-2.0])
-  fi
-
-  AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(Could not find python headers)])
-fi
-
-AM_CONDITIONAL(ENABLE_PYTHON, test "x$enable_python" = "xyes")
-GOBJECT_INTROSPECTION_CHECK([0.6.3])
-
-# -----------------------------------------------------------
 # Enable vala demos (default to "no")
 # -----------------------------------------------------------
 
@@ -272,18 +235,12 @@ AC_CONFIG_FILES([Makefile
                  bindings/vala/demos/Makefile
                  champlain-memphis.pc
                  champlain-memphis-uninstalled.pc])
-AC_CONFIG_FILES([bindings/python/update-binding.sh],
-                [
-                 chmod +x bindings/python/update-binding.sh
+AC_CONFIG_FILES([
                  chmod +x bindings/vala/champlain/create.sh
                  chmod +x bindings/vala/champlain-gtk/create.sh
                  chmod +x bindings/vala/champlain-memphis/create.sh
                 ])
 AC_OUTPUT
-#                 bindings/python/Makefile
-#                 bindings/python/champlain/Makefile
-#                 bindings/python/champlain-gtk/Makefile
-#                 bindings/python/demos/Makefile
 
 echo ""
 echo " libchamplain $VERSION"
@@ -299,7 +256,6 @@ echo "Extra tile sources:"
 echo "  Memphis source: ${enable_memphis}"
 echo ""
 echo "Bindings:"
-echo "       Python bindings: ${enable_python}"
 echo "         Vala bindings: yes"
 echo "            Vala demos: ${enable_vala_demos}"
 echo " gobject-introspection: ${enable_introspection}"
