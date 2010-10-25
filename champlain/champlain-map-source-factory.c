@@ -171,6 +171,21 @@ ChamplainMapSourceDesc OSM_OSMARENDER_DESC =
 };
 
 static
+ChamplainMapSourceDesc OSM_MAPQUEST_DESC =
+{
+  CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST,
+  "MapQuest OSM",
+  "Data, imagery and map information provided by MapQuest, Open Street Map and contributors",
+  "http://creativecommons.org/licenses/by-sa/2.0/",
+  0,
+  17,
+  CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+  champlain_map_source_new_generic,
+  "http://otile1.mqcdn.com/tiles/1.0.0/osm/#Z#/#X#/#Y#.png",
+  NULL
+};
+
+static
 ChamplainMapSourceDesc OSM_CYCLEMAP_DESC =
 {
   CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
@@ -282,6 +297,8 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
       OSM_TRANSPORTMAP_DESC.constructor, OSM_TRANSPORTMAP_DESC.data);
   champlain_map_source_factory_register (factory, &OSM_OSMARENDER_DESC,
       OSM_OSMARENDER_DESC.constructor, OSM_OSMARENDER_DESC.data);
+  champlain_map_source_factory_register (factory, &OSM_MAPQUEST_DESC,
+      OSM_MAPQUEST_DESC.constructor, OSM_MAPQUEST_DESC.data);
 #if 0
   champlain_map_source_factory_register (factory, &OAM_DESC,
       OAM_DESC.constructor, OAM_DESC.data);
