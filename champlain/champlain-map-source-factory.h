@@ -98,6 +98,12 @@ gboolean champlain_map_source_factory_register (ChamplainMapSourceFactory *facto
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "osm-osmarender"
 /**
+ * CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST:
+ *
+ * Mapquest OpenStreetMap
+ */
+#define CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST "osm-mapquest"
+/**
  * CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP:
  *
  * OpenStreetMap Cycle Map
@@ -124,6 +130,7 @@ gboolean champlain_map_source_factory_register (ChamplainMapSourceFactory *facto
 #else
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap I"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap II"
+#define CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST "Mapquest OSM"
 #define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "OpenCycleMap"
 #define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "Public Transport"
 #define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
