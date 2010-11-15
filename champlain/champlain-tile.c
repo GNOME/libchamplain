@@ -35,10 +35,29 @@
 #include <gio/gio.h>
 #include <clutter/clutter.h>
 
-G_DEFINE_TYPE (ChamplainTile, champlain_tile, CLUTTER_TYPE_GROUP)
+G_DEFINE_TYPE (ChamplainTile, champlain_tile, CLUTTER_TYPE_ACTOR)
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_TILE, ChamplainTilePrivate))
+
+
+static void paint (ClutterActor *self);
+static void pick (ClutterActor *self, 
+    const ClutterColor *color);
+static void get_preferred_width (ClutterActor *self,
+    gfloat for_height,
+    gfloat *min_width_p,
+    gfloat *natural_width_p);
+static void get_preferred_height (ClutterActor *self,
+    gfloat for_width,
+    gfloat *min_height_p,
+    gfloat *natural_height_p);
+static void allocate (ClutterActor *self,
+    const ClutterActorBox *box,
+    ClutterAllocationFlags flags);
+static void map (ClutterActor *self);
+static void unmap (ClutterActor *self);
+
 
 enum
 {
@@ -70,7 +89,9 @@ struct _ChamplainTilePrivate
   gint zoom_level; /* The tile's zoom level */
 
   ChamplainState state; /* The tile state: loading, validation, done */
-  ClutterActor *content_actor; /* The actual tile actor */
+  /* The tile actor that will be displayed after champlain_tile_display_content () */
+  ClutterActor *content_actor; 
+  ClutterGroup *content_group; /* A group used for the fade in effect */
   gboolean fade_in;
 
   GTimeVal *modified_time; /* The last modified time of the cache */
@@ -183,6 +204,11 @@ champlain_tile_dispose (GObject *object)
       g_object_unref (priv->content_actor);
       priv->content_actor = NULL;
     }
+  if (priv->content_group)
+    {
+      clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
+      priv->content_group = NULL;
+    }
 
   G_OBJECT_CLASS (champlain_tile_parent_class)->dispose (object);
 }
@@ -204,6 +230,7 @@ static void
 champlain_tile_class_init (ChamplainTileClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
 
   g_type_class_add_private (klass, sizeof (ChamplainTilePrivate));
 
@@ -211,6 +238,14 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   object_class->set_property = champlain_tile_set_property;
   object_class->dispose = champlain_tile_dispose;
   object_class->finalize = champlain_tile_finalize;
+
+  actor_class->get_preferred_width = get_preferred_width;
+  actor_class->get_preferred_height = get_preferred_height;
+  actor_class->allocate = allocate;
+  actor_class->paint = paint;
+  actor_class->pick = pick;
+  actor_class->map = map;
+  actor_class->unmap = unmap;
 
   /**
    * ChamplainTile:x:
@@ -379,6 +414,8 @@ champlain_tile_init (ChamplainTile *self)
   priv->fade_in = FALSE;
 
   priv->content_actor = NULL;
+  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
+  clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
 }
 
 
@@ -395,6 +432,97 @@ ChamplainTile *
 champlain_tile_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_TILE, NULL);
+}
+
+
+static void
+paint (ClutterActor *self)
+{
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+  
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+pick (ClutterActor *self, 
+    const ClutterColor *color)
+{
+  CLUTTER_ACTOR_CLASS (champlain_tile_parent_class)->pick (self, color);
+
+  paint (self);
+}
+
+
+static void
+get_preferred_width (ClutterActor *self,
+    gfloat for_height,
+    gfloat *min_width_p,
+    gfloat *natural_width_p)
+{
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  clutter_actor_get_preferred_width (CLUTTER_ACTOR (priv->content_group),
+      for_height,
+      min_width_p,
+      natural_width_p);
+}
+
+
+static void
+get_preferred_height (ClutterActor *self,
+    gfloat for_width,
+    gfloat *min_height_p,
+    gfloat *natural_height_p)
+{
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  clutter_actor_get_preferred_height (CLUTTER_ACTOR (priv->content_group),
+      for_width,
+      min_height_p,
+      natural_height_p);
+}
+
+
+static void
+allocate (ClutterActor *self,
+    const ClutterActorBox *box,
+    ClutterAllocationFlags flags)
+{
+  ClutterActorBox child_box;
+
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_tile_parent_class)->allocate (self, box, flags);
+
+  child_box.x1 = 0;
+  child_box.x2 = box->x2 - box->x1;
+  child_box.y1 = 0;
+  child_box.y2 = box->y2 - box->y1;
+
+  clutter_actor_allocate (CLUTTER_ACTOR (priv->content_group), &child_box, flags);
+}
+
+
+static void
+map (ClutterActor *self)
+{
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_tile_parent_class)->map (self);
+
+  clutter_actor_map (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+unmap (ClutterActor *self)
+{
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_tile_parent_class)->unmap (self);
+
+  clutter_actor_unmap (CLUTTER_ACTOR (priv->content_group));
 }
 
 
@@ -741,8 +869,10 @@ champlain_tile_set_content (ChamplainTile *self,
 static void
 fade_in_completed (G_GNUC_UNUSED ClutterAnimation *animation, ChamplainTile *self)
 {
-  if (clutter_group_get_n_children (CLUTTER_GROUP (self)) > 1)
-    clutter_actor_destroy (clutter_group_get_nth_child (CLUTTER_GROUP (self), 0));
+  ChamplainTilePrivate *priv = self->priv;
+
+  if (clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group)) > 1)
+    clutter_actor_destroy (clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), 0));
 }
 
 
@@ -766,8 +896,7 @@ champlain_tile_display_content (ChamplainTile *self)
     return;
 
   clutter_actor_set_opacity (priv->content_actor, 0);
-  clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->content_actor);
-
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->content_actor);
   if (priv->fade_in)
     {
       animation = clutter_actor_animate (priv->content_actor,

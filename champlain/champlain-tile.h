@@ -86,14 +86,14 @@ struct _ChamplainRenderCallbackData
 
 struct _ChamplainTile
 {
-  ClutterGroup parent;
+  ClutterActor parent;
 
   ChamplainTilePrivate *priv;
 };
 
 struct _ChamplainTileClass
 {
-  ClutterGroupClass parent_class;
+  ClutterActorClass parent_class;
 };
 
 
