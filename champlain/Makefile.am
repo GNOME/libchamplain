@@ -146,8 +146,9 @@ if HAVE_INTROSPECTION
 INTROSPECTION_GIRS =
 INTROSPECTION_SCANNER_ARGS = --warn-all
 INTROSPECTION_COMPILER_ARGS =
-introspection_sources = $(libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES)
-
+introspection_sources = \
+	$(libchamplain_headers_public)	\
+	$(libchamplain_sources)
 if ENABLE_MEMPHIS
 memphis_gir_include = Memphis-0.2
 endif

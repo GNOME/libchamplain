@@ -339,7 +339,7 @@ gtk_champlain_embed_new ()
  *
  * Gets a #ChamplainView from the #GtkChamplainEmbed object.
  *
- * Return value: a #ChamplainView ready to be used
+ * Return value: (transfer none): a #ChamplainView ready to be used
  *
  * Since: 0.4
  */

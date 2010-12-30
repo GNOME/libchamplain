@@ -1336,7 +1336,7 @@ champlain_marker_set_draw_background (ChamplainMarker *marker,
  *
  * Get the marker's image.
  *
- * Returns: the marker's image.
+ * Returns: (transfer none): the marker's image.
  *
  * Since: 0.4
  */

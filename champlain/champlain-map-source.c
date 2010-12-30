@@ -234,7 +234,7 @@ champlain_map_source_init (ChamplainMapSource *map_source)
  *
  * Get the next source in the chain.
  *
- * Returns: the next source in the chain.
+ * Returns: (transfer none): the next source in the chain.
  *
  * Since: 0.6
  */
@@ -253,7 +253,7 @@ champlain_map_source_get_next_source (ChamplainMapSource *map_source)
  *
  * Get the renderer used for tiles rendering.
  *
- * Returns: the renderer.
+ * Returns: (transfer none): the renderer.
  *
  * Since: 0.8
  */
