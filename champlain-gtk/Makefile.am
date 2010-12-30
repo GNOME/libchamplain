@@ -49,7 +49,7 @@ libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_LDFLAGS= \
 	-no-undefined \
 	-export-symbols-regex ^gtk_champlain_.*
 
-AM_CPPFLAGS = $(GTK_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_GTK_COMPILATION
+AM_CPPFLAGS = $(GTK_CFLAGS) $(WARN_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_GTK_COMPILATION
 
 
 lib_LTLIBRARIES = libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
@@ -65,7 +65,7 @@ if HAVE_INTROSPECTION
 
 -include $(INTROSPECTION_MAKEFILE)
 INTROSPECTION_GIRS =
-INTROSPECTION_SCANNER_ARGS = --add-include-path=$(top_builddir)/champlain
+INTROSPECTION_SCANNER_ARGS = --warn-all --add-include-path=$(top_builddir)/champlain
 INTROSPECTION_COMPILER_ARGS = --includedir=$(top_builddir)/champlain
 
 introspection_sources = $(libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_SOURCES)
