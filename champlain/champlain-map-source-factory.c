@@ -319,7 +319,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
  *
  * A method to obtain the singleton object.
  *
- * Returns: the singleton #ChamplainMapSourceFactory, it should be freed
+ * Returns: (transfer full): the singleton #ChamplainMapSourceFactory, it should be freed
  * using #g_object_unref when not needed.
  *
  * Since: 0.4
@@ -337,7 +337,7 @@ champlain_map_source_factory_dup_default (void)
  *
  * Get the list of registered map sources.
  *
- * Returns: the list of registered map sources, the items should not be freed,
+ * Returns: (transfer container): the list of registered map sources, the items should not be freed,
  * the list should be freed with #g_slist_free.
  *
  * Since: 0.4
@@ -357,7 +357,7 @@ champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *factory)
  * The id should not contain any character that can't be in a filename as it
  * will be used as the cache directory name for that map source.
  *
- * Returns: a ready to use #ChamplainMapSource matching the given name, returns
+ * Returns: (transfer full): a ready to use #ChamplainMapSource matching the given name, returns
  * NULL is none match.
  *
  * Since: 0.4
@@ -389,7 +389,7 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  *
  * Creates a cached map source.
  *
- * Returns: a ready to use #ChamplainMapSourceChain consisting of
+ * Returns: (transfer full): a ready to use #ChamplainMapSourceChain consisting of
  * #ChamplainMemoryCache, #ChamplainFileCache, #ChamplainMapSource matching the given name, and
  * an error tile source created with champlain_map_source_factory_create_error_source ().
  *
@@ -435,7 +435,7 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
  *
  * Creates a map source generating error tiles.
  *
- * Returns: a ready to use map source generating error tiles.
+ * Returns: (transfer full): a ready to use map source generating error tiles.
  *
  * Since: 0.8
  */
@@ -457,7 +457,7 @@ champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *fac
  * champlain_map_source_factory_register:
  * @factory: A #ChamplainMapSourceFactory
  * @desc: the description of the map source
- * @constructor: the new map source constructor function
+ * @constructor: (scope notified): the new map source constructor function
  * @data: data to be passed to the constructor function, or NULL
  *
  * Registers the new map source with the given constructor.  When this map

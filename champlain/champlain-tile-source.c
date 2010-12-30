@@ -403,7 +403,7 @@ champlain_tile_source_init (ChamplainTileSource *tile_source)
  *
  * Gets the cache used for storing tiles by this tile source.
  *
- * Returns: the cache
+ * Returns: (transfer none): the cache
  *
  * Since: 0.6
  */

@@ -798,7 +798,7 @@ champlain_tile_display_content (ChamplainTile *self)
  *
  * Gets the tile's content actor.
  *
- * Returns: the tile's content, this actor will change each time the tile's content changes.
+ * Returns: (transfer none): the tile's content, this actor will change each time the tile's content changes.
  * You should not unref this content, it is owned by the tile.
  *
  * Since: 0.4

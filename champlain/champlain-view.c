@@ -3263,7 +3263,7 @@ champlain_view_get_max_zoom_level (ChamplainView *view)
  *
  * Gets the view's current map source.
  *
- * Returns: the view's current map source. If you need to keep a reference to the
+ * Returns: (transfer none): the view's current map source. If you need to keep a reference to the
  * map source then you have to call #g_object_ref.
  *
  * Since: 0.4

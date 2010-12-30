@@ -302,7 +302,7 @@ champlain_selection_layer_new ()
  *
  * This function will return NULL if in CHAMPLAIN_SELETION_MULTIPLE.
  *
- * Returns: the selected #ChamplainBaseMarker or NULL if none is selected.
+ * Returns: (transfer none): the selected #ChamplainBaseMarker or NULL if none is selected.
  *
  * Since: 0.4
  */
