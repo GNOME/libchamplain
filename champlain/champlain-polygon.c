@@ -492,7 +492,7 @@ champlain_polygon_get_points (ChamplainPolygon *polygon)
 /**
  * champlain_polygon_set_fill_color:
  * @polygon: The polygon
- * @color: The polygon's fill color or NULL to reset to the
+ * @color: (allow-none): The polygon's fill color or NULL to reset to the
  *         default color. The color parameter is copied.
  *
  * Set the polygon's fill color.
@@ -521,7 +521,7 @@ champlain_polygon_set_fill_color (ChamplainPolygon *polygon,
 /**
  * champlain_polygon_set_stroke_color:
  * @polygon: The polygon
- * @color: The polygon's stroke color or NULL to reset to the
+ * @color: (allow-none): The polygon's stroke color or NULL to reset to the
  *         default color. The color parameter is copied.
  *
  * Set the polygon's stroke color.
