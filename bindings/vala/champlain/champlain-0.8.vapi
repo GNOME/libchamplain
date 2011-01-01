@@ -384,7 +384,7 @@ namespace Champlain {
 		public void add_layer (Champlain.Layer layer);
 		public void add_polygon (Champlain.Polygon polygon);
 		public void center_on (double latitude, double longitude);
-		public void ensure_markers_visible (Champlain.BaseMarker[] markers, bool animate);
+		public void ensure_markers_visible ([CCode (array_length = false)] Champlain.BaseMarker[] markers, bool animate);
 		public void ensure_visible (double lat1, double lon1, double lat2, double lon2, bool animate);
 		public bool get_coords_at (uint x, uint y, out double lat, out double lon);
 		public bool get_coords_from_event (Clutter.Event event, out double lat, out double lon);
@@ -486,6 +486,8 @@ namespace Champlain {
 	public const string MAP_SOURCE_OSM_CYCLE_MAP;
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public const string MAP_SOURCE_OSM_MAPNIK;
+	[CCode (cheader_filename = "champlain/champlain.h")]
+	public const string MAP_SOURCE_OSM_MAPQUEST;
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public const string MAP_SOURCE_OSM_OSMARENDER;
 	[CCode (cheader_filename = "champlain/champlain.h")]
