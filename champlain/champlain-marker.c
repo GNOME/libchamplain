@@ -1032,7 +1032,7 @@ champlain_marker_set_text (ChamplainMarker *marker,
 /**
  * champlain_marker_set_image:
  * @marker: The marker.
- * @image: The image as a @ClutterActor or NULL to remove the current image.
+ * @image: (allow-none): The image as a @ClutterActor or NULL to remove the current image.
  *
  * Sets the marker's image.
  *
@@ -1107,7 +1107,7 @@ champlain_marker_set_alignment (ChamplainMarker *marker,
 /**
  * champlain_marker_set_color:
  * @marker: The marker
- * @color: The marker's background color or NULL to reset the background to the
+ * @color: (allow-none): The marker's background color or NULL to reset the background to the
  *         default color. The color parameter is copied.
  *
  * Set the marker's background color.
@@ -1137,7 +1137,7 @@ champlain_marker_set_color (ChamplainMarker *marker,
 /**
  * champlain_marker_set_text_color:
  * @marker: The marker
- * @color: The marker's text color or NULL to reset the text to the default
+ * @color: (allow-none): The marker's text color or NULL to reset the text to the default
  *         color. The color parameter is copied.
  *
  * Set the marker's text color.
@@ -1167,7 +1167,7 @@ champlain_marker_set_text_color (ChamplainMarker *marker,
 /**
  * champlain_marker_set_font_name:
  * @marker: The marker
- * @font_name: The marker's font name or NULL to reset the font to the default
+ * @font_name: (allow-none): The marker's font name or NULL to reset the font to the default
  *             value.
  *
  * Set the marker's font name such as "Sans 12".
