@@ -887,9 +887,9 @@ champlain_marker_new (void)
 /**
  * champlain_marker_new_with_text:
  * @text: the text of the text
- * @font: the font to use to draw the text, for example "Courrier Bold 11", can be NULL
- * @text_color: a #ClutterColor, the color of the text, can be NULL
- * @marker_color: a #ClutterColor, the color of the marker, can be NULL
+ * @font: (allow-none): the font to use to draw the text, for example "Courrier Bold 11", can be NULL
+ * @text_color: (allow-none): a #ClutterColor, the color of the text, can be NULL
+ * @marker_color: (allow-none): a #ClutterColor, the color of the marker, can be NULL
  *
  * Creates a new instance of #ChamplainMarker with text value.
  *

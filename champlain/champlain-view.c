@@ -2376,8 +2376,8 @@ champlain_view_remove_layer (ChamplainView *view,
  * champlain_view_get_coords_from_event:
  * @view: a #ChamplainView
  * @event: a #ClutterEvent
- * @lat: a variable where to put the latitude of the event
- * @lon: a variable where to put the longitude of the event
+ * @lat: (out): a variable where to put the latitude of the event
+ * @lon: (out): a variable where to put the longitude of the event
  *
  * Gets coordinates from button-press-event and button-release-event signals.
  *
@@ -2388,8 +2388,8 @@ champlain_view_remove_layer (ChamplainView *view,
 gboolean
 champlain_view_get_coords_from_event (ChamplainView *view,
     ClutterEvent *event,
-    gdouble *latitude,
-    gdouble *longitude)
+    gdouble *lat,
+    gdouble *lon)
 {
   DEBUG_LOG ()
 
@@ -2439,7 +2439,7 @@ champlain_view_get_coords_from_event (ChamplainView *view,
       return FALSE;
     }
 
-  return champlain_view_get_coords_at (view, x, y, latitude, longitude);
+  return champlain_view_get_coords_at (view, x, y, lat, lon);
 }
 
 
@@ -2448,8 +2448,8 @@ champlain_view_get_coords_from_event (ChamplainView *view,
  * @view: a #ChamplainView
  * @x: the x position in the view
  * @y: the y position in the view
- * @lat: a variable where to put the latitude of the event
- * @lon: a variable where to put the longitude of the event
+ * @lat: (out): a variable where to put the latitude of the event
+ * @lon: (out): a variable where to put the longitude of the event
  *
  * Gets latitude and longitude for the given x, y position in
  * the view. Use if you get coordinates from GtkEvents for example.
@@ -2462,8 +2462,8 @@ gboolean
 champlain_view_get_coords_at (ChamplainView *view,
     guint x,
     guint y,
-    gdouble *latitude,
-    gdouble *longitude)
+    gdouble *lat,
+    gdouble *lon)
 {
   DEBUG_LOG ()
 
@@ -2477,11 +2477,11 @@ champlain_view_get_coords_at (ChamplainView *view,
   rel_x = x - actor_x;
   rel_y = y - actor_y;
 
-  if (latitude)
-    *latitude = viewport_get_latitude_at (priv,
+  if (lat)
+    *lat = viewport_get_latitude_at (priv,
           priv->viewport_size.y + rel_y + priv->anchor.y);
-  if (longitude)
-    *longitude = viewport_get_longitude_at (priv,
+  if (lon)
+    *lon = viewport_get_longitude_at (priv,
           priv->viewport_size.x + rel_x + priv->anchor.x);
 
   return TRUE;
@@ -3088,7 +3088,7 @@ champlain_view_ensure_visible (ChamplainView *view,
 /**
  * champlain_view_ensure_markers_visible:
  * @view: a #ChamplainView
- * @markers: a NULL terminated array of #ChamplainMarker elements
+ * @markers: (array zero-terminated=1): a NULL terminated array of #ChamplainMarker elements
  * @animate: a #gboolean
  *
  * Changes the map's zoom level and center to make sure those markers are
