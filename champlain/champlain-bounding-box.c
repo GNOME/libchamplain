@@ -106,8 +106,8 @@ champlain_bounding_box_free (ChamplainBoundingBox *bbox)
 /**
  * champlain_bounding_box_get_center:
  * @bbox: a #ChamplainBoundingBox
- * @lat: the latitude of the box center
- * @lon: the longitude of the box center
+ * @lat: (out): the latitude of the box center
+ * @lon: (out): the longitude of the box center
  *
  * Sets the latitude and longitude of the box to @lat and @lon.
  *
