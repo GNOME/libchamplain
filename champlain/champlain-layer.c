@@ -44,12 +44,6 @@ enum
   PROP_0
 };
 
-static void layer_add_cb (ClutterGroup *layer,
-    ClutterActor *marker,
-    gpointer data);
-static void layer_remove_cb (ClutterGroup *layer,
-    ClutterActor *marker,
-    gpointer data);
 
 static void
 champlain_layer_get_property (GObject *object,
@@ -110,59 +104,6 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
 static void
 champlain_layer_init (ChamplainLayer *self)
 {
-  g_signal_connect_after (G_OBJECT (self), "actor-added",
-      G_CALLBACK (layer_add_cb), NULL);
-  g_signal_connect_after (G_OBJECT (self), "actor-removed",
-      G_CALLBACK (layer_remove_cb), NULL);
-}
-
-
-/* This serves to keep the markers ordered by their latitude.
- * Markers that are up north on the map should be lowered in the list so that
- * they are drawn the first. This is to make the illusion of a semi-3d plane
- * where the most north you are, the farther you are.
- */
-static void
-set_marker_depth (GObject *marker)
-{
-  gdouble lat, z;
-  
-  g_object_get (G_OBJECT (marker), "latitude", &lat, NULL);
-  z = (lat >= 0) ? 90.0 - lat : 90.0 + lat;
-  clutter_actor_set_depth (CLUTTER_ACTOR (marker), z);
-}
-
-
-static void
-marker_position_notify (GObject *gobject,
-    G_GNUC_UNUSED GParamSpec *pspec,
-    gpointer user_data)
-{
-  set_marker_depth (gobject);
-}
-
-
-static void
-layer_add_cb (ClutterGroup *layer,
-    ClutterActor *actor,
-    G_GNUC_UNUSED gpointer data)
-{
-  ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
-
-  set_marker_depth (G_OBJECT(actor));
-
-  g_signal_connect (G_OBJECT (marker), "notify::latitude",
-      G_CALLBACK (marker_position_notify), layer);
-}
-
-
-static void
-layer_remove_cb (ClutterGroup *layer,
-    ClutterActor *actor,
-    G_GNUC_UNUSED gpointer data)
-{
-  g_signal_handlers_disconnect_by_func (G_OBJECT (actor),
-      G_CALLBACK (marker_position_notify), layer);
 }
 
 
