@@ -337,7 +337,7 @@ champlain_map_source_factory_dup_default (void)
  *
  * Get the list of registered map sources.
  *
- * Returns: (transfer container): the list of registered map sources, the items should not be freed,
+ * Returns: (transfer container) (element-type ChamplainMapSourceDesc): the list of registered map sources, the items should not be freed,
  * the list should be freed with #g_slist_free.
  *
  * Since: 0.4

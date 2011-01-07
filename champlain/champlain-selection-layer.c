@@ -325,7 +325,7 @@ champlain_selection_layer_get_selected (ChamplainSelectionLayer *layer)
  *
  * Gets the list of selected markers.
  *
- * Returns: the list of selected #ChamplainBaseMarker or NULL if none is selected.
+ * Returns: (transfer none) (element-type ChamplainBaseMarker): the list of selected #ChamplainBaseMarker or NULL if none is selected.
  * You shouldn't free that list.
  *
  * Since: 0.4
