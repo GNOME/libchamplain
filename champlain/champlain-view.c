@@ -162,6 +162,9 @@ struct _ChamplainViewPrivate
   gdouble longitude;
   gdouble latitude;
 
+  /* Timer to track time between viewport updates */
+  GTimer *update_viewport_timer;
+
   /* Hack to get smaller x,y coordinates as the clutter limit is G_MAXINT16 */
   ChamplainFloatPoint anchor;
 
@@ -199,8 +202,6 @@ struct _ChamplainViewPrivate
   /* Lines and shapes */
   ClutterActor *polygon_layer;  /* Contains the polygons */
 
-  guint update_cb_id;
-  gboolean perform_update;
   gint tiles_loading;
 };
 
@@ -269,7 +270,6 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble latitude,
     gdouble longitude,
     guint duration);
-static gboolean perform_update_cb (ChamplainView *view);
 static gboolean fill_tile_cb (FillTileCallbackData *data);
 
 #define SCALE_HEIGHT  20
@@ -335,14 +335,11 @@ update_viewport (ChamplainView *view,
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
-  gfloat old_lat, old_lon;
 
   ChamplainFloatPoint old_anchor;
 
   old_anchor.x = priv->anchor.x;
   old_anchor.y = priv->anchor.y;
-  old_lon = priv->longitude;
-  old_lat = priv->latitude;
 
   view_update_anchor (view,
       x + priv->anchor.x + priv->viewport_size.width / 2.0,
@@ -374,11 +371,8 @@ update_viewport (ChamplainView *view,
   priv->longitude = viewport_get_current_longitude (priv);
   priv->latitude = viewport_get_current_latitude (priv);
 
-  if (fabs (priv->longitude - old_lon) > 0.001)
-    g_object_notify (G_OBJECT (view), "longitude");
-
-  if (fabs (priv->latitude - old_lat) > 0.001)
-    g_object_notify (G_OBJECT (view), "latitude");
+  g_object_notify (G_OBJECT (view), "longitude");
+  g_object_notify (G_OBJECT (view), "latitude");
 }
 
 
@@ -797,8 +791,6 @@ champlain_view_dispose (GObject *object)
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
 
-  g_source_remove (priv->update_cb_id);
-
   if (priv->factory != NULL)
     {
       g_object_unref (priv->factory);
@@ -863,6 +855,9 @@ champlain_view_dispose (GObject *object)
 
   if (priv->goto_context != NULL)
     champlain_view_stop_go_to (view);
+
+  if (priv->update_viewport_timer != NULL)
+    g_timer_destroy (priv->update_viewport_timer);
 
   G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
 }
@@ -1574,8 +1569,8 @@ champlain_view_init (ChamplainView *view)
   priv->show_scale = FALSE;
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
   priv->max_scale_width = 100;
-  priv->perform_update = TRUE;
   priv->tiles_loading = 0;
+  priv->update_viewport_timer = g_timer_new();
 
   /* Setup map layer */
   priv->map_layer = g_object_ref (clutter_group_new ());
@@ -1644,19 +1639,8 @@ champlain_view_init (ChamplainView *view)
   /* Setup license */
   create_license (view);
 
-  priv->update_cb_id = g_timeout_add (250, (GSourceFunc) perform_update_cb, view);
-
   priv->state = CHAMPLAIN_STATE_DONE;
   g_object_notify (G_OBJECT (view), "state");
-}
-
-
-static gboolean
-perform_update_cb (ChamplainView *view)
-{
-/*  DEBUG_LOG() */
-  view->priv->perform_update = TRUE;
-  return TRUE;
 }
 
 
@@ -1676,11 +1660,10 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
 
   if (fabs (x - priv->viewport_size.x) > 100 ||
       fabs (y - priv->viewport_size.y) > 100 ||
-      priv->perform_update)
+      g_timer_elapsed (priv->update_viewport_timer, NULL) > 0.25)
     {
-      priv->perform_update = FALSE;
-
       update_viewport (view, x, y);
+      g_timer_start (priv->update_viewport_timer);
     }
 }
 
