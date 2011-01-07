@@ -476,7 +476,7 @@ champlain_polygon_clear_points (ChamplainPolygon *polygon)
  *
  * Gets a list of polygon points.
  *
- * Returns: (transfer none): a list of all points from the polygon, it shouldn't be freed.
+ * Returns: (transfer none) (element-type ChamplainPoint): a list of all points from the polygon, it shouldn't be freed.
  *
  * Since: 0.4
  */

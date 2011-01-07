@@ -371,7 +371,7 @@ champlain_file_cache_init (ChamplainFileCache *file_cache)
 /**
  * champlain_file_cache_new_full:
  * @size_limit: maximal size of the cache in bytes
- * @cache_dir: the directory where the cache is created. When cache_dir == NULL,
+ * @cache_dir: (allow-none): the directory where the cache is created. When cache_dir == NULL,
  * a cache in ~/.cache/champlain is used.
  * @renderer: the #ChamplainRenderer used for tiles rendering
  *
