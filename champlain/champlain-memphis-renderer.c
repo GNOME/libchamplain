@@ -638,7 +638,7 @@ champlain_memphis_renderer_get_rule (ChamplainMemphisRenderer *renderer,
  *
  * Get a list of rule id's.
  *
- * Returns: a #GList of id strings of the form:
+ * Returns: (transfer full) (element-type utf8): a #GList of id strings of the form:
  * key1|key2|...|keyN:value1|value2|...|valueM
  *
  * Example: "waterway:river|stream|canal"
