@@ -12,3 +12,10 @@ champlain_marker_new_with_text.marker_color nullable="1"
 champlain_bounding_box_get_center.lat is_out="1"
 champlain_bounding_box_get_center.lon is_out="1"
 
+champlain_file_cache_new_full.cache_dir nullable="1"
+
+champlain_polygon_get_points type_arguments="unowned Point"
+
+champlain_selection_layer_get_selected_markers type_arguments="unowned BaseMarker"
+
+champlain_map_source_factory_dup_list type_arguments="unowned MapSourceDesc"

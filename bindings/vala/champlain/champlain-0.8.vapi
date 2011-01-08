@@ -44,7 +44,9 @@ namespace Champlain {
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class FileCache : Champlain.TileCache {
 		[CCode (has_construct_function = false)]
-		public FileCache.full (uint size_limit, string cache_dir, Champlain.Renderer renderer);
+		protected FileCache ();
+		[CCode (has_construct_function = false)]
+		public FileCache.full (uint size_limit, string? cache_dir, Champlain.Renderer renderer);
 		public unowned string get_cache_dir ();
 		public uint get_size_limit ();
 		public void purge ();
@@ -55,6 +57,8 @@ namespace Champlain {
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class FileTileSource : Champlain.TileSource {
+		[CCode (has_construct_function = false)]
+		protected FileTileSource ();
 		[CCode (has_construct_function = false)]
 		public FileTileSource.full (string id, string name, string license, string license_uri, uint min_zoom, uint max_zoom, uint tile_size, Champlain.MapProjection projection, Champlain.Renderer renderer);
 		public void load_map_data (string map_path);
@@ -79,6 +83,8 @@ namespace Champlain {
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class MapSource : GLib.InitiallyUnowned {
+		[CCode (has_construct_function = false)]
+		protected MapSource ();
 		public virtual void fill_tile (Champlain.Tile tile);
 		public uint get_column_count (uint zoom_level);
 		public virtual unowned string get_id ();
@@ -128,11 +134,13 @@ namespace Champlain {
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class MapSourceFactory : GLib.Object {
+		[CCode (has_construct_function = false)]
+		protected MapSourceFactory ();
 		public unowned Champlain.MapSource create (string id);
 		public unowned Champlain.MapSource create_cached_source (string id);
 		public unowned Champlain.MapSource create_error_source (uint tile_size);
 		public static unowned Champlain.MapSourceFactory dup_default ();
-		public unowned GLib.SList dup_list ();
+		public unowned GLib.SList<weak Champlain.MapSourceDesc> dup_list ();
 		public bool register (Champlain.MapSourceDesc desc, Champlain.MapSourceConstructor constructor, void* data);
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
@@ -194,6 +202,8 @@ namespace Champlain {
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class MemoryCache : Champlain.TileCache {
+		[CCode (has_construct_function = false)]
+		protected MemoryCache ();
 		public void clean ();
 		[CCode (has_construct_function = false)]
 		public MemoryCache.full (uint size_limit, Champlain.Renderer renderer);
@@ -203,6 +213,8 @@ namespace Champlain {
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class NetworkBboxTileSource : Champlain.TileSource {
+		[CCode (has_construct_function = false)]
+		protected NetworkBboxTileSource ();
 		[CCode (has_construct_function = false)]
 		public NetworkBboxTileSource.full (string id, string name, string license, string license_uri, uint min_zoom, uint max_zoom, uint tile_size, Champlain.MapProjection projection, Champlain.Renderer renderer);
 		public unowned string get_api_uri ();
@@ -217,6 +229,8 @@ namespace Champlain {
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class NetworkTileSource : Champlain.TileSource {
 		[CCode (has_construct_function = false)]
+		protected NetworkTileSource ();
+		[CCode (has_construct_function = false)]
 		public NetworkTileSource.full (string id, string name, string license, string license_uri, uint min_zoom, uint max_zoom, uint tile_size, Champlain.MapProjection projection, string uri_format, Champlain.Renderer renderer);
 		public bool get_offline ();
 		public unowned string get_proxy_uri ();
@@ -230,6 +244,8 @@ namespace Champlain {
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class NullTileSource : Champlain.TileSource {
+		[CCode (has_construct_function = false)]
+		protected NullTileSource ();
 		[CCode (has_construct_function = false)]
 		public NullTileSource.full (Champlain.Renderer renderer);
 	}
@@ -252,7 +268,7 @@ namespace Champlain {
 		public bool get_fill ();
 		public Clutter.Color get_fill_color ();
 		public bool get_mark_points ();
-		public unowned GLib.List get_points ();
+		public unowned GLib.List<weak Champlain.Point> get_points ();
 		public bool get_stroke ();
 		public Clutter.Color get_stroke_color ();
 		public double get_stroke_width ();
@@ -286,6 +302,8 @@ namespace Champlain {
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class Renderer : GLib.InitiallyUnowned {
+		[CCode (has_construct_function = false)]
+		protected Renderer ();
 		public virtual void render (Champlain.Tile tile);
 		public virtual void set_data (string data, uint size);
 	}
@@ -295,7 +313,7 @@ namespace Champlain {
 		public SelectionLayer ();
 		public uint count_selected_markers ();
 		public unowned Champlain.BaseMarker get_selected ();
-		public unowned GLib.List get_selected_markers ();
+		public unowned GLib.List<weak Champlain.BaseMarker> get_selected_markers ();
 		public Champlain.SelectionMode get_selection_mode ();
 		public bool marker_is_selected (Champlain.BaseMarker marker);
 		public void select (Champlain.BaseMarker marker);
@@ -343,12 +361,16 @@ namespace Champlain {
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class TileCache : Champlain.MapSource {
+		[CCode (has_construct_function = false)]
+		protected TileCache ();
 		public virtual void on_tile_filled (Champlain.Tile tile);
 		public virtual void refresh_tile_time (Champlain.Tile tile);
 		public virtual void store_tile (Champlain.Tile tile, string contents, size_t size);
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public class TileSource : Champlain.MapSource {
+		[CCode (has_construct_function = false)]
+		protected TileSource ();
 		public unowned Champlain.TileCache get_cache ();
 		public void set_cache (Champlain.TileCache cache);
 		public void set_id (string id);
