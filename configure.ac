@@ -210,8 +210,7 @@ CHAMPLAIN_CONFIG_COMMANDS([champlain/champlain-features.h],
 
 # ----------------------------------------------------------
 
-AC_CONFIG_FILES([Makefile
-                 build/Makefile
+AC_CONFIG_FILES([build/Makefile
                  champlain/Makefile
                  champlain/champlain-version.h
                  demos/Makefile
@@ -236,7 +235,8 @@ AC_CONFIG_FILES([Makefile
                  bindings/vala/champlain-gtk/create.sh
                  bindings/vala/demos/Makefile
                  champlain-memphis.pc
-                 champlain-memphis-uninstalled.pc],
+                 champlain-memphis-uninstalled.pc])
+AC_CONFIG_FILES([Makefile],
                 [chmod +x bindings/vala/champlain/create.sh
                  chmod +x bindings/vala/champlain-gtk/create.sh
                  chmod +x bindings/vala/champlain-memphis/create.sh
