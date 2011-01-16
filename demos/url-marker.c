@@ -256,7 +256,7 @@ main (int argc, char *argv[])
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), view);
 
   /* Create the markers and marker layer */
-  layer = champlain_layer_new ();
+  layer = champlain_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
   champlain_view_add_layer (CHAMPLAIN_VIEW (view), layer);
   session = soup_session_async_new ();
   create_marker_from_url (layer, session, 48.218611, 17.146397,

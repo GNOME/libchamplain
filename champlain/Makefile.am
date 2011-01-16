@@ -17,7 +17,6 @@ libchamplain_headers_public = 				\
 	$(srcdir)/champlain-point.h			\
 	$(srcdir)/champlain-view.h			\
 	$(srcdir)/champlain-layer.h 			\
-	$(srcdir)/champlain-selection-layer.h 		\
 	$(srcdir)/champlain-base-marker.h		\
 	$(srcdir)/champlain-marker.h			\
 	$(srcdir)/champlain-tile.h			\
@@ -54,7 +53,6 @@ libchamplain_sources =					\
 	$(srcdir)/champlain-debug.c 			\
 	$(srcdir)/champlain-view.c 			\
 	$(srcdir)/champlain-layer.c 			\
-	$(srcdir)/champlain-selection-layer.c 		\
 	$(srcdir)/champlain-base-marker.c 		\
 	$(srcdir)/champlain-marker.c 			\
 	$(srcdir)/champlain-tile.c			\

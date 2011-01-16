@@ -393,7 +393,7 @@ champlain_tile_class_init (ChamplainTileClass *klass)
     g_signal_new ("render-complete", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
         g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE,
-        1, G_TYPE_POINTER);
+        1, G_TYPE_OBJECT);
 }
 
 

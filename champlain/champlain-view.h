@@ -127,9 +127,6 @@ void champlain_view_ensure_markers_visible (ChamplainView *view,
 
 void champlain_view_set_map_source (ChamplainView *view,
     ChamplainMapSource *map_source);
-void champlain_view_set_size (ChamplainView *view,
-    guint width,
-    guint height);
 void champlain_view_set_decel_rate (ChamplainView *view,
     gdouble rate);
 void champlain_view_set_scroll_mode (ChamplainView *view,
@@ -159,11 +156,6 @@ gboolean champlain_view_get_coords_from_event (ChamplainView *view,
     gdouble *lat,
     gdouble *lon);
 
-gboolean champlain_view_get_coords_at (ChamplainView *view,
-    guint x,
-    guint y,
-    gdouble *lat,
-    gdouble *lon);
 
 gint champlain_view_get_zoom_level (ChamplainView *view);
 gint champlain_view_get_min_zoom_level (ChamplainView *view);
@@ -185,6 +177,28 @@ void champlain_view_remove_polygon (ChamplainView *view,
     ChamplainPolygon *polygon);
 
 void champlain_view_reload_tiles (ChamplainView *view);
+
+
+
+gdouble champlain_view_layer_x_to_longitude (ChamplainView *view,
+    gdouble x);
+gdouble champlain_view_layer_y_to_latitude (ChamplainView *view,
+    gdouble y);
+gdouble champlain_view_longitude_to_layer_x (ChamplainView *viev, 
+    gdouble longitude);
+gdouble champlain_view_latitude_to_layer_y (ChamplainView *viev, 
+    gdouble latitude);
+
+gdouble champlain_view_x_to_longitude (ChamplainView *view,
+    gdouble x);
+gdouble champlain_view_y_to_latitude (ChamplainView *view,
+    gdouble y);
+gdouble champlain_view_longitude_to_x (ChamplainView *view, 
+    gdouble longitude);
+gdouble champlain_view_latitude_to_y (ChamplainView *view, 
+    gdouble latitude);
+
+
 
 G_END_DECLS
 

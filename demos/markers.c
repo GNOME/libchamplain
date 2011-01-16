@@ -45,9 +45,11 @@ create_marker_layer (G_GNUC_UNUSED ChamplainView *view)
 {
   ClutterActor *marker;
   ChamplainLayer *layer;
+  ClutterActor *layer_actor;
   ClutterColor orange = { 0xf3, 0x94, 0x07, 0xbb };
 
-  layer = champlain_selection_layer_new ();
+  layer = champlain_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
+  layer_actor = CLUTTER_ACTOR (layer);
 
   marker = champlain_marker_new_with_text ("Montréal\n<span size=\"xx-small\">Québec</span>",
         "Serif 14", NULL, NULL);
@@ -84,6 +86,6 @@ create_marker_layer (G_GNUC_UNUSED ChamplainView *view)
       -71.918907);
   champlain_layer_add_marker (layer, CHAMPLAIN_BASE_MARKER (marker));
 
-  champlain_layer_show (layer);
+  clutter_actor_show (layer_actor);
   return layer;
 }

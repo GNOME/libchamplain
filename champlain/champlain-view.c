@@ -207,12 +207,6 @@ struct _ChamplainViewPrivate
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
 
-static gdouble viewport_get_current_longitude (ChamplainViewPrivate *priv);
-static gdouble viewport_get_current_latitude (ChamplainViewPrivate *priv);
-static gdouble viewport_get_longitude_at (ChamplainViewPrivate *priv,
-    gint x);
-static gdouble viewport_get_latitude_at (ChamplainViewPrivate *priv,
-    gint y);
 static gboolean scroll_event (ClutterActor *actor,
     ClutterScrollEvent *event,
     ChamplainView *view);
@@ -277,54 +271,6 @@ static gboolean fill_tile_cb (FillTileCallbackData *data);
 #define SCALE_INSIDE_PADDING 10
 #define SCALE_LINE_WIDTH 2
 
-static gdouble
-viewport_get_longitude_at (ChamplainViewPrivate *priv,
-    gint x)
-{
-  DEBUG_LOG ()
-
-  if (!priv->map_source)
-    return 0.0;
-
-  return champlain_map_source_get_longitude (priv->map_source,
-      priv->zoom_level, x);
-}
-
-
-static gdouble
-viewport_get_current_longitude (ChamplainViewPrivate *priv)
-{
-  DEBUG_LOG ()
-
-  return viewport_get_longitude_at (priv, priv->anchor.x +
-      priv->viewport_size.x + priv->viewport_size.width / 2.0);
-}
-
-
-static gdouble
-viewport_get_latitude_at (ChamplainViewPrivate *priv,
-    gint y)
-{
-  DEBUG_LOG ()
-
-  if (!priv->map_source)
-    return 0.0;
-
-  return champlain_map_source_get_latitude (priv->map_source,
-      priv->zoom_level, y);
-}
-
-
-static gdouble
-viewport_get_current_latitude (ChamplainViewPrivate *priv)
-{
-  DEBUG_LOG ()
-
-  return viewport_get_latitude_at (priv,
-      priv->anchor.y + priv->viewport_size.y +
-      priv->viewport_size.height / 2.0);
-}
-
 
 /* Updates the internals after the viewport changed */
 static void
@@ -364,12 +310,17 @@ update_viewport (ChamplainView *view,
   priv->viewport_size.y = y;
 
   view_load_visible_tiles (view);
-  marker_reposition (view);
+  g_signal_emit_by_name (view, "layer-relocated", NULL);
   update_scale (view);
   view_update_polygons (view);
 
-  priv->longitude = viewport_get_current_longitude (priv);
-  priv->latitude = viewport_get_current_latitude (priv);
+  priv->longitude = champlain_map_source_get_longitude (priv->map_source,
+      priv->zoom_level, 
+      priv->anchor.x + priv->viewport_size.x + priv->viewport_size.width / 2.0);
+
+  priv->latitude = champlain_map_source_get_latitude (priv->map_source,
+      priv->zoom_level,
+      priv->anchor.y + priv->viewport_size.y + priv->viewport_size.height / 2.0);
 
   g_object_notify (G_OBJECT (view), "longitude");
   g_object_notify (G_OBJECT (view), "latitude");
@@ -503,11 +454,7 @@ redraw_polygon_on_idle (PolygonRedrawContext *ctx)
   ChamplainViewPrivate *priv = ctx->view->priv;
 
   if (ctx->polygon)
-    champlain_polygon_draw_polygon (ctx->polygon,
-        priv->map_source, priv->zoom_level,
-        priv->viewport_size.width, priv->viewport_size.height,
-        priv->viewport_size.x + priv->anchor.x,
-        priv->viewport_size.y + priv->anchor.y);
+    champlain_polygon_draw_polygon (ctx->polygon, ctx->view);
 
   priv->polygon_redraw_id = 0;
 
@@ -546,7 +493,6 @@ resize_viewport (ChamplainView *view)
   DEBUG_LOG ()
 
   gdouble lower, upper;
-  gint i;
   TidyAdjustment *hadjust, *vadjust;
 
   ChamplainViewPrivate *priv = view->priv;
@@ -595,21 +541,6 @@ resize_viewport (ChamplainView *view)
 
   /* no more updates of TidyAdjustment, we can unblock the signal again */
   g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
-
-  /* Resize polygon actors */
-  if (priv->viewport_size.width == 0 ||
-      priv->viewport_size.height == 0)
-    return;
-
-  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->polygon_layer)); i++)
-    {
-      ChamplainPolygon *polygon = CHAMPLAIN_POLYGON (clutter_group_get_nth_child (CLUTTER_GROUP (priv->polygon_layer), i));
-
-      clutter_actor_set_position (CLUTTER_ACTOR (polygon), 0, 0);
-      champlain_polygon_draw_polygon (polygon, priv->map_source, priv->zoom_level,
-          priv->viewport_size.width, priv->viewport_size.height,
-          priv->viewport_size.x + priv->anchor.x, priv->viewport_size.y + priv->anchor.y);
-    }
 }
 
 
@@ -1328,12 +1259,12 @@ button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
     {
       ClutterActor *actor = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (priv->user_layers), i));
 
-      if (actor && CHAMPLAIN_IS_SELECTION_LAYER (actor))
+      if (actor && CHAMPLAIN_IS_LAYER (actor))
         {
-          ChamplainSelectionLayer *layer = CHAMPLAIN_SELECTION_LAYER (actor);
-          if (champlain_selection_layer_count_selected_markers (layer) > 0)
+          ChamplainLayer *layer = CHAMPLAIN_LAYER (actor);
+          if (champlain_layer_get_selected_markers (layer) != NULL)
             {
-              champlain_selection_layer_unselect_all (layer);
+              champlain_layer_unselect_all (layer);
               found = TRUE;
             }
         }
@@ -1665,29 +1596,6 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
       update_viewport (view, x, y);
       g_timer_start (priv->update_viewport_timer);
     }
-}
-
-
-/**
- * champlain_view_set_size:
- * @view: a #ChamplainView
- * @width: the width in pixels
- * @height: the height in pixels
- *
- * Sets the size of the view.  This function is deprecated and should not be used in new code
- * Use #clutter_actor_set_size instead.
- *
- * Since: 0.1
- */
-/* FIXME: move to an handler of actor size change */
-void
-champlain_view_set_size (ChamplainView *view,
-    guint width,
-    guint height)
-{
-  DEBUG_LOG ()
-
-  clutter_actor_set_size (CLUTTER_ACTOR (view), width, height);
 }
 
 
@@ -2312,21 +2220,12 @@ champlain_view_add_layer (ChamplainView *view,
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+  
+  champlain_layer_set_view (layer, view);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (view->priv->user_layers),
       CLUTTER_ACTOR (layer));
   clutter_actor_raise_top (CLUTTER_ACTOR (layer));
-
-  g_idle_add_full (G_PRIORITY_DEFAULT,
-      (GSourceFunc) marker_reposition,
-      g_object_ref (view),
-      (GDestroyNotify) g_object_unref);
-
-  g_signal_connect_after (layer, "actor-added",
-      G_CALLBACK (layer_add_marker_cb), view);
-
-  clutter_container_foreach (CLUTTER_CONTAINER (layer),
-      CLUTTER_CALLBACK (connect_marker_notify_cb), view);
 }
 
 
@@ -2422,53 +2321,142 @@ champlain_view_get_coords_from_event (ChamplainView *view,
       return FALSE;
     }
 
-  return champlain_view_get_coords_at (view, x, y, lat, lon);
+  *lon = champlain_view_x_to_longitude (view, x);
+  *lat = champlain_view_y_to_latitude (view, y);
+  
+  return TRUE;
 }
 
 
-/**
- * champlain_view_get_coords_at:
- * @view: a #ChamplainView
- * @x: the x position in the view
- * @y: the y position in the view
- * @lat: (out): a variable where to put the latitude of the event
- * @lon: (out): a variable where to put the longitude of the event
- *
- * Gets latitude and longitude for the given x, y position in
- * the view. Use if you get coordinates from GtkEvents for example.
- *
- * Returns: TRUE when successful.
- *
- * Since: 0.4
- */
-gboolean
-champlain_view_get_coords_at (ChamplainView *view,
-    guint x,
-    guint y,
-    gdouble *lat,
-    gdouble *lon)
+gdouble
+champlain_view_x_to_longitude (ChamplainView *view,
+    gdouble x)
 {
   DEBUG_LOG ()
 
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+  
   ChamplainViewPrivate *priv = view->priv;
-  gfloat actor_x, actor_y;
-  gdouble rel_x, rel_y;
 
-  clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
-
-  rel_x = x - actor_x;
-  rel_y = y - actor_y;
-
-  if (lat)
-    *lat = viewport_get_latitude_at (priv,
-          priv->viewport_size.y + rel_y + priv->anchor.y);
-  if (lon)
-    *lon = viewport_get_longitude_at (priv,
-          priv->viewport_size.x + rel_x + priv->anchor.x);
-
-  return TRUE;
+  return champlain_view_layer_x_to_longitude (view, priv->viewport_size.x + x);
 }
+
+
+gdouble
+champlain_view_y_to_latitude (ChamplainView *view,
+    gdouble y)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+  
+  ChamplainViewPrivate *priv = view->priv;
+
+  return champlain_view_layer_y_to_latitude (view, priv->viewport_size.y + y);
+}
+
+gdouble
+champlain_view_longitude_to_x (ChamplainView *view, 
+    gdouble longitude)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  return champlain_view_longitude_to_layer_x (view, longitude) - priv->viewport_size.x;
+}
+
+
+gdouble
+champlain_view_latitude_to_y (ChamplainView *view, 
+    gdouble latitude)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  return champlain_view_latitude_to_layer_y (view, latitude) - priv->viewport_size.y;
+}
+
+
+
+gdouble
+champlain_view_layer_x_to_longitude (ChamplainView *view,
+    gdouble x)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+  ChamplainViewPrivate *priv = view->priv;
+  
+  gdouble longitude;
+
+  longitude = champlain_map_source_get_longitude (priv->map_source,
+      priv->zoom_level, 
+      x + priv->anchor.x);
+
+  return longitude;
+}
+
+
+gdouble
+champlain_view_layer_y_to_latitude (ChamplainView *view,
+    gdouble y)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+  ChamplainViewPrivate *priv = view->priv;
+  
+  gdouble latitude;
+
+  latitude = champlain_map_source_get_longitude (priv->map_source,
+      priv->zoom_level, 
+      y + priv->anchor.y);
+
+  return latitude;
+}
+
+
+gdouble
+champlain_view_longitude_to_layer_x (ChamplainView *view, 
+    gdouble longitude)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
+
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble x;
+
+  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
+  x -= priv->anchor.x;
+  
+  return x;
+}
+
+
+gdouble
+champlain_view_latitude_to_layer_y (ChamplainView *view, 
+    gdouble latitude)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
+
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble y;
+
+  y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
+  y -= priv->anchor.y;
+
+  return y;
+}
+
 
 
 static void
@@ -3133,8 +3121,6 @@ view_set_zoom_level_at (ChamplainView *view,
 
   gdouble lon, lat;
   gint x_diff, y_diff;
-  gfloat actor_x, actor_y;
-  gdouble rel_x, rel_y;
   gfloat x2, y2;
   gdouble lat2, lon2;
 
@@ -3143,19 +3129,17 @@ view_set_zoom_level_at (ChamplainView *view,
 
   champlain_view_stop_go_to (view);
 
-  clutter_actor_get_transformed_position (priv->finger_scroll, &actor_x, &actor_y);
-  rel_x = x - actor_x;
-  rel_y = y - actor_y;
-
   /* Keep the lon, lat where the mouse is */
-  lon = viewport_get_longitude_at (priv,
-    priv->viewport_size.x + rel_x + priv->anchor.x);
-  lat = viewport_get_latitude_at (priv,
-    priv->viewport_size.y + rel_y + priv->anchor.y);
+  lon = champlain_map_source_get_longitude (priv->map_source,
+    priv->zoom_level, 
+    priv->viewport_size.x + x + priv->anchor.x);
+  lat = champlain_map_source_get_latitude (priv->map_source,
+      priv->zoom_level,
+      priv->viewport_size.y + y + priv->anchor.y);
 
   /* How far was it from the center of the viewport (in px) */
-  x_diff = priv->viewport_size.width / 2 - rel_x;
-  y_diff = priv->viewport_size.height / 2 - rel_y;
+  x_diff = priv->viewport_size.width / 2 - x;
+  y_diff = priv->viewport_size.height / 2 - y;
 
   priv->zoom_level = zoom_level;
 
@@ -3472,9 +3456,7 @@ view_update_polygons (ChamplainView *view)
     {
       ChamplainPolygon *polygon = CHAMPLAIN_POLYGON (clutter_group_get_nth_child (polygon_layer_group, i));
 
-      champlain_polygon_draw_polygon (polygon, priv->map_source, priv->zoom_level,
-          priv->viewport_size.width, priv->viewport_size.height,
-          priv->viewport_size.x + priv->anchor.x, priv->viewport_size.y + priv->anchor.y);
+      champlain_polygon_draw_polygon (polygon, view);
     }
 
   /* Position the layer in the viewport */

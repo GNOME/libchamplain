@@ -28,7 +28,7 @@
 #include "champlain-polygon.h"
 
 #include "champlain-private.h"
-#include "champlain-map-source.h"
+#include "champlain-view.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
@@ -782,18 +782,16 @@ champlain_polygon_hide (ChamplainPolygon *polygon)
 
 void
 champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
-    ChamplainMapSource *map_source,
-    guint zoom_level,
-    gfloat width,
-    gfloat height,
-    gfloat shift_x,
-    gfloat shift_y)
+    ChamplainView *view)
 {
   ChamplainPolygonPrivate *priv = polygon->priv;
   ClutterActor *cairo_texture;
   cairo_t *cr;
+  gfloat width, height;
+  
+  clutter_actor_get_size (CLUTTER_ACTOR (view), &width, &height);
 
-  if (!priv->visible || width == 0 || height == 0)
+  if (!priv->visible || width == 0.0 || height == 0.0)
     return;
 
   clutter_group_remove_all (CLUTTER_GROUP (polygon));
@@ -814,11 +812,8 @@ champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
       ChamplainPoint *point = (ChamplainPoint *) list->data;
       gfloat x, y;
 
-      x = champlain_map_source_get_x (map_source, zoom_level, point->lon);
-      y = champlain_map_source_get_y (map_source, zoom_level, point->lat);
-
-      x -= shift_x;
-      y -= shift_y;
+      x = champlain_view_longitude_to_x (view, point->lon);
+      y = champlain_view_latitude_to_y (view, point->lat);
 
       cairo_line_to (cr, x, y);
 
@@ -857,11 +852,8 @@ champlain_polygon_draw_polygon (ChamplainPolygon *polygon,
           ChamplainPoint *point = (ChamplainPoint *) list->data;
           gfloat x, y;
 
-          x = champlain_map_source_get_x (map_source, zoom_level, point->lon);
-          y = champlain_map_source_get_y (map_source, zoom_level, point->lat);
-
-          x -= shift_x;
-          y -= shift_y;
+          x = champlain_view_longitude_to_x (view, point->lon);
+          y = champlain_view_latitude_to_y (view, point->lat);
 
           cairo_arc (cr, x, y, priv->stroke_width * 1.5, 0, 2 * M_PI);
           cairo_fill (cr);
