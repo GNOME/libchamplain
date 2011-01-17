@@ -1,3 +1,16 @@
+libchamplain 0.8.1 (2011-01-18)
+===============================
+
+Stable release
+
+Changes:
+* Include MapQuest renderer for OSM (Tomaž Vajngerl)
+* Improve introspection annotations (Patrick Salecker, Jiří Techet)
+* Remove static python bindings, use introspection-based instead (William Jon McCann)
+* Improve Vala bindings (Tomaž Vajngerl, Andreas Brauchli)
+* Fix marker positioning problems by not ordering them by latitude (Jiří Techet)
+* Fire latitude and longitude signals independently of viewport shift (Jiří Techet, Tomaž Vajngerl)
+
 libchamplain 0.8.0 (2010-09-27)
 ===============================
 
