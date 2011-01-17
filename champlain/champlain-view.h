@@ -121,9 +121,6 @@ void champlain_view_ensure_visible (ChamplainView *view,
     gdouble lat2,
     gdouble lon2,
     gboolean animate);
-void champlain_view_ensure_markers_visible (ChamplainView *view,
-    ChamplainBaseMarker *markers[],
-    gboolean animate);
 
 void champlain_view_set_map_source (ChamplainView *view,
     ChamplainMapSource *map_source);

@@ -83,6 +83,7 @@ enum
 {
   /* normal signals */
   ANIMATION_COMPLETED,
+  LAYER_RELOCATED,
   LAST_SIGNAL
 };
 
@@ -210,11 +211,6 @@ G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
 static gboolean scroll_event (ClutterActor *actor,
     ClutterScrollEvent *event,
     ChamplainView *view);
-static void marker_reposition_cb (ChamplainMarker *marker,
-    ChamplainView *view);
-static void layer_reposition_cb (ClutterActor *layer,
-    ChamplainView *view);
-static gboolean marker_reposition (gpointer data);
 static void resize_viewport (ChamplainView *view);
 static void champlain_view_get_property (GObject *object,
     guint prop_id,
@@ -229,14 +225,6 @@ static void champlain_view_class_init (ChamplainViewClass *champlainViewClass);
 static void champlain_view_init (ChamplainView *view);
 static void viewport_pos_changed_cb (GObject *gobject,
     GParamSpec *arg1,
-    ChamplainView *view);
-static void notify_marker_reposition_cb (ChamplainMarker *marker,
-    GParamSpec *arg1,
-    ChamplainView *view);
-static void layer_add_marker_cb (ClutterGroup *layer,
-    ChamplainMarker *marker,
-    ChamplainView *view);
-static void connect_marker_notify_cb (ChamplainMarker *marker,
     ChamplainView *view);
 static gboolean finger_scroll_button_press_cb (ClutterActor *actor,
     ClutterButtonEvent *event,
@@ -291,7 +279,7 @@ update_viewport (ChamplainView *view,
       x + priv->anchor.x + priv->viewport_size.width / 2.0,
       y + priv->anchor.y + priv->viewport_size.height / 2.0);
 
-  if (priv->anchor.x - old_anchor.x != 0)
+  if (priv->anchor.x - old_anchor.x != 0 || priv->anchor.y - old_anchor.y != 0)
     {
       ChamplainFloatPoint diff;
 
@@ -359,90 +347,6 @@ scroll_event (G_GNUC_UNUSED ClutterActor *actor,
     zoom_level = priv->zoom_level - 1;
 
   return view_set_zoom_level_at (view, zoom_level, event->x, event->y);
-}
-
-
-static void
-marker_reposition_cb (ChamplainMarker *marker,
-    ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  ChamplainViewPrivate *priv = view->priv;
-  ChamplainBaseMarker *base_marker = CHAMPLAIN_BASE_MARKER (marker);
-
-  gint x, y;
-
-  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level,
-        champlain_base_marker_get_longitude (base_marker));
-  y = champlain_map_source_get_y (priv->map_source, priv->zoom_level,
-        champlain_base_marker_get_latitude (base_marker));
-
-  clutter_actor_set_position (CLUTTER_ACTOR (marker),
-      x - priv->anchor.x,
-      y - priv->anchor.y);
-}
-
-
-static void
-notify_marker_reposition_cb (ChamplainMarker *marker,
-    G_GNUC_UNUSED GParamSpec *arg1,
-    ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  marker_reposition_cb (marker, view);
-}
-
-
-static void
-layer_add_marker_cb (G_GNUC_UNUSED ClutterGroup *layer,
-    ChamplainMarker *marker,
-    ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_signal_connect (marker, "notify::longitude",
-      G_CALLBACK (notify_marker_reposition_cb), view);
-
-  g_idle_add_full (G_PRIORITY_DEFAULT,
-      (GSourceFunc) marker_reposition,
-      g_object_ref (view),
-      (GDestroyNotify) g_object_unref);
-}
-
-
-static void
-connect_marker_notify_cb (ChamplainMarker *marker,
-    ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_signal_connect (marker, "notify::longitude",
-      G_CALLBACK (notify_marker_reposition_cb), view);
-}
-
-
-static void
-layer_reposition_cb (ClutterActor *layer,
-    ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  clutter_container_foreach (CLUTTER_CONTAINER (layer),
-      CLUTTER_CALLBACK (marker_reposition_cb), view);
-}
-
-
-static gboolean
-marker_reposition (gpointer data)
-{
-  DEBUG_LOG ()
-
-  ChamplainView *view = CHAMPLAIN_VIEW (data);
-  clutter_container_foreach (CLUTTER_CONTAINER (view->priv->user_layers),
-      CLUTTER_CALLBACK (layer_reposition_cb), view);
-  return FALSE;
 }
 
 
@@ -1214,6 +1118,12 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
     g_signal_new ("animation-completed", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED, 0, NULL, NULL,
         g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 0);
+        
+  signals[LAYER_RELOCATED] =
+    g_signal_new ("layer-relocated", G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+        
 }
 
 
@@ -1240,7 +1150,7 @@ create_license (ChamplainView *view)
   clutter_actor_raise_top (priv->license_actor);
 }
 
-
+/*
 static gboolean
 button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
     ClutterEvent *event,
@@ -1248,31 +1158,9 @@ button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
 {
   DEBUG_LOG ()
 
-  guint i;
-  gboolean found = FALSE;
-  ChamplainViewPrivate *priv = view->priv;
-
-  if (clutter_event_get_button (event) != 1)
-    return FALSE;
-
-  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->user_layers)); i++)
-    {
-      ClutterActor *actor = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (priv->user_layers), i));
-
-      if (actor && CHAMPLAIN_IS_LAYER (actor))
-        {
-          ChamplainLayer *layer = CHAMPLAIN_LAYER (actor);
-          if (champlain_layer_get_selected_markers (layer) != NULL)
-            {
-              champlain_layer_unselect_all (layer);
-              found = TRUE;
-            }
-        }
-    }
-
-  return found;
+  return TRUE;
 }
-
+*/
 
 static void
 update_scale (ChamplainView *view)
@@ -1543,8 +1431,8 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (panning_completed), view);
   g_signal_connect (priv->finger_scroll, "button-press-event",
       G_CALLBACK (finger_scroll_button_press_cb), view);
-  g_signal_connect_after (priv->finger_scroll, "button-release-event",
-      G_CALLBACK (button_release_cb), view);
+//  g_signal_connect_after (priv->finger_scroll, "button-release-event",
+//      G_CALLBACK (button_release_cb), view);
 
   clutter_stage_set_key_focus (CLUTTER_STAGE (clutter_stage_get_default ()),
       priv->finger_scroll);
@@ -1921,7 +1809,7 @@ champlain_view_center_on (ChamplainView *view,
   view_load_visible_tiles (view);
   view_update_polygons (view);
   update_scale (view);
-  marker_reposition (view);
+  g_signal_emit_by_name (view, "layer-relocated", NULL);
 }
 
 
@@ -2221,10 +2109,9 @@ champlain_view_add_layer (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
   
-  champlain_layer_set_view (layer, view);
-
   clutter_container_add_actor (CLUTTER_CONTAINER (view->priv->user_layers),
       CLUTTER_ACTOR (layer));
+  champlain_layer_set_view (layer, view);
   clutter_actor_raise_top (CLUTTER_ACTOR (layer));
 }
 
@@ -2247,8 +2134,8 @@ champlain_view_remove_layer (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  g_signal_handlers_disconnect_by_func (layer,
-      G_CALLBACK (layer_add_marker_cb), view);
+  champlain_layer_set_view (layer, view);      
+
   clutter_container_remove_actor (CLUTTER_CONTAINER (view->priv->user_layers),
       CLUTTER_ACTOR (layer));
 }
@@ -3053,58 +2940,6 @@ champlain_view_ensure_visible (ChamplainView *view,
     champlain_view_go_to (view, min_lat + height / 2.0, min_lon + width / 2.0);
   else
     champlain_view_center_on (view, min_lat + height / 2.0, min_lon + width / 2.0);
-}
-
-
-/**
- * champlain_view_ensure_markers_visible:
- * @view: a #ChamplainView
- * @markers: (array zero-terminated=1): a NULL terminated array of #ChamplainMarker elements
- * @animate: a #gboolean
- *
- * Changes the map's zoom level and center to make sure those markers are
- * visible.
- *
- * FIXME: This doesn't take into account the marker's actor size yet
- *
- * Since: 0.4
- */
-void
-champlain_view_ensure_markers_visible (ChamplainView *view,
-    ChamplainBaseMarker *markers[],
-    gboolean animate)
-{
-  DEBUG_LOG ()
-
-  gdouble min_lat, min_lon, max_lat, max_lon;
-  ChamplainBaseMarker *marker = NULL;
-  gint i = 0;
-
-  min_lat = min_lon = 200;
-  max_lat = max_lon = -200;
-
-  marker = markers[i];
-  while (marker != NULL)
-    {
-      gdouble lat, lon;
-      g_object_get (G_OBJECT (marker), "latitude", &lat, "longitude", &lon,
-          NULL);
-
-      if (lon < min_lon)
-        min_lon = lon;
-
-      if (lat < min_lat)
-        min_lat = lat;
-
-      if (lon > max_lon)
-        max_lon = lon;
-
-      if (lat > max_lat)
-        max_lat = lat;
-
-      marker = markers[i++];
-    }
-  champlain_view_ensure_visible (view, min_lat, min_lon, max_lat, max_lon, animate);
 }
 
 

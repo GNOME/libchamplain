@@ -35,6 +35,7 @@
 #include "champlain-base-marker.h"
 #include "champlain-enum-types.h"
 #include "champlain-private.h"
+#include "champlain-view.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
@@ -113,6 +114,11 @@ champlain_layer_dispose (GObject *object)
   if (priv->selection != NULL)
     {
       champlain_layer_unselect_all (self);
+    }
+
+  if (priv->view != NULL)
+    {
+      champlain_layer_set_view (self, NULL);
     }
 
   G_OBJECT_CLASS (champlain_layer_parent_class)->dispose (object);
@@ -613,6 +619,61 @@ champlain_layer_get_selection_mode (ChamplainLayer *layer)
 }
 
 
+static void
+relocate_cb (G_GNUC_UNUSED GObject *gobject,
+    ChamplainLayer *layer)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+    
+  ChamplainLayerPrivate *priv = layer->priv;
+  gint i, n_children;
+  
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (priv->view));
+
+  n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
+  for (i = 0; i < n_children; i++)
+    {
+      ClutterActor *actor = clutter_group_get_nth_child (
+          CLUTTER_GROUP (layer), i);
+      if (CHAMPLAIN_IS_BASE_MARKER (actor))
+        {
+          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+          gint x, y;
+
+          x = champlain_view_longitude_to_layer_x (priv->view, 
+            champlain_base_marker_get_longitude (marker));
+          y = champlain_view_latitude_to_layer_y (priv->view, 
+            champlain_base_marker_get_latitude (marker));
+
+          clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
+        }
+    }
+}
+
+
+static gboolean
+button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
+    ClutterEvent *event,
+    ChamplainLayer *layer)
+{
+  gboolean found = FALSE;
+printf("FOOOOOO\n");
+  if (clutter_event_get_button (event) != 1)
+    return FALSE;
+
+  if (champlain_layer_get_selected_markers (layer) != NULL)
+    {
+      champlain_layer_unselect_all (layer);
+      found = TRUE;
+    }
+
+  return found;
+}
+
+
+
+
+
 void champlain_layer_set_view (ChamplainLayer *layer,
     ChamplainView *view)
 {
@@ -620,6 +681,8 @@ void champlain_layer_set_view (ChamplainLayer *layer,
   
   if (layer->priv->view != NULL)
     {
+      g_signal_handlers_disconnect_by_func (layer->priv->view,
+        G_CALLBACK (relocate_cb), layer);
       g_object_unref (layer->priv->view);
     }
   
@@ -629,16 +692,64 @@ void champlain_layer_set_view (ChamplainLayer *layer,
     {
       g_object_ref (view);
   
-    g_idle_add_full (G_PRIORITY_DEFAULT,
-      (GSourceFunc) marker_reposition,
-      g_object_ref (view),
-      (GDestroyNotify) g_object_unref);
-
-  g_signal_connect_after (layer, "actor-added",
-      G_CALLBACK (layer_add_marker_cb), view);
-
-  clutter_container_foreach (CLUTTER_CONTAINER (layer),
-      CLUTTER_CALLBACK (connect_marker_notify_cb), view);
+      g_signal_connect (view, "layer-relocated",
+        G_CALLBACK (relocate_cb), layer);
+        
+      g_signal_connect_after (view, "button-release-event",
+        G_CALLBACK (button_release_cb), layer);
+  
     }
 }
+
+/**
+ * champlain_view_ensure_markers_visible:
+ * @view: a #ChamplainView
+ * @markers: (array zero-terminated=1): a NULL terminated array of #ChamplainMarker elements
+ * @animate: a #gboolean
+ *
+ * Changes the map's zoom level and center to make sure those markers are
+ * visible.
+ *
+ * FIXME: This doesn't take into account the marker's actor size yet
+ *
+ * Since: 0.4
+ */
+/*void
+champlain_view_ensure_markers_visible (ChamplainView *view,
+    ChamplainBaseMarker *markers[],
+    gboolean animate)
+{
+  DEBUG_LOG ()
+
+  gdouble min_lat, min_lon, max_lat, max_lon;
+  ChamplainBaseMarker *marker = NULL;
+  gint i = 0;
+
+  min_lat = min_lon = 200;
+  max_lat = max_lon = -200;
+
+  marker = markers[i];
+  while (marker != NULL)
+    {
+      gdouble lat, lon;
+      g_object_get (G_OBJECT (marker), "latitude", &lat, "longitude", &lon,
+          NULL);
+
+      if (lon < min_lon)
+        min_lon = lon;
+
+      if (lat < min_lat)
+        min_lat = lat;
+
+      if (lon > max_lon)
+        max_lon = lon;
+
+      if (lat > max_lat)
+        max_lat = lat;
+
+      marker = markers[i++];
+    }
+  champlain_view_ensure_visible (view, min_lat, min_lon, max_lat, max_lon, animate);
+}*/
+
 

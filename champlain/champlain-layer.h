@@ -91,7 +91,6 @@ void champlain_layer_remove_marker (ChamplainLayer *layer,
 
 void champlain_layer_set_view (ChamplainLayer *layer,
     ChamplainView *view);
-void champlain_layer_clear_view (ChamplainLayer *layer);
 
 void champlain_layer_animate_in_all_markers (ChamplainLayer *layer);
 void champlain_layer_animate_out_all_markers (ChamplainLayer *layer);
@@ -114,6 +113,9 @@ void champlain_layer_set_selection_mode (ChamplainLayer *layer,
     ChamplainSelectionMode mode);
 ChamplainSelectionMode champlain_layer_get_selection_mode (
     ChamplainLayer *layer);
+//void champlain_view_ensure_markers_visible (ChamplainView *view,
+//    ChamplainBaseMarker *markers[],
+//    gboolean animate);
 
 G_END_DECLS
 
