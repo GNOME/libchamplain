@@ -72,7 +72,7 @@
 #include <tidy-scrollable.h>
 #include <tidy-viewport.h>
 
-/* #define VIEW_LOG */
+#define VIEW_LOG 
 #ifdef VIEW_LOG
 #define DEBUG_LOG() g_print ("%s\n", __FUNCTION__);
 #else
@@ -234,7 +234,7 @@ static void update_scale (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
 static void view_position_tile (ChamplainView *view,
     ChamplainTile *tile);
-static void view_update_anchor (ChamplainView *view,
+static gboolean view_update_anchor (ChamplainView *view,
     gint x,
     gint y);
 static gboolean view_set_zoom_level_at (ChamplainView *view,
@@ -262,53 +262,42 @@ static gboolean fill_tile_cb (FillTileCallbackData *data);
 
 /* Updates the internals after the viewport changed */
 static void
-update_viewport (ChamplainView *view,
-    gfloat x,
-    gfloat y)
+update_viewport (ChamplainView *view, 
+    gfloat x, 
+    gfloat y, 
+    gboolean force)
 {
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
+  gboolean relocate;
 
-  ChamplainFloatPoint old_anchor;
+  relocate = view_update_anchor (view, x, y);
 
-  old_anchor.x = priv->anchor.x;
-  old_anchor.y = priv->anchor.y;
-
-  view_update_anchor (view,
-      x + priv->anchor.x + priv->viewport_size.width / 2.0,
-      y + priv->anchor.y + priv->viewport_size.height / 2.0);
-
-  if (priv->anchor.x - old_anchor.x != 0 || priv->anchor.y - old_anchor.y != 0)
+  priv->viewport_size.x = x - priv->anchor.x - priv->viewport_size.width / 2.0;
+  priv->viewport_size.y = y - priv->anchor.y - priv->viewport_size.height / 2.0;
+  
+  if (relocate || force)
     {
-      ChamplainFloatPoint diff;
-
-      diff.x = priv->anchor.x - old_anchor.x;
-      diff.y = priv->anchor.y - old_anchor.y;
-
-      DEBUG ("Relocating the viewport by %f, %f", diff.x, diff.y);
-
       g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
       tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
-          x - diff.x, y - diff.y, 0);
+          priv->viewport_size.x,
+          priv->viewport_size.y,
+          0);
       g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
     }
 
-  priv->viewport_size.x = x;
-  priv->viewport_size.y = y;
-
-  view_load_visible_tiles (view);
-  g_signal_emit_by_name (view, "layer-relocated", NULL);
-  update_scale (view);
-  view_update_polygons (view);
-
   priv->longitude = champlain_map_source_get_longitude (priv->map_source,
       priv->zoom_level, 
-      priv->anchor.x + priv->viewport_size.x + priv->viewport_size.width / 2.0);
+      x);
 
   priv->latitude = champlain_map_source_get_latitude (priv->map_source,
       priv->zoom_level,
-      priv->anchor.y + priv->viewport_size.y + priv->viewport_size.height / 2.0);
+      y);
+
+  view_load_visible_tiles (view);
+  view_update_polygons (view);
+  update_scale (view);
 
   g_object_notify (G_OBJECT (view), "longitude");
   g_object_notify (G_OBJECT (view), "latitude");
@@ -321,12 +310,16 @@ panning_completed (G_GNUC_UNUSED TidyFingerScroll *scroll,
 {
   DEBUG_LOG ()
 
+  ChamplainViewPrivate *priv = view->priv;
+  ChamplainFloatPoint absolute;
   gfloat x, y;
 
-  tidy_viewport_get_origin (TIDY_VIEWPORT (view->priv->viewport), &x, &y,
-      NULL);
+  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y, NULL);
 
-  update_viewport (view, x, y);
+  absolute.x = x + priv->anchor.x + priv->viewport_size.width / 2.0;
+  absolute.y = y + priv->anchor.y + priv->viewport_size.height / 2.0;
+      
+  update_viewport (view, absolute.x, absolute.y, FALSE);
 }
 
 
@@ -1460,17 +1453,21 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
-
   gfloat x, y;
 
-  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y,
-      NULL);
+  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y, NULL);
 
   if (fabs (x - priv->viewport_size.x) > 100 ||
       fabs (y - priv->viewport_size.y) > 100 ||
       g_timer_elapsed (priv->update_viewport_timer, NULL) > 0.25)
     {
-      update_viewport (view, x, y);
+      ChamplainFloatPoint absolute;
+      
+      absolute.x = x + priv->anchor.x + priv->viewport_size.width / 2.0;
+      absolute.y = y + priv->anchor.y + priv->viewport_size.height / 2.0;
+      
+      update_viewport (view, absolute.x, absolute.y, FALSE);
+      
       g_timer_start (priv->update_viewport_timer);
     }
 }
@@ -1694,10 +1691,10 @@ champlain_view_new (void)
 }
 
 
-static void
+static gboolean
 view_update_anchor (ChamplainView *view,
-    gint x,  /* Absolute x */
-    gint y)  /* Absolute y */
+    gint x,  /* Absolute x of the viewport center */
+    gint y)  /* Absolute y of the viewport center */
 {
   DEBUG_LOG ()
 
@@ -1716,37 +1713,32 @@ view_update_anchor (ChamplainView *view,
       y - priv->anchor.y - priv->viewport_size.height / 2 <= 0 + priv->viewport_size.height)
     need_update = TRUE;
 
-  if (need_anchor && need_update)
+  if (need_update)
     {
-      gdouble max;
+      if (need_anchor)
+        {
+          priv->anchor.x = x - G_MAXINT16 / 2;
+          priv->anchor.y = y - G_MAXINT16 / 2;
 
-      priv->anchor.x = x - G_MAXINT16 / 2;
-      priv->anchor.y = y - G_MAXINT16 / 2;
+          if (priv->anchor.x < 0)
+            priv->anchor.x = 0;
+          if (priv->anchor.y < 0)
+            priv->anchor.y = 0;
 
-      if (priv->anchor.x < 0)
-        priv->anchor.x = 0;
-      if (priv->anchor.y < 0)
-        priv->anchor.y = 0;
-
-      max = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
-        champlain_map_source_get_tile_size (priv->map_source) -
-        (G_MAXINT16 / 2);
-      if (priv->anchor.x > max)
-        priv->anchor.x = max;
-      if (priv->anchor.y > max)
-        priv->anchor.y = max;
-
+          DEBUG ("New Anchor (%f, %f) at (%d, %d)", priv->anchor.x, priv->anchor.y, x, y);
+        }
+      else
+        {
+          priv->anchor.x = 0;
+          priv->anchor.y = 0;
+          DEBUG ("Clear Anchor at (%d, %d)", x, y);
+        }
+    
       priv->anchor_zoom_level = priv->zoom_level;
-      DEBUG ("New Anchor (%f, %f) at (%d, %d)", priv->anchor.x, priv->anchor.y, x, y);
+      g_signal_emit_by_name (view, "layer-relocated", NULL);
     }
 
-  if (!need_anchor)
-    {
-      priv->anchor.x = 0;
-      priv->anchor.y = 0;
-      priv->anchor_zoom_level = priv->zoom_level;
-      DEBUG ("Clear Anchor at (%d, %d)", x, y);
-    }
+  return need_update;
 }
 
 
@@ -1779,26 +1771,8 @@ champlain_view_center_on (ChamplainView *view,
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
 
   DEBUG ("Centering on %f, %f (%d, %d)", latitude, longitude, x, y);
-
-  view_update_anchor (view, x, y);
-
-  priv->viewport_size.x = x - priv->anchor.x - priv->viewport_size.width / 2.0;
-  priv->viewport_size.y = y - priv->anchor.y - priv->viewport_size.height / 2.0;
-
-  g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
-  tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
-      priv->viewport_size.x,
-      priv->viewport_size.y,
-      0);
-  g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
-
-  g_object_notify (G_OBJECT (view), "longitude");
-  g_object_notify (G_OBJECT (view), "latitude");
-
-  view_load_visible_tiles (view);
-  view_update_polygons (view);
-  update_scale (view);
-  g_signal_emit_by_name (view, "layer-relocated", NULL);
+  
+  update_viewport (view, x, y, TRUE);
 }
 
 
