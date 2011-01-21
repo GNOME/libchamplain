@@ -396,7 +396,10 @@ resize_viewport (ChamplainView *view)
 {
   DEBUG_LOG ()
 
-  gdouble lower, upper;
+  gdouble lower_x = 0;
+  gdouble lower_y = 0;
+  gdouble upper_x = G_MAXINT16;
+  gdouble upper_y = G_MAXINT16;
   TidyAdjustment *hadjust, *vadjust;
 
   ChamplainViewPrivate *priv = view->priv;
@@ -406,15 +409,14 @@ resize_viewport (ChamplainView *view)
 
   if (priv->zoom_level < 8)
     {
-      lower = -priv->viewport_size.width / 2.0;
-      upper = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level) *
+      lower_x = -priv->viewport_size.width / 2.0;
+      lower_y = -priv->viewport_size.height / 2.0;
+      upper_x = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level) *
         champlain_map_source_get_tile_size (priv->map_source) -
         priv->viewport_size.width / 2.0;
-    }
-  else
-    {
-      lower = 0;
-      upper = G_MAXINT16;
+      upper_y = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
+        champlain_map_source_get_tile_size (priv->map_source) -
+        priv->viewport_size.height / 2.0;
     }
 
   /*
@@ -425,25 +427,12 @@ resize_viewport (ChamplainView *view)
    */
   g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 
-  g_object_set (hadjust, "lower", lower, "upper", upper,
+  g_object_set (hadjust, "lower", lower_x, "upper", upper_x,
       "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
 
-  if (priv->zoom_level < 8)
-    {
-      lower = -priv->viewport_size.height / 2.0;
-      upper = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
-        champlain_map_source_get_tile_size (priv->map_source) -
-        priv->viewport_size.height / 2.0;
-    }
-  else
-    {
-      lower = 0;
-      upper = G_MAXINT16;
-    }
-  g_object_set (vadjust, "lower", lower, "upper", upper,
+  g_object_set (vadjust, "lower", lower_y, "upper", upper_y,
       "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
 
-  /* no more updates of TidyAdjustment, we can unblock the signal again */
   g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 }
 
