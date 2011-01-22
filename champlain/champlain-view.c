@@ -2343,8 +2343,8 @@ view_load_visible_tiles (ChamplainView *view)
   x_end = x_first + x_count;
   y_end = y_first + y_count;
 
-  max_x_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
-  max_y_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+  max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+  max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
 
   if (x_end > max_x_end)
     x_end = max_x_end;
