@@ -72,7 +72,7 @@
 #include <tidy-scrollable.h>
 #include <tidy-viewport.h>
 
-#define VIEW_LOG 
+//#define VIEW_LOG 
 #ifdef VIEW_LOG
 #define DEBUG_LOG() g_print ("%s\n", __FUNCTION__);
 #else
@@ -2264,7 +2264,7 @@ champlain_view_layer_y_to_latitude (ChamplainView *view,
   
   gdouble latitude;
 
-  latitude = champlain_map_source_get_longitude (priv->map_source,
+  latitude = champlain_map_source_get_latitude (priv->map_source,
       priv->zoom_level, 
       y + priv->anchor.y);
 
