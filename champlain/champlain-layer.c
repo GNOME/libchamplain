@@ -657,7 +657,7 @@ button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
     ChamplainLayer *layer)
 {
   gboolean found = FALSE;
-printf("FOOOOOO\n");
+  
   if (clutter_event_get_button (event) != 1)
     return FALSE;
 

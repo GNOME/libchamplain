@@ -1,6 +1,6 @@
 /*** BEGIN file-header ***/
-#ifndef __TIDY_ENUM_TYPES_H__
-#define __TIDY_ENUM_TYPES_H__
+#ifndef __MX_ENUM_TYPES_H__
+#define __MX_ENUM_TYPES_H__
 
 #include <glib-object.h>
 
@@ -15,11 +15,11 @@ G_BEGIN_DECLS
 /*** BEGIN file-tail ***/
 G_END_DECLS
 
-#endif /* !__TIDY_ENUM_TYPES_H__ */
+#endif /* !__MX_ENUM_TYPES_H__ */
 /*** END file-tail ***/
 
 /*** BEGIN value-header ***/
 GType @enum_name@_get_type (void) G_GNUC_CONST;
-#define TIDY_TYPE_@ENUMSHORT@ (@enum_name@_get_type())
+#define MX_TYPE_@ENUMSHORT@ (@enum_name@_get_type())
 
 /*** END value-header ***/

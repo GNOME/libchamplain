@@ -1,4 +1,4 @@
-/* tidy-private.h: Private declarations
+/* mx-private.h: Private declarations
  *
  * Copyright (C) 2007 OpenedHand
  *
@@ -18,8 +18,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef __TIDY_PRIVATE_H__
-#define __TIDY_PRIVATE_H__
+#ifndef __MX_PRIVATE_H__
+#define __MX_PRIVATE_H__
 
 #include <glib.h>
 
@@ -27,14 +27,14 @@ G_BEGIN_DECLS
 
 #define I_(str)         (g_intern_static_string ((str)))
 
-#define TIDY_PARAM_READABLE     \
-        (G_PARAM_READABLE |     \
+#define MX_PARAM_READWRITE    \
+        (G_PARAM_READABLE | G_PARAM_WRITABLE | \
          G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
 
-#define TIDY_PARAM_READWRITE    \
+#define MX_PARAM_READWRITE    \
         (G_PARAM_READABLE | G_PARAM_WRITABLE | \
          G_PARAM_STATIC_NICK | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB)
 
 G_END_DECLS
 
-#endif /* __TIDY_PRIVATE_H__ */
+#endif /* __MX_PRIVATE_H__ */

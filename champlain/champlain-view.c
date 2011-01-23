@@ -67,10 +67,10 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <math.h>
-#include <tidy-adjustment.h>
-#include <tidy-finger-scroll.h>
-#include <tidy-scrollable.h>
-#include <tidy-viewport.h>
+#include <mx-kinetic-scroll-view.h>
+#include <mx-viewport.h>
+#include <mx-adjustment.h>
+#include <mx-scrollable.h>
 
 //#define VIEW_LOG 
 #ifdef VIEW_LOG
@@ -176,6 +176,7 @@ struct _ChamplainViewPrivate
   ClutterActor *viewport;  /* Contains the map_layer, license and markers */
   ClutterActor *map_layer; /* Contains tiles actors (grouped by zoom level) */
   ChamplainRectangle viewport_size;
+  ClutterActor *viewport_container;
 
   ClutterActor *user_layers; /* Contains the markers */
 
@@ -280,7 +281,7 @@ update_viewport (ChamplainView *view,
   if (relocate || force)
     {
       g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
-      tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
+      mx_viewport_set_origin (MX_VIEWPORT (priv->viewport),
           priv->viewport_size.x,
           priv->viewport_size.y,
           0);
@@ -305,7 +306,7 @@ update_viewport (ChamplainView *view,
 
 
 static void
-panning_completed (G_GNUC_UNUSED TidyFingerScroll *scroll,
+panning_completed (G_GNUC_UNUSED MxKineticScrollView *scroll,
     ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -314,7 +315,7 @@ panning_completed (G_GNUC_UNUSED TidyFingerScroll *scroll,
   ChamplainFloatPoint absolute;
   gfloat x, y;
 
-  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y, NULL);
+  mx_viewport_get_origin (MX_VIEWPORT (priv->viewport), &x, &y, NULL);
 
   absolute.x = x + priv->anchor.x + priv->viewport_size.width / 2.0;
   absolute.y = y + priv->anchor.y + priv->viewport_size.height / 2.0;
@@ -393,11 +394,11 @@ resize_viewport (ChamplainView *view)
   gdouble lower_y = 0;
   gdouble upper_x = G_MAXINT16;
   gdouble upper_y = G_MAXINT16;
-  TidyAdjustment *hadjust, *vadjust;
+  MxAdjustment *hadjust, *vadjust;
 
   ChamplainViewPrivate *priv = view->priv;
 
-  tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->viewport), &hadjust,
+  mx_scrollable_get_adjustments (MX_SCROLLABLE (priv->viewport), &hadjust,
       &vadjust);
 
   if (priv->zoom_level < 8)
@@ -414,7 +415,7 @@ resize_viewport (ChamplainView *view)
 
   /*
    * block emmision of signal by priv->viewport with viewport_pos_changed_cb()
-   * callback - the signal can be emitted by updating TidyAdjustment, but
+   * callback - the signal can be emitted by updating MxAdjustment, but
    * calling the callback now would be a disaster since we don't have updated
    * anchor yet
    */
@@ -488,7 +489,7 @@ champlain_view_get_property (GObject *object,
     case PROP_DECEL_RATE:
       {
         gdouble decel = 0.0;
-        g_object_get (priv->finger_scroll, "decel-rate", &decel, NULL);
+        g_object_get (priv->finger_scroll, "deceleration", &decel, NULL);
         g_value_set_double (value, decel);
         break;
       }
@@ -640,14 +641,14 @@ champlain_view_dispose (GObject *object)
 
   if (priv->finger_scroll != NULL)
     {
-      tidy_finger_scroll_stop (TIDY_FINGER_SCROLL (priv->finger_scroll));
+      mx_kinetic_scroll_view_stop (MX_KINETIC_SCROLL_VIEW (priv->finger_scroll));
       g_object_unref (priv->finger_scroll);
       priv->finger_scroll = NULL;
     }
 
   if (priv->viewport != NULL)
     {
-      tidy_viewport_stop (TIDY_VIEWPORT (priv->viewport));
+//      mx_viewport_stop (MX_VIEWPORT (priv->viewport));
       g_object_unref (priv->viewport);
       priv->viewport = NULL;
     }
@@ -1385,8 +1386,21 @@ champlain_view_init (ChamplainView *view)
   priv->user_layers = g_object_ref (clutter_group_new ());
   clutter_actor_show (priv->user_layers);
 
+  priv->viewport_container = g_object_ref (clutter_group_new ());
+
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport_container),
+      priv->map_layer);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport_container),
+      priv->polygon_layer);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport_container),
+      priv->user_layers);
+
+  clutter_actor_show (priv->viewport_container);
+
   /* Setup viewport */
-  priv->viewport = g_object_ref (tidy_viewport_new ());
+  priv->viewport = g_object_ref (mx_viewport_new ());
+  mx_bin_set_child (MX_BIN (priv->viewport), priv->viewport_container);
+  
   g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
 
   g_signal_connect (priv->viewport, "notify::x-origin",
@@ -1394,18 +1408,11 @@ champlain_view_init (ChamplainView *view)
   g_signal_connect (priv->viewport, "notify::y-origin",
       G_CALLBACK (viewport_pos_changed_cb), view);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
-      priv->map_layer);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
-      priv->polygon_layer);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
-      priv->user_layers);
-
   clutter_actor_raise (priv->polygon_layer, priv->map_layer);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
 
   /* Setup finger scroll */
-  priv->finger_scroll = g_object_ref (tidy_finger_scroll_new (priv->scroll_mode));
+  priv->finger_scroll = g_object_ref (mx_kinetic_scroll_view_new ());
 
   g_signal_connect (priv->finger_scroll, "scroll-event",
       G_CALLBACK (scroll_event), view);
@@ -1455,7 +1462,7 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
   ChamplainViewPrivate *priv = view->priv;
   gfloat x, y;
 
-  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y, NULL);
+  mx_viewport_get_origin (MX_VIEWPORT (priv->viewport), &x, &y, NULL);
 
   if (fabs (x - priv->viewport_size.x) > 100 ||
       fabs (y - priv->viewport_size.y) > 100 ||
@@ -2624,7 +2631,7 @@ champlain_view_set_decel_rate (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view) &&
       rate < 2.0 && rate > 1.0001);
 
-  g_object_set (view->priv->finger_scroll, "decel-rate", rate, NULL);
+  g_object_set (view->priv->finger_scroll, "deceleration", rate, NULL);
 }
 
 
@@ -2649,8 +2656,8 @@ champlain_view_set_scroll_mode (ChamplainView *view,
 
   priv->scroll_mode = mode;
 
-  g_object_set (G_OBJECT (priv->finger_scroll), "mode",
-      priv->scroll_mode, NULL);
+//  g_object_set (G_OBJECT (priv->finger_scroll), "mode",
+//      priv->scroll_mode, NULL);
 }
 
 
@@ -3062,7 +3069,7 @@ champlain_view_get_decel_rate (ChamplainView *view)
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
 
   gdouble decel = 0.0;
-  g_object_get (view->priv->finger_scroll, "decel-rate", &decel, NULL);
+  g_object_get (view->priv->finger_scroll, "deceleration", &decel, NULL);
   return decel;
 }
 

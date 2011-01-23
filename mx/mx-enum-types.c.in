@@ -1,5 +1,5 @@
 /*** BEGIN file-header ***/
-#include "tidy-enum-types.h"
+#include "mx-enum-types.h"
 /*** END file-header ***/
 
 /*** BEGIN file-production ***/
