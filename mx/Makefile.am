@@ -5,7 +5,6 @@ EXTRA_DIST =
 
 
 mx_headers_public = \
-	$(srcdir)/mx-draggable.h		\
 	$(srcdir)/mx-viewport.h		\
 	$(srcdir)/mx-kinetic-scroll-view.h		\
 	$(srcdir)/mx-types.h		\
@@ -15,7 +14,6 @@ mx_headers_public = \
 	$(srcdir)/mx-private.h
 
 mx_sources = \
-	$(srcdir)/mx-draggable.c		\
 	$(srcdir)/mx-viewport.c		\
 	$(srcdir)/mx-kinetic-scroll-view.c		\
 	$(srcdir)/mx-adjustment.c		\

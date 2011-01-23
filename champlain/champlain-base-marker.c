@@ -75,6 +75,8 @@ struct _ChamplainBaseMarkerPrivate
   gdouble lon;
   gdouble lat;
   gboolean highlighted;
+  
+  ChamplainFloatPoint click_coord;
 };
 
 static void
@@ -207,6 +209,90 @@ champlain_base_marker_class_init (ChamplainBaseMarkerClass *marker_class)
 }
 
 
+static gboolean
+motion_event_cb (ClutterActor        *stage,
+                 ClutterMotionEvent  *event,
+                 ChamplainBaseMarker *marker)
+{
+  ChamplainBaseMarkerPrivate *priv = marker->priv;
+  ChamplainFloatPoint coord;
+
+  if (event->type != CLUTTER_MOTION)
+    return FALSE;
+
+  if (clutter_actor_transform_stage_point (CLUTTER_ACTOR (marker),
+                                           event->x,
+                                           event->y,
+                                           &coord.x, &coord.y))
+    {
+      gfloat dx = coord.x - priv->click_coord.x;
+      gfloat dy = coord.y - priv->click_coord.y;
+        
+      clutter_actor_move_by (CLUTTER_ACTOR (marker), dx, dy);
+    }
+
+  return TRUE;
+}
+
+
+static gboolean
+button_release_event_cb (ClutterActor        *stage,
+                         ClutterButtonEvent  *event,
+                         ChamplainBaseMarker *marker)
+{
+  if ((event->type != CLUTTER_BUTTON_RELEASE) ||
+      (event->button != 1))
+    return FALSE;
+
+  g_signal_handlers_disconnect_by_func (stage,
+                                        motion_event_cb,
+                                        marker);
+  g_signal_handlers_disconnect_by_func (stage,
+                                        button_release_event_cb,
+                                        marker);
+  
+  clutter_set_motion_events_enabled (TRUE);
+
+  return TRUE;
+}
+
+
+static gboolean
+button_press_event_cb (ClutterActor        *actor,
+                       ClutterEvent        *event,
+                       ChamplainBaseMarker *marker)
+{
+  ChamplainBaseMarkerPrivate *priv = marker->priv;
+  ClutterButtonEvent *bevent = (ClutterButtonEvent *)event;
+  ClutterActor *stage = clutter_actor_get_stage (actor);
+
+  if ((event->type == CLUTTER_BUTTON_PRESS) &&
+      (bevent->button == 1) &&
+      stage)
+    {
+      if (clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
+                                               &priv->click_coord.x, &priv->click_coord.y))
+        {
+          g_signal_connect (stage,
+                            "captured-event",
+                            G_CALLBACK (motion_event_cb),
+                            marker);
+          g_signal_connect (stage,
+                            "captured-event",
+                            G_CALLBACK (button_release_event_cb),
+                            marker);
+
+          clutter_set_motion_events_enabled (FALSE);
+
+          /* Swallow the press event */
+          return TRUE;
+        }
+    }
+
+  return FALSE;
+}
+
+
 static void
 champlain_base_marker_init (ChamplainBaseMarker *marker)
 {
@@ -217,6 +303,11 @@ champlain_base_marker_init (ChamplainBaseMarker *marker)
   priv->lat = 0;
   priv->lon = 0;
   priv->highlighted = FALSE;
+  
+  g_signal_connect (marker,
+                    "button-press-event",
+                    G_CALLBACK (button_press_event_cb),
+                    marker);
 }
 
 
