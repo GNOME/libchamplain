@@ -85,6 +85,20 @@ void champlain_base_marker_animate_out (ChamplainBaseMarker *marker);
 void champlain_base_marker_animate_out_with_delay (ChamplainBaseMarker *marker,
     guint delay);
 
+void
+champlain_base_marker_set_selectable (ChamplainBaseMarker *marker,
+    gboolean value);
+gboolean
+champlain_base_marker_get_selectable (ChamplainBaseMarker *marker);
+void
+champlain_base_marker_set_movable (ChamplainBaseMarker *marker,
+    gboolean value);
+gboolean
+champlain_base_marker_get_movable (ChamplainBaseMarker *marker);
+
+
+
+
 G_END_DECLS
 
 #endif

@@ -61,6 +61,8 @@ enum
   PROP_LONGITUDE,
   PROP_LATITUDE,
   PROP_HIGHLIGHTED,
+  PROP_SELECTABLE,
+  PROP_MOVABLE,
 };
 
 /* static guint champlain_base_marker_signals[LAST_SIGNAL] = { 0, }; */
@@ -75,6 +77,8 @@ struct _ChamplainBaseMarkerPrivate
   gdouble lon;
   gdouble lat;
   gboolean highlighted;
+  gboolean selectable;
+  gboolean movable;
   
   ChamplainFloatPoint click_coord;
 };
@@ -102,6 +106,14 @@ champlain_base_marker_get_property (GObject *object,
       g_value_set_boolean (value, priv->highlighted);
       break;
 
+    case PROP_SELECTABLE:
+      g_value_set_boolean (value, priv->selectable);
+      break;
+      
+    case PROP_MOVABLE:
+      g_value_set_boolean (value, priv->movable);
+      break;
+      
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -137,6 +149,20 @@ champlain_base_marker_set_property (GObject *object,
     {
       gboolean bvalue = g_value_get_boolean (value);
       champlain_base_marker_set_highlighted (base_marker, bvalue);
+      break;
+    }
+
+    case PROP_SELECTABLE:
+    {
+      gboolean bvalue = g_value_get_boolean (value);
+      champlain_base_marker_set_selectable (base_marker, bvalue);
+      break;
+    }
+
+    case PROP_MOVABLE:
+    {
+      gboolean bvalue = g_value_get_boolean (value);
+      champlain_base_marker_set_movable (base_marker, bvalue);
       break;
     }
 
@@ -206,6 +232,31 @@ champlain_base_marker_class_init (ChamplainBaseMarkerClass *marker_class)
       g_param_spec_boolean ("highlighted", "Highlighted",
           "The highlighted stated of the marker",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
+          
+  /**
+   * ChamplainBaseMarker:selectable:
+   *
+   * The selectable state of the marker
+   *
+   * Since: 0.10
+   */
+  g_object_class_install_property (object_class, PROP_SELECTABLE,
+      g_param_spec_boolean ("selectable", "Selectable",
+          "The movable stated of the marker",
+          FALSE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+   * ChamplainBaseMarker:movable:
+   *
+   * The movable state of the marker
+   *
+   * Since: 0.10
+   */
+  g_object_class_install_property (object_class, PROP_MOVABLE,
+      g_param_spec_boolean ("movable", "Movable",
+          "The movable state of the marker",
+          FALSE, CHAMPLAIN_PARAM_READWRITE));
+          
 }
 
 
@@ -265,31 +316,40 @@ button_press_event_cb (ClutterActor        *actor,
   ChamplainBaseMarkerPrivate *priv = marker->priv;
   ClutterButtonEvent *bevent = (ClutterButtonEvent *)event;
   ClutterActor *stage = clutter_actor_get_stage (actor);
+  gboolean swallow_event = FALSE;
 
-  if ((event->type == CLUTTER_BUTTON_PRESS) &&
-      (bevent->button == 1) &&
-      stage)
+  if (event->type != CLUTTER_BUTTON_PRESS ||
+      bevent->button != 1 ||
+      !stage)
     {
-      if (clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
-                                               &priv->click_coord.x, &priv->click_coord.y))
-        {
-          g_signal_connect (stage,
-                            "captured-event",
-                            G_CALLBACK (motion_event_cb),
-                            marker);
-          g_signal_connect (stage,
-                            "captured-event",
-                            G_CALLBACK (button_release_event_cb),
-                            marker);
-
-          clutter_set_motion_events_enabled (FALSE);
-
-          /* Swallow the press event */
-          return TRUE;
-        }
+      return swallow_event;
     }
 
-  return FALSE;
+  if (priv->selectable)
+    {
+      champlain_base_marker_set_highlighted (marker, TRUE);
+      swallow_event = TRUE;
+    }
+          
+  if (priv->movable &&
+      clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
+                                           &priv->click_coord.x, &priv->click_coord.y))
+    {
+      g_signal_connect (stage,
+                        "captured-event",
+                        G_CALLBACK (motion_event_cb),
+                        marker);
+      g_signal_connect (stage,
+                        "captured-event",
+                        G_CALLBACK (button_release_event_cb),
+                        marker);
+
+      clutter_set_motion_events_enabled (FALSE);
+
+      swallow_event = TRUE;
+    }
+
+  return swallow_event;
 }
 
 
@@ -303,6 +363,10 @@ champlain_base_marker_init (ChamplainBaseMarker *marker)
   priv->lat = 0;
   priv->lon = 0;
   priv->highlighted = FALSE;
+  priv->selectable = FALSE;
+  priv->movable = FALSE;
+  
+  clutter_actor_set_reactive (CLUTTER_ACTOR (marker), TRUE);
   
   g_signal_connect (marker,
                     "button-press-event",
@@ -436,6 +500,84 @@ champlain_base_marker_get_highlighted (ChamplainBaseMarker *marker)
   return marker->priv->highlighted;
 }
 
+
+/**
+ * champlain_base_marker_set_selectable:
+ * @marker: a #ChamplainBaseMarker
+ * @value: the selectable state
+ *
+ * Sets the marker as selectable or not. 
+ *
+ * Since: 0.10
+ */
+void
+champlain_base_marker_set_selectable (ChamplainBaseMarker *marker,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+
+  marker->priv->selectable = value;
+
+  g_object_notify (G_OBJECT (marker), "selectable");
+}
+
+
+/**
+ * champlain_base_marker_get_selectable:
+ * @marker: a #ChamplainBaseMarker
+ *
+ * Checks whether the marker is selectable.
+ *
+ * Returns: the selectable or not state of the marker.
+ *
+ * Since: 0.10
+ */
+gboolean
+champlain_base_marker_get_selectable (ChamplainBaseMarker *marker)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker), FALSE);
+
+  return marker->priv->selectable;
+}
+
+/**
+ * champlain_base_marker_set_movable:
+ * @marker: a #ChamplainBaseMarker
+ * @value: the movable state
+ *
+ * Sets the marker as movable or not. 
+ *
+ * Since: 0.10
+ */
+void
+champlain_base_marker_set_movable (ChamplainBaseMarker *marker,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+
+  marker->priv->movable = value;
+
+  g_object_notify (G_OBJECT (marker), "movable");
+}
+
+
+/**
+ * champlain_base_marker_get_movable:
+ * @marker: a #ChamplainBaseMarker
+ *
+ * Checks whether the marker is movable.
+ *
+ * Returns: the movable or not state of the marker.
+ *
+ * Since: 0.10
+ */
+gboolean
+champlain_base_marker_get_movable (ChamplainBaseMarker *marker)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker), FALSE);
+
+  return marker->priv->movable;
+}
 
 /**
  * champlain_base_marker_animate_in:
