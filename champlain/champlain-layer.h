@@ -98,16 +98,12 @@ void champlain_layer_animate_out_all_markers (ChamplainLayer *layer);
 void champlain_layer_show_all_markers (ChamplainLayer *layer);
 void champlain_layer_hide_all_markers (ChamplainLayer *layer);
 
-void champlain_layer_select (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker);
-void champlain_layer_unselect (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker);
 gboolean champlain_layer_marker_is_selected (ChamplainLayer *layer,
     ChamplainBaseMarker *marker);
 
 void champlain_layer_select_all (ChamplainLayer *layer);
 void champlain_layer_unselect_all (ChamplainLayer *layer);
-const GList *champlain_layer_get_selected_markers (ChamplainLayer *layer);
+GSList *champlain_layer_get_selected_markers (ChamplainLayer *layer);
 
 void champlain_layer_set_selection_mode (ChamplainLayer *layer,
     ChamplainSelectionMode mode);

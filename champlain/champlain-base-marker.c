@@ -331,14 +331,17 @@ button_press_event_cb (ClutterActor        *actor,
       swallow_event = TRUE;
     }
           
-  if (priv->movable &&
-      clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
+  if (clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
                                            &priv->click_coord.x, &priv->click_coord.y))
     {
-      g_signal_connect (stage,
-                        "captured-event",
-                        G_CALLBACK (motion_event_cb),
-                        marker);
+      if (priv->movable) 
+        {
+          g_signal_connect (stage,
+                            "captured-event",
+                            G_CALLBACK (motion_event_cb),
+                            marker);
+        }
+    
       g_signal_connect (stage,
                         "captured-event",
                         G_CALLBACK (button_release_event_cb),
@@ -363,7 +366,7 @@ champlain_base_marker_init (ChamplainBaseMarker *marker)
   priv->lat = 0;
   priv->lon = 0;
   priv->highlighted = FALSE;
-  priv->selectable = FALSE;
+  priv->selectable = TRUE;
   priv->movable = FALSE;
   
   clutter_actor_set_reactive (CLUTTER_ACTOR (marker), TRUE);

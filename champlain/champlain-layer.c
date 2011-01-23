@@ -62,9 +62,13 @@ static guint signals[LAST_SIGNAL] = { 0, };
 struct _ChamplainLayerPrivate
 {
   ChamplainSelectionMode mode;
-  GList *selection;
   ChamplainView *view;
 };
+
+
+static void marker_highlighted_cb (ChamplainBaseMarker *marker,
+    G_GNUC_UNUSED GParamSpec *arg1,
+    ChamplainLayer *layer);
 
 static void
 champlain_layer_get_property (GObject *object,
@@ -111,11 +115,6 @@ champlain_layer_dispose (GObject *object)
   ChamplainLayer *self = CHAMPLAIN_LAYER (object);
   ChamplainLayerPrivate *priv = self->priv;
   
-  if (priv->selection != NULL)
-    {
-      champlain_layer_unselect_all (self);
-    }
-
   if (priv->view != NULL)
     {
       champlain_layer_set_view (self, NULL);
@@ -175,13 +174,30 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
 }
 
 
+static gboolean
+button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
+    ClutterEvent *event,
+    ChamplainLayer *layer)
+{
+  if (clutter_event_get_button (event) != 1)
+    return FALSE;
+    
+  champlain_layer_unselect_all (layer);
+
+  return FALSE;
+}
+
+
 static void
 champlain_layer_init (ChamplainLayer *self)
 {
   self->priv = GET_PRIVATE (self);
   self->priv->mode = CHAMPLAIN_SELECTION_NONE;
-  self->priv->selection = NULL;
   self->priv->view = NULL;
+  
+  clutter_actor_set_reactive (CLUTTER_ACTOR (self), TRUE);
+  g_signal_connect (self, "button-release-event",
+    G_CALLBACK (button_release_cb), self);  
 }
 
 
@@ -203,57 +219,43 @@ champlain_layer_new_full (ChamplainSelectionMode mode)
 
 
 static void
-marker_select (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker)
+set_highlighted_all_but_one (ChamplainLayer *layer,
+    ChamplainBaseMarker *not_highlighted,
+    gboolean highlight)
 {
-  /* Add selection */
-  g_object_ref (marker);
-  champlain_base_marker_set_highlighted (marker, TRUE);
-  layer->priv->selection = g_list_prepend (layer->priv->selection, marker);
+  int i;
+  
+  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+    {
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+      
+      if (marker != not_highlighted)
+        {
+          g_signal_handlers_block_by_func (marker, 
+              G_CALLBACK (marker_highlighted_cb), 
+              layer);
 
-  g_signal_emit_by_name (layer, "changed", NULL);
+          champlain_base_marker_set_highlighted (marker, highlight);
+          champlain_base_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
+
+          g_signal_handlers_unblock_by_func (marker, 
+              G_CALLBACK (marker_highlighted_cb), 
+              layer);
+        }
+    }
 }
+
 
 
 static void
-select (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker,
-    gboolean mouse,
-    gboolean append)
+marker_highlighted_cb (ChamplainBaseMarker *marker,
+    G_GNUC_UNUSED GParamSpec *arg1,
+    ChamplainLayer *layer)
 {
-  if (layer->priv->mode == CHAMPLAIN_SELECTION_NONE)
-    return;
-
-  if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE || (mouse && !append))
+  if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
     {
-      /* Clear previous selection */
-      champlain_layer_unselect_all (layer);
-      marker_select (layer, marker);
+      set_highlighted_all_but_one (layer, marker, FALSE);
     }
-  else if (layer->priv->mode == CHAMPLAIN_SELECTION_MULTIPLE)
-    {
-      if (champlain_layer_marker_is_selected (layer, marker))
-        {
-          if (mouse)
-            champlain_layer_unselect (layer, marker);
-        }
-      else
-        marker_select (layer, marker);
-    }
-}
-
-
-static gboolean
-marker_clicked_cb (ClutterActor *actor,
-    ClutterButtonEvent *event,
-    gpointer user_data)
-{
-  select (CHAMPLAIN_LAYER (user_data),
-      CHAMPLAIN_BASE_MARKER (actor),
-      TRUE,
-      (event->modifier_state & CLUTTER_CONTROL_MASK));
-
-  return TRUE;
 }
 
 
@@ -270,15 +272,13 @@ void
 champlain_layer_add_marker (ChamplainLayer *layer,
     ChamplainBaseMarker *marker)
 {
-  ClutterActor *actor = CLUTTER_ACTOR (marker);
-    
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
   g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
 
-  clutter_actor_set_reactive (actor, TRUE);
+  champlain_base_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
 
-  g_signal_connect (G_OBJECT (marker), "button-release-event",
-      G_CALLBACK (marker_clicked_cb), layer);
+  g_signal_connect (G_OBJECT (marker), "notify::highlighted",
+      G_CALLBACK (marker_highlighted_cb), layer);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
 }
@@ -301,7 +301,7 @@ champlain_layer_remove_marker (ChamplainLayer *layer,
   g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
 
   g_signal_handlers_disconnect_by_func (G_OBJECT (marker),
-      G_CALLBACK (marker_clicked_cb), layer);
+      G_CALLBACK (marker_highlighted_cb), layer);
 
   clutter_container_remove_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
 }
@@ -359,7 +359,6 @@ champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
 }
 
 
-//TODO: do we need it? (we can hide the whole layer)
 /**
  * champlain_layer_show_all_markers:
  * @layer: a #ChamplainLayer
@@ -383,7 +382,6 @@ champlain_layer_show_all_markers (ChamplainLayer *layer)
     }
 }
 
-//TODO: do we need it? (we can hide the whole layer)
 /**
  * champlain_layer_hide_all_markers:
  * @layer: a #ChamplainLayer
@@ -414,90 +412,29 @@ champlain_layer_hide_all_markers (ChamplainLayer *layer)
  *
  * Gets the list of selected markers.
  *
- * Returns: (transfer none) (element-type ChamplainBaseMarker): the list of selected #ChamplainBaseMarker or NULL if none is selected.
- * You shouldn't free that list.
+ * Returns: (transfer container) (element-type ChamplainBaseMarker): the list of selected #ChamplainBaseMarker or NULL if none is selected.
+ * You should free the list but not the elements of the list.
  *
- * Since: 0.4
+ * Since: 0.10
  */
-const GList *
+GSList *
 champlain_layer_get_selected_markers (ChamplainLayer *layer)
 {
-  return layer->priv->selection;
-}
-
-
-/**
- * champlain_layer_select:
- * @layer: a #ChamplainLayer
- * @marker: a #ChamplainBaseMarker
- *
- * Selects the marker.
- *
- * Since: 0.4
- */
-void
-champlain_layer_select (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker)
-{
-  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
-  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
-
-  select (layer, marker, FALSE, FALSE);
-}
-
-
-/**
- * champlain_layer_unselect:
- * @layer: a #ChamplainLayer
- * @marker: a #ChamplainBaseMarker
- *
- * Unselect the marker.
- *
- * Since: 0.4
- */
-void
-champlain_layer_unselect (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker)
-{
-  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
-  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
-
-  GList *selection;
-
-  selection = g_list_find (layer->priv->selection, marker);
-  if (selection != NULL)
+  GSList *lst = NULL;
+    
+  g_return_val_if_fail (CHAMPLAIN_IS_LAYER (layer), NULL);
+    
+  gint i, n_children;
+  
+  n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
+  for (i = 0; i < n_children; i++)
     {
-      champlain_base_marker_set_highlighted (marker, FALSE);
-      g_object_unref (selection->data);
-      layer->priv->selection = g_list_delete_link (layer->priv->selection, selection);
-
-      g_signal_emit_by_name (layer, "changed", NULL);
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      
+      lst = g_slist_prepend (lst, actor);
     }
-}
 
-
-/**
- * champlain_layer_marker_is_selected:
- * @layer: a #ChamplainLayer
- * @marker: a #ChamplainBaseMarker
- *
- * Checks whether the marker is selected.
- *
- * Returns: whether the marker is selected or not.
- *
- * Since: 0.4
- */
-gboolean
-champlain_layer_marker_is_selected (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_LAYER (layer), FALSE);
-  g_return_val_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker), FALSE);
-
-  GList *selection;
-
-  selection = g_list_find (layer->priv->selection, marker);
-  return selection != NULL;
+  return lst;
 }
 
 
@@ -514,20 +451,7 @@ champlain_layer_unselect_all (ChamplainLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  GList *selection = layer->priv->selection;
-  
-  if (selection == NULL)
-    return;
-
-  while (selection != NULL)
-    {
-      champlain_base_marker_set_highlighted (selection->data, FALSE);
-      g_object_unref (selection->data);
-      selection = g_list_delete_link (selection, selection);
-    }
-  layer->priv->selection = NULL;
-
-  g_signal_emit_by_name (layer, "changed", NULL);
+  set_highlighted_all_but_one (layer, NULL, FALSE);
 }
 
 
@@ -545,26 +469,7 @@ champlain_layer_select_all (ChamplainLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  gint n_children;
-  gint i;
-
-  if (layer->priv->mode == CHAMPLAIN_SELECTION_NONE)
-    return;
-
-  if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
-    return;
-
-  n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
-  for (i = 0; i < n_children; i++)
-    {
-      ClutterActor *actor = clutter_group_get_nth_child (
-          CLUTTER_GROUP (layer), i);
-      if (CHAMPLAIN_IS_BASE_MARKER (actor))
-        {
-          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
-          select (layer, marker, FALSE, FALSE);
-        }
-    }
+  set_highlighted_all_but_one (layer, NULL, TRUE);
 }
 
 
@@ -586,14 +491,16 @@ champlain_layer_set_selection_mode (ChamplainLayer *layer,
 {
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
+  gboolean highlight;
+  
   if (layer->priv->mode == mode)
     return;
   layer->priv->mode = mode;
 
-  /* Switching to single mode shouldn't keep the selection */
-  if (mode == CHAMPLAIN_SELECTION_NONE ||
-      mode == CHAMPLAIN_SELECTION_SINGLE)
-    champlain_layer_unselect_all (layer);
+  highlight = mode != CHAMPLAIN_SELECTION_NONE &&
+              mode != CHAMPLAIN_SELECTION_SINGLE;
+
+  set_highlighted_all_but_one (layer, NULL, highlight);
 
   g_object_notify (G_OBJECT (layer), "selection-mode");
 }
@@ -620,8 +527,7 @@ champlain_layer_get_selection_mode (ChamplainLayer *layer)
 
 
 static void
-relocate_cb (G_GNUC_UNUSED GObject *gobject,
-    ChamplainLayer *layer)
+relocate (ChamplainLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
     
@@ -633,45 +539,27 @@ relocate_cb (G_GNUC_UNUSED GObject *gobject,
   n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
   for (i = 0; i < n_children; i++)
     {
-      ClutterActor *actor = clutter_group_get_nth_child (
-          CLUTTER_GROUP (layer), i);
-      if (CHAMPLAIN_IS_BASE_MARKER (actor))
-        {
-          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
-          gint x, y;
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      gint x, y;
 
-          x = champlain_view_longitude_to_layer_x (priv->view, 
-            champlain_base_marker_get_longitude (marker));
-          y = champlain_view_latitude_to_layer_y (priv->view, 
-            champlain_base_marker_get_latitude (marker));
+      x = champlain_view_longitude_to_layer_x (priv->view, 
+        champlain_base_marker_get_longitude (marker));
+      y = champlain_view_latitude_to_layer_y (priv->view, 
+        champlain_base_marker_get_latitude (marker));
 
-          clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
-        }
+      clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
     }
 }
 
-
-static gboolean
-button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
-    ClutterEvent *event,
+static void
+relocate_cb (G_GNUC_UNUSED GObject *gobject,
     ChamplainLayer *layer)
 {
-  gboolean found = FALSE;
-  
-  if (clutter_event_get_button (event) != 1)
-    return FALSE;
-
-  if (champlain_layer_get_selected_markers (layer) != NULL)
-    {
-      champlain_layer_unselect_all (layer);
-      found = TRUE;
-    }
-
-  return found;
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+    
+  relocate (layer);
 }
-
-
-
 
 
 void champlain_layer_set_view (ChamplainLayer *layer,
@@ -695,9 +583,7 @@ void champlain_layer_set_view (ChamplainLayer *layer,
       g_signal_connect (view, "layer-relocated",
         G_CALLBACK (relocate_cb), layer);
         
-      g_signal_connect_after (view, "button-release-event",
-        G_CALLBACK (button_release_cb), layer);
-  
+      relocate (layer);          
     }
 }
 
