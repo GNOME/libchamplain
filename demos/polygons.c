@@ -71,7 +71,7 @@ main (int argc,
     char *argv[])
 {
   ClutterActor *actor, *stage, *buttons, *button;
-  ChamplainPolygon *polygon;
+//  ChamplainPolygon *polygon;
   gfloat width, total_width = 0;;
 
   g_thread_init (NULL);
@@ -110,9 +110,9 @@ main (int argc,
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), buttons);
 
   /* draw a line */
-  polygon = champlain_polygon_new ();
+//  polygon = champlain_polygon_new ();
   /* Cheap approx of Highway 10 */
-  champlain_polygon_append_point (polygon, 45.4095, -73.3197);
+/*  champlain_polygon_append_point (polygon, 45.4095, -73.3197);
   champlain_polygon_append_point (polygon, 45.4104, -73.2846);
   champlain_polygon_append_point (polygon, 45.4178, -73.2239);
   champlain_polygon_append_point (polygon, 45.4176, -73.2181);
@@ -123,9 +123,9 @@ main (int argc,
   champlain_polygon_append_point (polygon, 45.4151, -73.1218);
   champlain_polygon_set_stroke_width (polygon, 5.0);
   champlain_view_add_polygon (CHAMPLAIN_VIEW (actor), polygon);
-
+*/
   /* draw a polygon */
-  polygon = champlain_polygon_new ();
+/*  polygon = champlain_polygon_new ();
   champlain_polygon_append_point (polygon, 45.1386, -73.9196);
   champlain_polygon_append_point (polygon, 45.1229, -73.8991);
   champlain_polygon_append_point (polygon, 45.0946, -73.9531);
@@ -134,7 +134,7 @@ main (int argc,
   g_object_set (polygon, "closed-path", TRUE, NULL);
   g_object_set (polygon, "fill", TRUE, NULL);
   champlain_view_add_polygon (CHAMPLAIN_VIEW (actor), polygon);
-
+*/
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (actor), "zoom-level", 8,
       "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC, NULL);

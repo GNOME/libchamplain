@@ -27,7 +27,6 @@
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-base-marker.h>
 #include <champlain/champlain-layer.h>
-#include <champlain/champlain-polygon.h>
 #include <champlain/champlain-map-source.h>
 
 #include <glib.h>
@@ -167,11 +166,6 @@ gboolean champlain_view_get_show_scale (ChamplainView *view);
 guint champlain_view_get_max_scale_width (ChamplainView *view);
 ChamplainUnit champlain_view_get_scale_unit (ChamplainView *view);
 gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
-
-void champlain_view_add_polygon (ChamplainView *view,
-    ChamplainPolygon *polygon);
-void champlain_view_remove_polygon (ChamplainView *view,
-    ChamplainPolygon *polygon);
 
 void champlain_view_reload_tiles (ChamplainView *view);
 

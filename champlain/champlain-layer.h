@@ -113,6 +113,26 @@ ChamplainSelectionMode champlain_layer_get_selection_mode (
 //    ChamplainBaseMarker *markers[],
 //    gboolean animate);
 
+void champlain_layer_set_polygon_fill_color (ChamplainLayer *layer,
+    const ClutterColor *color);
+void champlain_layer_set_polygon_stroke_color (ChamplainLayer *layer,
+    const ClutterColor *color);
+ClutterColor *champlain_layer_get_polygon_fill_color (ChamplainLayer *layer);
+ClutterColor *champlain_layer_get_polygon_stroke_color (ChamplainLayer *layer);
+
+gboolean champlain_layer_get_polygon_fill (ChamplainLayer *layer);
+void champlain_layer_set_polygon_fill (ChamplainLayer *layer,
+    gboolean value);
+gboolean champlain_layer_get_polygon_stroke (ChamplainLayer *layer);
+void champlain_layer_set_polygon_stroke (ChamplainLayer *layer,
+    gboolean value);
+void champlain_layer_set_polygon_stroke_width (ChamplainLayer *layer,
+    gdouble value);
+gdouble champlain_layer_get_polygon_stroke_width (ChamplainLayer *layer);
+
+void champlain_layer_show_polygon (ChamplainLayer *layer);
+void champlain_layer_hide_polygon (ChamplainLayer *layer);
+
 G_END_DECLS
 
 #endif

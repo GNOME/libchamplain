@@ -28,7 +28,7 @@
 #define COL_ID 0
 #define COL_NAME 1
 
-static ChamplainPolygon *polygon;
+//static ChamplainPolygon *polygon;
 static gboolean destroying = FALSE;
 
 /*
@@ -48,12 +48,12 @@ toggle_layer (GtkToggleButton *widget,
 {
   if (gtk_toggle_button_get_active (widget))
     {
-      champlain_polygon_show (polygon);
+//      champlain_polygon_show (polygon);
       champlain_layer_animate_in_all_markers (CHAMPLAIN_LAYER (layer));
     }
   else
     {
-      champlain_polygon_hide (polygon);
+//      champlain_polygon_hide (polygon);
       champlain_layer_animate_out_all_markers (CHAMPLAIN_LAYER (layer));
     }
 }
@@ -246,9 +246,9 @@ main (int argc,
   champlain_view_add_layer (view, layer);
   champlain_layer_hide_all_markers (CHAMPLAIN_LAYER (layer));
 
-  polygon = champlain_polygon_new ();
+//  polygon = champlain_polygon_new ();
   /* Cheap approx of Highway 10 */
-  champlain_polygon_append_point (polygon, 45.4095, -73.3197);
+/*  champlain_polygon_append_point (polygon, 45.4095, -73.3197);
   champlain_polygon_append_point (polygon, 45.4104, -73.2846);
   champlain_polygon_append_point (polygon, 45.4178, -73.2239);
   champlain_polygon_append_point (polygon, 45.4176, -73.2181);
@@ -263,7 +263,7 @@ main (int argc,
       NULL);
   champlain_view_add_polygon (CHAMPLAIN_VIEW (view), polygon);
   champlain_polygon_hide (polygon);
-
+*/
   gtk_widget_set_size_request (widget, 640, 480);
 
   bbox = gtk_hbox_new (FALSE, 10);

@@ -59,7 +59,6 @@
 #include "champlain-marshal.h"
 #include "champlain-map-source.h"
 #include "champlain-map-source-factory.h"
-#include "champlain-polygon.h"
 #include "champlain-private.h"
 #include "champlain-tile.h"
 
@@ -136,11 +135,6 @@ typedef struct
   gdouble from_longitude;
 } GoToContext;
 
-typedef struct
-{
-  ChamplainView *view;
-  ChamplainPolygon *polygon;
-} PolygonRedrawContext;
 
 typedef struct
 {
@@ -198,12 +192,6 @@ struct _ChamplainViewPrivate
   /* champlain_view_go_to's context, kept for stop_go_to */
   GoToContext *goto_context;
 
-  /* notify_polygon_cb's context, kept for idle cb */
-  guint polygon_redraw_id;
-
-  /* Lines and shapes */
-  ClutterActor *polygon_layer;  /* Contains the polygons */
-
   gint tiles_loading;
 };
 
@@ -245,7 +233,6 @@ static gboolean view_set_zoom_level_at (ChamplainView *view,
 static void tile_state_notify (ChamplainTile *tile,
     G_GNUC_UNUSED GParamSpec *pspec,
     ChamplainView *view);
-static void view_update_polygons (ChamplainView *view);
 static gboolean finger_scroll_key_press_cb (ClutterActor *actor,
     ClutterKeyEvent *event,
     ChamplainView *view);
@@ -297,7 +284,6 @@ update_viewport (ChamplainView *view,
       y);
 
   view_load_visible_tiles (view);
-  view_update_polygons (view);
   update_scale (view);
 
   g_object_notify (G_OBJECT (view), "longitude");
@@ -341,47 +327,6 @@ scroll_event (G_GNUC_UNUSED ClutterActor *actor,
     zoom_level = priv->zoom_level - 1;
 
   return view_set_zoom_level_at (view, zoom_level, event->x, event->y);
-}
-
-
-static gboolean
-redraw_polygon_on_idle (PolygonRedrawContext *ctx)
-{
-  DEBUG_LOG ()
-
-  ChamplainViewPrivate *priv = ctx->view->priv;
-
-  if (ctx->polygon)
-    champlain_polygon_draw_polygon (ctx->polygon, ctx->view);
-
-  priv->polygon_redraw_id = 0;
-
-  g_object_unref (ctx->view);
-  g_object_unref (ctx->polygon);
-  /* ctx is freed by g_idle_add_full */
-  return FALSE;
-}
-
-
-static void
-notify_polygon_cb (ChamplainPolygon *polygon,
-    G_GNUC_UNUSED GParamSpec *arg1,
-    ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  ChamplainViewPrivate *priv = view->priv;
-  PolygonRedrawContext *ctx;
-
-  if (priv->polygon_redraw_id != 0)
-    return;
-
-  ctx = g_new0 (PolygonRedrawContext, 1);
-  ctx->view = g_object_ref (view);
-  ctx->polygon = g_object_ref (polygon);
-
-  priv->polygon_redraw_id = g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
-        (GSourceFunc) redraw_polygon_on_idle, ctx, g_free);
 }
 
 
@@ -663,12 +608,6 @@ champlain_view_dispose (GObject *object)
     {
       g_object_unref (priv->user_layers);
       priv->user_layers = NULL;
-    }
-
-  if (priv->polygon_layer != NULL)
-    {
-      g_object_unref (CLUTTER_ACTOR (priv->polygon_layer));
-      priv->polygon_layer = NULL;
     }
 
   if (priv->goto_context != NULL)
@@ -1367,7 +1306,6 @@ champlain_view_init (ChamplainView *view)
   priv->latitude = 0.0f;
   priv->longitude = 0.0f;
   priv->goto_context = NULL;
-  priv->polygon_redraw_id = 0;
   priv->show_scale = FALSE;
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
   priv->max_scale_width = 100;
@@ -1378,10 +1316,6 @@ champlain_view_init (ChamplainView *view)
   priv->map_layer = g_object_ref (clutter_group_new ());
   clutter_actor_show (priv->map_layer);
 
-  /* Setup polygon layer */
-  priv->polygon_layer = g_object_ref (clutter_group_new ());
-  clutter_actor_show (priv->polygon_layer);
-
   /* Setup user_layers */
   priv->user_layers = g_object_ref (clutter_group_new ());
   clutter_actor_show (priv->user_layers);
@@ -1390,8 +1324,6 @@ champlain_view_init (ChamplainView *view)
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport_container),
       priv->map_layer);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport_container),
-      priv->polygon_layer);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport_container),
       priv->user_layers);
 
@@ -1408,7 +1340,6 @@ champlain_view_init (ChamplainView *view)
   g_signal_connect (priv->viewport, "notify::y-origin",
       G_CALLBACK (viewport_pos_changed_cb), view);
 
-  clutter_actor_raise (priv->polygon_layer, priv->map_layer);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
 
   /* Setup finger scroll */
@@ -3239,86 +3170,4 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
 
   return view->priv->zoom_on_double_click;
-}
-
-
-static void
-view_update_polygons (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  ChamplainViewPrivate *priv = view->priv;
-  ClutterGroup *polygon_layer_group = CLUTTER_GROUP (priv->polygon_layer);
-  guint polygon_num, i;
-  gfloat x, y;
-
-  polygon_num = clutter_group_get_n_children (polygon_layer_group);
-
-  if (polygon_num == 0)
-    return;
-
-  for (i = 0; i < polygon_num; i++)
-    {
-      ChamplainPolygon *polygon = CHAMPLAIN_POLYGON (clutter_group_get_nth_child (polygon_layer_group, i));
-
-      champlain_polygon_draw_polygon (polygon, view);
-    }
-
-  /* Position the layer in the viewport */
-  x = priv->viewport_size.x;
-  y = priv->viewport_size.y;
-
-  clutter_actor_set_position (priv->polygon_layer, x, y);
-}
-
-
-/**
- * champlain_view_add_polygon:
- * @view: a #ChamplainView
- * @polygon: a #ChamplainPolygon
- *
- * Adds a #ChamplainPolygon to the #ChamplainView
- *
- * Since: 0.4
- */
-void
-champlain_view_add_polygon (ChamplainView *view,
-    ChamplainPolygon *polygon)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
-
-  ChamplainViewPrivate *priv = view->priv;
-
-  g_signal_connect (polygon, "notify",
-      G_CALLBACK (notify_polygon_cb), view);
-
-  clutter_actor_set_position (CLUTTER_ACTOR (polygon), 0, 0);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->polygon_layer),
-      CLUTTER_ACTOR (polygon));
-}
-
-
-/**
- * champlain_view_remove_polygon:
- * @view: a #ChamplainView
- * @polygon: a #ChamplainPolygon
- *
- * Removes a #ChamplainPolygon from #ChamplainView
- *
- * Since: 0.4
- */
-void
-champlain_view_remove_polygon (ChamplainView *view,
-    ChamplainPolygon *polygon)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_POLYGON (polygon));
-
-  clutter_container_remove_actor (CLUTTER_CONTAINER (view->priv->polygon_layer),
-      CLUTTER_ACTOR (polygon));
 }

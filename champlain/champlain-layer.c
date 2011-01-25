@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -54,8 +54,18 @@ enum
 enum
 {
   PROP_0,
-  PROP_SELECTION_MODE
+  PROP_SELECTION_MODE,
+  PROP_CLOSED_PATH,
+  PROP_STROKE_WIDTH,
+  PROP_STROKE_COLOR,
+  PROP_FILL,
+  PROP_FILL_COLOR,
+  PROP_STROKE,
+  PROP_VISIBLE,
 };
+
+static ClutterColor DEFAULT_FILL_COLOR = { 0xcc, 0x00, 0x00, 0xaa };
+static ClutterColor DEFAULT_STROKE_COLOR = { 0xa4, 0x00, 0x00, 0xff };
 
 static guint signals[LAST_SIGNAL] = { 0, };
 
@@ -63,6 +73,15 @@ struct _ChamplainLayerPrivate
 {
   ChamplainSelectionMode mode;
   ChamplainView *view;
+  
+  ClutterActor *polygon_actor;
+  gboolean closed_path;
+  ClutterColor *stroke_color;
+  gboolean fill;
+  ClutterColor *fill_color;
+  gboolean stroke;
+  gdouble stroke_width;
+  gboolean visible;
 };
 
 
@@ -84,6 +103,35 @@ champlain_layer_get_property (GObject *object,
     case PROP_SELECTION_MODE:
       g_value_set_enum (value, priv->mode);
       break;
+      
+    case PROP_CLOSED_PATH:
+      g_value_set_boolean (value, priv->closed_path);
+      break;
+
+    case PROP_FILL:
+      g_value_set_boolean (value, priv->fill);
+      break;
+
+    case PROP_STROKE:
+      g_value_set_boolean (value, priv->stroke);
+      break;
+
+    case PROP_FILL_COLOR:
+      clutter_value_set_color (value, priv->fill_color);
+      break;
+
+    case PROP_STROKE_COLOR:
+      clutter_value_set_color (value, priv->stroke_color);
+      break;
+
+    case PROP_STROKE_WIDTH:
+      g_value_set_double (value, priv->stroke_width);
+      break;
+
+    case PROP_VISIBLE:
+      g_value_set_boolean (value, priv->visible);
+      break;
+      
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -97,12 +145,50 @@ champlain_layer_set_property (GObject *object,
     GParamSpec *pspec)
 {
   ChamplainLayer *self = CHAMPLAIN_LAYER (object);
+  ChamplainLayerPrivate *priv = self->priv;
   
   switch (property_id)
     {
     case PROP_SELECTION_MODE:
       champlain_layer_set_selection_mode (self, g_value_get_enum (value));
       break;
+      
+    case PROP_CLOSED_PATH:
+      priv->closed_path = g_value_get_boolean (value);
+      break;
+
+    case PROP_FILL:
+      champlain_layer_set_polygon_fill (CHAMPLAIN_LAYER (object),
+          g_value_get_boolean (value));
+      break;
+
+    case PROP_STROKE:
+      champlain_layer_set_polygon_stroke (CHAMPLAIN_LAYER (object),
+          g_value_get_boolean (value));
+      break;
+
+    case PROP_FILL_COLOR:
+      champlain_layer_set_polygon_fill_color (CHAMPLAIN_LAYER (object),
+          clutter_value_get_color (value));
+      break;
+
+    case PROP_STROKE_COLOR:
+      champlain_layer_set_polygon_stroke_color (CHAMPLAIN_LAYER (object),
+          clutter_value_get_color (value));
+      break;
+
+    case PROP_STROKE_WIDTH:
+      champlain_layer_set_polygon_stroke_width (CHAMPLAIN_LAYER (object),
+          g_value_get_double (value));
+      break;
+
+    case PROP_VISIBLE:
+      if (g_value_get_boolean (value))
+        champlain_layer_show_polygon (CHAMPLAIN_LAYER (object));
+      else
+        champlain_layer_hide_polygon (CHAMPLAIN_LAYER (object));
+      break;
+      
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -127,6 +213,12 @@ champlain_layer_dispose (GObject *object)
 static void
 champlain_layer_finalize (GObject *object)
 {
+  ChamplainLayer *self = CHAMPLAIN_LAYER (object);
+  ChamplainLayerPrivate *priv = self->priv;
+  
+  clutter_color_free (priv->stroke_color);
+  clutter_color_free (priv->fill_color);
+
   G_OBJECT_CLASS (champlain_layer_parent_class)->finalize (object);
 }
 
@@ -157,6 +249,109 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
           "Determines the type of selection that will be performed.",
           CHAMPLAIN_TYPE_SELECTION_MODE,
           CHAMPLAIN_SELECTION_NONE,
+          CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+   * ChamplainPolygon:close-path:
+   *
+   * The shape is a closed path
+   *
+   * Since: 0.4
+   */
+  g_object_class_install_property (object_class,
+      PROP_CLOSED_PATH,
+      g_param_spec_boolean ("closed-path",
+          "Closed Path",
+          "The Path is Closed",
+          FALSE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+   * ChamplainPolygon:fill:
+   *
+   * The shape should be filled
+   *
+   * Since: 0.4
+   */
+  g_object_class_install_property (object_class,
+      PROP_FILL,
+      g_param_spec_boolean ("fill",
+          "Fill",
+          "The shape is filled",
+          FALSE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+   * ChamplainPolygon:stroke:
+   *
+   * The shape should be stroked
+   *
+   * Since: 0.4
+   */
+  g_object_class_install_property (object_class,
+      PROP_STROKE,
+      g_param_spec_boolean ("stroke",
+          "Stroke",
+          "The shape is stroked",
+          TRUE, CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+   * ChamplainPolygon:stroke-color:
+   *
+   * The polygon's stroke color
+   *
+   * Since: 0.4
+   */
+  g_object_class_install_property (object_class,
+      PROP_STROKE_COLOR,
+      clutter_param_spec_color ("stroke-color",
+          "Stroke Color",
+          "The polygon's stroke color",
+          &DEFAULT_STROKE_COLOR,
+          CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+   * ChamplainPolygon:text-color:
+   *
+   * The polygon's fill color
+   *
+   * Since: 0.4
+   */
+  g_object_class_install_property (object_class,
+      PROP_FILL_COLOR,
+      clutter_param_spec_color ("fill-color",
+          "Fill Color",
+          "The polygon's fill color",
+          &DEFAULT_FILL_COLOR,
+          CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+   * ChamplainPolygon:stroke-width:
+   *
+   * The polygon's stroke width (in pixels)
+   *
+   * Since: 0.4
+   */
+  g_object_class_install_property (object_class,
+      PROP_STROKE_WIDTH,
+      g_param_spec_double ("stroke-width",
+          "Stroke Width",
+          "The polygon's stroke width",
+          0, 100.0,
+          2.0,
+          CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+   * ChamplainPolygon:visible:
+   *
+   * Wether the polygon is visible
+   *
+   * Since: 0.4
+   */
+  g_object_class_install_property (object_class,
+      PROP_VISIBLE,
+      g_param_spec_boolean ("visible",
+          "Visible",
+          "The polygon's visibility",
+          TRUE,
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
@@ -191,9 +386,25 @@ button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
 static void
 champlain_layer_init (ChamplainLayer *self)
 {
+  ChamplainLayerPrivate *priv;
+  
   self->priv = GET_PRIVATE (self);
-  self->priv->mode = CHAMPLAIN_SELECTION_NONE;
-  self->priv->view = NULL;
+  priv = self->priv;
+  priv->mode = CHAMPLAIN_SELECTION_NONE;
+  priv->view = NULL;
+
+  priv->visible = TRUE;
+  priv->fill = FALSE;
+  priv->stroke = TRUE;
+  priv->stroke_width = 2.0;
+
+  priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
+  priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
+  
+  //TODO destroy + ref()
+  priv->polygon_actor = clutter_group_new ();
+  clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->polygon_actor);
+  
   
   clutter_actor_set_reactive (CLUTTER_ACTOR (self), TRUE);
   g_signal_connect (self, "button-release-event",
@@ -227,20 +438,24 @@ set_highlighted_all_but_one (ChamplainLayer *layer,
   
   for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
-      
-      if (marker != not_highlighted)
-        {
-          g_signal_handlers_block_by_func (marker, 
-              G_CALLBACK (marker_highlighted_cb), 
-              layer);
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      if (CHAMPLAIN_IS_BASE_MARKER (actor))
+        {    
+          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+          
+          if (marker != not_highlighted)
+            {
+              g_signal_handlers_block_by_func (marker, 
+                  G_CALLBACK (marker_highlighted_cb), 
+                  layer);
 
-          champlain_base_marker_set_highlighted (marker, highlight);
-          champlain_base_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
+              champlain_base_marker_set_highlighted (marker, highlight);
+              champlain_base_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
 
-          g_signal_handlers_unblock_by_func (marker, 
-              G_CALLBACK (marker_highlighted_cb), 
-              layer);
+              g_signal_handlers_unblock_by_func (marker, 
+                  G_CALLBACK (marker_highlighted_cb), 
+                  layer);
+            }
         }
     }
 }
@@ -325,10 +540,14 @@ champlain_layer_animate_in_all_markers (ChamplainLayer *layer)
 
   for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      if (CHAMPLAIN_IS_BASE_MARKER (actor))
+        {    
+          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
 
-      champlain_base_marker_animate_in_with_delay (marker, delay);
-      delay += 50;
+          champlain_base_marker_animate_in_with_delay (marker, delay);
+          delay += 50;
+        }
     }
 }
 
@@ -351,10 +570,14 @@ champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
 
   for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      if (CHAMPLAIN_IS_BASE_MARKER (actor))
+        {    
+          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
 
-      champlain_base_marker_animate_out_with_delay (marker, delay);
-      delay += 50;
+          champlain_base_marker_animate_out_with_delay (marker, delay);
+          delay += 50;
+        }
     }
 }
 
@@ -540,15 +763,18 @@ relocate (ChamplainLayer *layer)
   for (i = 0; i < n_children; i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
-      gint x, y;
+      if (CHAMPLAIN_IS_BASE_MARKER (actor))
+        {    
+          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+          gint x, y;
 
-      x = champlain_view_longitude_to_layer_x (priv->view, 
-        champlain_base_marker_get_longitude (marker));
-      y = champlain_view_latitude_to_layer_y (priv->view, 
-        champlain_base_marker_get_latitude (marker));
+          x = champlain_view_longitude_to_layer_x (priv->view, 
+            champlain_base_marker_get_longitude (marker));
+          y = champlain_view_latitude_to_layer_y (priv->view, 
+            champlain_base_marker_get_latitude (marker));
 
-      clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
+          clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
+        }
     }
 }
 
@@ -559,6 +785,94 @@ relocate_cb (G_GNUC_UNUSED GObject *gobject,
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
     
   relocate (layer);
+}
+
+
+
+static void
+redraw_polygon (ChamplainLayer *layer)
+{
+  ChamplainLayerPrivate *priv = layer->priv;
+  ClutterActor *cairo_texture;
+  cairo_t *cr;
+  gfloat width, height;
+  int i, n_children;
+  ChamplainView *view = priv->view;
+  gdouble lon, lat;
+  gdouble x, y;
+  
+  clutter_actor_get_size (CLUTTER_ACTOR (view), &width, &height);
+
+  if (!priv->visible || width == 0.0 || height == 0.0)
+    return;
+
+  clutter_group_remove_all (CLUTTER_GROUP (priv->polygon_actor));
+  cairo_texture = clutter_cairo_texture_new (width, height);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->polygon_actor), cairo_texture);
+  
+  lon = champlain_view_x_to_longitude (view, 0);
+  lat = champlain_view_y_to_latitude (view, 0);
+  x = champlain_view_longitude_to_layer_x (view, lon);
+  y = champlain_view_latitude_to_layer_y (view, lat);
+  clutter_actor_set_position (priv->polygon_actor, x, y);
+
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
+
+  /* Clear the drawing area */
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_rectangle (cr, 0, 0, width, height);
+  cairo_fill (cr);
+
+  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+  n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
+  for (i = 0; i < n_children; i++)
+    {
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      if (CHAMPLAIN_IS_BASE_MARKER (actor))
+        {    
+          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+          gfloat x, y;
+
+          x = champlain_view_longitude_to_x (view, champlain_base_marker_get_longitude (marker));
+          y = champlain_view_latitude_to_y (view, champlain_base_marker_get_latitude (marker));
+
+          cairo_line_to (cr, x, y);
+        }
+    }
+
+  if (priv->closed_path)
+    cairo_close_path (cr);
+
+  cairo_set_source_rgba (cr,
+      priv->fill_color->red / 255.0,
+      priv->fill_color->green / 255.0,
+      priv->fill_color->blue / 255.0,
+      priv->fill_color->alpha / 255.0);
+
+  if (priv->fill)
+    cairo_fill_preserve (cr);
+
+  cairo_set_source_rgba (cr,
+      priv->stroke_color->red / 255.0,
+      priv->stroke_color->green / 255.0,
+      priv->stroke_color->blue / 255.0,
+      priv->stroke_color->alpha / 255.0);
+
+  cairo_set_line_width (cr, priv->stroke_width);
+
+  if (priv->stroke)
+    cairo_stroke (cr);
+
+  cairo_destroy (cr);
+}
+
+
+static void
+redraw_polygon_cb (G_GNUC_UNUSED GObject *gobject,
+    G_GNUC_UNUSED GParamSpec *arg1,
+    ChamplainLayer *layer)
+{
+  redraw_polygon (layer);
 }
 
 
@@ -582,8 +896,12 @@ void champlain_layer_set_view (ChamplainLayer *layer,
   
       g_signal_connect (view, "layer-relocated",
         G_CALLBACK (relocate_cb), layer);
+
+      g_signal_connect (view, "notify::latitude",
+        G_CALLBACK (redraw_polygon_cb), layer);
         
-      relocate (layer);          
+      relocate (layer);
+      redraw_polygon (layer);
     }
 }
 
@@ -638,4 +956,254 @@ champlain_view_ensure_markers_visible (ChamplainView *view,
   champlain_view_ensure_visible (view, min_lat, min_lon, max_lat, max_lon, animate);
 }*/
 
+
+/**
+ * champlain_polygon_set_fill_color:
+ * @polygon: The polygon
+ * @color: (allow-none): The polygon's fill color or NULL to reset to the
+ *         default color. The color parameter is copied.
+ *
+ * Set the polygon's fill color.
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_set_polygon_fill_color (ChamplainLayer *layer,
+    const ClutterColor *color)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  ChamplainLayerPrivate *priv = layer->priv;
+
+  if (priv->fill_color != NULL)
+    clutter_color_free (priv->fill_color);
+
+  if (color == NULL)
+    color = &DEFAULT_FILL_COLOR;
+
+  priv->fill_color = clutter_color_copy (color);
+  g_object_notify (G_OBJECT (layer), "fill-color");
+}
+
+
+/**
+ * champlain_polygon_set_stroke_color:
+ * @polygon: The polygon
+ * @color: (allow-none): The polygon's stroke color or NULL to reset to the
+ *         default color. The color parameter is copied.
+ *
+ * Set the polygon's stroke color.
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_set_polygon_stroke_color (ChamplainLayer *layer,
+    const ClutterColor *color)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  ChamplainLayerPrivate *priv = layer->priv;
+
+  if (priv->stroke_color != NULL)
+    clutter_color_free (priv->stroke_color);
+
+  if (color == NULL)
+    color = &DEFAULT_STROKE_COLOR;
+
+  priv->stroke_color = clutter_color_copy (color);
+  g_object_notify (G_OBJECT (layer), "stroke-color");
+}
+
+
+/**
+ * champlain_polygon_get_fill_color:
+ * @polygon: The polygon
+ *
+ * Gets the polygon's fill color.
+ *
+ * Returns: the polygon's fill color.
+ *
+ * Since: 0.4
+ */
+ClutterColor *
+champlain_layer_get_polygon_fill_color (ChamplainLayer *layer)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LAYER (layer), NULL);
+
+  return layer->priv->fill_color;
+}
+
+
+/**
+ * champlain_polygon_get_stroke_color:
+ * @polygon: The polygon
+ *
+ * Gets the polygon's stroke color.
+ *
+ * Returns: the polygon's stroke color.
+ *
+ * Since: 0.4
+ */
+ClutterColor *
+champlain_layer_get_polygon_stroke_color (ChamplainLayer *layer)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LAYER (layer), NULL);
+
+  return layer->priv->stroke_color;
+}
+
+
+/**
+ * champlain_polygon_set_stroke:
+ * @polygon: The polygon
+ * @value: if the polygon is stroked
+ *
+ * Sets the polygon to have a stroke
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_set_polygon_stroke (ChamplainLayer *layer,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  layer->priv->stroke = value;
+  g_object_notify (G_OBJECT (layer), "stroke");
+}
+
+
+/**
+ * champlain_polygon_get_stroke:
+ * @polygon: The polygon
+ *
+ * Checks whether the polygon has a stroke.
+ *
+ * Returns: TRUE if the polygon has a stroke, FALSE otherwise.
+ *
+ * Since: 0.4
+ */
+gboolean
+champlain_layer_get_polygon_stroke (ChamplainLayer *layer)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LAYER (layer), FALSE);
+
+  return layer->priv->stroke;
+}
+
+
+/**
+ * champlain_polygon_set_fill:
+ * @polygon: The polygon
+ * @value: if the polygon is filled
+ *
+ * Sets the polygon to have be filled
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_set_polygon_fill (ChamplainLayer *layer,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  layer->priv->fill = value;
+  g_object_notify (G_OBJECT (layer), "fill");
+}
+
+
+/**
+ * champlain_polygon_get_fill:
+ * @polygon: The polygon
+ *
+ * Checks whether the polygon is filled.
+ *
+ * Returns: TRUE if the polygon is filled, FALSE otherwise.
+ *
+ * Since: 0.4
+ */
+gboolean
+champlain_layer_get_polygon_fill (ChamplainLayer *layer)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LAYER (layer), FALSE);
+
+  return layer->priv->fill;
+}
+
+
+/**
+ * champlain_polygon_set_stroke_width:
+ * @polygon: The polygon
+ * @value: the width of the stroke (in pixels)
+ *
+ * Sets the width of the stroke
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_set_polygon_stroke_width (ChamplainLayer *layer,
+    gdouble value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  layer->priv->stroke_width = value;
+  g_object_notify (G_OBJECT (layer), "stroke-width");
+}
+
+
+/**
+ * champlain_polygon_get_stroke_width:
+ * @polygon: The polygon
+ *
+ * Gets the width of the stroke.
+ *
+ * Returns: the width of the stroke
+ *
+ * Since: 0.4
+ */
+gdouble
+champlain_layer_get_polygon_stroke_width (ChamplainLayer *layer)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LAYER (layer), 0);
+
+  return layer->priv->stroke_width;
+}
+
+
+/**
+ * champlain_polygon_show:
+ * @polygon: The polygon
+ *
+ * Makes the polygon visible
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_show_polygon (ChamplainLayer *layer)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  layer->priv->visible = TRUE;
+  clutter_actor_show (CLUTTER_ACTOR (layer->priv->polygon_actor));
+  g_object_notify (G_OBJECT (layer->priv->polygon_actor), "visible");
+}
+
+
+/**
+ * champlain_polygon_hide:
+ * @polygon: The polygon
+ *
+ * Hides the polygon
+ *
+ * Since: 0.4
+ */
+void
+champlain_layer_hide_polygon (ChamplainLayer *layer)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  layer->priv->visible = FALSE;
+  clutter_actor_hide (CLUTTER_ACTOR (layer->priv->polygon_actor));
+  g_object_notify (G_OBJECT (layer->priv->polygon_actor), "visible");
+}
 

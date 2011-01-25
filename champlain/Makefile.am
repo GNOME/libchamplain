@@ -29,7 +29,6 @@ libchamplain_headers_public = 				\
 	$(srcdir)/champlain-file-cache.h		\
 	$(srcdir)/champlain-map-source-factory.h	\
 	$(srcdir)/champlain-map-source-desc.h		\
-	$(srcdir)/champlain-polygon.h			\
 	$(srcdir)/champlain-renderer.h			\
 	$(srcdir)/champlain-image-renderer.h		\
 	$(srcdir)/champlain-error-tile-renderer.h	\
@@ -66,7 +65,6 @@ libchamplain_sources =					\
 	$(srcdir)/champlain-map-source-factory.c	\
 	$(srcdir)/champlain-map-source-desc.c		\
 	$(srcdir)/champlain-point.c			\
-	$(srcdir)/champlain-polygon.c			\
 	$(srcdir)/champlain-renderer.c			\
 	$(srcdir)/champlain-image-renderer.c		\
 	$(srcdir)/champlain-error-tile-renderer.c	\
