@@ -835,6 +835,7 @@ button_release_event_cb (ClutterActor        *stage,
   if (!decelerating)
     {
       clamp_adjustments (scroll, 250, TRUE, TRUE);
+      priv->in_drag = FALSE;
       g_signal_emit_by_name (scroll, "panning-completed", NULL);
     }
 
