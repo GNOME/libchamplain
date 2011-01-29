@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2011 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -52,8 +53,11 @@
 enum
 {
   /* normal signals */
-  LAST_SIGNAL
+  MOVE_BY_SIGNAL,
+  LAST_SIGNAL,
 };
+
+static guint signals[LAST_SIGNAL] = { 0, };
 
 enum
 {
@@ -256,7 +260,11 @@ champlain_base_marker_class_init (ChamplainBaseMarkerClass *marker_class)
       g_param_spec_boolean ("movable", "Movable",
           "The movable state of the marker",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
-          
+
+  signals[MOVE_BY_SIGNAL] =
+    g_signal_new ("move-by", G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+        _champlain_marshal_VOID__FLOAT_FLOAT, G_TYPE_NONE, 2, G_TYPE_FLOAT, G_TYPE_FLOAT);
 }
 
 
@@ -279,7 +287,7 @@ motion_event_cb (ClutterActor        *stage,
       gfloat dx = coord.x - priv->click_coord.x;
       gfloat dy = coord.y - priv->click_coord.y;
         
-      clutter_actor_move_by (CLUTTER_ACTOR (marker), dx, dy);
+      g_signal_emit_by_name (marker, "move-by", dx, dy);
     }
 
   return TRUE;
@@ -322,7 +330,7 @@ button_press_event_cb (ClutterActor        *actor,
       bevent->button != 1 ||
       !stage)
     {
-      return swallow_event;
+      return FALSE;
     }
 
   if (priv->selectable)
@@ -340,16 +348,16 @@ button_press_event_cb (ClutterActor        *actor,
                             "captured-event",
                             G_CALLBACK (motion_event_cb),
                             marker);
+                            
+          g_signal_connect (stage,
+                            "captured-event",
+                            G_CALLBACK (button_release_event_cb),
+                            marker);
+
+          clutter_set_motion_events_enabled (FALSE);
+
+          swallow_event = TRUE;
         }
-    
-      g_signal_connect (stage,
-                        "captured-event",
-                        G_CALLBACK (button_release_event_cb),
-                        marker);
-
-      clutter_set_motion_events_enabled (FALSE);
-
-      swallow_event = TRUE;
     }
 
   return swallow_event;

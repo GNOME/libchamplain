@@ -88,6 +88,9 @@ struct _ChamplainLayerPrivate
 static void marker_highlighted_cb (ChamplainBaseMarker *marker,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainLayer *layer);
+    
+static void redraw_polygon (ChamplainLayer *layer);
+
 
 static void
 champlain_layer_get_property (GObject *object,
@@ -369,20 +372,6 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
 }
 
 
-static gboolean
-button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
-    ClutterEvent *event,
-    ChamplainLayer *layer)
-{
-  if (clutter_event_get_button (event) != 1)
-    return FALSE;
-    
-  champlain_layer_unselect_all (layer);
-
-  return FALSE;
-}
-
-
 static void
 champlain_layer_init (ChamplainLayer *self)
 {
@@ -405,10 +394,6 @@ champlain_layer_init (ChamplainLayer *self)
   priv->polygon_actor = clutter_group_new ();
   clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->polygon_actor);
   
-  
-  clutter_actor_set_reactive (CLUTTER_ACTOR (self), TRUE);
-  g_signal_connect (self, "button-release-event",
-    G_CALLBACK (button_release_cb), self);  
 }
 
 
@@ -436,30 +421,26 @@ set_highlighted_all_but_one (ChamplainLayer *layer,
 {
   int i;
   
-  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      if (CHAMPLAIN_IS_BASE_MARKER (actor))
-        {    
-          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
-          
-          if (marker != not_highlighted)
-            {
-              g_signal_handlers_block_by_func (marker, 
-                  G_CALLBACK (marker_highlighted_cb), 
-                  layer);
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      
+      if (marker != not_highlighted)
+        {
+          g_signal_handlers_block_by_func (marker, 
+              G_CALLBACK (marker_highlighted_cb), 
+              layer);
 
-              champlain_base_marker_set_highlighted (marker, highlight);
-              champlain_base_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
+          champlain_base_marker_set_highlighted (marker, highlight);
+          champlain_base_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
 
-              g_signal_handlers_unblock_by_func (marker, 
-                  G_CALLBACK (marker_highlighted_cb), 
-                  layer);
-            }
+          g_signal_handlers_unblock_by_func (marker, 
+              G_CALLBACK (marker_highlighted_cb), 
+              layer);
         }
     }
 }
-
 
 
 static void
@@ -471,6 +452,58 @@ marker_highlighted_cb (ChamplainBaseMarker *marker,
     {
       set_highlighted_all_but_one (layer, marker, FALSE);
     }
+}
+
+
+static void
+set_marker_position (ChamplainLayer *layer, ChamplainBaseMarker *marker)
+{
+  ChamplainLayerPrivate *priv = layer->priv;
+  gint x, y;
+  
+  /* layer not yet added to the view */
+  if (priv->view == NULL)
+    return;
+
+  x = champlain_view_longitude_to_layer_x (priv->view, 
+    champlain_base_marker_get_longitude (marker));
+  y = champlain_view_latitude_to_layer_y (priv->view, 
+    champlain_base_marker_get_latitude (marker));
+
+  clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
+}
+
+
+static void
+marker_position_notify (ChamplainBaseMarker *marker,
+    G_GNUC_UNUSED GParamSpec *pspec,
+    ChamplainLayer *layer)
+{
+  set_marker_position (layer, marker);
+  redraw_polygon (layer);
+}
+
+
+static void
+marker_move_by_cb (ChamplainBaseMarker *marker,
+    gfloat dx,
+    gfloat dy,
+    ChamplainLayer *layer)
+{
+  ChamplainLayerPrivate *priv = layer->priv;
+  ChamplainView *view = priv->view;
+  gdouble x, y, lat, lon;
+
+  x = champlain_view_longitude_to_x (view, champlain_base_marker_get_longitude (marker));
+  y = champlain_view_latitude_to_y (view, champlain_base_marker_get_latitude (marker));
+  
+  x += dx;
+  y += dy;
+
+  lon = champlain_view_x_to_longitude (view, x);
+  lat = champlain_view_y_to_latitude (view, y);
+    
+  champlain_base_marker_set_position (marker, lat, lon);
 }
 
 
@@ -495,7 +528,15 @@ champlain_layer_add_marker (ChamplainLayer *layer,
   g_signal_connect (G_OBJECT (marker), "notify::highlighted",
       G_CALLBACK (marker_highlighted_cb), layer);
 
+  g_signal_connect (G_OBJECT (marker), "notify::latitude",
+      G_CALLBACK (marker_position_notify), layer);
+
+  g_signal_connect (G_OBJECT (marker), "move-by",
+      G_CALLBACK (marker_move_by_cb), layer);
+
   clutter_container_add_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
+  set_marker_position (layer, marker);
+  redraw_polygon (layer);
 }
 
 
@@ -518,7 +559,11 @@ champlain_layer_remove_marker (ChamplainLayer *layer,
   g_signal_handlers_disconnect_by_func (G_OBJECT (marker),
       G_CALLBACK (marker_highlighted_cb), layer);
 
+  g_signal_handlers_disconnect_by_func (G_OBJECT (marker),
+      G_CALLBACK (marker_position_notify), layer);
+
   clutter_container_remove_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
+  redraw_polygon (layer);
 }
 
 
@@ -538,16 +583,13 @@ champlain_layer_animate_in_all_markers (ChamplainLayer *layer)
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      if (CHAMPLAIN_IS_BASE_MARKER (actor))
-        {    
-          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
 
-          champlain_base_marker_animate_in_with_delay (marker, delay);
-          delay += 50;
-        }
+      champlain_base_marker_animate_in_with_delay (marker, delay);
+      delay += 50;
     }
 }
 
@@ -568,16 +610,13 @@ champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      if (CHAMPLAIN_IS_BASE_MARKER (actor))
-        {    
-          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
 
-          champlain_base_marker_animate_out_with_delay (marker, delay);
-          delay += 50;
-        }
+      champlain_base_marker_animate_out_with_delay (marker, delay);
+      delay += 50;
     }
 }
 
@@ -597,7 +636,7 @@ champlain_layer_show_all_markers (ChamplainLayer *layer)
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
       ClutterActor *marker = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
 
@@ -620,13 +659,46 @@ champlain_layer_hide_all_markers (ChamplainLayer *layer)
 
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  for (i = 0; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
       ClutterActor *marker = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
 
       clutter_actor_hide (marker);
     }
 }
+
+
+void
+champlain_layer_set_all_markers_movable (ChamplainLayer *layer)
+{
+  guint i;
+
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+    {
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+
+      champlain_base_marker_set_movable (marker, TRUE);
+    }
+}
+
+
+void
+champlain_layer_set_all_markers_unmovable (ChamplainLayer *layer)
+{
+  guint i;
+
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+    {
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+
+      champlain_base_marker_set_movable (marker, FALSE);
+    }
+}
+
 
 
 /**
@@ -650,7 +722,7 @@ champlain_layer_get_selected_markers (ChamplainLayer *layer)
   gint i, n_children;
   
   n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
-  for (i = 0; i < n_children; i++)
+  for (i = 1; i < n_children; i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
       
@@ -760,22 +832,15 @@ relocate (ChamplainLayer *layer)
   g_return_if_fail (CHAMPLAIN_IS_VIEW (priv->view));
 
   n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
-  for (i = 0; i < n_children; i++)
+  for (i = 1; i < n_children; i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      if (CHAMPLAIN_IS_BASE_MARKER (actor))
-        {    
-          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
-          gint x, y;
-
-          x = champlain_view_longitude_to_layer_x (priv->view, 
-            champlain_base_marker_get_longitude (marker));
-          y = champlain_view_latitude_to_layer_y (priv->view, 
-            champlain_base_marker_get_latitude (marker));
-
-          clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
-        }
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      
+      set_marker_position (layer, marker);
     }
+
+  redraw_polygon (layer);
 }
 
 static void
@@ -801,6 +866,10 @@ redraw_polygon (ChamplainLayer *layer)
   gdouble lon, lat;
   gdouble x, y;
   
+  /* layer not yet added to the view */
+  if (view == NULL)
+    return;
+    
   clutter_actor_get_size (CLUTTER_ACTOR (view), &width, &height);
 
   if (!priv->visible || width == 0.0 || height == 0.0)
@@ -818,26 +887,18 @@ redraw_polygon (ChamplainLayer *layer)
 
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
 
-  /* Clear the drawing area */
-  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-  cairo_rectangle (cr, 0, 0, width, height);
-  cairo_fill (cr);
-
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
   n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
-  for (i = 0; i < n_children; i++)
+  for (i = 1; i < n_children; i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      if (CHAMPLAIN_IS_BASE_MARKER (actor))
-        {    
-          ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
-          gfloat x, y;
+      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      gfloat x, y;
 
-          x = champlain_view_longitude_to_x (view, champlain_base_marker_get_longitude (marker));
-          y = champlain_view_latitude_to_y (view, champlain_base_marker_get_latitude (marker));
+      x = champlain_view_longitude_to_x (view, champlain_base_marker_get_longitude (marker));
+      y = champlain_view_latitude_to_y (view, champlain_base_marker_get_latitude (marker));
 
-          cairo_line_to (cr, x, y);
-        }
+      cairo_line_to (cr, x, y);
     }
 
   if (priv->closed_path)

@@ -1072,17 +1072,6 @@ create_license (ChamplainView *view)
   clutter_actor_raise_top (priv->license_actor);
 }
 
-/*
-static gboolean
-button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
-    ClutterEvent *event,
-    ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  return TRUE;
-}
-*/
 
 static void
 update_scale (ChamplainView *view)
@@ -1351,8 +1340,6 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (panning_completed), view);
   g_signal_connect (priv->finger_scroll, "button-press-event",
       G_CALLBACK (finger_scroll_button_press_cb), view);
-//  g_signal_connect_after (priv->finger_scroll, "button-release-event",
-//      G_CALLBACK (button_release_cb), view);
 
   clutter_stage_set_key_focus (CLUTTER_STAGE (clutter_stage_get_default ()),
       priv->finger_scroll);

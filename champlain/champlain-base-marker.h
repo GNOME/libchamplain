@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2011 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -74,6 +75,15 @@ void champlain_base_marker_set_position (ChamplainBaseMarker *marker,
     gdouble longitude);
 gdouble champlain_base_marker_get_latitude (ChamplainBaseMarker *marker);
 gdouble champlain_base_marker_get_longitude (ChamplainBaseMarker *marker);
+
+void champlain_base_marker_set_selectable (ChamplainBaseMarker *marker,
+    gboolean value);
+gboolean champlain_base_marker_get_selectable (ChamplainBaseMarker *marker);
+
+void champlain_base_marker_set_movable (ChamplainBaseMarker *marker,
+    gboolean value);
+gboolean champlain_base_marker_get_movable (ChamplainBaseMarker *marker);
+
 void champlain_base_marker_set_highlighted (ChamplainBaseMarker *marker,
     gboolean value);
 gboolean champlain_base_marker_get_highlighted (ChamplainBaseMarker *marker);
@@ -84,20 +94,6 @@ void champlain_base_marker_animate_in_with_delay (ChamplainBaseMarker *marker,
 void champlain_base_marker_animate_out (ChamplainBaseMarker *marker);
 void champlain_base_marker_animate_out_with_delay (ChamplainBaseMarker *marker,
     guint delay);
-
-void
-champlain_base_marker_set_selectable (ChamplainBaseMarker *marker,
-    gboolean value);
-gboolean
-champlain_base_marker_get_selectable (ChamplainBaseMarker *marker);
-void
-champlain_base_marker_set_movable (ChamplainBaseMarker *marker,
-    gboolean value);
-gboolean
-champlain_base_marker_get_movable (ChamplainBaseMarker *marker);
-
-
-
 
 G_END_DECLS
 

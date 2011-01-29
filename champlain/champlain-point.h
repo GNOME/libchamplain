@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,35 +23,65 @@
 #ifndef CHAMPLAIN_POINT_H
 #define CHAMPLAIN_POINT_H
 
+#include <champlain/champlain-base-marker.h>
+
 #include <glib-object.h>
+#include <clutter/clutter.h>
 
 G_BEGIN_DECLS
 
-typedef struct _ChamplainPoint ChamplainPoint;
+#define CHAMPLAIN_TYPE_POINT champlain_point_get_type ()
 
-/**
- * ChamplainPoint:
- * @lat: latitude
- * @lon: longitude
- *
- * A base struct to store a latitude and longitude.
- */
+#define CHAMPLAIN_POINT(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_POINT, ChamplainPoint))
+
+#define CHAMPLAIN_POINT_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_POINT, ChamplainPointClass))
+
+#define CHAMPLAIN_IS_POINT(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_POINT))
+
+#define CHAMPLAIN_IS_POINT_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_POINT))
+
+#define CHAMPLAIN_POINT_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_POINT, ChamplainPointClass))
+
+typedef struct _ChamplainPointPrivate ChamplainPointPrivate;
+
+typedef struct _ChamplainPoint ChamplainPoint;
+typedef struct _ChamplainPointClass ChamplainPointClass;
+
 struct _ChamplainPoint
 {
-  double lat;
-  double lon;
+  ChamplainBaseMarker base;
+
+  ChamplainPointPrivate *priv;
 };
 
-GType champlain_point_get_type (void) G_GNUC_CONST;
-#define CHAMPLAIN_TYPE_POINT (champlain_point_get_type ())
-#define CHAMPLAIN_POINT(x) ((ChamplainPoint *) (x))
+struct _ChamplainPointClass
+{
+  ChamplainBaseMarkerClass parent_class;
+};
 
-ChamplainPoint *champlain_point_copy (const ChamplainPoint *point);
+GType champlain_point_get_type (void);
 
-void champlain_point_free (ChamplainPoint *point);
+ClutterActor *champlain_point_new (void);
 
-ChamplainPoint *champlain_point_new (gdouble lat,
-    gdouble lon);
+ClutterActor *champlain_point_new_full (gdouble size, 
+    const ClutterColor *color);
+
+void champlain_point_set_color (ChamplainPoint *marker,
+    const ClutterColor *color);
+
+ClutterColor *champlain_point_get_color (ChamplainPoint *marker);
+
+void champlain_point_set_highlight_color (ClutterColor *color);
+const ClutterColor *champlain_point_get_highlight_color (void);
+
+void champlain_point_set_size (ChamplainPoint *point,
+    gdouble size);
+gdouble champlain_point_get_size (ChamplainPoint *point);
 
 G_END_DECLS
 

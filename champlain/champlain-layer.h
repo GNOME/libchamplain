@@ -98,8 +98,8 @@ void champlain_layer_animate_out_all_markers (ChamplainLayer *layer);
 void champlain_layer_show_all_markers (ChamplainLayer *layer);
 void champlain_layer_hide_all_markers (ChamplainLayer *layer);
 
-gboolean champlain_layer_marker_is_selected (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker);
+void champlain_layer_set_all_markers_movable (ChamplainLayer *layer);
+void champlain_layer_set_all_markers_unmovable (ChamplainLayer *layer);
 
 void champlain_layer_select_all (ChamplainLayer *layer);
 void champlain_layer_unselect_all (ChamplainLayer *layer);
@@ -113,22 +113,25 @@ ChamplainSelectionMode champlain_layer_get_selection_mode (
 //    ChamplainBaseMarker *markers[],
 //    gboolean animate);
 
+ClutterColor *champlain_layer_get_polygon_fill_color (ChamplainLayer *layer);
 void champlain_layer_set_polygon_fill_color (ChamplainLayer *layer,
     const ClutterColor *color);
+
+ClutterColor *champlain_layer_get_polygon_stroke_color (ChamplainLayer *layer);
 void champlain_layer_set_polygon_stroke_color (ChamplainLayer *layer,
     const ClutterColor *color);
-ClutterColor *champlain_layer_get_polygon_fill_color (ChamplainLayer *layer);
-ClutterColor *champlain_layer_get_polygon_stroke_color (ChamplainLayer *layer);
 
 gboolean champlain_layer_get_polygon_fill (ChamplainLayer *layer);
 void champlain_layer_set_polygon_fill (ChamplainLayer *layer,
     gboolean value);
+
 gboolean champlain_layer_get_polygon_stroke (ChamplainLayer *layer);
 void champlain_layer_set_polygon_stroke (ChamplainLayer *layer,
     gboolean value);
+
+gdouble champlain_layer_get_polygon_stroke_width (ChamplainLayer *layer);
 void champlain_layer_set_polygon_stroke_width (ChamplainLayer *layer,
     gdouble value);
-gdouble champlain_layer_get_polygon_stroke_width (ChamplainLayer *layer);
 
 void champlain_layer_show_polygon (ChamplainLayer *layer);
 void champlain_layer_hide_polygon (ChamplainLayer *layer);
