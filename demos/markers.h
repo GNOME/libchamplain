@@ -21,6 +21,6 @@
 #ifndef MARKERS_H
 #define MARKERS_H
 
-ChamplainLayer *create_marker_layer (ChamplainView *view);
+ChamplainMarkerLayer *create_marker_layer (ChamplainView *view);
 
 #endif

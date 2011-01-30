@@ -1990,16 +1990,16 @@ champlain_view_set_max_zoom_level (ChamplainView *view,
  */
 void
 champlain_view_add_layer (ChamplainView *view,
-    ChamplainLayer *layer)
+    ChamplainMarkerLayer *layer)
 {
   DEBUG_LOG ()
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
   
   clutter_container_add_actor (CLUTTER_CONTAINER (view->priv->user_layers),
       CLUTTER_ACTOR (layer));
-  champlain_layer_set_view (layer, view);
+  champlain_marker_layer_set_view (layer, view);
   clutter_actor_raise_top (CLUTTER_ACTOR (layer));
 }
 
@@ -2015,14 +2015,14 @@ champlain_view_add_layer (ChamplainView *view,
  */
 void
 champlain_view_remove_layer (ChamplainView *view,
-    ChamplainLayer *layer)
+    ChamplainMarkerLayer *layer)
 {
   DEBUG_LOG ()
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  champlain_layer_set_view (layer, view);      
+  champlain_marker_layer_set_view (layer, NULL);      
 
   clutter_container_remove_actor (CLUTTER_CONTAINER (view->priv->user_layers),
       CLUTTER_ACTOR (layer));

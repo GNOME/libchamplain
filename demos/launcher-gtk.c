@@ -28,7 +28,7 @@
 #define COL_ID 0
 #define COL_NAME 1
 
-static ChamplainLayer *polygon;
+static ChamplainMarkerLayer *polygon;
 static gboolean destroying = FALSE;
 
 /*
@@ -48,15 +48,15 @@ toggle_layer (GtkToggleButton *widget,
 {
   if (gtk_toggle_button_get_active (widget))
     {
-      champlain_layer_show_polygon (polygon);
-      champlain_layer_animate_in_all_markers (polygon);
-      champlain_layer_animate_in_all_markers (CHAMPLAIN_LAYER (layer));
+      champlain_marker_layer_show_polygon (polygon);
+      champlain_marker_layer_animate_in_all_markers (polygon);
+      champlain_marker_layer_animate_in_all_markers (CHAMPLAIN_MARKER_LAYER (layer));
     }
   else
     {
-      champlain_layer_hide_polygon (polygon);
-      champlain_layer_animate_out_all_markers (polygon);
-      champlain_layer_animate_out_all_markers (CHAMPLAIN_LAYER (layer));
+      champlain_marker_layer_hide_polygon (polygon);
+      champlain_marker_layer_animate_out_all_markers (polygon);
+      champlain_marker_layer_animate_out_all_markers (CHAMPLAIN_MARKER_LAYER (layer));
     }
 }
 
@@ -201,14 +201,14 @@ build_combo_box (GtkComboBox *box)
 
 
 static void
-append_point (ChamplainLayer *layer, gdouble lon, gdouble lat)
+append_point (ChamplainMarkerLayer *layer, gdouble lon, gdouble lat)
 {
   ClutterActor *point;  
   static ClutterColor color = { 0xa4, 0x00, 0x00, 0xff };
   
   point = champlain_point_new_full (10, &color);
   champlain_marker_set_position (CHAMPLAIN_MARKER (point), lon, lat);
-  champlain_layer_add_marker (layer, CHAMPLAIN_MARKER (point));
+  champlain_marker_layer_add_marker (layer, CHAMPLAIN_MARKER (point));
 }
 
 
@@ -219,7 +219,7 @@ main (int argc,
   GtkWidget *window;
   GtkWidget *widget, *vbox, *bbox, *button, *viewport;
   ChamplainView *view;
-  ChamplainLayer *layer;
+  ChamplainMarkerLayer *layer;
 
   g_thread_init (NULL);
   gtk_clutter_init (&argc, &argv);
@@ -259,7 +259,7 @@ main (int argc,
   layer = create_marker_layer (view);
   champlain_view_add_layer (view, layer);
 
-  polygon = champlain_layer_new_full (CHAMPLAIN_SELECTION_NONE);
+  polygon = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_NONE);
   /* Cheap approx of Highway 10 */
   append_point (polygon, 45.4095, -73.3197);
   append_point (polygon, 45.4104, -73.2846);
@@ -270,9 +270,9 @@ main (int argc,
   append_point (polygon, 45.3994, -73.1877);
   append_point (polygon, 45.4000, -73.1815);
   append_point (polygon, 45.4151, -73.1218);
-  champlain_layer_set_polygon_stroke_width (polygon, 5.0);
-  champlain_layer_hide_all_markers (polygon);
-  champlain_layer_hide_polygon (polygon);
+  champlain_marker_layer_set_polygon_stroke_width (polygon, 5.0);
+  champlain_marker_layer_hide_all_markers (polygon);
+  champlain_marker_layer_hide_polygon (polygon);
   champlain_view_add_layer (view, polygon);
 
   gtk_widget_set_size_request (widget, 640, 480);

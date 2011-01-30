@@ -23,7 +23,7 @@
 /* The data needed for constructing a marker */
 typedef struct
 {
-  ChamplainLayer *layer;
+  ChamplainMarkerLayer *layer;
   gdouble latitude;
   gdouble longitude;
 } MarkerData;
@@ -142,7 +142,7 @@ texture_new_from_pixbuf (GdkPixbuf *pixbuf, GError **error)
  * actor (a texture) and will use this as the source image for a new marker.
  * The marker will then be added to an existing layer.
  *
- * This callback expects the parameter data to be a valid ChamplainLayer.
+ * This callback expects the parameter data to be a valid ChamplainMarkerLayer.
  */
 static void
 image_downloaded_cb (SoupSession *session,
@@ -218,7 +218,7 @@ cleanup:
  *
  */
 static void
-create_marker_from_url (ChamplainLayer *layer,
+create_marker_from_url (ChamplainMarkerLayer *layer,
     SoupSession *session,
     gdouble latitude,
     gdouble longitude,
@@ -241,7 +241,7 @@ int
 main (int argc, char *argv[])
 {
   ClutterActor *view, *stage;
-  ChamplainLayer *layer;
+  ChamplainMarkerLayer *layer;
   SoupSession *session;
 
   g_thread_init (NULL);
@@ -256,7 +256,7 @@ main (int argc, char *argv[])
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), view);
 
   /* Create the markers and marker layer */
-  layer = champlain_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
+  layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
   champlain_view_add_layer (CHAMPLAIN_VIEW (view), layer);
   session = soup_session_async_new ();
   create_marker_from_url (layer, session, 48.218611, 17.146397,

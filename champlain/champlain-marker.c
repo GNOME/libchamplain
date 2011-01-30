@@ -22,7 +22,7 @@
  * @short_description: A marker to identify points of interest on a map
  *
  * Markers reprensent points of interest on a map. Markers need to be
- * placed on a layer (a #ChamplainLayer). Layers have to be added to a
+ * placed on a layer (a #ChamplainMarkerLayer). Layers have to be added to a
  * #champlainview for the markers to show on the map.
  *
  * A marker is nothing more than a regular #clutteractor. You can draw on

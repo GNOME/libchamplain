@@ -90,7 +90,7 @@ main (int argc,
     char *argv[])
 {
   ClutterActor *actor, *stage, *buttons, *button;
-  ChamplainLayer *layer;
+  ChamplainMarkerLayer *layer;
   gfloat width, total_width = 0;
 
   g_thread_init (NULL);

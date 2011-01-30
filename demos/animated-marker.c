@@ -120,7 +120,7 @@ int
 main (int argc, char *argv[])
 {
   ClutterActor *actor, *marker, *stage;
-  ChamplainLayer *layer;
+  ChamplainMarkerLayer *layer;
   GpsCallbackData callback_data;
 
   g_thread_init (NULL);
@@ -135,7 +135,7 @@ main (int argc, char *argv[])
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
 
   /* Create the marker layer */
-  layer = champlain_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
+  layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
   clutter_actor_show (CLUTTER_ACTOR (layer));
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
 

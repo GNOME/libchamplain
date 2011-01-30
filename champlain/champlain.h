@@ -29,7 +29,7 @@
 #include "champlain/champlain-enum-types.h"
 #include "champlain/champlain-version.h"
 
-#include "champlain/champlain-layer.h"
+#include "champlain/champlain-marker-layer.h"
 #include "champlain/champlain-point.h"
 #include "champlain/champlain-marker.h"
 #include "champlain/champlain-label.h"
