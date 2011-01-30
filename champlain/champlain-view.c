@@ -42,8 +42,7 @@
  * an error occurs during download, an error tile will be displayed.
  *
  * The button-press-event and button-release-event signals are emitted each
- * time a mouse button is pressed on the @view.  Coordinates can be converted
- * with #champlain_view_get_coords_from_event.
+ * time a mouse button is pressed on the @view.  
  */
 
 #include "config.h"
@@ -1440,7 +1439,8 @@ finger_scroll_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
     {
       gdouble lon, lat;
 
-      champlain_view_get_coords_from_event (view, (ClutterEvent *) event, &lat, &lon);
+      lon = champlain_view_x_to_longitude (view, event->x);
+      lat = champlain_view_y_to_latitude (view, event->y);
 
       champlain_view_stop_go_to (view);
 
@@ -1990,7 +1990,7 @@ champlain_view_set_max_zoom_level (ChamplainView *view,
  */
 void
 champlain_view_add_layer (ChamplainView *view,
-    ChamplainMarkerLayer *layer)
+    ChamplainLayer *layer)
 {
   DEBUG_LOG ()
 
@@ -1999,7 +1999,7 @@ champlain_view_add_layer (ChamplainView *view,
   
   clutter_container_add_actor (CLUTTER_CONTAINER (view->priv->user_layers),
       CLUTTER_ACTOR (layer));
-  champlain_marker_layer_set_view (layer, view);
+  champlain_layer_set_view (layer, view);
   clutter_actor_raise_top (CLUTTER_ACTOR (layer));
 }
 
@@ -2015,91 +2015,17 @@ champlain_view_add_layer (ChamplainView *view,
  */
 void
 champlain_view_remove_layer (ChamplainView *view,
-    ChamplainMarkerLayer *layer)
+    ChamplainLayer *layer)
 {
   DEBUG_LOG ()
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  champlain_marker_layer_set_view (layer, NULL);      
+  champlain_layer_set_view (layer, NULL);      
 
   clutter_container_remove_actor (CLUTTER_CONTAINER (view->priv->user_layers),
       CLUTTER_ACTOR (layer));
-}
-
-
-/**
- * champlain_view_get_coords_from_event:
- * @view: a #ChamplainView
- * @event: a #ClutterEvent
- * @lat: (out): a variable where to put the latitude of the event
- * @lon: (out): a variable where to put the longitude of the event
- *
- * Gets coordinates from button-press-event and button-release-event signals.
- *
- * Returns: the latitude, longitude coordinates for the given ClutterEvent.
- *
- * Since: 0.2.8
- */
-gboolean
-champlain_view_get_coords_from_event (ChamplainView *view,
-    ClutterEvent *event,
-    gdouble *lat,
-    gdouble *lon)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
-  /* Apparently there isn a more precise test */
-  g_return_val_if_fail (event, FALSE);
-
-  guint x, y;
-
-  switch (clutter_event_type (event))
-    {
-    case CLUTTER_BUTTON_PRESS:
-    case CLUTTER_BUTTON_RELEASE:
-      {
-        ClutterButtonEvent *e = (ClutterButtonEvent *) event;
-        x = e->x;
-        y = e->y;
-      }
-      break;
-
-    case CLUTTER_SCROLL:
-      {
-        ClutterScrollEvent *e = (ClutterScrollEvent *) event;
-        x = e->x;
-        y = e->y;
-      }
-      break;
-
-    case CLUTTER_MOTION:
-      {
-        ClutterMotionEvent *e = (ClutterMotionEvent *) event;
-        x = e->x;
-        y = e->y;
-      }
-      break;
-
-    case CLUTTER_ENTER:
-    case CLUTTER_LEAVE:
-      {
-        ClutterCrossingEvent *e = (ClutterCrossingEvent *) event;
-        x = e->x;
-        y = e->y;
-      }
-      break;
-
-    default:
-      return FALSE;
-    }
-
-  *lon = champlain_view_x_to_longitude (view, x);
-  *lat = champlain_view_y_to_latitude (view, y);
-  
-  return TRUE;
 }
 
 

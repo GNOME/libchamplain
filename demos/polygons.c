@@ -136,7 +136,7 @@ main (int argc,
   champlain_marker_layer_set_polygon_stroke_width (layer, 5.0);
   champlain_marker_layer_hide_all_markers (layer);
   champlain_marker_layer_show_polygon (layer);
-  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
+  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
   /* draw a polygon */
   layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_NONE);
@@ -149,7 +149,7 @@ main (int argc,
   g_object_set (layer, "fill", TRUE, NULL);
   champlain_marker_layer_hide_all_markers (layer);
   champlain_marker_layer_show_polygon (layer);
-  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
+  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (actor), "zoom-level", 8,

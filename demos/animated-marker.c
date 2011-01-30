@@ -137,7 +137,7 @@ main (int argc, char *argv[])
   /* Create the marker layer */
   layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
   clutter_actor_show (CLUTTER_ACTOR (layer));
-  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
+  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
   /* Create a marker */
   marker = create_marker ();

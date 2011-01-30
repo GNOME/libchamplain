@@ -31,9 +31,10 @@ map_view_button_release_cb (G_GNUC_UNUSED ClutterActor *actor,
   if (event->button != 1 || event->click_count > 1)
     return FALSE;
 
-  if (champlain_view_get_coords_from_event (view, (ClutterEvent *) event, &lat,
-          &lon))
-    g_print ("Map clicked at %f, %f \n", lat, lon);
+  lon = champlain_view_x_to_longitude (view, event->x);
+  lat = champlain_view_y_to_latitude (view, event->y);
+
+  g_print ("Map clicked at %f, %f \n", lat, lon);
 
   return TRUE;
 }
@@ -130,7 +131,7 @@ main (int argc,
 
   /* Create the markers and marker layer */
   layer = create_marker_layer (CHAMPLAIN_VIEW (actor));
-  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), layer);
+  champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
   /* Connect to the click event */
   clutter_actor_set_reactive (actor, TRUE);

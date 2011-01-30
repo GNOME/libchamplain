@@ -39,7 +39,7 @@
 #include <clutter/clutter.h>
 #include <glib.h>
 
-G_DEFINE_TYPE (ChamplainMarkerLayer, champlain_marker_layer, CLUTTER_TYPE_GROUP)
+G_DEFINE_TYPE (ChamplainMarkerLayer, champlain_marker_layer, CHAMPLAIN_TYPE_LAYER)
 
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MARKER_LAYER, ChamplainMarkerLayerPrivate))
 
@@ -89,6 +89,9 @@ static void marker_highlighted_cb (ChamplainMarker *marker,
     ChamplainMarkerLayer *layer);
     
 static void redraw_polygon (ChamplainMarkerLayer *layer);
+
+static void set_view (ChamplainLayer *layer,
+    ChamplainView *view);
 
 
 static void
@@ -205,7 +208,7 @@ champlain_marker_layer_dispose (GObject *object)
   
   if (priv->view != NULL)
     {
-      champlain_marker_layer_set_view (self, NULL);
+      set_view (CHAMPLAIN_LAYER (self), NULL);
     }
 
   G_OBJECT_CLASS (champlain_marker_layer_parent_class)->dispose (object);
@@ -229,6 +232,7 @@ static void
 champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  ChamplainLayerClass *layer_class = CHAMPLAIN_LAYER_CLASS (klass);
 
   g_type_class_add_private (klass, sizeof (ChamplainMarkerLayerPrivate));
   
@@ -236,6 +240,8 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
   object_class->dispose = champlain_marker_layer_dispose;
   object_class->get_property = champlain_marker_layer_get_property;
   object_class->set_property = champlain_marker_layer_set_property;
+  
+  layer_class->set_view = set_view;
   
   /**
    * ChamplainMarkerLayer:selection-mode:
@@ -936,19 +942,22 @@ redraw_polygon_cb (G_GNUC_UNUSED GObject *gobject,
 }
 
 
-void champlain_marker_layer_set_view (ChamplainMarkerLayer *layer,
+static void 
+set_view (ChamplainLayer *layer,
     ChamplainView *view)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer) && (CHAMPLAIN_IS_VIEW (view) || view == NULL));
   
-  if (layer->priv->view != NULL)
+  ChamplainMarkerLayer *marker_layer = CHAMPLAIN_MARKER_LAYER (layer);
+  
+  if (marker_layer->priv->view != NULL)
     {
-      g_signal_handlers_disconnect_by_func (layer->priv->view,
-        G_CALLBACK (relocate_cb), layer);
-      g_object_unref (layer->priv->view);
+      g_signal_handlers_disconnect_by_func (marker_layer->priv->view,
+        G_CALLBACK (relocate_cb), marker_layer);
+      g_object_unref (marker_layer->priv->view);
     }
   
-  layer->priv->view = view;
+  marker_layer->priv->view = view;
 
   if (view != NULL)
     {
@@ -960,8 +969,8 @@ void champlain_marker_layer_set_view (ChamplainMarkerLayer *layer,
       g_signal_connect (view, "notify::latitude",
         G_CALLBACK (redraw_polygon_cb), layer);
         
-      relocate (layer);
-      redraw_polygon (layer);
+      relocate (marker_layer);
+      redraw_polygon (marker_layer);
     }
 }
 

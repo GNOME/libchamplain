@@ -62,11 +62,12 @@ toggle_layer (GtkToggleButton *widget,
 
 
 gboolean
-mouse_click_cb (ClutterActor *actor, ClutterEvent *event, gpointer data)
+mouse_click_cb (ClutterActor *actor, ClutterButtonEvent *event, ChamplainView *view)
 {
   gdouble lat, lon;
 
-  champlain_view_get_coords_from_event (CHAMPLAIN_VIEW (data), event, &lat, &lon);
+  lon = champlain_view_x_to_longitude (view, event->x);
+  lat = champlain_view_y_to_latitude (view, event->y);
   g_print ("Mouse click at: %f  %f\n", lat, lon);
 
   return TRUE;
@@ -257,7 +258,7 @@ main (int argc,
   champlain_view_center_on (CHAMPLAIN_VIEW (view), 45.466, -73.75);
 
   layer = create_marker_layer (view);
-  champlain_view_add_layer (view, layer);
+  champlain_view_add_layer (view, CHAMPLAIN_LAYER (layer));
 
   polygon = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_NONE);
   /* Cheap approx of Highway 10 */
@@ -273,7 +274,7 @@ main (int argc,
   champlain_marker_layer_set_polygon_stroke_width (polygon, 5.0);
   champlain_marker_layer_hide_all_markers (polygon);
   champlain_marker_layer_hide_polygon (polygon);
-  champlain_view_add_layer (view, polygon);
+  champlain_view_add_layer (view, CHAMPLAIN_LAYER (polygon));
 
   gtk_widget_set_size_request (widget, 640, 480);
 

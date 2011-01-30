@@ -16,6 +16,7 @@ libchamplain_headers_public = 				\
 	$(srcdir)/champlain-defines.h			\
 	$(srcdir)/champlain-point.h			\
 	$(srcdir)/champlain-view.h			\
+	$(srcdir)/champlain-layer.h 			\
 	$(srcdir)/champlain-marker-layer.h 			\
 	$(srcdir)/champlain-marker.h		\
 	$(srcdir)/champlain-label.h			\
@@ -51,6 +52,7 @@ libchamplain_sources =					\
 	$(memphis_sources)				\
 	$(srcdir)/champlain-debug.c 			\
 	$(srcdir)/champlain-view.c 			\
+	$(srcdir)/champlain-layer.c 			\
 	$(srcdir)/champlain-marker-layer.c 			\
 	$(srcdir)/champlain-marker.c 		\
 	$(srcdir)/champlain-label.c 			\

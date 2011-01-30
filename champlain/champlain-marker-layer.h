@@ -25,6 +25,7 @@
 
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-marker.h>
+#include <champlain/champlain-layer.h>
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
@@ -70,14 +71,14 @@ typedef enum
 
 struct _ChamplainMarkerLayer
 {
-  ClutterGroup parent;
+  ChamplainLayer parent;
   
   ChamplainMarkerLayerPrivate *priv;
 };
 
 struct _ChamplainMarkerLayerClass
 {
-  ClutterGroupClass parent_class;
+  ChamplainLayerClass parent_class;
 };
 
 GType champlain_marker_layer_get_type (void);
@@ -88,9 +89,6 @@ void champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
     ChamplainMarker *marker);
 void champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
     ChamplainMarker *marker);
-
-void champlain_marker_layer_set_view (ChamplainMarkerLayer *layer,
-    ChamplainView *view);
 
 void champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer);
 void champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer);
