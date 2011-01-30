@@ -24,7 +24,7 @@
 #define CHAMPLAIN_LAYER_H
 
 #include <champlain/champlain-defines.h>
-#include <champlain/champlain-base-marker.h>
+#include <champlain/champlain-marker.h>
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
@@ -85,9 +85,9 @@ GType champlain_layer_get_type (void);
 ChamplainLayer *champlain_layer_new_full (ChamplainSelectionMode mode);
 
 void champlain_layer_add_marker (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker);
+    ChamplainMarker *marker);
 void champlain_layer_remove_marker (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker);
+    ChamplainMarker *marker);
 
 void champlain_layer_set_view (ChamplainLayer *layer,
     ChamplainView *view);
@@ -110,7 +110,7 @@ void champlain_layer_set_selection_mode (ChamplainLayer *layer,
 ChamplainSelectionMode champlain_layer_get_selection_mode (
     ChamplainLayer *layer);
 //void champlain_view_ensure_markers_visible (ChamplainView *view,
-//    ChamplainBaseMarker *markers[],
+//    ChamplainMarker *markers[],
 //    gboolean animate);
 
 ClutterColor *champlain_layer_get_polygon_fill_color (ChamplainLayer *layer);

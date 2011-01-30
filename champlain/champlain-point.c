@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2011 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,28 +16,10 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/**
- * SECTION:champlain-marker
- * @short_description: A marker to identify points of interest on a map
- *
- * Markers reprensent points of interest on a map. Markers need to be placed on
- * a layer (a #ChamplainLayer).  Layers have to be added to a #ChamplainView for
- * the markers to show on the map.
- *
- * A marker is nothing more than a regular #ClutterActor.  You can draw on it
- * what ever you want. Set the markers position on the map
- * using #champlain_marker_set_position.
- *
- * Champlain has a default type of markers with text. To create one,
- * use #champlain_marker_new_with_text.
- */
 
 #include "config.h"
 
-#include "champlain-marker.h"
-
 #include "champlain.h"
-#include "champlain-base-marker.h"
 #include "champlain-defines.h"
 #include "champlain-marshal.h"
 #include "champlain-private.h"
@@ -69,7 +51,7 @@ enum
   PROP_SIZE,
 };
 
-/* static guint champlain_marker_signals[LAST_SIGNAL] = { 0, }; */
+/* static guint champlain_point_signals[LAST_SIGNAL] = { 0, }; */
 
 struct _ChamplainPointPrivate
 {
@@ -79,15 +61,15 @@ struct _ChamplainPointPrivate
   guint redraw_id;
 };
 
-G_DEFINE_TYPE (ChamplainPoint, champlain_point, CHAMPLAIN_TYPE_BASE_MARKER);
+G_DEFINE_TYPE (ChamplainPoint, champlain_point, CHAMPLAIN_TYPE_MARKER);
 
 #define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_POINT, ChamplainPointPrivate))
 
-static void draw_marker (ChamplainPoint *marker);
+static void draw_point (ChamplainPoint *point);
 
 /**
- * champlain_marker_set_highlight_color:
+ * champlain_point_set_highlight_color:
  * @color: a #ClutterColor
  *
  * Changes the highlight color, this is to ensure a better integration with
@@ -106,7 +88,7 @@ champlain_point_set_highlight_color (ClutterColor *color)
 
 
 /**
- * champlain_marker_get_highlight_color:
+ * champlain_point_get_highlight_color:
  *
  * Gets the highlight color.
  *
@@ -152,16 +134,16 @@ champlain_point_set_property (GObject *object,
     const GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainPoint *marker = CHAMPLAIN_POINT (object);
+  ChamplainPoint *point = CHAMPLAIN_POINT (object);
 
   switch (prop_id)
     {
     case PROP_COLOR:
-      champlain_point_set_color (marker, clutter_value_get_color (value));
+      champlain_point_set_color (point, clutter_value_get_color (value));
       break;
 
     case PROP_SIZE:
-      champlain_point_set_size (marker, g_value_get_double (value));
+      champlain_point_set_size (point, g_value_get_double (value));
       break;
       
     default:
@@ -195,30 +177,20 @@ champlain_point_finalize (GObject *object)
 
 
 static void
-champlain_point_class_init (ChamplainPointClass *markerClass)
+champlain_point_class_init (ChamplainPointClass *pointClass)
 {
-  g_type_class_add_private (markerClass, sizeof (ChamplainPointPrivate));
+  g_type_class_add_private (pointClass, sizeof (ChamplainPointPrivate));
 
-  GObjectClass *object_class = G_OBJECT_CLASS (markerClass);
+  GObjectClass *object_class = G_OBJECT_CLASS (pointClass);
   object_class->finalize = champlain_point_finalize;
   object_class->dispose = champlain_point_dispose;
   object_class->get_property = champlain_point_get_property;
   object_class->set_property = champlain_point_set_property;
 
-  /**
-   * ChamplainMarker:color:
-   *
-   * The marker's color
-   *
-   * Since: 0.4
-   */
   g_object_class_install_property (object_class, PROP_COLOR,
-      clutter_param_spec_color ("color", "Color", "The marker's color",
+      clutter_param_spec_color ("color", "Color", "The point's color",
           &DEFAULT_COLOR, CHAMPLAIN_PARAM_READWRITE));
 
-  /**
-   * TODO
-   */
   g_object_class_install_property (object_class, PROP_SIZE,
       g_param_spec_double ("size", "Size", "The point size", 0, G_MAXDOUBLE,
           12, CHAMPLAIN_PARAM_READWRITE));
@@ -226,23 +198,23 @@ champlain_point_class_init (ChamplainPointClass *markerClass)
 
 
 static void
-draw_marker (ChamplainPoint *marker)
+draw_point (ChamplainPoint *point)
 {
-  ChamplainPointPrivate *priv = marker->priv;
+  ChamplainPointPrivate *priv = point->priv;
   ClutterActor *cairo_texture;
   cairo_t *cr;
   gdouble size = priv->size;
   gdouble radius = size / 2.0;
   ClutterColor *color;
   
-  clutter_group_remove_all (CLUTTER_GROUP (marker));
+  clutter_group_remove_all (CLUTTER_GROUP (point));
   cairo_texture = clutter_cairo_texture_new (size, size);
-  clutter_container_add_actor (CLUTTER_CONTAINER (marker), cairo_texture);
-  clutter_actor_set_anchor_point (CLUTTER_ACTOR (marker), radius, radius);
+  clutter_container_add_actor (CLUTTER_CONTAINER (point), cairo_texture);
+  clutter_actor_set_anchor_point (CLUTTER_ACTOR (point), radius, radius);
 
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
 
-  if (champlain_base_marker_get_highlighted (CHAMPLAIN_BASE_MARKER (marker)))
+  if (champlain_marker_get_highlighted (CHAMPLAIN_MARKER (point)))
     color = &SELECTED_COLOR;
   else
     color = priv->color;  
@@ -270,36 +242,26 @@ notify_highlighted (GObject *gobject,
     G_GNUC_UNUSED GParamSpec *pspec,
     G_GNUC_UNUSED gpointer user_data)
 {
-  draw_marker (CHAMPLAIN_POINT (gobject));
+  draw_point (CHAMPLAIN_POINT (gobject));
 }
 
 
-
 static void
-champlain_point_init (ChamplainPoint *marker)
+champlain_point_init (ChamplainPoint *point)
 {
-  ChamplainPointPrivate *priv = GET_PRIVATE (marker);
+  ChamplainPointPrivate *priv = GET_PRIVATE (point);
 
-  marker->priv = priv;
+  point->priv = priv;
 
   priv->color = clutter_color_copy (&DEFAULT_COLOR);
   priv->size = 12;
   
-  draw_marker (marker);
+  draw_point (point);
 
-  g_signal_connect (marker, "notify::highlighted", G_CALLBACK (notify_highlighted), NULL);
+  g_signal_connect (point, "notify::highlighted", G_CALLBACK (notify_highlighted), NULL);
 }
 
 
-/**
- * champlain_marker_new:
- *
- * Creates a new instance of #ChamplainMarker.
- *
- * Returns: a new #ChamplainMarker ready to be used as a #ClutterActor.
- *
- * Since: 0.2
- */
 ClutterActor *
 champlain_point_new (void)
 {
@@ -307,35 +269,19 @@ champlain_point_new (void)
 }
 
 
-
-
-/**
- * champlain_marker_new_full:
- * @text: The text
- * @actor: The image
- *
- * Creates a new instance of #ChamplainMarker consisting of a custom #ClutterActor.
- *
- * Returns: a new #ChamplainMarker with a drawn marker containing the given
- * image.
- *
- * Since: 0.4
- */
 ClutterActor *
 champlain_point_new_full (gdouble size, 
     const ClutterColor *color)
 {
-  ChamplainPoint *marker = CHAMPLAIN_POINT (champlain_point_new ());
+  ChamplainPoint *point = CHAMPLAIN_POINT (champlain_point_new ());
 
-  champlain_point_set_size (marker, size);
-  champlain_point_set_color (marker, color);
+  champlain_point_set_size (point, size);
+  champlain_point_set_color (point, color);
   
-  return CLUTTER_ACTOR (marker);
+  return CLUTTER_ACTOR (point);
 }
 
 
-/**
- */
 void
 champlain_point_set_size (ChamplainPoint *point,
     gdouble size)
@@ -344,12 +290,10 @@ champlain_point_set_size (ChamplainPoint *point,
 
   point->priv->size = size;
   g_object_notify (G_OBJECT (point), "size");
-  draw_marker (point);
+  draw_point (point);
 }
 
 
-/**
- */
 gdouble
 champlain_point_get_size (ChamplainPoint *point)
 {
@@ -359,16 +303,6 @@ champlain_point_get_size (ChamplainPoint *point)
 }
 
 
-/**
- * champlain_point_set_color:
- * @point: The point
- * @color: (allow-none): The point's background color or NULL to reset the background to the
- *         default color. The color parameter is copied.
- *
- * Set the point's background color.
- *
- * Since: 0.4
- */
 void
 champlain_point_set_color (ChamplainPoint *point,
     const ClutterColor *color)
@@ -385,19 +319,10 @@ champlain_point_set_color (ChamplainPoint *point,
 
   priv->color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (point), "color");
-  draw_marker (point);
+  draw_point (point);
 }
 
-/**
- * champlain_point_get_color:
- * @point: The point
- *
- * Gets the point's color.
- *
- * Returns: the point's color.
- *
- * Since: 0.4
- */
+
 ClutterColor *
 champlain_point_get_color (ChamplainPoint *point)
 {

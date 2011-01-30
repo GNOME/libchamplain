@@ -32,7 +32,6 @@
 #include "champlain-layer.h"
 
 #include "champlain-defines.h"
-#include "champlain-base-marker.h"
 #include "champlain-enum-types.h"
 #include "champlain-private.h"
 #include "champlain-view.h"
@@ -85,7 +84,7 @@ struct _ChamplainLayerPrivate
 };
 
 
-static void marker_highlighted_cb (ChamplainBaseMarker *marker,
+static void marker_highlighted_cb (ChamplainMarker *marker,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainLayer *layer);
     
@@ -416,7 +415,7 @@ champlain_layer_new_full (ChamplainSelectionMode mode)
 
 static void
 set_highlighted_all_but_one (ChamplainLayer *layer,
-    ChamplainBaseMarker *not_highlighted,
+    ChamplainMarker *not_highlighted,
     gboolean highlight)
 {
   int i;
@@ -424,7 +423,7 @@ set_highlighted_all_but_one (ChamplainLayer *layer,
   for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (actor);
       
       if (marker != not_highlighted)
         {
@@ -432,8 +431,8 @@ set_highlighted_all_but_one (ChamplainLayer *layer,
               G_CALLBACK (marker_highlighted_cb), 
               layer);
 
-          champlain_base_marker_set_highlighted (marker, highlight);
-          champlain_base_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
+          champlain_marker_set_highlighted (marker, highlight);
+          champlain_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
 
           g_signal_handlers_unblock_by_func (marker, 
               G_CALLBACK (marker_highlighted_cb), 
@@ -444,7 +443,7 @@ set_highlighted_all_but_one (ChamplainLayer *layer,
 
 
 static void
-marker_highlighted_cb (ChamplainBaseMarker *marker,
+marker_highlighted_cb (ChamplainMarker *marker,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainLayer *layer)
 {
@@ -456,7 +455,7 @@ marker_highlighted_cb (ChamplainBaseMarker *marker,
 
 
 static void
-set_marker_position (ChamplainLayer *layer, ChamplainBaseMarker *marker)
+set_marker_position (ChamplainLayer *layer, ChamplainMarker *marker)
 {
   ChamplainLayerPrivate *priv = layer->priv;
   gint x, y;
@@ -466,16 +465,16 @@ set_marker_position (ChamplainLayer *layer, ChamplainBaseMarker *marker)
     return;
 
   x = champlain_view_longitude_to_layer_x (priv->view, 
-    champlain_base_marker_get_longitude (marker));
+    champlain_marker_get_longitude (marker));
   y = champlain_view_latitude_to_layer_y (priv->view, 
-    champlain_base_marker_get_latitude (marker));
+    champlain_marker_get_latitude (marker));
 
   clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
 }
 
 
 static void
-marker_position_notify (ChamplainBaseMarker *marker,
+marker_position_notify (ChamplainMarker *marker,
     G_GNUC_UNUSED GParamSpec *pspec,
     ChamplainLayer *layer)
 {
@@ -485,7 +484,7 @@ marker_position_notify (ChamplainBaseMarker *marker,
 
 
 static void
-marker_move_by_cb (ChamplainBaseMarker *marker,
+marker_move_by_cb (ChamplainMarker *marker,
     gfloat dx,
     gfloat dy,
     ChamplainLayer *layer)
@@ -494,8 +493,8 @@ marker_move_by_cb (ChamplainBaseMarker *marker,
   ChamplainView *view = priv->view;
   gdouble x, y, lat, lon;
 
-  x = champlain_view_longitude_to_x (view, champlain_base_marker_get_longitude (marker));
-  y = champlain_view_latitude_to_y (view, champlain_base_marker_get_latitude (marker));
+  x = champlain_view_longitude_to_x (view, champlain_marker_get_longitude (marker));
+  y = champlain_view_latitude_to_y (view, champlain_marker_get_latitude (marker));
   
   x += dx;
   y += dy;
@@ -503,14 +502,14 @@ marker_move_by_cb (ChamplainBaseMarker *marker,
   lon = champlain_view_x_to_longitude (view, x);
   lat = champlain_view_y_to_latitude (view, y);
     
-  champlain_base_marker_set_position (marker, lat, lon);
+  champlain_marker_set_position (marker, lat, lon);
 }
 
 
 /**
  * champlain_layer_add_marker:
  * @layer: a #ChamplainLayer
- * @marker: a #ChamplainBaseMarker
+ * @marker: a #ChamplainMarker
  *
  * Adds the marker to the layer.
  *
@@ -518,12 +517,12 @@ marker_move_by_cb (ChamplainBaseMarker *marker,
  */
 void
 champlain_layer_add_marker (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker)
+    ChamplainMarker *marker)
 {
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
-  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+  g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  champlain_base_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
+  champlain_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
 
   g_signal_connect (G_OBJECT (marker), "notify::highlighted",
       G_CALLBACK (marker_highlighted_cb), layer);
@@ -543,7 +542,7 @@ champlain_layer_add_marker (ChamplainLayer *layer,
 /**
  * champlain_layer_remove_marker:
  * @layer: a #ChamplainLayer
- * @marker: a #ChamplainBaseMarker
+ * @marker: a #ChamplainMarker
  *
  * Removes the marker from the layer.
  *
@@ -551,10 +550,10 @@ champlain_layer_add_marker (ChamplainLayer *layer,
  */
 void
 champlain_layer_remove_marker (ChamplainLayer *layer,
-    ChamplainBaseMarker *marker)
+    ChamplainMarker *marker)
 {
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
-  g_return_if_fail (CHAMPLAIN_IS_BASE_MARKER (marker));
+  g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
   g_signal_handlers_disconnect_by_func (G_OBJECT (marker),
       G_CALLBACK (marker_highlighted_cb), layer);
@@ -586,9 +585,9 @@ champlain_layer_animate_in_all_markers (ChamplainLayer *layer)
   for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (actor);
 
-      champlain_base_marker_animate_in_with_delay (marker, delay);
+      champlain_marker_animate_in_with_delay (marker, delay);
       delay += 50;
     }
 }
@@ -613,9 +612,9 @@ champlain_layer_animate_out_all_markers (ChamplainLayer *layer)
   for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (actor);
 
-      champlain_base_marker_animate_out_with_delay (marker, delay);
+      champlain_marker_animate_out_with_delay (marker, delay);
       delay += 50;
     }
 }
@@ -677,9 +676,9 @@ champlain_layer_set_all_markers_movable (ChamplainLayer *layer)
 
   for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
 
-      champlain_base_marker_set_movable (marker, TRUE);
+      champlain_marker_set_movable (marker, TRUE);
     }
 }
 
@@ -693,9 +692,9 @@ champlain_layer_set_all_markers_unmovable (ChamplainLayer *layer)
 
   for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
 
-      champlain_base_marker_set_movable (marker, FALSE);
+      champlain_marker_set_movable (marker, FALSE);
     }
 }
 
@@ -707,7 +706,7 @@ champlain_layer_set_all_markers_unmovable (ChamplainLayer *layer)
  *
  * Gets the list of selected markers.
  *
- * Returns: (transfer container) (element-type ChamplainBaseMarker): the list of selected #ChamplainBaseMarker or NULL if none is selected.
+ * Returns: (transfer container) (element-type ChamplainMarker): the list of selected #ChamplainMarker or NULL if none is selected.
  * You should free the list but not the elements of the list.
  *
  * Since: 0.10
@@ -835,7 +834,7 @@ relocate (ChamplainLayer *layer)
   for (i = 1; i < n_children; i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (actor);
       
       set_marker_position (layer, marker);
     }
@@ -892,11 +891,11 @@ redraw_polygon (ChamplainLayer *layer)
   for (i = 1; i < n_children; i++)
     {
       ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
-      ChamplainBaseMarker *marker = CHAMPLAIN_BASE_MARKER (actor);
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (actor);
       gfloat x, y;
 
-      x = champlain_view_longitude_to_x (view, champlain_base_marker_get_longitude (marker));
-      y = champlain_view_latitude_to_y (view, champlain_base_marker_get_latitude (marker));
+      x = champlain_view_longitude_to_x (view, champlain_marker_get_longitude (marker));
+      y = champlain_view_latitude_to_y (view, champlain_marker_get_latitude (marker));
 
       cairo_line_to (cr, x, y);
     }
@@ -981,13 +980,13 @@ void champlain_layer_set_view (ChamplainLayer *layer,
  */
 /*void
 champlain_view_ensure_markers_visible (ChamplainView *view,
-    ChamplainBaseMarker *markers[],
+    ChamplainMarker *markers[],
     gboolean animate)
 {
   DEBUG_LOG ()
 
   gdouble min_lat, min_lon, max_lat, max_lon;
-  ChamplainBaseMarker *marker = NULL;
+  ChamplainMarker *marker = NULL;
   gint i = 0;
 
   min_lat = min_lon = 200;

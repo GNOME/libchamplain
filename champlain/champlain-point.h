@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2011 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 #ifndef CHAMPLAIN_POINT_H
 #define CHAMPLAIN_POINT_H
 
-#include <champlain/champlain-base-marker.h>
+#include <champlain/champlain-marker.h>
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
@@ -54,14 +54,14 @@ typedef struct _ChamplainPointClass ChamplainPointClass;
 
 struct _ChamplainPoint
 {
-  ChamplainBaseMarker base;
+  ChamplainMarker parent;
 
   ChamplainPointPrivate *priv;
 };
 
 struct _ChamplainPointClass
 {
-  ChamplainBaseMarkerClass parent_class;
+  ChamplainMarkerClass parent_class;
 };
 
 GType champlain_point_get_type (void);
@@ -71,10 +71,10 @@ ClutterActor *champlain_point_new (void);
 ClutterActor *champlain_point_new_full (gdouble size, 
     const ClutterColor *color);
 
-void champlain_point_set_color (ChamplainPoint *marker,
+void champlain_point_set_color (ChamplainPoint *point,
     const ClutterColor *color);
 
-ClutterColor *champlain_point_get_color (ChamplainPoint *marker);
+ClutterColor *champlain_point_get_color (ChamplainPoint *point);
 
 void champlain_point_set_highlight_color (ClutterColor *color);
 const ClutterColor *champlain_point_get_highlight_color (void);

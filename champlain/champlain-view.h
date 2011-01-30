@@ -25,7 +25,6 @@
 #define CHAMPLAIN_VIEW_H
 
 #include <champlain/champlain-defines.h>
-#include <champlain/champlain-base-marker.h>
 #include <champlain/champlain-layer.h>
 #include <champlain/champlain-map-source.h>
 

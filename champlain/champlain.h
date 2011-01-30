@@ -31,8 +31,8 @@
 
 #include "champlain/champlain-layer.h"
 #include "champlain/champlain-point.h"
-#include "champlain/champlain-base-marker.h"
 #include "champlain/champlain-marker.h"
+#include "champlain/champlain-label.h"
 #include "champlain/champlain-view.h"
 #include "champlain/champlain-bounding-box.h"
 

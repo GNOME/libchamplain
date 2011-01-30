@@ -35,7 +35,7 @@ create_marker ()
   cairo_t *cr;
 
   /* Create the marker */
-  marker = champlain_base_marker_new ();
+  marker = champlain_marker_new ();
 
   /* Static filled circle ----------------------------------------------- */
   bg = clutter_cairo_texture_new (MARKER_SIZE, MARKER_SIZE);
@@ -102,7 +102,7 @@ double lon = -73.75;
 typedef struct
 {
   ChamplainView *view;
-  ChamplainBaseMarker *marker;
+  ChamplainMarker *marker;
 } GpsCallbackData;
 
 static gboolean
@@ -111,7 +111,7 @@ gps_callback (GpsCallbackData *data)
   lat += 0.005;
   lon += 0.005;
   champlain_view_center_on (data->view, lat, lon);
-  champlain_base_marker_set_position (data->marker, lat, lon);
+  champlain_marker_set_position (data->marker, lat, lon);
   return TRUE;
 }
 
@@ -150,7 +150,7 @@ main (int argc, char *argv[])
 
   /* Create callback that updates the map periodically */
   callback_data.view = CHAMPLAIN_VIEW (actor);
-  callback_data.marker = CHAMPLAIN_BASE_MARKER (marker);
+  callback_data.marker = CHAMPLAIN_MARKER (marker);
 
   g_timeout_add (1000, (GSourceFunc) gps_callback, &callback_data);
 

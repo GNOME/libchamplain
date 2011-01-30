@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2011 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +24,7 @@
 #ifndef CHAMPLAIN_MARKER_H
 #define CHAMPLAIN_MARKER_H
 
-#include <champlain/champlain-base-marker.h>
+#include <champlain/champlain-defines.h>
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
@@ -52,84 +53,47 @@ typedef struct _ChamplainMarkerPrivate ChamplainMarkerPrivate;
 typedef struct _ChamplainMarker ChamplainMarker;
 typedef struct _ChamplainMarkerClass ChamplainMarkerClass;
 
+
 struct _ChamplainMarker
 {
-  ChamplainBaseMarker base;
+  ClutterGroup group;
 
   ChamplainMarkerPrivate *priv;
 };
 
 struct _ChamplainMarkerClass
 {
-  ChamplainBaseMarkerClass parent_class;
-
-  void (*draw_marker)(ChamplainMarker *marker);
+  ClutterGroupClass parent_class;
 };
 
 GType champlain_marker_get_type (void);
 
 ClutterActor *champlain_marker_new (void);
 
-ClutterActor *champlain_marker_new_with_text (const gchar *text,
-    const gchar *font,
-    ClutterColor *text_color,
-    ClutterColor *marker_color);
+void champlain_marker_set_position (ChamplainMarker *marker,
+    gdouble latitude,
+    gdouble longitude);
+gdouble champlain_marker_get_latitude (ChamplainMarker *marker);
+gdouble champlain_marker_get_longitude (ChamplainMarker *marker);
 
-ClutterActor *champlain_marker_new_with_image (ClutterActor *actor);
+void champlain_marker_set_selectable (ChamplainMarker *marker,
+    gboolean value);
+gboolean champlain_marker_get_selectable (ChamplainMarker *marker);
 
-ClutterActor *champlain_marker_new_from_file (const gchar *filename,
-    GError **error);
+void champlain_marker_set_movable (ChamplainMarker *marker,
+    gboolean value);
+gboolean champlain_marker_get_movable (ChamplainMarker *marker);
 
-ClutterActor *champlain_marker_new_full (const gchar *text,
-    ClutterActor *actor);
+void champlain_marker_set_highlighted (ChamplainMarker *marker,
+    gboolean value);
+gboolean champlain_marker_get_highlighted (ChamplainMarker *marker);
 
-void champlain_marker_set_text (ChamplainMarker *marker,
-    const gchar *text);
-void champlain_marker_set_image (ChamplainMarker *marker,
-    ClutterActor *image);
-void champlain_marker_set_use_markup (ChamplainMarker *marker,
-    gboolean use_markup);
-void champlain_marker_set_alignment (ChamplainMarker *marker,
-    PangoAlignment alignment);
-void champlain_marker_set_color (ChamplainMarker *marker,
-    const ClutterColor *color);
-void champlain_marker_set_text_color (ChamplainMarker *marker,
-    const ClutterColor *color);
-void champlain_marker_set_font_name (ChamplainMarker *marker,
-    const gchar *font_name);
-void champlain_marker_set_wrap (ChamplainMarker *marker,
-    gboolean wrap);
-void champlain_marker_set_wrap_mode (ChamplainMarker *marker,
-    PangoWrapMode wrap_mode);
-void champlain_marker_set_attributes (ChamplainMarker *marker,
-    PangoAttrList *list);
-void champlain_marker_set_single_line_mode (ChamplainMarker *marker,
-    gboolean mode);
-void champlain_marker_set_ellipsize (ChamplainMarker *marker,
-    PangoEllipsizeMode mode);
-void champlain_marker_set_draw_background (ChamplainMarker *marker,
-    gboolean background);
-
-gboolean champlain_marker_get_use_markup (ChamplainMarker *marker);
-const gchar *champlain_marker_get_text (ChamplainMarker *marker);
-ClutterActor *champlain_marker_get_image (ChamplainMarker *marker);
-PangoAlignment champlain_marker_get_alignment (ChamplainMarker *marker);
-ClutterColor *champlain_marker_get_color (ChamplainMarker *marker);
-ClutterColor *champlain_marker_get_text_color (ChamplainMarker *marker);
-const gchar *champlain_marker_get_font_name (ChamplainMarker *marker);
-gboolean champlain_marker_get_wrap (ChamplainMarker *marker);
-PangoWrapMode champlain_marker_get_wrap_mode (ChamplainMarker *marker);
-PangoEllipsizeMode champlain_marker_get_ellipsize (ChamplainMarker *marker);
-gboolean champlain_marker_get_single_line_mode (ChamplainMarker *marker);
-gboolean champlain_marker_get_draw_background (ChamplainMarker *marker);
-
-void champlain_marker_set_highlight_color (ClutterColor *color);
-const ClutterColor *champlain_marker_get_highlight_color (void);
-
-void champlain_marker_set_highlight_text_color (ClutterColor *color);
-const ClutterColor *champlain_marker_get_highlight_text_color (void);
-
-void champlain_marker_queue_redraw (ChamplainMarker *marker);
+void champlain_marker_animate_in (ChamplainMarker *marker);
+void champlain_marker_animate_in_with_delay (ChamplainMarker *marker,
+    guint delay);
+void champlain_marker_animate_out (ChamplainMarker *marker);
+void champlain_marker_animate_out_with_delay (ChamplainMarker *marker,
+    guint delay);
 
 G_END_DECLS
 
