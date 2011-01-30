@@ -2112,8 +2112,13 @@ champlain_view_x_to_longitude (ChamplainView *view,
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
   
   ChamplainViewPrivate *priv = view->priv;
+  gdouble longitude;
 
-  return champlain_view_layer_x_to_longitude (view, priv->viewport_size.x + x);
+  longitude = champlain_map_source_get_longitude (priv->map_source,
+      priv->zoom_level, 
+      x + priv->viewport_size.x + priv->anchor.x);
+
+  return longitude;
 }
 
 
@@ -2126,8 +2131,13 @@ champlain_view_y_to_latitude (ChamplainView *view,
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
   
   ChamplainViewPrivate *priv = view->priv;
+  gdouble latitude;
 
-  return champlain_view_layer_y_to_latitude (view, priv->viewport_size.y + y);
+  latitude = champlain_map_source_get_latitude (priv->map_source,
+      priv->zoom_level, 
+      y + priv->viewport_size.y + priv->anchor.y);
+
+  return latitude;
 }
 
 gdouble
@@ -2139,8 +2149,13 @@ champlain_view_longitude_to_x (ChamplainView *view,
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
 
   ChamplainViewPrivate *priv = view->priv;
+  gdouble x;
 
-  return champlain_view_longitude_to_layer_x (view, longitude) - priv->viewport_size.x;
+  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
+  x -= priv->anchor.x;
+  x -= priv->viewport_size.x;
+
+  return x;
 }
 
 
@@ -2153,85 +2168,38 @@ champlain_view_latitude_to_y (ChamplainView *view,
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
 
   ChamplainViewPrivate *priv = view->priv;
-
-  return champlain_view_latitude_to_layer_y (view, latitude) - priv->viewport_size.y;
-}
-
-
-
-gdouble
-champlain_view_layer_x_to_longitude (ChamplainView *view,
-    gdouble x)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
-  ChamplainViewPrivate *priv = view->priv;
-  
-  gdouble longitude;
-
-  longitude = champlain_map_source_get_longitude (priv->map_source,
-      priv->zoom_level, 
-      x + priv->anchor.x);
-
-  return longitude;
-}
-
-
-gdouble
-champlain_view_layer_y_to_latitude (ChamplainView *view,
-    gdouble y)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
-  ChamplainViewPrivate *priv = view->priv;
-  
-  gdouble latitude;
-
-  latitude = champlain_map_source_get_latitude (priv->map_source,
-      priv->zoom_level, 
-      y + priv->anchor.y);
-
-  return latitude;
-}
-
-
-gdouble
-champlain_view_longitude_to_layer_x (ChamplainView *view, 
-    gdouble longitude)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
-
-  ChamplainViewPrivate *priv = view->priv;
-  gdouble x;
-
-  x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
-  x -= priv->anchor.x;
-  
-  return x;
-}
-
-
-gdouble
-champlain_view_latitude_to_layer_y (ChamplainView *view, 
-    gdouble latitude)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
-
-  ChamplainViewPrivate *priv = view->priv;
   gdouble y;
 
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
   y -= priv->anchor.y;
+  y -= priv->viewport_size.y;
 
   return y;
 }
 
+
+double
+champlain_view_get_viewport_x (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+  ChamplainViewPrivate *priv = view->priv;
+  
+  return priv->viewport_size.x;
+}
+
+
+double
+champlain_view_get_viewport_y (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+  ChamplainViewPrivate *priv = view->priv;
+  
+  return priv->viewport_size.y;
+}
 
 
 static void

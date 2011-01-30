@@ -169,16 +169,6 @@ gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
 void champlain_view_reload_tiles (ChamplainView *view);
 
 
-
-gdouble champlain_view_layer_x_to_longitude (ChamplainView *view,
-    gdouble x);
-gdouble champlain_view_layer_y_to_latitude (ChamplainView *view,
-    gdouble y);
-gdouble champlain_view_longitude_to_layer_x (ChamplainView *viev, 
-    gdouble longitude);
-gdouble champlain_view_latitude_to_layer_y (ChamplainView *viev, 
-    gdouble latitude);
-
 gdouble champlain_view_x_to_longitude (ChamplainView *view,
     gdouble x);
 gdouble champlain_view_y_to_latitude (ChamplainView *view,
@@ -188,6 +178,8 @@ gdouble champlain_view_longitude_to_x (ChamplainView *view,
 gdouble champlain_view_latitude_to_y (ChamplainView *view, 
     gdouble latitude);
 
+double champlain_view_get_viewport_x (ChamplainView *view);
+double champlain_view_get_viewport_y (ChamplainView *view);
 
 
 G_END_DECLS

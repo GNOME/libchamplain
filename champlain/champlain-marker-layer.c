@@ -464,10 +464,12 @@ set_marker_position (ChamplainMarkerLayer *layer, ChamplainMarker *marker)
   if (priv->view == NULL)
     return;
 
-  x = champlain_view_longitude_to_layer_x (priv->view, 
+  x = champlain_view_longitude_to_x (priv->view, 
     champlain_marker_get_longitude (marker));
-  y = champlain_view_latitude_to_layer_y (priv->view, 
+  x += champlain_view_get_viewport_x (priv->view);
+  y = champlain_view_latitude_to_y (priv->view, 
     champlain_marker_get_latitude (marker));
+  y += champlain_view_get_viewport_y (priv->view);
 
   clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
 }
@@ -862,7 +864,6 @@ redraw_polygon (ChamplainMarkerLayer *layer)
   gfloat width, height;
   int i, n_children;
   ChamplainView *view = priv->view;
-  gdouble lon, lat;
   gdouble x, y;
   
   /* layer not yet added to the view */
@@ -878,10 +879,9 @@ redraw_polygon (ChamplainMarkerLayer *layer)
   cairo_texture = clutter_cairo_texture_new (width, height);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->polygon_actor), cairo_texture);
   
-  lon = champlain_view_x_to_longitude (view, 0);
-  lat = champlain_view_y_to_latitude (view, 0);
-  x = champlain_view_longitude_to_layer_x (view, lon);
-  y = champlain_view_latitude_to_layer_y (view, lat);
+  x = champlain_view_get_viewport_x (priv->view);
+  y = champlain_view_get_viewport_y (priv->view);
+
   clutter_actor_set_position (priv->polygon_actor, x, y);
 
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
