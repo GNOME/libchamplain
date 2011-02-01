@@ -176,7 +176,7 @@ champlain_scale_class_init (ChamplainScaleClass *scale_class)
    */
   g_object_class_install_property (object_class,
       PROP_SCALE_UNIT,
-      g_param_spec_enum ("scale-unit",
+      g_param_spec_enum ("unit",
           "The scale's unit",
           "The map scale's unit",
           CHAMPLAIN_TYPE_UNIT,
