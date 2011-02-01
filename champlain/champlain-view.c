@@ -144,9 +144,9 @@ struct _ChamplainViewPrivate
   ChamplainMapSourceFactory *factory; /* The map source factory */
   ChamplainMapSource *map_source; /* Current map tile source */
   ChamplainScrollMode scroll_mode;
-  gint zoom_level; /* Holds the current zoom level number */
-  gint min_zoom_level; /* Lowest allowed zoom level */
-  gint max_zoom_level; /* Highest allowed zoom level */
+  guint zoom_level; /* Holds the current zoom level number */
+  guint min_zoom_level; /* Lowest allowed zoom level */
+  guint max_zoom_level; /* Highest allowed zoom level */
 
   /* Represents the (lat, lon) at the center of the viewport */
   gdouble longitude;
@@ -214,7 +214,7 @@ static gboolean view_update_anchor (ChamplainView *view,
     gint x,
     gint y);
 static gboolean view_set_zoom_level_at (ChamplainView *view,
-    gint zoom_level,
+    guint zoom_level,
     gint x,
     gint y);
 static void tile_state_notify (ChamplainTile *tile,
@@ -300,7 +300,7 @@ scroll_event (G_GNUC_UNUSED ClutterActor *actor,
 
   ChamplainViewPrivate *priv = view->priv;
 
-  gint zoom_level = priv->zoom_level;
+  guint zoom_level = priv->zoom_level;
 
   if (event->direction == CLUTTER_SCROLL_UP)
     zoom_level = priv->zoom_level + 1;
@@ -742,7 +742,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
    */
   g_object_class_install_property (object_class,
       PROP_ZOOM_LEVEL,
-      g_param_spec_int ("zoom-level",
+      g_param_spec_uint ("zoom-level",
           "Zoom level",
           "The level of zoom of the map",
           0, 20, 3, CHAMPLAIN_PARAM_READWRITE));
@@ -756,7 +756,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
    */
   g_object_class_install_property (object_class,
       PROP_MIN_ZOOM_LEVEL,
-      g_param_spec_int ("min-zoom-level",
+      g_param_spec_uint ("min-zoom-level",
           "Min zoom level",
           "The lowest allowed level of zoom",
           0, 20, 0, CHAMPLAIN_PARAM_READWRITE));
@@ -770,7 +770,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
    */
   g_object_class_install_property (object_class,
       PROP_MAX_ZOOM_LEVEL,
-      g_param_spec_int ("max-zoom-level",
+      g_param_spec_uint ("max-zoom-level",
           "Max zoom level",
           "The highest allowed level of zoom",
           0, 20, 20, CHAMPLAIN_PARAM_READWRITE));
@@ -1489,7 +1489,7 @@ champlain_view_zoom_out (ChamplainView *view)
 /**
  * champlain_view_set_zoom_level:
  * @view: a #ChamplainView
- * @zoom_level: a gint
+ * @zoom_level: a guint
  *
  * Changes the current zoom level
  *
@@ -1497,7 +1497,7 @@ champlain_view_zoom_out (ChamplainView *view)
  */
 void
 champlain_view_set_zoom_level (ChamplainView *view,
-    gint zoom_level)
+    guint zoom_level)
 {
   DEBUG_LOG ()
 
@@ -1525,7 +1525,7 @@ champlain_view_set_zoom_level (ChamplainView *view,
 /**
  * champlain_view_set_min_zoom_level:
  * @view: a #ChamplainView
- * @zoom_level: a gint
+ * @zoom_level: a guint
  *
  * Changes the lowest allowed zoom level
  *
@@ -1533,7 +1533,7 @@ champlain_view_set_zoom_level (ChamplainView *view,
  */
 void
 champlain_view_set_min_zoom_level (ChamplainView *view,
-    gint min_zoom_level)
+    guint min_zoom_level)
 {
   DEBUG_LOG ()
 
@@ -1556,7 +1556,7 @@ champlain_view_set_min_zoom_level (ChamplainView *view,
 /**
  * champlain_view_set_max_zoom_level:
  * @view: a #ChamplainView
- * @zoom_level: a gint
+ * @zoom_level: a guint
  *
  * Changes the highest allowed zoom level
  *
@@ -1564,7 +1564,7 @@ champlain_view_set_min_zoom_level (ChamplainView *view,
  */
 void
 champlain_view_set_max_zoom_level (ChamplainView *view,
-    gint max_zoom_level)
+    guint max_zoom_level)
 {
   DEBUG_LOG ()
 
@@ -2136,7 +2136,7 @@ champlain_view_ensure_visible (ChamplainView *view,
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
-  gint zoom_level = priv->zoom_level;
+  guint zoom_level = priv->zoom_level;
   gdouble width, height;
   gdouble min_lat, min_lon, max_lat, max_lon;
   gboolean good_size = FALSE;
@@ -2205,7 +2205,7 @@ champlain_view_ensure_visible (ChamplainView *view,
 /* Sets the zoom level, leaving the (x, y) at the exact same point in the view */
 static gboolean
 view_set_zoom_level_at (ChamplainView *view,
-    gint zoom_level,
+    guint zoom_level,
     gint x,
     gint y)
 {
@@ -2265,7 +2265,7 @@ view_set_zoom_level_at (ChamplainView *view,
  *
  * Since: 0.4
  */
-gint
+guint
 champlain_view_get_zoom_level (ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -2286,7 +2286,7 @@ champlain_view_get_zoom_level (ChamplainView *view)
  *
  * Since: 0.4
  */
-gint
+guint
 champlain_view_get_min_zoom_level (ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -2307,7 +2307,7 @@ champlain_view_get_min_zoom_level (ChamplainView *view)
  *
  * Since: 0.4
  */
-gint
+guint
 champlain_view_get_max_zoom_level (ChamplainView *view)
 {
   DEBUG_LOG ()

@@ -95,11 +95,11 @@ void champlain_view_stop_go_to (ChamplainView *view);
 void champlain_view_zoom_in (ChamplainView *view);
 void champlain_view_zoom_out (ChamplainView *view);
 void champlain_view_set_zoom_level (ChamplainView *view,
-    gint zoom_level);
+    guint zoom_level);
 void champlain_view_set_min_zoom_level (ChamplainView *view,
-    gint zoom_level);
+    guint zoom_level);
 void champlain_view_set_max_zoom_level (ChamplainView *view,
-    gint zoom_level);
+    guint zoom_level);
 
 void champlain_view_ensure_visible (ChamplainView *view,
     gdouble lat1,
@@ -124,9 +124,9 @@ void champlain_view_add_layer (ChamplainView *view,
 void champlain_view_remove_layer (ChamplainView *view,
     ChamplainLayer *layer);
 
-gint champlain_view_get_zoom_level (ChamplainView *view);
-gint champlain_view_get_min_zoom_level (ChamplainView *view);
-gint champlain_view_get_max_zoom_level (ChamplainView *view);
+guint champlain_view_get_zoom_level (ChamplainView *view);
+guint champlain_view_get_min_zoom_level (ChamplainView *view);
+guint champlain_view_get_max_zoom_level (ChamplainView *view);
 ChamplainMapSource *champlain_view_get_map_source (ChamplainView *view);
 gdouble champlain_view_get_decel_rate (ChamplainView *view);
 ChamplainScrollMode champlain_view_get_scroll_mode (ChamplainView *view);
