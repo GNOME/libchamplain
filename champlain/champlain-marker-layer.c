@@ -46,7 +46,6 @@ G_DEFINE_TYPE (ChamplainMarkerLayer, champlain_marker_layer, CHAMPLAIN_TYPE_LAYE
 enum
 {
   /* normal signals */
-  CHANGED,
   LAST_SIGNAL
 };
 
@@ -66,7 +65,7 @@ enum
 static ClutterColor DEFAULT_FILL_COLOR = { 0xcc, 0x00, 0x00, 0xaa };
 static ClutterColor DEFAULT_STROKE_COLOR = { 0xa4, 0x00, 0x00, 0xff };
 
-static guint signals[LAST_SIGNAL] = { 0, };
+//static guint signals[LAST_SIGNAL] = { 0, };
 
 struct _ChamplainMarkerLayerPrivate
 {
@@ -361,18 +360,6 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           "The polygon's visibility",
           TRUE,
           CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-   * ChamplainMarkerLayer::changed
-   *
-   * The changed signal is emitted when the selected marker(s) change.
-   *
-   * Since: 0.4.1
-   */
-  signals[CHANGED] =
-    g_signal_new ("changed", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
 }
 
@@ -748,7 +735,7 @@ champlain_marker_layer_get_selected_markers (ChamplainMarkerLayer *layer)
  * Since: 0.4
  */
 void
-champlain_marker_layer_unselect_all (ChamplainMarkerLayer *layer)
+champlain_marker_layer_unselect_all_markers (ChamplainMarkerLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
@@ -766,7 +753,7 @@ champlain_marker_layer_unselect_all (ChamplainMarkerLayer *layer)
  * Since: 0.4
  */
 void
-champlain_marker_layer_select_all (ChamplainMarkerLayer *layer)
+champlain_marker_layer_select_all_markers (ChamplainMarkerLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 

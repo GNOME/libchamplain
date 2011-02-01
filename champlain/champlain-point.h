@@ -73,15 +73,14 @@ ClutterActor *champlain_point_new_full (gdouble size,
 
 void champlain_point_set_color (ChamplainPoint *point,
     const ClutterColor *color);
-
 ClutterColor *champlain_point_get_color (ChamplainPoint *point);
-
-void champlain_point_set_highlight_color (ClutterColor *color);
-const ClutterColor *champlain_point_get_highlight_color (void);
 
 void champlain_point_set_size (ChamplainPoint *point,
     gdouble size);
 gdouble champlain_point_get_size (ChamplainPoint *point);
+
+void champlain_point_set_highlight_color (ClutterColor *color);
+const ClutterColor *champlain_point_get_highlight_color (void);
 
 G_END_DECLS
 

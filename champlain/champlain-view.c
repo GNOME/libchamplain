@@ -381,15 +381,15 @@ champlain_view_get_property (GObject *object,
       break;
 
     case PROP_ZOOM_LEVEL:
-      g_value_set_int (value, priv->zoom_level);
+      g_value_set_uint (value, priv->zoom_level);
       break;
 
     case PROP_MIN_ZOOM_LEVEL:
-      g_value_set_int (value, priv->min_zoom_level);
+      g_value_set_uint (value, priv->min_zoom_level);
       break;
 
     case PROP_MAX_ZOOM_LEVEL:
-      g_value_set_int (value, priv->max_zoom_level);
+      g_value_set_uint (value, priv->max_zoom_level);
       break;
 
     case PROP_MAP_SOURCE:
@@ -450,15 +450,15 @@ champlain_view_set_property (GObject *object,
       break;
 
     case PROP_ZOOM_LEVEL:
-      champlain_view_set_zoom_level (view, g_value_get_int (value));
+      champlain_view_set_zoom_level (view, g_value_get_uint (value));
       break;
 
     case PROP_MIN_ZOOM_LEVEL:
-      champlain_view_set_min_zoom_level (view, g_value_get_int (value));
+      champlain_view_set_min_zoom_level (view, g_value_get_uint (value));
       break;
 
     case PROP_MAX_ZOOM_LEVEL:
-      champlain_view_set_max_zoom_level (view, g_value_get_int (value));
+      champlain_view_set_max_zoom_level (view, g_value_get_uint (value));
       break;
 
     case PROP_MAP_SOURCE:

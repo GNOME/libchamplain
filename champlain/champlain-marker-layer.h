@@ -99,8 +99,8 @@ void champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer);
 void champlain_marker_layer_set_all_markers_movable (ChamplainMarkerLayer *layer);
 void champlain_marker_layer_set_all_markers_unmovable (ChamplainMarkerLayer *layer);
 
-void champlain_marker_layer_select_all (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_unselect_all (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_select_all_markers (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_unselect_all_markers (ChamplainMarkerLayer *layer);
 GSList *champlain_marker_layer_get_selected_markers (ChamplainMarkerLayer *layer);
 
 void champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
