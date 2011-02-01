@@ -264,7 +264,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
   signals[MOVE_BY_SIGNAL] =
     g_signal_new ("moved", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        _champlain_marshal_VOID__FLOAT_FLOAT, G_TYPE_NONE, 2, G_TYPE_FLOAT, G_TYPE_FLOAT);
+        _champlain_marshal_VOID__DOUBLE_DOUBLE, G_TYPE_NONE, 2, G_TYPE_DOUBLE, G_TYPE_DOUBLE);
 }
 
 

@@ -492,8 +492,8 @@ marker_position_notify (ChamplainMarker *marker,
 
 static void
 marker_move_by_cb (ChamplainMarker *marker,
-    gfloat dx,
-    gfloat dy,
+    gdouble dx,
+    gdouble dy,
     ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = layer->priv;
