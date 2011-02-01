@@ -262,7 +262,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   signals[MOVE_BY_SIGNAL] =
-    g_signal_new ("move-by", G_OBJECT_CLASS_TYPE (object_class),
+    g_signal_new ("moved", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
         _champlain_marshal_VOID__FLOAT_FLOAT, G_TYPE_NONE, 2, G_TYPE_FLOAT, G_TYPE_FLOAT);
 }
@@ -287,7 +287,7 @@ motion_event_cb (ClutterActor        *stage,
       gfloat dx = coord.x - priv->click_coord.x;
       gfloat dy = coord.y - priv->click_coord.y;
         
-      g_signal_emit_by_name (marker, "move-by", dx, dy);
+      g_signal_emit_by_name (marker, "moved", dx, dy);
     }
 
   return TRUE;
