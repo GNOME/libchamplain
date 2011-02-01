@@ -60,6 +60,7 @@
 #include "champlain-map-source-factory.h"
 #include "champlain-private.h"
 #include "champlain-tile.h"
+#include "champlain-license.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
@@ -97,13 +98,8 @@ enum
   PROP_DECEL_RATE,
   PROP_SCROLL_MODE,
   PROP_KEEP_CENTER_ON_RESIZE,
-  PROP_SHOW_LICENSE,
-  PROP_LICENSE_EXTRA,
   PROP_ZOOM_ON_DOUBLE_CLICK,
   PROP_STATE,
-  PROP_SHOW_SCALE,
-  PROP_SCALE_UNIT,
-  PROP_MAX_SCALE_WIDTH,
 };
 
 #define PADDING 10
@@ -177,14 +173,7 @@ struct _ChamplainViewPrivate
 
   gboolean zoom_on_double_click;
 
-  gboolean show_license;
   ClutterActor *license_actor; /* Contains the license info */
-  gchar *license_text; /* Extra license text */
-
-  ClutterActor *scale_actor;
-  gboolean show_scale;
-  ChamplainUnit scale_unit;
-  guint max_scale_width;
 
   ChamplainState state; /* View's global state */
 
@@ -192,6 +181,7 @@ struct _ChamplainViewPrivate
   GoToContext *goto_context;
 
   gint tiles_loading;
+  ClutterLayoutManager *layout_manager;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
@@ -217,8 +207,6 @@ static void viewport_pos_changed_cb (GObject *gobject,
 static gboolean finger_scroll_button_press_cb (ClutterActor *actor,
     ClutterButtonEvent *event,
     ChamplainView *view);
-static void update_license (ChamplainView *view);
-static void update_scale (ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
 static void view_position_tile (ChamplainView *view,
     ChamplainTile *tile);
@@ -240,11 +228,6 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble longitude,
     guint duration);
 static gboolean fill_tile_cb (FillTileCallbackData *data);
-
-#define SCALE_HEIGHT  20
-#define SCALE_PADDING 10
-#define SCALE_INSIDE_PADDING 10
-#define SCALE_LINE_WIDTH 2
 
 
 /* Updates the internals after the viewport changed */
@@ -283,7 +266,6 @@ update_viewport (ChamplainView *view,
       y);
 
   view_load_visible_tiles (view);
-  update_scale (view);
 
   g_object_notify (G_OBJECT (view), "longitude");
   g_object_notify (G_OBJECT (view), "latitude");
@@ -418,18 +400,6 @@ champlain_view_get_property (GObject *object,
       g_value_set_enum (value, priv->scroll_mode);
       break;
 
-    case PROP_SHOW_SCALE:
-      g_value_set_boolean (value, priv->show_scale);
-      break;
-
-    case PROP_MAX_SCALE_WIDTH:
-      g_value_set_uint (value, priv->max_scale_width);
-      break;
-
-    case PROP_SCALE_UNIT:
-      g_value_set_enum (value, priv->scale_unit);
-      break;
-
     case PROP_DECEL_RATE:
       {
         gdouble decel = 0.0;
@@ -440,14 +410,6 @@ champlain_view_get_property (GObject *object,
 
     case PROP_KEEP_CENTER_ON_RESIZE:
       g_value_set_boolean (value, priv->keep_center_on_resize);
-      break;
-
-    case PROP_SHOW_LICENSE:
-      g_value_set_boolean (value, priv->show_license);
-      break;
-
-    case PROP_LICENSE_EXTRA:
-      g_value_set_string (value, priv->license_text);
       break;
 
     case PROP_ZOOM_ON_DOUBLE_CLICK:
@@ -507,32 +469,12 @@ champlain_view_set_property (GObject *object,
       champlain_view_set_scroll_mode (view, g_value_get_enum (value));
       break;
 
-    case PROP_SHOW_SCALE:
-      champlain_view_set_show_scale (view, g_value_get_boolean (value));
-      break;
-
-    case PROP_MAX_SCALE_WIDTH:
-      champlain_view_set_max_scale_width (view, g_value_get_uint (value));
-      break;
-
-    case PROP_SCALE_UNIT:
-      champlain_view_set_scale_unit (view, g_value_get_enum (value));
-      break;
-
     case PROP_DECEL_RATE:
       champlain_view_set_decel_rate (view, g_value_get_double (value));
       break;
 
     case PROP_KEEP_CENTER_ON_RESIZE:
       champlain_view_set_keep_center_on_resize (view, g_value_get_boolean (value));
-      break;
-
-    case PROP_SHOW_LICENSE:
-      champlain_view_set_show_license (view, g_value_get_boolean (value));
-      break;
-
-    case PROP_LICENSE_EXTRA:
-      champlain_view_set_license_text (view, g_value_get_string (value));
       break;
 
     case PROP_ZOOM_ON_DOUBLE_CLICK:
@@ -577,12 +519,6 @@ champlain_view_dispose (GObject *object)
       priv->license_actor = NULL;
     }
 
-  if (priv->scale_actor != NULL)
-    {
-      g_object_unref (priv->scale_actor);
-      priv->scale_actor = NULL;
-    }
-
   if (priv->finger_scroll != NULL)
     {
       mx_kinetic_scroll_view_stop (MX_KINETIC_SCROLL_VIEW (priv->finger_scroll));
@@ -624,9 +560,7 @@ champlain_view_finalize (GObject *object)
 {
   DEBUG_LOG ()
 
-  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW (object)->priv;
-
-  g_free (priv->license_text);
+//  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW (object)->priv;
 
   G_OBJECT_CLASS (champlain_view_parent_class)->finalize (object);
 }
@@ -644,13 +578,6 @@ _update_idle_cb (ChamplainView *view)
       priv->viewport_size.height);
 
   resize_viewport (view);
-
-  clutter_actor_set_position (priv->license_actor,
-      priv->viewport_size.width - PADDING,
-      priv->viewport_size.height - PADDING);
-  clutter_actor_set_position (priv->scale_actor,
-      SCALE_PADDING,
-      priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING);
 
   if (priv->keep_center_on_resize)
     champlain_view_center_on (view, priv->latitude, priv->longitude);
@@ -714,9 +641,6 @@ champlain_view_realize (ClutterActor *actor)
 
   /* this call will launch the tiles loading */
   champlain_view_center_on (view, priv->latitude, priv->longitude);
-
-  update_scale (view);
-  update_license (view);
 }
 
 
@@ -912,39 +836,6 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
           TRUE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainView:show-license:
-   *
-   * Show the license on the map view.  The license information should always be
-   * available in a way or another in your application.  You can have it in
-   * About, or on the map.
-   *
-   * Since: 0.2.8
-   */
-  g_object_class_install_property (object_class,
-      PROP_SHOW_LICENSE,
-      g_param_spec_boolean ("show-license",
-          "Show the map data license",
-          "Show the map data license on the map view",
-          TRUE, CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-   * ChamplainView:license-text:
-   *
-   * Sets additional text to be displayed in the license area.  The map's
-   * license will be added below it. Your text can have multiple line, just use
-   * "\n" in between.
-   *
-   * Since: 0.4.3
-   */
-  g_object_class_install_property (object_class,
-      PROP_LICENSE_EXTRA,
-      g_param_spec_string ("license-text",
-          "Additional license",
-          "Additional license text",
-          "",
-          CHAMPLAIN_PARAM_READWRITE));
-
-  /**
    * ChamplainView:zoom-on-double-click:
    *
    * Should the view zoom in and recenter when the user double click on the map.
@@ -976,56 +867,6 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
           G_PARAM_READABLE));
 
   /**
-   * ChamplainView:show-scale:
-   *
-   * Display the map scale.
-   *
-   * Since: 0.4.3
-   */
-  g_object_class_install_property (object_class,
-      PROP_SHOW_SCALE,
-      g_param_spec_boolean ("show-scale",
-          "Show the map scale",
-          "Show the map scale "
-          "on the screen",
-          FALSE,
-          G_PARAM_READWRITE));
-
-  /**
-   * ChamplainView:max-scale-width:
-   *
-   * The size of the map scale on screen in pixels.
-   *
-   * Since: 0.4.3
-   */
-  g_object_class_install_property (object_class,
-      PROP_MAX_SCALE_WIDTH,
-      g_param_spec_uint ("max-scale-width",
-          "The width of the scale",
-          "The max width of the scale"
-          "on screen",
-          1,
-          2000,
-          100,
-          G_PARAM_READWRITE));
-
-  /**
-   * ChamplainView:scale-unit:
-   *
-   * The scale's units.
-   *
-   * Since: 0.4.3
-   */
-  g_object_class_install_property (object_class,
-      PROP_SCALE_UNIT,
-      g_param_spec_enum ("scale-unit",
-          "The scale's unit",
-          "The map scale's unit",
-          CHAMPLAIN_TYPE_UNIT,
-          CHAMPLAIN_UNIT_KM,
-          G_PARAM_READWRITE));
-
-  /**
    * ChamplainView::animation-completed:
    *
    * The #ChamplainView::animation-completed signal is emitted when any animation in the view
@@ -1045,214 +886,6 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
         g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
         
-}
-
-
-static void
-create_license (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  ChamplainViewPrivate *priv = view->priv;
-
-  if (priv->license_actor)
-    {
-      g_object_unref (priv->license_actor);
-      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage), priv->license_actor);
-    }
-
-  priv->license_actor = g_object_ref (clutter_text_new ());
-  clutter_text_set_font_name (CLUTTER_TEXT (priv->license_actor), "sans 8");
-  clutter_text_set_line_alignment (CLUTTER_TEXT (priv->license_actor), PANGO_ALIGN_RIGHT);
-  clutter_actor_set_opacity (priv->license_actor, 128);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage),
-      priv->license_actor);
-  clutter_actor_set_anchor_point_from_gravity (priv->license_actor, CLUTTER_GRAVITY_SOUTH_EAST);
-  clutter_actor_raise_top (priv->license_actor);
-}
-
-
-static void
-update_scale (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  static gfloat previous_m_per_pixel = 0.0;
-  static gint previous_zoom_level = 0.0;
-
-  gboolean is_small_unit = TRUE;  /* indicates if using meters */
-  ClutterActor *text, *line;
-  gfloat width;
-  ChamplainViewPrivate *priv = view->priv;
-  gfloat m_per_pixel;
-  gfloat scale_width = priv->max_scale_width;
-  gchar *label;
-  cairo_t *cr;
-  gfloat base;
-  gfloat factor;
-  gboolean final_unit = FALSE;
-
-  if (priv->show_scale)
-    {
-      clutter_actor_show (priv->scale_actor);
-    }
-  else
-    {
-      clutter_actor_hide (priv->scale_actor);
-      return;
-    }
-
-  m_per_pixel = champlain_map_source_get_meters_per_pixel (priv->map_source,
-        priv->zoom_level, priv->latitude, priv->longitude);
-
-  /* Don't redraw too often, 1 meters difference is a good value
-   * since at low levels the value changes alot, and not at high levels */
-  if (fabs (m_per_pixel - previous_m_per_pixel) < 10 &&
-      previous_zoom_level == priv->zoom_level)
-    return;
-
-  previous_m_per_pixel = m_per_pixel;
-  previous_zoom_level = priv->zoom_level;
-
-  if (priv->scale_unit == CHAMPLAIN_UNIT_MILES)
-    m_per_pixel *= 3.28;  /* m_per_pixel is now in ft */
-
-  /* This loop will find the pretty value to display on the scale.
-   * It will be run once for metric units, and twice for imperials
-   * so that both feet and miles have pretty numbers.
-   */
-  do
-    {
-      /* Keep the previous power of 10 */
-      base = floor (log (m_per_pixel * scale_width) / log (10));
-      base = pow (10, base);
-
-      /* How many times can it be fitted in our max scale width */
-      g_assert (base > 0);
-      g_assert (m_per_pixel * scale_width / base > 0);
-      scale_width /= m_per_pixel * scale_width / base;
-      g_assert (scale_width > 0);
-      factor = floor (priv->max_scale_width / scale_width);
-      base *= factor;
-      scale_width *= factor;
-
-      if (priv->scale_unit == CHAMPLAIN_UNIT_KM)
-        {
-          if (base / 1000.0 >= 1)
-            {
-              base /= 1000.0; /* base is now in km */
-              is_small_unit = FALSE;
-            }
-          final_unit = TRUE; /* Don't need to recompute */
-        }
-      else if (priv->scale_unit == CHAMPLAIN_UNIT_MILES)
-        {
-          if (is_small_unit && base / 5280.0 >= 1)
-            {
-              m_per_pixel /= 5280.0; /* m_per_pixel is now in miles */
-              is_small_unit = FALSE;
-              /* we need to recompute the base because 1000 ft != 1 mile */
-            }
-          else
-            final_unit = TRUE;
-        }
-    } while (!final_unit);
-
-  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-far-label");
-  label = g_strdup_printf ("%g", base);
-  /* Get only digits width for centering */
-  clutter_text_set_text (CLUTTER_TEXT (text), label);
-  g_free (label);
-  clutter_actor_get_size (text, &width, NULL);
-  /* actual label with unit */
-  label = g_strdup_printf ("%g %s", base,
-        priv->scale_unit == CHAMPLAIN_UNIT_KM ?
-        (is_small_unit ? "m" : "km") :
-        (is_small_unit ? "ft" : "miles"));
-  clutter_text_set_text (CLUTTER_TEXT (text), label);
-  g_free (label);
-  clutter_actor_set_position (text, (scale_width - width / 2) + SCALE_INSIDE_PADDING, -SCALE_INSIDE_PADDING);
-
-  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-mid-label");
-  label = g_strdup_printf ("%g", base / 2.0);
-  clutter_text_set_text (CLUTTER_TEXT (text), label);
-  clutter_actor_get_size (text, &width, NULL);
-  clutter_actor_set_position (text, (scale_width - width) / 2 + SCALE_INSIDE_PADDING, -SCALE_INSIDE_PADDING);
-  g_free (label);
-
-  /* Draw the line */
-  line = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->scale_actor), "scale-line");
-  clutter_cairo_texture_clear (CLUTTER_CAIRO_TEXTURE (line));
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (line));
-
-  cairo_set_source_rgb (cr, 0, 0, 0);
-  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
-  cairo_set_line_width (cr, SCALE_LINE_WIDTH);
-
-  /* First tick */
-  cairo_move_to (cr, SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
-  cairo_line_to (cr, SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
-  cairo_stroke (cr);
-
-  /* Line */
-  cairo_move_to (cr, SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
-  cairo_line_to (cr, scale_width + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
-  cairo_stroke (cr);
-
-  /* Middle tick */
-  cairo_move_to (cr, scale_width / 2 + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
-  cairo_line_to (cr, scale_width / 2 + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
-  cairo_stroke (cr);
-
-  /* Last tick */
-  cairo_move_to (cr, scale_width + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 4);
-  cairo_line_to (cr, scale_width + SCALE_INSIDE_PADDING, SCALE_HEIGHT / 2);
-  cairo_stroke (cr);
-
-  cairo_destroy (cr);
-}
-
-
-static void
-create_scale (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  ClutterActor *scale, *text;
-  gfloat width;
-  ChamplainViewPrivate *priv = view->priv;
-
-  if (priv->scale_actor)
-    {
-      g_object_unref (priv->scale_actor);
-      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->stage), priv->scale_actor);
-    }
-
-  priv->scale_actor = g_object_ref (clutter_group_new ());
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage), priv->scale_actor);
-
-  scale = clutter_cairo_texture_new (priv->max_scale_width + 2 * SCALE_INSIDE_PADDING, SCALE_HEIGHT + 2 * SCALE_INSIDE_PADDING);
-  clutter_actor_set_name (scale, "scale-line");
-
-  text = clutter_text_new_with_text ("Sans 9", "X km");
-  clutter_actor_set_name (text, "scale-far-label");
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
-
-  text = clutter_text_new_with_text ("Sans 9", "X km");
-  clutter_actor_set_name (text, "scale-mid-label");
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
-
-  text = clutter_text_new_with_text ("Sans 9", "0");
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), text);
-  clutter_actor_get_size (text, &width, NULL);
-  clutter_actor_set_position (text, SCALE_INSIDE_PADDING - width / 2, -SCALE_INSIDE_PADDING);
-
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->scale_actor), scale);
-  clutter_actor_set_position (priv->scale_actor, SCALE_PADDING - SCALE_INSIDE_PADDING,
-      priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING - SCALE_INSIDE_PADDING);
-
-  clutter_actor_set_opacity (priv->scale_actor, 200);
-  clutter_actor_raise_top (priv->scale_actor);
 }
 
 
@@ -1278,9 +911,7 @@ champlain_view_init (ChamplainView *view)
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
   priv->keep_center_on_resize = TRUE;
   priv->zoom_on_double_click = TRUE;
-  priv->show_license = TRUE;
   priv->license_actor = NULL;
-  priv->license_text = NULL;
   priv->stage = NULL;
   priv->scroll_mode = CHAMPLAIN_SCROLL_MODE_PUSH;
   priv->viewport_size.x = 0;
@@ -1294,9 +925,6 @@ champlain_view_init (ChamplainView *view)
   priv->latitude = 0.0f;
   priv->longitude = 0.0f;
   priv->goto_context = NULL;
-  priv->show_scale = FALSE;
-  priv->scale_unit = CHAMPLAIN_UNIT_KM;
-  priv->max_scale_width = 100;
   priv->tiles_loading = 0;
   priv->update_viewport_timer = g_timer_new();
 
@@ -1349,20 +977,24 @@ champlain_view_init (ChamplainView *view)
       priv->viewport);
 
   /* Setup stage */
-  priv->stage = g_object_ref (clutter_group_new ());
+  priv->layout_manager = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_CENTER,
+                                  CLUTTER_BIN_ALIGNMENT_CENTER);
+  priv->stage = g_object_ref (clutter_box_new (priv->layout_manager));
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->stage),
-      priv->finger_scroll);
+  clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->finger_scroll,
+                          CLUTTER_BIN_ALIGNMENT_FILL,
+                          CLUTTER_BIN_ALIGNMENT_FILL);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (view), priv->stage);
 
   resize_viewport (view);
 
-  /* Setup scale */
-  create_scale (view);
-
   /* Setup license */
-  create_license (view);
+  priv->license_actor = g_object_ref (champlain_license_new ());
+  champlain_license_connect_view (CHAMPLAIN_LICENSE (priv->license_actor), view);
+  clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->license_actor,
+                          CLUTTER_BIN_ALIGNMENT_END,
+                          CLUTTER_BIN_ALIGNMENT_END);
 
   priv->state = CHAMPLAIN_STATE_DONE;
   g_object_notify (G_OBJECT (view), "state");
@@ -1394,33 +1026,6 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
       
       g_timer_start (priv->update_viewport_timer);
     }
-}
-
-
-static void
-update_license (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  ChamplainViewPrivate *priv = view->priv;
-  gchar *license;
-
-  if (priv->license_text)
-    license = g_strjoin ("\n",
-          priv->license_text,
-          champlain_map_source_get_license (priv->map_source),
-          NULL);
-  else
-    license = g_strdup (champlain_map_source_get_license (priv->map_source));
-
-  clutter_text_set_text (CLUTTER_TEXT (priv->license_actor), license);
-
-  if (priv->show_license)
-    clutter_actor_show (priv->license_actor);
-  else
-    clutter_actor_hide (priv->license_actor);
-
-  g_free (license);
 }
 
 
@@ -2418,7 +2023,6 @@ champlain_view_set_map_source (ChamplainView *view,
 
   remove_all_tiles (view);
 
-  update_license (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
 
   g_object_notify (G_OBJECT (view), "map-source");
@@ -2491,125 +2095,6 @@ champlain_view_set_keep_center_on_resize (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   view->priv->keep_center_on_resize = value;
-}
-
-
-/**
- * champlain_view_set_license_text:
- * @view: a #ChamplainView
- * @text: a license
- *
- * Show the additional license text on the map view.  The text will preceed the
- * map's licence when displayed. Use "\n" to separate the lines.
- *
- * Since: 0.4.3
- */
-void
-champlain_view_set_license_text (ChamplainView *view,
-    const gchar *text)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  ChamplainViewPrivate *priv = view->priv;
-
-  if (priv->license_text)
-    g_free (priv->license_text);
-
-  priv->license_text = g_strdup (text);
-  update_license (view);
-}
-
-
-/**
- * champlain_view_set_show_license:
- * @view: a #ChamplainView
- * @value: a #gboolean
- *
- * Show the license on the map view.  The license information should always be
- * available in a way or another in your application.  You can have it in
- * About, or on the map.
- *
- * Since: 0.4
- */
-void
-champlain_view_set_show_license (ChamplainView *view,
-    gboolean value)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  view->priv->show_license = value;
-  update_license (view);
-}
-
-
-/**
- * champlain_view_set_show_scale:
- * @view: a #ChamplainView
- * @value: a #gboolean
- *
- * Show the scale on the map view.
- *
- * Since: 0.4.3
- */
-void
-champlain_view_set_show_scale (ChamplainView *view,
-    gboolean value)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  view->priv->show_scale = value;
-  update_scale (view);
-}
-
-
-/**
- * champlain_view_set_max_scale_width:
- * @view: a #ChamplainView
- * @value: a #guint in pixels
- *
- * Sets the maximum width of the scale on the screen in pixels
- *
- * Since: 0.4.3
- */
-void
-champlain_view_set_max_scale_width (ChamplainView *view,
-    guint value)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  view->priv->max_scale_width = value;
-  create_scale (view);
-  update_scale (view);
-}
-
-
-/**
- * champlain_view_set_scale_unit:
- * @view: a #ChamplainView
- * @unit: a #ChamplainUnit
- *
- * Sets the scales unit.
- *
- * Since: 0.4.3
- */
-void
-champlain_view_set_scale_unit (ChamplainView *view,
-    ChamplainUnit unit)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  view->priv->scale_unit = unit;
-  update_scale (view);
 }
 
 
@@ -2929,111 +2414,6 @@ champlain_view_get_keep_center_on_resize (ChamplainView *view)
 
 
 /**
- * champlain_view_get_show_license:
- * @view: The view
- *
- * Checks whether the view displays the license.
- *
- * Returns: TRUE if the view displays the license, FALSE otherwise.
- *
- * Since: 0.4
- */
-gboolean
-champlain_view_get_show_license (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
-
-  return view->priv->show_license;
-}
-
-
-/**
- * champlain_view_get_license_text:
- * @view: The view
- *
- * Gets the additional license text.
- *
- * Returns: the additional license text
- *
- * Since: 0.4.3
- */
-const gchar *
-champlain_view_get_license_text (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
-
-  return view->priv->license_text;
-}
-
-
-/**
- * champlain_view_get_show_scale:
- * @view: The view
- *
- * Checks whether the view displays the scale.
- *
- * Returns: TRUE if the view displays the scale, FALSE otherwise.
- *
- * Since: 0.4.3
- */
-gboolean
-champlain_view_get_show_scale (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
-
-  return view->priv->show_scale;
-}
-
-
-/**
- * champlain_view_get_max_scale_width:
- * @view: The view
- *
- * Gets the maximal scale width.
- *
- * Returns: The max scale width in pixels.
- *
- * Since: 0.4.3
- */
-guint
-champlain_view_get_max_scale_width (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
-
-  return view->priv->max_scale_width;
-}
-
-
-/**
- * champlain_view_get_scale_unit:
- * @view: The view
- *
- * Gets the unit used by the scale.
- *
- * Returns: The unit used by the scale
- *
- * Since: 0.4.3
- */
-ChamplainUnit
-champlain_view_get_scale_unit (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
-
-  return view->priv->scale_unit;
-}
-
-
-/**
  * champlain_view_get_zoom_on_double_click:
  * @view: The view
  *
@@ -3051,4 +2431,40 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
 
   return view->priv->zoom_on_double_click;
+}
+
+
+ClutterBinLayout *
+champlain_view_get_layout_manager (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+  
+  ChamplainViewPrivate *priv = view->priv;
+  
+  return CLUTTER_BIN_LAYOUT (priv->layout_manager);
+}
+
+
+const gchar *
+champlain_view_get_license_text (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+  
+  ChamplainViewPrivate *priv = view->priv;
+  
+  return champlain_map_source_get_license (priv->map_source);  
+}
+
+
+ChamplainLicense *champlain_view_get_license_actor (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
+  
+  return CHAMPLAIN_LICENSE (view->priv->license_actor);      
 }

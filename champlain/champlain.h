@@ -36,6 +36,7 @@
 #include "champlain/champlain-label.h"
 #include "champlain/champlain-view.h"
 #include "champlain/champlain-bounding-box.h"
+#include "champlain/champlain-scale.h"
 
 #include "champlain/champlain-map-source.h"
 #include "champlain/champlain-tile-source.h"

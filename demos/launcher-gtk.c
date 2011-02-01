@@ -221,6 +221,9 @@ main (int argc,
   GtkWidget *widget, *vbox, *bbox, *button, *viewport;
   ChamplainView *view;
   ChamplainMarkerLayer *layer;
+  ClutterActor *scale;
+  ClutterBinLayout *layout_manager;
+  ChamplainLicense *license_actor;
 
   g_thread_init (NULL);
   gtk_clutter_init (&argc, &argv);
@@ -252,9 +255,20 @@ main (int argc,
   g_object_set (G_OBJECT (view),
       "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
       "zoom-level", 5,
-      "license-text", "Don't eat cereals with orange juice\nIt tastes bad",
-      "show-scale", TRUE,
       NULL);
+      
+  scale = champlain_scale_new ();
+  champlain_scale_connect_view (CHAMPLAIN_SCALE (scale), view);
+  
+  /* align to the bottom left */
+  layout_manager = champlain_view_get_layout_manager (view);
+  clutter_bin_layout_add (layout_manager, scale,
+                          CLUTTER_BIN_ALIGNMENT_START,
+                          CLUTTER_BIN_ALIGNMENT_END);
+  
+  license_actor = champlain_view_get_license_actor (view);
+  champlain_license_set_text (license_actor, "Don't eat cereals with orange juice\nIt tastes bad");
+  
   champlain_view_center_on (CHAMPLAIN_VIEW (view), 45.466, -73.75);
 
   layer = create_marker_layer (view);

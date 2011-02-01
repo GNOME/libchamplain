@@ -27,6 +27,7 @@
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-layer.h>
 #include <champlain/champlain-map-source.h>
+#include <champlain/champlain-license.h>
 
 #include <glib.h>
 #include <glib-object.h>
@@ -66,19 +67,6 @@ typedef enum
   CHAMPLAIN_SCROLL_MODE_KINETIC
 } ChamplainScrollMode;
 
-
-/**
- * ChamplainUnit:
- * @CHAMPLAIN_UNIT_KM: kilometers
- * @CHAMPLAIN_UNIT_MILES: miles
- *
- * Units used by the scale.
- */
-typedef enum
-{
-  CHAMPLAIN_UNIT_KM,
-  CHAMPLAIN_UNIT_MILES,
-} ChamplainUnit;
 
 struct _ChamplainView
 {
@@ -128,16 +116,6 @@ void champlain_view_set_scroll_mode (ChamplainView *view,
     ChamplainScrollMode mode);
 void champlain_view_set_keep_center_on_resize (ChamplainView *view,
     gboolean value);
-void champlain_view_set_show_license (ChamplainView *view,
-    gboolean value);
-void champlain_view_set_license_text (ChamplainView *view,
-    const gchar *text);
-void champlain_view_set_show_scale (ChamplainView *view,
-    gboolean value);
-void champlain_view_set_scale_unit (ChamplainView *view,
-    ChamplainUnit unit);
-void champlain_view_set_max_scale_width (ChamplainView *view,
-    guint value);
 void champlain_view_set_zoom_on_double_click (ChamplainView *view,
     gboolean value);
 
@@ -146,7 +124,6 @@ void champlain_view_add_layer (ChamplainView *view,
 void champlain_view_remove_layer (ChamplainView *view,
     ChamplainLayer *layer);
 
-
 gint champlain_view_get_zoom_level (ChamplainView *view);
 gint champlain_view_get_min_zoom_level (ChamplainView *view);
 gint champlain_view_get_max_zoom_level (ChamplainView *view);
@@ -154,15 +131,10 @@ ChamplainMapSource *champlain_view_get_map_source (ChamplainView *view);
 gdouble champlain_view_get_decel_rate (ChamplainView *view);
 ChamplainScrollMode champlain_view_get_scroll_mode (ChamplainView *view);
 gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
-gboolean champlain_view_get_show_license (ChamplainView *view);
 const gchar *champlain_view_get_license_text (ChamplainView *view);
-gboolean champlain_view_get_show_scale (ChamplainView *view);
-guint champlain_view_get_max_scale_width (ChamplainView *view);
-ChamplainUnit champlain_view_get_scale_unit (ChamplainView *view);
 gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
 
 void champlain_view_reload_tiles (ChamplainView *view);
-
 
 gdouble champlain_view_x_to_longitude (ChamplainView *view,
     gdouble x);
@@ -176,6 +148,9 @@ gdouble champlain_view_latitude_to_y (ChamplainView *view,
 double champlain_view_get_viewport_x (ChamplainView *view);
 double champlain_view_get_viewport_y (ChamplainView *view);
 
+ClutterBinLayout *champlain_view_get_layout_manager (ChamplainView *view); 
+
+ChamplainLicense *champlain_view_get_license_actor (ChamplainView *view);
 
 G_END_DECLS
 
