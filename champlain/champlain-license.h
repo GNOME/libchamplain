@@ -69,13 +69,12 @@ GType champlain_license_get_type (void);
 
 ClutterActor *champlain_license_new (void);
 
-void champlain_license_set_text (ChamplainLicense *license,
+void champlain_license_set_extra_text (ChamplainLicense *license,
     const gchar *text);
 
-const gchar *champlain_license_get_text (ChamplainLicense *license);
+const gchar *champlain_license_get_extra_text (ChamplainLicense *license);
 
-void 
-champlain_license_connect_view (ChamplainLicense *license,
+void champlain_license_connect_view (ChamplainLicense *license,
     ChamplainView *view);
 
 G_END_DECLS

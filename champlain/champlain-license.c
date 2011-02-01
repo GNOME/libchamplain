@@ -50,7 +50,7 @@ enum
 
 struct _ChamplainLicensePrivate
 {
-  gchar *license_text; /* Extra license text */
+  gchar *extra_text; /* Extra license text */
   ClutterActor *license_actor;
   
   ChamplainView *view;
@@ -75,7 +75,7 @@ champlain_license_get_property (GObject *object,
   switch (prop_id)
     {
     case PROP_LICENSE_EXTRA:
-      g_value_set_string (value, priv->license_text);
+      g_value_set_string (value, priv->extra_text);
       break;
 
     default:
@@ -95,7 +95,7 @@ champlain_license_set_property (GObject *object,
   switch (prop_id)
     {
     case PROP_LICENSE_EXTRA:
-      champlain_license_set_text (license, g_value_get_string (value));
+      champlain_license_set_extra_text (license, g_value_get_string (value));
       break;
 
     default:
@@ -118,7 +118,7 @@ champlain_license_finalize (GObject *object)
 {
   ChamplainLicensePrivate *priv = CHAMPLAIN_LICENSE (object)->priv;
 
-  g_free (priv->license_text);
+  g_free (priv->extra_text);
 
   G_OBJECT_CLASS (champlain_license_parent_class)->finalize (object);
 }
@@ -146,7 +146,7 @@ champlain_license_class_init (ChamplainLicenseClass *license_class)
    */
   g_object_class_install_property (object_class,
       PROP_LICENSE_EXTRA,
-      g_param_spec_string ("license-text",
+      g_param_spec_string ("extra-text",
           "Additional license",
           "Additional license text",
           "",
@@ -164,9 +164,9 @@ redraw_license (ChamplainLicense *license)
   if (!priv->view)
     return;
 
-  if (priv->license_text)
+  if (priv->extra_text)
     text = g_strjoin ("\n",
-          priv->license_text,
+          priv->extra_text,
           champlain_view_get_license_text (priv->view),
           NULL);
   else
@@ -207,7 +207,7 @@ champlain_license_init (ChamplainLicense *license)
   ChamplainLicensePrivate *priv = GET_PRIVATE (license);
 
   license->priv = priv;
-  priv->license_text = NULL;
+  priv->extra_text = NULL;
   priv->view = NULL;
   priv->license_actor = NULL;
   
@@ -245,7 +245,7 @@ champlain_license_connect_view (ChamplainLicense *license,
 }
 
 /**
- * champlain_view_set_license_text:
+ * champlain_view_set_extra_text:
  * @view: a #ChamplainView
  * @text: a license
  *
@@ -255,22 +255,22 @@ champlain_license_connect_view (ChamplainLicense *license,
  * Since: 0.4.3
  */
 void
-champlain_license_set_text (ChamplainLicense *license,
+champlain_license_set_extra_text (ChamplainLicense *license,
     const gchar *text)
 {
   g_return_if_fail (CHAMPLAIN_IS_LICENSE (license));
 
   ChamplainLicensePrivate *priv = license->priv;
 
-  if (priv->license_text)
-    g_free (priv->license_text);
+  if (priv->extra_text)
+    g_free (priv->extra_text);
 
-  priv->license_text = g_strdup (text);
+  priv->extra_text = g_strdup (text);
   redraw_license (license);
 }
 
 /**
- * champlain_view_get_license_text:
+ * champlain_view_get_extra_text:
  * @view: The view
  *
  * Gets the additional license text.
@@ -280,11 +280,11 @@ champlain_license_set_text (ChamplainLicense *license,
  * Since: 0.4.3
  */
 const gchar *
-champlain_license_get_text (ChamplainLicense *license)
+champlain_license_get_extra_text (ChamplainLicense *license)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_LICENSE (license), FALSE);
 
-  return license->priv->license_text;
+  return license->priv->extra_text;
 }
 
 

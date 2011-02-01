@@ -267,7 +267,7 @@ main (int argc,
                           CLUTTER_BIN_ALIGNMENT_END);
   
   license_actor = champlain_view_get_license_actor (view);
-  champlain_license_set_text (license_actor, "Don't eat cereals with orange juice\nIt tastes bad");
+  champlain_license_set_extra_text (license_actor, "Don't eat cereals with orange juice\nIt tastes bad");
   
   champlain_view_center_on (CHAMPLAIN_VIEW (view), 45.466, -73.75);
 
