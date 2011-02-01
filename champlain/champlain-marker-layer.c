@@ -464,18 +464,17 @@ static void
 set_marker_position (ChamplainMarkerLayer *layer, ChamplainMarker *marker)
 {
   ChamplainMarkerLayerPrivate *priv = layer->priv;
-  gint x, y;
+  gdouble x, y, origin_x, origin_y;
   
   /* layer not yet added to the view */
   if (priv->view == NULL)
     return;
 
+  champlain_view_get_viewport_origin (priv->view, &origin_x, &origin_y);
   x = champlain_view_longitude_to_x (priv->view, 
-    champlain_marker_get_longitude (marker));
-  x += champlain_view_get_viewport_x (priv->view);
+    champlain_marker_get_longitude (marker)) + origin_x;
   y = champlain_view_latitude_to_y (priv->view, 
-    champlain_marker_get_latitude (marker));
-  y += champlain_view_get_viewport_y (priv->view);
+    champlain_marker_get_latitude (marker)) + origin_y;
 
   clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
 }
@@ -885,8 +884,7 @@ redraw_polygon (ChamplainMarkerLayer *layer)
   cairo_texture = clutter_cairo_texture_new (width, height);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->polygon_actor), cairo_texture);
   
-  x = champlain_view_get_viewport_x (priv->view);
-  y = champlain_view_get_viewport_y (priv->view);
+  champlain_view_get_viewport_origin (priv->view, &x, &y);
 
   clutter_actor_set_position (priv->polygon_actor, x, y);
 

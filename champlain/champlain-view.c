@@ -1709,27 +1709,19 @@ champlain_view_latitude_to_y (ChamplainView *view,
 }
 
 
-double
-champlain_view_get_viewport_x (ChamplainView *view)
+void 
+champlain_view_get_viewport_origin (ChamplainView *view, gdouble *x, gdouble *y)
 {
   DEBUG_LOG ()
 
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   ChamplainViewPrivate *priv = view->priv;
   
-  return priv->viewport_size.x;
-}
-
-
-double
-champlain_view_get_viewport_y (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
-  ChamplainViewPrivate *priv = view->priv;
-  
-  return priv->viewport_size.y;
+  if (x)
+    *x = priv->viewport_size.x;
+ 
+  if (y)
+    *y = priv->viewport_size.y;
 }
 
 
