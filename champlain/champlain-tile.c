@@ -83,10 +83,10 @@ static guint champlain_tile_signals[LAST_SIGNAL] = { 0, };
 
 struct _ChamplainTilePrivate
 {
-  gint x; /* The x position on the map (in pixels) */
-  gint y; /* The y position on the map (in pixels) */
-  gint size; /* The tile's width and height (only support square tiles */
-  gint zoom_level; /* The tile's zoom level */
+  guint x; /* The x position on the map (in pixels) */
+  guint y; /* The y position on the map (in pixels) */
+  guint size; /* The tile's width and height (only support square tiles */
+  guint zoom_level; /* The tile's zoom level */
 
   ChamplainState state; /* The tile state: loading, validation, done */
   /* The tile actor that will be displayed after champlain_tile_display_content () */
@@ -109,15 +109,15 @@ champlain_tile_get_property (GObject *object,
   switch (property_id)
     {
     case PROP_X:
-      g_value_set_int (value, champlain_tile_get_x (self));
+      g_value_set_uint (value, champlain_tile_get_x (self));
       break;
 
     case PROP_Y:
-      g_value_set_int (value, champlain_tile_get_y (self));
+      g_value_set_uint (value, champlain_tile_get_y (self));
       break;
 
     case PROP_ZOOM_LEVEL:
-      g_value_set_int (value, champlain_tile_get_zoom_level (self));
+      g_value_set_uint (value, champlain_tile_get_zoom_level (self));
       break;
 
     case PROP_SIZE:
@@ -157,15 +157,15 @@ champlain_tile_set_property (GObject *object,
   switch (property_id)
     {
     case PROP_X:
-      champlain_tile_set_x (self, g_value_get_int (value));
+      champlain_tile_set_x (self, g_value_get_uint (value));
       break;
 
     case PROP_Y:
-      champlain_tile_set_y (self, g_value_get_int (value));
+      champlain_tile_set_y (self, g_value_get_uint (value));
       break;
 
     case PROP_ZOOM_LEVEL:
-      champlain_tile_set_zoom_level (self, g_value_get_int (value));
+      champlain_tile_set_zoom_level (self, g_value_get_uint (value));
       break;
 
     case PROP_SIZE:
@@ -256,10 +256,10 @@ champlain_tile_class_init (ChamplainTileClass *klass)
    */
   g_object_class_install_property (object_class,
       PROP_X,
-      g_param_spec_int ("x",
+      g_param_spec_uint ("x",
           "x",
           "The X position of the tile",
-          G_MININT,
+          0,
           G_MAXINT,
           0,
           G_PARAM_READWRITE));
@@ -273,10 +273,10 @@ champlain_tile_class_init (ChamplainTileClass *klass)
    */
   g_object_class_install_property (object_class,
       PROP_Y,
-      g_param_spec_int ("y",
+      g_param_spec_uint ("y",
           "y",
           "The Y position of the tile",
-          G_MININT,
+          0,
           G_MAXINT,
           0,
           G_PARAM_READWRITE));
@@ -290,10 +290,10 @@ champlain_tile_class_init (ChamplainTileClass *klass)
    */
   g_object_class_install_property (object_class,
       PROP_ZOOM_LEVEL,
-      g_param_spec_int ("zoom-level",
+      g_param_spec_uint ("zoom-level",
           "Zoom Level",
           "The zoom level of the tile",
-          G_MININT,
+          0,
           G_MAXINT,
           0,
           G_PARAM_READWRITE));
@@ -536,7 +536,7 @@ unmap (ClutterActor *self)
  *
  * Since: 0.4
  */
-gint
+guint
 champlain_tile_get_x (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
@@ -555,7 +555,7 @@ champlain_tile_get_x (ChamplainTile *self)
  *
  * Since: 0.4
  */
-gint
+guint
 champlain_tile_get_y (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
@@ -574,7 +574,7 @@ champlain_tile_get_y (ChamplainTile *self)
  *
  * Since: 0.4
  */
-gint
+guint
 champlain_tile_get_zoom_level (ChamplainTile *self)
 {
   g_return_val_if_fail (CHAMPLAIN_TILE (self), 0);
@@ -632,7 +632,7 @@ champlain_tile_get_state (ChamplainTile *self)
  */
 void
 champlain_tile_set_x (ChamplainTile *self,
-    gint x)
+    guint x)
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
@@ -653,7 +653,7 @@ champlain_tile_set_x (ChamplainTile *self,
  */
 void
 champlain_tile_set_y (ChamplainTile *self,
-    gint y)
+    guint y)
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
@@ -674,7 +674,7 @@ champlain_tile_set_y (ChamplainTile *self,
  */
 void
 champlain_tile_set_zoom_level (ChamplainTile *self,
-    gint zoom_level)
+    guint zoom_level)
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
 
@@ -744,10 +744,10 @@ champlain_tile_set_state (ChamplainTile *self,
  * Since: 0.4
  */
 ChamplainTile *
-champlain_tile_new_full (gint x,
-    gint y,
+champlain_tile_new_full (guint x,
+    guint y,
     guint size,
-    gint zoom_level)
+    guint zoom_level)
 {
   return g_object_new (CHAMPLAIN_TYPE_TILE, "x", x, "y", y, "zoom-level",
       zoom_level, "size", size, NULL);

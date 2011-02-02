@@ -81,7 +81,7 @@ struct _ChamplainRenderCallbackData
 {
   gboolean error;
   const gchar *data;
-  guint size;
+  gsize size;
 };
 
 struct _ChamplainTile
@@ -100,14 +100,14 @@ struct _ChamplainTileClass
 GType champlain_tile_get_type (void);
 
 ChamplainTile *champlain_tile_new (void);
-ChamplainTile *champlain_tile_new_full (gint x,
-    gint y,
+ChamplainTile *champlain_tile_new_full (guint x,
+    guint y,
     guint size,
-    gint zoom_level);
+    guint zoom_level);
 
-gint champlain_tile_get_x (ChamplainTile *self);
-gint champlain_tile_get_y (ChamplainTile *self);
-gint champlain_tile_get_zoom_level (ChamplainTile *self);
+guint champlain_tile_get_x (ChamplainTile *self);
+guint champlain_tile_get_y (ChamplainTile *self);
+guint champlain_tile_get_zoom_level (ChamplainTile *self);
 guint champlain_tile_get_size (ChamplainTile *self);
 ChamplainState champlain_tile_get_state (ChamplainTile *self);
 ClutterActor *champlain_tile_get_content (ChamplainTile *self);
@@ -116,11 +116,11 @@ const gchar *champlain_tile_get_etag (ChamplainTile *self);
 gboolean champlain_tile_get_fade_in (ChamplainTile *self);
 
 void champlain_tile_set_x (ChamplainTile *self,
-    gint x);
+    guint x);
 void champlain_tile_set_y (ChamplainTile *self,
-    gint y);
+    guint y);
 void champlain_tile_set_zoom_level (ChamplainTile *self,
-    gint zoom_level);
+    guint zoom_level);
 void champlain_tile_set_size (ChamplainTile *self,
     guint size);
 void champlain_tile_set_state (ChamplainTile *self,
