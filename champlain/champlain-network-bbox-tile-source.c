@@ -192,7 +192,7 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
    */
   g_object_class_install_property (object_class,
       PROP_API_URI,
-      g_param_spec_string ("api_uri",
+      g_param_spec_string ("api-uri",
           "API URI",
           "The API URI of an OpenStreetMap server",
           "http://www.informationfreeway.org/api/0.6",
