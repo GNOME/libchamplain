@@ -67,22 +67,6 @@ typedef enum
   CHAMPLAIN_STATE_DONE
 } ChamplainState;
 
-/**
- * ChamplainRenderCallbackData:
- * @error: TRUE if there was an error during tile rendering
- * @data: the data used for tile rendering
- * @size: the size of the data
- *
- * Used by the #ChamplainTile::render-complete signal.
- *
- * Since: 0.8
- */
-struct _ChamplainRenderCallbackData
-{
-  gboolean error;
-  const gchar *data;
-  gsize size;
-};
 
 struct _ChamplainTile
 {

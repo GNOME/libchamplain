@@ -27,6 +27,7 @@
 
 #include "champlain-enum-types.h"
 #include "champlain-private.h"
+#include "champlain-marshal.h"
 
 #include <math.h>
 #include <errno.h>
@@ -379,7 +380,7 @@ champlain_tile_class_init (ChamplainTileClass *klass)
           FALSE,
           G_PARAM_READWRITE));
 
-  /**
+  /*
    * ChamplainTile::render-complete:
    * @self: a #ChamplainTile
    * @calback_data: a #ChamplainRenderCallbackData struct
@@ -392,8 +393,8 @@ champlain_tile_class_init (ChamplainTileClass *klass)
   champlain_tile_signals[RENDER_COMPLETE] =
     g_signal_new ("render-complete", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE,
-        1, G_TYPE_POINTER);
+        _champlain_marshal_VOID__POINTER_UINT_BOOLEAN, G_TYPE_NONE,
+        3, G_TYPE_POINTER, G_TYPE_UINT, G_TYPE_BOOLEAN);
 }
 
 

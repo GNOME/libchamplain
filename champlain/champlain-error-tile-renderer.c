@@ -193,17 +193,14 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
   ChamplainErrorTileRenderer *error_renderer = CHAMPLAIN_ERROR_TILE_RENDERER (renderer);
   ChamplainErrorTileRendererPrivate *priv = error_renderer->priv;
   ClutterActor *clone;
-  guint size;
-  ChamplainRenderCallbackData callback_data;
-
-  callback_data.data = NULL;
-  callback_data.size = 0;
-  callback_data.error = FALSE;
+  gpointer data = NULL;
+  guint size = 0;
+  gboolean error = FALSE;
 
   if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_LOADED)
     {
       /* cache is just validating tile - don't generate error tile in this case - instead use what we have */
-      g_signal_emit_by_name (tile, "render-complete", &callback_data);
+      g_signal_emit_by_name (tile, "render-complete", data, size, error);
       return;
     }
 
@@ -250,7 +247,7 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
   clone = clutter_texture_new ();
   clutter_texture_set_cogl_texture (CLUTTER_TEXTURE (clone), priv->error_tex);
   champlain_tile_set_content (tile, clone);
-  g_signal_emit_by_name (tile, "render-complete", &callback_data);
+  g_signal_emit_by_name (tile, "render-complete", data, size, error);
 }
 
 

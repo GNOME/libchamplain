@@ -514,7 +514,9 @@ typedef struct
 
 static void
 tile_rendered_cb (ChamplainTile *tile,
-    ChamplainRenderCallbackData *data,
+    gpointer data,
+    guint size,
+    gboolean error,
     FileLoadedData *user_data)
 {
   ChamplainMapSource *map_source = user_data->map_source;
@@ -533,7 +535,7 @@ tile_rendered_cb (ChamplainTile *tile,
   file_cache = CHAMPLAIN_FILE_CACHE (map_source);
   priv = file_cache->priv;
 
-  if (data->error)
+  if (error)
     {
       DEBUG ("Tile rendering failed");
       goto load_next;

@@ -302,11 +302,12 @@ tile_loaded_cb (gpointer worker_data)
   ChamplainTile *tile = data->tile;
   cairo_surface_t *cst = data->cst;
   ChamplainRenderer *renderer = CHAMPLAIN_RENDERER (data->renderer);
-  ChamplainRenderCallbackData callback_data;
+  gpointer ret_data = NULL;
+  guint ret_size = 0;
+  gboolean ret_error = TRUE;
   cairo_t *cr_clutter;
   ClutterActor *actor;
   guint size = data->size;
-  GError *error = NULL;
   GdkPixbuf *pixbuf = NULL;
   gchar *buffer = NULL;
   gsize buffer_size;
@@ -316,11 +317,11 @@ tile_loaded_cb (gpointer worker_data)
   if (!tile)
     {
       DEBUG ("Tile destroyed while loading");
-      goto error;
+      goto finish;
     }
 
   if (!cst)
-    goto error;
+    goto finish;
 
   /* draw the clutter texture */
   actor = clutter_cairo_texture_new (size, size);
@@ -339,24 +340,18 @@ tile_loaded_cb (gpointer worker_data)
       GDK_COLORSPACE_RGB, TRUE, 8, size, size,
       cairo_image_surface_get_stride (cst), NULL, NULL);
 
-  if (!gdk_pixbuf_save_to_buffer (pixbuf, &buffer, &buffer_size, "png", &error, NULL))
-    goto error;
+  if (!gdk_pixbuf_save_to_buffer (pixbuf, &buffer, &buffer_size, "png", NULL, NULL))
+    goto finish;
 
   champlain_tile_set_content (tile, actor);
 
-  callback_data.error = FALSE;
-  callback_data.data = buffer;
-  callback_data.size = buffer_size;
-  goto finish;
-
-error:
-  callback_data.error = TRUE;
-  callback_data.data = NULL;
-  callback_data.size = 0;
+  ret_data = buffer;
+  ret_size = buffer_size;
+  ret_error = FALSE;
 
 finish:
   if (tile)
-    g_signal_emit_by_name (tile, "render-complete", &callback_data);
+    g_signal_emit_by_name (tile, "render-complete", ret_data, ret_size, ret_error);
 
   if (pixbuf)
     g_object_unref (pixbuf);

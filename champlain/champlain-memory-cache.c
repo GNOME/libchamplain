@@ -292,7 +292,9 @@ delete_queue_member (QueueMember *member, gpointer user_data)
 
 static void
 tile_rendered_cb (ChamplainTile *tile,
-    ChamplainRenderCallbackData *data,
+    gpointer data,
+    guint size,
+    gboolean error,
     ChamplainMapSource *map_source)
 {
   ChamplainMapSource *next_source;
@@ -301,7 +303,7 @@ tile_rendered_cb (ChamplainTile *tile,
 
   next_source = champlain_map_source_get_next_source (map_source);
 
-  if (!data->error)
+  if (!error)
     {
       if (CHAMPLAIN_IS_TILE_CACHE (next_source))
         champlain_tile_cache_on_tile_filled (CHAMPLAIN_TILE_CACHE (next_source), tile);

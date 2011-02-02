@@ -376,7 +376,9 @@ champlain_network_bbox_tile_source_load_map_data (
 
 static void
 tile_rendered_cb (ChamplainTile *tile,
-    ChamplainRenderCallbackData *data,
+    gpointer data,
+    guint size,
+    gboolean error,
     ChamplainMapSource *map_source)
 {
   ChamplainMapSource *next_source;
@@ -385,13 +387,13 @@ tile_rendered_cb (ChamplainTile *tile,
 
   next_source = champlain_map_source_get_next_source (map_source);
 
-  if (!data->error)
+  if (!error)
     {
       ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE (map_source);
       ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
 
-      if (tile_cache && data->data)
-        champlain_tile_cache_store_tile (tile_cache, tile, data->data, data->size);
+      if (tile_cache && data)
+        champlain_tile_cache_store_tile (tile_cache, tile, data, size);
 
       champlain_tile_set_fade_in (tile, TRUE);
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);

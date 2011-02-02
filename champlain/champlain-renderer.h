@@ -47,7 +47,6 @@ G_BEGIN_DECLS
 typedef struct _ChamplainRenderer ChamplainRenderer;
 typedef struct _ChamplainRendererClass ChamplainRendererClass;
 
-typedef struct _ChamplainRenderCallbackData ChamplainRenderCallbackData;
 
 struct _ChamplainRenderer
 {

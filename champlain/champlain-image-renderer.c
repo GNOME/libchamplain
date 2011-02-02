@@ -124,37 +124,35 @@ static void
 render (ChamplainRenderer *renderer, ChamplainTile *tile)
 {
   ChamplainImageRendererPrivate *priv = GET_PRIVATE (renderer);
-  ChamplainRenderCallbackData callback_data;
+  gboolean error = TRUE;
   GdkPixbufLoader *loader = NULL;
-  GError *error = NULL;
+  GError *gerror = NULL;
   ClutterActor *actor = NULL;
   GdkPixbuf *pixbuf;
 
-  callback_data.error = FALSE;
-
   if (!priv->data || priv->size == 0)
-    goto error;
+    goto finish;
     
   loader = gdk_pixbuf_loader_new ();
   if (!gdk_pixbuf_loader_write (loader,
           (const guchar *) priv->data,
           priv->size,
-          &error))
+          &gerror))
     {
-      if (error)
+      if (gerror)
         {
-          g_warning ("Unable to load the pixbuf: %s", error->message);
-          g_error_free (error);
+          g_warning ("Unable to load the pixbuf: %s", gerror->message);
+          g_error_free (gerror);
         }
-      goto error;
+      goto finish;
     }
 
-  gdk_pixbuf_loader_close (loader, &error);
-  if (error)
+  gdk_pixbuf_loader_close (loader, &gerror);
+  if (gerror)
     {
-      g_warning ("Unable to close the pixbuf loader: %s", error->message);
-      g_error_free (error);
-      goto error;
+      g_warning ("Unable to close the pixbuf loader: %s", gerror->message);
+      g_error_free (gerror);
+      goto finish;
     }
 
   /* Load the image into clutter */
@@ -168,32 +166,27 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
           gdk_pixbuf_get_rowstride (pixbuf),
           gdk_pixbuf_get_bits_per_sample (pixbuf) *
           gdk_pixbuf_get_n_channels (pixbuf) / 8,
-          0, &error))
+          0, &gerror))
     {
-      if (error)
+      if (gerror)
         {
-          g_warning ("Unable to transfer to clutter: %s", error->message);
-          g_error_free (error);
+          g_warning ("Unable to transfer to clutter: %s", gerror->message);
+          g_error_free (gerror);
         }
 
       g_object_unref (actor);
       actor = NULL;
-      goto error;
+      goto finish;
     }
 
-  goto finish;
-
-error:
-  callback_data.error = TRUE;
+  error = FALSE;
 
 finish:
-  callback_data.data = priv->data;
-  callback_data.size = priv->size;
 
   if (actor)
     champlain_tile_set_content (tile, actor);
 
-  g_signal_emit_by_name (tile, "render-complete", &callback_data);
+  g_signal_emit_by_name (tile, "render-complete", priv->data, priv->size, error);
 
   if (loader)
     g_object_unref (loader);
