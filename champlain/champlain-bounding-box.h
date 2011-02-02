@@ -34,9 +34,9 @@ typedef struct _ChamplainBoundingBox ChamplainBoundingBox;
 /**
  * ChamplainBoundingBox:
  * @left: left coordinate
- * @bottom: bottom coordinate
- * @right: right coordinate
  * @top: top coordinate
+ * @right: right coordinate
+ * @bottom: bottom coordinate
  *
  * Defines the area of a ChamplainMapDataSource that contains data.
  *
@@ -45,9 +45,9 @@ typedef struct _ChamplainBoundingBox ChamplainBoundingBox;
 struct _ChamplainBoundingBox
 {
   gdouble left;
-  gdouble bottom;
-  gdouble right;
   gdouble top;
+  gdouble right;
+  gdouble bottom;
 };
 
 GType champlain_bounding_box_get_type (void) G_GNUC_CONST;
@@ -60,8 +60,8 @@ ChamplainBoundingBox *champlain_bounding_box_copy (const ChamplainBoundingBox *b
 void champlain_bounding_box_free (ChamplainBoundingBox *bbox);
 
 void champlain_bounding_box_get_center (ChamplainBoundingBox *bbox,
-    gdouble *lat,
-    gdouble *lon);
+    gdouble *latitude,
+    gdouble *longitude);
 
 G_END_DECLS
 

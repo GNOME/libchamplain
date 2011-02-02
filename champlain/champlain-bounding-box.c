@@ -106,8 +106,8 @@ champlain_bounding_box_free (ChamplainBoundingBox *bbox)
 /**
  * champlain_bounding_box_get_center:
  * @bbox: a #ChamplainBoundingBox
- * @lat: (out): the latitude of the box center
- * @lon: (out): the longitude of the box center
+ * @latitude: (out): the latitude of the box center
+ * @longitude: (out): the longitude of the box center
  *
  * Sets the latitude and longitude of the box to @lat and @lon.
  *
@@ -115,11 +115,11 @@ champlain_bounding_box_free (ChamplainBoundingBox *bbox)
  */
 void
 champlain_bounding_box_get_center (ChamplainBoundingBox *bbox,
-    gdouble *lat,
-    gdouble *lon)
+    gdouble *latitude,
+    gdouble *longitude)
 {
   g_return_if_fail (CHAMPLAIN_BOUNDING_BOX (bbox));
 
-  *lat = (bbox->right + bbox->left) / 2.0;
-  *lon = (bbox->top + bbox->bottom) / 2.0;
+  *longitude = (bbox->right + bbox->left) / 2.0;
+  *latitude = (bbox->top + bbox->bottom) / 2.0;
 }

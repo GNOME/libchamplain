@@ -466,8 +466,8 @@ set_data (ChamplainRenderer *renderer,
 
   bbox = champlain_bounding_box_new ();
 
-  memphis_map_get_bounding_box (map, &bbox->left, &bbox->top,
-      &bbox->right, &bbox->bottom);
+  memphis_map_get_bounding_box (map, &bbox->bottom, &bbox->left, &bbox->top,
+      &bbox->right);
   g_object_set (G_OBJECT (renderer), "bounding-box", bbox, NULL);
   champlain_bounding_box_free (bbox);
 }
