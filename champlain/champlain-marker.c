@@ -84,7 +84,8 @@ struct _ChamplainMarkerPrivate
   gboolean selectable;
   gboolean movable;
   
-  ChamplainFloatPoint click_coord;
+  gfloat click_x;
+  gfloat click_y;
 };
 
 static void
@@ -274,7 +275,7 @@ motion_event_cb (ClutterActor        *stage,
                  ChamplainMarker *marker)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
-  ChamplainFloatPoint coord;
+  gfloat x, y;
 
   if (event->type != CLUTTER_MOTION)
     return FALSE;
@@ -282,12 +283,9 @@ motion_event_cb (ClutterActor        *stage,
   if (clutter_actor_transform_stage_point (CLUTTER_ACTOR (marker),
                                            event->x,
                                            event->y,
-                                           &coord.x, &coord.y))
+                                           &x, &y))
     {
-      gfloat dx = coord.x - priv->click_coord.x;
-      gfloat dy = coord.y - priv->click_coord.y;
-        
-      g_signal_emit_by_name (marker, "moved", dx, dy);
+      g_signal_emit_by_name (marker, "moved", x - priv->click_x, y - priv->click_y);
     }
 
   return TRUE;
@@ -340,7 +338,7 @@ button_press_event_cb (ClutterActor        *actor,
     }
           
   if (clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
-                                           &priv->click_coord.x, &priv->click_coord.y))
+                                           &priv->click_x, &priv->click_y))
     {
       if (priv->movable) 
         {

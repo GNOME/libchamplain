@@ -22,25 +22,6 @@
 #include <glib.h>
 #include <clutter/clutter.h>
 
-/*
- * WARNING - NEVER put class private declarations here - add accessor methods
- * to the classes instead. Object encapsulation should be sacred.
- */
-
-typedef struct
-{
-  gfloat x;
-  gfloat y;
-  gfloat z;
-} ChamplainFloatPoint;
-
-typedef struct
-{
-  gfloat x;
-  gfloat y;
-  gint width;
-  gint height;
-} ChamplainRectangle;
 
 #define CHAMPLAIN_PARAM_READABLE     \
   (G_PARAM_READABLE |     \
