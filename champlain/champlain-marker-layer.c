@@ -72,7 +72,7 @@ struct _ChamplainMarkerLayerPrivate
   ChamplainSelectionMode mode;
   ChamplainView *view;
   
-  ClutterActor *polygon_actor;
+  ClutterActor *path_actor;
   gboolean closed_path;
   ClutterColor *stroke_color;
   gboolean fill;
@@ -87,7 +87,7 @@ static void marker_highlighted_cb (ChamplainMarker *marker,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainMarkerLayer *layer);
     
-static void redraw_polygon (ChamplainMarkerLayer *layer);
+static void redraw_path (ChamplainMarkerLayer *layer);
 
 static void set_view (ChamplainLayer *layer,
     ChamplainView *view);
@@ -162,35 +162,35 @@ champlain_marker_layer_set_property (GObject *object,
       break;
 
     case PROP_FILL:
-      champlain_marker_layer_set_polygon_fill (CHAMPLAIN_MARKER_LAYER (object),
+      champlain_marker_layer_set_path_fill (CHAMPLAIN_MARKER_LAYER (object),
           g_value_get_boolean (value));
       break;
 
     case PROP_STROKE:
-      champlain_marker_layer_set_polygon_stroke (CHAMPLAIN_MARKER_LAYER (object),
+      champlain_marker_layer_set_path_stroke (CHAMPLAIN_MARKER_LAYER (object),
           g_value_get_boolean (value));
       break;
 
     case PROP_FILL_COLOR:
-      champlain_marker_layer_set_polygon_fill_color (CHAMPLAIN_MARKER_LAYER (object),
+      champlain_marker_layer_set_path_fill_color (CHAMPLAIN_MARKER_LAYER (object),
           clutter_value_get_color (value));
       break;
 
     case PROP_STROKE_COLOR:
-      champlain_marker_layer_set_polygon_stroke_color (CHAMPLAIN_MARKER_LAYER (object),
+      champlain_marker_layer_set_path_stroke_color (CHAMPLAIN_MARKER_LAYER (object),
           clutter_value_get_color (value));
       break;
 
     case PROP_STROKE_WIDTH:
-      champlain_marker_layer_set_polygon_stroke_width (CHAMPLAIN_MARKER_LAYER (object),
+      champlain_marker_layer_set_path_stroke_width (CHAMPLAIN_MARKER_LAYER (object),
           g_value_get_double (value));
       break;
 
     case PROP_VISIBLE:
       if (g_value_get_boolean (value))
-        champlain_marker_layer_show_polygon (CHAMPLAIN_MARKER_LAYER (object));
+        champlain_marker_layer_show_path (CHAMPLAIN_MARKER_LAYER (object));
       else
-        champlain_marker_layer_hide_polygon (CHAMPLAIN_MARKER_LAYER (object));
+        champlain_marker_layer_hide_path (CHAMPLAIN_MARKER_LAYER (object));
       break;
       
     default:
@@ -259,7 +259,7 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPolygon:close-path:
+   * ChamplainPath:close-path:
    *
    * The shape is a closed path
    *
@@ -273,7 +273,7 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPolygon:fill:
+   * ChamplainPath:fill:
    *
    * The shape should be filled
    *
@@ -287,7 +287,7 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPolygon:stroke:
+   * ChamplainPath:stroke:
    *
    * The shape should be stroked
    *
@@ -301,9 +301,9 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           TRUE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPolygon:stroke-color:
+   * ChamplainPath:stroke-color:
    *
-   * The polygon's stroke color
+   * The path's stroke color
    *
    * Since: 0.4
    */
@@ -311,14 +311,14 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
       PROP_STROKE_COLOR,
       clutter_param_spec_color ("stroke-color",
           "Stroke Color",
-          "The polygon's stroke color",
+          "The path's stroke color",
           &DEFAULT_STROKE_COLOR,
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPolygon:text-color:
+   * ChamplainPath:text-color:
    *
-   * The polygon's fill color
+   * The path's fill color
    *
    * Since: 0.4
    */
@@ -326,14 +326,14 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
       PROP_FILL_COLOR,
       clutter_param_spec_color ("fill-color",
           "Fill Color",
-          "The polygon's fill color",
+          "The path's fill color",
           &DEFAULT_FILL_COLOR,
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPolygon:stroke-width:
+   * ChamplainPath:stroke-width:
    *
-   * The polygon's stroke width (in pixels)
+   * The path's stroke width (in pixels)
    *
    * Since: 0.4
    */
@@ -341,15 +341,15 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
       PROP_STROKE_WIDTH,
       g_param_spec_double ("stroke-width",
           "Stroke Width",
-          "The polygon's stroke width",
+          "The path's stroke width",
           0, 100.0,
           2.0,
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPolygon:visible:
+   * ChamplainPath:visible:
    *
-   * Wether the polygon is visible
+   * Wether the path is visible
    *
    * Since: 0.4
    */
@@ -357,7 +357,7 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
       PROP_VISIBLE,
       g_param_spec_boolean ("visible",
           "Visible",
-          "The polygon's visibility",
+          "The path's visibility",
           TRUE,
           CHAMPLAIN_PARAM_READWRITE));
 
@@ -383,8 +383,8 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
   
   //TODO destroy + ref()
-  priv->polygon_actor = clutter_group_new ();
-  clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->polygon_actor);
+  priv->path_actor = clutter_group_new ();
+  clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->path_actor);
   
 }
 
@@ -473,7 +473,7 @@ marker_position_notify (ChamplainMarker *marker,
     ChamplainMarkerLayer *layer)
 {
   set_marker_position (layer, marker);
-  redraw_polygon (layer);
+  redraw_path (layer);
 }
 
 
@@ -529,7 +529,7 @@ champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
 
   clutter_container_add_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
   set_marker_position (layer, marker);
-  redraw_polygon (layer);
+  redraw_path (layer);
 }
 
 
@@ -556,7 +556,7 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
       G_CALLBACK (marker_position_notify), layer);
 
   clutter_container_remove_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
-  redraw_polygon (layer);
+  redraw_path (layer);
 }
 
 
@@ -833,7 +833,7 @@ relocate (ChamplainMarkerLayer *layer)
       set_marker_position (layer, marker);
     }
 
-  redraw_polygon (layer);
+  redraw_path (layer);
 }
 
 static void
@@ -848,7 +848,7 @@ relocate_cb (G_GNUC_UNUSED GObject *gobject,
 
 
 static void
-redraw_polygon (ChamplainMarkerLayer *layer)
+redraw_path (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = layer->priv;
   ClutterActor *cairo_texture;
@@ -867,13 +867,13 @@ redraw_polygon (ChamplainMarkerLayer *layer)
   if (!priv->visible || width == 0.0 || height == 0.0)
     return;
 
-  clutter_group_remove_all (CLUTTER_GROUP (priv->polygon_actor));
+  clutter_group_remove_all (CLUTTER_GROUP (priv->path_actor));
   cairo_texture = clutter_cairo_texture_new (width, height);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->polygon_actor), cairo_texture);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->path_actor), cairo_texture);
   
   champlain_view_get_viewport_origin (priv->view, &x, &y);
 
-  clutter_actor_set_position (priv->polygon_actor, x, y);
+  clutter_actor_set_position (priv->path_actor, x, y);
 
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
 
@@ -919,11 +919,11 @@ redraw_polygon (ChamplainMarkerLayer *layer)
 
 
 static void
-redraw_polygon_cb (G_GNUC_UNUSED GObject *gobject,
+redraw_path_cb (G_GNUC_UNUSED GObject *gobject,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainMarkerLayer *layer)
 {
-  redraw_polygon (layer);
+  redraw_path (layer);
 }
 
 
@@ -952,10 +952,10 @@ set_view (ChamplainLayer *layer,
         G_CALLBACK (relocate_cb), layer);
 
       g_signal_connect (view, "notify::latitude",
-        G_CALLBACK (redraw_polygon_cb), layer);
+        G_CALLBACK (redraw_path_cb), layer);
         
       relocate (marker_layer);
-      redraw_polygon (marker_layer);
+      redraw_path (marker_layer);
     }
 }
 
@@ -1012,17 +1012,17 @@ champlain_view_ensure_markers_visible (ChamplainView *view,
 
 
 /**
- * champlain_polygon_set_fill_color:
- * @polygon: The polygon
- * @color: (allow-none): The polygon's fill color or NULL to reset to the
+ * champlain_path_set_fill_color:
+ * @path: The path
+ * @color: (allow-none): The path's fill color or NULL to reset to the
  *         default color. The color parameter is copied.
  *
- * Set the polygon's fill color.
+ * Set the path's fill color.
  *
  * Since: 0.4
  */
 void
-champlain_marker_layer_set_polygon_fill_color (ChamplainMarkerLayer *layer,
+champlain_marker_layer_set_path_fill_color (ChamplainMarkerLayer *layer,
     const ClutterColor *color)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
@@ -1041,17 +1041,17 @@ champlain_marker_layer_set_polygon_fill_color (ChamplainMarkerLayer *layer,
 
 
 /**
- * champlain_polygon_set_stroke_color:
- * @polygon: The polygon
- * @color: (allow-none): The polygon's stroke color or NULL to reset to the
+ * champlain_path_set_stroke_color:
+ * @path: The path
+ * @color: (allow-none): The path's stroke color or NULL to reset to the
  *         default color. The color parameter is copied.
  *
- * Set the polygon's stroke color.
+ * Set the path's stroke color.
  *
  * Since: 0.4
  */
 void
-champlain_marker_layer_set_polygon_stroke_color (ChamplainMarkerLayer *layer,
+champlain_marker_layer_set_path_stroke_color (ChamplainMarkerLayer *layer,
     const ClutterColor *color)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
@@ -1070,17 +1070,17 @@ champlain_marker_layer_set_polygon_stroke_color (ChamplainMarkerLayer *layer,
 
 
 /**
- * champlain_polygon_get_fill_color:
- * @polygon: The polygon
+ * champlain_path_get_fill_color:
+ * @path: The path
  *
- * Gets the polygon's fill color.
+ * Gets the path's fill color.
  *
- * Returns: the polygon's fill color.
+ * Returns: the path's fill color.
  *
  * Since: 0.4
  */
 ClutterColor *
-champlain_marker_layer_get_polygon_fill_color (ChamplainMarkerLayer *layer)
+champlain_marker_layer_get_path_fill_color (ChamplainMarkerLayer *layer)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), NULL);
 
@@ -1089,17 +1089,17 @@ champlain_marker_layer_get_polygon_fill_color (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_polygon_get_stroke_color:
- * @polygon: The polygon
+ * champlain_path_get_stroke_color:
+ * @path: The path
  *
- * Gets the polygon's stroke color.
+ * Gets the path's stroke color.
  *
- * Returns: the polygon's stroke color.
+ * Returns: the path's stroke color.
  *
  * Since: 0.4
  */
 ClutterColor *
-champlain_marker_layer_get_polygon_stroke_color (ChamplainMarkerLayer *layer)
+champlain_marker_layer_get_path_stroke_color (ChamplainMarkerLayer *layer)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), NULL);
 
@@ -1108,16 +1108,16 @@ champlain_marker_layer_get_polygon_stroke_color (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_polygon_set_stroke:
- * @polygon: The polygon
- * @value: if the polygon is stroked
+ * champlain_path_set_stroke:
+ * @path: The path
+ * @value: if the path is stroked
  *
- * Sets the polygon to have a stroke
+ * Sets the path to have a stroke
  *
  * Since: 0.4
  */
 void
-champlain_marker_layer_set_polygon_stroke (ChamplainMarkerLayer *layer,
+champlain_marker_layer_set_path_stroke (ChamplainMarkerLayer *layer,
     gboolean value)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
@@ -1128,17 +1128,17 @@ champlain_marker_layer_set_polygon_stroke (ChamplainMarkerLayer *layer,
 
 
 /**
- * champlain_polygon_get_stroke:
- * @polygon: The polygon
+ * champlain_path_get_stroke:
+ * @path: The path
  *
- * Checks whether the polygon has a stroke.
+ * Checks whether the path has a stroke.
  *
- * Returns: TRUE if the polygon has a stroke, FALSE otherwise.
+ * Returns: TRUE if the path has a stroke, FALSE otherwise.
  *
  * Since: 0.4
  */
 gboolean
-champlain_marker_layer_get_polygon_stroke (ChamplainMarkerLayer *layer)
+champlain_marker_layer_get_path_stroke (ChamplainMarkerLayer *layer)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), FALSE);
 
@@ -1147,16 +1147,16 @@ champlain_marker_layer_get_polygon_stroke (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_polygon_set_fill:
- * @polygon: The polygon
- * @value: if the polygon is filled
+ * champlain_path_set_fill:
+ * @path: The path
+ * @value: if the path is filled
  *
- * Sets the polygon to have be filled
+ * Sets the path to have be filled
  *
  * Since: 0.4
  */
 void
-champlain_marker_layer_set_polygon_fill (ChamplainMarkerLayer *layer,
+champlain_marker_layer_set_path_fill (ChamplainMarkerLayer *layer,
     gboolean value)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
@@ -1167,17 +1167,17 @@ champlain_marker_layer_set_polygon_fill (ChamplainMarkerLayer *layer,
 
 
 /**
- * champlain_polygon_get_fill:
- * @polygon: The polygon
+ * champlain_path_get_fill:
+ * @path: The path
  *
- * Checks whether the polygon is filled.
+ * Checks whether the path is filled.
  *
- * Returns: TRUE if the polygon is filled, FALSE otherwise.
+ * Returns: TRUE if the path is filled, FALSE otherwise.
  *
  * Since: 0.4
  */
 gboolean
-champlain_marker_layer_get_polygon_fill (ChamplainMarkerLayer *layer)
+champlain_marker_layer_get_path_fill (ChamplainMarkerLayer *layer)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), FALSE);
 
@@ -1186,8 +1186,8 @@ champlain_marker_layer_get_polygon_fill (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_polygon_set_stroke_width:
- * @polygon: The polygon
+ * champlain_path_set_stroke_width:
+ * @path: The path
  * @value: the width of the stroke (in pixels)
  *
  * Sets the width of the stroke
@@ -1195,7 +1195,7 @@ champlain_marker_layer_get_polygon_fill (ChamplainMarkerLayer *layer)
  * Since: 0.4
  */
 void
-champlain_marker_layer_set_polygon_stroke_width (ChamplainMarkerLayer *layer,
+champlain_marker_layer_set_path_stroke_width (ChamplainMarkerLayer *layer,
     gdouble value)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
@@ -1206,8 +1206,8 @@ champlain_marker_layer_set_polygon_stroke_width (ChamplainMarkerLayer *layer,
 
 
 /**
- * champlain_polygon_get_stroke_width:
- * @polygon: The polygon
+ * champlain_path_get_stroke_width:
+ * @path: The path
  *
  * Gets the width of the stroke.
  *
@@ -1216,7 +1216,7 @@ champlain_marker_layer_set_polygon_stroke_width (ChamplainMarkerLayer *layer,
  * Since: 0.4
  */
 gdouble
-champlain_marker_layer_get_polygon_stroke_width (ChamplainMarkerLayer *layer)
+champlain_marker_layer_get_path_stroke_width (ChamplainMarkerLayer *layer)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), 0);
 
@@ -1225,39 +1225,39 @@ champlain_marker_layer_get_polygon_stroke_width (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_polygon_show:
- * @polygon: The polygon
+ * champlain_path_show:
+ * @path: The path
  *
- * Makes the polygon visible
+ * Makes the path visible
  *
  * Since: 0.4
  */
 void
-champlain_marker_layer_show_polygon (ChamplainMarkerLayer *layer)
+champlain_marker_layer_show_path (ChamplainMarkerLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
   layer->priv->visible = TRUE;
-  clutter_actor_show (CLUTTER_ACTOR (layer->priv->polygon_actor));
-  g_object_notify (G_OBJECT (layer->priv->polygon_actor), "visible");
+  clutter_actor_show (CLUTTER_ACTOR (layer->priv->path_actor));
+  g_object_notify (G_OBJECT (layer->priv->path_actor), "visible");
 }
 
 
 /**
- * champlain_polygon_hide:
- * @polygon: The polygon
+ * champlain_path_hide:
+ * @path: The path
  *
- * Hides the polygon
+ * Hides the path
  *
  * Since: 0.4
  */
 void
-champlain_marker_layer_hide_polygon (ChamplainMarkerLayer *layer)
+champlain_marker_layer_hide_path (ChamplainMarkerLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
   layer->priv->visible = FALSE;
-  clutter_actor_hide (CLUTTER_ACTOR (layer->priv->polygon_actor));
-  g_object_notify (G_OBJECT (layer->priv->polygon_actor), "visible");
+  clutter_actor_hide (CLUTTER_ACTOR (layer->priv->path_actor));
+  g_object_notify (G_OBJECT (layer->priv->path_actor), "visible");
 }
 

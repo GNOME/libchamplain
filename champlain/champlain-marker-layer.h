@@ -111,28 +111,28 @@ ChamplainSelectionMode champlain_marker_layer_get_selection_mode (
 //    ChamplainMarker *markers[],
 //    gboolean animate);
 
-ClutterColor *champlain_marker_layer_get_polygon_fill_color (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_polygon_fill_color (ChamplainMarkerLayer *layer,
+ClutterColor *champlain_marker_layer_get_path_fill_color (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_set_path_fill_color (ChamplainMarkerLayer *layer,
     const ClutterColor *color);
 
-ClutterColor *champlain_marker_layer_get_polygon_stroke_color (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_polygon_stroke_color (ChamplainMarkerLayer *layer,
+ClutterColor *champlain_marker_layer_get_path_stroke_color (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_set_path_stroke_color (ChamplainMarkerLayer *layer,
     const ClutterColor *color);
 
-gboolean champlain_marker_layer_get_polygon_fill (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_polygon_fill (ChamplainMarkerLayer *layer,
+gboolean champlain_marker_layer_get_path_fill (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_set_path_fill (ChamplainMarkerLayer *layer,
     gboolean value);
 
-gboolean champlain_marker_layer_get_polygon_stroke (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_polygon_stroke (ChamplainMarkerLayer *layer,
+gboolean champlain_marker_layer_get_path_stroke (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_set_path_stroke (ChamplainMarkerLayer *layer,
     gboolean value);
 
-gdouble champlain_marker_layer_get_polygon_stroke_width (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_polygon_stroke_width (ChamplainMarkerLayer *layer,
+gdouble champlain_marker_layer_get_path_stroke_width (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_set_path_stroke_width (ChamplainMarkerLayer *layer,
     gdouble value);
 
-void champlain_marker_layer_show_polygon (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_hide_polygon (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_show_path (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_hide_path (ChamplainMarkerLayer *layer);
 
 G_END_DECLS
 

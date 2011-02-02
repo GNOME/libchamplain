@@ -133,12 +133,12 @@ main (int argc,
   append_point (layer, 45.3994, -73.1877);
   append_point (layer, 45.4000, -73.1815);
   append_point (layer, 45.4151, -73.1218);
-  champlain_marker_layer_set_polygon_stroke_width (layer, 5.0);
+  champlain_marker_layer_set_path_stroke_width (layer, 5.0);
   champlain_marker_layer_hide_all_markers (layer);
-  champlain_marker_layer_show_polygon (layer);
+  champlain_marker_layer_show_path (layer);
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
-  /* draw a polygon */
+  /* draw a path */
   layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_NONE);
   append_point (layer, 45.1386, -73.9196);
   append_point (layer, 45.1229, -73.8991);
@@ -148,7 +148,7 @@ main (int argc,
   g_object_set (layer, "closed-path", TRUE, NULL);
   g_object_set (layer, "fill", TRUE, NULL);
   champlain_marker_layer_hide_all_markers (layer);
-  champlain_marker_layer_show_polygon (layer);
+  champlain_marker_layer_show_path (layer);
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
   /* Finish initialising the map view */

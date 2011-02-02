@@ -28,7 +28,7 @@
 #define COL_ID 0
 #define COL_NAME 1
 
-static ChamplainMarkerLayer *polygon;
+static ChamplainMarkerLayer *path_layer;
 static gboolean destroying = FALSE;
 
 /*
@@ -48,14 +48,14 @@ toggle_layer (GtkToggleButton *widget,
 {
   if (gtk_toggle_button_get_active (widget))
     {
-      champlain_marker_layer_show_polygon (polygon);
-      champlain_marker_layer_animate_in_all_markers (polygon);
+      champlain_marker_layer_show_path (path_layer);
+      champlain_marker_layer_animate_in_all_markers (path_layer);
       champlain_marker_layer_animate_in_all_markers (CHAMPLAIN_MARKER_LAYER (layer));
     }
   else
     {
-      champlain_marker_layer_hide_polygon (polygon);
-      champlain_marker_layer_animate_out_all_markers (polygon);
+      champlain_marker_layer_hide_path (path_layer);
+      champlain_marker_layer_animate_out_all_markers (path_layer);
       champlain_marker_layer_animate_out_all_markers (CHAMPLAIN_MARKER_LAYER (layer));
     }
 }
@@ -274,21 +274,21 @@ main (int argc,
   layer = create_marker_layer (view);
   champlain_view_add_layer (view, CHAMPLAIN_LAYER (layer));
 
-  polygon = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_NONE);
+  path_layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_NONE);
   /* Cheap approx of Highway 10 */
-  append_point (polygon, 45.4095, -73.3197);
-  append_point (polygon, 45.4104, -73.2846);
-  append_point (polygon, 45.4178, -73.2239);
-  append_point (polygon, 45.4176, -73.2181);
-  append_point (polygon, 45.4151, -73.2126);
-  append_point (polygon, 45.4016, -73.1926);
-  append_point (polygon, 45.3994, -73.1877);
-  append_point (polygon, 45.4000, -73.1815);
-  append_point (polygon, 45.4151, -73.1218);
-  champlain_marker_layer_set_polygon_stroke_width (polygon, 5.0);
-  champlain_marker_layer_hide_all_markers (polygon);
-  champlain_marker_layer_hide_polygon (polygon);
-  champlain_view_add_layer (view, CHAMPLAIN_LAYER (polygon));
+  append_point (path_layer, 45.4095, -73.3197);
+  append_point (path_layer, 45.4104, -73.2846);
+  append_point (path_layer, 45.4178, -73.2239);
+  append_point (path_layer, 45.4176, -73.2181);
+  append_point (path_layer, 45.4151, -73.2126);
+  append_point (path_layer, 45.4016, -73.1926);
+  append_point (path_layer, 45.3994, -73.1877);
+  append_point (path_layer, 45.4000, -73.1815);
+  append_point (path_layer, 45.4151, -73.1218);
+  champlain_marker_layer_set_path_stroke_width (path_layer, 5.0);
+  champlain_marker_layer_hide_all_markers (path_layer);
+  champlain_marker_layer_hide_path (path_layer);
+  champlain_view_add_layer (view, CHAMPLAIN_LAYER (path_layer));
 
   gtk_widget_set_size_request (widget, 640, 480);
 
