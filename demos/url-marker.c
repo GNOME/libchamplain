@@ -268,7 +268,7 @@ main (int argc, char *argv[])
 
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (view), "zoom-level", 10,
-      "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC, NULL);
+      "kinetic-mode", TRUE, NULL);
   champlain_view_center_on (CHAMPLAIN_VIEW (view), 48.22, 16.8);
 
   clutter_actor_show_all (stage);

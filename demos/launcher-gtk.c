@@ -253,7 +253,7 @@ main (int argc,
 
 
   g_object_set (G_OBJECT (view),
-      "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
+      "kinetic-mode", TRUE,
       "zoom-level", 5,
       NULL);
       

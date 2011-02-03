@@ -96,7 +96,7 @@ enum
   PROP_MAX_ZOOM_LEVEL,
   PROP_MAP_SOURCE,
   PROP_DECEL_RATE,
-  PROP_SCROLL_MODE,
+  PROP_KINETIC_MODE,
   PROP_KEEP_CENTER_ON_RESIZE,
   PROP_ZOOM_ON_DOUBLE_CLICK,
   PROP_STATE,
@@ -138,7 +138,7 @@ struct _ChamplainViewPrivate
 
   ChamplainMapSourceFactory *factory; /* The map source factory */
   ChamplainMapSource *map_source; /* Current map tile source */
-  ChamplainScrollMode scroll_mode;
+  gboolean kinetic_mode;
   guint zoom_level; /* Holds the current zoom level number */
   guint min_zoom_level; /* Lowest allowed zoom level */
   guint max_zoom_level; /* Highest allowed zoom level */
@@ -397,8 +397,8 @@ champlain_view_get_property (GObject *object,
       g_value_set_object (value, priv->map_source);
       break;
 
-    case PROP_SCROLL_MODE:
-      g_value_set_enum (value, priv->scroll_mode);
+    case PROP_KINETIC_MODE:
+      g_value_set_boolean (value, priv->kinetic_mode);
       break;
 
     case PROP_DECEL_RATE:
@@ -466,8 +466,8 @@ champlain_view_set_property (GObject *object,
       champlain_view_set_map_source (view, g_value_get_object (value));
       break;
 
-    case PROP_SCROLL_MODE:
-      champlain_view_set_scroll_mode (view, g_value_get_enum (value));
+    case PROP_KINETIC_MODE:
+      champlain_view_set_kinetic_mode (view, g_value_get_boolean (value));
       break;
 
     case PROP_DECEL_RATE:
@@ -529,7 +529,6 @@ champlain_view_dispose (GObject *object)
 
   if (priv->viewport != NULL)
     {
-//      mx_viewport_stop (MX_VIEWPORT (priv->viewport));
       g_object_unref (priv->viewport);
       priv->viewport = NULL;
     }
@@ -792,20 +791,18 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainView:scroll-mode:
+   * ChamplainView:kinetic-mode:
    *
-   * Determines the way the view reacts to scroll events.
+   * Determines whether the view should use kinetic mode.
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
-      PROP_SCROLL_MODE,
-      g_param_spec_enum ("scroll-mode",
-          "Scroll Mode",
-          "Determines the way the view reacts to scroll events.",
-          CHAMPLAIN_TYPE_SCROLL_MODE,
-          CHAMPLAIN_SCROLL_MODE_KINETIC,
-          CHAMPLAIN_PARAM_READWRITE));
+      PROP_KINETIC_MODE,
+      g_param_spec_boolean ("kinetic-mode",
+          "Kinetic Mode",
+          "Determines whether the view should use kinetic mode.",
+          FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainView:decel-rate:
@@ -914,7 +911,7 @@ champlain_view_init (ChamplainView *view)
   priv->zoom_on_double_click = TRUE;
   priv->license_actor = NULL;
   priv->stage = NULL;
-  priv->scroll_mode = CHAMPLAIN_SCROLL_MODE_PUSH;
+  priv->kinetic_mode = FALSE;
   priv->viewport_x = 0;
   priv->viewport_y = 0;
   priv->viewport_width = 0;
@@ -1078,9 +1075,9 @@ scroll_to (ChamplainView *view,
   lat = champlain_map_source_get_latitude (priv->map_source, priv->zoom_level, y);
   lon = champlain_map_source_get_longitude (priv->map_source, priv->zoom_level, x);
 
-  if (priv->scroll_mode == CHAMPLAIN_SCROLL_MODE_KINETIC)
+  if (priv->kinetic_mode)
     champlain_view_go_to_with_duration (view, lat, lon, 300);
-  else if (priv->scroll_mode == CHAMPLAIN_SCROLL_MODE_PUSH)
+  else 
     champlain_view_center_on (view, lat, lon);
 }
 
@@ -2045,17 +2042,17 @@ champlain_view_set_decel_rate (ChamplainView *view,
 
 
 /**
- * champlain_view_set_scroll_mode:
+ * champlain_view_set_kinetic_mode:
  * @view: a #ChamplainView
- * @mode: a #ChamplainScrollMode value
+ * @kinetic: TRUE for kinetic mode, FALSE for push mode
  *
  * Determines the way the view reacts to scroll events.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
-champlain_view_set_scroll_mode (ChamplainView *view,
-    ChamplainScrollMode mode)
+champlain_view_set_kinetic_mode (ChamplainView *view,
+    gboolean kinetic)
 {
   DEBUG_LOG ()
 
@@ -2063,10 +2060,8 @@ champlain_view_set_scroll_mode (ChamplainView *view,
 
   ChamplainViewPrivate *priv = view->priv;
 
-  priv->scroll_mode = mode;
-
-//  g_object_set (G_OBJECT (priv->finger_scroll), "mode",
-//      priv->scroll_mode, NULL);
+  priv->kinetic_mode = kinetic;
+  mx_kinetic_scroll_view_set_kinetic_mode (MX_KINETIC_SCROLL_VIEW (priv->finger_scroll), kinetic);
 }
 
 
@@ -2330,23 +2325,23 @@ champlain_view_get_decel_rate (ChamplainView *view)
 
 
 /**
- * champlain_view_get_scroll_mode:
+ * champlain_view_get_kinetic_mode:
  * @view: The view
  *
  * Gets the view's scroll mode behaviour.
  *
- * Returns: the view's scroll mode behaviour.
+ * Returns: TRUE for kinetic mode, FALSE for push mode.
  *
- * Since: 0.4
+ * Since: 0.10
  */
-ChamplainScrollMode
-champlain_view_get_scroll_mode (ChamplainView *view)
+gboolean
+champlain_view_get_kinetic_mode (ChamplainView *view)
 {
   DEBUG_LOG ()
 
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), CHAMPLAIN_SCROLL_MODE_PUSH);
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
 
-  return view->priv->scroll_mode;
+  return view->priv->kinetic_mode;
 }
 
 

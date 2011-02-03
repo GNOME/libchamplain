@@ -55,19 +55,6 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainViewPrivate ChamplainViewPrivate;
 
-/**
- * ChamplainScrollMode:
- * @CHAMPLAIN_SCROLL_MODE_PUSH: Non-kinetic scrolling
- * @CHAMPLAIN_SCROLL_MODE_KINETIC: Kinetic scrolling
- *
- * Type of scrolling.
- */
-typedef enum
-{
-  CHAMPLAIN_SCROLL_MODE_PUSH,
-  CHAMPLAIN_SCROLL_MODE_KINETIC
-} ChamplainScrollMode;
-
 
 struct _ChamplainView
 {
@@ -110,8 +97,8 @@ void champlain_view_set_map_source (ChamplainView *view,
     ChamplainMapSource *map_source);
 void champlain_view_set_decel_rate (ChamplainView *view,
     gdouble rate);
-void champlain_view_set_scroll_mode (ChamplainView *view,
-    ChamplainScrollMode mode);
+void champlain_view_set_kinetic_mode (ChamplainView *view,
+    gboolean kinetic);
 void champlain_view_set_keep_center_on_resize (ChamplainView *view,
     gboolean value);
 void champlain_view_set_zoom_on_double_click (ChamplainView *view,
@@ -127,7 +114,7 @@ guint champlain_view_get_min_zoom_level (ChamplainView *view);
 guint champlain_view_get_max_zoom_level (ChamplainView *view);
 ChamplainMapSource *champlain_view_get_map_source (ChamplainView *view);
 gdouble champlain_view_get_decel_rate (ChamplainView *view);
-ChamplainScrollMode champlain_view_get_scroll_mode (ChamplainView *view);
+gboolean champlain_view_get_kinetic_mode (ChamplainView *view);
 gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
 const gchar *champlain_view_get_license_text (ChamplainView *view);
 gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);

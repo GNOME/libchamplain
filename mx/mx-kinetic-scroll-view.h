@@ -87,6 +87,11 @@ void mx_kinetic_scroll_view_set_overshoot (MxKineticScrollView *scroll,
                                            gdouble              overshoot);
 gdouble mx_kinetic_scroll_view_get_overshoot (MxKineticScrollView *scroll);
 
+void mx_kinetic_scroll_view_set_kinetic_mode (MxKineticScrollView *scroll,
+    gboolean kinetic);
+
+gboolean mx_kinetic_scroll_view_get_kinetic_mode (MxKineticScrollView *scroll);
+
 G_END_DECLS
 
 #endif /* __MX_KINETIC_SCROLL_VIEW_H__ */

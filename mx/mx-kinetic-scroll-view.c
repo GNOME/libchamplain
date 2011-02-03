@@ -81,6 +81,7 @@ struct _MxKineticScrollViewPrivate
   gdouble                decel_rate;
   gdouble                overshoot;
   gdouble                accumulated_delta;
+  gboolean               kinetic_mode;
 };
 
 enum {
@@ -92,7 +93,8 @@ enum {
   PROP_VADJUST,
   PROP_BUTTON,
   PROP_USE_CAPTURED,
-  PROP_OVERSHOOT
+  PROP_OVERSHOOT,
+  PROP_KINETIC_MODE,
 };
 
 enum
@@ -194,6 +196,10 @@ mx_kinetic_scroll_view_get_property (GObject    *object,
     case PROP_OVERSHOOT:
       g_value_set_double (value, priv->overshoot);
       break;
+      
+    case PROP_KINETIC_MODE:
+      g_value_set_boolean (value, priv->kinetic_mode);
+      break;
 
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -250,6 +256,10 @@ mx_kinetic_scroll_view_set_property (GObject      *object,
 
     case PROP_OVERSHOOT:
       mx_kinetic_scroll_view_set_overshoot (self, g_value_get_double (value));
+      break;
+
+    case PROP_KINETIC_MODE:
+      mx_kinetic_scroll_view_set_kinetic_mode (self, g_value_get_boolean (value));
       break;
 
     default:
@@ -388,6 +398,13 @@ mx_kinetic_scroll_view_class_init (MxKineticScrollViewClass *klass)
                                0.0, 1.0, 0.0,
                                MX_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_OVERSHOOT, pspec);
+
+  pspec = g_param_spec_boolean ("kinetic-mode",
+                                "Kinetic Mode",
+                                "Determines whether the view should use kinetic mode.",
+                                FALSE, 
+                                MX_PARAM_READWRITE);
+  g_object_class_install_property (object_class, PROP_KINETIC_MODE, pspec);
 
   /* MxScrollable properties */
   g_object_class_override_property (object_class,
@@ -660,7 +677,7 @@ button_release_event_cb (ClutterActor        *stage,
 
   clutter_set_motion_events_enabled (TRUE);
 
-  if (child)
+  if (child && priv->kinetic_mode)
     {
       gfloat event_x, event_y;
 
@@ -945,6 +962,7 @@ mx_kinetic_scroll_view_init (MxKineticScrollView *self)
   g_array_set_size (priv->motion_buffer, 3);
   priv->decel_rate = 1.1f;
   priv->button = 1;
+  priv->kinetic_mode = FALSE;
 
   clutter_actor_set_reactive (CLUTTER_ACTOR (self), TRUE);
   g_signal_connect (self, "button-press-event",
@@ -1193,4 +1211,22 @@ mx_kinetic_scroll_view_get_overshoot (MxKineticScrollView *scroll)
 {
   g_return_val_if_fail (MX_IS_KINETIC_SCROLL_VIEW (scroll), 0.0);
   return scroll->priv->overshoot;
+}
+
+void
+mx_kinetic_scroll_view_set_kinetic_mode (MxKineticScrollView *scroll,
+    gboolean kinetic)
+{
+  MxKineticScrollViewPrivate *priv;
+
+  priv = scroll->priv;
+  priv->kinetic_mode = kinetic;
+}
+
+gboolean
+mx_kinetic_scroll_view_get_kinetic_mode (MxKineticScrollView *scroll)
+{
+  g_return_val_if_fail (MX_IS_KINETIC_SCROLL_VIEW (scroll), FALSE);
+
+  return scroll->priv->kinetic_mode;
 }

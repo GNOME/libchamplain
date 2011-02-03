@@ -761,7 +761,7 @@ main (int argc,
   widget = gtk_champlain_embed_new ();
   champlain_view = gtk_champlain_embed_get_view (GTK_CHAMPLAIN_EMBED (widget));
 
-  g_object_set (G_OBJECT (champlain_view), "scroll-mode", CHAMPLAIN_SCROLL_MODE_KINETIC,
+  g_object_set (G_OBJECT (champlain_view), "kinetic-mode", TRUE,
       "zoom-level", 9, NULL);
 
   gtk_widget_set_size_request (widget, 640, 480);
