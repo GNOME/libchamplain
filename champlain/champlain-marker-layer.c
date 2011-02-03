@@ -972,43 +972,41 @@ set_view (ChamplainLayer *layer,
  *
  * Since: 0.4
  */
-/*void
-champlain_view_ensure_markers_visible (ChamplainView *view,
-    ChamplainMarker *markers[],
-    gboolean animate)
+ChamplainBoundingBox *
+champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
 {
-  DEBUG_LOG ()
-
-  gdouble min_lat, min_lon, max_lat, max_lon;
-  ChamplainMarker *marker = NULL;
   gint i = 0;
+  ChamplainBoundingBox *bbox;
+  
+  bbox = champlain_bounding_box_new ();
+  bbox->left = CHAMPLAIN_MAX_LONGITUDE;
+  bbox->right = CHAMPLAIN_MIN_LONGITUDE;
+  bbox->bottom = CHAMPLAIN_MAX_LATITUDE;
+  bbox->top = CHAMPLAIN_MIN_LATITUDE;
 
-  min_lat = min_lon = 200;
-  max_lat = max_lon = -200;
-
-  marker = markers[i];
-  while (marker != NULL)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
     {
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
       gdouble lat, lon;
+      
       g_object_get (G_OBJECT (marker), "latitude", &lat, "longitude", &lon,
           NULL);
 
-      if (lon < min_lon)
-        min_lon = lon;
+      if (lon < bbox->left)
+        bbox->left = lon;
 
-      if (lat < min_lat)
-        min_lat = lat;
+      if (lat < bbox->bottom)
+        bbox->bottom = lat;
 
-      if (lon > max_lon)
-        max_lon = lon;
+      if (lon > bbox->right)
+        bbox->right = lon;
 
-      if (lat > max_lat)
-        max_lat = lat;
-
-      marker = markers[i++];
+      if (lat > bbox->top)
+        bbox->top = lat;
     }
-  champlain_view_ensure_visible (view, min_lat, min_lon, max_lat, max_lon, animate);
-}*/
+
+  return bbox;
+}
 
 
 /**

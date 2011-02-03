@@ -26,6 +26,7 @@
 #include <champlain/champlain-defines.h>
 #include <champlain/champlain-marker.h>
 #include <champlain/champlain-layer.h>
+#include <champlain/champlain-bounding-box.h>
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
@@ -107,9 +108,7 @@ void champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
     ChamplainSelectionMode mode);
 ChamplainSelectionMode champlain_marker_layer_get_selection_mode (
     ChamplainMarkerLayer *layer);
-//void champlain_view_ensure_markers_visible (ChamplainView *view,
-//    ChamplainMarker *markers[],
-//    gboolean animate);
+ChamplainBoundingBox *champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer);
 
 ClutterColor *champlain_marker_layer_get_path_fill_color (ChamplainMarkerLayer *layer);
 void champlain_marker_layer_set_path_fill_color (ChamplainMarkerLayer *layer,

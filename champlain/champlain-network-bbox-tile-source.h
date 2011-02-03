@@ -23,6 +23,7 @@
 #include <glib-object.h>
 
 #include <champlain/champlain-tile-source.h>
+#include <champlain/champlain-bounding-box.h>
 
 G_BEGIN_DECLS
 
@@ -74,10 +75,7 @@ ChamplainNetworkBboxTileSource *champlain_network_bbox_tile_source_new_full (con
 
 void champlain_network_bbox_tile_source_load_map_data (
     ChamplainNetworkBboxTileSource *map_data_source,
-    gdouble bound_left,
-    gdouble bound_bottom,
-    gdouble bound_right,
-    gdouble bound_top);
+    ChamplainBoundingBox *bbox);
 
 const gchar *champlain_network_bbox_tile_source_get_api_uri (
     ChamplainNetworkBboxTileSource *map_data_source);

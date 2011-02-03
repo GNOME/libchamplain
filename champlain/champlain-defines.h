@@ -25,6 +25,11 @@
 
 #define CHAMPLAIN_API __attribute__((visibility ("default")))
 
+#define CHAMPLAIN_MIN_LATITUDE -90
+#define CHAMPLAIN_MAX_LATITUDE 90
+#define CHAMPLAIN_MIN_LONGITUDE -180
+#define CHAMPLAIN_MAX_LONGITUDE 180
+
 typedef struct _ChamplainView ChamplainView;
 typedef struct _ChamplainViewClass ChamplainViewClass;
 

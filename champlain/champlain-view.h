@@ -28,6 +28,7 @@
 #include <champlain/champlain-layer.h>
 #include <champlain/champlain-map-source.h>
 #include <champlain/champlain-license.h>
+#include <champlain/champlain-bounding-box.h>
 
 #include <glib.h>
 #include <glib-object.h>
@@ -102,10 +103,7 @@ void champlain_view_set_max_zoom_level (ChamplainView *view,
     guint zoom_level);
 
 void champlain_view_ensure_visible (ChamplainView *view,
-    gdouble lat1,
-    gdouble lon1,
-    gdouble lat2,
-    gdouble lon2,
+    ChamplainBoundingBox *bbox,
     gboolean animate);
 
 void champlain_view_set_map_source (ChamplainView *view,

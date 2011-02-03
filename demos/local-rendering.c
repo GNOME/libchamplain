@@ -119,14 +119,19 @@ static void
 load_network_map_data (ChamplainNetworkBboxTileSource *source, ChamplainView *view)
 {
   gdouble lat, lon;
+  ChamplainBoundingBox *bbox = champlain_bounding_box_new ();
 
   g_signal_connect (source, "notify::state", G_CALLBACK (data_source_state_changed),
       map_data_state_img);
 
   g_object_get (G_OBJECT (view), "latitude", &lat, "longitude", &lon, NULL);
 
-  champlain_network_bbox_tile_source_load_map_data (source,
-      lon - 0.008, lat - 0.008, lon + 0.008, lat + 0.008);
+  bbox->left = lon - 0.008;
+  bbox->right = lon + 0.008;
+  bbox->bottom = lat - 0.008;
+  bbox->top = lat + 0.008;
+  champlain_network_bbox_tile_source_load_map_data (source, bbox);
+  champlain_bounding_box_free (bbox);
 }
 
 

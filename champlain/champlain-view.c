@@ -113,11 +113,6 @@ static guint signals[LAST_SIGNAL] = { 0, };
    level < champlain_map_source_get_min_zoom_level (priv->map_source) || \
    level > champlain_map_source_get_max_zoom_level (priv->map_source))
 
-#define CHAMPLAIN_MIN_LAT -90
-#define CHAMPLAIN_MAX_LAT 90
-#define CHAMPLAIN_MIN_LONG -180
-#define CHAMPLAIN_MAX_LONG 180
-
 /* Between state values for go_to */
 typedef struct
 {
@@ -378,12 +373,12 @@ champlain_view_get_property (GObject *object,
     {
     case PROP_LONGITUDE:
       g_value_set_double (value,
-          CLAMP (priv->longitude, CHAMPLAIN_MIN_LONG, CHAMPLAIN_MAX_LONG));
+          CLAMP (priv->longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE));
       break;
 
     case PROP_LATITUDE:
       g_value_set_double (value,
-          CLAMP (priv->latitude, CHAMPLAIN_MIN_LAT, CHAMPLAIN_MAX_LAT));
+          CLAMP (priv->latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE));
       break;
 
     case PROP_ZOOM_LEVEL:
@@ -1300,8 +1295,8 @@ champlain_view_center_on (ChamplainView *view,
   gint x, y;
   ChamplainViewPrivate *priv = view->priv;
 
-  priv->longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONG, CHAMPLAIN_MAX_LONG);
-  priv->latitude = CLAMP (latitude, CHAMPLAIN_MIN_LAT, CHAMPLAIN_MAX_LAT);
+  priv->longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
+  priv->latitude = CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
 
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
@@ -2120,10 +2115,6 @@ champlain_view_set_zoom_on_double_click (ChamplainView *view,
 /**
  * champlain_view_ensure_visible:
  * @view: a #ChamplainView
- * @lat1: the latitude of position 1
- * @lon1: the longitude of position 1
- * @lat2: the latitude of position 2
- * @lon2: the longitude of position 2
  * @animate: a #gboolean
  *
  * Changes the map's zoom level and center to make sure the two given
@@ -2133,57 +2124,27 @@ champlain_view_set_zoom_on_double_click (ChamplainView *view,
  */
 void
 champlain_view_ensure_visible (ChamplainView *view,
-    gdouble lat1,
-    gdouble lon1,
-    gdouble lat2,
-    gdouble lon2,
+    ChamplainBoundingBox *bbox,
     gboolean animate)
 {
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
   guint zoom_level = priv->zoom_level;
-  gdouble width, height;
-  gdouble min_lat, min_lon, max_lat, max_lon;
   gboolean good_size = FALSE;
+  gdouble lat, lon;
 
-  /*We first sort the lat,lon in order to have min and max */
-  if (lat1 < lat2)
-    {
-      min_lat = lat1;
-      max_lat = lat2;
-    }
-  else
-    {
-      max_lat = lat1;
-      min_lat = lat2;
-    }
+  champlain_bounding_box_get_center (bbox, &lat, &lon);
 
-  if (lon1 < lon2)
-    {
-      min_lon = lon1;
-      max_lon = lon2;
-    }
-  else
-    {
-      max_lon = lon1;
-      min_lon = lon2;
-    }
-
-  width = max_lon - min_lon;
-  height = max_lat - min_lat;
-  width *= 1.1;
-  height *= 1.1;
-
-  DEBUG ("Zone to expose (%f, %f) to (%f, %f)", min_lat, min_lon, max_lat, max_lon);
+  DEBUG ("Zone to expose (%f, %f) to (%f, %f)", bbox->bottom, bbox->left, bbox->top, bbox->right);
   do
     {
       gint min_x, min_y, max_x, max_y;
-      min_x = champlain_map_source_get_x (priv->map_source, zoom_level, min_lon);
-      min_y = champlain_map_source_get_y (priv->map_source, zoom_level, min_lat);
-
-      max_x = champlain_map_source_get_x (priv->map_source, zoom_level, max_lon);
-      max_y = champlain_map_source_get_y (priv->map_source, zoom_level, max_lat);
+      
+      min_x = champlain_map_source_get_x (priv->map_source, zoom_level, bbox->left);
+      min_y = champlain_map_source_get_y (priv->map_source, zoom_level, bbox->bottom);
+      max_x = champlain_map_source_get_x (priv->map_source, zoom_level, bbox->right);
+      max_y = champlain_map_source_get_y (priv->map_source, zoom_level, bbox->top);
 
       if (min_y - max_y <= priv->viewport_height &&
           max_x - min_x <= priv->viewport_width)
@@ -2194,17 +2155,16 @@ champlain_view_ensure_visible (ChamplainView *view,
       if (zoom_level <= priv->min_zoom_level)
         {
           zoom_level = priv->min_zoom_level;
-          min_lat = min_lon = width = height = 0;
-          break;
+          good_size = TRUE;
         }
     } while (!good_size);
 
   DEBUG ("Ideal zoom level is %d", zoom_level);
   champlain_view_set_zoom_level (view, zoom_level);
   if (animate)
-    champlain_view_go_to (view, min_lat + height / 2.0, min_lon + width / 2.0);
+    champlain_view_go_to (view, lat, lon);
   else
-    champlain_view_center_on (view, min_lat + height / 2.0, min_lon + width / 2.0);
+    champlain_view_center_on (view, lat, lon);
 }
 
 

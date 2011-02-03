@@ -327,11 +327,8 @@ load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
 /**
  * champlain_network_bbox_tile_source_load_map_data:
  * @map_data_source: a #ChamplainNetworkBboxTileSource
- * @bound_left: the left bound in degree
- * @bound_bottom: the lower bound in degree
- * @bound_right: the right bound in degree
- * @bound_top: the upper bound in degree
- *
+ * @bbox: bounding box of the requested area
+ * 
  * Asynchronously loads map data within a bounding box from the server.
  * The box must not exceed an edge size of 0.25 degree. There are also
  * limitations on the maximum number of nodes that can be requested.
@@ -340,20 +337,17 @@ load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
  * url="http://api.openstreetmap.org/api/capabilities">
  * http://api.openstreetmap.org/api/capabilities</ulink>
  *
- * Since: 0.8
+ * Since: 0.10
  */
 void
 champlain_network_bbox_tile_source_load_map_data (
     ChamplainNetworkBboxTileSource *self,
-    gdouble bound_left,
-    gdouble bound_bottom,
-    gdouble bound_right,
-    gdouble bound_top)
+    ChamplainBoundingBox *bbox)
 {
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_BBOX_TILE_SOURCE (self));
 
-  g_return_if_fail (bound_right - bound_left < 0.25 &&
-      bound_top - bound_bottom < 0.25);
+  g_return_if_fail (bbox->right - bbox->left < 0.25 &&
+      bbox->top - bbox->bottom < 0.25);
 
   ChamplainNetworkBboxTileSourcePrivate *priv = self->priv;
   SoupMessage *msg;
@@ -361,7 +355,7 @@ champlain_network_bbox_tile_source_load_map_data (
 
   url = g_strdup_printf (
       "http://api.openstreetmap.org/api/0.6/map?bbox=%f,%f,%f,%f",
-      bound_left, bound_bottom, bound_right, bound_top);
+      bbox->left, bbox->bottom, bbox->right, bbox->top);
   msg = soup_message_new ("GET", url);
 
   DEBUG ("Request BBox data: '%s'", url);
