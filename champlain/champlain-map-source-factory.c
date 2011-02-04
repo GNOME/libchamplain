@@ -29,7 +29,7 @@
  * will return a ready to use #ChamplainMapSource.
  *
  * To get the list of registered map sources, use
- * #champlain_map_source_factory_dup_list.
+ * #champlain_map_source_factory_get_registered.
  *
  */
 #include "config.h"
@@ -83,13 +83,11 @@ struct _ChamplainMapSourceFactoryPrivate
 };
 
 static ChamplainMapSource *champlain_map_source_new_generic (
-    ChamplainMapSourceDesc *desc,
-    gpointer data);
+    ChamplainMapSourceDesc *desc);
 
 #ifdef CHAMPLAIN_HAS_MEMPHIS
 static ChamplainMapSource *champlain_map_source_new_memphis (
-    ChamplainMapSourceDesc *desc,
-    gpointer user_data);
+    ChamplainMapSourceDesc *desc);
 #endif
 
 
@@ -140,176 +138,144 @@ champlain_map_source_factory_class_init (ChamplainMapSourceFactoryClass *klass)
 }
 
 
-static
-ChamplainMapSourceDesc OSM_MAPNIK_DESC =
-{
-  CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
-  "OpenStreetMap Mapnik",
-  "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
-  "http://creativecommons.org/licenses/by-sa/2.0/",
-  0,
-  18,
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-  champlain_map_source_new_generic,
-  "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png",
-  NULL
-};
-
-static
-ChamplainMapSourceDesc OSM_OSMARENDER_DESC =
-{
-  CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
-  "OpenStreetMap Osmarender",
-  "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
-  "http://creativecommons.org/licenses/by-sa/2.0/",
-  0,
-  17,
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-  champlain_map_source_new_generic,
-  "http://tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png",
-  NULL
-};
-
-static
-ChamplainMapSourceDesc OSM_MAPQUEST_DESC =
-{
-  CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST,
-  "MapQuest OSM",
-  "Data, imagery and map information provided by MapQuest, Open Street Map and contributors",
-  "http://creativecommons.org/licenses/by-sa/2.0/",
-  0,
-  17,
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-  champlain_map_source_new_generic,
-  "http://otile1.mqcdn.com/tiles/1.0.0/osm/#Z#/#X#/#Y#.png",
-  NULL
-};
-
-static
-ChamplainMapSourceDesc OSM_CYCLEMAP_DESC =
-{
-  CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
-  "OpenStreetMap Cycle Map",
-  "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
-  "http://creativecommons.org/licenses/by-sa/2.0/",
-  0,
-  18,
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-  champlain_map_source_new_generic,
-  "http://andy.sandbox.cloudmade.com/tiles/cycle/#Z#/#X#/#Y#.png",
-  NULL
-};
-
-static
-ChamplainMapSourceDesc OSM_TRANSPORTMAP_DESC =
-{
-  CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP,
-  "OpenStreetMap Transport Map",
-  "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
-  "http://creativecommons.org/licenses/by-sa/2.0/",
-  0,
-  18,
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-  champlain_map_source_new_generic,
-  "http://tile.xn--pnvkarte-m4a.de/tilegen/#Z#/#X#/#Y#.png",
-  NULL
-};
-
-#if 0
-/* Disabling until OpenArealMap works again */
-static
-ChamplainMapSourceDesc OAM_DESC =
-{
-  CHAMPLAIN_MAP_SOURCE_OAM,
-  "OpenAerialMap",
-  "(CC) BY 3.0 OpenAerialMap contributors",
-  "http://creativecommons.org/licenses/by/3.0/",
-  0,
-  17,
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-  champlain_map_source_new_generic,
-  "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg",
-  NULL
-};
-#endif
-
-static
-ChamplainMapSourceDesc MFF_RELIEF_DESC =
-{
-  CHAMPLAIN_MAP_SOURCE_MFF_RELIEF,
-  "Maps for Free Relief",
-  "Map data available under GNU Free Documentation license, Version 1.2 or later",
-  "http://www.gnu.org/copyleft/fdl.html",
-  0,
-  11,
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-  champlain_map_source_new_generic,
-  "http://maps-for-free.com/layer/relief/z#Z#/row#Y#/#Z#_#X#-#Y#.jpg",
-  NULL
-};
-
-#ifdef CHAMPLAIN_HAS_MEMPHIS
-static
-ChamplainMapSourceDesc MEMPHIS_LOCAL_DESC =
-{
-  CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL,
-  "OpenStreetMap Memphis Local Map",
-  "(CC) BY 2.0 OpenStreetMap contributors",
-  "http://creativecommons.org/licenses/by/2.0/",
-  12,
-  18,
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-  champlain_map_source_new_memphis,
-  "",
-  NULL
-};
-
-static
-ChamplainMapSourceDesc MEMPHIS_NETWORK_DESC =
-{
-  CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK,
-  "OpenStreetMap Memphis Network Map",
-  "(CC) BY 2.0 OpenStreetMap contributors",
-  "http://creativecommons.org/licenses/by/2.0/",
-  12,
-  18,
-  CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-  champlain_map_source_new_memphis,
-  "",
-  NULL
-};
-#endif
-
 static void
 champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 {
   ChamplainMapSourceFactoryPrivate *priv = GET_PRIVATE (factory);
+  ChamplainMapSourceDesc *desc;
 
   factory->priv = priv;
-
   priv->registered_sources = NULL;
 
-  champlain_map_source_factory_register (factory, &OSM_MAPNIK_DESC,
-      OSM_MAPNIK_DESC.constructor, OSM_MAPNIK_DESC.data);
-  champlain_map_source_factory_register (factory, &OSM_CYCLEMAP_DESC,
-      OSM_CYCLEMAP_DESC.constructor, OSM_CYCLEMAP_DESC.data);
-  champlain_map_source_factory_register (factory, &OSM_TRANSPORTMAP_DESC,
-      OSM_TRANSPORTMAP_DESC.constructor, OSM_TRANSPORTMAP_DESC.data);
-  champlain_map_source_factory_register (factory, &OSM_OSMARENDER_DESC,
-      OSM_OSMARENDER_DESC.constructor, OSM_OSMARENDER_DESC.data);
-  champlain_map_source_factory_register (factory, &OSM_MAPQUEST_DESC,
-      OSM_MAPQUEST_DESC.constructor, OSM_MAPQUEST_DESC.data);
+  desc = champlain_map_source_desc_new_full (
+      CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
+      "OpenStreetMap Mapnik",
+      "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
+      "http://creativecommons.org/licenses/by-sa/2.0/",
+      0,
+      18,
+      256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png",
+      champlain_map_source_new_generic,
+      NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+      CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
+      "OpenStreetMap Osmarender",
+      "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
+      "http://creativecommons.org/licenses/by-sa/2.0/",
+      0,
+      17,
+      256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png",
+      champlain_map_source_new_generic,
+      NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+      CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST,
+      "MapQuest OSM",
+      "Data, imagery and map information provided by MapQuest, Open Street Map and contributors",
+      "http://creativecommons.org/licenses/by-sa/2.0/",
+      0,
+      17,
+      256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://otile1.mqcdn.com/tiles/1.0.0/osm/#Z#/#X#/#Y#.png",
+      champlain_map_source_new_generic,
+      NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+      CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
+      "OpenStreetMap Cycle Map",
+      "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
+      "http://creativecommons.org/licenses/by-sa/2.0/",
+      0,
+      18,
+      256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://andy.sandbox.cloudmade.com/tiles/cycle/#Z#/#X#/#Y#.png",
+      champlain_map_source_new_generic,
+      NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+      CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP,
+      "OpenStreetMap Transport Map",
+      "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
+      "http://creativecommons.org/licenses/by-sa/2.0/",
+      0,
+      18,
+      256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://tile.xn--pnvkarte-m4a.de/tilegen/#Z#/#X#/#Y#.png",
+      champlain_map_source_new_generic,
+      NULL);
+  champlain_map_source_factory_register (factory, desc);
+
 #if 0
-  champlain_map_source_factory_register (factory, &OAM_DESC,
-      OAM_DESC.constructor, OAM_DESC.data);
+/* Disabling until OpenArealMap works again */
+  desc = champlain_map_source_desc_new_full (
+      CHAMPLAIN_MAP_SOURCE_OAM,
+      "OpenAerialMap",
+      "(CC) BY 3.0 OpenAerialMap contributors",
+      "http://creativecommons.org/licenses/by/3.0/",
+      0,
+      17,
+      256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg",
+      champlain_map_source_new_generic,
+      NULL);
+  champlain_map_source_factory_register (factory, desc);
 #endif
-  champlain_map_source_factory_register (factory, &MFF_RELIEF_DESC,
-      MFF_RELIEF_DESC.constructor, MFF_RELIEF_DESC.data);
+
+  desc = champlain_map_source_desc_new_full (
+      CHAMPLAIN_MAP_SOURCE_MFF_RELIEF,
+      "Maps for Free Relief",
+      "Map data available under GNU Free Documentation license, Version 1.2 or later",
+      "http://www.gnu.org/copyleft/fdl.html",
+      0,
+      11,
+      256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "http://maps-for-free.com/layer/relief/z#Z#/row#Y#/#Z#_#X#-#Y#.jpg",
+      champlain_map_source_new_generic,
+      NULL);
+  champlain_map_source_factory_register (factory, desc);
+
 #ifdef CHAMPLAIN_HAS_MEMPHIS
-  champlain_map_source_factory_register (factory, &MEMPHIS_LOCAL_DESC,
-      MEMPHIS_LOCAL_DESC.constructor, MEMPHIS_LOCAL_DESC.data);
-  champlain_map_source_factory_register (factory, &MEMPHIS_NETWORK_DESC,
-      MEMPHIS_NETWORK_DESC.constructor, MEMPHIS_NETWORK_DESC.data);
+  desc = champlain_map_source_desc_new_full (
+      CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL,
+      "OpenStreetMap Memphis Local Map",
+      "(CC) BY 2.0 OpenStreetMap contributors",
+      "http://creativecommons.org/licenses/by/2.0/",
+      12,
+      18,
+      256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "",
+      champlain_map_source_new_memphis,
+      NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+      CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK,
+      "OpenStreetMap Memphis Network Map",
+      "(CC) BY 2.0 OpenStreetMap contributors",
+      "http://creativecommons.org/licenses/by/2.0/",
+      12,
+      18,
+      256,
+      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+      "",
+      champlain_map_source_new_memphis,
+      NULL);
+  champlain_map_source_factory_register (factory, desc);
 #endif
 }
 
@@ -332,7 +298,7 @@ champlain_map_source_factory_dup_default (void)
 
 
 /**
- * champlain_map_source_factory_dup_list:
+ * champlain_map_source_factory_get_registered:
  * @factory: the Factory
  *
  * Get the list of registered map sources.
@@ -343,7 +309,7 @@ champlain_map_source_factory_dup_default (void)
  * Since: 0.4
  */
 GSList *
-champlain_map_source_factory_dup_list (ChamplainMapSourceFactory *factory)
+champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *factory)
 {
   return g_slist_copy (factory->priv->registered_sources);
 }
@@ -373,8 +339,13 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
   while (item != NULL)
     {
       ChamplainMapSourceDesc *desc = CHAMPLAIN_MAP_SOURCE_DESC (item->data);
-      if (strcmp (desc->id, id) == 0)
-        return desc->constructor (desc, desc->data);
+      if (strcmp (champlain_map_source_desc_get_id (desc), id) == 0)
+        {
+          ChamplainMapSourceConstructor constructor;
+          
+          constructor = champlain_map_source_desc_get_constructor (desc);
+          return constructor (desc);
+        }
       item = g_slist_next (item);
     }
 
@@ -472,37 +443,48 @@ champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *fac
  */
 gboolean
 champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
-    ChamplainMapSourceDesc *desc,
-    ChamplainMapSourceConstructor constructor,
-    gpointer data)
+    ChamplainMapSourceDesc *desc)
 {
   /* FIXME: check for existing factory with that name? */
-  desc->constructor = constructor;
-  desc->data = data;
   factory->priv->registered_sources = g_slist_append (factory->priv->registered_sources, desc);
   return TRUE;
 }
 
 
 static ChamplainMapSource *
-champlain_map_source_new_generic (
-    ChamplainMapSourceDesc *desc, G_GNUC_UNUSED gpointer user_data)
+champlain_map_source_new_generic (ChamplainMapSourceDesc *desc)
 {
   ChamplainMapSource *map_source;
   ChamplainRenderer *renderer;
+  gchar *id, *name, *license, *license_uri, *uri_format;
+  guint min_zoom, max_zoom, tile_size;
+  ChamplainMapProjection projection;
+  
+  g_object_get (G_OBJECT (desc), 
+      "id", &id, 
+      "name", &name,
+      "license", &license,
+      "license-uri", &license_uri,
+      "min-zoom-level", &min_zoom,
+      "max-zoom-level", &max_zoom,
+      "tile-size", &tile_size, 
+      "projection", &projection,
+      "uri-format", &uri_format,
+      NULL);
 
   renderer = CHAMPLAIN_RENDERER (champlain_image_renderer_new ());
+  
   map_source = CHAMPLAIN_MAP_SOURCE (champlain_network_tile_source_new_full (
-          desc->id,
-          desc->name,
-          desc->license,
-          desc->license_uri,
-          desc->min_zoom_level,
-          desc->max_zoom_level,
-          256,
-          desc->projection,
-          desc->uri_format,
-          renderer));
+      id,
+      name,
+      license,
+      license_uri,
+      min_zoom,
+      max_zoom,
+      tile_size,
+      projection,
+      uri_format,
+      renderer));
 
   return map_source;
 }
@@ -510,42 +492,55 @@ champlain_map_source_new_generic (
 
 #ifdef CHAMPLAIN_HAS_MEMPHIS
 static ChamplainMapSource *
-champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc,
-    G_GNUC_UNUSED gpointer user_data)
+champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc)
 {
   ChamplainMapSource *map_source;
   ChamplainRenderer *renderer;
+  gchar *id, *name, *license, *license_uri;
+  guint min_zoom, max_zoom, tile_size;
+  ChamplainMapProjection projection;
+  
+  g_object_get (G_OBJECT (desc), 
+                  "id", &id, 
+                  "name", &name,
+                  "license", &license,
+                  "license-uri", &license_uri,
+                  "min-zoom-level", &min_zoom,
+                  "max-zoom-level", &max_zoom,
+                  "tile-size", &tile_size, 
+                  "projection", &projection,
+                  NULL);
 
-  renderer = CHAMPLAIN_RENDERER (champlain_memphis_renderer_new_full (256));
-  if (g_strcmp0 (desc->id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL) == 0)
+  renderer = CHAMPLAIN_RENDERER (champlain_memphis_renderer_new_full (tile_size));
+  
+  if (g_strcmp0 (id, CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL) == 0)
     {
       map_source = CHAMPLAIN_MAP_SOURCE (champlain_file_tile_source_new_full (
-              desc->id,
-              desc->name,
-              desc->license,
-              desc->license_uri,
-              desc->min_zoom_level,
-              desc->max_zoom_level,
-              256,
-              desc->projection,
+              id,
+              name,
+              license,
+              license_uri,
+              min_zoom,
+              max_zoom,
+              tile_size,
+              projection,
               renderer));
     }
   else
     {
       map_source = CHAMPLAIN_MAP_SOURCE (champlain_network_bbox_tile_source_new_full (
-              desc->id,
-              desc->name,
-              desc->license,
-              desc->license_uri,
-              desc->min_zoom_level,
-              desc->max_zoom_level,
-              256,
-              desc->projection,
+              id,
+              name,
+              license,
+              license_uri,
+              min_zoom,
+              max_zoom,
+              tile_size,
+              projection,
               renderer));
     }
 
   return map_source;
 }
-
 
 #endif

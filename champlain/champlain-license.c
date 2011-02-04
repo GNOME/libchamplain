@@ -197,7 +197,6 @@ create_license (ChamplainLicense *license)
   clutter_text_set_line_alignment (CLUTTER_TEXT (priv->license_actor), PANGO_ALIGN_RIGHT);
   clutter_actor_set_opacity (priv->license_actor, 128);
   clutter_container_add_actor (CLUTTER_CONTAINER (license), priv->license_actor);
-//  clutter_actor_set_anchor_point_from_gravity (priv->license_actor, CLUTTER_GRAVITY_SOUTH_EAST);
 }
 
 

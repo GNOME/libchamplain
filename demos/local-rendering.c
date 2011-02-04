@@ -613,18 +613,18 @@ build_source_combo_box (GtkComboBox *box)
         -1);
 
   factory = champlain_map_source_factory_dup_default ();
-  sources = champlain_map_source_factory_dup_list (factory);
+  sources = champlain_map_source_factory_get_registered (factory);
 
   iter = sources;
   while (iter != NULL)
     {
-      ChamplainMapSourceDesc *desc;
-
-      desc = (ChamplainMapSourceDesc *) iter->data;
+      ChamplainMapSourceDesc *desc = CHAMPLAIN_MAP_SOURCE_DESC (iter->data);
+      const gchar *id = champlain_map_source_desc_get_id (desc);
+      const gchar *name = champlain_map_source_desc_get_name (desc);
 
       gtk_tree_store_append (store, &parent, NULL);
-      gtk_tree_store_set (store, &parent, COL_ID, desc->id,
-          COL_NAME, desc->name, -1);
+      gtk_tree_store_set (store, &parent, COL_ID, id,
+          COL_NAME, name, -1);
 
       iter = g_slist_next (iter);
     }

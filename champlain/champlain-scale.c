@@ -350,11 +350,8 @@ create_scale (ChamplainScale *scale)
   scale_actor = clutter_cairo_texture_new (priv->max_scale_width + 2 * SCALE_INSIDE_PADDING, SCALE_HEIGHT + priv->text_height + GAP_SIZE + 2*SCALE_INSIDE_PADDING);
   clutter_actor_set_name (scale_actor, "scale-line");
   clutter_container_add_actor (CLUTTER_CONTAINER (scale), scale_actor);
-//  clutter_actor_set_position (CLUTTER_ACTOR (scale_actor), 0, 2*SCALE_INSIDE_PADDING);
-//      priv->viewport_size.height - SCALE_HEIGHT - SCALE_PADDING - SCALE_INSIDE_PADDING);
 
   clutter_actor_set_opacity (CLUTTER_ACTOR (scale), 200);
-//  clutter_actor_raise_top (scale);
 }
 
 

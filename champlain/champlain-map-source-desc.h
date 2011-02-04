@@ -28,9 +28,41 @@
 
 G_BEGIN_DECLS
 
+#define CHAMPLAIN_TYPE_MAP_SOURCE_DESC champlain_map_source_desc_get_type ()
+
+#define CHAMPLAIN_MAP_SOURCE_DESC(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_DESC, ChamplainMapSourceDesc))
+
+#define CHAMPLAIN_MAP_SOURCE_DESC_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_MAP_SOURCE_DESC, ChamplainMapSourceDescClass))
+
+#define CHAMPLAIN_IS_MAP_SOURCE_DESC(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_DESC))
+
+#define CHAMPLAIN_IS_MAP_SOURCE_DESC_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_MAP_SOURCE_DESC))
+
+#define CHAMPLAIN_MAP_SOURCE_DESC_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_DESC, ChamplainMapSourceDescClass))
+
+typedef struct _ChamplainMapSourceDescPrivate ChamplainMapSourceDescPrivate;
 
 typedef struct _ChamplainMapSourceDesc ChamplainMapSourceDesc;
+typedef struct _ChamplainMapSourceDescClass ChamplainMapSourceDescClass;
 
+struct _ChamplainMapSourceDesc
+{
+  GObject parent_instance;
+
+  ChamplainMapSourceDescPrivate *priv;
+};
+
+struct _ChamplainMapSourceDescClass
+{
+  GObjectClass parent_class;
+};
+
+GType champlain_map_source_desc_get_type (void);
 
 /**
  * ChamplainMapSourceConstructor:
@@ -45,13 +77,13 @@ typedef struct _ChamplainMapSourceDesc ChamplainMapSourceDesc;
  * Since: 0.4
  */
 typedef ChamplainMapSource * (*ChamplainMapSourceConstructor)
-  (ChamplainMapSourceDesc *desc, gpointer data);
+  (ChamplainMapSourceDesc *desc);
 
 #define CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR (f) ((ChamplainMapSourceConstructor) (f))
 
-#define CHAMPLAIN_MAP_SOURCE_DESC(obj) ((ChamplainMapSourceDesc *) (obj))
 
-/**
+
+/*
  * ChamplainMapSourceDesc:
  * @id: A unique identifier, should contain only characters found in filenames
  * @name: A display name
@@ -68,28 +100,30 @@ typedef ChamplainMapSource * (*ChamplainMapSourceConstructor)
  *
  * Since: 0.4
  */
-struct _ChamplainMapSourceDesc
-{
-  gchar *id;
-  gchar *name;
-  gchar *license;
-  gchar *license_uri;
-  gint min_zoom_level;
-  gint max_zoom_level;
-  ChamplainMapProjection projection;
-  ChamplainMapSourceConstructor constructor;
-  gchar *uri_format;
-  gpointer data;
-};
+ChamplainMapSourceDesc *champlain_map_source_desc_new_full (
+  gchar *id,
+  gchar *name,
+  gchar *license,
+  gchar *license_uri,
+  guint min_zoom_level,
+  guint max_zoom_level,
+  guint tile_size,
+  ChamplainMapProjection projection,
+  gchar *uri_format,
+  ChamplainMapSourceConstructor constructor,
+  gpointer data);
 
-GType champlain_map_source_desc_get_type (void) G_GNUC_CONST;
-#define CHAMPLAIN_TYPE_MAP_SOURCE_DESC (champlain_map_source_desc_get_type ())
-
-ChamplainMapSourceDesc *champlain_map_source_desc_copy (const ChamplainMapSourceDesc *desc);
-
-void champlain_map_source_desc_free (ChamplainMapSourceDesc *desc);
-
-ChamplainMapSourceDesc *champlain_map_source_desc_new (void);
+const gchar *champlain_map_source_desc_get_id (ChamplainMapSourceDesc *desc);
+const gchar *champlain_map_source_desc_get_name (ChamplainMapSourceDesc *desc);
+const gchar *champlain_map_source_desc_get_license (ChamplainMapSourceDesc *desc);
+const gchar *champlain_map_source_desc_get_license_uri (ChamplainMapSourceDesc *desc);
+const gchar *champlain_map_source_desc_get_uri_format (ChamplainMapSourceDesc *desc);
+guint champlain_map_source_desc_get_min_zoom_level (ChamplainMapSourceDesc *desc);
+guint champlain_map_source_desc_get_max_zoom_level (ChamplainMapSourceDesc *desc);
+guint champlain_map_source_desc_get_tile_size (ChamplainMapSourceDesc *desc);
+ChamplainMapProjection champlain_map_source_desc_get_projection (ChamplainMapSourceDesc *desc);
+gpointer champlain_map_source_desc_get_data (ChamplainMapSourceDesc *desc);
+const ChamplainMapSourceConstructor champlain_map_source_desc_get_constructor (ChamplainMapSourceDesc *desc);
 
 G_END_DECLS
 
