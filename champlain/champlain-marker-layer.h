@@ -102,7 +102,6 @@ void champlain_marker_layer_set_all_markers_unmovable (ChamplainMarkerLayer *lay
 
 void champlain_marker_layer_select_all_markers (ChamplainMarkerLayer *layer);
 void champlain_marker_layer_unselect_all_markers (ChamplainMarkerLayer *layer);
-GSList *champlain_marker_layer_get_selected_markers (ChamplainMarkerLayer *layer);
 
 void champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
     ChamplainSelectionMode mode);

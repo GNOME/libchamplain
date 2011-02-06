@@ -358,6 +358,9 @@ button_press_event_cb (ClutterActor        *actor,
         }
     }
 
+  if (swallow_event)
+    clutter_actor_raise (CLUTTER_ACTOR (marker), NULL);
+
   return swallow_event;
 }
 
