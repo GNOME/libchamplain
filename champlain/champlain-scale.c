@@ -54,11 +54,12 @@ struct _ChamplainScalePrivate
   ChamplainUnit scale_unit;
   guint max_scale_width;
   gfloat text_height;
+  ClutterGroup *content_group;
   
   ChamplainView *view;
 };
 
-G_DEFINE_TYPE (ChamplainScale, champlain_scale, CLUTTER_TYPE_GROUP);
+G_DEFINE_TYPE (ChamplainScale, champlain_scale, CLUTTER_TYPE_ACTOR);
 
 #define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_SCALE, ChamplainScalePrivate))
@@ -69,6 +70,22 @@ G_DEFINE_TYPE (ChamplainScale, champlain_scale, CLUTTER_TYPE_GROUP);
 #define SCALE_INSIDE_PADDING 10
 #define SCALE_LINE_WIDTH 2
 
+static void paint (ClutterActor *self);
+static void pick (ClutterActor *self, 
+    const ClutterColor *color);
+static void get_preferred_width (ClutterActor *self,
+    gfloat for_height,
+    gfloat *min_width_p,
+    gfloat *natural_width_p);
+static void get_preferred_height (ClutterActor *self,
+    gfloat for_width,
+    gfloat *min_height_p,
+    gfloat *natural_height_p);
+static void allocate (ClutterActor *self,
+    const ClutterActorBox *box,
+    ClutterAllocationFlags flags);
+static void map (ClutterActor *self);
+static void unmap (ClutterActor *self);
 
 
 static void
@@ -123,7 +140,13 @@ champlain_scale_set_property (GObject *object,
 static void
 champlain_scale_dispose (GObject *object)
 {
-//  ChamplainScalePrivate *priv = CHAMPLAIN_SCALE (object)->priv;
+  ChamplainScalePrivate *priv = CHAMPLAIN_SCALE (object)->priv;
+
+  if (priv->content_group)
+    {
+      clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
+      priv->content_group = NULL;
+    }
 
   G_OBJECT_CLASS (champlain_scale_parent_class)->dispose (object);
 }
@@ -139,15 +162,25 @@ champlain_scale_finalize (GObject *object)
 
 
 static void
-champlain_scale_class_init (ChamplainScaleClass *scale_class)
+champlain_scale_class_init (ChamplainScaleClass *klass)
 {
-  g_type_class_add_private (scale_class, sizeof (ChamplainScalePrivate));
+  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  
+  g_type_class_add_private (klass, sizeof (ChamplainScalePrivate));
 
-  GObjectClass *object_class = G_OBJECT_CLASS (scale_class);
   object_class->finalize = champlain_scale_finalize;
   object_class->dispose = champlain_scale_dispose;
   object_class->get_property = champlain_scale_get_property;
   object_class->set_property = champlain_scale_set_property;
+
+  actor_class->get_preferred_width = get_preferred_width;
+  actor_class->get_preferred_height = get_preferred_height;
+  actor_class->allocate = allocate;
+  actor_class->paint = paint;
+  actor_class->pick = pick;
+  actor_class->map = map;
+  actor_class->unmap = unmap;
 
   /**
    * ChamplainScale:max-width:
@@ -270,7 +303,7 @@ redraw_scale (ChamplainScale *scale)
         }
     } while (!final_unit);
 
-  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (scale), "scale-far-label");
+  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->content_group), "scale-far-label");
   label = g_strdup_printf ("%g", base);
   /* Get only digits width for centering */
   clutter_text_set_text (CLUTTER_TEXT (text), label);
@@ -285,7 +318,7 @@ redraw_scale (ChamplainScale *scale)
   g_free (label);
   clutter_actor_set_position (text, (scale_width - width / 2) + SCALE_INSIDE_PADDING, SCALE_INSIDE_PADDING);
 
-  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (scale), "scale-mid-label");
+  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->content_group), "scale-mid-label");
   label = g_strdup_printf ("%g", base / 2.0);
   clutter_text_set_text (CLUTTER_TEXT (text), label);
   clutter_actor_get_size (text, &width, &height);
@@ -293,7 +326,7 @@ redraw_scale (ChamplainScale *scale)
   g_free (label);
 
   /* Draw the line */
-  line = clutter_container_find_child_by_name (CLUTTER_CONTAINER (scale), "scale-line");
+  line = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->content_group), "scale-line");
   clutter_cairo_texture_clear (CLUTTER_CAIRO_TEXTURE (line));
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (line));
 
@@ -336,20 +369,20 @@ create_scale (ChamplainScale *scale)
 
   text = clutter_text_new_with_text ("Sans 9", "X km");
   clutter_actor_set_name (text, "scale-far-label");
-  clutter_container_add_actor (CLUTTER_CONTAINER (scale), text);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), text);
 
   text = clutter_text_new_with_text ("Sans 9", "X km");
   clutter_actor_set_name (text, "scale-mid-label");
-  clutter_container_add_actor (CLUTTER_CONTAINER (scale), text);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), text);
 
   text = clutter_text_new_with_text ("Sans 9", "0");
-  clutter_container_add_actor (CLUTTER_CONTAINER (scale), text);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), text);
   clutter_actor_get_size (text, &width, &priv->text_height);
   clutter_actor_set_position (text, SCALE_INSIDE_PADDING - width / 2, SCALE_INSIDE_PADDING);
 
   scale_actor = clutter_cairo_texture_new (priv->max_scale_width + 2 * SCALE_INSIDE_PADDING, SCALE_HEIGHT + priv->text_height + GAP_SIZE + 2*SCALE_INSIDE_PADDING);
   clutter_actor_set_name (scale_actor, "scale-line");
-  clutter_container_add_actor (CLUTTER_CONTAINER (scale), scale_actor);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), scale_actor);
 
   clutter_actor_set_opacity (CLUTTER_ACTOR (scale), 200);
 }
@@ -365,6 +398,8 @@ champlain_scale_init (ChamplainScale *scale)
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
   priv->max_scale_width = 100;
   priv->view = NULL;
+  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
+  clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (scale));
   
   create_scale (scale);
 }
@@ -375,6 +410,100 @@ champlain_scale_new (void)
 {
   return CLUTTER_ACTOR (g_object_new (CHAMPLAIN_TYPE_SCALE, NULL));
 }
+
+
+static void
+paint (ClutterActor *self)
+{
+  ChamplainScalePrivate *priv = GET_PRIVATE (self);
+  
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+pick (ClutterActor *self, 
+    const ClutterColor *color)
+{
+  ChamplainScalePrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_scale_parent_class)->pick (self, color);
+
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+get_preferred_width (ClutterActor *self,
+    gfloat for_height,
+    gfloat *min_width_p,
+    gfloat *natural_width_p)
+{
+  ChamplainScalePrivate *priv = GET_PRIVATE (self);
+
+  clutter_actor_get_preferred_width (CLUTTER_ACTOR (priv->content_group),
+      for_height,
+      min_width_p,
+      natural_width_p);
+}
+
+
+static void
+get_preferred_height (ClutterActor *self,
+    gfloat for_width,
+    gfloat *min_height_p,
+    gfloat *natural_height_p)
+{
+  ChamplainScalePrivate *priv = GET_PRIVATE (self);
+
+  clutter_actor_get_preferred_height (CLUTTER_ACTOR (priv->content_group),
+      for_width,
+      min_height_p,
+      natural_height_p);
+}
+
+
+static void
+allocate (ClutterActor *self,
+    const ClutterActorBox *box,
+    ClutterAllocationFlags flags)
+{
+  ClutterActorBox child_box;
+
+  ChamplainScalePrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_scale_parent_class)->allocate (self, box, flags);
+
+  child_box.x1 = 0;
+  child_box.x2 = box->x2 - box->x1;
+  child_box.y1 = 0;
+  child_box.y2 = box->y2 - box->y1;
+
+  clutter_actor_allocate (CLUTTER_ACTOR (priv->content_group), &child_box, flags);
+}
+
+
+static void
+map (ClutterActor *self)
+{
+  ChamplainScalePrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_scale_parent_class)->map (self);
+
+  clutter_actor_map (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+unmap (ClutterActor *self)
+{
+  ChamplainScalePrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_scale_parent_class)->unmap (self);
+
+  clutter_actor_unmap (CLUTTER_ACTOR (priv->content_group));
+}
+
 
 /**
  * champlain_scale_set_max_width:

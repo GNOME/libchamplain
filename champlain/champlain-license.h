@@ -55,14 +55,14 @@ typedef struct _ChamplainLicenseClass ChamplainLicenseClass;
 
 struct _ChamplainLicense
 {
-  ClutterGroup parent;
+  ClutterActor parent;
 
   ChamplainLicensePrivate *priv;
 };
 
 struct _ChamplainLicenseClass
 {
-  ClutterGroupClass parent_class;
+  ClutterActorClass parent_class;
 };
 
 GType champlain_license_get_type (void);

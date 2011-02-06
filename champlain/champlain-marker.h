@@ -56,14 +56,14 @@ typedef struct _ChamplainMarkerClass ChamplainMarkerClass;
 
 struct _ChamplainMarker
 {
-  ClutterGroup group;
+  ClutterActor parent;
 
   ChamplainMarkerPrivate *priv;
 };
 
 struct _ChamplainMarkerClass
 {
-  ClutterGroupClass parent_class;
+  ClutterActorClass parent_class;
 };
 
 GType champlain_marker_get_type (void);

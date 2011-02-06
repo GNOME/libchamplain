@@ -449,9 +449,11 @@ static void
 pick (ClutterActor *self, 
     const ClutterColor *color)
 {
+  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+
   CLUTTER_ACTOR_CLASS (champlain_tile_parent_class)->pick (self, color);
 
-  paint (self);
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
 }
 
 

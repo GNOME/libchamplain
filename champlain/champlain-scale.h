@@ -67,14 +67,14 @@ typedef enum
 
 struct _ChamplainScale
 {
-  ClutterGroup parent;
+  ClutterActor parent;
 
   ChamplainScalePrivate *priv;
 };
 
 struct _ChamplainScaleClass
 {
-  ClutterGroupClass parent_class;
+  ClutterActorClass parent_class;
 };
 
 GType champlain_scale_get_type (void);

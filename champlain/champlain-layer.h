@@ -50,12 +50,12 @@ typedef struct _ChamplainLayerClass ChamplainLayerClass;
 
 struct _ChamplainLayer
 {
-  ClutterGroup parent;
+  ClutterActor parent;
 };
 
 struct _ChamplainLayerClass
 {
-  ClutterGroupClass parent_class;
+  ClutterActorClass parent_class;
 
   void (*set_view)(ChamplainLayer *layer,
       ChamplainView *view);

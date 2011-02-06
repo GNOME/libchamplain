@@ -71,7 +71,7 @@ enum
 
 /* static guint champlain_marker_signals[LAST_SIGNAL] = { 0, }; */
 
-G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_GROUP);
+G_DEFINE_TYPE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_ACTOR);
 
 #define CHAMPLAIN_MARKER_GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))

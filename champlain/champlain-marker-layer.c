@@ -80,7 +80,26 @@ struct _ChamplainMarkerLayerPrivate
   gboolean stroke;
   gdouble stroke_width;
   gboolean visible;
+  
+  ClutterGroup *content_group;
 };
+
+static void paint (ClutterActor *self);
+static void pick (ClutterActor *self, 
+    const ClutterColor *color);
+static void get_preferred_width (ClutterActor *self,
+    gfloat for_height,
+    gfloat *min_width_p,
+    gfloat *natural_width_p);
+static void get_preferred_height (ClutterActor *self,
+    gfloat for_width,
+    gfloat *min_height_p,
+    gfloat *natural_height_p);
+static void allocate (ClutterActor *self,
+    const ClutterActorBox *box,
+    ClutterAllocationFlags flags);
+static void map (ClutterActor *self);
+static void unmap (ClutterActor *self);
 
 
 static void marker_highlighted_cb (ChamplainMarker *marker,
@@ -210,6 +229,12 @@ champlain_marker_layer_dispose (GObject *object)
       set_view (CHAMPLAIN_LAYER (self), NULL);
     }
 
+  if (priv->content_group)
+    {
+      clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
+      priv->content_group = NULL;
+    }
+
   G_OBJECT_CLASS (champlain_marker_layer_parent_class)->dispose (object);
 }
 
@@ -230,6 +255,7 @@ champlain_marker_layer_finalize (GObject *object)
 static void
 champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
 {
+  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ChamplainLayerClass *layer_class = CHAMPLAIN_LAYER_CLASS (klass);
 
@@ -239,6 +265,14 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
   object_class->dispose = champlain_marker_layer_dispose;
   object_class->get_property = champlain_marker_layer_get_property;
   object_class->set_property = champlain_marker_layer_set_property;
+  
+  actor_class->get_preferred_width = get_preferred_width;
+  actor_class->get_preferred_height = get_preferred_height;
+  actor_class->allocate = allocate;
+  actor_class->paint = paint;
+  actor_class->pick = pick;
+  actor_class->map = map;
+  actor_class->unmap = unmap;
   
   layer_class->set_view = set_view;
   
@@ -381,10 +415,13 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
 
   priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
+
+  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
+  clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
   
   //TODO destroy + ref()
   priv->path_actor = clutter_group_new ();
-  clutter_container_add_actor (CLUTTER_CONTAINER (self), priv->path_actor);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->path_actor);
   
 }
 
@@ -407,15 +444,109 @@ champlain_marker_layer_new_full (ChamplainSelectionMode mode)
 
 
 static void
+paint (ClutterActor *self)
+{
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (self);
+  
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+pick (ClutterActor *self, 
+    const ClutterColor *color)
+{
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_marker_layer_parent_class)->pick (self, color);
+
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+get_preferred_width (ClutterActor *self,
+    gfloat for_height,
+    gfloat *min_width_p,
+    gfloat *natural_width_p)
+{
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (self);
+
+  clutter_actor_get_preferred_width (CLUTTER_ACTOR (priv->content_group),
+      for_height,
+      min_width_p,
+      natural_width_p);
+}
+
+
+static void
+get_preferred_height (ClutterActor *self,
+    gfloat for_width,
+    gfloat *min_height_p,
+    gfloat *natural_height_p)
+{
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (self);
+
+  clutter_actor_get_preferred_height (CLUTTER_ACTOR (priv->content_group),
+      for_width,
+      min_height_p,
+      natural_height_p);
+}
+
+
+static void
+allocate (ClutterActor *self,
+    const ClutterActorBox *box,
+    ClutterAllocationFlags flags)
+{
+  ClutterActorBox child_box;
+
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_marker_layer_parent_class)->allocate (self, box, flags);
+
+  child_box.x1 = 0;
+  child_box.x2 = box->x2 - box->x1;
+  child_box.y1 = 0;
+  child_box.y2 = box->y2 - box->y1;
+
+  clutter_actor_allocate (CLUTTER_ACTOR (priv->content_group), &child_box, flags);
+}
+
+
+static void
+map (ClutterActor *self)
+{
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_marker_layer_parent_class)->map (self);
+
+  clutter_actor_map (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+unmap (ClutterActor *self)
+{
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_marker_layer_parent_class)->unmap (self);
+
+  clutter_actor_unmap (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
 set_highlighted_all_but_one (ChamplainMarkerLayer *layer,
     ChamplainMarker *not_highlighted,
     gboolean highlight)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   int i;
   
-  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group)); i++)
     {
-      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i);
       ChamplainMarker *marker = CHAMPLAIN_MARKER (actor);
       
       if (marker != not_highlighted)
@@ -513,6 +644,8 @@ void
 champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
     ChamplainMarker *marker)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
@@ -527,7 +660,7 @@ champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
   g_signal_connect (G_OBJECT (marker), "moved",
       G_CALLBACK (marker_move_by_cb), layer);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
   set_marker_position (layer, marker);
   redraw_path (layer);
 }
@@ -546,6 +679,8 @@ void
 champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
     ChamplainMarker *marker)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
@@ -555,7 +690,7 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
   g_signal_handlers_disconnect_by_func (G_OBJECT (marker),
       G_CALLBACK (marker_position_notify), layer);
 
-  clutter_container_remove_actor (CLUTTER_CONTAINER (layer), CLUTTER_ACTOR (marker));
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
   redraw_path (layer);
 }
 
@@ -571,14 +706,16 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
 void
 champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  
   guint i;
   guint delay = 0;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group)); i++)
     {
-      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i);
       ChamplainMarker *marker = CHAMPLAIN_MARKER (actor);
 
       champlain_marker_animate_in_with_delay (marker, delay);
@@ -598,14 +735,16 @@ champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer)
 void
 champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  
   guint i;
   guint delay = 0;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group)); i++)
     {
-      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i);
       ChamplainMarker *marker = CHAMPLAIN_MARKER (actor);
 
       champlain_marker_animate_out_with_delay (marker, delay);
@@ -625,13 +764,14 @@ champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer)
 void
 champlain_marker_layer_show_all_markers (ChamplainMarkerLayer *layer)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   guint i;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group)); i++)
     {
-      ClutterActor *marker = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+      ClutterActor *marker = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i));
 
       clutter_actor_show (marker);
     }
@@ -648,13 +788,14 @@ champlain_marker_layer_show_all_markers (ChamplainMarkerLayer *layer)
 void
 champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   guint i;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group)); i++)
     {
-      ClutterActor *marker = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+      ClutterActor *marker = CLUTTER_ACTOR (clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i));
 
       clutter_actor_hide (marker);
     }
@@ -664,13 +805,14 @@ champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer)
 void
 champlain_marker_layer_set_all_markers_movable (ChamplainMarkerLayer *layer)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   guint i;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group)); i++)
     {
-      ChamplainMarker *marker = CHAMPLAIN_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i));
 
       champlain_marker_set_movable (marker, TRUE);
     }
@@ -680,13 +822,14 @@ champlain_marker_layer_set_all_markers_movable (ChamplainMarkerLayer *layer)
 void
 champlain_marker_layer_set_all_markers_unmovable (ChamplainMarkerLayer *layer)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   guint i;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group)); i++)
     {
-      ChamplainMarker *marker = CHAMPLAIN_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i));
 
       champlain_marker_set_movable (marker, FALSE);
     }
@@ -708,16 +851,17 @@ champlain_marker_layer_set_all_markers_unmovable (ChamplainMarkerLayer *layer)
 GSList *
 champlain_marker_layer_get_selected_markers (ChamplainMarkerLayer *layer)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GSList *lst = NULL;
     
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), NULL);
     
   gint i, n_children;
   
-  n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
+  n_children = clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group));
   for (i = 1; i < n_children; i++)
     {
-      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i);
       
       lst = g_slist_prepend (lst, actor);
     }
@@ -824,10 +968,10 @@ relocate (ChamplainMarkerLayer *layer)
   
   g_return_if_fail (CHAMPLAIN_IS_VIEW (priv->view));
 
-  n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
+  n_children = clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group));
   for (i = 1; i < n_children; i++)
     {
-      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i);
       ChamplainMarker *marker = CHAMPLAIN_MARKER (actor);
       
       set_marker_position (layer, marker);
@@ -878,10 +1022,10 @@ redraw_path (ChamplainMarkerLayer *layer)
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
 
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
-  n_children = clutter_group_get_n_children (CLUTTER_GROUP (layer));
+  n_children = clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group));
   for (i = 1; i < n_children; i++)
     {
-      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (layer), i);
+      ClutterActor *actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i);
       ChamplainMarker *marker = CHAMPLAIN_MARKER (actor);
       gfloat x, y;
 
@@ -975,6 +1119,7 @@ set_view (ChamplainLayer *layer,
 ChamplainBoundingBox *
 champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
 {
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   gint i = 0;
   ChamplainBoundingBox *bbox;
   
@@ -984,9 +1129,9 @@ champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
   bbox->bottom = CHAMPLAIN_MAX_LATITUDE;
   bbox->top = CHAMPLAIN_MIN_LATITUDE;
 
-  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (layer)); i++)
+  for (i = 1; i < clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group)); i++)
     {
-      ChamplainMarker *marker = CHAMPLAIN_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (layer), i));
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), i));
       gdouble lat, lon;
       
       g_object_get (G_OBJECT (marker), "latitude", &lat, "longitude", &lon,

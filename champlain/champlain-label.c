@@ -103,6 +103,8 @@ struct _ChamplainLabelPrivate
   ClutterActor *shadow;
   ClutterActor *background;
   guint redraw_id;
+  
+  ClutterGroup *content_group;  
 };
 
 G_DEFINE_TYPE (ChamplainLabel, champlain_label, CHAMPLAIN_TYPE_MARKER);
@@ -111,6 +113,23 @@ G_DEFINE_TYPE (ChamplainLabel, champlain_label, CHAMPLAIN_TYPE_MARKER);
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_LABEL, ChamplainLabelPrivate))
 
 static void draw_label (ChamplainLabel *label);
+
+static void paint (ClutterActor *self);
+static void pick (ClutterActor *self, 
+    const ClutterColor *color);
+static void get_preferred_width (ClutterActor *self,
+    gfloat for_height,
+    gfloat *min_width_p,
+    gfloat *natural_width_p);
+static void get_preferred_height (ClutterActor *self,
+    gfloat for_width,
+    gfloat *min_height_p,
+    gfloat *natural_height_p);
+static void allocate (ClutterActor *self,
+    const ClutterActorBox *box,
+    ClutterAllocationFlags flags);
+static void map (ClutterActor *self);
+static void unmap (ClutterActor *self);
 
 /**
  * champlain_label_set_highlight_color:
@@ -345,6 +364,12 @@ champlain_label_dispose (GObject *object)
       priv->attributes = NULL;
     }
 
+  if (priv->content_group)
+    {
+      clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
+      priv->content_group = NULL;
+    }
+
   G_OBJECT_CLASS (champlain_label_parent_class)->dispose (object);
 }
 
@@ -389,17 +414,28 @@ champlain_label_finalize (GObject *object)
 
 
 static void
-champlain_label_class_init (ChamplainLabelClass *labelClass)
+champlain_label_class_init (ChamplainLabelClass *klass)
 {
-  g_type_class_add_private (labelClass, sizeof (ChamplainLabelPrivate));
+  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  
+  g_type_class_add_private (klass, sizeof (ChamplainLabelPrivate));
 
-  GObjectClass *object_class = G_OBJECT_CLASS (labelClass);
   object_class->finalize = champlain_label_finalize;
   object_class->dispose = champlain_label_dispose;
   object_class->get_property = champlain_label_get_property;
   object_class->set_property = champlain_label_set_property;
 
-  labelClass->draw_label = draw_label;
+  actor_class->get_preferred_width = get_preferred_width;
+  actor_class->get_preferred_height = get_preferred_height;
+  actor_class->allocate = allocate;
+  actor_class->paint = paint;
+  actor_class->pick = pick;
+  actor_class->map = map;
+  actor_class->unmap = unmap;
+
+  klass->draw_label = draw_label;
+  
   /**
    * ChamplainLabel:text:
    *
@@ -611,11 +647,11 @@ draw_shadow (ChamplainLabel *label,
 
   clutter_actor_set_position (shadow, 0, height / 2.0);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (label), shadow);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), shadow);
 
   if (priv->shadow != NULL)
     {
-      clutter_container_remove_actor (CLUTTER_CONTAINER (label),
+      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group),
           priv->shadow);
       g_object_unref (priv->shadow);
     }
@@ -667,11 +703,11 @@ draw_background (ChamplainLabel *label,
   cairo_stroke (cr);
   cairo_destroy (cr);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (label), bg);
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), bg);
 
   if (priv->background != NULL)
     {
-      clutter_container_remove_actor (CLUTTER_CONTAINER (label),
+      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group),
           priv->background);
       g_object_unref (priv->background);
     }
@@ -694,7 +730,7 @@ draw_label (ChamplainLabel *label)
       total_width = clutter_actor_get_width (priv->image) + 2 * PADDING;
       total_height = clutter_actor_get_height (priv->image) + 2 * PADDING;
       if (clutter_actor_get_parent (priv->image) == NULL)
-        clutter_container_add_actor (CLUTTER_CONTAINER (label), priv->image);
+        clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->image);
     }
 
   if (priv->text != NULL && strlen (priv->text) > 0)
@@ -735,7 +771,7 @@ draw_label (ChamplainLabel *label)
       clutter_text_set_color (CLUTTER_TEXT (priv->text_actor),
           (champlain_marker_get_highlighted (marker) ? &SELECTED_TEXT_COLOR : priv->text_color));
       if (clutter_actor_get_parent (priv->text_actor) == NULL)
-        clutter_container_add_actor (CLUTTER_CONTAINER (label), priv->text_actor);
+        clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->text_actor);
     }
 
   if (priv->text_actor == NULL && priv->image == NULL)
@@ -755,14 +791,14 @@ draw_label (ChamplainLabel *label)
     {
       if (priv->background != NULL)
         {
-          clutter_container_remove_actor (CLUTTER_CONTAINER (label), priv->background);
+          clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), priv->background);
           g_object_unref (G_OBJECT (priv->background));
           priv->background = NULL;
         }
 
       if (priv->shadow != NULL)
         {
-          clutter_container_remove_actor (CLUTTER_CONTAINER (label), priv->shadow);
+          clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), priv->shadow);
           g_object_unref (G_OBJECT (priv->shadow));
           priv->shadow = NULL;
         }
@@ -862,6 +898,8 @@ champlain_label_init (ChamplainLabel *label)
   priv->redraw_id = 0;
   priv->shadow = NULL;
   priv->text_actor = NULL;
+  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
+  clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (label));
 
   g_signal_connect (label, "notify::highlighted", G_CALLBACK (notify_highlighted), NULL);
 }
@@ -880,6 +918,99 @@ ClutterActor *
 champlain_label_new (void)
 {
   return CLUTTER_ACTOR (g_object_new (CHAMPLAIN_TYPE_LABEL, NULL));
+}
+
+
+static void
+paint (ClutterActor *self)
+{
+  ChamplainLabelPrivate *priv = GET_PRIVATE (self);
+  
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+pick (ClutterActor *self, 
+    const ClutterColor *color)
+{
+  ChamplainLabelPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_label_parent_class)->pick (self, color);
+
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+get_preferred_width (ClutterActor *self,
+    gfloat for_height,
+    gfloat *min_width_p,
+    gfloat *natural_width_p)
+{
+  ChamplainLabelPrivate *priv = GET_PRIVATE (self);
+
+  clutter_actor_get_preferred_width (CLUTTER_ACTOR (priv->content_group),
+      for_height,
+      min_width_p,
+      natural_width_p);
+}
+
+
+static void
+get_preferred_height (ClutterActor *self,
+    gfloat for_width,
+    gfloat *min_height_p,
+    gfloat *natural_height_p)
+{
+  ChamplainLabelPrivate *priv = GET_PRIVATE (self);
+
+  clutter_actor_get_preferred_height (CLUTTER_ACTOR (priv->content_group),
+      for_width,
+      min_height_p,
+      natural_height_p);
+}
+
+
+static void
+allocate (ClutterActor *self,
+    const ClutterActorBox *box,
+    ClutterAllocationFlags flags)
+{
+  ClutterActorBox child_box;
+
+  ChamplainLabelPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_label_parent_class)->allocate (self, box, flags);
+
+  child_box.x1 = 0;
+  child_box.x2 = box->x2 - box->x1;
+  child_box.y1 = 0;
+  child_box.y2 = box->y2 - box->y1;
+
+  clutter_actor_allocate (CLUTTER_ACTOR (priv->content_group), &child_box, flags);
+}
+
+
+static void
+map (ClutterActor *self)
+{
+  ChamplainLabelPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_label_parent_class)->map (self);
+
+  clutter_actor_map (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+unmap (ClutterActor *self)
+{
+  ChamplainLabelPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_label_parent_class)->unmap (self);
+
+  clutter_actor_unmap (CLUTTER_ACTOR (priv->content_group));
 }
 
 

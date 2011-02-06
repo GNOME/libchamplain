@@ -18,7 +18,7 @@
 
 #include "champlain-layer.h"
 
-G_DEFINE_TYPE (ChamplainLayer, champlain_layer, CLUTTER_TYPE_GROUP)
+G_DEFINE_TYPE (ChamplainLayer, champlain_layer, CLUTTER_TYPE_ACTOR)
 
 static void
 champlain_layer_dispose (GObject *object)
