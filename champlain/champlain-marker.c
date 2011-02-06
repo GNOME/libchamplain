@@ -64,7 +64,7 @@ enum
   PROP_0,
   PROP_LONGITUDE,
   PROP_LATITUDE,
-  PROP_HIGHLIGHTED,
+  PROP_SELECTED,
   PROP_SELECTABLE,
   PROP_MOVABLE,
 };
@@ -80,7 +80,7 @@ struct _ChamplainMarkerPrivate
 {
   gdouble lon;
   gdouble lat;
-  gboolean highlighted;
+  gboolean selected;
   gboolean selectable;
   gboolean movable;
   
@@ -107,8 +107,8 @@ champlain_marker_get_property (GObject *object,
       g_value_set_double (value, priv->lat);
       break;
 
-    case PROP_HIGHLIGHTED:
-      g_value_set_boolean (value, priv->highlighted);
+    case PROP_SELECTED:
+      g_value_set_boolean (value, priv->selected);
       break;
 
     case PROP_SELECTABLE:
@@ -150,10 +150,10 @@ champlain_marker_set_property (GObject *object,
       break;
     }
 
-    case PROP_HIGHLIGHTED:
+    case PROP_SELECTED:
     {
       gboolean bvalue = g_value_get_boolean (value);
-      champlain_marker_set_highlighted (marker, bvalue);
+      champlain_marker_set_selected (marker, bvalue);
       break;
     }
 
@@ -227,15 +227,15 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
           -90.0f, 90.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainMarker:highlighted:
+   * ChamplainMarker:selected:
    *
-   * The highlighted state of the marker
+   * The selected state of the marker
    *
-   * Since: 0.4
+   * Since: 0.10
    */
-  g_object_class_install_property (object_class, PROP_HIGHLIGHTED,
-      g_param_spec_boolean ("highlighted", "Highlighted",
-          "The highlighted stated of the marker",
+  g_object_class_install_property (object_class, PROP_SELECTED,
+      g_param_spec_boolean ("selected", "Selected",
+          "The sighlighted stated of the marker",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
           
   /**
@@ -333,7 +333,7 @@ button_press_event_cb (ClutterActor        *actor,
 
   if (priv->selectable)
     {
-      champlain_marker_set_highlighted (marker, TRUE);
+      champlain_marker_set_selected (marker, TRUE);
       swallow_event = TRUE;
     }
           
@@ -374,7 +374,7 @@ champlain_marker_init (ChamplainMarker *marker)
 
   priv->lat = 0;
   priv->lon = 0;
-  priv->highlighted = FALSE;
+  priv->selected = FALSE;
   priv->selectable = TRUE;
   priv->movable = FALSE;
   
@@ -473,43 +473,43 @@ champlain_marker_get_longitude (ChamplainMarker *marker)
 
 
 /**
- * champlain_marker_set_highlighted:
+ * champlain_marker_set_selected:
  * @marker: a #ChamplainMarker
- * @value: the highlighted state
+ * @value: the selected state
  *
- * Sets the marker as highlighted or not. This will affect the "Selected" look
+ * Sets the marker as selected or not. This will affect the "Selected" look
  * of the marker.
  *
  * Since: 0.4
  */
 void
-champlain_marker_set_highlighted (ChamplainMarker *marker,
+champlain_marker_set_selected (ChamplainMarker *marker,
     gboolean value)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  marker->priv->highlighted = value;
+  marker->priv->selected = value;
 
-  g_object_notify (G_OBJECT (marker), "highlighted");
+  g_object_notify (G_OBJECT (marker), "selected");
 }
 
 
 /**
- * champlain_marker_get_highlighted:
+ * champlain_marker_get_selected:
  * @marker: a #ChamplainMarker
  *
- * Checks whether the marker is highlighted.
+ * Checks whether the marker is selected.
  *
- * Returns: the highlighted or not state of the marker.
+ * Returns: the selected or not state of the marker.
  *
  * Since: 0.4
  */
 gboolean
-champlain_marker_get_highlighted (ChamplainMarker *marker)
+champlain_marker_get_selected (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  return marker->priv->highlighted;
+  return marker->priv->selected;
 }
 
 

@@ -84,9 +84,9 @@ void champlain_marker_set_movable (ChamplainMarker *marker,
     gboolean value);
 gboolean champlain_marker_get_movable (ChamplainMarker *marker);
 
-void champlain_marker_set_highlighted (ChamplainMarker *marker,
+void champlain_marker_set_selected (ChamplainMarker *marker,
     gboolean value);
-gboolean champlain_marker_get_highlighted (ChamplainMarker *marker);
+gboolean champlain_marker_get_selected (ChamplainMarker *marker);
 
 void champlain_marker_animate_in (ChamplainMarker *marker);
 void champlain_marker_animate_in_with_delay (ChamplainMarker *marker,

@@ -123,11 +123,11 @@ PangoEllipsizeMode champlain_label_get_ellipsize (ChamplainLabel *label);
 gboolean champlain_label_get_single_line_mode (ChamplainLabel *label);
 gboolean champlain_label_get_draw_background (ChamplainLabel *label);
 
-void champlain_label_set_highlight_color (ClutterColor *color);
-const ClutterColor *champlain_label_get_highlight_color (void);
+void champlain_label_set_selection_color (ClutterColor *color);
+const ClutterColor *champlain_label_get_selection_color (void);
 
-void champlain_label_set_highlight_text_color (ClutterColor *color);
-const ClutterColor *champlain_label_get_highlight_text_color (void);
+void champlain_label_set_selection_text_color (ClutterColor *color);
+const ClutterColor *champlain_label_get_selection_text_color (void);
 
 void champlain_label_queue_redraw (ChamplainLabel *label);
 

@@ -103,7 +103,7 @@ static void map (ClutterActor *self);
 static void unmap (ClutterActor *self);
 
 
-static void marker_highlighted_cb (ChamplainMarker *marker,
+static void marker_selected_cb (ChamplainMarker *marker,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainMarkerLayer *layer);
     
@@ -540,9 +540,9 @@ unmap (ClutterActor *self)
 
 
 static void
-set_highlighted_all_but_one (ChamplainMarkerLayer *layer,
-    ChamplainMarker *not_highlighted,
-    gboolean highlight)
+set_selected_all_but_one (ChamplainMarkerLayer *layer,
+    ChamplainMarker *not_selected,
+    gboolean select)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GSList *elem;
@@ -551,17 +551,17 @@ set_highlighted_all_but_one (ChamplainMarkerLayer *layer,
     {
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
       
-      if (marker != not_highlighted)
+      if (marker != not_selected)
         {
           g_signal_handlers_block_by_func (marker, 
-              G_CALLBACK (marker_highlighted_cb), 
+              G_CALLBACK (marker_selected_cb), 
               layer);
 
-          champlain_marker_set_highlighted (marker, highlight);
+          champlain_marker_set_selected (marker, select);
           champlain_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
 
           g_signal_handlers_unblock_by_func (marker, 
-              G_CALLBACK (marker_highlighted_cb), 
+              G_CALLBACK (marker_selected_cb), 
               layer);
         }
     }
@@ -569,13 +569,13 @@ set_highlighted_all_but_one (ChamplainMarkerLayer *layer,
 
 
 static void
-marker_highlighted_cb (ChamplainMarker *marker,
+marker_selected_cb (ChamplainMarker *marker,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainMarkerLayer *layer)
 {
   if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
     {
-      set_highlighted_all_but_one (layer, marker, FALSE);
+      set_selected_all_but_one (layer, marker, FALSE);
     }
 }
 
@@ -653,8 +653,8 @@ champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
 
   champlain_marker_set_selectable (marker, layer->priv->mode != CHAMPLAIN_SELECTION_NONE);
 
-  g_signal_connect (G_OBJECT (marker), "notify::highlighted",
-      G_CALLBACK (marker_highlighted_cb), layer);
+  g_signal_connect (G_OBJECT (marker), "notify::selected",
+      G_CALLBACK (marker_selected_cb), layer);
 
   g_signal_connect (G_OBJECT (marker), "notify::latitude",
       G_CALLBACK (marker_position_notify), layer);
@@ -688,7 +688,7 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
   g_signal_handlers_disconnect_by_func (G_OBJECT (marker),
-      G_CALLBACK (marker_highlighted_cb), layer);
+      G_CALLBACK (marker_selected_cb), layer);
 
   g_signal_handlers_disconnect_by_func (G_OBJECT (marker),
       G_CALLBACK (marker_position_notify), layer);
@@ -851,7 +851,7 @@ champlain_marker_layer_unselect_all_markers (ChamplainMarkerLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  set_highlighted_all_but_one (layer, NULL, FALSE);
+  set_selected_all_but_one (layer, NULL, FALSE);
 }
 
 
@@ -869,7 +869,7 @@ champlain_marker_layer_select_all_markers (ChamplainMarkerLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  set_highlighted_all_but_one (layer, NULL, TRUE);
+  set_selected_all_but_one (layer, NULL, TRUE);
 }
 
 
@@ -891,16 +891,16 @@ champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  gboolean highlight;
+  gboolean select;
   
   if (layer->priv->mode == mode)
     return;
   layer->priv->mode = mode;
 
-  highlight = mode != CHAMPLAIN_SELECTION_NONE &&
-              mode != CHAMPLAIN_SELECTION_SINGLE;
+  select = mode != CHAMPLAIN_SELECTION_NONE &&
+           mode != CHAMPLAIN_SELECTION_SINGLE;
 
-  set_highlighted_all_but_one (layer, NULL, highlight);
+  set_selected_all_but_one (layer, NULL, select);
 
   g_object_notify (G_OBJECT (layer), "selection-mode");
 }

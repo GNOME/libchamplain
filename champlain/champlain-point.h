@@ -79,8 +79,8 @@ void champlain_point_set_size (ChamplainPoint *point,
     gdouble size);
 gdouble champlain_point_get_size (ChamplainPoint *point);
 
-void champlain_point_set_highlight_color (ClutterColor *color);
-const ClutterColor *champlain_point_get_highlight_color (void);
+void champlain_point_set_selection_color (ClutterColor *color);
+const ClutterColor *champlain_point_get_selection_color (void);
 
 G_END_DECLS
 

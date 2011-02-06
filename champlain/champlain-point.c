@@ -87,16 +87,16 @@ static void unmap (ClutterActor *self);
 static void draw_point (ChamplainPoint *point);
 
 /**
- * champlain_point_set_highlight_color:
+ * champlain_point_set_selection_color:
  * @color: a #ClutterColor
  *
- * Changes the highlight color, this is to ensure a better integration with
+ * Changes the selection color, this is to ensure a better integration with
  * the desktop, this is automatically done by GtkChamplainEmbed.
  *
  * Since: 0.4
  */
 void
-champlain_point_set_highlight_color (ClutterColor *color)
+champlain_point_set_selection_color (ClutterColor *color)
 {
   SELECTED_COLOR.red = color->red;
   SELECTED_COLOR.green = color->green;
@@ -106,16 +106,16 @@ champlain_point_set_highlight_color (ClutterColor *color)
 
 
 /**
- * champlain_point_get_highlight_color:
+ * champlain_point_get_selection_color:
  *
- * Gets the highlight color.
+ * Gets the selection color.
  *
- * Returns: the highlight color. Should not be freed.
+ * Returns: the selection color. Should not be freed.
  *
  * Since: 0.4.1
  */
 const ClutterColor *
-champlain_point_get_highlight_color ()
+champlain_point_get_selection_color ()
 {
   return &SELECTED_COLOR;
 }
@@ -248,7 +248,7 @@ draw_point (ChamplainPoint *point)
 
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
 
-  if (champlain_marker_get_highlighted (CHAMPLAIN_MARKER (point)))
+  if (champlain_marker_get_selected (CHAMPLAIN_MARKER (point)))
     color = &SELECTED_COLOR;
   else
     color = priv->color;  
@@ -272,7 +272,7 @@ draw_point (ChamplainPoint *point)
 
 
 static void
-notify_highlighted (GObject *gobject,
+notify_selected (GObject *gobject,
     G_GNUC_UNUSED GParamSpec *pspec,
     G_GNUC_UNUSED gpointer user_data)
 {
@@ -294,7 +294,7 @@ champlain_point_init (ChamplainPoint *point)
   
   draw_point (point);
 
-  g_signal_connect (point, "notify::highlighted", G_CALLBACK (notify_highlighted), NULL);
+  g_signal_connect (point, "notify::selected", G_CALLBACK (notify_selected), NULL);
 }
 
 
