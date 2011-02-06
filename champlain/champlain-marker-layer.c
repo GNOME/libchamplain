@@ -82,7 +82,7 @@ struct _ChamplainMarkerLayerPrivate
   gboolean visible;
   
   ClutterGroup *content_group;
-  GSList *markers;
+  GList *markers;
 };
 
 static void paint (ClutterActor *self);
@@ -248,7 +248,7 @@ champlain_marker_layer_finalize (GObject *object)
   
   clutter_color_free (priv->stroke_color);
   clutter_color_free (priv->fill_color);
-  g_slist_free (priv->markers);
+  g_list_free (priv->markers);
 
   G_OBJECT_CLASS (champlain_marker_layer_parent_class)->finalize (object);
 }
@@ -545,7 +545,7 @@ set_selected_all_but_one (ChamplainMarkerLayer *layer,
     gboolean select)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
-  GSList *elem;
+  GList *elem;
   
   for (elem = priv->markers; elem != NULL; elem = elem->next)
     {
@@ -633,18 +633,11 @@ marker_move_by_cb (ChamplainMarker *marker,
 }
 
 
-/**
- * champlain_marker_layer_add_marker:
- * @layer: a #ChamplainMarkerLayer
- * @marker: a #ChamplainMarker
- *
- * Adds the marker to the layer.
- *
- * Since: 0.4
- */
-void
-champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
-    ChamplainMarker *marker)
+static void
+add_marker (ChamplainMarkerLayer *layer,
+    ChamplainMarker *marker,
+    gboolean append,
+    guint position)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
 
@@ -664,8 +657,68 @@ champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
   set_marker_position (layer, marker);
-  priv->markers = g_slist_prepend (priv->markers, marker);
+  if (append)
+    priv->markers = g_list_append (priv->markers, marker);
+  else  
+    priv->markers = g_list_insert (priv->markers, marker, position);
   redraw_path (layer);
+}
+
+
+/**
+ * champlain_marker_layer_add_marker:
+ * @layer: a #ChamplainMarkerLayer
+ * @marker: a #ChamplainMarker
+ *
+ * Adds the marker to the layer.
+ *
+ * Since: 0.4
+ */
+void
+champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
+    ChamplainMarker *marker)
+{
+  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
+
+  add_marker (layer, marker, TRUE, 0);
+}
+
+
+void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
+{
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  GList *elem;
+  
+  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
+
+
+  for (elem = priv->markers; elem != NULL; elem = elem->next)
+    {
+      GObject *marker = G_OBJECT (elem->data);
+      
+      g_signal_handlers_disconnect_by_func (marker,
+          G_CALLBACK (marker_selected_cb), layer);
+
+      g_signal_handlers_disconnect_by_func (marker,
+          G_CALLBACK (marker_position_notify), layer);
+    }
+
+  clutter_group_remove_all (CLUTTER_GROUP (priv->content_group));
+  g_list_free (priv->markers);
+  priv->markers = NULL;
+
+  priv->path_actor = clutter_group_new ();
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->path_actor);
+}
+
+
+GList *
+champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer)
+{
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+
+  return priv->markers;
 }
 
 
@@ -694,10 +747,21 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
       G_CALLBACK (marker_position_notify), layer);
 
   clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
-  priv->markers = g_slist_remove (priv->markers, marker);
+  priv->markers = g_list_remove (priv->markers, marker);
   redraw_path (layer);
 }
 
+
+void 
+champlain_marker_layer_insert_marker (ChamplainMarkerLayer *layer,
+    ChamplainMarker *marker,
+    guint position)
+{
+  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
+
+  add_marker (layer, marker, FALSE, position);
+}
 
 /**
  * champlain_marker_layer_animate_in_all_markers:
@@ -711,7 +775,7 @@ void
 champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
-  GSList *elem;
+  GList *elem;
   guint delay = 0;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
@@ -739,7 +803,7 @@ champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   
-  GSList *elem;
+  GList *elem;
   guint delay = 0;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
@@ -766,7 +830,7 @@ void
 champlain_marker_layer_show_all_markers (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
-  GSList *elem;
+  GList *elem;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
@@ -790,7 +854,7 @@ void
 champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
-  GSList *elem;
+  GList *elem;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
@@ -807,7 +871,7 @@ void
 champlain_marker_layer_set_all_markers_movable (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
-  GSList *elem;
+  GList *elem;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
@@ -824,7 +888,7 @@ void
 champlain_marker_layer_set_all_markers_unmovable (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
-  GSList *elem;
+  GList *elem;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
@@ -932,7 +996,7 @@ relocate (ChamplainMarkerLayer *layer)
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
     
   ChamplainMarkerLayerPrivate *priv = layer->priv;
-  GSList *elem;
+  GList *elem;
   
   g_return_if_fail (CHAMPLAIN_IS_VIEW (priv->view));
 
@@ -964,7 +1028,7 @@ redraw_path (ChamplainMarkerLayer *layer)
   ClutterActor *cairo_texture;
   cairo_t *cr;
   gfloat width, height;
-  GSList *elem;
+  GList *elem;
   ChamplainView *view = priv->view;
   gdouble x, y;
   
@@ -1084,7 +1148,7 @@ ChamplainBoundingBox *
 champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
-  GSList *elem;
+  GList *elem;
   ChamplainBoundingBox *bbox;
   
   bbox = champlain_bounding_box_new ();

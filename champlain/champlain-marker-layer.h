@@ -90,6 +90,11 @@ void champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
     ChamplainMarker *marker);
 void champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
     ChamplainMarker *marker);
+void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_insert_marker (ChamplainMarkerLayer *layer,
+    ChamplainMarker *marker,
+    guint position);
+GList *champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer);
 
 void champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer);
 void champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer);
