@@ -664,7 +664,7 @@ champlain_map_source_desc_get_projection (ChamplainMapSourceDesc *desc)
  *
  * Gets user data.
  *
- * Returns: the user data.
+ * Returns: (transfer none): the user data.
  *
  * Since: 0.10
  */
@@ -683,7 +683,7 @@ champlain_map_source_desc_get_data (ChamplainMapSourceDesc *desc)
  *
  * Gets the map source constructor.
  *
- * Returns: the constructor.
+ * Returns: (transfer none): the constructor.
  *
  * Since: 0.10
  */

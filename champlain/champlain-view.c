@@ -2462,7 +2462,7 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
  * Returns the #ClutterBinLayout manager. The manager can be used to align
  * user provided actors on top of the map.
  *
- * Returns: the layout manager
+ * Returns: (transfer none): the layout manager
  *
  * Since: 0.10
  */
@@ -2488,7 +2488,7 @@ champlain_view_get_layout_manager (ChamplainView *view)
  * layout manager. It can be manipulated using standard #ClutterActor methods
  * (hidden and so on).
  *
- * Returns: the license actor
+ * Returns: (transfer none): the license actor
  *
  * Since: 0.10
  */
