@@ -295,11 +295,11 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPath:close-path:
+   * ChamplainMarkerLayer:close-path:
    *
    * The shape is a closed path
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
       PROP_CLOSED_PATH,
@@ -309,11 +309,11 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPath:fill:
+   * ChamplainMarkerLayer:fill:
    *
    * The shape should be filled
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
       PROP_FILL,
@@ -323,11 +323,11 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPath:stroke:
+   * ChamplainMarkerLayer:stroke:
    *
    * The shape should be stroked
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
       PROP_STROKE,
@@ -337,11 +337,11 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           TRUE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPath:stroke-color:
+   * ChamplainMarkerLayer:stroke-color:
    *
    * The path's stroke color
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
       PROP_STROKE_COLOR,
@@ -352,11 +352,11 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPath:text-color:
+   * ChamplainMarkerLayer:fill-color:
    *
    * The path's fill color
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
       PROP_FILL_COLOR,
@@ -367,11 +367,11 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPath:stroke-width:
+   * ChamplainMarkerLayer:stroke-width:
    *
    * The path's stroke width (in pixels)
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
       PROP_STROKE_WIDTH,
@@ -383,11 +383,11 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainPath:visible:
+   * ChamplainMarkerLayer:visible:
    *
    * Wether the path is visible
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
       PROP_VISIBLE,
@@ -435,9 +435,9 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
  *
  * Creates a new instance of #ChamplainMarkerLayer.
  *
- * Returns: a new #ChamplainMarkerLayer ready to be used as a #ClutterContainer for the markers.
+ * Returns: a new #ChamplainMarkerLayer ready to be used as a container for the markers.
  *
- * Since: 0.2.2
+ * Since: 0.10
  */
 ChamplainMarkerLayer *
 champlain_marker_layer_new_full (ChamplainSelectionMode mode)
@@ -672,7 +672,7 @@ add_marker (ChamplainMarkerLayer *layer,
  *
  * Adds the marker to the layer.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
@@ -685,6 +685,14 @@ champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
 }
 
 
+/**
+ * champlain_marker_layer_remove_all:
+ * @layer: a #ChamplainMarkerLayer
+ *
+ * Removes all markers from the layer.
+ *
+ * Since: 0.10
+ */
 void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
@@ -713,6 +721,16 @@ void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
 }
 
 
+/**
+ * champlain_marker_layer_get_markers:
+ * @layer: a #ChamplainMarkerLayer
+ *
+ * Gets the list of all markers inserted into the layer.
+ * 
+ * Returns: (transfer none) (element-type ChamplainMarker): the list
+ *
+ * Since: 0.10
+ */
 GList *
 champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer)
 {
@@ -729,7 +747,7 @@ champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer)
  *
  * Removes the marker from the layer.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
@@ -752,6 +770,16 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
 }
 
 
+/**
+ * champlain_marker_layer_insert_marker:
+ * @layer: a #ChamplainMarkerLayer
+ * @marker: a #ChamplainMarker
+ * @position: position in the list where the marker should be inserted
+ *
+ * Inserts a marker to the specified position.
+ *
+ * Since: 0.10
+ */
 void 
 champlain_marker_layer_insert_marker (ChamplainMarkerLayer *layer,
     ChamplainMarker *marker,
@@ -769,7 +797,7 @@ champlain_marker_layer_insert_marker (ChamplainMarkerLayer *layer,
  *
  * Fade in all markers with an animation
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer)
@@ -796,7 +824,7 @@ champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer)
  *
  * Fade out all markers with an animation
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer)
@@ -824,7 +852,7 @@ champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer)
  *
  * Calls clutter_actor_show on all markers
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_show_all_markers (ChamplainMarkerLayer *layer)
@@ -848,7 +876,7 @@ champlain_marker_layer_show_all_markers (ChamplainMarkerLayer *layer)
  *
  * Calls clutter_actor_hide on all markers
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer)
@@ -867,6 +895,14 @@ champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer)
 }
 
 
+/**
+ * champlain_marker_layer_set_all_markers_movable:
+ * @layer: a #ChamplainMarkerLayer
+ *
+ * Sets all markers movable
+ *
+ * Since: 0.10
+ */
 void
 champlain_marker_layer_set_all_markers_movable (ChamplainMarkerLayer *layer)
 {
@@ -884,6 +920,14 @@ champlain_marker_layer_set_all_markers_movable (ChamplainMarkerLayer *layer)
 }
 
 
+/**
+ * champlain_marker_layer_set_all_markers_unmovable:
+ * @layer: a #ChamplainMarkerLayer
+ *
+ * Sets all markers unmovable
+ *
+ * Since: 0.10
+ */
 void
 champlain_marker_layer_set_all_markers_unmovable (ChamplainMarkerLayer *layer)
 {
@@ -903,12 +947,12 @@ champlain_marker_layer_set_all_markers_unmovable (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_marker_layer_unselect_all:
+ * champlain_marker_layer_unselect_all_markers:
  * @layer: a #ChamplainMarkerLayer
  *
  * Unselects all markers.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_unselect_all_markers (ChamplainMarkerLayer *layer)
@@ -920,13 +964,12 @@ champlain_marker_layer_unselect_all_markers (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_marker_layer_select_all:
+ * champlain_marker_layer_select_all_markers:
  * @layer: a #ChamplainMarkerLayer
  *
- * Selects all markers in the layer. This call will only work if the selection
- * mode is set CHAMPLAIN_SELETION_MULTIPLE.
+ * Selects all markers in the layer. 
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_select_all_markers (ChamplainMarkerLayer *layer)
@@ -947,7 +990,7 @@ champlain_marker_layer_select_all_markers (ChamplainMarkerLayer *layer)
  * NOTE: changing selection mode to CHAMPLAIN_SELECTION_NONE or
  * CHAMPLAIN_SELECTION_SINGLE will clear all previously selected markers.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
@@ -978,7 +1021,7 @@ champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
  *
  * Returns: the selection mode of the layer.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 ChamplainSelectionMode
 champlain_marker_layer_get_selection_mode (ChamplainMarkerLayer *layer)
@@ -1132,17 +1175,16 @@ set_view (ChamplainLayer *layer,
 }
 
 /**
- * champlain_view_ensure_markers_visible:
- * @view: a #ChamplainView
- * @markers: (array zero-terminated=1): a NULL terminated array of #ChamplainMarker elements
- * @animate: a #gboolean
+ * champlain_marker_layer_get_bounding_box:
+ * @layer: a #ChamplainMarkerLayer
  *
- * Changes the map's zoom level and center to make sure those markers are
- * visible.
+ * Gets the bounding box occupied by the markers in the layer
  *
+ * Returns: The bounding box.
+ * 
  * FIXME: This doesn't take into account the marker's actor size yet
  *
- * Since: 0.4
+ * Since: 0.10
  */
 ChamplainBoundingBox *
 champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
@@ -1183,14 +1225,14 @@ champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_path_set_fill_color:
- * @path: The path
+ * champlain_marker_layer_set_path_fill_color:
+ * @layer: a #ChamplainMarkerLayer
  * @color: (allow-none): The path's fill color or NULL to reset to the
  *         default color. The color parameter is copied.
  *
  * Set the path's fill color.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_set_path_fill_color (ChamplainMarkerLayer *layer,
@@ -1212,14 +1254,14 @@ champlain_marker_layer_set_path_fill_color (ChamplainMarkerLayer *layer,
 
 
 /**
- * champlain_path_set_stroke_color:
- * @path: The path
+ * champlain_marker_layer_set_path_stroke_color:
+ * @layer: a #ChamplainMarkerLayer
  * @color: (allow-none): The path's stroke color or NULL to reset to the
  *         default color. The color parameter is copied.
  *
  * Set the path's stroke color.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_set_path_stroke_color (ChamplainMarkerLayer *layer,
@@ -1241,14 +1283,14 @@ champlain_marker_layer_set_path_stroke_color (ChamplainMarkerLayer *layer,
 
 
 /**
- * champlain_path_get_fill_color:
- * @path: The path
+ * champlain_marker_layer_get_path_fill_color:
+ * @layer: a #ChamplainMarkerLayer
  *
  * Gets the path's fill color.
  *
  * Returns: the path's fill color.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 ClutterColor *
 champlain_marker_layer_get_path_fill_color (ChamplainMarkerLayer *layer)
@@ -1260,14 +1302,14 @@ champlain_marker_layer_get_path_fill_color (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_path_get_stroke_color:
- * @path: The path
+ * champlain_marker_layer_get_path_stroke_color:
+ * @layer: a #ChamplainMarkerLayer
  *
  * Gets the path's stroke color.
  *
  * Returns: the path's stroke color.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 ClutterColor *
 champlain_marker_layer_get_path_stroke_color (ChamplainMarkerLayer *layer)
@@ -1279,13 +1321,13 @@ champlain_marker_layer_get_path_stroke_color (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_path_set_stroke:
- * @path: The path
+ * champlain_marker_layer_set_path_stroke:
+ * @layer: a #ChamplainMarkerLayer
  * @value: if the path is stroked
  *
- * Sets the path to have a stroke
+ * Sets the path to be stroked
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_set_path_stroke (ChamplainMarkerLayer *layer,
@@ -1299,14 +1341,14 @@ champlain_marker_layer_set_path_stroke (ChamplainMarkerLayer *layer,
 
 
 /**
- * champlain_path_get_stroke:
- * @path: The path
+ * champlain_marker_layer_get_path_stroke:
+ * @layer: a #ChamplainMarkerLayer
  *
- * Checks whether the path has a stroke.
+ * Checks whether the path is stroked.
  *
- * Returns: TRUE if the path has a stroke, FALSE otherwise.
+ * Returns: TRUE if the path is stroked, FALSE otherwise.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 gboolean
 champlain_marker_layer_get_path_stroke (ChamplainMarkerLayer *layer)
@@ -1318,13 +1360,13 @@ champlain_marker_layer_get_path_stroke (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_path_set_fill:
- * @path: The path
+ * champlain_marker_layer_set_path_fill:
+ * @layer: a #ChamplainMarkerLayer
  * @value: if the path is filled
  *
- * Sets the path to have be filled
+ * Sets the path to be filled
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_set_path_fill (ChamplainMarkerLayer *layer,
@@ -1338,14 +1380,14 @@ champlain_marker_layer_set_path_fill (ChamplainMarkerLayer *layer,
 
 
 /**
- * champlain_path_get_fill:
- * @path: The path
+ * champlain_marker_layer_get_path_fill:
+ * @layer: a #ChamplainMarkerLayer
  *
  * Checks whether the path is filled.
  *
  * Returns: TRUE if the path is filled, FALSE otherwise.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 gboolean
 champlain_marker_layer_get_path_fill (ChamplainMarkerLayer *layer)
@@ -1357,13 +1399,13 @@ champlain_marker_layer_get_path_fill (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_path_set_stroke_width:
- * @path: The path
+ * champlain_marker_layer_set_path_stroke_width:
+ * @layer: a #ChamplainMarkerLayer
  * @value: the width of the stroke (in pixels)
  *
  * Sets the width of the stroke
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_set_path_stroke_width (ChamplainMarkerLayer *layer,
@@ -1377,14 +1419,14 @@ champlain_marker_layer_set_path_stroke_width (ChamplainMarkerLayer *layer,
 
 
 /**
- * champlain_path_get_stroke_width:
- * @path: The path
+ * champlain_marker_layer_get_path_stroke_width:
+ * @layer: a #ChamplainMarkerLayer
  *
  * Gets the width of the stroke.
  *
  * Returns: the width of the stroke
  *
- * Since: 0.4
+ * Since: 0.10
  */
 gdouble
 champlain_marker_layer_get_path_stroke_width (ChamplainMarkerLayer *layer)
@@ -1396,12 +1438,12 @@ champlain_marker_layer_get_path_stroke_width (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_path_show:
- * @path: The path
+ * champlain_marker_layer_show_path:
+ * @layer: a #ChamplainMarkerLayer
  *
  * Makes the path visible
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_show_path (ChamplainMarkerLayer *layer)
@@ -1415,12 +1457,12 @@ champlain_marker_layer_show_path (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_path_hide:
- * @path: The path
+ * champlain_marker_layer_hide_path:
+ * @layer: a #ChamplainMarkerLayer
  *
  * Hides the path
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_layer_hide_path (ChamplainMarkerLayer *layer)

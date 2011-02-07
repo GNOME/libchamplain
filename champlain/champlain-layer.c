@@ -16,6 +16,14 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-layer
+ * @short_description: Base class of libchamplain layers
+ *
+ * Every layer (overlay that moves together with the map) has to inherit this
+ * class and implement its virtual methods.
+ */
+
 #include "champlain-layer.h"
 
 G_DEFINE_TYPE (ChamplainLayer, champlain_layer, CLUTTER_TYPE_ACTOR)
@@ -45,7 +53,19 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
   klass->set_view = NULL;
 }
 
-
+/**
+ * champlain_layer_set_view:
+ * @layer: a #ChamplainLayer
+ * @view: a #ChamplainView
+ *
+ * #ChamplainView calls this method to pass a reference to itself to the layer
+ * when the layer is added to the view. When the layer is removed from the
+ * view, it passes NULL to the layer. Custom layers can implement this method
+ * and perform the necessary initialization. This method schould not be called
+ * by user code.
+ *
+ * Since: 0.10
+ */
 void champlain_layer_set_view (ChamplainLayer *layer,
     ChamplainView *view)
 {

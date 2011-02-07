@@ -16,6 +16,14 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-point
+ * @short_description: Simple point to mark a coordinate
+ *
+ * #ChamplainPoint is a simple variant of #ChamplainMarker. Contrary to
+ * #ChamplainLabel, it is not capable of labelling the point with text and
+ * only shows the location of the point as a circle on the map.
+ */
 
 #include "config.h"
 
@@ -86,14 +94,14 @@ static void unmap (ClutterActor *self);
 
 static void draw_point (ChamplainPoint *point);
 
+
 /**
  * champlain_point_set_selection_color:
- * @color: a #ClutterColor
+ * @color: The selection color.
  *
- * Changes the selection color, this is to ensure a better integration with
- * the desktop, this is automatically done by GtkChamplainEmbed.
+ * Set the selection color.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_point_set_selection_color (ClutterColor *color)
@@ -110,16 +118,15 @@ champlain_point_set_selection_color (ClutterColor *color)
  *
  * Gets the selection color.
  *
- * Returns: the selection color. Should not be freed.
+ * Returns: the color.
  *
- * Since: 0.4.1
+ * Since: 0.10
  */
 const ClutterColor *
 champlain_point_get_selection_color ()
 {
   return &SELECTED_COLOR;
 }
-
 
 
 static void
@@ -298,6 +305,15 @@ champlain_point_init (ChamplainPoint *point)
 }
 
 
+/**
+ * champlain_point_new:
+ * 
+ * Creates an instance of #ChamplainPoint with default size and color.
+ *
+ * Returns: a new #ChamplainPoint.
+ *
+ * Since: 0.10
+ */
 ClutterActor *
 champlain_point_new (void)
 {
@@ -305,6 +321,17 @@ champlain_point_new (void)
 }
 
 
+/**
+ * champlain_point_new_full:
+ * @size: Marker size
+ * @color: Marker color
+ * 
+ * Creates an instance of #ChamplainPoint with the specified size and color.
+ *
+ * Returns: a new #ChamplainPoint.
+ *
+ * Since: 0.10
+ */
 ClutterActor *
 champlain_point_new_full (gdouble size, 
     const ClutterColor *color)
@@ -316,6 +343,7 @@ champlain_point_new_full (gdouble size,
   
   return CLUTTER_ACTOR (point);
 }
+
 
 static void
 paint (ClutterActor *self)
@@ -410,6 +438,15 @@ unmap (ClutterActor *self)
 }
 
 
+/**
+ * champlain_point_set_size:
+ * @point: a #ChamplainPoint
+ * @size: The size of the point.
+ *
+ * Set the size of the point.
+ *
+ * Since: 0.10
+ */
 void
 champlain_point_set_size (ChamplainPoint *point,
     gdouble size)
@@ -422,6 +459,16 @@ champlain_point_set_size (ChamplainPoint *point,
 }
 
 
+/**
+ * champlain_point_get_size:
+ * @point: a #ChamplainPoint
+ *
+ * Gets the size of the point.
+ *
+ * Returns: the size.
+ *
+ * Since: 0.10
+ */
 gdouble
 champlain_point_get_size (ChamplainPoint *point)
 {
@@ -431,6 +478,16 @@ champlain_point_get_size (ChamplainPoint *point)
 }
 
 
+/**
+ * champlain_point_set_color:
+ * @point: a #ChamplainPoint
+ * @color: (allow-none): The color of the point or NULL to reset the background to the
+ *         default color. The color parameter is copied.
+ *
+ * Set the color of the point.
+ *
+ * Since: 0.10
+ */
 void
 champlain_point_set_color (ChamplainPoint *point,
     const ClutterColor *color)
@@ -451,6 +508,16 @@ champlain_point_set_color (ChamplainPoint *point,
 }
 
 
+/**
+ * champlain_point_get_color:
+ * @point: a #ChamplainPoint
+ *
+ * Gets the color of the point.
+ *
+ * Returns: the color.
+ *
+ * Since: 0.10
+ */
 ClutterColor *
 champlain_point_get_color (ChamplainPoint *point)
 {

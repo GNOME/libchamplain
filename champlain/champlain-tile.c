@@ -380,15 +380,17 @@ champlain_tile_class_init (ChamplainTileClass *klass)
           FALSE,
           G_PARAM_READWRITE));
 
-  /*
+  /**
    * ChamplainTile::render-complete:
    * @self: a #ChamplainTile
-   * @calback_data: a #ChamplainRenderCallbackData struct
+   * @data: the result of the rendering
+   * @size: size of data
+   * @error: TRUE if there was an error during rendering
    * 
    * The #ChamplainTile::render-complete signal is emitted when rendering of the tile is
    * completed by the renderer.
    *
-   * Since: 0.8
+   * Since: 0.10
    */
   champlain_tile_signals[RENDER_COMPLETE] =
     g_signal_new ("render-complete", G_OBJECT_CLASS_TYPE (object_class),

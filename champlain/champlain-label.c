@@ -138,7 +138,7 @@ static void unmap (ClutterActor *self);
  * Changes the selection color, this is to ensure a better integration with
  * the desktop, this is automatically done by GtkChamplainEmbed.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_selection_color (ClutterColor *color)
@@ -157,7 +157,7 @@ champlain_label_set_selection_color (ClutterColor *color)
  *
  * Returns: the selection color. Should not be freed.
  *
- * Since: 0.4.1
+ * Since: 0.10
  */
 const ClutterColor *
 champlain_label_get_selection_color ()
@@ -173,7 +173,7 @@ champlain_label_get_selection_color ()
  * Changes the selection text color, this is to ensure a better integration with
  * the desktop, this is automatically done by GtkChamplainEmbed.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_selection_text_color (ClutterColor *color)
@@ -192,7 +192,7 @@ champlain_label_set_selection_text_color (ClutterColor *color)
  *
  * Returns: the selection text color. Should not be freed.
  *
- * Since: 0.4.1
+ * Since: 0.10
  */
 const ClutterColor *
 champlain_label_get_selection_text_color ()
@@ -441,7 +441,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * The text of the label
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_TEXT,
       g_param_spec_string ("text", "Text", "The text of the label",
@@ -452,7 +452,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * The image of the label
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_IMAGE,
       g_param_spec_object ("image", "Image", "The image of the label",
@@ -463,7 +463,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * If the label's text uses markup
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_USE_MARKUP,
       g_param_spec_boolean ("use-markup", "Use Markup", "The text uses markup",
@@ -474,7 +474,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * The label's alignment
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_ALIGNMENT,
       g_param_spec_enum ("alignment", "Alignment", "The label's alignment",
@@ -485,7 +485,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * The label's color
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_COLOR,
       clutter_param_spec_color ("color", "Color", "The label's color",
@@ -496,7 +496,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * The label's text color
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_TEXT_COLOR,
       clutter_param_spec_color ("text-color", "Text Color", "The label's text color",
@@ -507,7 +507,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * The label's text font name
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_FONT_NAME,
       g_param_spec_string ("font-name", "Font Name", "The label's text font name",
@@ -518,7 +518,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * If the label's text wrap is set
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_WRAP,
       g_param_spec_boolean ("wrap", "Wrap", "The label's text wrap",
@@ -529,7 +529,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * The label's text wrap mode
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_WRAP_MODE,
       g_param_spec_enum ("wrap-mode", "Wrap Mode", "The label's text wrap mode",
@@ -540,7 +540,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * The label's ellipsize mode
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_ELLIPSIZE,
       g_param_spec_enum ("ellipsize", "Ellipsize Mode", "The label's text ellipsize mode",
@@ -551,7 +551,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * If the label has a background
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_DRAW_BACKGROUND,
       g_param_spec_boolean ("draw-background", "Draw Background", "The label has a background",
@@ -562,7 +562,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    *
    * If the label is in single line mode
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_SINGLE_LINE_MODE,
       g_param_spec_boolean ("single-line-mode", "Single Line Mode", "The label's single line mode",
@@ -847,7 +847,7 @@ redraw_on_idle (gpointer gobject)
  * that affect the aspect of the label.  When they change, call this function
  * to update the label.
  *
- * Since: 0.4.3
+ * Since: 0.10
  */
 void
 champlain_label_queue_redraw (ChamplainLabel *label)
@@ -912,7 +912,7 @@ champlain_label_init (ChamplainLabel *label)
  *
  * Returns: a new #ChamplainLabel ready to be used as a #ClutterActor.
  *
- * Since: 0.2
+ * Since: 0.10
  */
 ClutterActor *
 champlain_label_new (void)
@@ -1025,7 +1025,7 @@ unmap (ClutterActor *self)
  *
  * Returns: a new #ChamplainLabel with a drawn label containing the given text.
  *
- * Since: 0.2
+ * Since: 0.10
  */
 ClutterActor *
 champlain_label_new_with_text (const gchar *text,
@@ -1059,7 +1059,7 @@ champlain_label_new_with_text (const gchar *text,
  * Returns: a new #ChamplainLabel with a drawn label containing the given
  * image.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 ClutterActor *
 champlain_label_new_with_image (ClutterActor *actor)
@@ -1085,7 +1085,7 @@ champlain_label_new_with_image (ClutterActor *actor)
  * Returns: a new #ChamplainLabel with a drawn label containing the given
  * image.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 ClutterActor *
 champlain_label_new_from_file (const gchar *filename,
@@ -1116,7 +1116,7 @@ champlain_label_new_from_file (const gchar *filename,
  * Returns: a new #ChamplainLabel with a drawn label containing the given
  * image.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 ClutterActor *
 champlain_label_new_full (const gchar *text,
@@ -1141,7 +1141,7 @@ champlain_label_new_full (const gchar *text,
  *
  * Sets the label's text.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_text (ChamplainLabel *label,
@@ -1166,7 +1166,7 @@ champlain_label_set_text (ChamplainLabel *label,
  *
  * Sets the label's image.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_image (ChamplainLabel *label,
@@ -1199,7 +1199,7 @@ champlain_label_set_image (ChamplainLabel *label,
  *
  * Sets if the label's text uses markup.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_use_markup (ChamplainLabel *label,
@@ -1220,7 +1220,7 @@ champlain_label_set_use_markup (ChamplainLabel *label,
  *
  * Set the label's text alignment.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_alignment (ChamplainLabel *label,
@@ -1242,7 +1242,7 @@ champlain_label_set_alignment (ChamplainLabel *label,
  *
  * Set the label's background color.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_color (ChamplainLabel *label,
@@ -1272,7 +1272,7 @@ champlain_label_set_color (ChamplainLabel *label,
  *
  * Set the label's text color.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_text_color (ChamplainLabel *label,
@@ -1302,7 +1302,7 @@ champlain_label_set_text_color (ChamplainLabel *label,
  *
  * Set the label's font name such as "Sans 12".
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_font_name (ChamplainLabel *label,
@@ -1331,7 +1331,7 @@ champlain_label_set_font_name (ChamplainLabel *label,
  *
  * Set if the label's text wrap.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_wrap (ChamplainLabel *label,
@@ -1352,7 +1352,7 @@ champlain_label_set_wrap (ChamplainLabel *label,
  *
  * Set the label's text color.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_wrap_mode (ChamplainLabel *label,
@@ -1373,7 +1373,7 @@ champlain_label_set_wrap_mode (ChamplainLabel *label,
  *
  * Set the label's text attribute.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_attributes (ChamplainLabel *label,
@@ -1403,7 +1403,7 @@ champlain_label_set_attributes (ChamplainLabel *label,
  *
  * Set the label's text ellipsize mode.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_ellipsize (ChamplainLabel *label,
@@ -1424,7 +1424,7 @@ champlain_label_set_ellipsize (ChamplainLabel *label,
  *
  * Set if the label's text is on a single line.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_single_line_mode (ChamplainLabel *label,
@@ -1446,7 +1446,7 @@ champlain_label_set_single_line_mode (ChamplainLabel *label,
  *
  * Set if the label has a background.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_label_set_draw_background (ChamplainLabel *label,
@@ -1468,7 +1468,7 @@ champlain_label_set_draw_background (ChamplainLabel *label,
  *
  * Returns: (transfer none): the label's image.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 ClutterActor *
 champlain_label_get_image (ChamplainLabel *label)
@@ -1487,7 +1487,7 @@ champlain_label_get_image (ChamplainLabel *label)
  *
  * Returns: if the label's text contains markup.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 gboolean
 champlain_label_get_use_markup (ChamplainLabel *label)
@@ -1506,7 +1506,7 @@ champlain_label_get_use_markup (ChamplainLabel *label)
  *
  * Returns: the label's text.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 const gchar *
 champlain_label_get_text (ChamplainLabel *label)
@@ -1525,7 +1525,7 @@ champlain_label_get_text (ChamplainLabel *label)
  *
  * Returns: the label's text alignment.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 PangoAlignment
 champlain_label_get_alignment (ChamplainLabel *label)
@@ -1544,7 +1544,7 @@ champlain_label_get_alignment (ChamplainLabel *label)
  *
  * Returns: the label's color.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 ClutterColor *
 champlain_label_get_color (ChamplainLabel *label)
@@ -1563,7 +1563,7 @@ champlain_label_get_color (ChamplainLabel *label)
  *
  * Returns: the label's text color.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 ClutterColor *
 champlain_label_get_text_color (ChamplainLabel *label)
@@ -1582,7 +1582,7 @@ champlain_label_get_text_color (ChamplainLabel *label)
  *
  * Returns: the label's font name.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 const gchar *
 champlain_label_get_font_name (ChamplainLabel *label)
@@ -1601,7 +1601,7 @@ champlain_label_get_font_name (ChamplainLabel *label)
  *
  * Returns: if the label's text wraps.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 gboolean
 champlain_label_get_wrap (ChamplainLabel *label)
@@ -1620,7 +1620,7 @@ champlain_label_get_wrap (ChamplainLabel *label)
  *
  * Returns: the label's text wrap mode.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 PangoWrapMode
 champlain_label_get_wrap_mode (ChamplainLabel *label)
@@ -1639,7 +1639,7 @@ champlain_label_get_wrap_mode (ChamplainLabel *label)
  *
  * Returns: the label's text ellipsize mode.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 PangoEllipsizeMode
 champlain_label_get_ellipsize (ChamplainLabel *label)
@@ -1658,7 +1658,7 @@ champlain_label_get_ellipsize (ChamplainLabel *label)
  *
  * Returns: the label's text single line mode.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 gboolean
 champlain_label_get_single_line_mode (ChamplainLabel *label)
@@ -1677,7 +1677,7 @@ champlain_label_get_single_line_mode (ChamplainLabel *label)
  *
  * Returns: if the label's has a background.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 gboolean
 champlain_label_get_draw_background (ChamplainLabel *label)

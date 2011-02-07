@@ -21,10 +21,9 @@
 
 /**
  * SECTION:champlain-map-source-desc
- * @short_description: A basic struct to describe map sources.
+ * @short_description: A class that describes map sources.
  *
- * A basic struct to describe map sources.
- *
+ * A class that describes map sources.
  */
 
 #include "champlain-map-source-desc.h"
@@ -247,6 +246,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
   object_class->get_property = champlain_map_source_desc_get_property;
   object_class->set_property = champlain_map_source_desc_set_property;
 
+  /**
+   * ChamplainMapSourceDesc:id:
+   *
+   * The id of the map source
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_ID,
       g_param_spec_string ("id",
@@ -255,6 +261,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           "",
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
+  /**
+   * ChamplainMapSourceDesc:name:
+   *
+   * The name of the map source
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_NAME,
       g_param_spec_string ("name",
@@ -263,6 +276,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           "",
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
           
+  /**
+   * ChamplainMapSourceDesc:license:
+   *
+   * The license of the map source
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_LICENSE,
       g_param_spec_string ("license",
@@ -271,6 +291,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           "",
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
           
+  /**
+   * ChamplainMapSourceDesc:license-uri:
+   *
+   * The license's uri for more information
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_LICENSE_URI,
       g_param_spec_string ("license-uri",
@@ -279,6 +306,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           "",
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
+  /**
+   * ChamplainMapSourceDesc:uri-format:
+   *
+   * The URI format of a network map source
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_URI_FORMAT,
       g_param_spec_string ("uri-format",
@@ -287,6 +321,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           "",
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
+  /**
+   * ChamplainMapSourceDesc:min-zoom-level:
+   *
+   * The minimum zoom level
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_MIN_ZOOM_LEVEL,
       g_param_spec_uint ("min-zoom-level",
@@ -295,6 +336,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           0, 20, 0, 
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
+  /**
+   * ChamplainMapSourceDesc:max-zoom-level:
+   *
+   * The maximum zoom level
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_MAX_ZOOM_LEVEL,
       g_param_spec_uint ("max-zoom-level",
@@ -303,6 +351,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           0, 20, 20, 
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
+  /**
+   * ChamplainMapSourceDesc:projection
+   *
+   * The map projection of the map source
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_PROJECTION,
       g_param_spec_enum ("projection",
@@ -312,6 +367,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           CHAMPLAIN_MAP_PROJECTION_MERCATOR,
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
+  /**
+   * ChamplainMapSourceDesc:tile-size:
+   *
+   * The tile size of the map source
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_TILE_SIZE,
       g_param_spec_uint ("tile-size",
@@ -322,6 +384,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           256,
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
+  /**
+   * ChamplainMapSourceDesc:constructor:
+   *
+   * The map source constructor
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_CONSTRUCTOR,
       g_param_spec_pointer ("constructor",
@@ -329,6 +398,13 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           "Map source constructor",
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
+  /**
+   * ChamplainMapSourceDesc:data:
+   *
+   * User data passed to the constructor
+   *
+   * Since: 0.10
+   */
   g_object_class_install_property (object_class,
       PROP_DATA,
       g_param_spec_pointer ("data",
@@ -360,14 +436,35 @@ champlain_map_source_desc_init (ChamplainMapSourceDesc *desc)
 }
 
 
+/**
+ * champlain_map_source_desc_new_full:
+ * @id: the map source's id
+ * @name: the map source's name
+ * @license: the map source's license
+ * @license_uri: the map source's license URI
+ * @min_zoom: the map source's minimum zoom level
+ * @max_zoom: the map source's maximum zoom level
+ * @tile_size: the map source's tile size (in pixels)
+ * @projection: the map source's projection
+ * @uri_format: the URI to fetch the tiles from, see #champlain_network_tile_source_set_uri_format
+ * @constructor: the map source's constructor
+ * @data: user data passed to the constructor
+ *
+ * Constructor of #ChamplainMapSourceDesc which describes a #ChamplainMapSource.  
+ * This is returned by #champlain_map_source_factory_get_registered
+ *
+ * Returns: a constructed #ChamplainMapSourceDesc object
+ *
+ * Since: 0.10
+ */
 ChamplainMapSourceDesc *
 champlain_map_source_desc_new_full (
   gchar *id,
   gchar *name,
   gchar *license,
   gchar *license_uri,
-  guint min_zoom_level,
-  guint max_zoom_level,
+  guint min_zoom,
+  guint max_zoom,
   guint tile_size,
   ChamplainMapProjection projection,
   gchar *uri_format,
@@ -379,8 +476,8 @@ champlain_map_source_desc_new_full (
       "name", name,
       "license", license,
       "license-uri", license_uri,
-      "min-zoom-level", min_zoom_level,
-      "max-zoom-level", max_zoom_level,
+      "min-zoom-level", min_zoom,
+      "max-zoom-level", max_zoom,
       "tile-size", tile_size, 
       "projection", projection,
       "uri-format", uri_format,
@@ -390,6 +487,16 @@ champlain_map_source_desc_new_full (
 }
 
 
+/**
+ * champlain_map_source_desc_get_id:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets map source's id.
+ *
+ * Returns: the map source's id.
+ *
+ * Since: 0.10
+ */
 const gchar *
 champlain_map_source_desc_get_id (ChamplainMapSourceDesc *desc)
 {
@@ -399,6 +506,16 @@ champlain_map_source_desc_get_id (ChamplainMapSourceDesc *desc)
 }
 
 
+/**
+ * champlain_map_source_desc_get_name:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets map source's name.
+ *
+ * Returns: the map source's name.
+ *
+ * Since: 0.10
+ */
 const gchar *
 champlain_map_source_desc_get_name (ChamplainMapSourceDesc *desc)
 {
@@ -408,6 +525,16 @@ champlain_map_source_desc_get_name (ChamplainMapSourceDesc *desc)
 }
 
 
+/**
+ * champlain_map_source_desc_get_license:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets map source's license.
+ *
+ * Returns: the map source's license.
+ *
+ * Since: 0.10
+ */
 const gchar *
 champlain_map_source_desc_get_license (ChamplainMapSourceDesc *desc)
 {
@@ -417,6 +544,16 @@ champlain_map_source_desc_get_license (ChamplainMapSourceDesc *desc)
 }
 
 
+/**
+ * champlain_map_source_desc_get_license_uri:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets map source's license URI.
+ *
+ * Returns: the map source's license URI.
+ *
+ * Since: 0.10
+ */
 const gchar *
 champlain_map_source_desc_get_license_uri (ChamplainMapSourceDesc *desc)
 {
@@ -426,6 +563,16 @@ champlain_map_source_desc_get_license_uri (ChamplainMapSourceDesc *desc)
 }
 
 
+/**
+ * champlain_map_source_desc_get_uri_format:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets network map source's URI format.
+ *
+ * Returns: the URI format.
+ *
+ * Since: 0.10
+ */
 const gchar *
 champlain_map_source_desc_get_uri_format (ChamplainMapSourceDesc *desc)
 {
@@ -435,6 +582,16 @@ champlain_map_source_desc_get_uri_format (ChamplainMapSourceDesc *desc)
 }
 
 
+/**
+ * champlain_map_source_desc_get_min_zoom_level:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets map source's minimum zoom level.
+ *
+ * Returns: the miminum zoom level this map source supports
+ *
+ * Since: 0.10
+ */
 guint
 champlain_map_source_desc_get_min_zoom_level (ChamplainMapSourceDesc *desc)
 {
@@ -444,6 +601,16 @@ champlain_map_source_desc_get_min_zoom_level (ChamplainMapSourceDesc *desc)
 }
 
 
+/**
+ * champlain_map_source_desc_get_max_zoom_level:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets map source's maximum zoom level.
+ *
+ * Returns: the maximum zoom level this map source supports
+ *
+ * Since: 0.10
+ */
 guint
 champlain_map_source_desc_get_max_zoom_level (ChamplainMapSourceDesc *desc)
 {
@@ -453,6 +620,16 @@ champlain_map_source_desc_get_max_zoom_level (ChamplainMapSourceDesc *desc)
 }
 
 
+/**
+ * champlain_map_source_desc_get_tile_size:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets map source's tile size.
+ *
+ * Returns: the tile's size (width and height) in pixels for this map source
+ *
+ * Since: 0.10
+ */
 guint
 champlain_map_source_desc_get_tile_size (ChamplainMapSourceDesc *desc)
 {
@@ -462,6 +639,16 @@ champlain_map_source_desc_get_tile_size (ChamplainMapSourceDesc *desc)
 }
 
 
+/**
+ * champlain_map_source_desc_get_projection:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets map source's projection.
+ *
+ * Returns: the map source's projection.
+ *
+ * Since: 0.10
+ */
 ChamplainMapProjection
 champlain_map_source_desc_get_projection (ChamplainMapSourceDesc *desc)
 {
@@ -471,6 +658,16 @@ champlain_map_source_desc_get_projection (ChamplainMapSourceDesc *desc)
 }
 
 
+/**
+ * champlain_map_source_desc_get_data:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets user data.
+ *
+ * Returns: the user data.
+ *
+ * Since: 0.10
+ */
 gpointer
 champlain_map_source_desc_get_data (ChamplainMapSourceDesc *desc)
 {
@@ -480,7 +677,18 @@ champlain_map_source_desc_get_data (ChamplainMapSourceDesc *desc)
 }
 
 
-const ChamplainMapSourceConstructor champlain_map_source_desc_get_constructor (ChamplainMapSourceDesc *desc)
+/**
+ * champlain_map_source_desc_get_constructor:
+ * @desc: a #ChamplainMapSourceDesc
+ *
+ * Gets the map source constructor.
+ *
+ * Returns: the constructor.
+ *
+ * Since: 0.10
+ */
+const ChamplainMapSourceConstructor 
+champlain_map_source_desc_get_constructor (ChamplainMapSourceDesc *desc)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE_DESC (desc), NULL);
 

@@ -76,6 +76,7 @@ const gchar *champlain_license_get_extra_text (ChamplainLicense *license);
 
 void champlain_license_connect_view (ChamplainLicense *license,
     ChamplainView *view);
+void champlain_license_disconnect_view (ChamplainLicense *license);
 
 G_END_DECLS
 

@@ -262,6 +262,16 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
           "The movable state of the marker",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
+  /**
+   * ChamplainMarker::moved:
+   * @dx: by how much the marker has been moved in the x direction 
+   * @dy: by how much the marker has been moved in the y direction 
+   *
+   * Emmitted when the marker is dragged by mouse. dx and dy specify by how much
+   * the marker has been dragged since last time.
+   *
+   * Since: 0.10
+   */
   signals[MOVE_BY_SIGNAL] =
     g_signal_new ("moved", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,

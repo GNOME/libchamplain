@@ -879,6 +879,16 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
         G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED, 0, NULL, NULL,
         g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 0);
         
+  /**
+   * ChamplainView::layer-relocated:
+   *
+   * Indicates that the layers hav been "relocated". In practice this means that
+   * every layer should connect to this signal and redraw itself when the signal is
+   * emitted. Layer relocation happens when zooming in/out and when panning for more
+   * than MAX_INT pixels.
+   *
+   * Since: 0.10
+   */
   signals[LAYER_RELOCATED] =
     g_signal_new ("layer-relocated", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
@@ -1632,6 +1642,17 @@ champlain_view_remove_layer (ChamplainView *view,
 }
 
 
+/**
+ * champlain_view_x_to_longitude:
+ * @view: a #ChamplainView
+ * @x: x coordinate of the view
+ *
+ * Converts the view's x coordinate to longitude.
+ *
+ * Returns: the longitude
+ * 
+ * Since: 0.10
+ */
 gdouble
 champlain_view_x_to_longitude (ChamplainView *view,
     gdouble x)
@@ -1651,6 +1672,17 @@ champlain_view_x_to_longitude (ChamplainView *view,
 }
 
 
+/**
+ * champlain_view_y_to_latitude:
+ * @view: a #ChamplainView
+ * @y: y coordinate of the view
+ *
+ * Converts the view's y coordinate to latitude.
+ *
+ * Returns: the latitude
+ *
+ * Since: 0.10
+ */
 gdouble
 champlain_view_y_to_latitude (ChamplainView *view,
     gdouble y)
@@ -1669,6 +1701,18 @@ champlain_view_y_to_latitude (ChamplainView *view,
   return latitude;
 }
 
+
+/**
+ * champlain_view_longitude_to_x:
+ * @view: a #ChamplainView
+ * @longitude: the longitude
+ *
+ * Converts the longitude to view's x coordinate.
+ *
+ * Returns: the x coordinate
+ *
+ * Since: 0.10
+ */
 gdouble
 champlain_view_longitude_to_x (ChamplainView *view, 
     gdouble longitude)
@@ -1688,6 +1732,17 @@ champlain_view_longitude_to_x (ChamplainView *view,
 }
 
 
+/**
+ * champlain_view_latitude_to_y:
+ * @view: a #ChamplainView
+ * @latitude: the latitude
+ *
+ * Converts the latitude to view's y coordinate.
+ *
+ * Returns: the y coordinate
+ *
+ * Since: 0.10
+ */
 gdouble
 champlain_view_latitude_to_y (ChamplainView *view, 
     gdouble latitude)
@@ -1707,8 +1762,20 @@ champlain_view_latitude_to_y (ChamplainView *view,
 }
 
 
+/**
+ * champlain_view_get_viewport_origin:
+ * @view: a #ChamplainView
+ * @x: (out): the x coordinate of the viewport
+ * @y: (out): the y coordinate of the viewport
+ *
+ * Gets the x and y coordinate of the viewport in respect to the layer origin.
+ *
+ * Since: 0.10
+ */
 void 
-champlain_view_get_viewport_origin (ChamplainView *view, gdouble *x, gdouble *y)
+champlain_view_get_viewport_origin (ChamplainView *view, 
+    gdouble *x, 
+    gdouble *y)
 {
   DEBUG_LOG ()
 
@@ -2110,12 +2177,13 @@ champlain_view_set_zoom_on_double_click (ChamplainView *view,
 /**
  * champlain_view_ensure_visible:
  * @view: a #ChamplainView
- * @animate: a #gboolean
+ * @bbox: bounding box of the area that should be visible
+ * @animate: perform animation
  *
- * Changes the map's zoom level and center to make sure the two given
- * positions are visible
+ * Changes the map's zoom level and center to make sure the two given area
+ * is visible
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_view_ensure_visible (ChamplainView *view,
@@ -2387,6 +2455,17 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
 }
 
 
+/**
+ * champlain_view_get_layout_manager:
+ * @view: The view
+ *
+ * Returns the #ClutterBinLayout manager. The manager can be used to align
+ * user provided actors on top of the map.
+ *
+ * Returns: the layout manager
+ *
+ * Since: 0.10
+ */
 ClutterBinLayout *
 champlain_view_get_layout_manager (ChamplainView *view)
 {
@@ -2400,19 +2479,19 @@ champlain_view_get_layout_manager (ChamplainView *view)
 }
 
 
-const gchar *
-champlain_view_get_license_text (ChamplainView *view)
-{
-  DEBUG_LOG ()
 
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
-  
-  ChamplainViewPrivate *priv = view->priv;
-  
-  return champlain_map_source_get_license (priv->map_source);  
-}
-
-
+/**
+ * champlain_view_get_license_actor:
+ * @view: The view
+ *
+ * Returns the #ChamplainLicense actor which is inserted by default into the
+ * layout manager. It can be manipulated using standard #ClutterActor methods
+ * (hidden and so on).
+ *
+ * Returns: the license actor
+ *
+ * Since: 0.10
+ */
 ChamplainLicense *champlain_view_get_license_actor (ChamplainView *view)
 {
   DEBUG_LOG ()

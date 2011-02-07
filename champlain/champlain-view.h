@@ -116,7 +116,6 @@ ChamplainMapSource *champlain_view_get_map_source (ChamplainView *view);
 gdouble champlain_view_get_decel_rate (ChamplainView *view);
 gboolean champlain_view_get_kinetic_mode (ChamplainView *view);
 gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
-const gchar *champlain_view_get_license_text (ChamplainView *view);
 gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
 
 void champlain_view_reload_tiles (ChamplainView *view);

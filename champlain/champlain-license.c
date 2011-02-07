@@ -16,6 +16,12 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-license
+ * @short_description: An actor that displays license text.
+ *
+ * An actor that displays license text.
+ */
 
 #include "config.h"
 
@@ -171,13 +177,13 @@ champlain_license_class_init (ChamplainLicenseClass *klass)
   actor_class->unmap = unmap;
 
   /**
-   * ChamplainView:license-text:
+   * ChamplainLicense:extra-text:
    *
    * Sets additional text to be displayed in the license area.  The map's
-   * license will be added below it. Your text can have multiple line, just use
+   * license will be added below it. Your text can have multiple lines, just use
    * "\n" in between.
    *
-   * Since: 0.4.3
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
       PROP_LICENSE_EXTRA,
@@ -195,17 +201,23 @@ redraw_license (ChamplainLicense *license)
   ChamplainLicensePrivate *priv = license->priv;
   gchar *text;
   gfloat width, height;
+  ChamplainMapSource *map_source;
   
   if (!priv->view)
     return;
 
+  map_source = champlain_view_get_map_source (priv->view);
+  
+  if (!map_source)
+    return;
+  
   if (priv->extra_text)
     text = g_strjoin ("\n",
           priv->extra_text,
-          champlain_view_get_license_text (priv->view),
+          champlain_map_source_get_license (map_source),
           NULL);
   else
-    text = g_strdup (champlain_view_get_license_text (priv->view));
+    text = g_strdup (champlain_map_source_get_license (map_source));
 
   clutter_text_set_text (CLUTTER_TEXT (priv->license_actor), text);
   clutter_actor_get_size (priv->license_actor, &width, &height);
@@ -251,6 +263,15 @@ champlain_license_init (ChamplainLicense *license)
 }
 
 
+/**
+ * champlain_license_new:
+ * 
+ * Creates an instance of #ChamplainLicense.
+ *
+ * Returns: a new #ChamplainLicense.
+ *
+ * Since: 0.10
+ */
 ClutterActor *
 champlain_license_new (void)
 {
@@ -360,6 +381,16 @@ redraw_license_cb (G_GNUC_UNUSED GObject *gobject,
 }
 
 
+/**
+ * champlain_license_connect_view:
+ * @license: The license
+ * @view: a #ChamplainView
+ * 
+ * This method connects to the necessary signals of #ChamplainView to make the
+ * license change automatically when the map source changes.
+ *
+ * Since: 0.10
+ */
 void 
 champlain_license_connect_view (ChamplainLicense *license,
     ChamplainView *view)
@@ -373,15 +404,36 @@ champlain_license_connect_view (ChamplainLicense *license,
   redraw_license (license);
 }
 
+
 /**
- * champlain_view_set_extra_text:
- * @view: a #ChamplainView
+ * champlain_license_disconnect_view:
+ * @license: The license
+ * 
+ * This method disconnects from the signals previously connected by champlain_license_connect_view().
+ *
+ * Since: 0.10
+ */
+void 
+champlain_license_disconnect_view (ChamplainLicense *license)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LICENSE (license));
+  
+  g_signal_handlers_disconnect_by_func (license->priv->view,
+                                        redraw_license_cb,
+                                        license);
+  license->priv->view = NULL;
+}
+
+
+/**
+ * champlain_license_set_extra_text:
+ * @license: a #ChamplainLicense
  * @text: a license
  *
  * Show the additional license text on the map view.  The text will preceed the
  * map's licence when displayed. Use "\n" to separate the lines.
  *
- * Since: 0.4.3
+ * Since: 0.10
  */
 void
 champlain_license_set_extra_text (ChamplainLicense *license,
@@ -399,14 +451,14 @@ champlain_license_set_extra_text (ChamplainLicense *license,
 }
 
 /**
- * champlain_view_get_extra_text:
- * @view: The view
+ * champlain_license_get_extra_text:
+ * @license: a #ChamplainLicense
  *
  * Gets the additional license text.
  *
  * Returns: the additional license text
  *
- * Since: 0.4.3
+ * Since: 0.10
  */
 const gchar *
 champlain_license_get_extra_text (ChamplainLicense *license)

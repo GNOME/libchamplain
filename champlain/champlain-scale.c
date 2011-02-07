@@ -16,6 +16,12 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:champlain-scale
+ * @short_description: An actor displaying a scale.
+ *
+ * An actor displaying a scale.
+ */
 
 #include "config.h"
 
@@ -112,7 +118,6 @@ champlain_scale_get_property (GObject *object,
 }
 
 
-
 static void
 champlain_scale_set_property (GObject *object,
     guint prop_id,
@@ -187,7 +192,7 @@ champlain_scale_class_init (ChamplainScaleClass *klass)
    *
    * The size of the map scale on screen in pixels.
    *
-   * Since: 0.4.3
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
       PROP_MAX_SCALE_WIDTH,
@@ -205,7 +210,7 @@ champlain_scale_class_init (ChamplainScaleClass *klass)
    *
    * The scale's units.
    *
-   * Since: 0.4.3
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
       PROP_SCALE_UNIT,
@@ -405,6 +410,15 @@ champlain_scale_init (ChamplainScale *scale)
 }
 
 
+/**
+ * champlain_scale_new:
+ * 
+ * Creates an instance of #ChamplainScale.
+ *
+ * Returns: a new #ChamplainScale.
+ *
+ * Since: 0.10
+ */
 ClutterActor *
 champlain_scale_new (void)
 {
@@ -512,7 +526,7 @@ unmap (ClutterActor *self)
  *
  * Sets the maximum width of the scale on the screen in pixels
  *
- * Since: 0.4.3
+ * Since: 0.10
  */
 void
 champlain_scale_set_max_width (ChamplainScale *scale,
@@ -533,7 +547,7 @@ champlain_scale_set_max_width (ChamplainScale *scale,
  *
  * Sets the scales unit.
  *
- * Since: 0.4.3
+ * Since: 0.10
  */
 void
 champlain_scale_set_unit (ChamplainScale *scale,
@@ -554,7 +568,7 @@ champlain_scale_set_unit (ChamplainScale *scale,
  *
  * Returns: The max scale width in pixels.
  *
- * Since: 0.4.3
+ * Since: 0.10
  */
 guint
 champlain_scale_get_max_width (ChamplainScale *scale)
@@ -573,7 +587,7 @@ champlain_scale_get_max_width (ChamplainScale *scale)
  *
  * Returns: The unit used by the scale
  *
- * Since: 0.4.3
+ * Since: 0.10
  */
 ChamplainUnit
 champlain_scale_get_unit (ChamplainScale *scale)
@@ -593,6 +607,16 @@ redraw_scale_cb (G_GNUC_UNUSED GObject *gobject,
 }
 
 
+/**
+ * champlain_scale_connect_view:
+ * @scale: The scale
+ * @view: a #ChamplainView
+ * 
+ * This method connects to the necessary signals of #ChamplainView to make the
+ * scale adapt to the current latitude and longitude.
+ *
+ * Since: 0.10
+ */
 void 
 champlain_scale_connect_view (ChamplainScale *scale,
     ChamplainView *view)
@@ -603,4 +627,24 @@ champlain_scale_connect_view (ChamplainScale *scale,
   g_signal_connect (view, "notify::latitude",
       G_CALLBACK (redraw_scale_cb), scale);
   redraw_scale (scale);
+}
+
+
+/**
+ * champlain_scale_disconnect_view:
+ * @scale: The scale
+ * 
+ * This method disconnects from the signals previously connected by champlain_scale_connect_view().
+ *
+ * Since: 0.10
+ */
+void 
+champlain_scale_disconnect_view (ChamplainScale *scale)
+{
+  g_return_if_fail (CHAMPLAIN_IS_SCALE (scale));
+  
+  g_signal_handlers_disconnect_by_func (scale->priv->view,
+                                        redraw_scale_cb,
+                                        scale);
+  scale->priv->view = NULL;
 }

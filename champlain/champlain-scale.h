@@ -92,6 +92,7 @@ ChamplainUnit champlain_scale_get_unit (ChamplainScale *scale);
 
 void champlain_scale_connect_view (ChamplainScale *scale,
     ChamplainView *view);
+void champlain_scale_disconnect_view (ChamplainScale *scale);
 
 G_END_DECLS
 

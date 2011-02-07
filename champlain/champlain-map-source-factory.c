@@ -428,18 +428,15 @@ champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *fac
  * champlain_map_source_factory_register:
  * @factory: A #ChamplainMapSourceFactory
  * @desc: the description of the map source
- * @constructor: (scope notified): the new map source constructor function
- * @data: data to be passed to the constructor function, or NULL
  *
  * Registers the new map source with the given constructor.  When this map
  * source is requested, the given constructor will be used to build the
  * map source.  #ChamplainMapSourceFactory will take ownership of the passed
- * #ChamplainMapSourceDesc, so don't free it. They will not be freed either so
- * you can use static structs here.
+ * #ChamplainMapSourceDesc, so don't free it. 
  *
  * Returns: TRUE if the registration suceeded.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 gboolean
 champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,

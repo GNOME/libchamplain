@@ -246,7 +246,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   /**
    * ChamplainTileSource:id:
    *
-   * The name of the tile source
+   * The id of the tile source
    *
    * Since: 0.4
    */

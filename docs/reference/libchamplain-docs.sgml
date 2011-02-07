@@ -45,22 +45,23 @@
     <xi:include href="xml/champlain-view.xml"/>
   </part>
   <part>
-    <title>Layers, Markers and Polygons</title>
+    <title>Layers and Markers</title>
     <chapter>
       <title>Layers</title>
       <xi:include href="xml/champlain-layer.xml"/>
-      <xi:include href="xml/champlain-selection-layer.xml"/>
+      <xi:include href="xml/champlain-marker-layer.xml"/>
     </chapter>
     <chapter>
       <title>Markers</title>
-      <xi:include href="xml/champlain-base-marker.xml"/>
       <xi:include href="xml/champlain-marker.xml"/>
-    </chapter>
-    <chapter>
-      <title>Polygons</title>
-      <xi:include href="xml/champlain-polygon.xml"/>
+      <xi:include href="xml/champlain-label.xml"/>
       <xi:include href="xml/champlain-point.xml"/>
     </chapter>
+  </part>
+  <part>
+    <title>Widgets</title>
+    <xi:include href="xml/champlain-license.xml"/>
+    <xi:include href="xml/champlain-scale.xml"/>
   </part>
   <part>
     <title>Map Source API</title>
@@ -83,6 +84,7 @@
       <title>Map Source Utilities</title>
       <xi:include href="xml/champlain-map-source-chain.xml"/>
       <xi:include href="xml/champlain-map-source-factory.xml"/>
+      <xi:include href="xml/champlain-map-source-desc.xml"/>
     </chapter>
   </part>
   <part>
@@ -95,7 +97,6 @@
   <part>
     <title>Others</title>
     <xi:include href="xml/champlain-tile.xml"/>
-    <xi:include href="xml/champlain-map-source-desc.xml"/>
     <xi:include href="xml/champlain-bounding-box.xml"/>
     <xi:include href="xml/champlain-version.xml"/>
   </part>
