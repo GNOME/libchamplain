@@ -136,7 +136,6 @@ struct _ChamplainViewPrivate
 {
   ClutterActor *stage;
 
-  ChamplainMapSourceFactory *factory; /* The map source factory */
   ChamplainMapSource *map_source; /* Current map tile source */
   gboolean kinetic_mode;
   guint zoom_level; /* Holds the current zoom level number */
@@ -495,12 +494,6 @@ champlain_view_dispose (GObject *object)
 
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
-
-  if (priv->factory != NULL)
-    {
-      g_object_unref (priv->factory);
-      priv->factory = NULL;
-    }
 
   if (priv->map_source != NULL)
     {
@@ -903,14 +896,15 @@ champlain_view_init (ChamplainView *view)
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  ChamplainMapSourceFactory *factory;
   ChamplainMapSource *source;
 
   champlain_debug_set_flags (g_getenv ("CHAMPLAIN_DEBUG"));
 
   view->priv = priv;
 
-  priv->factory = champlain_map_source_factory_dup_default ();
-  source = champlain_map_source_factory_create_cached_source (priv->factory, CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK);
+  factory = champlain_map_source_factory_dup_default ();
+  source = champlain_map_source_factory_create_cached_source (factory, CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK);
 
   priv->map_source = CHAMPLAIN_MAP_SOURCE (source);
 
