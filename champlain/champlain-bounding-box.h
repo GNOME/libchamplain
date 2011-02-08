@@ -63,6 +63,9 @@ void champlain_bounding_box_get_center (ChamplainBoundingBox *bbox,
     gdouble *latitude,
     gdouble *longitude);
 
+void champlain_bounding_box_compose (ChamplainBoundingBox *bbox,
+    ChamplainBoundingBox *other);
+
 G_END_DECLS
 
 #endif

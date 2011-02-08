@@ -123,3 +123,33 @@ champlain_bounding_box_get_center (ChamplainBoundingBox *bbox,
   *longitude = (bbox->right + bbox->left) / 2.0;
   *latitude = (bbox->top + bbox->bottom) / 2.0;
 }
+
+
+/**
+ * champlain_bounding_box_compose:
+ * @bbox: a #ChamplainBoundingBox
+ * @other: a #ChamplainBoundingBox
+ *
+ * Sets bbox equal to the bounding box containing both @bbox and @other.
+ *
+ * Since: 0.10
+ */
+void
+champlain_bounding_box_compose (ChamplainBoundingBox *bbox,
+    ChamplainBoundingBox *other)
+{
+  g_return_if_fail (CHAMPLAIN_BOUNDING_BOX (bbox));
+  
+  if (other->left < bbox->left)
+    bbox->left = other->left;
+    
+  if (other->right > bbox->right)
+    bbox->right = other->right;
+
+  if (other->top > bbox->top)
+    bbox->top = other->top;
+
+  if (other->bottom < bbox->bottom)
+    bbox->bottom = other->bottom;
+}
+

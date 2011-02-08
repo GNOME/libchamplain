@@ -476,6 +476,7 @@ champlain_bounding_box_new
 champlain_bounding_box_copy
 champlain_bounding_box_free
 champlain_bounding_box_get_center
+champlain_bounding_box_compose
 <SUBSECTION Standard>
 CHAMPLAIN_BOUNDING_BOX
 CHAMPLAIN_TYPE_BOUNDING_BOX
