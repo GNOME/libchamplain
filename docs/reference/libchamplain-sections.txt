@@ -74,7 +74,6 @@ champlain_label_set_selection_color
 champlain_label_get_selection_color
 champlain_label_set_selection_text_color
 champlain_label_get_selection_text_color
-champlain_label_queue_redraw
 <SUBSECTION Standard>
 CHAMPLAIN_LABEL
 CHAMPLAIN_IS_LABEL
@@ -92,7 +91,6 @@ ChamplainLabelPrivate
 <FILE>champlain-marker</FILE>
 <TITLE>ChamplainMarker</TITLE>
 ChamplainMarker
-champlain_marker_new
 champlain_marker_set_position
 champlain_marker_get_latitude
 champlain_marker_get_longitude
@@ -713,4 +711,20 @@ ChamplainMemphisRendererClass
 ChamplainMemphisRendererPrivate
 </SECTION>
 
-
+<SECTION>
+<FILE>champlain-custom-marker</FILE>
+<TITLE>ChamplainCustomMarker</TITLE>
+ChamplainCustomMarker
+champlain_custom_marker_new
+<SUBSECTION Standard>
+CHAMPLAIN_CUSTOM_MARKER
+CHAMPLAIN_IS_CUSTOM_MARKER
+CHAMPLAIN_TYPE_CUSTOM_MARKER
+champlain_custom_marker_get_type
+CHAMPLAIN_CUSTOM_MARKER_CLASS
+CHAMPLAIN_IS_CUSTOM_MARKER_CLASS
+CHAMPLAIN_CUSTOM_MARKER_GET_CLASS
+<SUBSECTION Private>
+ChamplainCustomMarkerClass
+ChamplainCustomMarkerPrivate
+</SECTION>

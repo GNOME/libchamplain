@@ -434,8 +434,6 @@ champlain_label_class_init (ChamplainLabelClass *klass)
   actor_class->map = map;
   actor_class->unmap = unmap;
 
-  klass->draw_label = draw_label;
-  
   /**
    * ChamplainLabel:text:
    *
@@ -832,13 +830,13 @@ redraw_on_idle (gpointer gobject)
 {
   ChamplainLabel *label = CHAMPLAIN_LABEL (gobject);
 
-  CHAMPLAIN_LABEL_GET_CLASS (gobject)->draw_label (label);
+  draw_label (label);
   label->priv->redraw_id = 0;
   return FALSE;
 }
 
 
-/**
+/*
  * champlain_label_queue_redraw:
  * @label: a #ChamplainLabel
  *
@@ -849,7 +847,7 @@ redraw_on_idle (gpointer gobject)
  *
  * Since: 0.10
  */
-void
+static void
 champlain_label_queue_redraw (ChamplainLabel *label)
 {
   ChamplainLabelPrivate *priv = label->priv;

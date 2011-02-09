@@ -62,8 +62,6 @@ struct _ChamplainLabel
 struct _ChamplainLabelClass
 {
   ChamplainMarkerClass parent_class;
-
-  void (*draw_label)(ChamplainLabel *label);
 };
 
 GType champlain_label_get_type (void);
@@ -128,8 +126,6 @@ const ClutterColor *champlain_label_get_selection_color (void);
 
 void champlain_label_set_selection_text_color (ClutterColor *color);
 const ClutterColor *champlain_label_get_selection_text_color (void);
-
-void champlain_label_queue_redraw (ChamplainLabel *label);
 
 G_END_DECLS
 
