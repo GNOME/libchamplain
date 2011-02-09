@@ -456,7 +456,7 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
         {
           champlain_memphis_renderer_load_rules (CHAMPLAIN_MEMPHIS_RENDERER (renderer), rules[rules_index]);
           champlain_file_tile_source_load_map_data (CHAMPLAIN_FILE_TILE_SOURCE (source), maps[map_index]);
-          gtk_widget_hide_all (memphis_box);
+          gtk_widget_hide (memphis_box);
           gtk_widget_set_no_show_all (memphis_box, FALSE);
           gtk_widget_set_no_show_all (memphis_local_box, FALSE);
           gtk_widget_set_no_show_all (memphis_net_box, TRUE);
@@ -466,7 +466,7 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
         {
           champlain_memphis_renderer_load_rules (CHAMPLAIN_MEMPHIS_RENDERER (renderer), rules[rules_index]);
           load_network_map_data (CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (source), view);
-          gtk_widget_hide_all (memphis_box);
+          gtk_widget_hide (memphis_box);
           gtk_widget_set_no_show_all (memphis_box, FALSE);
           gtk_widget_set_no_show_all (memphis_local_box, TRUE);
           gtk_widget_set_no_show_all (memphis_net_box, FALSE);
@@ -474,7 +474,7 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
         }
       else
         {
-          gtk_widget_hide_all (memphis_box);
+          gtk_widget_hide (memphis_box);
           gtk_widget_set_no_show_all (memphis_box, TRUE);
         }
 
