@@ -652,7 +652,7 @@ add_marker (ChamplainMarkerLayer *layer,
   g_signal_connect (G_OBJECT (marker), "notify::latitude",
       G_CALLBACK (marker_position_notify), layer);
 
-  g_signal_connect (G_OBJECT (marker), "moved",
+  g_signal_connect (G_OBJECT (marker), "drag-motion",
       G_CALLBACK (marker_move_by_cb), layer);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));

@@ -52,7 +52,9 @@
 enum
 {
   /* normal signals */
-  MOVE_BY_SIGNAL,
+  DRAG_MOTION_SIGNAL,
+  DRAG_BEGIN_SIGNAL,
+  DRAG_FINISH_SIGNAL,
   LAST_SIGNAL,
 };
 
@@ -262,7 +264,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainMarker::moved:
+   * ChamplainMarker::drag-motion:
    * @dx: by how much the marker has been moved in the x direction 
    * @dy: by how much the marker has been moved in the y direction 
    *
@@ -271,10 +273,35 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    *
    * Since: 0.10
    */
-  signals[MOVE_BY_SIGNAL] =
-    g_signal_new ("moved", G_OBJECT_CLASS_TYPE (object_class),
+  signals[DRAG_MOTION_SIGNAL] =
+    g_signal_new ("drag-motion", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
         _champlain_marshal_VOID__DOUBLE_DOUBLE, G_TYPE_NONE, 2, G_TYPE_DOUBLE, G_TYPE_DOUBLE);
+        
+  /**
+   * ChamplainMarker::drag-begin:
+   *
+   * Emitted when marker dragging begins.
+   *
+   * Since: 0.10
+   */
+  signals[DRAG_BEGIN_SIGNAL] =
+    g_signal_new ("drag-begin", G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+
+  /**
+   * ChamplainMarker::drag-finish:
+   *
+   * Emitted when marker dragging ends.
+   *
+   * Since: 0.10
+   */
+  signals[DRAG_FINISH_SIGNAL] =
+    g_signal_new ("drag-finish", G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+        
 }
 
 
@@ -294,7 +321,7 @@ motion_event_cb (ClutterActor        *stage,
                                            event->y,
                                            &x, &y))
     {
-      g_signal_emit_by_name (marker, "moved", x - priv->click_x, y - priv->click_y);
+      g_signal_emit_by_name (marker, "drag-motion", x - priv->click_x, y - priv->click_y);
     }
 
   return TRUE;
@@ -318,6 +345,7 @@ button_release_event_cb (ClutterActor        *stage,
                                         marker);
   
   clutter_set_motion_events_enabled (TRUE);
+  g_signal_emit_by_name (marker, "drag-finish");
 
   return TRUE;
 }
@@ -362,6 +390,7 @@ button_press_event_cb (ClutterActor        *actor,
                             marker);
 
           clutter_set_motion_events_enabled (FALSE);
+          g_signal_emit_by_name (marker, "drag-begin");
 
           swallow_event = TRUE;
         }
