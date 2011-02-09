@@ -68,7 +68,6 @@ struct _ChamplainMarkerClass
 
 GType champlain_marker_get_type (void);
 
-ClutterActor *champlain_marker_new (void);
 
 void champlain_marker_set_position (ChamplainMarker *marker,
     gdouble latitude,

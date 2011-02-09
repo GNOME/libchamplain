@@ -26,12 +26,11 @@
  * #champlainview for the markers to show on the map.
  *
  * A marker is nothing more than a regular #clutteractor. You can draw on
- * it what ever you want. Don't forget to set the anchor position in the 
- * marker using #clutter_actor_set_anchor_point. Set the markers position
+ * it what ever you want.  Set the markers position
  * on the map using #champlain_marker_set_position.
  *
- * champlain has a more evoluted type of markers with text and image support.
- * See #ChamplainMarker.
+ * libchamplain has a more evoluted type of markers with text and image support.
+ * See #ChamplainLabel.
  */
 
 #include "config.h"
@@ -207,7 +206,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    *
    * The longitude coordonate of the map
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_LONGITUDE,
       g_param_spec_double ("longitude", "Longitude",
@@ -219,7 +218,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    *
    * The latitude coordonate of the map
    *
-   * Since: 0.4
+   * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_LATITUDE,
       g_param_spec_double ("latitude", "Latitude",
@@ -398,26 +397,6 @@ champlain_marker_init (ChamplainMarker *marker)
 
 
 /**
- * champlain_marker_new:
- *
- * Creates a new instance of #ChamplainMarker.
- *
- * Returns: a new #ChamplainMarker ready to be used as a #ClutterActor.
- *
- * Since: 0.4
- */
-ClutterActor *
-champlain_marker_new (void)
-{
-  ChamplainMarker *marker;
-
-  marker = CHAMPLAIN_MARKER (g_object_new (CHAMPLAIN_TYPE_MARKER, NULL));
-
-  return CLUTTER_ACTOR (marker);
-}
-
-
-/**
  * champlain_marker_set_position:
  * @marker: a #ChamplainMarker
  * @latitude: the longitude to center the map at
@@ -425,7 +404,7 @@ champlain_marker_new (void)
  *
  * Positions the marker on the map at the coordinates
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_set_position (ChamplainMarker *marker,
@@ -452,7 +431,7 @@ champlain_marker_set_position (ChamplainMarker *marker,
  *
  * Returns: the latitude of the marker.
  *
- * Since: 0.6
+ * Since: 0.10
  */
 gdouble
 champlain_marker_get_latitude (ChamplainMarker *marker)
@@ -471,7 +450,7 @@ champlain_marker_get_latitude (ChamplainMarker *marker)
  *
  * Returns: the longitude of the marker.
  *
- * Since: 0.6
+ * Since: 0.10
  */
 gdouble
 champlain_marker_get_longitude (ChamplainMarker *marker)
@@ -490,7 +469,7 @@ champlain_marker_get_longitude (ChamplainMarker *marker)
  * Sets the marker as selected or not. This will affect the "Selected" look
  * of the marker.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_set_selected (ChamplainMarker *marker,
@@ -512,7 +491,7 @@ champlain_marker_set_selected (ChamplainMarker *marker,
  *
  * Returns: the selected or not state of the marker.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 gboolean
 champlain_marker_get_selected (ChamplainMarker *marker)
@@ -607,7 +586,7 @@ champlain_marker_get_movable (ChamplainMarker *marker)
  *
  * Animates the marker as if it were falling from the sky onto the map.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_animate_in (ChamplainMarker *marker)
@@ -624,7 +603,7 @@ champlain_marker_animate_in (ChamplainMarker *marker)
  * Animates the marker as if it were falling from the sky onto the map after
  * delay.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_animate_in_with_delay (ChamplainMarker *marker,
@@ -655,7 +634,7 @@ champlain_marker_animate_in_with_delay (ChamplainMarker *marker,
  *
  * Animates the marker as if it were drawn through the sky.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_animate_out (ChamplainMarker *marker)
@@ -697,7 +676,7 @@ on_animation_completed (G_GNUC_UNUSED ClutterAnimation *animation,
  * Animates the marker as if it were drawn through the sky after
  * delay.
  *
- * Since: 0.4
+ * Since: 0.10
  */
 void
 champlain_marker_animate_out_with_delay (ChamplainMarker *marker,

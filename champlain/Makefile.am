@@ -15,6 +15,7 @@ libchamplain_headers_public = 				\
 	$(srcdir)/champlain.h 				\
 	$(srcdir)/champlain-defines.h			\
 	$(srcdir)/champlain-point.h			\
+	$(srcdir)/champlain-custom-marker.h			\
 	$(srcdir)/champlain-view.h			\
 	$(srcdir)/champlain-layer.h 			\
 	$(srcdir)/champlain-marker-layer.h 			\
@@ -71,6 +72,7 @@ libchamplain_sources =					\
 	$(srcdir)/champlain-map-source-factory.c	\
 	$(srcdir)/champlain-map-source-desc.c		\
 	$(srcdir)/champlain-point.c			\
+	$(srcdir)/champlain-custom-marker.c			\
 	$(srcdir)/champlain-renderer.c			\
 	$(srcdir)/champlain-image-renderer.c		\
 	$(srcdir)/champlain-error-tile-renderer.c	\

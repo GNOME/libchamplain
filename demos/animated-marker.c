@@ -35,7 +35,7 @@ create_marker ()
   cairo_t *cr;
 
   /* Create the marker */
-  marker = champlain_marker_new ();
+  marker = champlain_custom_marker_new ();
 
   /* Static filled circle ----------------------------------------------- */
   bg = clutter_cairo_texture_new (MARKER_SIZE, MARKER_SIZE);
@@ -141,7 +141,7 @@ main (int argc, char *argv[])
 
   /* Create a marker */
   marker = create_marker ();
-  clutter_container_add (CLUTTER_CONTAINER (layer), marker, NULL);
+  champlain_marker_layer_add_marker (layer, CHAMPLAIN_MARKER (marker));
 
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (actor), "zoom-level", 12,

@@ -192,8 +192,7 @@ image_downloaded_cb (SoupSession *session,
   texture = NULL;
   champlain_marker_set_position (CHAMPLAIN_MARKER (marker),
       marker_data->latitude, marker_data->longitude);
-  clutter_container_add (CLUTTER_CONTAINER (marker_data->layer), marker, NULL);
-  clutter_actor_show_all (marker);
+  champlain_marker_layer_add_marker (marker_data->layer, CHAMPLAIN_MARKER (marker));
 
 cleanup:
   if (marker_data)
