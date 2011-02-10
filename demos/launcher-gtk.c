@@ -48,13 +48,13 @@ toggle_layer (GtkToggleButton *widget,
 {
   if (gtk_toggle_button_get_active (widget))
     {
-      champlain_marker_layer_show_path (path_layer);
+      champlain_marker_layer_set_path_visible (path_layer, TRUE);
       champlain_marker_layer_animate_in_all_markers (path_layer);
       champlain_marker_layer_animate_in_all_markers (CHAMPLAIN_MARKER_LAYER (layer));
     }
   else
     {
-      champlain_marker_layer_hide_path (path_layer);
+      champlain_marker_layer_set_path_visible (path_layer, FALSE);
       champlain_marker_layer_animate_out_all_markers (path_layer);
       champlain_marker_layer_animate_out_all_markers (CHAMPLAIN_MARKER_LAYER (layer));
     }
@@ -272,6 +272,7 @@ main (int argc,
   champlain_view_center_on (CHAMPLAIN_VIEW (view), 45.466, -73.75);
 
   layer = create_marker_layer (view);
+  champlain_marker_layer_set_path_visible (layer, TRUE);
   champlain_view_add_layer (view, CHAMPLAIN_LAYER (layer));
 
   path_layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_NONE);
@@ -287,7 +288,7 @@ main (int argc,
   append_point (path_layer, 45.4151, -73.1218);
   champlain_marker_layer_set_path_stroke_width (path_layer, 5.0);
   champlain_marker_layer_hide_all_markers (path_layer);
-  champlain_marker_layer_hide_path (path_layer);
+  champlain_marker_layer_set_path_visible (path_layer, FALSE);
   champlain_view_add_layer (view, CHAMPLAIN_LAYER (path_layer));
 
   gtk_widget_set_size_request (widget, 640, 480);

@@ -134,8 +134,9 @@ gdouble champlain_marker_layer_get_path_stroke_width (ChamplainMarkerLayer *laye
 void champlain_marker_layer_set_path_stroke_width (ChamplainMarkerLayer *layer,
     gdouble value);
 
-void champlain_marker_layer_show_path (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_hide_path (ChamplainMarkerLayer *layer);
+gboolean champlain_marker_layer_get_path_visible (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_set_path_visible (ChamplainMarkerLayer *layer, 
+    gboolean show);
 
 G_END_DECLS
 

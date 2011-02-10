@@ -207,10 +207,8 @@ champlain_marker_layer_set_property (GObject *object,
       break;
 
     case PROP_VISIBLE:
-      if (g_value_get_boolean (value))
-        champlain_marker_layer_show_path (CHAMPLAIN_MARKER_LAYER (object));
-      else
-        champlain_marker_layer_hide_path (CHAMPLAIN_MARKER_LAYER (object));
+        champlain_marker_layer_set_path_visible (CHAMPLAIN_MARKER_LAYER (object),
+            g_value_get_boolean (value));
       break;
       
     default:
@@ -295,7 +293,7 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainMarkerLayer:close-path:
+   * ChamplainMarkerLayer:path-closed:
    *
    * The shape is a closed path
    *
@@ -303,13 +301,13 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
    */
   g_object_class_install_property (object_class,
       PROP_CLOSED_PATH,
-      g_param_spec_boolean ("closed-path",
+      g_param_spec_boolean ("path-closed",
           "Closed Path",
           "The Path is Closed",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainMarkerLayer:fill:
+   * ChamplainMarkerLayer:path-fill:
    *
    * The shape should be filled
    *
@@ -317,13 +315,13 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
    */
   g_object_class_install_property (object_class,
       PROP_FILL,
-      g_param_spec_boolean ("fill",
+      g_param_spec_boolean ("path-fill",
           "Fill",
           "The shape is filled",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainMarkerLayer:stroke:
+   * ChamplainMarkerLayer:path-stroke:
    *
    * The shape should be stroked
    *
@@ -331,13 +329,13 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
    */
   g_object_class_install_property (object_class,
       PROP_STROKE,
-      g_param_spec_boolean ("stroke",
+      g_param_spec_boolean ("path-stroke",
           "Stroke",
           "The shape is stroked",
           TRUE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainMarkerLayer:stroke-color:
+   * ChamplainMarkerLayer:path-stroke-color:
    *
    * The path's stroke color
    *
@@ -345,14 +343,14 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
    */
   g_object_class_install_property (object_class,
       PROP_STROKE_COLOR,
-      clutter_param_spec_color ("stroke-color",
+      clutter_param_spec_color ("path-stroke-color",
           "Stroke Color",
           "The path's stroke color",
           &DEFAULT_STROKE_COLOR,
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainMarkerLayer:fill-color:
+   * ChamplainMarkerLayer:path-fill-color:
    *
    * The path's fill color
    *
@@ -360,14 +358,14 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
    */
   g_object_class_install_property (object_class,
       PROP_FILL_COLOR,
-      clutter_param_spec_color ("fill-color",
+      clutter_param_spec_color ("path-fill-color",
           "Fill Color",
           "The path's fill color",
           &DEFAULT_FILL_COLOR,
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainMarkerLayer:stroke-width:
+   * ChamplainMarkerLayer:path-stroke-width:
    *
    * The path's stroke width (in pixels)
    *
@@ -375,7 +373,7 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
    */
   g_object_class_install_property (object_class,
       PROP_STROKE_WIDTH,
-      g_param_spec_double ("stroke-width",
+      g_param_spec_double ("path-stroke-width",
           "Stroke Width",
           "The path's stroke width",
           0, 100.0,
@@ -383,7 +381,7 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainMarkerLayer:visible:
+   * ChamplainMarkerLayer:path-visible:
    *
    * Wether the path is visible
    *
@@ -391,10 +389,10 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
    */
   g_object_class_install_property (object_class,
       PROP_VISIBLE,
-      g_param_spec_boolean ("visible",
+      g_param_spec_boolean ("path-visible",
           "Visible",
           "The path's visibility",
-          TRUE,
+          FALSE,
           CHAMPLAIN_PARAM_READWRITE));
 
 }
@@ -410,7 +408,7 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
   priv->mode = CHAMPLAIN_SELECTION_NONE;
   priv->view = NULL;
 
-  priv->visible = TRUE;
+  priv->visible = FALSE;
   priv->fill = FALSE;
   priv->stroke = TRUE;
   priv->stroke_width = 2.0;
@@ -1249,7 +1247,7 @@ champlain_marker_layer_set_path_fill_color (ChamplainMarkerLayer *layer,
     color = &DEFAULT_FILL_COLOR;
 
   priv->fill_color = clutter_color_copy (color);
-  g_object_notify (G_OBJECT (layer), "fill-color");
+  g_object_notify (G_OBJECT (layer), "path-fill-color");
 }
 
 
@@ -1278,7 +1276,7 @@ champlain_marker_layer_set_path_stroke_color (ChamplainMarkerLayer *layer,
     color = &DEFAULT_STROKE_COLOR;
 
   priv->stroke_color = clutter_color_copy (color);
-  g_object_notify (G_OBJECT (layer), "stroke-color");
+  g_object_notify (G_OBJECT (layer), "path-stroke-color");
 }
 
 
@@ -1336,7 +1334,7 @@ champlain_marker_layer_set_path_stroke (ChamplainMarkerLayer *layer,
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
   layer->priv->stroke = value;
-  g_object_notify (G_OBJECT (layer), "stroke");
+  g_object_notify (G_OBJECT (layer), "path-stroke");
 }
 
 
@@ -1375,7 +1373,7 @@ champlain_marker_layer_set_path_fill (ChamplainMarkerLayer *layer,
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
   layer->priv->fill = value;
-  g_object_notify (G_OBJECT (layer), "fill");
+  g_object_notify (G_OBJECT (layer), "path-fill");
 }
 
 
@@ -1414,7 +1412,7 @@ champlain_marker_layer_set_path_stroke_width (ChamplainMarkerLayer *layer,
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
   layer->priv->stroke_width = value;
-  g_object_notify (G_OBJECT (layer), "stroke-width");
+  g_object_notify (G_OBJECT (layer), "path-stroke-width");
 }
 
 
@@ -1438,39 +1436,44 @@ champlain_marker_layer_get_path_stroke_width (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_marker_layer_show_path:
+ * champlain_marker_layer_set_path_visible:
  * @layer: a #ChamplainMarkerLayer
+ * @value: TRUE to make the path visible
  *
- * Makes the path visible
+ * Sets path visibility.
  *
  * Since: 0.10
  */
 void
-champlain_marker_layer_show_path (ChamplainMarkerLayer *layer)
+champlain_marker_layer_set_path_visible (ChamplainMarkerLayer *layer,
+    gboolean value)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  layer->priv->visible = TRUE;
-  clutter_actor_show (CLUTTER_ACTOR (layer->priv->path_actor));
-  g_object_notify (G_OBJECT (layer->priv->path_actor), "visible");
+  layer->priv->visible = value;
+  if (value)
+    clutter_actor_show (CLUTTER_ACTOR (layer->priv->path_actor));
+  else
+    clutter_actor_hide (CLUTTER_ACTOR (layer->priv->path_actor));
+  g_object_notify (G_OBJECT (layer), "path-visible");
 }
 
 
 /**
- * champlain_marker_layer_hide_path:
+ * champlain_marker_layer_get_path_visible:
  * @layer: a #ChamplainMarkerLayer
  *
- * Hides the path
+ * Gets path visibility.
+ *
+ * Returns: TRUE when the path is visible, FALSE otherwise
  *
  * Since: 0.10
  */
-void
-champlain_marker_layer_hide_path (ChamplainMarkerLayer *layer)
+gboolean 
+champlain_marker_layer_get_path_visible (ChamplainMarkerLayer *layer)
 {
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
+  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), FALSE);
 
-  layer->priv->visible = FALSE;
-  clutter_actor_hide (CLUTTER_ACTOR (layer->priv->path_actor));
-  g_object_notify (G_OBJECT (layer->priv->path_actor), "visible");
+  return layer->priv->visible;
 }
 
