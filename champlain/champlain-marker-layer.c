@@ -723,9 +723,10 @@ void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
  * champlain_marker_layer_get_markers:
  * @layer: a #ChamplainMarkerLayer
  *
- * Gets the list of all markers inserted into the layer.
+ * Gets a copy of the list of all markers inserted into the layer. You should
+ * free the list but not its contents.
  * 
- * Returns: (transfer none) (element-type ChamplainMarker): the list
+ * Returns: (transfer container) (element-type ChamplainMarker): the list
  *
  * Since: 0.10
  */
@@ -734,7 +735,7 @@ champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
 
-  return priv->markers;
+  return g_list_copy (priv->markers);
 }
 
 
