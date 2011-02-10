@@ -894,15 +894,15 @@ champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer)
 
 
 /**
- * champlain_marker_layer_set_all_markers_movable:
+ * champlain_marker_layer_set_all_markers_draggable:
  * @layer: a #ChamplainMarkerLayer
  *
- * Sets all markers movable
+ * Sets all markers draggable
  *
  * Since: 0.10
  */
 void
-champlain_marker_layer_set_all_markers_movable (ChamplainMarkerLayer *layer)
+champlain_marker_layer_set_all_markers_draggable (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
@@ -913,21 +913,21 @@ champlain_marker_layer_set_all_markers_movable (ChamplainMarkerLayer *layer)
     {
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
 
-      champlain_marker_set_movable (marker, TRUE);
+      champlain_marker_set_draggable (marker, TRUE);
     }
 }
 
 
 /**
- * champlain_marker_layer_set_all_markers_unmovable:
+ * champlain_marker_layer_set_all_markers_undraggable:
  * @layer: a #ChamplainMarkerLayer
  *
- * Sets all markers unmovable
+ * Sets all markers undraggable
  *
  * Since: 0.10
  */
 void
-champlain_marker_layer_set_all_markers_unmovable (ChamplainMarkerLayer *layer)
+champlain_marker_layer_set_all_markers_undraggable (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
@@ -938,7 +938,7 @@ champlain_marker_layer_set_all_markers_unmovable (ChamplainMarkerLayer *layer)
     {
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
 
-      champlain_marker_set_movable (marker, FALSE);
+      champlain_marker_set_draggable (marker, FALSE);
     }
 }
 

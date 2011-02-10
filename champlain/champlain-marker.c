@@ -67,7 +67,7 @@ enum
   PROP_LATITUDE,
   PROP_SELECTED,
   PROP_SELECTABLE,
-  PROP_MOVABLE,
+  PROP_DRAGGABLE,
 };
 
 /* static guint champlain_marker_signals[LAST_SIGNAL] = { 0, }; */
@@ -83,7 +83,7 @@ struct _ChamplainMarkerPrivate
   gdouble lat;
   gboolean selected;
   gboolean selectable;
-  gboolean movable;
+  gboolean draggable;
   
   gfloat click_x;
   gfloat click_y;
@@ -116,8 +116,8 @@ champlain_marker_get_property (GObject *object,
       g_value_set_boolean (value, priv->selectable);
       break;
       
-    case PROP_MOVABLE:
-      g_value_set_boolean (value, priv->movable);
+    case PROP_DRAGGABLE:
+      g_value_set_boolean (value, priv->draggable);
       break;
       
     default:
@@ -165,10 +165,10 @@ champlain_marker_set_property (GObject *object,
       break;
     }
 
-    case PROP_MOVABLE:
+    case PROP_DRAGGABLE:
     {
       gboolean bvalue = g_value_get_boolean (value);
-      champlain_marker_set_movable (marker, bvalue);
+      champlain_marker_set_draggable (marker, bvalue);
       break;
     }
 
@@ -236,7 +236,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    */
   g_object_class_install_property (object_class, PROP_SELECTED,
       g_param_spec_boolean ("selected", "Selected",
-          "The sighlighted stated of the marker",
+          "The sighlighted state of the marker",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
           
   /**
@@ -248,19 +248,19 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    */
   g_object_class_install_property (object_class, PROP_SELECTABLE,
       g_param_spec_boolean ("selectable", "Selectable",
-          "The movable stated of the marker",
+          "The draggable state of the marker",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainMarker:movable:
+   * ChamplainMarker:draggable:
    *
-   * The movable state of the marker
+   * The draggable state of the marker
    *
    * Since: 0.10
    */
-  g_object_class_install_property (object_class, PROP_MOVABLE,
-      g_param_spec_boolean ("movable", "Movable",
-          "The movable state of the marker",
+  g_object_class_install_property (object_class, PROP_DRAGGABLE,
+      g_param_spec_boolean ("draggable", "Draggable",
+          "The draggable state of the marker",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
@@ -377,7 +377,7 @@ button_press_event_cb (ClutterActor        *actor,
   if (clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
                                            &priv->click_x, &priv->click_y))
     {
-      if (priv->movable) 
+      if (priv->draggable) 
         {
           g_signal_connect (stage,
                             "captured-event",
@@ -414,7 +414,7 @@ champlain_marker_init (ChamplainMarker *marker)
   priv->lon = 0;
   priv->selected = FALSE;
   priv->selectable = TRUE;
-  priv->movable = FALSE;
+  priv->draggable = FALSE;
   
   clutter_actor_set_reactive (CLUTTER_ACTOR (marker), TRUE);
   
@@ -571,42 +571,42 @@ champlain_marker_get_selectable (ChamplainMarker *marker)
 }
 
 /**
- * champlain_marker_set_movable:
+ * champlain_marker_set_draggable:
  * @marker: a #ChamplainMarker
- * @value: the movable state
+ * @value: the draggable state
  *
- * Sets the marker as movable or not. 
+ * Sets the marker as draggable or not. 
  *
  * Since: 0.10
  */
 void
-champlain_marker_set_movable (ChamplainMarker *marker,
+champlain_marker_set_draggable (ChamplainMarker *marker,
     gboolean value)
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
 
-  marker->priv->movable = value;
+  marker->priv->draggable = value;
 
-  g_object_notify (G_OBJECT (marker), "movable");
+  g_object_notify (G_OBJECT (marker), "draggable");
 }
 
 
 /**
- * champlain_marker_get_movable:
+ * champlain_marker_get_draggable:
  * @marker: a #ChamplainMarker
  *
- * Checks whether the marker is movable.
+ * Checks whether the marker is draggable.
  *
- * Returns: the movable or not state of the marker.
+ * Returns: the draggable or not state of the marker.
  *
  * Since: 0.10
  */
 gboolean
-champlain_marker_get_movable (ChamplainMarker *marker)
+champlain_marker_get_draggable (ChamplainMarker *marker)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), FALSE);
 
-  return marker->priv->movable;
+  return marker->priv->draggable;
 }
 
 /**

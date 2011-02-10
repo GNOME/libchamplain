@@ -62,7 +62,7 @@ create_marker_layer (G_GNUC_UNUSED ChamplainView *view)
       -71.918907);
   champlain_marker_layer_add_marker (layer, CHAMPLAIN_MARKER (marker));
   
-  champlain_marker_layer_set_all_markers_movable (layer);
+  champlain_marker_layer_set_all_markers_draggable (layer);
 
   clutter_actor_show (layer_actor);
   return layer;

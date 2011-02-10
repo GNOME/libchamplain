@@ -102,8 +102,8 @@ void champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer
 void champlain_marker_layer_show_all_markers (ChamplainMarkerLayer *layer);
 void champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer);
 
-void champlain_marker_layer_set_all_markers_movable (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_all_markers_unmovable (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_set_all_markers_draggable (ChamplainMarkerLayer *layer);
+void champlain_marker_layer_set_all_markers_undraggable (ChamplainMarkerLayer *layer);
 
 void champlain_marker_layer_select_all_markers (ChamplainMarkerLayer *layer);
 void champlain_marker_layer_unselect_all_markers (ChamplainMarkerLayer *layer);

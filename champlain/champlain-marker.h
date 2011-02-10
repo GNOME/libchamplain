@@ -79,9 +79,9 @@ void champlain_marker_set_selectable (ChamplainMarker *marker,
     gboolean value);
 gboolean champlain_marker_get_selectable (ChamplainMarker *marker);
 
-void champlain_marker_set_movable (ChamplainMarker *marker,
+void champlain_marker_set_draggable (ChamplainMarker *marker,
     gboolean value);
-gboolean champlain_marker_get_movable (ChamplainMarker *marker);
+gboolean champlain_marker_get_draggable (ChamplainMarker *marker);
 
 void champlain_marker_set_selected (ChamplainMarker *marker,
     gboolean value);
