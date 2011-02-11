@@ -235,7 +235,8 @@ static void
 update_viewport (ChamplainView *view, 
     gfloat x, 
     gfloat y, 
-    gboolean force)
+    gboolean force_relocate,
+    gboolean set_coords)
 {
   DEBUG_LOG ()
 
@@ -247,7 +248,7 @@ update_viewport (ChamplainView *view,
   priv->viewport_x = x - priv->anchor_x - priv->viewport_width / 2.0;
   priv->viewport_y = y - priv->anchor_y - priv->viewport_height / 2.0;
   
-  if (relocate || force)
+  if (relocate || force_relocate)
     {
       g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
       mx_viewport_set_origin (MX_VIEWPORT (priv->viewport),
@@ -257,18 +258,21 @@ update_viewport (ChamplainView *view,
       g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
     }
 
-  priv->longitude = champlain_map_source_get_longitude (priv->map_source,
-      priv->zoom_level, 
-      x);
+  if (set_coords)
+    {
+      priv->longitude = champlain_map_source_get_longitude (priv->map_source,
+          priv->zoom_level, 
+          x);
 
-  priv->latitude = champlain_map_source_get_latitude (priv->map_source,
-      priv->zoom_level,
-      y);
+      priv->latitude = champlain_map_source_get_latitude (priv->map_source,
+          priv->zoom_level,
+          y);
+          
+      g_object_notify (G_OBJECT (view), "longitude");
+      g_object_notify (G_OBJECT (view), "latitude");
+    }
 
   view_load_visible_tiles (view);
-
-  g_object_notify (G_OBJECT (view), "longitude");
-  g_object_notify (G_OBJECT (view), "latitude");
 }
 
 
@@ -287,7 +291,7 @@ panning_completed (G_GNUC_UNUSED MxKineticScrollView *scroll,
   absolute_x = x + priv->anchor_x + priv->viewport_width / 2.0;
   absolute_y = y + priv->anchor_y + priv->viewport_height / 2.0;
       
-  update_viewport (view, absolute_x, absolute_y, FALSE);
+  update_viewport (view, absolute_x, absolute_y, FALSE, TRUE);
 }
 
 
@@ -1024,7 +1028,7 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
       absolute_x = x + priv->anchor_x + priv->viewport_width / 2.0;
       absolute_y = y + priv->anchor_y + priv->viewport_height / 2.0;
       
-      update_viewport (view, absolute_x, absolute_y, FALSE);
+      update_viewport (view, absolute_x, absolute_y, FALSE, TRUE);
       
       g_timer_start (priv->update_viewport_timer);
     }
@@ -1299,12 +1303,15 @@ champlain_view_center_on (ChamplainView *view,
   priv->longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
   priv->latitude = CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
 
+  g_object_notify (G_OBJECT (view), "longitude");
+  g_object_notify (G_OBJECT (view), "latitude");
+
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
 
   DEBUG ("Centering on %f, %f (%d, %d)", latitude, longitude, x, y);
   
-  update_viewport (view, x, y, TRUE);
+  update_viewport (view, x, y, TRUE, FALSE);
 }
 
 
