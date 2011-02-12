@@ -35,6 +35,7 @@
 #include "champlain-enum-types.h"
 #include "champlain-private.h"
 #include "champlain-view.h"
+#include "champlain-group.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
@@ -81,7 +82,7 @@ struct _ChamplainMarkerLayerPrivate
   gdouble stroke_width;
   gboolean visible;
   
-  ClutterGroup *content_group;
+  ChamplainGroup *content_group;
   GList *markers;
 };
 
@@ -417,11 +418,11 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
   priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
 
-  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
+  priv->content_group = CHAMPLAIN_GROUP (champlain_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
   
   //TODO destroy + ref()
-  priv->path_actor = clutter_group_new ();
+  priv->path_actor = champlain_group_new ();
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->path_actor);
   
 }
@@ -652,7 +653,7 @@ add_marker (ChamplainMarkerLayer *layer,
 
   g_signal_connect (G_OBJECT (marker), "drag-motion",
       G_CALLBACK (marker_move_by_cb), layer);
-
+      
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
   set_marker_position (layer, marker);
   if (append)
@@ -710,11 +711,11 @@ void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
           G_CALLBACK (marker_position_notify), layer);
     }
 
-  clutter_group_remove_all (CLUTTER_GROUP (priv->content_group));
+  champlain_group_remove_all (CHAMPLAIN_GROUP (priv->content_group));
   g_list_free (priv->markers);
   priv->markers = NULL;
 
-  priv->path_actor = clutter_group_new ();
+  priv->path_actor = champlain_group_new ();
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->path_actor);
 }
 
@@ -1074,16 +1075,17 @@ redraw_path (ChamplainMarkerLayer *layer)
   ChamplainView *view = priv->view;
   gdouble x, y;
   
+  
   /* layer not yet added to the view */
   if (view == NULL)
     return;
-    
+
   clutter_actor_get_size (CLUTTER_ACTOR (view), &width, &height);
 
   if (!priv->visible || width == 0.0 || height == 0.0)
     return;
 
-  clutter_group_remove_all (CLUTTER_GROUP (priv->path_actor));
+  champlain_group_remove_all (CHAMPLAIN_GROUP (priv->path_actor));
   cairo_texture = clutter_cairo_texture_new (width, height);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->path_actor), cairo_texture);
   

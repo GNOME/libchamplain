@@ -43,6 +43,7 @@ libchamplain_headers_public = 				\
 
 libchamplain_headers_private =	\
 	$(srcdir)/champlain-debug.h	\
+	$(srcdir)/champlain-group.h	\
 	$(srcdir)/champlain-private.h
 
 
@@ -56,8 +57,8 @@ libchamplain_sources =					\
 	$(srcdir)/champlain-debug.c 			\
 	$(srcdir)/champlain-view.c 			\
 	$(srcdir)/champlain-layer.c 			\
-	$(srcdir)/champlain-marker-layer.c 			\
-	$(srcdir)/champlain-marker.c 		\
+	$(srcdir)/champlain-marker-layer.c		\
+	$(srcdir)/champlain-marker.c	 		\
 	$(srcdir)/champlain-label.c 			\
 	$(srcdir)/champlain-scale.c			\
 	$(srcdir)/champlain-license.c			\
@@ -72,13 +73,14 @@ libchamplain_sources =					\
 	$(srcdir)/champlain-map-source-factory.c	\
 	$(srcdir)/champlain-map-source-desc.c		\
 	$(srcdir)/champlain-point.c			\
-	$(srcdir)/champlain-custom-marker.c			\
+	$(srcdir)/champlain-custom-marker.c		\
 	$(srcdir)/champlain-renderer.c			\
 	$(srcdir)/champlain-image-renderer.c		\
 	$(srcdir)/champlain-error-tile-renderer.c	\
 	$(srcdir)/champlain-file-tile-source.c		\
 	$(srcdir)/champlain-null-tile-source.c		\
 	$(srcdir)/champlain-network-bbox-tile-source.c	\
+	$(srcdir)/champlain-group.c			\
 	$(srcdir)/champlain-bounding-box.c
 
 champlain-features.h: $(top_builddir)/config.status
