@@ -822,6 +822,8 @@ draw_label (ChamplainLabel *label)
     clutter_actor_set_anchor_point (CLUTTER_ACTOR (label),
         0,
         clutter_actor_get_height (priv->text_actor) / 2.0);
+
+  clutter_actor_queue_redraw (CLUTTER_ACTOR (label));
 }
 
 
