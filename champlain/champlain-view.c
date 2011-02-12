@@ -243,6 +243,17 @@ update_viewport (ChamplainView *view,
   ChamplainViewPrivate *priv = view->priv;
   gboolean relocate;
 
+  if (set_coords)
+    {
+      priv->longitude = champlain_map_source_get_longitude (priv->map_source,
+          priv->zoom_level, 
+          x);
+
+      priv->latitude = champlain_map_source_get_latitude (priv->map_source,
+          priv->zoom_level,
+          y);
+    }
+
   relocate = view_update_anchor (view, x, y);
 
   priv->viewport_x = x - priv->anchor_x - priv->viewport_width / 2.0;
@@ -256,18 +267,12 @@ update_viewport (ChamplainView *view,
           priv->viewport_y,
           0);
       g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
+      
+      g_signal_emit_by_name (view, "layer-relocated", NULL);
     }
 
   if (set_coords)
     {
-      priv->longitude = champlain_map_source_get_longitude (priv->map_source,
-          priv->zoom_level, 
-          x);
-
-      priv->latitude = champlain_map_source_get_latitude (priv->map_source,
-          priv->zoom_level,
-          y);
-          
       g_object_notify (G_OBJECT (view), "longitude");
       g_object_notify (G_OBJECT (view), "latitude");
     }
@@ -1271,7 +1276,6 @@ view_update_anchor (ChamplainView *view,
         }
     
       priv->anchor_zoom_level = priv->zoom_level;
-      g_signal_emit_by_name (view, "layer-relocated", NULL);
     }
 
   return need_update;
@@ -1303,15 +1307,15 @@ champlain_view_center_on (ChamplainView *view,
   priv->longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
   priv->latitude = CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
 
-  g_object_notify (G_OBJECT (view), "longitude");
-  g_object_notify (G_OBJECT (view), "latitude");
-
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
 
   DEBUG ("Centering on %f, %f (%d, %d)", latitude, longitude, x, y);
   
   update_viewport (view, x, y, TRUE, FALSE);
+
+  g_object_notify (G_OBJECT (view), "longitude");
+  g_object_notify (G_OBJECT (view), "latitude");
 }
 
 
