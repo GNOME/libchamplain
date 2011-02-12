@@ -134,7 +134,7 @@ typedef struct
 
 struct _ChamplainViewPrivate
 {
-  ClutterActor *stage;
+  ClutterActor *view_box;
 
   ChamplainMapSource *map_source; /* Current map tile source */
   gboolean kinetic_mode;
@@ -510,10 +510,10 @@ champlain_view_dispose (GObject *object)
       priv->map_source = NULL;
     }
 
-  if (priv->stage != NULL)
+  if (priv->view_box != NULL)
     {
-      g_object_unref (priv->stage);
-      priv->stage = NULL;
+      g_object_unref (priv->view_box);
+      priv->view_box = NULL;
     }
 
   if (priv->license_actor != NULL)
@@ -923,7 +923,7 @@ champlain_view_init (ChamplainView *view)
   priv->keep_center_on_resize = TRUE;
   priv->zoom_on_double_click = TRUE;
   priv->license_actor = NULL;
-  priv->stage = NULL;
+  priv->view_box = NULL;
   priv->kinetic_mode = FALSE;
   priv->viewport_x = 0;
   priv->viewport_y = 0;
@@ -990,13 +990,13 @@ champlain_view_init (ChamplainView *view)
   /* Setup stage */
   priv->layout_manager = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_CENTER,
                                   CLUTTER_BIN_ALIGNMENT_CENTER);
-  priv->stage = g_object_ref (clutter_box_new (priv->layout_manager));
+  priv->view_box = g_object_ref (clutter_box_new (priv->layout_manager));
 
   clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->kinetic_scroll,
                           CLUTTER_BIN_ALIGNMENT_FILL,
                           CLUTTER_BIN_ALIGNMENT_FILL);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (view), priv->stage);
+  clutter_container_add_actor (CLUTTER_CONTAINER (view), priv->view_box);
 
   resize_viewport (view);
 
