@@ -82,7 +82,8 @@ struct _ChamplainMarkerLayerPrivate
   gdouble stroke_width;
   gboolean visible;
   
-  ChamplainGroup *content_group;
+  ClutterGroup *content_group;
+  ChamplainGroup *marker_group;
   GList *markers;
 };
 
@@ -227,6 +228,12 @@ champlain_marker_layer_dispose (GObject *object)
   if (priv->view != NULL)
     {
       set_view (CHAMPLAIN_LAYER (self), NULL);
+    }
+
+  if (priv->marker_group)
+    {
+      clutter_actor_destroy (CLUTTER_ACTOR (priv->marker_group));
+      priv->marker_group = NULL;
     }
 
   if (priv->content_group)
@@ -418,13 +425,15 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
   priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
 
-  priv->content_group = CHAMPLAIN_GROUP (champlain_group_new ());
+  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
-  
+
   //TODO destroy + ref()
-  priv->path_actor = champlain_group_new ();
+  priv->path_actor =  clutter_cairo_texture_new (256, 256);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->path_actor);
   
+  priv->marker_group = CHAMPLAIN_GROUP (champlain_group_new ());
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (priv->marker_group));
 }
 
 
@@ -654,7 +663,7 @@ add_marker (ChamplainMarkerLayer *layer,
   g_signal_connect (G_OBJECT (marker), "drag-motion",
       G_CALLBACK (marker_move_by_cb), layer);
       
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->marker_group), CLUTTER_ACTOR (marker));
   set_marker_position (layer, marker);
   if (append)
     priv->markers = g_list_append (priv->markers, marker);
@@ -711,12 +720,9 @@ void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
           G_CALLBACK (marker_position_notify), layer);
     }
 
-  champlain_group_remove_all (CHAMPLAIN_GROUP (priv->content_group));
+  champlain_group_remove_all (CHAMPLAIN_GROUP (priv->marker_group));
   g_list_free (priv->markers);
   priv->markers = NULL;
-
-  priv->path_actor = champlain_group_new ();
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->path_actor);
 }
 
 
@@ -764,7 +770,7 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
   g_signal_handlers_disconnect_by_func (G_OBJECT (marker),
       G_CALLBACK (marker_position_notify), layer);
 
-  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->marker_group), CLUTTER_ACTOR (marker));
   priv->markers = g_list_remove (priv->markers, marker);
   redraw_path (layer);
 }
@@ -1068,12 +1074,12 @@ static void
 redraw_path (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = layer->priv;
-  ClutterActor *cairo_texture;
   cairo_t *cr;
   gfloat width, height;
   GList *elem;
   ChamplainView *view = priv->view;
   gdouble x, y;
+  guint last_width, last_height;
   
   
   /* layer not yet added to the view */
@@ -1084,16 +1090,23 @@ redraw_path (ChamplainMarkerLayer *layer)
 
   if (!priv->visible || width == 0.0 || height == 0.0)
     return;
+    
+  clutter_cairo_texture_get_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), &last_width, &last_height);
 
-  champlain_group_remove_all (CHAMPLAIN_GROUP (priv->path_actor));
-  cairo_texture = clutter_cairo_texture_new (width, height);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->path_actor), cairo_texture);
-  
+  if ((guint)width != last_width || (guint)height != last_height)
+    {
+      clutter_cairo_texture_set_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), width, height);
+    }
+
   champlain_view_get_viewport_origin (priv->view, &x, &y);
-
   clutter_actor_set_position (priv->path_actor, x, y);
 
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (priv->path_actor));
+
+  /* Clear the drawing area */
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_rectangle (cr, 0, 0, width, height);
+  cairo_fill (cr);
 
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
   for (elem = priv->markers; elem != NULL; elem = elem->next)

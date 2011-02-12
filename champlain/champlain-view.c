@@ -61,6 +61,7 @@
 #include "champlain-private.h"
 #include "champlain-tile.h"
 #include "champlain-license.h"
+#include "champlain-group.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
@@ -940,7 +941,7 @@ champlain_view_init (ChamplainView *view)
   priv->update_viewport_timer = g_timer_new();
 
   /* Setup map layer */
-  priv->map_layer = g_object_ref (clutter_group_new ());
+  priv->map_layer = g_object_ref (champlain_group_new ());
   clutter_actor_show (priv->map_layer);
 
   /* Setup user_layers */
