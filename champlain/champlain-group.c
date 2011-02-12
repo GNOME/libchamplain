@@ -166,7 +166,7 @@ champlain_group_real_raise (ClutterContainer *container,
       last_item = g_list_last (priv->children);
 
       if (last_item)
-	sibling = last_item->data;
+        sibling = last_item->data;
 
       priv->children = g_list_append (priv->children, actor);
     }
@@ -183,11 +183,11 @@ champlain_group_real_raise (ClutterContainer *container,
    *
    * FIXME: optimise
    */
-  if (sibling &&
+/*  if (sibling &&
       clutter_actor_get_depth (sibling) != clutter_actor_get_depth (actor))
     {
       clutter_actor_set_depth (actor, clutter_actor_get_depth (sibling));
-    }
+    }*/
 
   clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
@@ -210,7 +210,7 @@ champlain_group_real_lower (ClutterContainer *container,
       last_item = g_list_first (priv->children);
 
       if (last_item)
-	sibling = last_item->data;
+        sibling = last_item->data;
 
       priv->children = g_list_prepend (priv->children, actor);
     }
@@ -222,11 +222,11 @@ champlain_group_real_lower (ClutterContainer *container,
     }
 
   /* See comment in group_raise for this */
-  if (sibling &&
+/*  if (sibling &&
       clutter_actor_get_depth (sibling) != clutter_actor_get_depth (actor))
     {
       clutter_actor_set_depth (actor, clutter_actor_get_depth (sibling));
-    }
+    }*/
 
   clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
@@ -238,7 +238,7 @@ champlain_group_real_sort_depth_order (ClutterContainer *container)
 
 //  priv->children = g_list_sort (priv->children, sort_by_depth);
 
-//  clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
+  clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
 
 static void
