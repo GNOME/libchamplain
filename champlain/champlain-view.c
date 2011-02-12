@@ -156,7 +156,7 @@ struct _ChamplainViewPrivate
   gdouble anchor_zoom_level; /* the zoom_level for which the current anchor has
                                 been computed for */
 
-  ClutterActor *finger_scroll; /* Contains the viewport */
+  ClutterActor *kinetic_scroll; /* Contains the viewport */
   ClutterActor *viewport;  /* Contains the map_layer, license and markers */
   ClutterActor *map_layer; /* Contains tiles actors (grouped by zoom level) */
   
@@ -204,7 +204,7 @@ static void champlain_view_init (ChamplainView *view);
 static void viewport_pos_changed_cb (GObject *gobject,
     GParamSpec *arg1,
     ChamplainView *view);
-static gboolean finger_scroll_button_press_cb (ClutterActor *actor,
+static gboolean kinetic_scroll_button_press_cb (ClutterActor *actor,
     ClutterButtonEvent *event,
     ChamplainView *view);
 static void view_load_visible_tiles (ChamplainView *view);
@@ -220,7 +220,7 @@ static gboolean view_set_zoom_level_at (ChamplainView *view,
 static void tile_state_notify (ChamplainTile *tile,
     G_GNUC_UNUSED GParamSpec *pspec,
     ChamplainView *view);
-static gboolean finger_scroll_key_press_cb (ClutterActor *actor,
+static gboolean kinetic_scroll_key_press_cb (ClutterActor *actor,
     ClutterKeyEvent *event,
     ChamplainView *view);
 static void champlain_view_go_to_with_duration (ChamplainView *view,
@@ -412,7 +412,7 @@ champlain_view_get_property (GObject *object,
     case PROP_DECEL_RATE:
       {
         gdouble decel = 0.0;
-        g_object_get (priv->finger_scroll, "deceleration", &decel, NULL);
+        g_object_get (priv->kinetic_scroll, "deceleration", &decel, NULL);
         g_value_set_double (value, decel);
         break;
       }
@@ -522,11 +522,11 @@ champlain_view_dispose (GObject *object)
       priv->license_actor = NULL;
     }
 
-  if (priv->finger_scroll != NULL)
+  if (priv->kinetic_scroll != NULL)
     {
-      mx_kinetic_scroll_view_stop (MX_KINETIC_SCROLL_VIEW (priv->finger_scroll));
-      g_object_unref (priv->finger_scroll);
-      priv->finger_scroll = NULL;
+      mx_kinetic_scroll_view_stop (MX_KINETIC_SCROLL_VIEW (priv->kinetic_scroll));
+      g_object_unref (priv->kinetic_scroll);
+      priv->kinetic_scroll = NULL;
     }
 
   if (priv->viewport != NULL)
@@ -575,7 +575,7 @@ _update_idle_cb (ChamplainView *view)
 
   ChamplainViewPrivate *priv = view->priv;
 
-  clutter_actor_set_size (priv->finger_scroll,
+  clutter_actor_set_size (priv->kinetic_scroll,
       priv->viewport_width,
       priv->viewport_height);
 
@@ -969,22 +969,22 @@ champlain_view_init (ChamplainView *view)
 
   clutter_actor_raise (priv->user_layers, priv->map_layer);
 
-  /* Setup finger scroll */
-  priv->finger_scroll = g_object_ref (mx_kinetic_scroll_view_new ());
+  /* Setup kinetic scroll */
+  priv->kinetic_scroll = g_object_ref (mx_kinetic_scroll_view_new ());
 
-  g_signal_connect (priv->finger_scroll, "scroll-event",
+  g_signal_connect (priv->kinetic_scroll, "scroll-event",
       G_CALLBACK (scroll_event), view);
-  g_signal_connect (priv->finger_scroll, "panning-completed",
+  g_signal_connect (priv->kinetic_scroll, "panning-completed",
       G_CALLBACK (panning_completed), view);
-  g_signal_connect (priv->finger_scroll, "button-press-event",
-      G_CALLBACK (finger_scroll_button_press_cb), view);
+  g_signal_connect (priv->kinetic_scroll, "button-press-event",
+      G_CALLBACK (kinetic_scroll_button_press_cb), view);
 
   clutter_stage_set_key_focus (CLUTTER_STAGE (clutter_stage_get_default ()),
-      priv->finger_scroll);
-  g_signal_connect (priv->finger_scroll, "key-press-event",
-      G_CALLBACK (finger_scroll_key_press_cb), view);
+      priv->kinetic_scroll);
+  g_signal_connect (priv->kinetic_scroll, "key-press-event",
+      G_CALLBACK (kinetic_scroll_key_press_cb), view);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->finger_scroll),
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->kinetic_scroll),
       priv->viewport);
 
   /* Setup stage */
@@ -992,7 +992,7 @@ champlain_view_init (ChamplainView *view)
                                   CLUTTER_BIN_ALIGNMENT_CENTER);
   priv->stage = g_object_ref (clutter_box_new (priv->layout_manager));
 
-  clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->finger_scroll,
+  clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->kinetic_scroll,
                           CLUTTER_BIN_ALIGNMENT_FILL,
                           CLUTTER_BIN_ALIGNMENT_FILL);
 
@@ -1041,7 +1041,7 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
 
 
 static gboolean
-finger_scroll_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
+kinetic_scroll_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
     ClutterButtonEvent *event,
     ChamplainView *view)
 {
@@ -1173,7 +1173,7 @@ champlain_view_scroll_down (ChamplainView *view)
 
 
 static gboolean
-finger_scroll_key_press_cb (G_GNUC_UNUSED ClutterActor *actor,
+kinetic_scroll_key_press_cb (G_GNUC_UNUSED ClutterActor *actor,
     ClutterKeyEvent *event,
     ChamplainView *view)
 {
@@ -2109,7 +2109,7 @@ champlain_view_set_decel_rate (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view) &&
       rate < 2.0 && rate > 1.0001);
 
-  g_object_set (view->priv->finger_scroll, "deceleration", rate, NULL);
+  g_object_set (view->priv->kinetic_scroll, "deceleration", rate, NULL);
 }
 
 
@@ -2133,7 +2133,7 @@ champlain_view_set_kinetic_mode (ChamplainView *view,
   ChamplainViewPrivate *priv = view->priv;
 
   priv->kinetic_mode = kinetic;
-  mx_kinetic_scroll_view_set_kinetic_mode (MX_KINETIC_SCROLL_VIEW (priv->finger_scroll), kinetic);
+  mx_kinetic_scroll_view_set_kinetic_mode (MX_KINETIC_SCROLL_VIEW (priv->kinetic_scroll), kinetic);
 }
 
 
@@ -2392,7 +2392,7 @@ champlain_view_get_decel_rate (ChamplainView *view)
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
 
   gdouble decel = 0.0;
-  g_object_get (view->priv->finger_scroll, "deceleration", &decel, NULL);
+  g_object_get (view->priv->kinetic_scroll, "deceleration", &decel, NULL);
   return decel;
 }
 
