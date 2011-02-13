@@ -28,7 +28,7 @@
 #include "champlain-tile-source.h"
 #include "champlain-enum-types.h"
 
-G_DEFINE_TYPE (ChamplainTileSource, champlain_tile_source, CHAMPLAIN_TYPE_MAP_SOURCE);
+G_DEFINE_ABSTRACT_TYPE (ChamplainTileSource, champlain_tile_source, CHAMPLAIN_TYPE_MAP_SOURCE);
 
 #define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_TILE_SOURCE, ChamplainTileSourcePrivate))
 
