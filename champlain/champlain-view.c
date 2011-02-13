@@ -554,7 +554,10 @@ champlain_view_dispose (GObject *object)
     champlain_view_stop_go_to (view);
 
   if (priv->update_viewport_timer != NULL)
-    g_timer_destroy (priv->update_viewport_timer);
+    {
+      g_timer_destroy (priv->update_viewport_timer);
+      priv->update_viewport_timer = NULL;
+    }
 
   G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
 }
