@@ -258,6 +258,7 @@ champlain_license_init (ChamplainLicense *license)
   priv->license_actor = NULL;
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (license));
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (license));
 
   create_license (license);
 }

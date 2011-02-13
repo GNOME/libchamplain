@@ -280,6 +280,7 @@ champlain_custom_marker_init (ChamplainCustomMarker *custom_marker)
   custom_marker->priv = priv;
   priv->content_group = CLUTTER_CONTAINER (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (custom_marker));
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (custom_marker));
 }
 
 

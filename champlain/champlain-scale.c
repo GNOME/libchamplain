@@ -405,6 +405,7 @@ champlain_scale_init (ChamplainScale *scale)
   priv->view = NULL;
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (scale));
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (scale));
   
   create_scale (scale);
 }

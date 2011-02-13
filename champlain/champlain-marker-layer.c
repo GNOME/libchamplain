@@ -427,6 +427,7 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
 
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
 
   //TODO destroy + ref()
   priv->path_actor =  clutter_cairo_texture_new (256, 256);

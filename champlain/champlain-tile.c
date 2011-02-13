@@ -419,6 +419,7 @@ champlain_tile_init (ChamplainTile *self)
   priv->content_actor = NULL;
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
 }
 
 
