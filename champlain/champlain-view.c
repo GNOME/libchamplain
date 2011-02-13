@@ -185,7 +185,8 @@ struct _ChamplainViewPrivate
   ClutterLayoutManager *layout_manager;
 };
 
-G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_GROUP);
+G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR);
+
 
 static gboolean scroll_event (ClutterActor *actor,
     ClutterScrollEvent *event,
@@ -259,6 +260,7 @@ update_viewport (ChamplainView *view,
 
   priv->viewport_x = x - priv->anchor_x - priv->viewport_width / 2.0;
   priv->viewport_y = y - priv->anchor_y - priv->viewport_height / 2.0;
+
   
   if (relocate || force_relocate)
     {
@@ -600,24 +602,32 @@ champlain_view_allocate (ClutterActor *actor,
 
   ChamplainView *view = CHAMPLAIN_VIEW (actor);
   ChamplainViewPrivate *priv = view->priv;
+  ClutterActorBox child_box;
   guint width, height;
 
   /* Chain up */
   CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->allocate (actor, box, flags);
-
+  
   width = box->x2 - box->x1;
   height = box->y2 - box->y1;
 
-  if (priv->viewport_width == width && priv->viewport_height == height)
-    return;
+  if (priv->viewport_width != width || priv->viewport_height != height)
+    {
+      g_idle_add_full (G_PRIORITY_HIGH_IDLE,
+          (GSourceFunc) _update_idle_cb,
+          g_object_ref (view),
+          (GDestroyNotify) g_object_unref);
+    }
+
+  child_box.x1 = 0;
+  child_box.x2 = width;
+  child_box.y1 = 0;
+  child_box.y2 = height;
 
   priv->viewport_width = width;
   priv->viewport_height = height;
 
-  g_idle_add_full (G_PRIORITY_HIGH_IDLE,
-      (GSourceFunc) _update_idle_cb,
-      g_object_ref (view),
-      (GDestroyNotify) g_object_unref);
+  clutter_actor_allocate (CLUTTER_ACTOR (priv->view_box), &child_box, flags);
 }
 
 
@@ -634,6 +644,7 @@ champlain_view_realize (ClutterActor *actor)
    * CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->realize (actor);
    * ClutterStage uses clutter_actor_realize.
    */
+   
   clutter_actor_realize (actor);
 
   /* Setup the viewport according to the zoom level */
@@ -690,6 +701,49 @@ champlain_view_get_preferred_height (ClutterActor *actor,
 
 
 static void
+paint (ClutterActor *self)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (self);
+  
+  clutter_actor_paint (CLUTTER_ACTOR (priv->view_box));
+}
+
+
+static void
+pick (ClutterActor *self, 
+    const ClutterColor *color)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->pick (self, color);
+
+  clutter_actor_paint (CLUTTER_ACTOR (priv->view_box));
+}
+
+
+static void
+map (ClutterActor *self)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->map (self);
+
+  clutter_actor_map (CLUTTER_ACTOR (priv->view_box));
+}
+
+
+static void
+unmap (ClutterActor *self)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->unmap (self);
+
+  clutter_actor_unmap (CLUTTER_ACTOR (priv->view_box));
+}
+
+
+static void
 champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 {
   DEBUG_LOG ()
@@ -707,6 +761,10 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   actor_class->get_preferred_width = champlain_view_get_preferred_width;
   actor_class->get_preferred_height = champlain_view_get_preferred_height;
   actor_class->realize = champlain_view_realize;
+  actor_class->paint = paint;
+  actor_class->pick = pick;
+  actor_class->map = map;
+  actor_class->unmap = unmap;
 
   /**
    * ChamplainView:longitude:
@@ -997,7 +1055,8 @@ champlain_view_init (ChamplainView *view)
                           CLUTTER_BIN_ALIGNMENT_FILL,
                           CLUTTER_BIN_ALIGNMENT_FILL);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (view), priv->view_box);
+  clutter_actor_set_parent (CLUTTER_ACTOR (priv->view_box), CLUTTER_ACTOR (view));
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (view));
 
   resize_viewport (view);
 
@@ -1312,7 +1371,7 @@ champlain_view_center_on (ChamplainView *view,
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
 
   DEBUG ("Centering on %f, %f (%d, %d)", latitude, longitude, x, y);
-  
+
   update_viewport (view, x, y, TRUE, FALSE);
 
   g_object_notify (G_OBJECT (view), "longitude");
@@ -2038,6 +2097,7 @@ tile_state_notify (ChamplainTile *tile,
           priv->state = CHAMPLAIN_STATE_DONE;
           g_object_notify (G_OBJECT (view), "state");
         }
+    
     }
 }
 

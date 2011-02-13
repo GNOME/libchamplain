@@ -58,14 +58,14 @@ typedef struct _ChamplainViewPrivate ChamplainViewPrivate;
 
 struct _ChamplainView
 {
-  ClutterGroup group;
+  ClutterActor parent;
 
   ChamplainViewPrivate *priv;
 };
 
 struct _ChamplainViewClass
 {
-  ClutterGroupClass parent_class;
+  ClutterActorClass parent_class;
 };
 
 GType champlain_view_get_type (void);
