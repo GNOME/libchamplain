@@ -23,7 +23,7 @@
  *
  */
 
-/**
+/*
  * SECTION:champlain-group
  * @short_description: A fixed layout container
  *

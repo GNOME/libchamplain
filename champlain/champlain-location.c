@@ -1,7 +1,31 @@
+/*
+ * Copyright (C) 2011 Jiri Techet <techet@gmail.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+/**
+ * SECTION:champlain-location
+ * @short_description: An interface common to objects having latitude and longitude
+ * 
+ * By implementing #ChamplainLocation the object declares that it has latitude
+ * and longitude and can be used to specify location on the map.
+ */
 
 #include "champlain-location.h"
 #include "champlain-private.h"
-
 
 static void
 champlain_location_base_init (gpointer g_iface)
@@ -11,27 +35,27 @@ champlain_location_base_init (gpointer g_iface)
   if (!initialized)
     {
       /**
-       * ChamplainMarker:longitude:
+       * ChamplainLocation:longitude:
        *
-       * The longitude coordonate of the map
+       * The longitude coordonate
        *
        * Since: 0.10
        */
       g_object_interface_install_property (g_iface,
           g_param_spec_double ("longitude", "Longitude",
-              "The longitude coordonate of the marker",
+              "The longitude coordonate",
               -180.0f, 180.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
 
       /**
-       * ChamplainMarker:latitude:
+       * ChamplainLocation:latitude:
        *
-       * The latitude coordonate of the map
+       * The latitude coordonate
        *
        * Since: 0.10
        */
       g_object_interface_install_property (g_iface,
           g_param_spec_double ("latitude", "Latitude",
-              "The latitude coordonate of the marker",
+              "The latitude coordonate",
               -90.0f, 90.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
 
       initialized = TRUE;
@@ -60,11 +84,11 @@ champlain_location_get_type (void)
 
 /**
  * champlain_location_set_position:
- * @marker: a #ChamplainMarker
- * @latitude: the longitude to center the map at
- * @longitude: the longitude to center the map at
+ * @location: a #ChamplainLocation
+ * @latitude: the latitude
+ * @longitude: the longitude
  *
- * Positions the marker on the map at the coordinates
+ * Sets the coordinates of the location
  *
  * Since: 0.10
  */
@@ -81,11 +105,11 @@ champlain_location_set_position (ChamplainLocation *location,
 
 /**
  * champlain_location_get_latitude:
- * @marker: a #ChamplainMarker
+ * @location: a #ChamplainLocation
  *
- * Gets the latitude of the marker.
+ * Gets the latitude coordinate.
  *
- * Returns: the latitude of the marker.
+ * Returns: the latitude coordinate.
  *
  * Since: 0.10
  */
@@ -98,11 +122,11 @@ champlain_location_get_latitude (ChamplainLocation *location)
 
 /**
  * champlain_location_get_longitude:
- * @marker: a #ChamplainMarker
+ * @location: a #ChamplainLocation
  *
- * Gets the longitude of the marker.
+ * Gets the longitude coordinate.
  *
- * Returns: the longitude of the marker.
+ * Returns: the longitude coordinate.
  *
  * Since: 0.10
  */

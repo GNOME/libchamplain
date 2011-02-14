@@ -18,10 +18,10 @@
 
 /**
  * SECTION:champlain-custom-marker
- * @short_description: #ChamplainCustom marker is a marker implementing the
+ * @short_description: #ChamplainCustomMarker is a marker implementing the
  * #ClutterContainer interface. 
  * 
- * #ChamplainCustom marker is a marker implementing the #ClutterContainer 
+ * #ChamplainCustomMarker is a marker implementing the #ClutterContainer 
  * interface. You can insert your custom actors into the container. Don't forget 
  * to set the anchor position in the marker using #clutter_actor_set_anchor_point.
  */

@@ -45,17 +45,24 @@
     <xi:include href="xml/champlain-view.xml"/>
   </part>
   <part>
-    <title>Layers and Markers</title>
+    <title>Layers, Markers and Locations</title>
     <chapter>
       <title>Layers</title>
       <xi:include href="xml/champlain-layer.xml"/>
       <xi:include href="xml/champlain-marker-layer.xml"/>
+      <xi:include href="xml/champlain-path-layer.xml"/>
     </chapter>
     <chapter>
       <title>Markers</title>
       <xi:include href="xml/champlain-marker.xml"/>
       <xi:include href="xml/champlain-label.xml"/>
       <xi:include href="xml/champlain-point.xml"/>
+      <xi:include href="xml/champlain-custom-marker.xml"/>
+    </chapter>
+    <chapter>
+      <title>Locations</title>
+      <xi:include href="xml/champlain-location.xml"/>
+      <xi:include href="xml/champlain-coordinate.xml"/>
     </chapter>
   </part>
   <part>

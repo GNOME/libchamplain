@@ -91,9 +91,6 @@ ChamplainLabelPrivate
 <FILE>champlain-marker</FILE>
 <TITLE>ChamplainMarker</TITLE>
 ChamplainMarker
-champlain_marker_set_position
-champlain_marker_get_latitude
-champlain_marker_get_longitude
 champlain_marker_set_selectable
 champlain_marker_get_selectable
 champlain_marker_set_draggable
@@ -314,7 +311,6 @@ champlain_marker_layer_new_full
 champlain_marker_layer_add_marker
 champlain_marker_layer_remove_marker
 champlain_marker_layer_remove_all
-champlain_marker_layer_insert_marker
 champlain_marker_layer_get_markers
 champlain_marker_layer_animate_in_all_markers
 champlain_marker_layer_animate_out_all_markers
@@ -327,18 +323,6 @@ champlain_marker_layer_unselect_all_markers
 champlain_marker_layer_set_selection_mode
 champlain_marker_layer_get_selection_mode
 champlain_marker_layer_get_bounding_box
-champlain_marker_layer_get_path_fill_color
-champlain_marker_layer_set_path_fill_color
-champlain_marker_layer_get_path_stroke_color
-champlain_marker_layer_set_path_stroke_color
-champlain_marker_layer_get_path_fill
-champlain_marker_layer_set_path_fill
-champlain_marker_layer_get_path_stroke
-champlain_marker_layer_set_path_stroke
-champlain_marker_layer_get_path_stroke_width
-champlain_marker_layer_set_path_stroke_width
-champlain_marker_layer_get_path_visible
-champlain_marker_layer_set_path_visible
 <SUBSECTION Standard>
 CHAMPLAIN_MARKER_LAYER
 CHAMPLAIN_IS_MARKER_LAYER
@@ -727,4 +711,74 @@ CHAMPLAIN_CUSTOM_MARKER_GET_CLASS
 <SUBSECTION Private>
 ChamplainCustomMarkerClass
 ChamplainCustomMarkerPrivate
+</SECTION>
+
+<SECTION>
+<FILE>champlain-path-layer</FILE>
+<TITLE>ChamplainPathLayer</TITLE>
+ChamplainPathLayer
+champlain_path_layer_new
+champlain_path_layer_add_node
+champlain_path_layer_remove_node
+champlain_path_layer_remove_all
+champlain_path_layer_insert_node
+champlain_path_layer_get_nodes
+champlain_path_layer_get_bounding_box
+champlain_path_layer_get_fill_color
+champlain_path_layer_set_fill_color
+champlain_path_layer_get_stroke_color
+champlain_path_layer_set_stroke_color
+champlain_path_layer_get_fill
+champlain_path_layer_set_fill
+champlain_path_layer_get_stroke
+champlain_path_layer_set_stroke
+champlain_path_layer_get_stroke_width
+champlain_path_layer_set_stroke_width
+champlain_path_layer_get_visible
+champlain_path_layer_set_visible
+<SUBSECTION Standard>
+CHAMPLAIN_PATH_LAYER
+CHAMPLAIN_IS_PATH_LAYER
+CHAMPLAIN_TYPE_PATH_LAYER
+champlain_path_layer_get_type
+CHAMPLAIN_PATH_LAYER_CLASS
+CHAMPLAIN_IS_PATH_LAYER_CLASS
+CHAMPLAIN_PATH_LAYER_GET_CLASS
+<SUBSECTION Private>
+ChamplainPathLayerClass
+ChamplainPathLayerPrivate
+</SECTION>
+
+<SECTION>
+<FILE>champlain-coordinate</FILE>
+<TITLE>ChamplainCoordinate</TITLE>
+ChamplainCoordinate
+champlain_coordinate_new
+champlain_coordinate_new_full
+<SUBSECTION Standard>
+CHAMPLAIN_COORDINATE
+CHAMPLAIN_IS_COORDINATE
+CHAMPLAIN_TYPE_COORDINATE
+champlain_coordinate_get_type
+CHAMPLAIN_COORDINATE_CLASS
+CHAMPLAIN_IS_COORDINATE_CLASS
+CHAMPLAIN_COORDINATE_GET_CLASS
+<SUBSECTION Private>
+ChamplainCoordinateClass
+ChamplainCoordinatePrivate
+</SECTION>
+
+<SECTION>
+<FILE>champlain-location</FILE>
+<TITLE>ChamplainLocation</TITLE>
+ChamplainLocationIface
+champlain_location_set_position
+champlain_location_get_latitude
+champlain_location_get_longitude
+<SUBSECTION Standard>
+CHAMPLAIN_LOCATION
+CHAMPLAIN_IS_LOCATION
+CHAMPLAIN_TYPE_LOCATION
+champlain_location_get_type
+CHAMPLAIN_LOCATION_GET_IFACE
 </SECTION>

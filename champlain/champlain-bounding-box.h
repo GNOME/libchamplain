@@ -44,6 +44,7 @@ typedef struct _ChamplainBoundingBox ChamplainBoundingBox;
  */
 struct _ChamplainBoundingBox
 {
+  /*< public >*/
   gdouble left;
   gdouble top;
   gdouble right;

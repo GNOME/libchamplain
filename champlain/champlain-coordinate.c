@@ -18,18 +18,9 @@
 
 /**
  * SECTION:champlain-coordinate
- * @short_description: A marker to identify points of interest on a map
- *
- * Markers reprensent points of interest on a map. Markers need to be
- * placed on a layer (a #ChamplainMarkerLayer). Layers have to be added to a
- * #champlainview for the markers to show on the map.
- *
- * A marker is nothing more than a regular #clutteractor. You can draw on
- * it what ever you want.  Set the markers position
- * on the map using #champlain_location_set_position.
- *
- * libchamplain has a more evoluted type of markers with text and image support.
- * See #ChamplainLabel.
+ * @short_description: The simpliest implementation of #ChamplainLocation
+ * 
+ * #ChamplainCoordinate is a simple object implementing #ChamplainLocation.
  */
 
 #include "champlain-coordinate.h"
@@ -218,7 +209,15 @@ champlain_coordinate_init (ChamplainCoordinate *coordinate)
   priv->lon = 0;
 }
 
-
+/**
+ * champlain_coordinate_new:
+ *
+ * Creates a new instance of #ChamplainCoordinate.
+ *
+ * Returns: the created instance.
+ *
+ * Since: 0.10
+ */
 ChamplainCoordinate *
 champlain_coordinate_new ()
 {
@@ -226,6 +225,18 @@ champlain_coordinate_new ()
 }
 
 
+/**
+ * champlain_coordinate_new_full:
+ * @latitude: the latitude coordinate
+ * @longitude: the longitude coordinate
+ * 
+ * Creates a new instance of #ChamplainCoordinate initialized with the given 
+ * coordinates.
+ *
+ * Returns: the created instance.
+ *
+ * Since: 0.10
+ */
 ChamplainCoordinate *
 champlain_coordinate_new_full (gdouble latitude, 
     gdouble longitude)

@@ -70,7 +70,6 @@ struct _ChamplainMarkerClass
 GType champlain_marker_get_type (void);
 
 
-
 void champlain_marker_set_selectable (ChamplainMarker *marker,
     gboolean value);
 gboolean champlain_marker_get_selectable (ChamplainMarker *marker);

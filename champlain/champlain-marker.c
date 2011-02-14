@@ -29,8 +29,8 @@
  * it what ever you want.  Set the markers position
  * on the map using #champlain_location_set_position.
  *
- * libchamplain has a more evoluted type of markers with text and image support.
- * See #ChamplainLabel.
+ * This is a base abstract class of all markers. libchamplain has a more evoluted
+ * type of markers with text and image support. See #ChamplainLabel for more details.
  */
 
 #include "config.h"

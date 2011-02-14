@@ -18,13 +18,14 @@
 
 /**
  * SECTION:champlain-path-layer
- * @short_description: A container for #ChamplainLocation
+ * @short_description: A layer displaying line path between inserted #ChamplainLocation
+ * objects
  *
- * A ChamplainPathLayer is little more than a #ClutterContainer. It keeps the
- * paths ordered so that they display correctly.
- *
- * Use #clutter_container_add to add paths to the layer and
- * #clutter_container_remove to remove them.
+ * This layer shows a connection between inserted objects implementing the
+ * #ChamplainLocation interface. This means that both #ChamplainMarker
+ * objects and #ChamplainCoordinate objects can be inserted into the layer.
+ * Of course, custom objects implementing the #ChamplainLocation interface
+ * can be used as well.
  */
 
 #include "config.h"
@@ -477,11 +478,10 @@ champlain_path_layer_init (ChamplainPathLayer *self)
 
 /**
  * champlain_path_layer_new:
- * @mode: Selection mode
  *
  * Creates a new instance of #ChamplainPathLayer.
  *
- * Returns: a new #ChamplainPathLayer ready to be used as a container for the markers.
+ * Returns: a new instance of #ChamplainPathLayer.
  *
  * Since: 0.10
  */
@@ -492,8 +492,6 @@ champlain_path_layer_new ()
 }
 
 
-
-
 static void
 position_notify (ChamplainLocation *location,
     G_GNUC_UNUSED GParamSpec *pspec,
@@ -501,7 +499,6 @@ position_notify (ChamplainLocation *location,
 {
   redraw_path (layer);
 }
-
 
 
 static void
@@ -533,7 +530,7 @@ add_node (ChamplainPathLayer *layer,
  * @layer: a #ChamplainPathLayer
  * @location: a #ChamplainLocation
  *
- * Adds the marker to the layer.
+ * Adds a #ChamplainLocation object to the layer.
  *
  * Since: 0.10
  */
@@ -552,11 +549,12 @@ champlain_path_layer_add_node (ChamplainPathLayer *layer,
  * champlain_path_layer_remove_all:
  * @layer: a #ChamplainPathLayer
  *
- * Removes all markers from the layer.
+ * Removes all #ChamplainLocation objects from the layer.
  *
  * Since: 0.10
  */
-void champlain_path_layer_remove_all (ChamplainPathLayer *layer)
+void 
+champlain_path_layer_remove_all (ChamplainPathLayer *layer)
 {
   ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
@@ -582,7 +580,7 @@ void champlain_path_layer_remove_all (ChamplainPathLayer *layer)
  * champlain_path_layer_get_nodes:
  * @layer: a #ChamplainPathLayer
  *
- * Gets a copy of the list of all markers inserted into the layer. You should
+ * Gets a copy of the list of all #ChamplainLocation objects inserted into the layer. You should
  * free the list but not its contents.
  * 
  * Returns: (transfer container) (element-type ChamplainLocation): the list
@@ -603,7 +601,7 @@ champlain_path_layer_get_nodes (ChamplainPathLayer *layer)
  * @layer: a #ChamplainPathLayer
  * @location: a #ChamplainLocation
  *
- * Removes the marker from the layer.
+ * Removes the #ChamplainLocation object from the layer.
  *
  * Since: 0.10
  */
@@ -629,9 +627,9 @@ champlain_path_layer_remove_node (ChamplainPathLayer *layer,
  * champlain_path_layer_insert_node:
  * @layer: a #ChamplainPathLayer
  * @location: a #ChamplainLocation
- * @position: position in the list where the marker should be inserted
+ * @position: position in the list where the #ChamplainLocation object should be inserted
  *
- * Inserts a marker to the specified position.
+ * Inserts a #ChamplainLocation object to the specified position.
  *
  * Since: 0.10
  */
@@ -780,12 +778,10 @@ set_view (ChamplainLayer *layer,
  * champlain_path_layer_get_bounding_box:
  * @layer: a #ChamplainPathLayer
  *
- * Gets the bounding box occupied by the markers in the layer
+ * Gets the bounding box occupied by the #ChamplainLocation objects in the layer
  *
  * Returns: The bounding box.
  * 
- * FIXME: This doesn't take into account the marker's actor size yet
- *
  * Since: 0.10
  */
 ChamplainBoundingBox *

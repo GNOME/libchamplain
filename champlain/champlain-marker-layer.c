@@ -20,11 +20,8 @@
  * SECTION:champlain-marker-layer
  * @short_description: A container for #ChamplainMarker
  *
- * A ChamplainMarkerLayer is little more than a #ClutterContainer. It keeps the
- * markers ordered so that they display correctly.
- *
- * Use #clutter_container_add to add markers to the layer and
- * #clutter_container_remove to remove them.
+ * A ChamplainMarkerLayer displays markers on the map. It is responsible for
+ * positioning markers correctly, marker selections and group marker operations. 
  */
 
 #include "config.h"
