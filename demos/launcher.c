@@ -92,6 +92,7 @@ main (int argc,
 {
   ClutterActor *actor, *stage, *buttons, *button;
   ChamplainMarkerLayer *layer;
+  ChamplainPathLayer *path;
   gfloat width, total_width = 0;
 
   g_thread_init (NULL);
@@ -130,7 +131,7 @@ main (int argc,
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), buttons);
 
   /* Create the markers and marker layer */
-  layer = create_marker_layer (CHAMPLAIN_VIEW (actor));
+  layer = create_marker_layer (CHAMPLAIN_VIEW (actor), &path);
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
   /* Connect to the click event */

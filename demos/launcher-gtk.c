@@ -220,6 +220,7 @@ main (int argc,
   ClutterActor *scale;
   ClutterBinLayout *layout_manager;
   ChamplainLicense *license_actor;
+  ChamplainPathLayer *path;
 
   g_thread_init (NULL);
   gtk_clutter_init (&argc, &argv);
@@ -267,7 +268,8 @@ main (int argc,
   
   champlain_view_center_on (CHAMPLAIN_VIEW (view), 45.466, -73.75);
 
-  layer = create_marker_layer (view);
+  layer = create_marker_layer (view, &path);
+  champlain_view_add_layer (view, CHAMPLAIN_LAYER (path));
   champlain_view_add_layer (view, CHAMPLAIN_LAYER (layer));
 
   path_layer = champlain_path_layer_new ();

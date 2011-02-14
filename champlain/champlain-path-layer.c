@@ -444,7 +444,7 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
       g_param_spec_boolean ("visible",
           "Visible",
           "The path's visibility",
-          FALSE,
+          TRUE,
           CHAMPLAIN_PARAM_READWRITE));
 
 }
@@ -459,7 +459,7 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   priv = self->priv;
   priv->view = NULL;
 
-  priv->visible = FALSE;
+  priv->visible = TRUE;
   priv->fill = FALSE;
   priv->stroke = TRUE;
   priv->stroke_width = 2.0;
