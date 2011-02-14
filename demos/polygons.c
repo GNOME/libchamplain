@@ -67,14 +67,12 @@ make_button (char *text)
 
 
 static void
-append_point (ChamplainMarkerLayer *layer, gdouble lon, gdouble lat)
+append_point (ChamplainPathLayer *layer, gdouble lon, gdouble lat)
 {
-  ClutterActor *point;  
-  static ClutterColor color = { 0xa4, 0x00, 0x00, 0xff };
+  ChamplainCoordinate *coord;  
   
-  point = champlain_point_new_full (10, &color);
-  champlain_marker_set_position (CHAMPLAIN_MARKER (point), lon, lat);
-  champlain_marker_layer_add_marker (layer, CHAMPLAIN_MARKER (point));
+  coord = champlain_coordinate_new_full (lon, lat);
+  champlain_path_layer_add_node (layer, CHAMPLAIN_LOCATION (coord));
 }
 
 
@@ -83,7 +81,7 @@ main (int argc,
     char *argv[])
 {
   ClutterActor *actor, *stage, *buttons, *button;
-  ChamplainMarkerLayer *layer;
+  ChamplainPathLayer *layer;
   gfloat width, total_width = 0;;
 
   g_thread_init (NULL);
@@ -122,9 +120,12 @@ main (int argc,
   clutter_container_add_actor (CLUTTER_CONTAINER (stage), buttons);
 
   /* draw a line */
-  layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_NONE);
+  layer = champlain_path_layer_new ();
+  champlain_path_layer_set_visible (layer, FALSE);
   /* Cheap approx of Highway 10 */
-  append_point (layer, 45.4095, -73.3197);
+  int i = 0;
+  for (i = 0; i < 50000; i++)
+    append_point (layer, 45.4095 + i / 10000.0, -73.3197 + i / 10000.0);
   append_point (layer, 45.4104, -73.2846);
   append_point (layer, 45.4178, -73.2239);
   append_point (layer, 45.4176, -73.2181);
@@ -133,22 +134,20 @@ main (int argc,
   append_point (layer, 45.3994, -73.1877);
   append_point (layer, 45.4000, -73.1815);
   append_point (layer, 45.4151, -73.1218);
-  champlain_marker_layer_set_path_stroke_width (layer, 5.0);
-  champlain_marker_layer_hide_all_markers (layer);
-  champlain_marker_layer_set_path_visible (layer, TRUE);
+  champlain_path_layer_set_stroke_width (layer, 5.0);
+  champlain_path_layer_set_visible (layer, TRUE);
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
   /* draw a path */
-  layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_NONE);
+  layer = champlain_path_layer_new ();
   append_point (layer, 45.1386, -73.9196);
   append_point (layer, 45.1229, -73.8991);
   append_point (layer, 45.0946, -73.9531);
   append_point (layer, 45.1085, -73.9714);
   append_point (layer, 45.1104, -73.9761);
-  g_object_set (layer, "path-closed", TRUE, NULL);
-  g_object_set (layer, "path-fill", TRUE, NULL);
-  champlain_marker_layer_hide_all_markers (layer);
-  champlain_marker_layer_set_path_visible (layer, TRUE);
+  g_object_set (layer, "closed", TRUE, NULL);
+  g_object_set (layer, "fill", TRUE, NULL);
+  champlain_path_layer_set_visible (layer, TRUE);
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
   /* Finish initialising the map view */

@@ -26,7 +26,7 @@
  *
  * A marker is nothing more than a regular #ClutterActor.  You can draw on it
  * what ever you want. Set the markers position on the map
- * using #champlain_marker_set_position.
+ * using #champlain_location_set_position.
  *
  * Champlain has a default type of markers with text. To create one,
  * use #champlain_label_new_with_text.

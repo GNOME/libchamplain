@@ -25,6 +25,7 @@
 #define CHAMPLAIN_MARKER_H
 
 #include <champlain/champlain-defines.h>
+#include <champlain/champlain-location.h>
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
@@ -69,11 +70,6 @@ struct _ChamplainMarkerClass
 GType champlain_marker_get_type (void);
 
 
-void champlain_marker_set_position (ChamplainMarker *marker,
-    gdouble latitude,
-    gdouble longitude);
-gdouble champlain_marker_get_latitude (ChamplainMarker *marker);
-gdouble champlain_marker_get_longitude (ChamplainMarker *marker);
 
 void champlain_marker_set_selectable (ChamplainMarker *marker,
     gboolean value);

@@ -1676,7 +1676,7 @@ champlain_view_add_layer (ChamplainView *view,
   DEBUG_LOG ()
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
   
   clutter_container_add_actor (CLUTTER_CONTAINER (view->priv->user_layers),
       CLUTTER_ACTOR (layer));
@@ -1701,7 +1701,7 @@ champlain_view_remove_layer (ChamplainView *view,
   DEBUG_LOG ()
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
+  g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
   champlain_layer_set_view (layer, NULL);      
 

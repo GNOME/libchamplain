@@ -31,8 +31,11 @@
 
 #include "champlain/champlain-layer.h"
 #include "champlain/champlain-marker-layer.h"
+#include "champlain/champlain-path-layer.h"
 #include "champlain/champlain-point.h"
 #include "champlain/champlain-custom-marker.h"
+#include "champlain/champlain-location.h"
+#include "champlain/champlain-coordinate.h"
 #include "champlain/champlain-marker.h"
 #include "champlain/champlain-label.h"
 #include "champlain/champlain-view.h"

@@ -190,7 +190,7 @@ image_downloaded_cb (SoupSession *session,
   /* Finally create a marker with the texture */
   marker = champlain_label_new_with_image (texture);
   texture = NULL;
-  champlain_marker_set_position (CHAMPLAIN_MARKER (marker),
+  champlain_location_set_position (CHAMPLAIN_LOCATION (marker),
       marker_data->latitude, marker_data->longitude);
   champlain_marker_layer_add_marker (marker_data->layer, CHAMPLAIN_MARKER (marker));
 

@@ -208,7 +208,7 @@ append_point (ChamplainMarkerLayer *layer, gdouble lon, gdouble lat)
   static ClutterColor color = { 0xa4, 0x00, 0x00, 0xff };
   
   point = champlain_point_new_full (10, &color);
-  champlain_marker_set_position (CHAMPLAIN_MARKER (point), lon, lat);
+  champlain_location_set_position (CHAMPLAIN_LOCATION (point), lon, lat);
   champlain_marker_layer_add_marker (layer, CHAMPLAIN_MARKER (point));
 }
 

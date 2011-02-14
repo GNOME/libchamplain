@@ -601,9 +601,9 @@ set_marker_position (ChamplainMarkerLayer *layer, ChamplainMarker *marker)
 
   champlain_view_get_viewport_origin (priv->view, &origin_x, &origin_y);
   x = champlain_view_longitude_to_x (priv->view, 
-    champlain_marker_get_longitude (marker)) + origin_x;
+    champlain_location_get_longitude (CHAMPLAIN_LOCATION (marker))) + origin_x;
   y = champlain_view_latitude_to_y (priv->view, 
-    champlain_marker_get_latitude (marker)) + origin_y;
+    champlain_location_get_latitude (CHAMPLAIN_LOCATION (marker))) + origin_y;
 
   clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
 }
@@ -629,8 +629,8 @@ marker_move_by_cb (ChamplainMarker *marker,
   ChamplainView *view = priv->view;
   gdouble x, y, lat, lon;
 
-  x = champlain_view_longitude_to_x (view, champlain_marker_get_longitude (marker));
-  y = champlain_view_latitude_to_y (view, champlain_marker_get_latitude (marker));
+  x = champlain_view_longitude_to_x (view, champlain_location_get_longitude (CHAMPLAIN_LOCATION (marker)));
+  y = champlain_view_latitude_to_y (view, champlain_location_get_latitude (CHAMPLAIN_LOCATION (marker)));
   
   x += dx;
   y += dy;
@@ -638,7 +638,7 @@ marker_move_by_cb (ChamplainMarker *marker,
   lon = champlain_view_x_to_longitude (view, x);
   lat = champlain_view_y_to_latitude (view, y);
     
-  champlain_marker_set_position (marker, lat, lon);
+  champlain_location_set_position (CHAMPLAIN_LOCATION (marker), lat, lon);
 }
 
 
@@ -1115,8 +1115,8 @@ redraw_path (ChamplainMarkerLayer *layer)
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
       gfloat x, y;
 
-      x = champlain_view_longitude_to_x (view, champlain_marker_get_longitude (marker));
-      y = champlain_view_latitude_to_y (view, champlain_marker_get_latitude (marker));
+      x = champlain_view_longitude_to_x (view, champlain_location_get_longitude (CHAMPLAIN_LOCATION (marker)));
+      y = champlain_view_latitude_to_y (view, champlain_location_get_latitude (CHAMPLAIN_LOCATION (marker)));
 
       cairo_line_to (cr, x, y);
     }

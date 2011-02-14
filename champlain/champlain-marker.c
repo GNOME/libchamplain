@@ -27,7 +27,7 @@
  *
  * A marker is nothing more than a regular #clutteractor. You can draw on
  * it what ever you want.  Set the markers position
- * on the map using #champlain_marker_set_position.
+ * on the map using #champlain_location_set_position.
  *
  * libchamplain has a more evoluted type of markers with text and image support.
  * See #ChamplainLabel.
@@ -72,7 +72,17 @@ enum
 
 /* static guint champlain_marker_signals[LAST_SIGNAL] = { 0, }; */
 
-G_DEFINE_ABSTRACT_TYPE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_ACTOR);
+static void set_position (ChamplainLocation *location,
+    gdouble latitude,
+    gdouble longitude);
+static gdouble get_latitude (ChamplainLocation *location);
+static gdouble get_longitude (ChamplainLocation *location);
+
+static void location_interface_init (ChamplainLocationIface *iface);
+
+G_DEFINE_ABSTRACT_TYPE_WITH_CODE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_ACTOR,
+                         G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION,
+                                                location_interface_init));
 
 #define CHAMPLAIN_MARKER_GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
@@ -140,14 +150,14 @@ champlain_marker_set_property (GObject *object,
     case PROP_LONGITUDE:
     {
       gdouble lon = g_value_get_double (value);
-      champlain_marker_set_position (marker, priv->lat, lon);
+      set_position (CHAMPLAIN_LOCATION (marker), priv->lat, lon);
       break;
     }
 
     case PROP_LATITUDE:
     {
       gdouble lat = g_value_get_double (value);
-      champlain_marker_set_position (marker, lat, priv->lon);
+      set_position (CHAMPLAIN_LOCATION (marker), lat, priv->lon);
       break;
     }
 
@@ -179,6 +189,54 @@ champlain_marker_set_property (GObject *object,
 
 
 static void
+set_position (ChamplainLocation *location,
+    gdouble latitude,
+    gdouble longitude)
+{
+  g_return_if_fail (CHAMPLAIN_IS_MARKER (location));
+
+  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER (location)->priv;
+
+  priv->lon = longitude;
+  priv->lat = latitude;
+
+  g_object_notify (G_OBJECT (location), "latitude");
+  g_object_notify (G_OBJECT (location), "longitude");
+}
+
+
+static gdouble
+get_latitude (ChamplainLocation *location)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MARKER (location), 0.0);
+
+  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER (location)->priv;
+
+  return priv->lat;
+}
+
+
+static gdouble
+get_longitude (ChamplainLocation *location)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MARKER (location), 0.0);
+
+  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER (location)->priv;
+
+  return priv->lon;
+}
+
+
+static void
+location_interface_init (ChamplainLocationIface *iface)
+{
+  iface->get_latitude = get_latitude;
+  iface->get_longitude = get_longitude;
+  iface->set_position = set_position;
+}
+
+
+static void
 champlain_marker_dispose (GObject *object)
 {
   G_OBJECT_CLASS (champlain_marker_parent_class)->dispose (object);
@@ -202,30 +260,6 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
   object_class->dispose = champlain_marker_dispose;
   object_class->get_property = champlain_marker_get_property;
   object_class->set_property = champlain_marker_set_property;
-
-  /**
-   * ChamplainMarker:longitude:
-   *
-   * The longitude coordonate of the map
-   *
-   * Since: 0.10
-   */
-  g_object_class_install_property (object_class, PROP_LONGITUDE,
-      g_param_spec_double ("longitude", "Longitude",
-          "The longitude coordonate of the marker",
-          -180.0f, 180.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-   * ChamplainMarker:latitude:
-   *
-   * The latitude coordonate of the map
-   *
-   * Since: 0.10
-   */
-  g_object_class_install_property (object_class, PROP_LATITUDE,
-      g_param_spec_double ("latitude", "Latitude",
-          "The latitude coordonate of the marker",
-          -90.0f, 90.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainMarker:selected:
@@ -301,7 +335,14 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
     g_signal_new ("drag-finish", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
         g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
-        
+
+  g_object_class_override_property (object_class,
+                                    PROP_LONGITUDE,
+                                    "longitude");
+
+  g_object_class_override_property (object_class,
+                                    PROP_LATITUDE,
+                                    "latitude");
 }
 
 
@@ -424,70 +465,6 @@ champlain_marker_init (ChamplainMarker *marker)
                     marker);
 }
 
-
-/**
- * champlain_marker_set_position:
- * @marker: a #ChamplainMarker
- * @latitude: the longitude to center the map at
- * @longitude: the longitude to center the map at
- *
- * Positions the marker on the map at the coordinates
- *
- * Since: 0.10
- */
-void
-champlain_marker_set_position (ChamplainMarker *marker,
-    gdouble latitude,
-    gdouble longitude)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
-
-  ChamplainMarkerPrivate *priv = marker->priv;
-
-  priv->lon = longitude;
-  priv->lat = latitude;
-
-  g_object_notify (G_OBJECT (marker), "latitude");
-  g_object_notify (G_OBJECT (marker), "longitude");
-}
-
-
-/**
- * champlain_marker_get_latitude:
- * @marker: a #ChamplainMarker
- *
- * Gets the latitude of the marker.
- *
- * Returns: the latitude of the marker.
- *
- * Since: 0.10
- */
-gdouble
-champlain_marker_get_latitude (ChamplainMarker *marker)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), 0.0);
-
-  return marker->priv->lat;
-}
-
-
-/**
- * champlain_marker_get_longitude:
- * @marker: a #ChamplainMarker
- *
- * Gets the longitude of the marker.
- *
- * Returns: the longitude of the marker.
- *
- * Since: 0.10
- */
-gdouble
-champlain_marker_get_longitude (ChamplainMarker *marker)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MARKER (marker), 0.0);
-
-  return marker->priv->lon;
-}
 
 
 /**
