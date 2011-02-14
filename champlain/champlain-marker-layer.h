@@ -91,9 +91,6 @@ void champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
 void champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
     ChamplainMarker *marker);
 void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_insert_marker (ChamplainMarkerLayer *layer,
-    ChamplainMarker *marker,
-    guint position);
 GList *champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer);
 
 void champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer);
@@ -113,30 +110,6 @@ void champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
 ChamplainSelectionMode champlain_marker_layer_get_selection_mode (
     ChamplainMarkerLayer *layer);
 ChamplainBoundingBox *champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer);
-
-ClutterColor *champlain_marker_layer_get_path_fill_color (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_path_fill_color (ChamplainMarkerLayer *layer,
-    const ClutterColor *color);
-
-ClutterColor *champlain_marker_layer_get_path_stroke_color (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_path_stroke_color (ChamplainMarkerLayer *layer,
-    const ClutterColor *color);
-
-gboolean champlain_marker_layer_get_path_fill (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_path_fill (ChamplainMarkerLayer *layer,
-    gboolean value);
-
-gboolean champlain_marker_layer_get_path_stroke (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_path_stroke (ChamplainMarkerLayer *layer,
-    gboolean value);
-
-gdouble champlain_marker_layer_get_path_stroke_width (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_path_stroke_width (ChamplainMarkerLayer *layer,
-    gdouble value);
-
-gboolean champlain_marker_layer_get_path_visible (ChamplainMarkerLayer *layer);
-void champlain_marker_layer_set_path_visible (ChamplainMarkerLayer *layer, 
-    gboolean value);
 
 G_END_DECLS
 

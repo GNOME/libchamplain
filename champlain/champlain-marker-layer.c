@@ -54,63 +54,22 @@ enum
 {
   PROP_0,
   PROP_SELECTION_MODE,
-  PROP_CLOSED_PATH,
-  PROP_STROKE_WIDTH,
-  PROP_STROKE_COLOR,
-  PROP_FILL,
-  PROP_FILL_COLOR,
-  PROP_STROKE,
-  PROP_VISIBLE,
 };
 
-static ClutterColor DEFAULT_FILL_COLOR = { 0xcc, 0x00, 0x00, 0xaa };
-static ClutterColor DEFAULT_STROKE_COLOR = { 0xa4, 0x00, 0x00, 0xff };
-
-//static guint signals[LAST_SIGNAL] = { 0, };
 
 struct _ChamplainMarkerLayerPrivate
 {
   ChamplainSelectionMode mode;
   ChamplainView *view;
   
-  ClutterActor *path_actor;
-  gboolean closed_path;
-  ClutterColor *stroke_color;
-  gboolean fill;
-  ClutterColor *fill_color;
-  gboolean stroke;
-  gdouble stroke_width;
-  gboolean visible;
-  
   ClutterGroup *content_group;
-  ChamplainGroup *marker_group;
-  GList *markers;
 };
-
-static void paint (ClutterActor *self);
-static void pick (ClutterActor *self, 
-    const ClutterColor *color);
-static void get_preferred_width (ClutterActor *self,
-    gfloat for_height,
-    gfloat *min_width_p,
-    gfloat *natural_width_p);
-static void get_preferred_height (ClutterActor *self,
-    gfloat for_width,
-    gfloat *min_height_p,
-    gfloat *natural_height_p);
-static void allocate (ClutterActor *self,
-    const ClutterActorBox *box,
-    ClutterAllocationFlags flags);
-static void map (ClutterActor *self);
-static void unmap (ClutterActor *self);
 
 
 static void marker_selected_cb (ChamplainMarker *marker,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainMarkerLayer *layer);
     
-static void redraw_path (ChamplainMarkerLayer *layer);
-
 static void set_view (ChamplainLayer *layer,
     ChamplainView *view);
 
@@ -130,34 +89,6 @@ champlain_marker_layer_get_property (GObject *object,
       g_value_set_enum (value, priv->mode);
       break;
       
-    case PROP_CLOSED_PATH:
-      g_value_set_boolean (value, priv->closed_path);
-      break;
-
-    case PROP_FILL:
-      g_value_set_boolean (value, priv->fill);
-      break;
-
-    case PROP_STROKE:
-      g_value_set_boolean (value, priv->stroke);
-      break;
-
-    case PROP_FILL_COLOR:
-      clutter_value_set_color (value, priv->fill_color);
-      break;
-
-    case PROP_STROKE_COLOR:
-      clutter_value_set_color (value, priv->stroke_color);
-      break;
-
-    case PROP_STROKE_WIDTH:
-      g_value_set_double (value, priv->stroke_width);
-      break;
-
-    case PROP_VISIBLE:
-      g_value_set_boolean (value, priv->visible);
-      break;
-      
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -171,7 +102,6 @@ champlain_marker_layer_set_property (GObject *object,
     GParamSpec *pspec)
 {
   ChamplainMarkerLayer *self = CHAMPLAIN_MARKER_LAYER (object);
-  ChamplainMarkerLayerPrivate *priv = self->priv;
   
   switch (property_id)
     {
@@ -179,279 +109,9 @@ champlain_marker_layer_set_property (GObject *object,
       champlain_marker_layer_set_selection_mode (self, g_value_get_enum (value));
       break;
       
-    case PROP_CLOSED_PATH:
-      priv->closed_path = g_value_get_boolean (value);
-      break;
-
-    case PROP_FILL:
-      champlain_marker_layer_set_path_fill (CHAMPLAIN_MARKER_LAYER (object),
-          g_value_get_boolean (value));
-      break;
-
-    case PROP_STROKE:
-      champlain_marker_layer_set_path_stroke (CHAMPLAIN_MARKER_LAYER (object),
-          g_value_get_boolean (value));
-      break;
-
-    case PROP_FILL_COLOR:
-      champlain_marker_layer_set_path_fill_color (CHAMPLAIN_MARKER_LAYER (object),
-          clutter_value_get_color (value));
-      break;
-
-    case PROP_STROKE_COLOR:
-      champlain_marker_layer_set_path_stroke_color (CHAMPLAIN_MARKER_LAYER (object),
-          clutter_value_get_color (value));
-      break;
-
-    case PROP_STROKE_WIDTH:
-      champlain_marker_layer_set_path_stroke_width (CHAMPLAIN_MARKER_LAYER (object),
-          g_value_get_double (value));
-      break;
-
-    case PROP_VISIBLE:
-        champlain_marker_layer_set_path_visible (CHAMPLAIN_MARKER_LAYER (object),
-            g_value_get_boolean (value));
-      break;
-      
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
-}
-
-
-static void
-champlain_marker_layer_dispose (GObject *object)
-{
-  ChamplainMarkerLayer *self = CHAMPLAIN_MARKER_LAYER (object);
-  ChamplainMarkerLayerPrivate *priv = self->priv;
-  
-  if (priv->view != NULL)
-    {
-      set_view (CHAMPLAIN_LAYER (self), NULL);
-    }
-
-  if (priv->marker_group)
-    {
-      clutter_actor_destroy (CLUTTER_ACTOR (priv->marker_group));
-      priv->marker_group = NULL;
-    }
-
-  if (priv->content_group)
-    {
-      clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
-      priv->content_group = NULL;
-    }
-
-  G_OBJECT_CLASS (champlain_marker_layer_parent_class)->dispose (object);
-}
-
-
-static void
-champlain_marker_layer_finalize (GObject *object)
-{
-  ChamplainMarkerLayer *self = CHAMPLAIN_MARKER_LAYER (object);
-  ChamplainMarkerLayerPrivate *priv = self->priv;
-  
-  clutter_color_free (priv->stroke_color);
-  clutter_color_free (priv->fill_color);
-  g_list_free (priv->markers);
-
-  G_OBJECT_CLASS (champlain_marker_layer_parent_class)->finalize (object);
-}
-
-
-static void
-champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
-{
-  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  ChamplainLayerClass *layer_class = CHAMPLAIN_LAYER_CLASS (klass);
-
-  g_type_class_add_private (klass, sizeof (ChamplainMarkerLayerPrivate));
-  
-  object_class->finalize = champlain_marker_layer_finalize;
-  object_class->dispose = champlain_marker_layer_dispose;
-  object_class->get_property = champlain_marker_layer_get_property;
-  object_class->set_property = champlain_marker_layer_set_property;
-  
-  actor_class->get_preferred_width = get_preferred_width;
-  actor_class->get_preferred_height = get_preferred_height;
-  actor_class->allocate = allocate;
-  actor_class->paint = paint;
-  actor_class->pick = pick;
-  actor_class->map = map;
-  actor_class->unmap = unmap;
-  
-  layer_class->set_view = set_view;
-  
-  /**
-   * ChamplainMarkerLayer:selection-mode:
-   *
-   * Determines the type of selection that will be performed.
-   *
-   * Since: 0.10
-   */
-  g_object_class_install_property (object_class,
-      PROP_SELECTION_MODE,
-      g_param_spec_enum ("selection-mode",
-          "Selection Mode",
-          "Determines the type of selection that will be performed.",
-          CHAMPLAIN_TYPE_SELECTION_MODE,
-          CHAMPLAIN_SELECTION_NONE,
-          CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-   * ChamplainMarkerLayer:path-closed:
-   *
-   * The shape is a closed path
-   *
-   * Since: 0.10
-   */
-  g_object_class_install_property (object_class,
-      PROP_CLOSED_PATH,
-      g_param_spec_boolean ("path-closed",
-          "Closed Path",
-          "The Path is Closed",
-          FALSE, CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-   * ChamplainMarkerLayer:path-fill:
-   *
-   * The shape should be filled
-   *
-   * Since: 0.10
-   */
-  g_object_class_install_property (object_class,
-      PROP_FILL,
-      g_param_spec_boolean ("path-fill",
-          "Fill",
-          "The shape is filled",
-          FALSE, CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-   * ChamplainMarkerLayer:path-stroke:
-   *
-   * The shape should be stroked
-   *
-   * Since: 0.10
-   */
-  g_object_class_install_property (object_class,
-      PROP_STROKE,
-      g_param_spec_boolean ("path-stroke",
-          "Stroke",
-          "The shape is stroked",
-          TRUE, CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-   * ChamplainMarkerLayer:path-stroke-color:
-   *
-   * The path's stroke color
-   *
-   * Since: 0.10
-   */
-  g_object_class_install_property (object_class,
-      PROP_STROKE_COLOR,
-      clutter_param_spec_color ("path-stroke-color",
-          "Stroke Color",
-          "The path's stroke color",
-          &DEFAULT_STROKE_COLOR,
-          CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-   * ChamplainMarkerLayer:path-fill-color:
-   *
-   * The path's fill color
-   *
-   * Since: 0.10
-   */
-  g_object_class_install_property (object_class,
-      PROP_FILL_COLOR,
-      clutter_param_spec_color ("path-fill-color",
-          "Fill Color",
-          "The path's fill color",
-          &DEFAULT_FILL_COLOR,
-          CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-   * ChamplainMarkerLayer:path-stroke-width:
-   *
-   * The path's stroke width (in pixels)
-   *
-   * Since: 0.10
-   */
-  g_object_class_install_property (object_class,
-      PROP_STROKE_WIDTH,
-      g_param_spec_double ("path-stroke-width",
-          "Stroke Width",
-          "The path's stroke width",
-          0, 100.0,
-          2.0,
-          CHAMPLAIN_PARAM_READWRITE));
-
-  /**
-   * ChamplainMarkerLayer:path-visible:
-   *
-   * Wether the path is visible
-   *
-   * Since: 0.10
-   */
-  g_object_class_install_property (object_class,
-      PROP_VISIBLE,
-      g_param_spec_boolean ("path-visible",
-          "Visible",
-          "The path's visibility",
-          FALSE,
-          CHAMPLAIN_PARAM_READWRITE));
-
-}
-
-
-static void
-champlain_marker_layer_init (ChamplainMarkerLayer *self)
-{
-  ChamplainMarkerLayerPrivate *priv;
-  
-  self->priv = GET_PRIVATE (self);
-  priv = self->priv;
-  priv->mode = CHAMPLAIN_SELECTION_NONE;
-  priv->view = NULL;
-
-  priv->visible = FALSE;
-  priv->fill = FALSE;
-  priv->stroke = TRUE;
-  priv->stroke_width = 2.0;
-  priv->markers = NULL;
-
-  priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
-  priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
-
-  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
-  clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
-
-  //TODO destroy + ref()
-  priv->path_actor =  clutter_cairo_texture_new (256, 256);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->path_actor);
-  
-  priv->marker_group = CHAMPLAIN_GROUP (champlain_group_new ());
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (priv->marker_group));
-}
-
-
-/**
- * champlain_marker_layer_new_full:
- * @mode: Selection mode
- *
- * Creates a new instance of #ChamplainMarkerLayer.
- *
- * Returns: a new #ChamplainMarkerLayer ready to be used as a container for the markers.
- *
- * Since: 0.10
- */
-ChamplainMarkerLayer *
-champlain_marker_layer_new_full (ChamplainSelectionMode mode)
-{
-  return g_object_new (CHAMPLAIN_TYPE_MARKER_LAYER, "selection-mode", mode, NULL);
 }
 
 
@@ -549,14 +209,123 @@ unmap (ClutterActor *self)
 
 
 static void
+champlain_marker_layer_dispose (GObject *object)
+{
+  ChamplainMarkerLayer *self = CHAMPLAIN_MARKER_LAYER (object);
+  ChamplainMarkerLayerPrivate *priv = self->priv;
+  
+  if (priv->view != NULL)
+    {
+      set_view (CHAMPLAIN_LAYER (self), NULL);
+    }
+
+  if (priv->content_group)
+    {
+      clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
+      priv->content_group = NULL;
+    }
+
+  G_OBJECT_CLASS (champlain_marker_layer_parent_class)->dispose (object);
+}
+
+
+static void
+champlain_marker_layer_finalize (GObject *object)
+{
+  G_OBJECT_CLASS (champlain_marker_layer_parent_class)->finalize (object);
+}
+
+
+static void
+champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
+{
+  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  ChamplainLayerClass *layer_class = CHAMPLAIN_LAYER_CLASS (klass);
+
+  g_type_class_add_private (klass, sizeof (ChamplainMarkerLayerPrivate));
+  
+  object_class->finalize = champlain_marker_layer_finalize;
+  object_class->dispose = champlain_marker_layer_dispose;
+  object_class->get_property = champlain_marker_layer_get_property;
+  object_class->set_property = champlain_marker_layer_set_property;
+  
+  actor_class->get_preferred_width = get_preferred_width;
+  actor_class->get_preferred_height = get_preferred_height;
+  actor_class->allocate = allocate;
+  actor_class->paint = paint;
+  actor_class->pick = pick;
+  actor_class->map = map;
+  actor_class->unmap = unmap;
+  
+  layer_class->set_view = set_view;
+  
+  /**
+   * ChamplainMarkerLayer:selection-mode:
+   *
+   * Determines the type of selection that will be performed.
+   *
+   * Since: 0.10
+   */
+  g_object_class_install_property (object_class,
+      PROP_SELECTION_MODE,
+      g_param_spec_enum ("selection-mode",
+          "Selection Mode",
+          "Determines the type of selection that will be performed.",
+          CHAMPLAIN_TYPE_SELECTION_MODE,
+          CHAMPLAIN_SELECTION_NONE,
+          CHAMPLAIN_PARAM_READWRITE));
+
+}
+
+
+static void
+champlain_marker_layer_init (ChamplainMarkerLayer *self)
+{
+  ChamplainMarkerLayerPrivate *priv;
+  
+  self->priv = GET_PRIVATE (self);
+  priv = self->priv;
+  priv->mode = CHAMPLAIN_SELECTION_NONE;
+  priv->view = NULL;
+
+  //TODO destroy + ref()
+  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
+  clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
+
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
+}
+
+
+/**
+ * champlain_marker_layer_new_full:
+ * @mode: Selection mode
+ *
+ * Creates a new instance of #ChamplainMarkerLayer.
+ *
+ * Returns: a new #ChamplainMarkerLayer ready to be used as a container for the markers.
+ *
+ * Since: 0.10
+ */
+ChamplainMarkerLayer *
+champlain_marker_layer_new_full (ChamplainSelectionMode mode)
+{
+  return g_object_new (CHAMPLAIN_TYPE_MARKER_LAYER, "selection-mode", mode, NULL);
+}
+
+
+static void
 set_selected_all_but_one (ChamplainMarkerLayer *layer,
     ChamplainMarker *not_selected,
     gboolean select)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
+  GList *markers;
   
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
+
+  for (elem = markers; elem != NULL; elem = elem->next)
     {
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
       
@@ -574,6 +343,8 @@ set_selected_all_but_one (ChamplainMarkerLayer *layer,
               layer);
         }
     }
+
+  g_list_free (markers);
 }
 
 
@@ -615,7 +386,6 @@ marker_position_notify (ChamplainMarker *marker,
     ChamplainMarkerLayer *layer)
 {
   set_marker_position (layer, marker);
-  redraw_path (layer);
 }
 
 
@@ -642,11 +412,18 @@ marker_move_by_cb (ChamplainMarker *marker,
 }
 
 
-static void
-add_marker (ChamplainMarkerLayer *layer,
-    ChamplainMarker *marker,
-    gboolean append,
-    guint position)
+/**
+ * champlain_marker_layer_add_marker:
+ * @layer: a #ChamplainMarkerLayer
+ * @marker: a #ChamplainMarker
+ *
+ * Adds the marker to the layer.
+ *
+ * Since: 0.10
+ */
+void
+champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
+    ChamplainMarker *marker)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
 
@@ -664,33 +441,8 @@ add_marker (ChamplainMarkerLayer *layer,
   g_signal_connect (G_OBJECT (marker), "drag-motion",
       G_CALLBACK (marker_move_by_cb), layer);
       
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->marker_group), CLUTTER_ACTOR (marker));
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
   set_marker_position (layer, marker);
-  if (append)
-    priv->markers = g_list_append (priv->markers, marker);
-  else  
-    priv->markers = g_list_insert (priv->markers, marker, position);
-  redraw_path (layer);
-}
-
-
-/**
- * champlain_marker_layer_add_marker:
- * @layer: a #ChamplainMarkerLayer
- * @marker: a #ChamplainMarker
- *
- * Adds the marker to the layer.
- *
- * Since: 0.10
- */
-void
-champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
-    ChamplainMarker *marker)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
-  g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
-
-  add_marker (layer, marker, TRUE, 0);
 }
 
 
@@ -706,11 +458,13 @@ void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
+  GList *markers;
   
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
 
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
+  for (elem = markers; elem != NULL; elem = elem->next)
     {
       GObject *marker = G_OBJECT (elem->data);
       
@@ -721,9 +475,8 @@ void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
           G_CALLBACK (marker_position_notify), layer);
     }
 
-  champlain_group_remove_all (CHAMPLAIN_GROUP (priv->marker_group));
-  g_list_free (priv->markers);
-  priv->markers = NULL;
+  champlain_group_remove_all (CHAMPLAIN_GROUP (priv->content_group));
+  g_list_free (markers);
 }
 
 
@@ -743,7 +496,7 @@ champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
 
-  return g_list_copy (priv->markers);
+  return clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
 }
 
 
@@ -771,32 +524,9 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
   g_signal_handlers_disconnect_by_func (G_OBJECT (marker),
       G_CALLBACK (marker_position_notify), layer);
 
-  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->marker_group), CLUTTER_ACTOR (marker));
-  priv->markers = g_list_remove (priv->markers, marker);
-  redraw_path (layer);
+  clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
 }
 
-
-/**
- * champlain_marker_layer_insert_marker:
- * @layer: a #ChamplainMarkerLayer
- * @marker: a #ChamplainMarker
- * @position: position in the list where the marker should be inserted
- *
- * Inserts a marker to the specified position.
- *
- * Since: 0.10
- */
-void 
-champlain_marker_layer_insert_marker (ChamplainMarkerLayer *layer,
-    ChamplainMarker *marker,
-    guint position)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
-  g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
-
-  add_marker (layer, marker, FALSE, position);
-}
 
 /**
  * champlain_marker_layer_animate_in_all_markers:
@@ -812,16 +542,21 @@ champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer)
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
   guint delay = 0;
+  GList *markers;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
+
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
   
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
+  for (elem = markers; elem != NULL; elem = elem->next)
     {
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
 
       champlain_marker_animate_in_with_delay (marker, delay);
       delay += 50;
     }
+
+  g_list_free (markers);
 }
 
 
@@ -840,16 +575,21 @@ champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer)
   
   GList *elem;
   guint delay = 0;
+  GList *markers;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
+
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
   
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
+  for (elem = markers; elem != NULL; elem = elem->next)
     {
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
 
       champlain_marker_animate_out_with_delay (marker, delay);
       delay += 50;
     }
+
+  g_list_free (markers);
 }
 
 
@@ -866,15 +606,20 @@ champlain_marker_layer_show_all_markers (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
+  GList *markers;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
+
+  for (elem = markers; elem != NULL; elem = elem->next)
     {
       ClutterActor *actor = CLUTTER_ACTOR (elem->data);
 
       clutter_actor_show (actor);
     }
+
+  g_list_free (markers);
 }
 
 /**
@@ -890,15 +635,20 @@ champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
+  GList *markers;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
+
+  for (elem = markers; elem != NULL; elem = elem->next)
     {
       ClutterActor *actor = CLUTTER_ACTOR (elem->data);
 
       clutter_actor_hide (actor);
     }
+
+  g_list_free (markers);
 }
 
 
@@ -915,15 +665,20 @@ champlain_marker_layer_set_all_markers_draggable (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
+  GList *markers;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
+
+  for (elem = markers; elem != NULL; elem = elem->next)
     {
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
 
       champlain_marker_set_draggable (marker, TRUE);
     }
+
+  g_list_free (markers);
 }
 
 
@@ -940,17 +695,21 @@ champlain_marker_layer_set_all_markers_undraggable (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
+  GList *markers;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
+
+  for (elem = markers; elem != NULL; elem = elem->next)
     {
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
 
       champlain_marker_set_draggable (marker, FALSE);
     }
-}
 
+  g_list_free (markers);
+}
 
 
 /**
@@ -1047,18 +806,22 @@ relocate (ChamplainMarkerLayer *layer)
     
   ChamplainMarkerLayerPrivate *priv = layer->priv;
   GList *elem;
-  
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (priv->view));
+  GList *markers;
 
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
+  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
+
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
+
+  for (elem = markers; elem != NULL; elem = elem->next)
     {
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
       
       set_marker_position (layer, marker);
     }
 
-  redraw_path (layer);
+  g_list_free (markers);
 }
+
 
 static void
 relocate_cb (G_GNUC_UNUSED GObject *gobject,
@@ -1067,93 +830,6 @@ relocate_cb (G_GNUC_UNUSED GObject *gobject,
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
     
   relocate (layer);
-}
-
-
-
-static void
-redraw_path (ChamplainMarkerLayer *layer)
-{
-  ChamplainMarkerLayerPrivate *priv = layer->priv;
-  cairo_t *cr;
-  gfloat width, height;
-  GList *elem;
-  ChamplainView *view = priv->view;
-  gdouble x, y;
-  guint last_width, last_height;
-  
-  
-  /* layer not yet added to the view */
-  if (view == NULL)
-    return;
-
-  clutter_actor_get_size (CLUTTER_ACTOR (view), &width, &height);
-
-  if (!priv->visible || width == 0.0 || height == 0.0)
-    return;
-    
-  clutter_cairo_texture_get_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), &last_width, &last_height);
-
-  if ((guint)width != last_width || (guint)height != last_height)
-    {
-      clutter_cairo_texture_set_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), width, height);
-    }
-
-  champlain_view_get_viewport_origin (priv->view, &x, &y);
-  clutter_actor_set_position (priv->path_actor, x, y);
-
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (priv->path_actor));
-
-  /* Clear the drawing area */
-  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-  cairo_rectangle (cr, 0, 0, width, height);
-  cairo_fill (cr);
-
-  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
-    {
-      ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
-      gfloat x, y;
-
-      x = champlain_view_longitude_to_x (view, champlain_location_get_longitude (CHAMPLAIN_LOCATION (marker)));
-      y = champlain_view_latitude_to_y (view, champlain_location_get_latitude (CHAMPLAIN_LOCATION (marker)));
-
-      cairo_line_to (cr, x, y);
-    }
-
-  if (priv->closed_path)
-    cairo_close_path (cr);
-
-  cairo_set_source_rgba (cr,
-      priv->fill_color->red / 255.0,
-      priv->fill_color->green / 255.0,
-      priv->fill_color->blue / 255.0,
-      priv->fill_color->alpha / 255.0);
-
-  if (priv->fill)
-    cairo_fill_preserve (cr);
-
-  cairo_set_source_rgba (cr,
-      priv->stroke_color->red / 255.0,
-      priv->stroke_color->green / 255.0,
-      priv->stroke_color->blue / 255.0,
-      priv->stroke_color->alpha / 255.0);
-
-  cairo_set_line_width (cr, priv->stroke_width);
-
-  if (priv->stroke)
-    cairo_stroke (cr);
-
-  cairo_destroy (cr);
-}
-
-
-static void
-redraw_path_cb (G_GNUC_UNUSED GObject *gobject,
-    G_GNUC_UNUSED GParamSpec *arg1,
-    ChamplainMarkerLayer *layer)
-{
-  redraw_path (layer);
 }
 
 
@@ -1181,11 +857,7 @@ set_view (ChamplainLayer *layer,
       g_signal_connect (view, "layer-relocated",
         G_CALLBACK (relocate_cb), layer);
 
-      g_signal_connect (view, "notify::latitude",
-        G_CALLBACK (redraw_path_cb), layer);
-        
       relocate (marker_layer);
-      redraw_path (marker_layer);
     }
 }
 
@@ -1207,6 +879,9 @@ champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
   ChamplainBoundingBox *bbox;
+  GList *markers;
+
+  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), NULL);
   
   bbox = champlain_bounding_box_new ();
   bbox->left = CHAMPLAIN_MAX_LONGITUDE;
@@ -1214,7 +889,9 @@ champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
   bbox->bottom = CHAMPLAIN_MAX_LATITUDE;
   bbox->top = CHAMPLAIN_MIN_LATITUDE;
 
-  for (elem = priv->markers; elem != NULL; elem = elem->next)
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
+
+  for (elem = markers; elem != NULL; elem = elem->next)
     {
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
       gdouble lat, lon;
@@ -1235,262 +912,7 @@ champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
         bbox->top = lat;
     }
 
+  g_list_free (markers);
+
   return bbox;
 }
-
-
-/**
- * champlain_marker_layer_set_path_fill_color:
- * @layer: a #ChamplainMarkerLayer
- * @color: (allow-none): The path's fill color or NULL to reset to the
- *         default color. The color parameter is copied.
- *
- * Set the path's fill color.
- *
- * Since: 0.10
- */
-void
-champlain_marker_layer_set_path_fill_color (ChamplainMarkerLayer *layer,
-    const ClutterColor *color)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
-
-  ChamplainMarkerLayerPrivate *priv = layer->priv;
-
-  if (priv->fill_color != NULL)
-    clutter_color_free (priv->fill_color);
-
-  if (color == NULL)
-    color = &DEFAULT_FILL_COLOR;
-
-  priv->fill_color = clutter_color_copy (color);
-  g_object_notify (G_OBJECT (layer), "path-fill-color");
-}
-
-
-/**
- * champlain_marker_layer_set_path_stroke_color:
- * @layer: a #ChamplainMarkerLayer
- * @color: (allow-none): The path's stroke color or NULL to reset to the
- *         default color. The color parameter is copied.
- *
- * Set the path's stroke color.
- *
- * Since: 0.10
- */
-void
-champlain_marker_layer_set_path_stroke_color (ChamplainMarkerLayer *layer,
-    const ClutterColor *color)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
-
-  ChamplainMarkerLayerPrivate *priv = layer->priv;
-
-  if (priv->stroke_color != NULL)
-    clutter_color_free (priv->stroke_color);
-
-  if (color == NULL)
-    color = &DEFAULT_STROKE_COLOR;
-
-  priv->stroke_color = clutter_color_copy (color);
-  g_object_notify (G_OBJECT (layer), "path-stroke-color");
-}
-
-
-/**
- * champlain_marker_layer_get_path_fill_color:
- * @layer: a #ChamplainMarkerLayer
- *
- * Gets the path's fill color.
- *
- * Returns: the path's fill color.
- *
- * Since: 0.10
- */
-ClutterColor *
-champlain_marker_layer_get_path_fill_color (ChamplainMarkerLayer *layer)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), NULL);
-
-  return layer->priv->fill_color;
-}
-
-
-/**
- * champlain_marker_layer_get_path_stroke_color:
- * @layer: a #ChamplainMarkerLayer
- *
- * Gets the path's stroke color.
- *
- * Returns: the path's stroke color.
- *
- * Since: 0.10
- */
-ClutterColor *
-champlain_marker_layer_get_path_stroke_color (ChamplainMarkerLayer *layer)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), NULL);
-
-  return layer->priv->stroke_color;
-}
-
-
-/**
- * champlain_marker_layer_set_path_stroke:
- * @layer: a #ChamplainMarkerLayer
- * @value: if the path is stroked
- *
- * Sets the path to be stroked
- *
- * Since: 0.10
- */
-void
-champlain_marker_layer_set_path_stroke (ChamplainMarkerLayer *layer,
-    gboolean value)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
-
-  layer->priv->stroke = value;
-  g_object_notify (G_OBJECT (layer), "path-stroke");
-}
-
-
-/**
- * champlain_marker_layer_get_path_stroke:
- * @layer: a #ChamplainMarkerLayer
- *
- * Checks whether the path is stroked.
- *
- * Returns: TRUE if the path is stroked, FALSE otherwise.
- *
- * Since: 0.10
- */
-gboolean
-champlain_marker_layer_get_path_stroke (ChamplainMarkerLayer *layer)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), FALSE);
-
-  return layer->priv->stroke;
-}
-
-
-/**
- * champlain_marker_layer_set_path_fill:
- * @layer: a #ChamplainMarkerLayer
- * @value: if the path is filled
- *
- * Sets the path to be filled
- *
- * Since: 0.10
- */
-void
-champlain_marker_layer_set_path_fill (ChamplainMarkerLayer *layer,
-    gboolean value)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
-
-  layer->priv->fill = value;
-  g_object_notify (G_OBJECT (layer), "path-fill");
-}
-
-
-/**
- * champlain_marker_layer_get_path_fill:
- * @layer: a #ChamplainMarkerLayer
- *
- * Checks whether the path is filled.
- *
- * Returns: TRUE if the path is filled, FALSE otherwise.
- *
- * Since: 0.10
- */
-gboolean
-champlain_marker_layer_get_path_fill (ChamplainMarkerLayer *layer)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), FALSE);
-
-  return layer->priv->fill;
-}
-
-
-/**
- * champlain_marker_layer_set_path_stroke_width:
- * @layer: a #ChamplainMarkerLayer
- * @value: the width of the stroke (in pixels)
- *
- * Sets the width of the stroke
- *
- * Since: 0.10
- */
-void
-champlain_marker_layer_set_path_stroke_width (ChamplainMarkerLayer *layer,
-    gdouble value)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
-
-  layer->priv->stroke_width = value;
-  g_object_notify (G_OBJECT (layer), "path-stroke-width");
-}
-
-
-/**
- * champlain_marker_layer_get_path_stroke_width:
- * @layer: a #ChamplainMarkerLayer
- *
- * Gets the width of the stroke.
- *
- * Returns: the width of the stroke
- *
- * Since: 0.10
- */
-gdouble
-champlain_marker_layer_get_path_stroke_width (ChamplainMarkerLayer *layer)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), 0);
-
-  return layer->priv->stroke_width;
-}
-
-
-/**
- * champlain_marker_layer_set_path_visible:
- * @layer: a #ChamplainMarkerLayer
- * @value: TRUE to make the path visible
- *
- * Sets path visibility.
- *
- * Since: 0.10
- */
-void
-champlain_marker_layer_set_path_visible (ChamplainMarkerLayer *layer,
-    gboolean value)
-{
-  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
-
-  layer->priv->visible = value;
-  if (value)
-    clutter_actor_show (CLUTTER_ACTOR (layer->priv->path_actor));
-  else
-    clutter_actor_hide (CLUTTER_ACTOR (layer->priv->path_actor));
-  g_object_notify (G_OBJECT (layer), "path-visible");
-}
-
-
-/**
- * champlain_marker_layer_get_path_visible:
- * @layer: a #ChamplainMarkerLayer
- *
- * Gets path visibility.
- *
- * Returns: TRUE when the path is visible, FALSE otherwise
- *
- * Since: 0.10
- */
-gboolean 
-champlain_marker_layer_get_path_visible (ChamplainMarkerLayer *layer)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), FALSE);
-
-  return layer->priv->visible;
-}
-
