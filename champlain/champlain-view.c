@@ -2265,6 +2265,9 @@ champlain_view_ensure_visible (ChamplainView *view,
   guint zoom_level = priv->zoom_level;
   gboolean good_size = FALSE;
   gdouble lat, lon;
+  
+  if (!champlain_bounding_box_is_valid (bbox))
+    return;
 
   champlain_bounding_box_get_center (bbox, &lat, &lon);
 
@@ -2297,6 +2300,47 @@ champlain_view_ensure_visible (ChamplainView *view,
     champlain_view_go_to (view, lat, lon);
   else
     champlain_view_center_on (view, lat, lon);
+}
+
+
+/**
+ * champlain_view_ensure_layers_visible:
+ * @view: a #ChamplainView
+ * @animate: perform animation
+ *
+ * Changes the map's zoom level and center to make sure that the bounding
+ * boxes of all inserted layers are visible.
+ *
+ * Since: 0.10
+ */
+void
+champlain_view_ensure_layers_visible (ChamplainView *view,
+    gboolean animate)
+{
+  DEBUG_LOG ()
+
+  GList *layers, *elem;
+  ChamplainBoundingBox *bbox;
+  
+  bbox = champlain_bounding_box_new ();
+  
+  layers = clutter_container_get_children (CLUTTER_CONTAINER (view->priv->user_layers));
+  
+  for (elem = layers; elem != NULL; elem = elem->next)
+    {
+      ChamplainLayer *layer = CHAMPLAIN_LAYER (elem->data);
+      ChamplainBoundingBox *other;
+
+      other = champlain_layer_get_bounding_box (layer);
+      champlain_bounding_box_compose (bbox, other);
+      champlain_bounding_box_free (other);
+    }
+
+  g_list_free (layers);
+
+  champlain_view_ensure_visible (view, bbox, animate);
+
+  champlain_bounding_box_free (bbox);
 }
 
 

@@ -25,6 +25,7 @@
 
 #include <clutter/clutter.h>
 #include <champlain/champlain-defines.h>
+#include <champlain/champlain-bounding-box.h>
 
 G_BEGIN_DECLS
 
@@ -59,6 +60,7 @@ struct _ChamplainLayerClass
 
   void (*set_view)(ChamplainLayer *layer,
       ChamplainView *view);
+  ChamplainBoundingBox * (*get_bounding_box) (ChamplainLayer *layer);
 };
 
 GType champlain_layer_get_type (void);
@@ -66,6 +68,8 @@ GType champlain_layer_get_type (void);
 
 void champlain_layer_set_view (ChamplainLayer *layer,
     ChamplainView *view);
+
+ChamplainBoundingBox *champlain_layer_get_bounding_box (ChamplainLayer *layer);
 
 G_END_DECLS
 

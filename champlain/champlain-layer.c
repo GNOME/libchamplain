@@ -51,6 +51,7 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
   object_class->dispose = champlain_layer_dispose;
 
   klass->set_view = NULL;
+  klass->get_bounding_box = NULL;
 }
 
 /**
@@ -72,6 +73,25 @@ void champlain_layer_set_view (ChamplainLayer *layer,
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
   CHAMPLAIN_LAYER_GET_CLASS (layer)->set_view (layer, view);
+}
+
+
+/**
+ * champlain_layer_get_bounding_box:
+ * @layer: a #ChamplainLayer
+ *
+ * Gets the bounding box occupied by the elements inside the layer.
+ *
+ * Returns: The bounding box.
+ * 
+ * Since: 0.10
+ */
+ChamplainBoundingBox *
+champlain_layer_get_bounding_box (ChamplainLayer *layer)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LAYER (layer), NULL);
+
+  return CHAMPLAIN_LAYER_GET_CLASS (layer)->get_bounding_box (layer);
 }
 
 

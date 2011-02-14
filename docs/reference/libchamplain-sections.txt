@@ -128,6 +128,7 @@ champlain_view_set_zoom_level
 champlain_view_set_min_zoom_level
 champlain_view_set_max_zoom_level
 champlain_view_ensure_visible
+champlain_view_ensure_layers_visible
 champlain_view_set_map_source
 champlain_view_set_decel_rate
 champlain_view_set_kinetic_mode
@@ -290,6 +291,7 @@ ChamplainTilePrivate
 <TITLE>ChamplainLayer</TITLE>
 ChamplainLayer
 champlain_layer_set_view
+champlain_layer_get_bounding_box
 <SUBSECTION Standard>
 CHAMPLAIN_LAYER
 CHAMPLAIN_IS_LAYER
@@ -322,7 +324,6 @@ champlain_marker_layer_select_all_markers
 champlain_marker_layer_unselect_all_markers
 champlain_marker_layer_set_selection_mode
 champlain_marker_layer_get_selection_mode
-champlain_marker_layer_get_bounding_box
 <SUBSECTION Standard>
 CHAMPLAIN_MARKER_LAYER
 CHAMPLAIN_IS_MARKER_LAYER
@@ -459,6 +460,8 @@ champlain_bounding_box_copy
 champlain_bounding_box_free
 champlain_bounding_box_get_center
 champlain_bounding_box_compose
+champlain_bounding_box_extend
+champlain_bounding_box_is_valid
 <SUBSECTION Standard>
 CHAMPLAIN_BOUNDING_BOX
 CHAMPLAIN_TYPE_BOUNDING_BOX
@@ -695,6 +698,7 @@ ChamplainMemphisRendererClass
 ChamplainMemphisRendererPrivate
 </SECTION>
 
+
 <SECTION>
 <FILE>champlain-custom-marker</FILE>
 <TITLE>ChamplainCustomMarker</TITLE>
@@ -723,7 +727,6 @@ champlain_path_layer_remove_node
 champlain_path_layer_remove_all
 champlain_path_layer_insert_node
 champlain_path_layer_get_nodes
-champlain_path_layer_get_bounding_box
 champlain_path_layer_get_fill_color
 champlain_path_layer_set_fill_color
 champlain_path_layer_get_stroke_color

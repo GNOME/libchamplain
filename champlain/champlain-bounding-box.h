@@ -67,6 +67,11 @@ void champlain_bounding_box_get_center (ChamplainBoundingBox *bbox,
 void champlain_bounding_box_compose (ChamplainBoundingBox *bbox,
     ChamplainBoundingBox *other);
 
+void champlain_bounding_box_extend (ChamplainBoundingBox *bbox,
+    gdouble latitude, gdouble longitude);
+
+gboolean champlain_bounding_box_is_valid (ChamplainBoundingBox *bbox);
+
 G_END_DECLS
 
 #endif

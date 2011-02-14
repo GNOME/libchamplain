@@ -82,8 +82,6 @@ void champlain_path_layer_insert_node (ChamplainPathLayer *layer,
     guint position);
 GList *champlain_path_layer_get_nodes (ChamplainPathLayer *layer);
 
-ChamplainBoundingBox *champlain_path_layer_get_bounding_box (ChamplainPathLayer *layer);
-
 ClutterColor *champlain_path_layer_get_fill_color (ChamplainPathLayer *layer);
 void champlain_path_layer_set_fill_color (ChamplainPathLayer *layer,
     const ClutterColor *color);

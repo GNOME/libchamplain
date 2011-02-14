@@ -109,7 +109,6 @@ void champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
     ChamplainSelectionMode mode);
 ChamplainSelectionMode champlain_marker_layer_get_selection_mode (
     ChamplainMarkerLayer *layer);
-ChamplainBoundingBox *champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer);
 
 G_END_DECLS
 

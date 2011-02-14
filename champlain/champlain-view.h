@@ -92,6 +92,8 @@ void champlain_view_set_max_zoom_level (ChamplainView *view,
 void champlain_view_ensure_visible (ChamplainView *view,
     ChamplainBoundingBox *bbox,
     gboolean animate);
+void champlain_view_ensure_layers_visible (ChamplainView *view,
+    gboolean animate);
 
 void champlain_view_set_map_source (ChamplainView *view,
     ChamplainMapSource *map_source);

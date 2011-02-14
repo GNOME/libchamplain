@@ -28,6 +28,7 @@
  */
 
 #include "champlain-bounding-box.h"
+#include "champlain-defines.h"
 
 GType
 champlain_bounding_box_get_type (void)
@@ -59,7 +60,16 @@ champlain_bounding_box_get_type (void)
 ChamplainBoundingBox *
 champlain_bounding_box_new (void)
 {
-  return g_slice_new (ChamplainBoundingBox);
+  ChamplainBoundingBox *bbox;
+  
+  bbox = g_slice_new (ChamplainBoundingBox);
+  
+  bbox->left = CHAMPLAIN_MAX_LONGITUDE;
+  bbox->right = CHAMPLAIN_MIN_LONGITUDE;
+  bbox->bottom = CHAMPLAIN_MAX_LATITUDE;
+  bbox->top = CHAMPLAIN_MIN_LATITUDE;
+
+  return bbox;
 }
 
 
@@ -151,5 +161,58 @@ champlain_bounding_box_compose (ChamplainBoundingBox *bbox,
 
   if (other->bottom < bbox->bottom)
     bbox->bottom = other->bottom;
+}
+
+
+/**
+ * champlain_bounding_box_extend:
+ * @bbox: a #ChamplainBoundingBox
+ * @latitude: latitude
+ * @longitude: longitude
+ *
+ * Extend the bounding box so it contains a point with @latitude and @longitude.
+ * Do nothing if the point is already inside the bounding box.
+ *
+ * Since: 0.10
+ */
+void champlain_bounding_box_extend (ChamplainBoundingBox *bbox,
+    gdouble latitude, gdouble longitude)
+{
+  g_return_if_fail (CHAMPLAIN_BOUNDING_BOX (bbox));
+  
+  if (longitude < bbox->left)
+    bbox->left = longitude;
+
+  if (latitude < bbox->bottom)
+    bbox->bottom = latitude;
+
+  if (longitude > bbox->right)
+    bbox->right = longitude;
+
+  if (latitude > bbox->top)
+    bbox->top = latitude;
+}
+
+
+/**
+ * champlain_bounding_box_is_valid:
+ * @bbox: a #ChamplainBoundingBox
+ *
+ * Checks whether bbox represents a valid bounding box on the map.
+ *
+ * Returns: TRUE when the bounding box is valid, FALSE otherwise.
+ *
+ * Since: 0.10
+ */
+gboolean
+champlain_bounding_box_is_valid (ChamplainBoundingBox *bbox)
+{
+  g_return_val_if_fail (CHAMPLAIN_BOUNDING_BOX (bbox), FALSE);
+
+  return (bbox->left < bbox->right) && (bbox->bottom < bbox->top) &&
+      (bbox->left > CHAMPLAIN_MIN_LONGITUDE) && (bbox->left < CHAMPLAIN_MAX_LONGITUDE) &&
+      (bbox->right > CHAMPLAIN_MIN_LONGITUDE) && (bbox->right < CHAMPLAIN_MAX_LONGITUDE) &&
+      (bbox->bottom > CHAMPLAIN_MIN_LATITUDE) && (bbox->bottom < CHAMPLAIN_MAX_LATITUDE) &&
+      (bbox->top > CHAMPLAIN_MIN_LATITUDE) && (bbox->top < CHAMPLAIN_MAX_LATITUDE);
 }
 

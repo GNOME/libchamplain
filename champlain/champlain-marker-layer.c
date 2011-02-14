@@ -70,6 +70,8 @@ static void marker_selected_cb (ChamplainMarker *marker,
 static void set_view (ChamplainLayer *layer,
     ChamplainView *view);
 
+static ChamplainBoundingBox *get_bounding_box (ChamplainLayer *layer);
+
 
 static void
 champlain_marker_layer_get_property (GObject *object,
@@ -256,7 +258,8 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
   actor_class->unmap = unmap;
   
   layer_class->set_view = set_view;
-  
+  layer_class->get_bounding_box = get_bounding_box;
+
   /**
    * ChamplainMarkerLayer:selection-mode:
    *
@@ -858,20 +861,9 @@ set_view (ChamplainLayer *layer,
     }
 }
 
-/**
- * champlain_marker_layer_get_bounding_box:
- * @layer: a #ChamplainMarkerLayer
- *
- * Gets the bounding box occupied by the markers in the layer
- *
- * Returns: The bounding box.
- * 
- * FIXME: This doesn't take into account the marker's actor size yet
- *
- * Since: 0.10
- */
-ChamplainBoundingBox *
-champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
+
+static ChamplainBoundingBox *
+get_bounding_box (ChamplainLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
@@ -881,10 +873,6 @@ champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), NULL);
   
   bbox = champlain_bounding_box_new ();
-  bbox->left = CHAMPLAIN_MAX_LONGITUDE;
-  bbox->right = CHAMPLAIN_MIN_LONGITUDE;
-  bbox->bottom = CHAMPLAIN_MAX_LATITUDE;
-  bbox->top = CHAMPLAIN_MIN_LATITUDE;
 
   markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
 
@@ -896,17 +884,7 @@ champlain_marker_layer_get_bounding_box (ChamplainMarkerLayer *layer)
       g_object_get (G_OBJECT (marker), "latitude", &lat, "longitude", &lon,
           NULL);
 
-      if (lon < bbox->left)
-        bbox->left = lon;
-
-      if (lat < bbox->bottom)
-        bbox->bottom = lat;
-
-      if (lon > bbox->right)
-        bbox->right = lon;
-
-      if (lat > bbox->top)
-        bbox->top = lat;
+      champlain_bounding_box_extend (bbox, lat, lon); 
     }
 
   g_list_free (markers);

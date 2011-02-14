@@ -91,6 +91,8 @@ static void redraw_path (ChamplainPathLayer *layer);
 static void set_view (ChamplainLayer *layer,
     ChamplainView *view);
 
+static ChamplainBoundingBox *get_bounding_box (ChamplainLayer *layer);
+
 
 static void
 champlain_path_layer_get_property (GObject *object,
@@ -340,7 +342,8 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
   actor_class->unmap = unmap;
   
   layer_class->set_view = set_view;
-  
+  layer_class->get_bounding_box = get_bounding_box;
+
   /**
    * ChamplainPathLayer:closed:
    *
@@ -774,28 +777,15 @@ set_view (ChamplainLayer *layer,
     }
 }
 
-/**
- * champlain_path_layer_get_bounding_box:
- * @layer: a #ChamplainPathLayer
- *
- * Gets the bounding box occupied by the #ChamplainLocation objects in the layer
- *
- * Returns: The bounding box.
- * 
- * Since: 0.10
- */
-ChamplainBoundingBox *
-champlain_path_layer_get_bounding_box (ChamplainPathLayer *layer)
+
+static ChamplainBoundingBox *
+get_bounding_box (ChamplainLayer *layer)
 {
   ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
   ChamplainBoundingBox *bbox;
   
   bbox = champlain_bounding_box_new ();
-  bbox->left = CHAMPLAIN_MAX_LONGITUDE;
-  bbox->right = CHAMPLAIN_MIN_LONGITUDE;
-  bbox->bottom = CHAMPLAIN_MAX_LATITUDE;
-  bbox->top = CHAMPLAIN_MIN_LATITUDE;
 
   for (elem = priv->nodes; elem != NULL; elem = elem->next)
     {
@@ -804,18 +794,8 @@ champlain_path_layer_get_bounding_box (ChamplainPathLayer *layer)
       
       g_object_get (G_OBJECT (location), "latitude", &lat, "longitude", &lon,
           NULL);
-
-      if (lon < bbox->left)
-        bbox->left = lon;
-
-      if (lat < bbox->bottom)
-        bbox->bottom = lat;
-
-      if (lon > bbox->right)
-        bbox->right = lon;
-
-      if (lat > bbox->top)
-        bbox->top = lat;
+          
+      champlain_bounding_box_extend (bbox, lat, lon); 
     }
 
   return bbox;
