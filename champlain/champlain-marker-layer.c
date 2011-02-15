@@ -393,6 +393,7 @@ static void
 marker_move_by_cb (ChamplainMarker *marker,
     gdouble dx,
     gdouble dy,
+    ClutterEvent *event,
     ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = layer->priv;

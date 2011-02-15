@@ -52,8 +52,9 @@
 enum
 {
   /* normal signals */
+  BUTTON_PRESS_SIGNAL,
+  BUTTON_RELEASE_SIGNAL,
   DRAG_MOTION_SIGNAL,
-  DRAG_BEGIN_SIGNAL,
   DRAG_FINISH_SIGNAL,
   LAST_SIGNAL,
 };
@@ -298,9 +299,36 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
+   * ChamplainMarker::button-press:
+   * @event: the underlying ClutterEvent 
+   *
+   * Emitted when button is pressed.
+   *
+   * Since: 0.10
+   */
+  signals[BUTTON_PRESS_SIGNAL] =
+    g_signal_new ("button-press", G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+        g_cclosure_marshal_VOID__BOXED, G_TYPE_NONE, 1, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
+
+  /**
+   * ChamplainMarker::button-release:
+   * @event: the underlying ClutterEvent 
+   *
+   * Emitted when button is released. This signal is not emmitted at the end of dragging.
+   *
+   * Since: 0.10
+   */
+  signals[BUTTON_RELEASE_SIGNAL] =
+    g_signal_new ("button-release", G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+        g_cclosure_marshal_VOID__BOXED, G_TYPE_NONE, 1, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
+
+  /**
    * ChamplainMarker::drag-motion:
    * @dx: by how much the marker has been moved in the x direction 
    * @dy: by how much the marker has been moved in the y direction 
+   * @event: the underlying ClutterEvent 
    *
    * Emmitted when the marker is dragged by mouse. dx and dy specify by how much
    * the marker has been dragged since last time.
@@ -310,32 +338,23 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
   signals[DRAG_MOTION_SIGNAL] =
     g_signal_new ("drag-motion", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        _champlain_marshal_VOID__DOUBLE_DOUBLE, G_TYPE_NONE, 2, G_TYPE_DOUBLE, G_TYPE_DOUBLE);
+        _champlain_marshal_VOID__DOUBLE_DOUBLE_BOXED, G_TYPE_NONE, 3, G_TYPE_DOUBLE, G_TYPE_DOUBLE, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
         
   /**
-   * ChamplainMarker::drag-begin:
-   *
-   * Emitted when marker dragging begins.
-   *
-   * Since: 0.10
-   */
-  signals[DRAG_BEGIN_SIGNAL] =
-    g_signal_new ("drag-begin", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
-
-  /**
    * ChamplainMarker::drag-finish:
+   * @event: the underlying ClutterEvent 
    *
-   * Emitted when marker dragging ends.
+   * Emitted when marker dragging ends (i.e. the button is released at the end
+   * of dragging).
    *
    * Since: 0.10
    */
   signals[DRAG_FINISH_SIGNAL] =
     g_signal_new ("drag-finish", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+        g_cclosure_marshal_VOID__BOXED, G_TYPE_NONE, 1, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
 
+        
   g_object_class_override_property (object_class,
                                     PROP_LONGITUDE,
                                     "longitude");
@@ -362,7 +381,7 @@ motion_event_cb (ClutterActor        *stage,
                                            event->y,
                                            &x, &y))
     {
-      g_signal_emit_by_name (marker, "drag-motion", x - priv->click_x, y - priv->click_y);
+      g_signal_emit_by_name (marker, "drag-motion", x - priv->click_x, y - priv->click_y, event);
     }
 
   return TRUE;
@@ -370,7 +389,7 @@ motion_event_cb (ClutterActor        *stage,
 
 
 static gboolean
-button_release_event_cb (ClutterActor        *stage,
+capture_release_event_cb (ClutterActor        *stage,
                          ClutterButtonEvent  *event,
                          ChamplainMarker *marker)
 {
@@ -382,11 +401,30 @@ button_release_event_cb (ClutterActor        *stage,
                                         motion_event_cb,
                                         marker);
   g_signal_handlers_disconnect_by_func (stage,
-                                        button_release_event_cb,
+                                        capture_release_event_cb,
                                         marker);
   
   clutter_set_motion_events_enabled (TRUE);
-  g_signal_emit_by_name (marker, "drag-finish");
+  g_signal_emit_by_name (marker, "drag-finish", event);
+
+  return TRUE;
+}
+
+
+static gboolean
+button_release_event_cb (ClutterActor        *actor,
+                       ClutterButtonEvent        *event,
+                       ChamplainMarker *marker)
+{
+  if ((event->type != CLUTTER_BUTTON_RELEASE) ||
+      (event->button != 1))
+    return FALSE;
+
+  g_signal_handlers_disconnect_by_func (marker,
+                                        button_release_event_cb,
+                                        marker);
+  
+  g_signal_emit_by_name (marker, "button-release", event);
 
   return TRUE;
 }
@@ -400,7 +438,6 @@ button_press_event_cb (ClutterActor        *actor,
   ChamplainMarkerPrivate *priv = marker->priv;
   ClutterButtonEvent *bevent = (ClutterButtonEvent *)event;
   ClutterActor *stage = clutter_actor_get_stage (actor);
-  gboolean swallow_event = FALSE;
 
   if (event->type != CLUTTER_BUTTON_PRESS ||
       bevent->button != 1 ||
@@ -409,16 +446,10 @@ button_press_event_cb (ClutterActor        *actor,
       return FALSE;
     }
 
-  if (priv->selectable)
+  if (priv->draggable) 
     {
-      champlain_marker_set_selected (marker, TRUE);
-      swallow_event = TRUE;
-    }
-          
-  if (clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
-                                           &priv->click_x, &priv->click_y))
-    {
-      if (priv->draggable) 
+      if (clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
+                                               &priv->click_x, &priv->click_y))
         {
           g_signal_connect (stage,
                             "captured-event",
@@ -427,20 +458,29 @@ button_press_event_cb (ClutterActor        *actor,
                             
           g_signal_connect (stage,
                             "captured-event",
-                            G_CALLBACK (button_release_event_cb),
+                            G_CALLBACK (capture_release_event_cb),
                             marker);
 
           clutter_set_motion_events_enabled (FALSE);
-          g_signal_emit_by_name (marker, "drag-begin");
-
-          swallow_event = TRUE;
         }
     }
+  else
+    {
+      g_signal_connect (marker,
+                "button-release-event",
+                G_CALLBACK (button_release_event_cb),
+                marker);
+    }
 
-  if (swallow_event)
+  if (priv->selectable)
+    champlain_marker_set_selected (marker, TRUE);
+    
+  if (priv->selectable || priv->draggable)
     clutter_actor_raise (CLUTTER_ACTOR (marker), NULL);
 
-  return swallow_event;
+  g_signal_emit_by_name (marker, "button-press", event);
+
+  return TRUE;
 }
 
 
