@@ -27,58 +27,36 @@
 #include "champlain-location.h"
 #include "champlain-private.h"
 
+typedef ChamplainLocationIface  ChamplainLocationInterface;
+G_DEFINE_INTERFACE (ChamplainLocation, champlain_location, G_TYPE_OBJECT);
+
+
 static void
-champlain_location_base_init (gpointer g_iface)
+champlain_location_default_init (ChamplainLocationInterface *iface)
 {
-  static gboolean initialized = FALSE;
+  /**
+   * ChamplainLocation:longitude:
+   *
+   * The longitude coordonate
+   *
+   * Since: 0.10
+   */
+  g_object_interface_install_property (iface,
+      g_param_spec_double ("longitude", "Longitude",
+          "The longitude coordonate",
+          -180.0f, 180.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
 
-  if (!initialized)
-    {
-      /**
-       * ChamplainLocation:longitude:
-       *
-       * The longitude coordonate
-       *
-       * Since: 0.10
-       */
-      g_object_interface_install_property (g_iface,
-          g_param_spec_double ("longitude", "Longitude",
-              "The longitude coordonate",
-              -180.0f, 180.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
-
-      /**
-       * ChamplainLocation:latitude:
-       *
-       * The latitude coordonate
-       *
-       * Since: 0.10
-       */
-      g_object_interface_install_property (g_iface,
-          g_param_spec_double ("latitude", "Latitude",
-              "The latitude coordonate",
-              -90.0f, 90.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
-
-      initialized = TRUE;
-    }
-}
-
-
-GType
-champlain_location_get_type (void)
-{
-  static GType type = 0;
-  if (type == 0)
-    {
-      static const GTypeInfo info =
-      {
-        sizeof (ChamplainLocationIface),
-        champlain_location_base_init,          /* base_init */
-        NULL,
-      };
-      type = g_type_register_static (G_TYPE_INTERFACE,
-                                     "ChamplainLocation", &info, 0);
-    }
-  return type;
+  /**
+   * ChamplainLocation:latitude:
+   *
+   * The latitude coordonate
+   *
+   * Since: 0.10
+   */
+  g_object_interface_install_property (iface,
+      g_param_spec_double ("latitude", "Latitude",
+          "The latitude coordonate",
+          -90.0f, 90.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
 }
 
 

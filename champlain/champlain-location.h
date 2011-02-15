@@ -16,6 +16,10 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#if !defined (__CHAMPLAIN_CHAMPLAIN_H_INSIDE__) && !defined (CHAMPLAIN_COMPILATION)
+#error "Only <champlain/champlain.h> can be included directly."
+#endif
+
 #ifndef __CHAMPLAIN_LOCATION_H__
 #define __CHAMPLAIN_LOCATION_H__
 
@@ -28,13 +32,14 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_IS_LOCATION(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_LOCATION))
 #define CHAMPLAIN_LOCATION_GET_IFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), CHAMPLAIN_TYPE_LOCATION, ChamplainLocationIface))
 
+typedef struct _ChamplainLocation ChamplainLocation; /* Dummy object */
+typedef struct _ChamplainLocationIface ChamplainLocationIface;
+
 /**
  * ChamplainLocation:
  *
  * An interface common to objects having latitude and longitude.
  */
-typedef struct _ChamplainLocation ChamplainLocation; /* Dummy object */
-typedef struct _ChamplainLocationIface ChamplainLocationIface;
 
 /**
  * ChamplainLocationIface:
@@ -47,7 +52,7 @@ typedef struct _ChamplainLocationIface ChamplainLocationIface;
 struct _ChamplainLocationIface
 {
   /*< private >*/
-  GTypeInterface parent;
+  GTypeInterface g_iface;
 
   /*< public >*/
   gdouble (* get_latitude) (ChamplainLocation *location);
