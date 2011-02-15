@@ -83,10 +83,12 @@ struct _ChamplainPathLayerPrivate
   ClutterGroup *content_group;
   ClutterActor *path_actor;
   GList *nodes;
+  gboolean redraw_scheduled;
 };
 
 
-static void redraw_path (ChamplainPathLayer *layer);
+static gboolean redraw_path (ChamplainPathLayer *layer);
+static void schedule_redraw (ChamplainPathLayer *layer);
 
 static void set_view (ChamplainLayer *layer,
     ChamplainView *view);
@@ -464,6 +466,7 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   priv->stroke = TRUE;
   priv->stroke_width = 2.0;
   priv->nodes = NULL;
+  priv->redraw_scheduled = FALSE;
 
   priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
@@ -500,7 +503,7 @@ position_notify (ChamplainLocation *location,
     G_GNUC_UNUSED GParamSpec *pspec,
     ChamplainPathLayer *layer)
 {
-  redraw_path (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -524,7 +527,7 @@ add_node (ChamplainPathLayer *layer,
     priv->nodes = g_list_append (priv->nodes, location);
   else  
     priv->nodes = g_list_insert (priv->nodes, location, position);
-  redraw_path (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -576,6 +579,7 @@ champlain_path_layer_remove_all (ChamplainPathLayer *layer)
 
   g_list_free (priv->nodes);
   priv->nodes = NULL;
+  schedule_redraw (layer);
 }
 
 
@@ -622,7 +626,7 @@ champlain_path_layer_remove_node (ChamplainPathLayer *layer,
 
   priv->nodes = g_list_remove (priv->nodes, location);
   g_object_unref (location);
-  redraw_path (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -656,12 +660,11 @@ relocate_cb (G_GNUC_UNUSED GObject *gobject,
 {
   g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
     
-  redraw_path (layer);
+  schedule_redraw (layer);
 }
 
 
-
-static void
+static gboolean
 redraw_path (ChamplainPathLayer *layer)
 {
   ChamplainPathLayerPrivate *priv = layer->priv;
@@ -674,12 +677,12 @@ redraw_path (ChamplainPathLayer *layer)
   
   /* layer not yet added to the view */
   if (view == NULL)
-    return;
+    return FALSE;
 
   clutter_actor_get_size (CLUTTER_ACTOR (view), &width, &height);
 
   if (!priv->visible || width == 0.0 || height == 0.0)
-    return;
+    return FALSE;
     
   clutter_cairo_texture_get_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), &last_width, &last_height);
 
@@ -734,6 +737,24 @@ redraw_path (ChamplainPathLayer *layer)
     cairo_stroke (cr);
 
   cairo_destroy (cr);
+
+  priv->redraw_scheduled = FALSE;
+  
+  return FALSE;
+}
+
+
+static void
+schedule_redraw (ChamplainPathLayer *layer)
+{
+  if (!layer->priv->redraw_scheduled)
+    {
+      layer->priv->redraw_scheduled = TRUE;
+      g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+          (GSourceFunc) redraw_path,
+          g_object_ref (layer),
+          (GDestroyNotify) g_object_unref);
+    }
 }
 
 
@@ -742,7 +763,7 @@ redraw_path_cb (G_GNUC_UNUSED GObject *gobject,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainPathLayer *layer)
 {
-  redraw_path (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -773,7 +794,7 @@ set_view (ChamplainLayer *layer,
       g_signal_connect (view, "notify::latitude",
         G_CALLBACK (redraw_path_cb), layer);
         
-      redraw_path (path_layer);
+      schedule_redraw (path_layer);
     }
 }
 

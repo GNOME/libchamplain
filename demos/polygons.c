@@ -121,7 +121,6 @@ main (int argc,
 
   /* draw a line */
   layer = champlain_path_layer_new ();
-  champlain_path_layer_set_visible (layer, FALSE);
   /* Cheap approx of Highway 10 */
   int i = 0;
   for (i = 0; i < 50000; i++)
@@ -135,7 +134,6 @@ main (int argc,
   append_point (layer, 45.4000, -73.1815);
   append_point (layer, 45.4151, -73.1218);
   champlain_path_layer_set_stroke_width (layer, 5.0);
-  champlain_path_layer_set_visible (layer, TRUE);
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
   /* draw a path */
