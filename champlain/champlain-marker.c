@@ -49,6 +49,9 @@
 #include <cairo.h>
 #include <math.h>
 
+static ClutterColor SELECTED_COLOR = { 0x00, 0x33, 0xcc, 0xff };
+static ClutterColor SELECTED_TEXT_COLOR = { 0xff, 0xff, 0xff, 0xff };
+
 enum
 {
   /* normal signals */
@@ -99,6 +102,77 @@ struct _ChamplainMarkerPrivate
   gfloat click_x;
   gfloat click_y;
 };
+
+
+/**
+ * champlain_marker_set_selection_color:
+ * @color: a #ClutterColor
+ *
+ * Changes the selection color, this is to ensure a better integration with
+ * the desktop, this is automatically done by GtkChamplainEmbed.
+ *
+ * Since: 0.10
+ */
+void
+champlain_marker_set_selection_color (ClutterColor *color)
+{
+  SELECTED_COLOR.red = color->red;
+  SELECTED_COLOR.green = color->green;
+  SELECTED_COLOR.blue = color->blue;
+  SELECTED_COLOR.alpha = color->alpha;
+}
+
+
+/**
+ * champlain_marker_get_selection_color:
+ *
+ * Gets the selection color.
+ *
+ * Returns: the selection color. Should not be freed.
+ *
+ * Since: 0.10
+ */
+const ClutterColor *
+champlain_marker_get_selection_color ()
+{
+  return &SELECTED_COLOR;
+}
+
+
+/**
+ * champlain_marker_set_selection_text_color:
+ * @color: a #ClutterColor
+ *
+ * Changes the selection text color, this is to ensure a better integration with
+ * the desktop, this is automatically done by GtkChamplainEmbed.
+ *
+ * Since: 0.10
+ */
+void
+champlain_marker_set_selection_text_color (ClutterColor *color)
+{
+  SELECTED_TEXT_COLOR.red = color->red;
+  SELECTED_TEXT_COLOR.green = color->green;
+  SELECTED_TEXT_COLOR.blue = color->blue;
+  SELECTED_TEXT_COLOR.alpha = color->alpha;
+}
+
+
+/**
+ * champlain_marker_get_selection_text_color:
+ *
+ * Gets the selection text color.
+ *
+ * Returns: the selection text color. Should not be freed.
+ *
+ * Since: 0.10
+ */
+const ClutterColor *
+champlain_marker_get_selection_text_color ()
+{
+  return &SELECTED_TEXT_COLOR;
+}
+
 
 static void
 champlain_marker_get_property (GObject *object,

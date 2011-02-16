@@ -250,13 +250,37 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 
 
 static void
+gdk_to_clutter_color (GdkColor *gtk_color,
+                      ClutterColor *color)
+{
+  color->red   = CLAMP (((gtk_color->red   / 65535.0) * 255), 0, 255);
+  color->green = CLAMP (((gtk_color->green / 65535.0) * 255), 0, 255);
+  color->blue  = CLAMP (((gtk_color->blue  / 65535.0) * 255), 0, 255);
+  color->alpha = 255;
+}
+
+
+static void
 view_realize_cb (GtkWidget *widget,
     GtkChamplainEmbed *view)
 {
+  ClutterColor color = { 0, 0, 0, };
   GtkChamplainEmbedPrivate *priv = view->priv;
-
+  GtkStyle *style;
+ 
   /* Setup mouse cursor to a hand */
   gdk_window_set_cursor (gtk_widget_get_window (priv->clutter_embed), priv->cursor_hand_open);
+
+  /* Set selection color */
+  style = gtk_widget_get_style (widget);
+
+  gdk_to_clutter_color (&style->text[GTK_STATE_SELECTED], &color);
+  champlain_marker_set_selection_text_color (&color);
+
+  gdk_to_clutter_color (&style->bg[GTK_STATE_SELECTED], &color);
+  champlain_marker_set_selection_color (&color);
+
+  /* To be added later: bg[active] (for selected markers, but focus is on another widget) */
 }
 
 

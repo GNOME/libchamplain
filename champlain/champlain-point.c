@@ -42,8 +42,6 @@
 
 #define DEFAULT_FONT_NAME "Sans 11"
 
-static ClutterColor SELECTED_COLOR = { 0x00, 0x33, 0xcc, 0xff };
-
 static ClutterColor DEFAULT_COLOR = { 0x33, 0x33, 0x33, 0xff };
 
 enum
@@ -93,40 +91,6 @@ static void map (ClutterActor *self);
 static void unmap (ClutterActor *self);
 
 static void draw_point (ChamplainPoint *point);
-
-
-/**
- * champlain_point_set_selection_color:
- * @color: The selection color.
- *
- * Set the selection color.
- *
- * Since: 0.10
- */
-void
-champlain_point_set_selection_color (ClutterColor *color)
-{
-  SELECTED_COLOR.red = color->red;
-  SELECTED_COLOR.green = color->green;
-  SELECTED_COLOR.blue = color->blue;
-  SELECTED_COLOR.alpha = color->alpha;
-}
-
-
-/**
- * champlain_point_get_selection_color:
- *
- * Gets the selection color.
- *
- * Returns: the color.
- *
- * Since: 0.10
- */
-const ClutterColor *
-champlain_point_get_selection_color ()
-{
-  return &SELECTED_COLOR;
-}
 
 
 static void
@@ -246,7 +210,7 @@ draw_point (ChamplainPoint *point)
   cairo_t *cr;
   gdouble size = priv->size;
   gdouble radius = size / 2.0;
-  ClutterColor *color;
+  const ClutterColor *color;
   
   clutter_group_remove_all (CLUTTER_GROUP (priv->content_group));
   cairo_texture = clutter_cairo_texture_new (size, size);
@@ -256,7 +220,7 @@ draw_point (ChamplainPoint *point)
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
 
   if (champlain_marker_get_selected (CHAMPLAIN_MARKER (point)))
-    color = &SELECTED_COLOR;
+    color = champlain_marker_get_selection_color ();
   else
     color = priv->color;  
   
