@@ -70,10 +70,6 @@ champlain_label_get_wrap_mode
 champlain_label_get_ellipsize
 champlain_label_get_single_line_mode
 champlain_label_get_draw_background
-champlain_label_set_selection_color
-champlain_label_get_selection_color
-champlain_label_set_selection_text_color
-champlain_label_get_selection_text_color
 <SUBSECTION Standard>
 CHAMPLAIN_LABEL
 CHAMPLAIN_IS_LABEL
@@ -101,6 +97,10 @@ champlain_marker_animate_in
 champlain_marker_animate_in_with_delay
 champlain_marker_animate_out
 champlain_marker_animate_out_with_delay
+champlain_marker_get_selection_color
+champlain_marker_get_selection_text_color
+champlain_marker_set_selection_color
+champlain_marker_set_selection_text_color
 <SUBSECTION Standard>
 CHAMPLAIN_MARKER
 CHAMPLAIN_IS_MARKER
@@ -359,8 +359,6 @@ champlain_point_set_color
 champlain_point_get_color
 champlain_point_set_size
 champlain_point_get_size
-champlain_point_set_selection_color
-champlain_point_get_selection_color
 <SUBSECTION Standard>
 CHAMPLAIN_POINT
 CHAMPLAIN_IS_POINT
