@@ -1066,9 +1066,9 @@ champlain_view_init (ChamplainView *view)
   /* Setup license */
   priv->license_actor = g_object_ref (champlain_license_new ());
   champlain_license_connect_view (CHAMPLAIN_LICENSE (priv->license_actor), view);
-  clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->license_actor,
-                          CLUTTER_BIN_ALIGNMENT_END,
-                          CLUTTER_BIN_ALIGNMENT_END);
+  champlain_view_bin_layout_add (view, priv->license_actor,
+                                 CLUTTER_BIN_ALIGNMENT_END,
+                                 CLUTTER_BIN_ALIGNMENT_END);
 
   priv->state = CHAMPLAIN_STATE_DONE;
   g_object_notify (G_OBJECT (view), "state");
@@ -2571,26 +2571,32 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
 
 
 /**
- * champlain_view_get_layout_manager:
+ * champlain_view_bin_layout_add:
  * @view: The view
+ * @child: The child to be inserted
+ * @x_align: x alignment
+ * @y_align: y alignment
  *
- * Returns the #ClutterBinLayout manager. The manager can be used to align
- * user provided actors on top of the map.
- *
- * Returns: (transfer none): the layout manager
+ * This function iserts a custom actor to the undrelying #ClutterBinLayout
+ * manager. The inserted actors appear on top of the map. See clutter_bin_layout_add()
+ * for reference.
  *
  * Since: 0.10
  */
-ClutterBinLayout *
-champlain_view_get_layout_manager (ChamplainView *view)
+void champlain_view_bin_layout_add (ChamplainView *view,
+  ClutterActor *child,
+  ClutterBinAlignment x_align,
+  ClutterBinAlignment y_align)
 {
+  ChamplainViewPrivate *priv = view->priv;
+  ClutterBinLayout *layout_manager;
+
   DEBUG_LOG ()
 
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   
-  ChamplainViewPrivate *priv = view->priv;
-  
-  return CLUTTER_BIN_LAYOUT (priv->layout_manager);
+  layout_manager = CLUTTER_BIN_LAYOUT (priv->layout_manager);
+  clutter_bin_layout_add (layout_manager, child, x_align, y_align);
 }
 
 

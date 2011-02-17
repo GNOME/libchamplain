@@ -150,7 +150,7 @@ champlain_view_y_to_latitude
 champlain_view_longitude_to_x
 champlain_view_latitude_to_y
 champlain_view_get_viewport_origin
-champlain_view_get_layout_manager
+champlain_view_bin_layout_add
 champlain_view_get_license_actor
 <SUBSECTION Standard>
 CHAMPLAIN_VIEW

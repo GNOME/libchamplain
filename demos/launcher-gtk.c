@@ -218,7 +218,6 @@ main (int argc,
   ChamplainView *view;
   ChamplainMarkerLayer *layer;
   ClutterActor *scale;
-  ClutterBinLayout *layout_manager;
   ChamplainLicense *license_actor;
   ChamplainPathLayer *path;
 
@@ -258,10 +257,9 @@ main (int argc,
   champlain_scale_connect_view (CHAMPLAIN_SCALE (scale), view);
   
   /* align to the bottom left */
-  layout_manager = champlain_view_get_layout_manager (view);
-  clutter_bin_layout_add (layout_manager, scale,
-                          CLUTTER_BIN_ALIGNMENT_START,
-                          CLUTTER_BIN_ALIGNMENT_END);
+  champlain_view_bin_layout_add (view, scale,
+                                 CLUTTER_BIN_ALIGNMENT_START,
+                                 CLUTTER_BIN_ALIGNMENT_END);
   
   license_actor = champlain_view_get_license_actor (view);
   champlain_license_set_extra_text (license_actor, "Don't eat cereals with orange juice\nIt tastes bad");

@@ -133,9 +133,14 @@ gdouble champlain_view_latitude_to_y (ChamplainView *view,
 
 void champlain_view_get_viewport_origin (ChamplainView *view, gdouble *x, gdouble *y);
 
-ClutterBinLayout *champlain_view_get_layout_manager (ChamplainView *view); 
+void champlain_view_bin_layout_add (ChamplainView *view,
+  ClutterActor *child,
+  ClutterBinAlignment x_align,
+  ClutterBinAlignment y_align);
 
 ChamplainLicense *champlain_view_get_license_actor (ChamplainView *view);
+
+
 
 G_END_DECLS
 
