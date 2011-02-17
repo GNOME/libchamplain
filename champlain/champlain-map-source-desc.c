@@ -437,7 +437,7 @@ champlain_map_source_desc_init (ChamplainMapSourceDesc *desc)
 
 
 /**
- * champlain_map_source_desc_new_full:
+ * champlain_map_source_desc_new_full: (skip)
  * @id: the map source's id
  * @name: the map source's name
  * @license: the map source's license
@@ -678,12 +678,12 @@ champlain_map_source_desc_get_data (ChamplainMapSourceDesc *desc)
 
 
 /**
- * champlain_map_source_desc_get_constructor:
+ * champlain_map_source_desc_get_constructor: (skip)
  * @desc: a #ChamplainMapSourceDesc
  *
  * Gets the map source constructor.
  *
- * Returns: (transfer none): the constructor.
+ * Returns: the constructor.
  *
  * Since: 0.10
  */
