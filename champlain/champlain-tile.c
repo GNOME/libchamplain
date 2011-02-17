@@ -904,6 +904,7 @@ champlain_tile_display_content (ChamplainTile *self)
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->content_actor);
 
   clutter_actor_set_opacity (CLUTTER_ACTOR (self), 0);
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
   if (priv->fade_in)
     {
       animation = clutter_actor_animate (CLUTTER_ACTOR (self),

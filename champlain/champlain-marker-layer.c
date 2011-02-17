@@ -377,6 +377,8 @@ set_marker_position (ChamplainMarkerLayer *layer, ChamplainMarker *marker)
     champlain_location_get_latitude (CHAMPLAIN_LOCATION (marker))) + origin_y;
 
   clutter_actor_set_position (CLUTTER_ACTOR (marker), x, y);
+
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (layer));
 }
 
 
@@ -444,6 +446,7 @@ champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
       
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
   set_marker_position (layer, marker);
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (layer));
 }
 
 
@@ -478,6 +481,7 @@ void champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
 
   champlain_group_remove_all (CHAMPLAIN_GROUP (priv->content_group));
   g_list_free (markers);
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (layer));
 }
 
 
@@ -526,6 +530,7 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
       G_CALLBACK (marker_position_notify), layer);
 
   clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (layer));
 }
 
 
@@ -821,6 +826,7 @@ relocate (ChamplainMarkerLayer *layer)
     }
 
   g_list_free (markers);
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (layer));
 }
 
 

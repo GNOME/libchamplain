@@ -238,7 +238,7 @@ champlain_group_real_sort_depth_order (ClutterContainer *container)
 
 //  priv->children = g_list_sort (priv->children, sort_by_depth);
 
-  clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
+//  clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
 
 static void

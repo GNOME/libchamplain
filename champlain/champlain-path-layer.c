@@ -689,6 +689,7 @@ redraw_path (ChamplainPathLayer *layer)
   if ((guint)width != last_width || (guint)height != last_height)
     {
       clutter_cairo_texture_set_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), width, height);
+      clutter_actor_queue_relayout (CLUTTER_ACTOR (layer));
     }
 
   champlain_view_get_viewport_origin (priv->view, &x, &y);
@@ -739,6 +740,7 @@ redraw_path (ChamplainPathLayer *layer)
   cairo_destroy (cr);
 
   priv->redraw_scheduled = FALSE;
+  clutter_actor_queue_redraw (CLUTTER_ACTOR (layer));
   
   return FALSE;
 }

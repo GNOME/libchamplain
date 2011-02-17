@@ -239,6 +239,8 @@ draw_point (ChamplainPoint *point)
   cairo_stroke (cr);
 
   cairo_destroy (cr);
+
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (point));
 }
 
 
@@ -262,11 +264,11 @@ champlain_point_init (ChamplainPoint *point)
   priv->size = 12;
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (point));
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (point));
   
   draw_point (point);
 
   g_signal_connect (point, "notify::selected", G_CALLBACK (notify_selected), NULL);
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (point));
 }
 
 
