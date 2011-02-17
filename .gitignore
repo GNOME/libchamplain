@@ -59,7 +59,6 @@ docs/reference-gtk/libchamplain-gtk-decl-list.txt
 docs/reference-gtk/libchamplain-gtk-decl.txt
 docs/reference-gtk/libchamplain-gtk-overrides.txt
 docs/reference-gtk/libchamplain-gtk-types.txt
-docs/reference-gtk/libchamplain-gtk.types
 docs/reference-gtk/html/*.*
 docs/reference-gtk/tmpl/*.*
 docs/reference-gtk/xml/*.*
@@ -76,7 +75,6 @@ docs/reference/libchamplain-decl-list.txt
 docs/reference/libchamplain-decl.txt
 docs/reference/libchamplain-overrides.txt
 docs/reference/libchamplain-types.txt
-docs/reference/libchamplain.types
 docs/reference/html/*.*
 docs/reference/tmpl/*.*
 docs/reference/xml/*.*
