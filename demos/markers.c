@@ -38,32 +38,32 @@ create_marker_layer (G_GNUC_UNUSED ChamplainView *view, ChamplainPathLayer **pat
   champlain_label_set_alignment (CHAMPLAIN_LABEL (marker), PANGO_ALIGN_RIGHT);
   champlain_label_set_color (CHAMPLAIN_LABEL (marker), &orange);
 
-  champlain_location_set_position (CHAMPLAIN_LOCATION (marker),
+  champlain_location_set_location (CHAMPLAIN_LOCATION (marker),
       45.528178, -73.563788);
   champlain_marker_layer_add_marker (layer, CHAMPLAIN_MARKER (marker));
   champlain_path_layer_add_node (*path, CHAMPLAIN_LOCATION (marker));
 
   marker = champlain_label_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-generic.png", NULL);
   champlain_label_set_text (CHAMPLAIN_LABEL (marker), "New York");
-  champlain_location_set_position (CHAMPLAIN_LOCATION (marker), 40.77, -73.98);
+  champlain_location_set_location (CHAMPLAIN_LOCATION (marker), 40.77, -73.98);
   champlain_marker_layer_add_marker (layer, CHAMPLAIN_MARKER (marker));
   champlain_path_layer_add_node (*path, CHAMPLAIN_LOCATION (marker));
 
   marker = champlain_label_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-important.png", NULL);
-  champlain_location_set_position (CHAMPLAIN_LOCATION (marker), 47.130885,
+  champlain_location_set_location (CHAMPLAIN_LOCATION (marker), 47.130885,
       -70.764141);
   champlain_marker_layer_add_marker (layer, CHAMPLAIN_MARKER (marker));
   champlain_path_layer_add_node (*path, CHAMPLAIN_LOCATION (marker));
 
   marker = champlain_point_new ();
-  champlain_location_set_position (CHAMPLAIN_LOCATION (marker), 45.130885,
+  champlain_location_set_location (CHAMPLAIN_LOCATION (marker), 45.130885,
       -65.764141);
   champlain_marker_layer_add_marker (layer, CHAMPLAIN_MARKER (marker));
   champlain_path_layer_add_node (*path, CHAMPLAIN_LOCATION (marker));
 
   marker = champlain_label_new_from_file ("/usr/share/icons/gnome/24x24/emblems/emblem-favorite.png", NULL);
   champlain_label_set_draw_background (CHAMPLAIN_LABEL (marker), FALSE);
-  champlain_location_set_position (CHAMPLAIN_LOCATION (marker), 45.41484,
+  champlain_location_set_location (CHAMPLAIN_LOCATION (marker), 45.41484,
       -71.918907);
   champlain_marker_layer_add_marker (layer, CHAMPLAIN_MARKER (marker));
   champlain_path_layer_add_node (*path, CHAMPLAIN_LOCATION (marker));

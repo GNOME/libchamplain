@@ -111,7 +111,7 @@ gps_callback (GpsCallbackData *data)
   lat += 0.005;
   lon += 0.005;
   champlain_view_center_on (data->view, lat, lon);
-  champlain_location_set_position (CHAMPLAIN_LOCATION (data->marker), lat, lon);
+  champlain_location_set_location (CHAMPLAIN_LOCATION (data->marker), lat, lon);
   return TRUE;
 }
 

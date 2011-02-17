@@ -38,7 +38,7 @@ enum
 };
 
 
-static void set_position (ChamplainLocation *location,
+static void set_location (ChamplainLocation *location,
     gdouble latitude,
     gdouble longitude);
 static gdouble get_latitude (ChamplainLocation *location);
@@ -98,14 +98,14 @@ champlain_coordinate_set_property (GObject *object,
     case PROP_LONGITUDE:
     {
       gdouble lon = g_value_get_double (value);
-      set_position (CHAMPLAIN_LOCATION (coordinate), priv->lat, lon);
+      set_location (CHAMPLAIN_LOCATION (coordinate), priv->lat, lon);
       break;
     }
 
     case PROP_LATITUDE:
     {
       gdouble lat = g_value_get_double (value);
-      set_position (CHAMPLAIN_LOCATION (coordinate), lat, priv->lon);
+      set_location (CHAMPLAIN_LOCATION (coordinate), lat, priv->lon);
       break;
     }
 
@@ -116,7 +116,7 @@ champlain_coordinate_set_property (GObject *object,
 
 
 static void
-set_position (ChamplainLocation *location,
+set_location (ChamplainLocation *location,
     gdouble latitude,
     gdouble longitude)
 {
@@ -159,7 +159,7 @@ location_interface_init (ChamplainLocationIface *iface)
 {
   iface->get_latitude = get_latitude;
   iface->get_longitude = get_longitude;
-  iface->set_position = set_position;
+  iface->set_location = set_location;
 }
 
 

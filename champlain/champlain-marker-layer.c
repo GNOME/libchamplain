@@ -411,7 +411,7 @@ marker_move_by_cb (ChamplainMarker *marker,
   lon = champlain_view_x_to_longitude (view, x);
   lat = champlain_view_y_to_latitude (view, y);
     
-  champlain_location_set_position (CHAMPLAIN_LOCATION (marker), lat, lon);
+  champlain_location_set_location (CHAMPLAIN_LOCATION (marker), lat, lon);
 }
 
 

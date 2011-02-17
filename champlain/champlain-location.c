@@ -61,7 +61,7 @@ champlain_location_default_init (ChamplainLocationInterface *iface)
 
 
 /**
- * champlain_location_set_position:
+ * champlain_location_set_location:
  * @location: a #ChamplainLocation
  * @latitude: the latitude
  * @longitude: the longitude
@@ -71,11 +71,11 @@ champlain_location_default_init (ChamplainLocationInterface *iface)
  * Since: 0.10
  */
 void 
-champlain_location_set_position (ChamplainLocation *location,
+champlain_location_set_location (ChamplainLocation *location,
     gdouble latitude,
     gdouble longitude)
 {
-  CHAMPLAIN_LOCATION_GET_IFACE (location)->set_position (location,
+  CHAMPLAIN_LOCATION_GET_IFACE (location)->set_location (location,
                                                          latitude,
                                                          longitude);
 }
