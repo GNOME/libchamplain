@@ -772,6 +772,7 @@ ChamplainCoordinatePrivate
 <SECTION>
 <FILE>champlain-location</FILE>
 <TITLE>ChamplainLocation</TITLE>
+ChamplainLocation
 ChamplainLocationIface
 champlain_location_set_position
 champlain_location_get_latitude

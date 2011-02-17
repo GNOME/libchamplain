@@ -20,15 +20,15 @@ DOC_MAIN_SGML_FILE=$(DOC_MODULE)-docs.sgml
 DOC_SOURCE_DIR=../../champlain-gtk
 
 # Extra options to pass to gtkdoc-scangobj. Not normally needed.
-SCANGOBJ_OPTIONS=--type-init-func 'g_type_init(); g_thread_init(NULL)'
+SCANGOBJ_OPTIONS=--type-init-func='g_type_init();g_thread_init(NULL)'
 
 # Extra options to supply to gtkdoc-scan.
 # e.g. SCAN_OPTIONS=--deprecated-guards="GTK_DISABLE_DEPRECATED"
-SCAN_OPTIONS=--rebuild-types
+SCAN_OPTIONS=
 
 # Extra options to supply to gtkdoc-mkdb.
 # e.g. MKDB_OPTIONS=--sgml-mode --output-format=xml
-MKDB_OPTIONS=--sgml-mode --output-format=xml
+MKDB_OPTIONS=--sgml-mode --output-format=xml --name-space=gtk_champlain
 
 # Extra options to supply to gtkdoc-mktmpl
 # e.g. MKTMPL_OPTIONS=--only-section-tmpl
