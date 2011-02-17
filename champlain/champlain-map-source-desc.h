@@ -103,7 +103,7 @@ guint champlain_map_source_desc_get_max_zoom_level (ChamplainMapSourceDesc *desc
 guint champlain_map_source_desc_get_tile_size (ChamplainMapSourceDesc *desc);
 ChamplainMapProjection champlain_map_source_desc_get_projection (ChamplainMapSourceDesc *desc);
 gpointer champlain_map_source_desc_get_data (ChamplainMapSourceDesc *desc);
-const ChamplainMapSourceConstructor champlain_map_source_desc_get_constructor (ChamplainMapSourceDesc *desc);
+ChamplainMapSourceConstructor champlain_map_source_desc_get_constructor (ChamplainMapSourceDesc *desc);
 
 G_END_DECLS
 

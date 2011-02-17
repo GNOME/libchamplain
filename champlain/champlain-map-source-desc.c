@@ -687,7 +687,7 @@ champlain_map_source_desc_get_data (ChamplainMapSourceDesc *desc)
  *
  * Since: 0.10
  */
-const ChamplainMapSourceConstructor 
+ChamplainMapSourceConstructor 
 champlain_map_source_desc_get_constructor (ChamplainMapSourceDesc *desc)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE_DESC (desc), NULL);
