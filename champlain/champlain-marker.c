@@ -101,6 +101,7 @@ struct _ChamplainMarkerPrivate
   
   gfloat click_x;
   gfloat click_y;
+  gboolean moved;
 };
 
 
@@ -456,6 +457,7 @@ motion_event_cb (ClutterActor        *stage,
                                            &x, &y))
     {
       g_signal_emit_by_name (marker, "drag-motion", x - priv->click_x, y - priv->click_y, event);
+      priv->moved = TRUE;
     }
 
   return TRUE;
@@ -467,6 +469,8 @@ capture_release_event_cb (ClutterActor        *stage,
                          ClutterButtonEvent  *event,
                          ChamplainMarker *marker)
 {
+  ChamplainMarkerPrivate *priv = marker->priv;
+
   if ((event->type != CLUTTER_BUTTON_RELEASE) ||
       (event->button != 1))
     return FALSE;
@@ -479,8 +483,11 @@ capture_release_event_cb (ClutterActor        *stage,
                                         marker);
   
   clutter_set_motion_events_enabled (TRUE);
-  g_signal_emit_by_name (marker, "drag-finish", event);
-
+  if (priv->moved)
+    g_signal_emit_by_name (marker, "drag-finish", event);
+  else
+    g_signal_emit_by_name (marker, "button-release", event);
+  
   return TRUE;
 }
 
@@ -525,6 +532,7 @@ button_press_event_cb (ClutterActor        *actor,
       if (clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
                                                &priv->click_x, &priv->click_y))
         {
+          priv->moved = FALSE;
           g_signal_connect (stage,
                             "captured-event",
                             G_CALLBACK (motion_event_cb),
