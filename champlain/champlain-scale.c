@@ -61,6 +61,7 @@ struct _ChamplainScalePrivate
   guint max_scale_width;
   gfloat text_height;
   ClutterGroup *content_group;
+  gboolean redraw_scheduled;
   
   ChamplainView *view;
 };
@@ -365,7 +366,23 @@ redraw_scale (ChamplainScale *scale)
   cairo_stroke (cr);
 
   cairo_destroy (cr);
+
+  priv->redraw_scheduled = FALSE;
   clutter_actor_queue_redraw (CLUTTER_ACTOR (scale));
+}
+
+
+static void
+schedule_redraw (ChamplainScale *scale)
+{
+  if (!scale->priv->redraw_scheduled)
+    {
+      scale->priv->redraw_scheduled = TRUE;
+      g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+          (GSourceFunc) redraw_scale,
+          g_object_ref (scale),
+          (GDestroyNotify) g_object_unref);
+    }
 }
 
 
@@ -407,6 +424,7 @@ champlain_scale_init (ChamplainScale *scale)
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
   priv->max_scale_width = 100;
   priv->view = NULL;
+  priv->redraw_scheduled = FALSE;
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (scale));
   clutter_actor_queue_relayout (CLUTTER_ACTOR (scale));
@@ -541,7 +559,7 @@ champlain_scale_set_max_width (ChamplainScale *scale,
 
   scale->priv->max_scale_width = value;
   create_scale (scale);
-  redraw_scale (scale);
+  schedule_redraw (scale);
 }
 
 
@@ -561,7 +579,7 @@ champlain_scale_set_unit (ChamplainScale *scale,
   g_return_if_fail (CHAMPLAIN_IS_SCALE (scale));
 
   scale->priv->scale_unit = unit;
-  redraw_scale (scale);
+  schedule_redraw (scale);
 }
 
 
@@ -608,7 +626,7 @@ redraw_scale_cb (G_GNUC_UNUSED GObject *gobject,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainScale *scale)
 {
-  redraw_scale (scale);
+  schedule_redraw (scale);
 }
 
 
@@ -631,7 +649,7 @@ champlain_scale_connect_view (ChamplainScale *scale,
   scale->priv->view = view;
   g_signal_connect (view, "notify::latitude",
       G_CALLBACK (redraw_scale_cb), scale);
-  redraw_scale (scale);
+  schedule_redraw (scale);
 }
 
 
