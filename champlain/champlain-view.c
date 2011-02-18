@@ -96,7 +96,7 @@ enum
   PROP_MIN_ZOOM_LEVEL,
   PROP_MAX_ZOOM_LEVEL,
   PROP_MAP_SOURCE,
-  PROP_DECEL_RATE,
+  PROP_DECELERATION,
   PROP_KINETIC_MODE,
   PROP_KEEP_CENTER_ON_RESIZE,
   PROP_ZOOM_ON_DOUBLE_CLICK,
@@ -412,7 +412,7 @@ champlain_view_get_property (GObject *object,
       g_value_set_boolean (value, priv->kinetic_mode);
       break;
 
-    case PROP_DECEL_RATE:
+    case PROP_DECELERATION:
       {
         gdouble decel = 0.0;
         g_object_get (priv->kinetic_scroll, "deceleration", &decel, NULL);
@@ -481,8 +481,8 @@ champlain_view_set_property (GObject *object,
       champlain_view_set_kinetic_mode (view, g_value_get_boolean (value));
       break;
 
-    case PROP_DECEL_RATE:
-      champlain_view_set_decel_rate (view, g_value_get_double (value));
+    case PROP_DECELERATION:
+      champlain_view_set_deceleration (view, g_value_get_double (value));
       break;
 
     case PROP_KEEP_CENTER_ON_RESIZE:
@@ -869,15 +869,15 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
           FALSE, CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainView:decel-rate:
+   * ChamplainView:deceleration:
    *
    * The deceleration rate for the kinetic mode. The default value is 1.1.
    *
-   * Since: 0.2
+   * Since: 0.10
    */
   g_object_class_install_property (object_class,
-      PROP_DECEL_RATE,
-      g_param_spec_double ("decel-rate",
+      PROP_DECELERATION,
+      g_param_spec_double ("deceleration",
           "Deceleration rate",
           "Rate at which the view will decelerate in kinetic mode.",
           1.0001, 2.0, 1.1, CHAMPLAIN_PARAM_READWRITE));
@@ -2158,7 +2158,7 @@ champlain_view_set_map_source (ChamplainView *view,
 
 
 /**
- * champlain_view_set_decel_rate:
+ * champlain_view_set_deceleration:
  * @view: a #ChamplainView
  * @rate: a #gdouble between 1.001 and 2.0
  *
@@ -2167,7 +2167,7 @@ champlain_view_set_map_source (ChamplainView *view,
  * Since: 0.4
  */
 void
-champlain_view_set_decel_rate (ChamplainView *view,
+champlain_view_set_deceleration (ChamplainView *view,
     gdouble rate)
 {
   DEBUG_LOG ()
@@ -2485,7 +2485,7 @@ champlain_view_get_map_source (ChamplainView *view)
 
 
 /**
- * champlain_view_get_decel_rate:
+ * champlain_view_get_deceleration:
  * @view: The view
  *
  * Gets the view's deceleration rate.
@@ -2495,7 +2495,7 @@ champlain_view_get_map_source (ChamplainView *view)
  * Since: 0.4
  */
 gdouble
-champlain_view_get_decel_rate (ChamplainView *view)
+champlain_view_get_deceleration (ChamplainView *view)
 {
   DEBUG_LOG ()
 
@@ -2597,6 +2597,7 @@ void champlain_view_bin_layout_add (ChamplainView *view,
   
   layout_manager = CLUTTER_BIN_LAYOUT (priv->layout_manager);
   clutter_bin_layout_add (layout_manager, child, x_align, y_align);
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (view));
 }
 
 

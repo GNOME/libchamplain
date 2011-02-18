@@ -97,7 +97,7 @@ void champlain_view_ensure_layers_visible (ChamplainView *view,
 
 void champlain_view_set_map_source (ChamplainView *view,
     ChamplainMapSource *map_source);
-void champlain_view_set_decel_rate (ChamplainView *view,
+void champlain_view_set_deceleration (ChamplainView *view,
     gdouble rate);
 void champlain_view_set_kinetic_mode (ChamplainView *view,
     gboolean kinetic);
@@ -115,7 +115,7 @@ guint champlain_view_get_zoom_level (ChamplainView *view);
 guint champlain_view_get_min_zoom_level (ChamplainView *view);
 guint champlain_view_get_max_zoom_level (ChamplainView *view);
 ChamplainMapSource *champlain_view_get_map_source (ChamplainView *view);
-gdouble champlain_view_get_decel_rate (ChamplainView *view);
+gdouble champlain_view_get_deceleration (ChamplainView *view);
 gboolean champlain_view_get_kinetic_mode (ChamplainView *view);
 gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
 gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
