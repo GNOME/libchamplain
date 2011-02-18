@@ -697,12 +697,11 @@ redraw_path (ChamplainPathLayer *layer)
 
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (priv->path_actor));
 
-  /* Clear the drawing area */
+  /* Clear the drawing area */  
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-  cairo_rectangle (cr, 0, 0, width, height);
-  cairo_fill (cr);
-
+  cairo_paint(cr);
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+  
   for (elem = priv->nodes; elem != NULL; elem = elem->next)
     {
       ChamplainLocation *location = CHAMPLAIN_LOCATION (elem->data);

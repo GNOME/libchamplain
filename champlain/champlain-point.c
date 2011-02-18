@@ -219,6 +219,10 @@ draw_point (ChamplainPoint *point)
 
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (cairo_texture));
 
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_paint(cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+
   if (champlain_marker_get_selected (CHAMPLAIN_MARKER (point)))
     color = champlain_marker_get_selection_color ();
   else

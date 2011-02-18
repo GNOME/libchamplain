@@ -558,6 +558,10 @@ draw_shadow (ChamplainLabel *label,
   shadow = clutter_cairo_texture_new (width + x, (height + point));
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (shadow));
 
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_paint(cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+
   cairo_matrix_init (&matrix,
       1, 0,
       slope, scaling,
@@ -601,6 +605,10 @@ draw_background (ChamplainLabel *label,
 
   bg = clutter_cairo_texture_new (width, height + point);
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (bg));
+
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_paint(cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
 
   /* If selected, add the selection color to the marker's color */
   if (champlain_marker_get_selected (marker))

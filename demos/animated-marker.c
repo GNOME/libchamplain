@@ -41,6 +41,10 @@ create_marker ()
   bg = clutter_cairo_texture_new (MARKER_SIZE, MARKER_SIZE);
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (bg));
 
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_paint(cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+
   /* Draw the circle */
   cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_arc (cr, MARKER_SIZE / 2.0, MARKER_SIZE / 2.0, MARKER_SIZE / 2.0, 0, 2 * M_PI);

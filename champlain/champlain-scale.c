@@ -332,8 +332,11 @@ redraw_scale (ChamplainScale *scale)
 
   /* Draw the line */
   line = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->content_group), "scale-line");
-  clutter_cairo_texture_clear (CLUTTER_CAIRO_TEXTURE (line));
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (line));
+
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_paint(cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
 
   cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
@@ -362,6 +365,7 @@ redraw_scale (ChamplainScale *scale)
   cairo_stroke (cr);
 
   cairo_destroy (cr);
+  clutter_actor_queue_redraw (CLUTTER_ACTOR (scale));
 }
 
 
