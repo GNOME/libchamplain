@@ -298,6 +298,22 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
 
 
 /**
+ * champlain_marker_layer_new:
+ *
+ * Creates a new instance of #ChamplainMarkerLayer.
+ *
+ * Returns: a new #ChamplainMarkerLayer ready to be used as a container for the markers.
+ *
+ * Since: 0.10
+ */
+ChamplainMarkerLayer *
+champlain_marker_layer_new ()
+{
+  return g_object_new (CHAMPLAIN_TYPE_MARKER_LAYER, NULL);
+}
+
+
+/**
  * champlain_marker_layer_new_full:
  * @mode: Selection mode
  *

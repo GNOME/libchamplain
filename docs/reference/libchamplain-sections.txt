@@ -309,6 +309,7 @@ ChamplainLayerClass
 <TITLE>ChamplainMarkerLayer</TITLE>
 ChamplainMarkerLayer
 ChamplainSelectionMode
+champlain_marker_layer_new
 champlain_marker_layer_new_full
 champlain_marker_layer_add_marker
 champlain_marker_layer_remove_marker

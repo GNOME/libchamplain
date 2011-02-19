@@ -84,6 +84,7 @@ struct _ChamplainMarkerLayerClass
 
 GType champlain_marker_layer_get_type (void);
 
+ChamplainMarkerLayer *champlain_marker_layer_new (void);
 ChamplainMarkerLayer *champlain_marker_layer_new_full (ChamplainSelectionMode mode);
 
 void champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
