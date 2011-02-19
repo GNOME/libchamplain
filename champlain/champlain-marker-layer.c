@@ -522,6 +522,42 @@ champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer)
 
 
 /**
+ * champlain_marker_layer_get_selected:
+ * @layer: a #ChamplainMarkerLayer
+ *
+ * Gets a list of selected markers.
+ * 
+ * Returns: (transfer container) (element-type ChamplainMarker): the list
+ *
+ * Since: 0.10
+ */
+GList *
+champlain_marker_layer_get_selected (ChamplainMarkerLayer *layer)
+{
+  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  GList *elem;
+  GList *markers;
+  GList *selected = NULL;
+
+  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), NULL);
+
+  markers = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
+  
+  for (elem = markers; elem != NULL; elem = elem->next)
+    {
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
+
+      if (champlain_marker_get_selected (marker))
+        selected = g_list_append (selected, marker);
+    }
+
+  g_list_free (markers);
+  
+  return selected;
+}
+
+
+/**
  * champlain_marker_layer_remove_marker:
  * @layer: a #ChamplainMarkerLayer
  * @marker: a #ChamplainMarker
