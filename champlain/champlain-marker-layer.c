@@ -380,7 +380,7 @@ static void
 set_marker_position (ChamplainMarkerLayer *layer, ChamplainMarker *marker)
 {
   ChamplainMarkerLayerPrivate *priv = layer->priv;
-  gdouble x, y, origin_x, origin_y;
+  gint x, y, origin_x, origin_y;
   
   /* layer not yet added to the view */
   if (priv->view == NULL)
@@ -928,7 +928,7 @@ get_bounding_box (ChamplainLayer *layer)
   GList *elem;
   ChamplainBoundingBox *bbox;
   GList *markers;
-  double x, y;
+  gdouble x, y;
 
   g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), NULL);
   

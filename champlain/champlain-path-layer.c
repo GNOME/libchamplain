@@ -672,7 +672,7 @@ redraw_path (ChamplainPathLayer *layer)
   gfloat width, height;
   GList *elem;
   ChamplainView *view = priv->view;
-  gdouble x, y;
+  gint x, y;
   guint last_width, last_height;
   
   /* layer not yet added to the view */

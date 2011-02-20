@@ -492,12 +492,14 @@ champlain_map_source_get_projection (ChamplainMapSource *map_source)
  *
  * Since: 0.4
  */
-guint
+gdouble
 champlain_map_source_get_x (ChamplainMapSource *map_source,
     guint zoom_level,
     gdouble longitude)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+
+  longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
 
   /* FIXME: support other projections */
   return ((longitude + 180.0) / 360.0 * pow (2.0, zoom_level)) * champlain_map_source_get_tile_size (map_source);
@@ -517,13 +519,15 @@ champlain_map_source_get_x (ChamplainMapSource *map_source,
  *
  * Since: 0.4
  */
-guint
+gdouble
 champlain_map_source_get_y (ChamplainMapSource *map_source,
     guint zoom_level,
     gdouble latitude)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
 
+  latitude = CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
+  
   /* FIXME: support other projections */
   return ((1.0 - log (tan (latitude * M_PI / 180.0) + 1.0 / cos (latitude * M_PI / 180.0)) / M_PI) / 
           2.0 * pow (2.0, zoom_level)) * champlain_map_source_get_tile_size (map_source);
@@ -546,12 +550,16 @@ champlain_map_source_get_y (ChamplainMapSource *map_source,
 gdouble
 champlain_map_source_get_longitude (ChamplainMapSource *map_source,
     guint zoom_level,
-    guint x)
+    gdouble x)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+  gdouble longitude;
+    
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0.0);
   /* FIXME: support other projections */
-  gdouble dx = (float) x / champlain_map_source_get_tile_size (map_source);
-  return dx / pow (2.0, zoom_level) * 360.0 - 180;
+  gdouble dx = (gdouble) x / champlain_map_source_get_tile_size (map_source);
+  longitude =  dx / pow (2.0, zoom_level) * 360.0 - 180.0;
+  
+  return CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
 }
 
 
@@ -571,13 +579,17 @@ champlain_map_source_get_longitude (ChamplainMapSource *map_source,
 gdouble
 champlain_map_source_get_latitude (ChamplainMapSource *map_source,
     guint zoom_level,
-    guint y)
+    gdouble y)
 {
-  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
+  gdouble latitude;
+  
+  g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0.0);
   /* FIXME: support other projections */
-  gdouble dy = (float) y / champlain_map_source_get_tile_size (map_source);
+  gdouble dy = (gdouble) y / champlain_map_source_get_tile_size (map_source);
   gdouble n = M_PI - 2.0 * M_PI * dy / pow (2.0, zoom_level);
-  return 180.0 / M_PI * atan (0.5 * (exp (n) - exp (-n)));
+  latitude = 180.0 / M_PI * atan (0.5 * (exp (n) - exp (-n)));
+  
+  return CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
 }
 
 

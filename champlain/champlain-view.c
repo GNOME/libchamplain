@@ -151,18 +151,18 @@ struct _ChamplainViewPrivate
   GTimer *update_viewport_timer;
 
   /* Hack to get smaller x,y coordinates as the clutter limit is G_MAXINT16 */
-  gdouble anchor_x;
-  gdouble anchor_y;
+  gint anchor_x;
+  gint anchor_y;
 
-  gdouble anchor_zoom_level; /* the zoom_level for which the current anchor has
+  guint anchor_zoom_level; /* the zoom_level for which the current anchor has
                                 been computed for */
 
   ClutterActor *kinetic_scroll; /* Contains the viewport */
   ClutterActor *viewport;  /* Contains the map_layer, license and markers */
   ClutterActor *map_layer; /* Contains tiles actors (grouped by zoom level) */
   
-  gdouble viewport_x;
-  gdouble viewport_y;
+  gint viewport_x;
+  gint viewport_y;
   gint viewport_width;
   gint viewport_height;
   
@@ -606,7 +606,7 @@ champlain_view_allocate (ClutterActor *actor,
   ChamplainView *view = CHAMPLAIN_VIEW (actor);
   ChamplainViewPrivate *priv = view->priv;
   ClutterActorBox child_box;
-  guint width, height;
+  gint width, height;
 
   /* Chain up */
   CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->allocate (actor, box, flags);
@@ -1329,7 +1329,7 @@ view_update_anchor (ChamplainView *view,
           if (priv->anchor_y < 0)
             priv->anchor_y = 0;
 
-          DEBUG ("New Anchor (%f, %f) at (%d, %d)", priv->anchor_x, priv->anchor_y, x, y);
+          DEBUG ("New Anchor (%d, %d) at (%d, %d)", priv->anchor_x, priv->anchor_y, x, y);
         }
       else
         {
@@ -1497,8 +1497,9 @@ champlain_view_go_to_with_duration (ChamplainView *view,
   ctx = g_slice_new (GoToContext);
   ctx->from_latitude = priv->latitude;
   ctx->from_longitude = priv->longitude;
-  ctx->to_latitude = latitude;
-  ctx->to_longitude = longitude;
+  ctx->to_latitude = CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);;
+  ctx->to_longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
+
   ctx->view = view;
 
   /* We keep a reference for stop */
@@ -1727,13 +1728,13 @@ gdouble
 champlain_view_x_to_longitude (ChamplainView *view,
     gdouble x)
 {
-  DEBUG_LOG ()
-
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
-  
   ChamplainViewPrivate *priv = view->priv;
   gdouble longitude;
 
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);  
+  
   longitude = champlain_map_source_get_longitude (priv->map_source,
       priv->zoom_level, 
       x + priv->viewport_x + priv->anchor_x);
@@ -1757,12 +1758,12 @@ gdouble
 champlain_view_y_to_latitude (ChamplainView *view,
     gdouble y)
 {
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble latitude;
+  
   DEBUG_LOG ()
 
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
-  
-  ChamplainViewPrivate *priv = view->priv;
-  gdouble latitude;
 
   latitude = champlain_map_source_get_latitude (priv->map_source,
       priv->zoom_level, 
@@ -1787,18 +1788,16 @@ gdouble
 champlain_view_longitude_to_x (ChamplainView *view, 
     gdouble longitude)
 {
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble x;
+  
   DEBUG_LOG ()
 
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
 
-  ChamplainViewPrivate *priv = view->priv;
-  gdouble x;
-
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude);
-  x -= priv->anchor_x;
-  x -= priv->viewport_x;
 
-  return x;
+  return x - priv->anchor_x - priv->viewport_x;
 }
 
 
@@ -1817,18 +1816,16 @@ gdouble
 champlain_view_latitude_to_y (ChamplainView *view, 
     gdouble latitude)
 {
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble y;
+  
   DEBUG_LOG ()
 
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0);
 
-  ChamplainViewPrivate *priv = view->priv;
-  gdouble y;
-
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude);
-  y -= priv->anchor_y;
-  y -= priv->viewport_y;
 
-  return y;
+  return y - priv->anchor_y - priv->viewport_y;
 }
 
 
@@ -1844,8 +1841,8 @@ champlain_view_latitude_to_y (ChamplainView *view,
  */
 void 
 champlain_view_get_viewport_origin (ChamplainView *view, 
-    gdouble *x, 
-    gdouble *y)
+    gint *x, 
+    gint *y)
 {
   DEBUG_LOG ()
 

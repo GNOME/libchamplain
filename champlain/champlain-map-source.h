@@ -104,18 +104,18 @@ guint champlain_map_source_get_max_zoom_level (ChamplainMapSource *map_source);
 guint champlain_map_source_get_tile_size (ChamplainMapSource *map_source);
 ChamplainMapProjection champlain_map_source_get_projection (ChamplainMapSource *map_source);
 
-guint champlain_map_source_get_x (ChamplainMapSource *map_source,
+gdouble champlain_map_source_get_x (ChamplainMapSource *map_source,
     guint zoom_level,
     gdouble longitude);
-guint champlain_map_source_get_y (ChamplainMapSource *map_source,
+gdouble champlain_map_source_get_y (ChamplainMapSource *map_source,
     guint zoom_level,
     gdouble latitude);
 gdouble champlain_map_source_get_longitude (ChamplainMapSource *map_source,
     guint zoom_level,
-    guint x);
+    gdouble x);
 gdouble champlain_map_source_get_latitude (ChamplainMapSource *map_source,
     guint zoom_level,
-    guint y);
+    gdouble y);
 guint champlain_map_source_get_row_count (ChamplainMapSource *map_source,
     guint zoom_level);
 guint champlain_map_source_get_column_count (ChamplainMapSource *map_source,
