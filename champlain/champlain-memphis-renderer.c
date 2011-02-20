@@ -600,7 +600,7 @@ champlain_memphis_renderer_set_rule (ChamplainMemphisRenderer *renderer,
 
 
 /**
- * champlain_memphis_renderer_get_rule:
+ * champlain_memphis_renderer_get_rule: (skip)
  * @renderer: a #ChamplainMemphisRenderer
  * @id: an id string
  *
