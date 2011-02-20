@@ -806,7 +806,6 @@ get_bounding_box (ChamplainLayer *layer)
   ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
   ChamplainBoundingBox *bbox;
-  gdouble x, y;
   
   bbox = champlain_bounding_box_new ();
 
@@ -821,16 +820,17 @@ get_bounding_box (ChamplainLayer *layer)
       champlain_bounding_box_extend (bbox, lat, lon); 
     }
 
-  // TODO: make the margin such that markers fit inside
-  x = champlain_view_longitude_to_x (priv->view, bbox->left);
-  y = champlain_view_latitude_to_y (priv->view, bbox->top);  
-  bbox->left = champlain_view_x_to_longitude (priv->view, x - 10);
-  bbox->top = champlain_view_y_to_latitude (priv->view, y - 10);
+  if (bbox->left == bbox->right)
+    {
+      bbox->left -= 0.0001;
+      bbox->right += 0.0001;
+    }
 
-  x = champlain_view_longitude_to_x (priv->view, bbox->right);
-  y = champlain_view_latitude_to_y (priv->view, bbox->bottom);  
-  bbox->right = champlain_view_x_to_longitude (priv->view, x + 10);
-  bbox->bottom = champlain_view_y_to_latitude (priv->view, y + 10);
+  if (bbox->bottom == bbox->top)
+    {
+      bbox->bottom -= 0.0001;
+      bbox->top += 0.0001;
+    }
 
   return bbox;
 }
