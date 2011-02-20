@@ -1,3 +1,38 @@
+libchamplain 0.9.0 (2011-02-21)
+===============================
+
+Unstable release
+Vala bindings have not been updated yet.
+
+Changes:
+* Port to GTK3 (William Jon McCann, Jiří Techet)
+* Rethink layer, marker, polygon and custom widget hierarchy (Jiří Techet)
+* Make ChamplainView more independent of layers and polygons (Jiří Techet)
+* Move license and scale actors outside of ChamplainView
+* Add possibility to align custom widget actors to different positions of 
+  ChamplainView (Jiří Techet)
+* Inherit all libchamplain actors from ClutterActor instead of ClutterGroup (Jiří Techet)
+* Replace tidy with mx (Jiří Techet)
+* Make markers and paths movable (Jiří Techet)
+* Change ChamplainMapSourceDesc to be a class (Jiří Techet)
+* Speed up marker addition by using custom ClutterGroup without depth ordering (Jiří Techet)
+* Depend on clutter 1.2 (needed for alignment) and clutter-gtk 1.0 (needed by GTK 3
+  port) (Jiří Techet)
+* Many other fixes, cleanups, renames, improvements and new bugs (Jiří Techet)
+
+libchamplain 0.8.1 (2011-01-18)
+===============================
+
+Stable release
+
+Changes:
+* Include MapQuest renderer for OSM (Tomaž Vajngerl)
+* Improve introspection annotations (Patrick Salecker, Jiří Techet)
+* Remove static python bindings, use introspection-based instead (William Jon McCann)
+* Improve Vala bindings (Tomaž Vajngerl, Andreas Brauchli)
+* Fix marker positioning problems by not ordering them by latitude (Jiří Techet)
+* Fire latitude and longitude signals independently of viewport shift (Jiří Techet, Tomaž Vajngerl)
+
 libchamplain 0.8.0 (2010-09-27)
 ===============================
 

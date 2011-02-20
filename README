@@ -8,32 +8,21 @@ libchamplain requires:
 
   * glib >= 2.10
   * gio >= 2.16
-  * gdk >= 2.10
-  * clutter >= 1.0
+  * gdk >= 3.0
+  * clutter >= 1.2
   * cairo >= 1.4
   * sqlite >= 3.0
-  * libsoup >= 2.4.1
+  * libsoup >= 2.33.5
 
 If you are building libchamplain-gtk, you will also need:
 
-  * gtk >= 2.12
-  * clutter-gtk >= 0.10
+  * gtk >= 3.0
+  * clutter-gtk >= 0.91.6
 
 If you are building libchamplain with local rendering support, you will
 also need:
 
   *  libmemphis >= 0.2.1
-
-If you are building the Python bindings, you will also need:
-
-  * pygtk >= 2.12
-  * pycobject >= 2.10
-  * pyclutter >= 1.0
-
-and optionally:
-
-  * pyclutter-gtk >= 0.10
-  * pymemphis >= 0.2
 
 The usual rules for building apply -
 
