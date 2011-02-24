@@ -25,6 +25,7 @@
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
+#include "tidy-adjustment.h"
 
 G_BEGIN_DECLS
 
@@ -65,6 +66,14 @@ void           tidy_viewport_get_origin  (TidyViewport *viewport,
                                           gfloat         *y,
                                           gfloat         *z);
 void           tidy_viewport_stop        (TidyViewport *viewport);
+
+void tidy_viewport_get_adjustments (TidyViewport *viewport,
+                            TidyAdjustment **hadjustment,
+                            TidyAdjustment **vadjustment);
+
+void tidy_viewport_set_adjustments (TidyViewport *viewport,
+                            TidyAdjustment *hadjustment,
+                            TidyAdjustment *vadjustment);
 
 G_END_DECLS
 

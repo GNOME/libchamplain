@@ -23,7 +23,8 @@
 #include "tidy-finger-scroll.h"
 #include "tidy-enum-types.h"
 #include "tidy-marshal.h"
-#include "tidy-scrollable.h"
+#include "tidy-adjustment.h"
+#include "tidy-viewport.h"
 #include <clutter/clutter.h>
 #include <math.h>
 
@@ -318,7 +319,7 @@ tidy_finger_scroll_add_actor (ClutterContainer *container,
     }
   else
     {
-      if (TIDY_IS_SCROLLABLE(actor))
+      if (TIDY_IS_VIEWPORT(actor))
         {
           priv->child = actor;
           clutter_actor_set_parent (actor, CLUTTER_ACTOR (container));
@@ -332,7 +333,7 @@ tidy_finger_scroll_add_actor (ClutterContainer *container,
         {
           g_warning ("Attempting to add an actor to "
                      "a TidyFingerScroll, but the actor does "
-                     "not implement TidyScrollable.");
+                     "not implement TidyViewport.");
         }
     }
 }
@@ -427,7 +428,7 @@ motion_event_cb (ClutterActor *actor,
           gdouble dx, dy;
           TidyAdjustment *hadjust, *vadjust;
 
-          tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->child),
+          tidy_viewport_get_adjustments (TIDY_VIEWPORT (priv->child),
                                            &hadjust,
                                            &vadjust);
 
@@ -471,7 +472,7 @@ clamp_adjustments (TidyFingerScroll *scroll)
       TidyAdjustment *hadj, *vadj;
       gboolean snap;
 
-      tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->child),
+      tidy_viewport_get_adjustments (TIDY_VIEWPORT (priv->child),
                                        &hadj, &vadj);
 
       /* FIXME: Hard-coded value here */
@@ -537,7 +538,7 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
       gint i;
       gboolean stop = TRUE;
 
-      tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->child),
+      tidy_viewport_get_adjustments (TIDY_VIEWPORT (priv->child),
                                        &hadjust,
                                        &vadjust);
 
@@ -660,7 +661,7 @@ button_release_event_cb (ClutterActor *actor,
               priv->dy = (y_origin - y) / frac;
 
               /* Get adjustments to do step-increment snapping */
-              tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->child),
+              tidy_viewport_get_adjustments (TIDY_VIEWPORT (priv->child),
                                                &hadjust,
                                                &vadjust);
 

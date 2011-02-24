@@ -70,7 +70,6 @@
 #include <tidy-finger-scroll.h>
 #include <tidy-viewport.h>
 #include <tidy-adjustment.h>
-#include <tidy-scrollable.h>
 
 //#define VIEW_LOG 
 #ifdef VIEW_LOG
@@ -336,7 +335,7 @@ resize_viewport (ChamplainView *view)
 
   ChamplainViewPrivate *priv = view->priv;
 
-  tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->viewport), &hadjust,
+  tidy_viewport_get_adjustments (TIDY_VIEWPORT (priv->viewport), &hadjust,
       &vadjust);
 
   if (priv->zoom_level < 8)

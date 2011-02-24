@@ -27,23 +27,10 @@
 #include <clutter/clutter.h>
 
 #include "tidy-viewport.h"
-#include "tidy-adjustment.h"
-#include "tidy-scrollable.h"
 #include "tidy-private.h"
 
-static void scrollable_interface_init (TidyScrollableInterface *iface);
 
-static void scrollable_set_adjustments (TidyScrollable *scrollable,
-                                        TidyAdjustment *hadjustment,
-                                        TidyAdjustment *vadjustment);
-
-static void scrollable_get_adjustments (TidyScrollable  *scrollable,
-                                        TidyAdjustment **hadjustment,
-                                        TidyAdjustment **vadjustment);
-
-G_DEFINE_TYPE_WITH_CODE (TidyViewport, tidy_viewport, CLUTTER_TYPE_GROUP,
-                         G_IMPLEMENT_INTERFACE (TIDY_TYPE_SCROLLABLE,
-                                                scrollable_interface_init))
+G_DEFINE_TYPE (TidyViewport, tidy_viewport, CLUTTER_TYPE_GROUP)
 
 #define VIEWPORT_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), TIDY_TYPE_VIEWPORT, \
@@ -70,7 +57,7 @@ enum
   PROP_Z_ORIGIN,
   PROP_HADJUST,
   PROP_VADJUST,
-  PROP_SYNC_ADJUST
+  PROP_SYNC_ADJUST,
 };
 
 static void
@@ -98,12 +85,12 @@ tidy_viewport_get_property (GObject    *object,
       break;
 
     case PROP_HADJUST :
-      scrollable_get_adjustments (TIDY_SCROLLABLE (object), &adjustment, NULL);
+      tidy_viewport_get_adjustments (TIDY_VIEWPORT (object), &adjustment, NULL);
       g_value_set_object (value, adjustment);
       break;
 
     case PROP_VADJUST :
-      scrollable_get_adjustments (TIDY_SCROLLABLE (object), NULL, &adjustment);
+      tidy_viewport_get_adjustments (TIDY_VIEWPORT (object), NULL, &adjustment);
       g_value_set_object (value, adjustment);
       break;
 
@@ -150,13 +137,13 @@ tidy_viewport_set_property (GObject      *object,
       break;
 
     case PROP_HADJUST :
-      scrollable_set_adjustments (TIDY_SCROLLABLE (object),
+      tidy_viewport_set_adjustments (TIDY_VIEWPORT (object),
                                   g_value_get_object (value),
                                   priv->vadjustment);
       break;
 
     case PROP_VADJUST :
-      scrollable_set_adjustments (TIDY_SCROLLABLE (object),
+      tidy_viewport_set_adjustments (TIDY_VIEWPORT (object),
                                   priv->hadjustment,
                                   g_value_get_object (value));
       break;
@@ -321,13 +308,22 @@ tidy_viewport_class_init (TidyViewportClass *klass)
                                                          TRUE,
                                                          G_PARAM_READWRITE));
 
-  g_object_class_override_property (gobject_class,
-                                    PROP_HADJUST,
-                                    "hadjustment");
+  g_object_class_install_property (gobject_class,
+                                   PROP_HADJUST,
+                                   g_param_spec_object ("hadjustment",
+                                                        "TidyAdjustment",
+                                                        "Horizontal adjustment",
+                                                        TIDY_TYPE_ADJUSTMENT,
+                                                        G_PARAM_READWRITE));
 
-  g_object_class_override_property (gobject_class,
-                                    PROP_VADJUST,
-                                    "vadjustment");
+  g_object_class_install_property (gobject_class,
+                                   PROP_VADJUST,
+                                   g_param_spec_object ("vadjustment",
+                                                        "TidyAdjustment",
+                                                        "Vertical adjustment",
+                                                        TIDY_TYPE_ADJUSTMENT,
+                                                        G_PARAM_READWRITE));
+
 }
 
 static void
@@ -361,12 +357,12 @@ vadjustment_value_notify_cb (TidyAdjustment *adjustment, GParamSpec *arg1,
                              priv->z);
 }
 
-static void
-scrollable_set_adjustments (TidyScrollable *scrollable,
+void
+tidy_viewport_set_adjustments (TidyViewport *viewport,
                             TidyAdjustment *hadjustment,
                             TidyAdjustment *vadjustment)
 {
-  TidyViewportPrivate *priv = TIDY_VIEWPORT (scrollable)->priv;
+  TidyViewportPrivate *priv = TIDY_VIEWPORT (viewport)->priv;
 
   if (hadjustment != priv->hadjustment)
     {
@@ -374,7 +370,7 @@ scrollable_set_adjustments (TidyScrollable *scrollable,
         {
           g_signal_handlers_disconnect_by_func (priv->hadjustment,
                                                 hadjustment_value_notify_cb,
-                                                scrollable);
+                                                viewport);
           g_object_unref (priv->hadjustment);
         }
 
@@ -383,7 +379,7 @@ scrollable_set_adjustments (TidyScrollable *scrollable,
           g_object_ref (hadjustment);
           g_signal_connect (hadjustment, "notify::value",
                             G_CALLBACK (hadjustment_value_notify_cb),
-                            scrollable);
+                            viewport);
         }
 
       priv->hadjustment = hadjustment;
@@ -395,7 +391,7 @@ scrollable_set_adjustments (TidyScrollable *scrollable,
         {
           g_signal_handlers_disconnect_by_func (priv->vadjustment,
                                                 vadjustment_value_notify_cb,
-                                                scrollable);
+                                                viewport);
           g_object_unref (priv->vadjustment);
         }
 
@@ -404,23 +400,23 @@ scrollable_set_adjustments (TidyScrollable *scrollable,
           g_object_ref (vadjustment);
           g_signal_connect (vadjustment, "notify::value",
                             G_CALLBACK (vadjustment_value_notify_cb),
-                            scrollable);
+                            viewport);
         }
 
       priv->vadjustment = vadjustment;
     }
 }
 
-static void
-scrollable_get_adjustments (TidyScrollable *scrollable,
+void
+tidy_viewport_get_adjustments (TidyViewport *viewport,
                             TidyAdjustment **hadjustment,
                             TidyAdjustment **vadjustment)
 {
   TidyViewportPrivate *priv;
 
-  g_return_if_fail (TIDY_IS_VIEWPORT (scrollable));
+  g_return_if_fail (TIDY_IS_VIEWPORT (viewport));
 
-  priv = ((TidyViewport *)scrollable)->priv;
+  priv = ((TidyViewport *)viewport)->priv;
 
   if (hadjustment)
     {
@@ -431,7 +427,7 @@ scrollable_get_adjustments (TidyScrollable *scrollable,
           TidyAdjustment *adjustment;
           guint width, stage_width, increment;
 
-          width = clutter_actor_get_width (CLUTTER_ACTOR(scrollable));
+          width = clutter_actor_get_width (CLUTTER_ACTOR(viewport));
           stage_width = clutter_actor_get_width (clutter_stage_get_default ());
           increment = MAX (1, MIN(stage_width, width));
 
@@ -441,7 +437,7 @@ scrollable_get_adjustments (TidyScrollable *scrollable,
                                             1,
                                             increment,
                                             increment);
-          scrollable_set_adjustments (scrollable,
+          tidy_viewport_set_adjustments (viewport,
                                       adjustment,
                                       priv->vadjustment);
           *hadjustment = adjustment;
@@ -457,7 +453,7 @@ scrollable_get_adjustments (TidyScrollable *scrollable,
           TidyAdjustment *adjustment;
           guint height, stage_height, increment;
 
-          height = clutter_actor_get_height (CLUTTER_ACTOR(scrollable));
+          height = clutter_actor_get_height (CLUTTER_ACTOR(viewport));
           stage_height = clutter_actor_get_height (clutter_stage_get_default ());
           increment = MAX (1, MIN(stage_height, height));
 
@@ -467,7 +463,7 @@ scrollable_get_adjustments (TidyScrollable *scrollable,
                                             1,
                                             increment,
                                             increment);
-          scrollable_set_adjustments (scrollable,
+          tidy_viewport_set_adjustments (viewport,
                                       priv->hadjustment,
                                       adjustment);
           *vadjustment = adjustment;
@@ -475,12 +471,6 @@ scrollable_get_adjustments (TidyScrollable *scrollable,
     }
 }
 
-static void
-scrollable_interface_init (TidyScrollableInterface *iface)
-{
-  iface->set_adjustments = scrollable_set_adjustments;
-  iface->get_adjustments = scrollable_get_adjustments;
-}
 
 static void
 clip_notify_cb (ClutterActor *actor,

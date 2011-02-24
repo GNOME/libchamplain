@@ -7,14 +7,12 @@ EXTRA_DIST =
 tidy_headers_public = \
 	$(srcdir)/tidy-adjustment.h		\
 	$(srcdir)/tidy-finger-scroll.h		\
-	$(srcdir)/tidy-scrollable.h		\
 	$(srcdir)/tidy-viewport.h		\
 	$(srcdir)/tidy-private.h
 
 tidy_sources = \
 	$(srcdir)/tidy-adjustment.c \
 	$(srcdir)/tidy-finger-scroll.c \
-	$(srcdir)/tidy-scrollable.c \
 	$(srcdir)/tidy-viewport.c
 
 
