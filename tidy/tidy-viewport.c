@@ -40,7 +40,6 @@ struct _TidyViewportPrivate
 {
   gfloat x;
   gfloat y;
-  gfloat z;
 
   TidyAdjustment *hadjustment;
   TidyAdjustment *vadjustment;
@@ -54,7 +53,6 @@ enum
 
   PROP_X_ORIGIN,
   PROP_Y_ORIGIN,
-  PROP_Z_ORIGIN,
   PROP_HADJUST,
   PROP_VADJUST,
   PROP_SYNC_ADJUST,
@@ -78,10 +76,6 @@ tidy_viewport_get_property (GObject    *object,
 
     case PROP_Y_ORIGIN:
       g_value_set_int (value, priv->y);
-      break;
-
-    case PROP_Z_ORIGIN:
-      g_value_set_int (value, priv->z);
       break;
 
     case PROP_HADJUST :
@@ -118,21 +112,12 @@ tidy_viewport_set_property (GObject      *object,
     case PROP_X_ORIGIN:
       tidy_viewport_set_origin (viewport,
                                  g_value_get_int (value),
-                                 priv->y,
-                                 priv->z);
+                                 priv->y);
       break;
 
     case PROP_Y_ORIGIN:
       tidy_viewport_set_origin (viewport,
                                  priv->x,
-                                 g_value_get_int (value),
-                                 priv->z);
-      break;
-
-    case PROP_Z_ORIGIN:
-      tidy_viewport_set_origin (viewport,
-                                 priv->x,
-                                 priv->y,
                                  g_value_get_int (value));
       break;
 
@@ -198,7 +183,7 @@ tidy_viewport_paint (ClutterActor *self)
 
   cogl_translate ((priv->x) * -1.0,
                   (priv->y) * -1.0,
-                  (priv->z) * -1.0);
+                  0.0);
 
   CLUTTER_ACTOR_CLASS (tidy_viewport_parent_class)->paint (self);
 
@@ -288,15 +273,6 @@ tidy_viewport_class_init (TidyViewportClass *klass)
                                                      G_PARAM_READWRITE));
 
   g_object_class_install_property (gobject_class,
-                                   PROP_Z_ORIGIN,
-                                   g_param_spec_int ("z-origin",
-                                                     "Z Origin",
-                                                     "Origin's Z coordinate in pixels",
-                                                     -G_MAXINT, G_MAXINT,
-                                                     0,
-                                                     G_PARAM_READWRITE));
-
-  g_object_class_install_property (gobject_class,
                                    PROP_SYNC_ADJUST,
                                    g_param_spec_boolean ("sync-adjustments",
                                                          "Synchronise "
@@ -338,8 +314,7 @@ hadjustment_value_notify_cb (TidyAdjustment *adjustment,
 
   tidy_viewport_set_origin (viewport,
                              value,
-                             priv->y,
-                             priv->z);
+                             priv->y);
 }
 
 static void
@@ -353,8 +328,7 @@ vadjustment_value_notify_cb (TidyAdjustment *adjustment, GParamSpec *arg1,
 
   tidy_viewport_set_origin (viewport,
                              priv->x,
-                             value,
-                             priv->z);
+                             value);
 }
 
 void
@@ -521,8 +495,7 @@ tidy_viewport_new (void)
 void
 tidy_viewport_set_origin (TidyViewport *viewport,
                           float x,
-                          float y,
-                          float z)
+                          float y)
 {
   TidyViewportPrivate *priv;
 
@@ -552,12 +525,6 @@ tidy_viewport_set_origin (TidyViewport *viewport,
                                     y);
     }
 
-  if (z != priv->z)
-    {
-      priv->z = z;
-      g_object_notify (G_OBJECT (viewport), "z-origin");
-    }
-
   g_object_thaw_notify (G_OBJECT (viewport));
 
   clutter_actor_queue_redraw (CLUTTER_ACTOR (viewport));
@@ -566,8 +533,7 @@ tidy_viewport_set_origin (TidyViewport *viewport,
 void
 tidy_viewport_get_origin (TidyViewport *viewport,
                           float *x,
-                          float *y,
-                          float *z)
+                          float *y)
 {
   TidyViewportPrivate *priv;
 
@@ -580,7 +546,4 @@ tidy_viewport_get_origin (TidyViewport *viewport,
 
   if (y)
     *y = priv->y;
-
-  if (z)
-    *z = priv->z;
 }

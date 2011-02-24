@@ -350,7 +350,7 @@ tidy_adjustment_set_value (TidyAdjustment *adjustment,
     }
 }
 
-void
+static void
 tidy_adjustment_clamp_page (TidyAdjustment *adjustment,
                             double lower,
                             double upper)

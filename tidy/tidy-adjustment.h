@@ -80,9 +80,6 @@ TidyAdjustment *tidy_adjustment_new          (gdouble         value,
 gdouble         tidy_adjustment_get_value    (TidyAdjustment *adjustment);
 void            tidy_adjustment_set_value    (TidyAdjustment *adjustment,
                                               gdouble         value);
-void            tidy_adjustment_clamp_page   (TidyAdjustment *adjustment,
-                                              gdouble         lower,
-                                              gdouble         upper);
 void            tidy_adjustment_set_values   (TidyAdjustment *adjustment,
                                               gdouble         value,
                                               gdouble         lower,

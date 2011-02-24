@@ -58,13 +58,11 @@ ClutterActor * tidy_viewport_new         (void);
 
 void           tidy_viewport_set_origin  (TidyViewport *viewport,
                                           float          x,
-                                          float          y,
-                                          float          z);
+                                          float          y);
 
 void           tidy_viewport_get_origin  (TidyViewport *viewport,
                                           gfloat         *x,
-                                          gfloat         *y,
-                                          gfloat         *z);
+                                          gfloat         *y);
 void           tidy_viewport_stop        (TidyViewport *viewport);
 
 void tidy_viewport_get_adjustments (TidyViewport *viewport,

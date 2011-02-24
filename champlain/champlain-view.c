@@ -266,8 +266,7 @@ update_viewport (ChamplainView *view,
       g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
       tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
           priv->viewport_x,
-          priv->viewport_y,
-          0);
+          priv->viewport_y);
       g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
       
       g_signal_emit_by_name (view, "layer-relocated", NULL);
@@ -293,7 +292,7 @@ panning_completed (G_GNUC_UNUSED TidyFingerScroll *scroll,
   gfloat absolute_x, absolute_y;
   gfloat x, y;
 
-  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y, NULL);
+  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y);
 
   absolute_x = x + priv->anchor_x + priv->viewport_width / 2.0;
   absolute_y = y + priv->anchor_y + priv->viewport_height / 2.0;
@@ -533,6 +532,7 @@ champlain_view_dispose (GObject *object)
 
   if (priv->viewport != NULL)
     {
+      tidy_viewport_stop (TIDY_VIEWPORT (priv->viewport));
       g_object_unref (priv->viewport);
       priv->viewport = NULL;
     }
@@ -1084,7 +1084,7 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
   ChamplainViewPrivate *priv = view->priv;
   gfloat x, y;
 
-  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y, NULL);
+  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y);
 
   if (fabs (x - priv->viewport_x) > 100 ||
       fabs (y - priv->viewport_y) > 100 ||
