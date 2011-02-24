@@ -1,4 +1,4 @@
-/* tidy-adjustment.c: Adjustment object
+/* champlain-adjustment.c: Adjustment object
  *
  * Copyright (C) 2008 OpenedHand
  *
@@ -27,15 +27,15 @@
 #include <glib-object.h>
 #include <clutter/clutter.h>
 
-#include "tidy-adjustment.h"
-#include "tidy-marshal.h"
-#include "tidy-private.h"
+#include "champlain-adjustment.h"
+#include "champlain-marshal.h"
+#include "champlain-private.h"
 
-G_DEFINE_TYPE (TidyAdjustment, tidy_adjustment, G_TYPE_OBJECT)
+G_DEFINE_TYPE (ChamplainAdjustment, champlain_adjustment, G_TYPE_OBJECT)
 
-#define ADJUSTMENT_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TIDY_TYPE_ADJUSTMENT, TidyAdjustmentPrivate))
+#define ADJUSTMENT_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentPrivate))
 
-struct _TidyAdjustmentPrivate
+struct _ChamplainAdjustmentPrivate
 {
   gdouble lower;
   gdouble upper;
@@ -78,24 +78,24 @@ enum
 
 static guint signals[LAST_SIGNAL] = { 0, };
 
-static void tidy_adjustment_set_lower          (TidyAdjustment *adjustment,
+static void champlain_adjustment_set_lower          (ChamplainAdjustment *adjustment,
                                                 gdouble         lower);
-static void tidy_adjustment_set_upper          (TidyAdjustment *adjustment,
+static void champlain_adjustment_set_upper          (ChamplainAdjustment *adjustment,
                                                 gdouble         upper);
-static void tidy_adjustment_set_step_increment (TidyAdjustment *adjustment,
+static void champlain_adjustment_set_step_increment (ChamplainAdjustment *adjustment,
                                                 gdouble         step);
-static void tidy_adjustment_set_page_increment (TidyAdjustment *adjustment,
+static void champlain_adjustment_set_page_increment (ChamplainAdjustment *adjustment,
                                                 gdouble         page);
-static void tidy_adjustment_set_page_size      (TidyAdjustment *adjustment,
+static void champlain_adjustment_set_page_size      (ChamplainAdjustment *adjustment,
                                                 gdouble         size);
 
 static void
-tidy_adjustment_get_property (GObject    *object,
+champlain_adjustment_get_property (GObject    *object,
                               guint       prop_id,
                               GValue     *value,
                               GParamSpec *pspec)
 {
-  TidyAdjustmentPrivate *priv = TIDY_ADJUSTMENT (object)->priv;
+  ChamplainAdjustmentPrivate *priv = CHAMPLAIN_ADJUSTMENT (object)->priv;
 
   switch (prop_id)
     {
@@ -134,41 +134,41 @@ tidy_adjustment_get_property (GObject    *object,
 }
 
 static void
-tidy_adjustment_set_property (GObject      *object,
+champlain_adjustment_set_property (GObject      *object,
                               guint         prop_id,
                               const GValue *value,
                               GParamSpec   *pspec)
 {
-  TidyAdjustment *adj = TIDY_ADJUSTMENT (object);
+  ChamplainAdjustment *adj = CHAMPLAIN_ADJUSTMENT (object);
 
   switch (prop_id)
     {
     case PROP_LOWER:
-      tidy_adjustment_set_lower (adj, g_value_get_double (value));
+      champlain_adjustment_set_lower (adj, g_value_get_double (value));
       break;
 
     case PROP_UPPER:
-      tidy_adjustment_set_upper (adj, g_value_get_double (value));
+      champlain_adjustment_set_upper (adj, g_value_get_double (value));
       break;
 
     case PROP_VALUE:
-      tidy_adjustment_set_value (adj, g_value_get_double (value));
+      champlain_adjustment_set_value (adj, g_value_get_double (value));
       break;
 
     case PROP_STEP_INC:
-      tidy_adjustment_set_step_increment (adj, g_value_get_double (value));
+      champlain_adjustment_set_step_increment (adj, g_value_get_double (value));
       break;
 
     case PROP_PAGE_INC:
-      tidy_adjustment_set_page_increment (adj, g_value_get_double (value));
+      champlain_adjustment_set_page_increment (adj, g_value_get_double (value));
       break;
 
     case PROP_PAGE_SIZE:
-      tidy_adjustment_set_page_size (adj, g_value_get_double (value));
+      champlain_adjustment_set_page_size (adj, g_value_get_double (value));
       break;
 
     case PROP_ELASTIC:
-      tidy_adjustment_set_elastic (adj, g_value_get_boolean (value));
+      champlain_adjustment_set_elastic (adj, g_value_get_boolean (value));
       break;
 
     default:
@@ -178,9 +178,9 @@ tidy_adjustment_set_property (GObject      *object,
 }
 
 static void
-stop_interpolation (TidyAdjustment *adjustment)
+stop_interpolation (ChamplainAdjustment *adjustment)
 {
-  TidyAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv = adjustment->priv;
   if (priv->interpolation)
     {
       clutter_timeline_stop (priv->interpolation);
@@ -196,29 +196,29 @@ stop_interpolation (TidyAdjustment *adjustment)
 }
 
 void
-tidy_adjustment_interpolate_stop (TidyAdjustment *adjustment)
+champlain_adjustment_interpolate_stop (ChamplainAdjustment *adjustment)
 {
   stop_interpolation (adjustment);
 }
 
 static void
-tidy_adjustment_dispose (GObject *object)
+champlain_adjustment_dispose (GObject *object)
 {
-  stop_interpolation (TIDY_ADJUSTMENT (object));
+  stop_interpolation (CHAMPLAIN_ADJUSTMENT (object));
   
-  G_OBJECT_CLASS (tidy_adjustment_parent_class)->dispose (object);
+  G_OBJECT_CLASS (champlain_adjustment_parent_class)->dispose (object);
 }
 
 static void
-tidy_adjustment_class_init (TidyAdjustmentClass *klass)
+champlain_adjustment_class_init (ChamplainAdjustmentClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (TidyAdjustmentPrivate));
+  g_type_class_add_private (klass, sizeof (ChamplainAdjustmentPrivate));
 
-  object_class->get_property = tidy_adjustment_get_property;
-  object_class->set_property = tidy_adjustment_set_property;
-  object_class->dispose = tidy_adjustment_dispose;
+  object_class->get_property = champlain_adjustment_get_property;
+  object_class->set_property = champlain_adjustment_set_property;
+  object_class->dispose = champlain_adjustment_dispose;
   
   g_object_class_install_property (object_class,
                                    PROP_LOWER,
@@ -228,7 +228,7 @@ tidy_adjustment_class_init (TidyAdjustmentClass *klass)
                                                         -G_MAXDOUBLE,
                                                         G_MAXDOUBLE,
                                                         0.0,
-                                                        TIDY_PARAM_READWRITE));
+                                                        CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
                                    PROP_UPPER,
                                    g_param_spec_double ("upper",
@@ -237,7 +237,7 @@ tidy_adjustment_class_init (TidyAdjustmentClass *klass)
                                                         -G_MAXDOUBLE,
                                                         G_MAXDOUBLE,
                                                         0.0,
-                                                        TIDY_PARAM_READWRITE));
+                                                        CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
                                    PROP_VALUE,
                                    g_param_spec_double ("value",
@@ -246,7 +246,7 @@ tidy_adjustment_class_init (TidyAdjustmentClass *klass)
                                                         -G_MAXDOUBLE,
                                                         G_MAXDOUBLE,
                                                         0.0,
-                                                        TIDY_PARAM_READWRITE));
+                                                        CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
                                    PROP_STEP_INC,
                                    g_param_spec_double ("step-increment",
@@ -255,7 +255,7 @@ tidy_adjustment_class_init (TidyAdjustmentClass *klass)
                                                         -G_MAXDOUBLE,
                                                         G_MAXDOUBLE,
                                                         0.0,
-                                                        TIDY_PARAM_READWRITE));
+                                                        CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
                                    PROP_PAGE_INC,
                                    g_param_spec_double ("page-increment",
@@ -264,7 +264,7 @@ tidy_adjustment_class_init (TidyAdjustmentClass *klass)
                                                         -G_MAXDOUBLE,
                                                         G_MAXDOUBLE,
                                                         0.0,
-                                                        TIDY_PARAM_READWRITE));
+                                                        CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
                                    PROP_PAGE_SIZE,
                                    g_param_spec_double ("page-size",
@@ -273,7 +273,7 @@ tidy_adjustment_class_init (TidyAdjustmentClass *klass)
                                                         -G_MAXDOUBLE,
                                                         G_MAXDOUBLE,
                                                         0.0,
-                                                        TIDY_PARAM_READWRITE));
+                                                        CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
                                    PROP_ELASTIC,
                                    g_param_spec_boolean ("elastic",
@@ -283,33 +283,33 @@ tidy_adjustment_class_init (TidyAdjustmentClass *klass)
                                                          "'elastic' way and "
                                                          "stop clamping value.",
                                                          FALSE,
-                                                         TIDY_PARAM_READWRITE));
+                                                         CHAMPLAIN_PARAM_READWRITE));
 
   signals[CHANGED] =
     g_signal_new ("changed",
                   G_TYPE_FROM_CLASS (klass),
                   G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (TidyAdjustmentClass, changed),
+                  G_STRUCT_OFFSET (ChamplainAdjustmentClass, changed),
                   NULL, NULL,
-                  _tidy_marshal_VOID__VOID,
+                  g_cclosure_marshal_VOID__VOID,
                   G_TYPE_NONE, 0);
 }
 
 static void
-tidy_adjustment_init (TidyAdjustment *self)
+champlain_adjustment_init (ChamplainAdjustment *self)
 {
   self->priv = ADJUSTMENT_PRIVATE (self);
 }
 
-TidyAdjustment *
-tidy_adjustment_new (gdouble value,
+ChamplainAdjustment *
+champlain_adjustment_new (gdouble value,
                      gdouble lower,
                      gdouble upper,
                      gdouble step_increment,
                      gdouble page_increment,
                      gdouble page_size)
 {
-  return g_object_new (TIDY_TYPE_ADJUSTMENT,
+  return g_object_new (CHAMPLAIN_TYPE_ADJUSTMENT,
                        "value", value,
                        "lower", lower,
                        "upper", upper,
@@ -320,20 +320,20 @@ tidy_adjustment_new (gdouble value,
 }
 
 gdouble
-tidy_adjustment_get_value (TidyAdjustment *adjustment)
+champlain_adjustment_get_value (ChamplainAdjustment *adjustment)
 {
-  g_return_val_if_fail (TIDY_IS_ADJUSTMENT (adjustment), 0.0);
+  g_return_val_if_fail (CHAMPLAIN_IS_ADJUSTMENT (adjustment), 0.0);
 
   return adjustment->priv->value;
 }
 
 void
-tidy_adjustment_set_value (TidyAdjustment *adjustment,
+champlain_adjustment_set_value (ChamplainAdjustment *adjustment,
                            double value)
 {
-  TidyAdjustmentPrivate *priv;
+  ChamplainAdjustmentPrivate *priv;
 
-  g_return_if_fail (TIDY_IS_ADJUSTMENT (adjustment));
+  g_return_if_fail (CHAMPLAIN_IS_ADJUSTMENT (adjustment));
 
   priv = adjustment->priv;
 
@@ -351,14 +351,14 @@ tidy_adjustment_set_value (TidyAdjustment *adjustment,
 }
 
 static void
-tidy_adjustment_clamp_page (TidyAdjustment *adjustment,
+champlain_adjustment_clamp_page (ChamplainAdjustment *adjustment,
                             double lower,
                             double upper)
 {
   gboolean changed;
-  TidyAdjustmentPrivate *priv;
+  ChamplainAdjustmentPrivate *priv;
 
-  g_return_if_fail (TIDY_IS_ADJUSTMENT (adjustment));
+  g_return_if_fail (CHAMPLAIN_IS_ADJUSTMENT (adjustment));
 
   priv = adjustment->priv;
 
@@ -386,10 +386,10 @@ tidy_adjustment_clamp_page (TidyAdjustment *adjustment,
 }
 
 static void
-tidy_adjustment_set_lower (TidyAdjustment *adjustment,
+champlain_adjustment_set_lower (ChamplainAdjustment *adjustment,
                            gdouble         lower)
 {
-  TidyAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
   if (priv->lower != lower)
     {
@@ -399,15 +399,15 @@ tidy_adjustment_set_lower (TidyAdjustment *adjustment,
 
       g_object_notify (G_OBJECT (adjustment), "lower");
 
-      tidy_adjustment_clamp_page (adjustment, priv->lower, priv->upper);
+      champlain_adjustment_clamp_page (adjustment, priv->lower, priv->upper);
     }
 }
 
 static void
-tidy_adjustment_set_upper (TidyAdjustment *adjustment,
+champlain_adjustment_set_upper (ChamplainAdjustment *adjustment,
                            gdouble         upper)
 {
-  TidyAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
   if (priv->upper != upper)
     {
@@ -417,15 +417,15 @@ tidy_adjustment_set_upper (TidyAdjustment *adjustment,
 
       g_object_notify (G_OBJECT (adjustment), "upper");
 
-      tidy_adjustment_clamp_page (adjustment, priv->lower, priv->upper);
+      champlain_adjustment_clamp_page (adjustment, priv->lower, priv->upper);
     }
 }
 
 static void
-tidy_adjustment_set_step_increment (TidyAdjustment *adjustment,
+champlain_adjustment_set_step_increment (ChamplainAdjustment *adjustment,
                                     gdouble         step)
 {
-  TidyAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
   if (priv->step_increment != step)
     {
@@ -438,10 +438,10 @@ tidy_adjustment_set_step_increment (TidyAdjustment *adjustment,
 }
 
 static void
-tidy_adjustment_set_page_increment (TidyAdjustment *adjustment,
+champlain_adjustment_set_page_increment (ChamplainAdjustment *adjustment,
                                     gdouble        page)
 {
-  TidyAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
   if (priv->page_increment != page)
     {
@@ -454,10 +454,10 @@ tidy_adjustment_set_page_increment (TidyAdjustment *adjustment,
 }
 
 static void
-tidy_adjustment_set_page_size (TidyAdjustment *adjustment,
+champlain_adjustment_set_page_size (ChamplainAdjustment *adjustment,
                                gdouble         size)
 {
-  TidyAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
   if (priv->page_size != size)
     {
@@ -467,12 +467,12 @@ tidy_adjustment_set_page_size (TidyAdjustment *adjustment,
 
       g_object_notify (G_OBJECT (adjustment), "page_size");
 
-      tidy_adjustment_clamp_page (adjustment, priv->lower, priv->upper);
+      champlain_adjustment_clamp_page (adjustment, priv->lower, priv->upper);
     }
 }
 
 void
-tidy_adjustment_get_values (TidyAdjustment *adjustment,
+champlain_adjustment_get_values (ChamplainAdjustment *adjustment,
                             gdouble        *value,
                             gdouble        *lower,
                             gdouble        *upper,
@@ -480,9 +480,9 @@ tidy_adjustment_get_values (TidyAdjustment *adjustment,
                             gdouble        *page_increment,
                             gdouble        *page_size)
 {
-  TidyAdjustmentPrivate *priv;
+  ChamplainAdjustmentPrivate *priv;
 
-  g_return_if_fail (TIDY_IS_ADJUSTMENT (adjustment));
+  g_return_if_fail (CHAMPLAIN_IS_ADJUSTMENT (adjustment));
 
   priv = adjustment->priv;
 
@@ -493,7 +493,7 @@ tidy_adjustment_get_values (TidyAdjustment *adjustment,
     *upper = priv->upper;
 
   if (value)
-    *value = tidy_adjustment_get_value (adjustment);
+    *value = champlain_adjustment_get_value (adjustment);
 
   if (step_increment)
     *step_increment = priv->step_increment;
@@ -508,9 +508,9 @@ tidy_adjustment_get_values (TidyAdjustment *adjustment,
 static void
 interpolation_new_frame_cb (ClutterTimeline *timeline,
                             gint             frame_num,
-                            TidyAdjustment  *adjustment)
+                            ChamplainAdjustment  *adjustment)
 {
-  TidyAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
   priv->interpolation = NULL;
   if (priv->elastic && priv->bounce_alpha)
@@ -519,10 +519,10 @@ interpolation_new_frame_cb (ClutterTimeline *timeline,
       gdouble dx = priv->old_position +
         (priv->new_position - priv->old_position) *
         progress;
-      tidy_adjustment_set_value (adjustment, dx);
+      champlain_adjustment_set_value (adjustment, dx);
     }
   else
-    tidy_adjustment_set_value (adjustment,
+    champlain_adjustment_set_value (adjustment,
                                 priv->old_position +
                                 frame_num * priv->dx);
   priv->interpolation = timeline;
@@ -530,12 +530,12 @@ interpolation_new_frame_cb (ClutterTimeline *timeline,
 
 static void
 interpolation_completed_cb (ClutterTimeline *timeline,
-                            TidyAdjustment  *adjustment)
+                            ChamplainAdjustment  *adjustment)
 {
-  TidyAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv = adjustment->priv;
  
   stop_interpolation (adjustment);
-  tidy_adjustment_set_value (adjustment,
+  champlain_adjustment_set_value (adjustment,
                               priv->new_position);
 }
 
@@ -562,18 +562,18 @@ bounce_alpha_func (ClutterAlpha *alpha,
 */
 
 void
-tidy_adjustment_interpolate (TidyAdjustment *adjustment,
+champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
                               gdouble         value,
                               guint           n_frames,
                               guint           fps)
 {
-  TidyAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
   stop_interpolation (adjustment);
 
   if (n_frames <= 1)
     {
-      tidy_adjustment_set_value (adjustment, value);
+      champlain_adjustment_set_value (adjustment, value);
       return;
     }
 
@@ -600,25 +600,25 @@ tidy_adjustment_interpolate (TidyAdjustment *adjustment,
 }
 
 gboolean
-tidy_adjustment_get_elastic (TidyAdjustment *adjustment)
+champlain_adjustment_get_elastic (ChamplainAdjustment *adjustment)
 {
   return adjustment->priv->elastic;
 }
 
 void
-tidy_adjustment_set_elastic (TidyAdjustment *adjustment,
+champlain_adjustment_set_elastic (ChamplainAdjustment *adjustment,
                              gboolean        elastic)
 {
   adjustment->priv->elastic = elastic;
 }
 
 gboolean
-tidy_adjustment_clamp (TidyAdjustment *adjustment,
+champlain_adjustment_clamp (ChamplainAdjustment *adjustment,
                        gboolean        interpolate,
                        guint           n_frames,
                        guint           fps)
 {
-  TidyAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv = adjustment->priv;
   gdouble dest = priv->value;
 
   if (priv->value < priv->lower)
@@ -629,12 +629,12 @@ tidy_adjustment_clamp (TidyAdjustment *adjustment,
   if (dest != priv->value)
     {
       if (interpolate)
-        tidy_adjustment_interpolate (adjustment,
+        champlain_adjustment_interpolate (adjustment,
                                       dest,
                                       n_frames,
                                       fps);
       else
-        tidy_adjustment_set_value (adjustment, dest);
+        champlain_adjustment_set_value (adjustment, dest);
 
       return TRUE;
     }

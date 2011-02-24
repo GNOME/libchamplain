@@ -1,4 +1,4 @@
-/* tidy-viewport.c: Viewport actor
+/* champlain-viewport.c: Viewport actor
  *
  * Copyright (C) 2008 OpenedHand
  *
@@ -26,23 +26,23 @@
 
 #include <clutter/clutter.h>
 
-#include "tidy-viewport.h"
-#include "tidy-private.h"
+#include "champlain-viewport.h"
+#include "champlain-private.h"
 
 
-G_DEFINE_TYPE (TidyViewport, tidy_viewport, CLUTTER_TYPE_GROUP)
+G_DEFINE_TYPE (ChamplainViewport, champlain_viewport, CLUTTER_TYPE_GROUP)
 
 #define VIEWPORT_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), TIDY_TYPE_VIEWPORT, \
-  TidyViewportPrivate))
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_VIEWPORT, \
+  ChamplainViewportPrivate))
 
-struct _TidyViewportPrivate
+struct _ChamplainViewportPrivate
 {
   gfloat x;
   gfloat y;
 
-  TidyAdjustment *hadjustment;
-  TidyAdjustment *vadjustment;
+  ChamplainAdjustment *hadjustment;
+  ChamplainAdjustment *vadjustment;
 
   gboolean sync_adjustments;
 };
@@ -59,14 +59,14 @@ enum
 };
 
 static void
-tidy_viewport_get_property (GObject    *object,
+champlain_viewport_get_property (GObject    *object,
                             guint       prop_id,
                             GValue     *value,
                             GParamSpec *pspec)
 {
-  TidyAdjustment *adjustment;
+  ChamplainAdjustment *adjustment;
 
-  TidyViewportPrivate *priv = TIDY_VIEWPORT (object)->priv;
+  ChamplainViewportPrivate *priv = CHAMPLAIN_VIEWPORT (object)->priv;
 
   switch (prop_id)
     {
@@ -79,12 +79,12 @@ tidy_viewport_get_property (GObject    *object,
       break;
 
     case PROP_HADJUST :
-      tidy_viewport_get_adjustments (TIDY_VIEWPORT (object), &adjustment, NULL);
+      champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (object), &adjustment, NULL);
       g_value_set_object (value, adjustment);
       break;
 
     case PROP_VADJUST :
-      tidy_viewport_get_adjustments (TIDY_VIEWPORT (object), NULL, &adjustment);
+      champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (object), NULL, &adjustment);
       g_value_set_object (value, adjustment);
       break;
 
@@ -99,36 +99,36 @@ tidy_viewport_get_property (GObject    *object,
 }
 
 static void
-tidy_viewport_set_property (GObject      *object,
+champlain_viewport_set_property (GObject      *object,
                             guint         prop_id,
                             const GValue *value,
                             GParamSpec   *pspec)
 {
-  TidyViewport *viewport = TIDY_VIEWPORT (object);
-  TidyViewportPrivate *priv = viewport->priv;
+  ChamplainViewport *viewport = CHAMPLAIN_VIEWPORT (object);
+  ChamplainViewportPrivate *priv = viewport->priv;
 
   switch (prop_id)
     {
     case PROP_X_ORIGIN:
-      tidy_viewport_set_origin (viewport,
+      champlain_viewport_set_origin (viewport,
                                  g_value_get_int (value),
                                  priv->y);
       break;
 
     case PROP_Y_ORIGIN:
-      tidy_viewport_set_origin (viewport,
+      champlain_viewport_set_origin (viewport,
                                  priv->x,
                                  g_value_get_int (value));
       break;
 
     case PROP_HADJUST :
-      tidy_viewport_set_adjustments (TIDY_VIEWPORT (object),
+      champlain_viewport_set_adjustments (CHAMPLAIN_VIEWPORT (object),
                                   g_value_get_object (value),
                                   priv->vadjustment);
       break;
 
     case PROP_VADJUST :
-      tidy_viewport_set_adjustments (TIDY_VIEWPORT (object),
+      champlain_viewport_set_adjustments (CHAMPLAIN_VIEWPORT (object),
                                   priv->hadjustment,
                                   g_value_get_object (value));
       break;
@@ -144,40 +144,40 @@ tidy_viewport_set_property (GObject      *object,
 }
 
 void
-tidy_viewport_stop (TidyViewport *viewport)
+champlain_viewport_stop (ChamplainViewport *viewport)
 {
-  TidyViewportPrivate *priv = TIDY_VIEWPORT (viewport)->priv;
+  ChamplainViewportPrivate *priv = CHAMPLAIN_VIEWPORT (viewport)->priv;
 
-  tidy_adjustment_interpolate_stop (priv->hadjustment);
-  tidy_adjustment_interpolate_stop (priv->vadjustment);
+  champlain_adjustment_interpolate_stop (priv->hadjustment);
+  champlain_adjustment_interpolate_stop (priv->vadjustment);
 }
 
 static void
-tidy_viewport_dispose (GObject *gobject)
+champlain_viewport_dispose (GObject *gobject)
 {
-  TidyViewportPrivate *priv = TIDY_VIEWPORT (gobject)->priv;
+  ChamplainViewportPrivate *priv = CHAMPLAIN_VIEWPORT (gobject)->priv;
 
   if (priv->hadjustment)
     {
-      tidy_adjustment_interpolate_stop (priv->hadjustment);
+      champlain_adjustment_interpolate_stop (priv->hadjustment);
       g_object_unref (priv->hadjustment);
       priv->hadjustment = NULL;
     }
 
   if (priv->vadjustment)
     {
-      tidy_adjustment_interpolate_stop (priv->vadjustment);
+      champlain_adjustment_interpolate_stop (priv->vadjustment);
       g_object_unref (priv->vadjustment);
       priv->vadjustment = NULL;
     }
 
-  G_OBJECT_CLASS (tidy_viewport_parent_class)->dispose (gobject);
+  G_OBJECT_CLASS (champlain_viewport_parent_class)->dispose (gobject);
 }
 
 static void
-tidy_viewport_paint (ClutterActor *self)
+champlain_viewport_paint (ClutterActor *self)
 {
-  TidyViewportPrivate *priv = TIDY_VIEWPORT (self)->priv;
+  ChamplainViewportPrivate *priv = CHAMPLAIN_VIEWPORT (self)->priv;
 
   cogl_push_matrix ();
 
@@ -185,29 +185,29 @@ tidy_viewport_paint (ClutterActor *self)
                   (priv->y) * -1.0,
                   0.0);
 
-  CLUTTER_ACTOR_CLASS (tidy_viewport_parent_class)->paint (self);
+  CLUTTER_ACTOR_CLASS (champlain_viewport_parent_class)->paint (self);
 
   cogl_pop_matrix ();
 }
 
 static void
-tidy_viewport_pick (ClutterActor       *self,
+champlain_viewport_pick (ClutterActor       *self,
                     const ClutterColor *color)
 {
-  tidy_viewport_paint (self);
+  champlain_viewport_paint (self);
 }
 
 static void
-tidy_viewport_allocate (ClutterActor          *self,
+champlain_viewport_allocate (ClutterActor          *self,
                         const ClutterActorBox *box,
                         ClutterAllocationFlags flags)
 {
   CoglFixed prev_value;
 
-  TidyViewportPrivate *priv = TIDY_VIEWPORT (self)->priv;
+  ChamplainViewportPrivate *priv = CHAMPLAIN_VIEWPORT (self)->priv;
 
   /* Chain up */
-  CLUTTER_ACTOR_CLASS (tidy_viewport_parent_class)->
+  CLUTTER_ACTOR_CLASS (champlain_viewport_parent_class)->
     allocate (self, box, flags);
 
   /* Refresh adjustments */
@@ -221,8 +221,8 @@ tidy_viewport_allocate (ClutterActor          *self,
                        NULL);
 
           /* Make sure value is clamped */
-          prev_value = tidy_adjustment_get_value (priv->hadjustment);
-          tidy_adjustment_set_value (priv->hadjustment, prev_value);
+          prev_value = champlain_adjustment_get_value (priv->hadjustment);
+          champlain_adjustment_set_value (priv->hadjustment, prev_value);
         }
 
       if (priv->vadjustment)
@@ -232,27 +232,27 @@ tidy_viewport_allocate (ClutterActor          *self,
                        "upper", (box->y2 - box->y1),
                        NULL);
 
-          prev_value = tidy_adjustment_get_value (priv->vadjustment);
-          tidy_adjustment_set_value (priv->vadjustment, prev_value);
+          prev_value = champlain_adjustment_get_value (priv->vadjustment);
+          champlain_adjustment_set_value (priv->vadjustment, prev_value);
         }
     }
 }
 
 static void
-tidy_viewport_class_init (TidyViewportClass *klass)
+champlain_viewport_class_init (ChamplainViewportClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (TidyViewportPrivate));
+  g_type_class_add_private (klass, sizeof (ChamplainViewportPrivate));
 
-  gobject_class->get_property = tidy_viewport_get_property;
-  gobject_class->set_property = tidy_viewport_set_property;
-  gobject_class->dispose = tidy_viewport_dispose;
+  gobject_class->get_property = champlain_viewport_get_property;
+  gobject_class->set_property = champlain_viewport_set_property;
+  gobject_class->dispose = champlain_viewport_dispose;
 
-  actor_class->paint = tidy_viewport_paint;
-  actor_class->pick = tidy_viewport_pick;
-  actor_class->allocate = tidy_viewport_allocate;
+  actor_class->paint = champlain_viewport_paint;
+  actor_class->pick = champlain_viewport_pick;
+  actor_class->allocate = champlain_viewport_allocate;
 
   g_object_class_install_property (gobject_class,
                                    PROP_X_ORIGIN,
@@ -287,56 +287,56 @@ tidy_viewport_class_init (TidyViewportClass *klass)
   g_object_class_install_property (gobject_class,
                                    PROP_HADJUST,
                                    g_param_spec_object ("hadjustment",
-                                                        "TidyAdjustment",
+                                                        "ChamplainAdjustment",
                                                         "Horizontal adjustment",
-                                                        TIDY_TYPE_ADJUSTMENT,
+                                                        CHAMPLAIN_TYPE_ADJUSTMENT,
                                                         G_PARAM_READWRITE));
 
   g_object_class_install_property (gobject_class,
                                    PROP_VADJUST,
                                    g_param_spec_object ("vadjustment",
-                                                        "TidyAdjustment",
+                                                        "ChamplainAdjustment",
                                                         "Vertical adjustment",
-                                                        TIDY_TYPE_ADJUSTMENT,
+                                                        CHAMPLAIN_TYPE_ADJUSTMENT,
                                                         G_PARAM_READWRITE));
 
 }
 
 static void
-hadjustment_value_notify_cb (TidyAdjustment *adjustment,
+hadjustment_value_notify_cb (ChamplainAdjustment *adjustment,
                              GParamSpec     *pspec,
-                             TidyViewport   *viewport)
+                             ChamplainViewport   *viewport)
 {
-  TidyViewportPrivate *priv = viewport->priv;
+  ChamplainViewportPrivate *priv = viewport->priv;
   gdouble value;
 
-  value = tidy_adjustment_get_value (adjustment);
+  value = champlain_adjustment_get_value (adjustment);
 
-  tidy_viewport_set_origin (viewport,
+  champlain_viewport_set_origin (viewport,
                              value,
                              priv->y);
 }
 
 static void
-vadjustment_value_notify_cb (TidyAdjustment *adjustment, GParamSpec *arg1,
-                             TidyViewport *viewport)
+vadjustment_value_notify_cb (ChamplainAdjustment *adjustment, GParamSpec *arg1,
+                             ChamplainViewport *viewport)
 {
-  TidyViewportPrivate *priv = viewport->priv;
+  ChamplainViewportPrivate *priv = viewport->priv;
   gdouble value;
 
-  value = tidy_adjustment_get_value (adjustment);
+  value = champlain_adjustment_get_value (adjustment);
 
-  tidy_viewport_set_origin (viewport,
+  champlain_viewport_set_origin (viewport,
                              priv->x,
                              value);
 }
 
 void
-tidy_viewport_set_adjustments (TidyViewport *viewport,
-                            TidyAdjustment *hadjustment,
-                            TidyAdjustment *vadjustment)
+champlain_viewport_set_adjustments (ChamplainViewport *viewport,
+                            ChamplainAdjustment *hadjustment,
+                            ChamplainAdjustment *vadjustment)
 {
-  TidyViewportPrivate *priv = TIDY_VIEWPORT (viewport)->priv;
+  ChamplainViewportPrivate *priv = CHAMPLAIN_VIEWPORT (viewport)->priv;
 
   if (hadjustment != priv->hadjustment)
     {
@@ -382,15 +382,15 @@ tidy_viewport_set_adjustments (TidyViewport *viewport,
 }
 
 void
-tidy_viewport_get_adjustments (TidyViewport *viewport,
-                            TidyAdjustment **hadjustment,
-                            TidyAdjustment **vadjustment)
+champlain_viewport_get_adjustments (ChamplainViewport *viewport,
+                            ChamplainAdjustment **hadjustment,
+                            ChamplainAdjustment **vadjustment)
 {
-  TidyViewportPrivate *priv;
+  ChamplainViewportPrivate *priv;
 
-  g_return_if_fail (TIDY_IS_VIEWPORT (viewport));
+  g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
 
-  priv = ((TidyViewport *)viewport)->priv;
+  priv = ((ChamplainViewport *)viewport)->priv;
 
   if (hadjustment)
     {
@@ -398,20 +398,20 @@ tidy_viewport_get_adjustments (TidyViewport *viewport,
         *hadjustment = priv->hadjustment;
       else
         {
-          TidyAdjustment *adjustment;
+          ChamplainAdjustment *adjustment;
           guint width, stage_width, increment;
 
           width = clutter_actor_get_width (CLUTTER_ACTOR(viewport));
           stage_width = clutter_actor_get_width (clutter_stage_get_default ());
           increment = MAX (1, MIN(stage_width, width));
 
-          adjustment = tidy_adjustment_new (priv->x,
+          adjustment = champlain_adjustment_new (priv->x,
                                             0,
                                             width,
                                             1,
                                             increment,
                                             increment);
-          tidy_viewport_set_adjustments (viewport,
+          champlain_viewport_set_adjustments (viewport,
                                       adjustment,
                                       priv->vadjustment);
           *hadjustment = adjustment;
@@ -424,20 +424,20 @@ tidy_viewport_get_adjustments (TidyViewport *viewport,
         *vadjustment = priv->vadjustment;
       else
         {
-          TidyAdjustment *adjustment;
+          ChamplainAdjustment *adjustment;
           guint height, stage_height, increment;
 
           height = clutter_actor_get_height (CLUTTER_ACTOR(viewport));
           stage_height = clutter_actor_get_height (clutter_stage_get_default ());
           increment = MAX (1, MIN(stage_height, height));
 
-          adjustment = tidy_adjustment_new (priv->y,
+          adjustment = champlain_adjustment_new (priv->y,
                                             0,
                                             height,
                                             1,
                                             increment,
                                             increment);
-          tidy_viewport_set_adjustments (viewport,
+          champlain_viewport_set_adjustments (viewport,
                                       priv->hadjustment,
                                       adjustment);
           *vadjustment = adjustment;
@@ -449,10 +449,10 @@ tidy_viewport_get_adjustments (TidyViewport *viewport,
 static void
 clip_notify_cb (ClutterActor *actor,
                 GParamSpec   *pspec,
-                TidyViewport *self)
+                ChamplainViewport *self)
 {
   gfloat width, height;
-  TidyViewportPrivate *priv = self->priv;
+  ChamplainViewportPrivate *priv = self->priv;
 
   if (!priv->sync_adjustments)
     return;
@@ -476,7 +476,7 @@ clip_notify_cb (ClutterActor *actor,
 }
 
 static void
-tidy_viewport_init (TidyViewport *self)
+champlain_viewport_init (ChamplainViewport *self)
 {
   self->priv = VIEWPORT_PRIVATE (self);
 
@@ -487,19 +487,19 @@ tidy_viewport_init (TidyViewport *self)
 }
 
 ClutterActor *
-tidy_viewport_new (void)
+champlain_viewport_new (void)
 {
-  return g_object_new (TIDY_TYPE_VIEWPORT, NULL);
+  return g_object_new (CHAMPLAIN_TYPE_VIEWPORT, NULL);
 }
 
 void
-tidy_viewport_set_origin (TidyViewport *viewport,
+champlain_viewport_set_origin (ChamplainViewport *viewport,
                           float x,
                           float y)
 {
-  TidyViewportPrivate *priv;
+  ChamplainViewportPrivate *priv;
 
-  g_return_if_fail (TIDY_IS_VIEWPORT (viewport));
+  g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
 
   priv = viewport->priv;
 
@@ -511,7 +511,7 @@ tidy_viewport_set_origin (TidyViewport *viewport,
       g_object_notify (G_OBJECT (viewport), "x-origin");
 
       if (priv->hadjustment)
-        tidy_adjustment_set_value (priv->hadjustment,
+        champlain_adjustment_set_value (priv->hadjustment,
                                     x);
     }
 
@@ -521,7 +521,7 @@ tidy_viewport_set_origin (TidyViewport *viewport,
       g_object_notify (G_OBJECT (viewport), "y-origin");
 
       if (priv->vadjustment)
-        tidy_adjustment_set_value (priv->vadjustment,
+        champlain_adjustment_set_value (priv->vadjustment,
                                     y);
     }
 
@@ -531,13 +531,13 @@ tidy_viewport_set_origin (TidyViewport *viewport,
 }
 
 void
-tidy_viewport_get_origin (TidyViewport *viewport,
+champlain_viewport_get_origin (ChamplainViewport *viewport,
                           float *x,
                           float *y)
 {
-  TidyViewportPrivate *priv;
+  ChamplainViewportPrivate *priv;
 
-  g_return_if_fail (TIDY_IS_VIEWPORT (viewport));
+  g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
 
   priv = viewport->priv;
 

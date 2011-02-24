@@ -1,4 +1,4 @@
-/* tidy-adjustment.h: Adjustment object
+/* champlain-adjustment.h: Adjustment object
  *
  * Copyright (C) 2008 OpenedHand
  *
@@ -20,74 +20,74 @@
  * Written by: Chris Lord <chris@openedhand.com>, inspired by GtkAdjustment
  */
 
-#ifndef __TIDY_ADJUSTMENT_H__
-#define __TIDY_ADJUSTMENT_H__
+#ifndef __CHAMPLAIN_ADJUSTMENT_H__
+#define __CHAMPLAIN_ADJUSTMENT_H__
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
 
 G_BEGIN_DECLS
 
-#define TIDY_TYPE_ADJUSTMENT            (tidy_adjustment_get_type())
-#define TIDY_ADJUSTMENT(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), TIDY_TYPE_ADJUSTMENT, TidyAdjustment))
-#define TIDY_IS_ADJUSTMENT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TIDY_TYPE_ADJUSTMENT))
-#define TIDY_ADJUSTMENT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), TIDY_TYPE_ADJUSTMENT, TidyAdjustmentClass))
-#define TIDY_IS_ADJUSTMENT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TIDY_TYPE_ADJUSTMENT))
-#define TIDY_ADJUSTMENT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), TIDY_TYPE_ADJUSTMENT, TidyAdjustmentClass))
+#define CHAMPLAIN_TYPE_ADJUSTMENT            (champlain_adjustment_get_type())
+#define CHAMPLAIN_ADJUSTMENT(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustment))
+#define CHAMPLAIN_IS_ADJUSTMENT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_ADJUSTMENT))
+#define CHAMPLAIN_ADJUSTMENT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentClass))
+#define CHAMPLAIN_IS_ADJUSTMENT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_ADJUSTMENT))
+#define CHAMPLAIN_ADJUSTMENT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentClass))
 
-typedef struct _TidyAdjustment          TidyAdjustment;
-typedef struct _TidyAdjustmentPrivate   TidyAdjustmentPrivate;
-typedef struct _TidyAdjustmentClass     TidyAdjustmentClass;
+typedef struct _ChamplainAdjustment          ChamplainAdjustment;
+typedef struct _ChamplainAdjustmentPrivate   ChamplainAdjustmentPrivate;
+typedef struct _ChamplainAdjustmentClass     ChamplainAdjustmentClass;
 
 /**
- * TidyAdjustment:
+ * ChamplainAdjustment:
  *
  * Class for handling an interval between to values. The contents of
- * the #TidyAdjustment are private and should be accessed using the
+ * the #ChamplainAdjustment are private and should be accessed using the
  * public API.
  */
-struct _TidyAdjustment
+struct _ChamplainAdjustment
 {
   /*< private >*/
   GObject parent_instance;
 
-  TidyAdjustmentPrivate *priv;
+  ChamplainAdjustmentPrivate *priv;
 };
 
 /**
- * TidyAdjustmentClass
+ * ChamplainAdjustmentClass
  * @changed: Class handler for the ::changed signal.
  *
- * Base class for #TidyAdjustment.
+ * Base class for #ChamplainAdjustment.
  */
-struct _TidyAdjustmentClass
+struct _ChamplainAdjustmentClass
 {
   /*< private >*/
   GObjectClass parent_class;
 
   /*< public >*/
-  void (* changed) (TidyAdjustment *adjustment);
+  void (* changed) (ChamplainAdjustment *adjustment);
 };
 
-GType tidy_adjustment_get_type (void) G_GNUC_CONST;
+GType champlain_adjustment_get_type (void) G_GNUC_CONST;
 
-TidyAdjustment *tidy_adjustment_new          (gdouble         value,
+ChamplainAdjustment *champlain_adjustment_new          (gdouble         value,
                                               gdouble         lower,
                                               gdouble         upper,
                                               gdouble         step_increment,
                                               gdouble         page_increment,
                                               gdouble         page_size);
-gdouble         tidy_adjustment_get_value    (TidyAdjustment *adjustment);
-void            tidy_adjustment_set_value    (TidyAdjustment *adjustment,
+gdouble         champlain_adjustment_get_value    (ChamplainAdjustment *adjustment);
+void            champlain_adjustment_set_value    (ChamplainAdjustment *adjustment,
                                               gdouble         value);
-void            tidy_adjustment_set_values   (TidyAdjustment *adjustment,
+void            champlain_adjustment_set_values   (ChamplainAdjustment *adjustment,
                                               gdouble         value,
                                               gdouble         lower,
                                               gdouble         upper,
                                               gdouble         step_increment,
                                               gdouble         page_increment,
                                               gdouble         page_size);
-void            tidy_adjustment_get_values   (TidyAdjustment *adjustment,
+void            champlain_adjustment_get_values   (ChamplainAdjustment *adjustment,
                                               gdouble        *value,
                                               gdouble        *lower,
                                               gdouble        *upper,
@@ -95,22 +95,22 @@ void            tidy_adjustment_get_values   (TidyAdjustment *adjustment,
                                               gdouble        *page_increment,
                                               gdouble        *page_size);
 
-void            tidy_adjustment_interpolate  (TidyAdjustment *adjustment,
+void            champlain_adjustment_interpolate  (ChamplainAdjustment *adjustment,
                                               gdouble         value,
                                               guint           n_frames,
                                               guint           fps);
 
-gboolean        tidy_adjustment_get_elastic  (TidyAdjustment *adjustment);
-void            tidy_adjustment_set_elastic  (TidyAdjustment *adjustment,
+gboolean        champlain_adjustment_get_elastic  (ChamplainAdjustment *adjustment);
+void            champlain_adjustment_set_elastic  (ChamplainAdjustment *adjustment,
                                               gboolean        elastic);
 
-gboolean        tidy_adjustment_clamp        (TidyAdjustment *adjustment,
+gboolean        champlain_adjustment_clamp        (ChamplainAdjustment *adjustment,
                                               gboolean        interpolate,
                                               guint           n_frames,
                                               guint           fps);
-void            tidy_adjustment_interpolate_stop (TidyAdjustment *adjustment);
+void            champlain_adjustment_interpolate_stop (ChamplainAdjustment *adjustment);
 
 G_END_DECLS
 
-#endif /* __TIDY_ADJUSTMENT_H__ */
+#endif /* __CHAMPLAIN_ADJUSTMENT_H__ */
 

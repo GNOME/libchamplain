@@ -42,6 +42,9 @@ libchamplain_headers_public = 				\
 	$(srcdir)/champlain-file-tile-source.h		\
 	$(srcdir)/champlain-null-tile-source.h		\
 	$(srcdir)/champlain-network-bbox-tile-source.h	\
+	$(srcdir)/champlain-adjustment.h		\
+	$(srcdir)/champlain-finger-scroll.h		\
+	$(srcdir)/champlain-viewport.h		\
 	$(srcdir)/champlain-bounding-box.h
 
 libchamplain_headers_private =	\
@@ -87,6 +90,9 @@ libchamplain_sources =					\
 	$(srcdir)/champlain-null-tile-source.c		\
 	$(srcdir)/champlain-network-bbox-tile-source.c	\
 	$(srcdir)/champlain-group.c			\
+	$(srcdir)/champlain-adjustment.c \
+	$(srcdir)/champlain-finger-scroll.c \
+	$(srcdir)/champlain-viewport.c	\
 	$(srcdir)/champlain-bounding-box.c
 
 champlain-features.h: $(top_builddir)/config.status
@@ -125,7 +131,7 @@ nodist_libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	$(libchamplain_headers_built)	\
 	$(libchamplain_sources_built)
 
-libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS) $(top_builddir)/tidy/libtidy-1.0.la
+libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS)
 
 libchamplain_@CHAMPLAIN_API_VERSION@_la_LDFLAGS = \
 	-version-info $(LIBRARY_VERSION)\
@@ -137,7 +143,6 @@ AM_CPPFLAGS = 				\
 	$(SOUP_CFLAGS)			\
 	$(MEMPHIS_CFLAGS)		\
 	-DDATADIR=\""$(datadir)"\"	\
-	-I$(top_srcdir)/tidy		\
 	-I$(top_srcdir)			\
 	-DCHAMPLAIN_COMPILATION 	\
 	$(WARN_CFLAGS)
@@ -174,7 +179,7 @@ Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_FILES = $(introspection_sources)
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_INCLUDES = Clutter-1.0 Gtk-3.0 $(memphis_gir_include)
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_CFLAGS = \
 	$(DEPS_CFLAGS) $(SOUP_CFLAGS) $(MEMPHIS_CFLAGS) \
-	-I$(top_srcdir)/tidy -I$(top_srcdir) -I$(top_builddir) \
+	-I$(top_srcdir) -I$(top_builddir) \
 	-DCHAMPLAIN_COMPILATION
 
 INTROSPECTION_GIRS += Champlain-@CHAMPLAIN_API_VERSION@.gir

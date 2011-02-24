@@ -1,4 +1,4 @@
-/* tidy-finger-scroll.c: Finger scrolling container actor
+/* champlain-finger-scroll.c: Finger scrolling container actor
  *
  * Copyright (C) 2008 OpenedHand
  *
@@ -20,33 +20,33 @@
  * Written by: Chris Lord <chris@openedhand.com>
  */
 
-#include "tidy-finger-scroll.h"
-#include "tidy-enum-types.h"
-#include "tidy-marshal.h"
-#include "tidy-adjustment.h"
-#include "tidy-viewport.h"
+#include "champlain-finger-scroll.h"
+#include "champlain-enum-types.h"
+#include "champlain-marshal.h"
+#include "champlain-adjustment.h"
+#include "champlain-viewport.h"
 #include <clutter/clutter.h>
 #include <math.h>
 
 static void clutter_container_iface_init (ClutterContainerIface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (TidyFingerScroll, tidy_finger_scroll, CLUTTER_TYPE_ACTOR,
+G_DEFINE_TYPE_WITH_CODE (ChamplainFingerScroll, champlain_finger_scroll, CLUTTER_TYPE_ACTOR,
                          G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER,
                                                 clutter_container_iface_init))
 
 
 #define FINGER_SCROLL_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
-                                  TIDY_TYPE_FINGER_SCROLL, \
-                                  TidyFingerScrollPrivate))
+                                  CHAMPLAIN_TYPE_FINGER_SCROLL, \
+                                  ChamplainFingerScrollPrivate))
 
 typedef struct {
   /* Units to store the origin of a click when scrolling */
   gfloat x;
   gfloat y;
   GTimeVal    time;
-} TidyFingerScrollMotion;
+} ChamplainFingerScrollMotion;
 
-struct _TidyFingerScrollPrivate
+struct _ChamplainFingerScrollPrivate
 {
   /* Scroll mode */
   gboolean kinetic;
@@ -79,10 +79,10 @@ enum
 static guint signals[LAST_SIGNAL] = { 0, };
 
 static void
-tidy_finger_scroll_get_property (GObject *object, guint property_id,
+champlain_finger_scroll_get_property (GObject *object, guint property_id,
                                  GValue *value, GParamSpec *pspec)
 {
-  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (object)->priv;
+  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (object)->priv;
 
   switch (property_id)
     {
@@ -101,10 +101,10 @@ tidy_finger_scroll_get_property (GObject *object, guint property_id,
 }
 
 static void
-tidy_finger_scroll_set_property (GObject *object, guint property_id,
+champlain_finger_scroll_set_property (GObject *object, guint property_id,
                                  const GValue *value, GParamSpec *pspec)
 {
-  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (object)->priv;
+  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (object)->priv;
 
   switch (property_id)
     {
@@ -126,9 +126,9 @@ tidy_finger_scroll_set_property (GObject *object, guint property_id,
 }
 
 static void
-tidy_finger_scroll_dispose (GObject *object)
+champlain_finger_scroll_dispose (GObject *object)
 {
-  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (object)->priv;
+  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (object)->priv;
 
   if (priv->child)
     clutter_container_remove_actor (CLUTTER_CONTAINER (object), priv->child);
@@ -140,24 +140,24 @@ tidy_finger_scroll_dispose (GObject *object)
       priv->deceleration_timeline = NULL;
     }
 
-  G_OBJECT_CLASS (tidy_finger_scroll_parent_class)->dispose (object);
+  G_OBJECT_CLASS (champlain_finger_scroll_parent_class)->dispose (object);
 }
 
 static void
-tidy_finger_scroll_finalize (GObject *object)
+champlain_finger_scroll_finalize (GObject *object)
 {
-  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (object)->priv;
+  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (object)->priv;
 
   g_array_free (priv->motion_buffer, TRUE);
 
-  G_OBJECT_CLASS (tidy_finger_scroll_parent_class)->finalize (object);
+  G_OBJECT_CLASS (champlain_finger_scroll_parent_class)->finalize (object);
 }
 
 
 static void
-tidy_finger_scroll_paint (ClutterActor *actor)
+champlain_finger_scroll_paint (ClutterActor *actor)
 {
-  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (actor)->priv;
+  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (actor)->priv;
 
   if (priv->child)
     clutter_actor_paint (priv->child);
@@ -165,24 +165,24 @@ tidy_finger_scroll_paint (ClutterActor *actor)
 
 
 static void
-tidy_finger_scroll_pick (ClutterActor *actor, const ClutterColor *color)
+champlain_finger_scroll_pick (ClutterActor *actor, const ClutterColor *color)
 {
   /* Chain up so we get a bounding box pained (if we are reactive) */
-  CLUTTER_ACTOR_CLASS (tidy_finger_scroll_parent_class)->pick (actor, color);
+  CLUTTER_ACTOR_CLASS (champlain_finger_scroll_parent_class)->pick (actor, color);
 
   /* Trigger pick on children */
-  tidy_finger_scroll_paint (actor);
+  champlain_finger_scroll_paint (actor);
 }
 
 
 static void
-tidy_finger_scroll_get_preferred_width (ClutterActor *actor,
+champlain_finger_scroll_get_preferred_width (ClutterActor *actor,
                                       gfloat   for_height,
                                       gfloat  *min_width_p,
                                       gfloat  *natural_width_p)
 {
 
-  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (actor)->priv;
+  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (actor)->priv;
 
   if (!priv->child)
     return;
@@ -197,13 +197,13 @@ tidy_finger_scroll_get_preferred_width (ClutterActor *actor,
 }
 
 static void
-tidy_finger_scroll_get_preferred_height (ClutterActor *actor,
+champlain_finger_scroll_get_preferred_height (ClutterActor *actor,
                                        gfloat   for_width,
                                        gfloat  *min_height_p,
                                        gfloat  *natural_height_p)
 {
 
-  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (actor)->priv;
+  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (actor)->priv;
 
   if (!priv->child)
     return;
@@ -217,16 +217,16 @@ tidy_finger_scroll_get_preferred_height (ClutterActor *actor,
 }
 
 static void
-tidy_finger_scroll_allocate (ClutterActor          *actor,
+champlain_finger_scroll_allocate (ClutterActor          *actor,
                            const ClutterActorBox *box,
                            ClutterAllocationFlags flags)
 {
   ClutterActorBox child_box;
 
-  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (actor)->priv;
+  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (actor)->priv;
 
   /* Chain up */
-  CLUTTER_ACTOR_CLASS (tidy_finger_scroll_parent_class)->
+  CLUTTER_ACTOR_CLASS (champlain_finger_scroll_parent_class)->
     allocate (actor, box, flags);
 
   /* Child */
@@ -248,28 +248,28 @@ tidy_finger_scroll_allocate (ClutterActor          *actor,
 }
 
 static void
-tidy_finger_scroll_class_init (TidyFingerScrollClass *klass)
+champlain_finger_scroll_class_init (ChamplainFingerScrollClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (TidyFingerScrollPrivate));
+  g_type_class_add_private (klass, sizeof (ChamplainFingerScrollPrivate));
 
-  object_class->get_property = tidy_finger_scroll_get_property;
-  object_class->set_property = tidy_finger_scroll_set_property;
-  object_class->dispose = tidy_finger_scroll_dispose;
-  object_class->finalize = tidy_finger_scroll_finalize;
+  object_class->get_property = champlain_finger_scroll_get_property;
+  object_class->set_property = champlain_finger_scroll_set_property;
+  object_class->dispose = champlain_finger_scroll_dispose;
+  object_class->finalize = champlain_finger_scroll_finalize;
 
-  actor_class->paint = tidy_finger_scroll_paint;
-  actor_class->pick = tidy_finger_scroll_pick;
-  actor_class->get_preferred_width = tidy_finger_scroll_get_preferred_width;
-  actor_class->get_preferred_height = tidy_finger_scroll_get_preferred_height;
-  actor_class->allocate = tidy_finger_scroll_allocate;
+  actor_class->paint = champlain_finger_scroll_paint;
+  actor_class->pick = champlain_finger_scroll_pick;
+  actor_class->get_preferred_width = champlain_finger_scroll_get_preferred_width;
+  actor_class->get_preferred_height = champlain_finger_scroll_get_preferred_height;
+  actor_class->allocate = champlain_finger_scroll_allocate;
 
   g_object_class_install_property (object_class,
                                    PROP_MODE,
                                    g_param_spec_boolean ("mode",
-                                                      "TidyFingerScrollMode",
+                                                      "ChamplainFingerScrollMode",
                                                       "Scrolling mode",
                                                       FALSE,
                                                       G_PARAM_READWRITE));
@@ -303,23 +303,23 @@ tidy_finger_scroll_class_init (TidyFingerScrollClass *klass)
 
 
 static void
-tidy_finger_scroll_add_actor (ClutterContainer *container,
+champlain_finger_scroll_add_actor (ClutterContainer *container,
                             ClutterActor     *actor)
 {
-  TidyFingerScroll *self = TIDY_FINGER_SCROLL (container);
-  TidyFingerScrollPrivate *priv = self->priv;
+  ChamplainFingerScroll *self = CHAMPLAIN_FINGER_SCROLL (container);
+  ChamplainFingerScrollPrivate *priv = self->priv;
 
   if (priv->child)
     {
       g_warning ("Attempting to add an actor of type %s to "
-                 "a TidyFingerScroll that already contains "
+                 "a ChamplainFingerScroll that already contains "
                  "an actor of type %s.",
                  g_type_name (G_OBJECT_TYPE (actor)),
                  g_type_name (G_OBJECT_TYPE (priv->child)));
     }
   else
     {
-      if (TIDY_IS_VIEWPORT(actor))
+      if (CHAMPLAIN_IS_VIEWPORT(actor))
         {
           priv->child = actor;
           clutter_actor_set_parent (actor, CLUTTER_ACTOR (container));
@@ -332,17 +332,17 @@ tidy_finger_scroll_add_actor (ClutterContainer *container,
       else
         {
           g_warning ("Attempting to add an actor to "
-                     "a TidyFingerScroll, but the actor does "
-                     "not implement TidyViewport.");
+                     "a ChamplainFingerScroll, but the actor does "
+                     "not implement ChamplainViewport.");
         }
     }
 }
 
 static void
-tidy_finger_scroll_remove_actor (ClutterContainer *container,
+champlain_finger_scroll_remove_actor (ClutterContainer *container,
                                ClutterActor     *actor)
 {
-  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (container)->priv;
+  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (container)->priv;
 
   if (actor == priv->child)
     {
@@ -362,18 +362,18 @@ tidy_finger_scroll_remove_actor (ClutterContainer *container,
 }
 
 static void
-tidy_finger_scroll_foreach (ClutterContainer *container,
+champlain_finger_scroll_foreach (ClutterContainer *container,
                           ClutterCallback   callback,
                           gpointer          callback_data)
 {
-  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (container)->priv;
+  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (container)->priv;
 
   if (priv->child)
     callback (priv->child, callback_data);
 }
 
 static void
-tidy_finger_scroll_lower (ClutterContainer *container,
+champlain_finger_scroll_lower (ClutterContainer *container,
                         ClutterActor     *actor,
                         ClutterActor     *sibling)
 {
@@ -381,7 +381,7 @@ tidy_finger_scroll_lower (ClutterContainer *container,
 }
 
 static void
-tidy_finger_scroll_raise (ClutterContainer *container,
+champlain_finger_scroll_raise (ClutterContainer *container,
                         ClutterActor     *actor,
                         ClutterActor     *sibling)
 {
@@ -389,7 +389,7 @@ tidy_finger_scroll_raise (ClutterContainer *container,
 }
 
 static void
-tidy_finger_scroll_sort_depth_order (ClutterContainer *container)
+champlain_finger_scroll_sort_depth_order (ClutterContainer *container)
 {
   /* single child */
 }
@@ -397,12 +397,12 @@ tidy_finger_scroll_sort_depth_order (ClutterContainer *container)
 static void
 clutter_container_iface_init (ClutterContainerIface *iface)
 {
-  iface->add = tidy_finger_scroll_add_actor;
-  iface->remove = tidy_finger_scroll_remove_actor;
-  iface->foreach = tidy_finger_scroll_foreach;
-  iface->lower = tidy_finger_scroll_lower;
-  iface->raise = tidy_finger_scroll_raise;
-  iface->sort_depth_order = tidy_finger_scroll_sort_depth_order;
+  iface->add = champlain_finger_scroll_add_actor;
+  iface->remove = champlain_finger_scroll_remove_actor;
+  iface->foreach = champlain_finger_scroll_foreach;
+  iface->lower = champlain_finger_scroll_lower;
+  iface->raise = champlain_finger_scroll_raise;
+  iface->sort_depth_order = champlain_finger_scroll_sort_depth_order;
 }
 
 
@@ -410,37 +410,37 @@ clutter_container_iface_init (ClutterContainerIface *iface)
 static gboolean
 motion_event_cb (ClutterActor *actor,
                  ClutterMotionEvent *event,
-                 TidyFingerScroll *scroll)
+                 ChamplainFingerScroll *scroll)
 {
   gfloat x, y;
 
-  TidyFingerScrollPrivate *priv = scroll->priv;
+  ChamplainFingerScrollPrivate *priv = scroll->priv;
 
   if (clutter_actor_transform_stage_point (actor,
                                            event->x,
                                            event->y,
                                            &x, &y))
     {
-      TidyFingerScrollMotion *motion;
+      ChamplainFingerScrollMotion *motion;
 
       if (priv->child)
         {
           gdouble dx, dy;
-          TidyAdjustment *hadjust, *vadjust;
+          ChamplainAdjustment *hadjust, *vadjust;
 
-          tidy_viewport_get_adjustments (TIDY_VIEWPORT (priv->child),
+          champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->child),
                                            &hadjust,
                                            &vadjust);
 
           motion = &g_array_index (priv->motion_buffer,
-                                   TidyFingerScrollMotion, priv->last_motion);
+                                   ChamplainFingerScrollMotion, priv->last_motion);
           dx = (motion->x - x) +
-               tidy_adjustment_get_value (hadjust);
+               champlain_adjustment_get_value (hadjust);
           dy = (motion->y - y) +
-               tidy_adjustment_get_value (vadjust);
+               champlain_adjustment_get_value (vadjust);
 
-          tidy_adjustment_set_value (hadjust, dx);
-          tidy_adjustment_set_value (vadjust, dy);
+          champlain_adjustment_set_value (hadjust, dx);
+          champlain_adjustment_set_value (vadjust, dy);
         }
 
       priv->last_motion ++;
@@ -452,7 +452,7 @@ motion_event_cb (ClutterActor *actor,
         }
 
       motion = &g_array_index (priv->motion_buffer,
-                               TidyFingerScrollMotion, priv->last_motion);
+                               ChamplainFingerScrollMotion, priv->last_motion);
       motion->x = x;
       motion->y = y;
       g_get_current_time (&motion->time);
@@ -462,17 +462,17 @@ motion_event_cb (ClutterActor *actor,
 }
 
 static void
-clamp_adjustments (TidyFingerScroll *scroll)
+clamp_adjustments (ChamplainFingerScroll *scroll)
 {
-  TidyFingerScrollPrivate *priv = scroll->priv;
+  ChamplainFingerScrollPrivate *priv = scroll->priv;
   
   if (priv->child)
     {
       guint fps, n_frames;
-      TidyAdjustment *hadj, *vadj;
+      ChamplainAdjustment *hadj, *vadj;
       gboolean snap;
 
-      tidy_viewport_get_adjustments (TIDY_VIEWPORT (priv->child),
+      champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->child),
                                        &hadj, &vadj);
 
       /* FIXME: Hard-coded value here */
@@ -480,42 +480,42 @@ clamp_adjustments (TidyFingerScroll *scroll)
       n_frames = fps / 6;
 
       snap = TRUE;
-      if (tidy_adjustment_get_elastic (hadj))
-        snap = !tidy_adjustment_clamp (hadj, TRUE, n_frames, fps);
+      if (champlain_adjustment_get_elastic (hadj))
+        snap = !champlain_adjustment_clamp (hadj, TRUE, n_frames, fps);
 
       /* Snap to the nearest step increment on hadjustment */
       if (snap)
         {
           gdouble d, value, lower, step_increment;
 
-          tidy_adjustment_get_values (hadj, &value, &lower, NULL,
+          champlain_adjustment_get_values (hadj, &value, &lower, NULL,
                                       &step_increment, NULL, NULL);
           d = (rint ((value - lower) / step_increment) *
               step_increment) + lower;
-          tidy_adjustment_set_value (hadj, d);
+          champlain_adjustment_set_value (hadj, d);
         }
 
       snap = TRUE;
-      if (tidy_adjustment_get_elastic (vadj))
-        snap = !tidy_adjustment_clamp (vadj, TRUE, n_frames, fps);
+      if (champlain_adjustment_get_elastic (vadj))
+        snap = !champlain_adjustment_clamp (vadj, TRUE, n_frames, fps);
 
       /* Snap to the nearest step increment on vadjustment */
       if (snap)
         {
           gdouble d, value, lower, step_increment;
 
-          tidy_adjustment_get_values (vadj, &value, &lower, NULL,
+          champlain_adjustment_get_values (vadj, &value, &lower, NULL,
                                       &step_increment, NULL, NULL);
           d = (rint ((value - lower) / step_increment) *
               step_increment) + lower;
-          tidy_adjustment_set_value (vadj, d);
+          champlain_adjustment_set_value (vadj, d);
         }
     }
 }
 
 static void
 deceleration_completed_cb (ClutterTimeline *timeline,
-                           TidyFingerScroll *scroll)
+                           ChamplainFingerScroll *scroll)
 {
   clamp_adjustments (scroll);
   g_object_unref (timeline);
@@ -527,35 +527,35 @@ deceleration_completed_cb (ClutterTimeline *timeline,
 static void
 deceleration_new_frame_cb (ClutterTimeline *timeline,
                            gint frame_num,
-                           TidyFingerScroll *scroll)
+                           ChamplainFingerScroll *scroll)
 {
-  TidyFingerScrollPrivate *priv = scroll->priv;
+  ChamplainFingerScrollPrivate *priv = scroll->priv;
 
   if (priv->child)
     {
       gdouble    value, lower, upper, page_size;
-      TidyAdjustment *hadjust, *vadjust;
+      ChamplainAdjustment *hadjust, *vadjust;
       gint i;
       gboolean stop = TRUE;
 
-      tidy_viewport_get_adjustments (TIDY_VIEWPORT (priv->child),
+      champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->child),
                                        &hadjust,
                                        &vadjust);
 
       for (i = 0; i < clutter_timeline_get_delta (timeline) / 15; i++)
         {
-          tidy_adjustment_set_value (hadjust,
+          champlain_adjustment_set_value (hadjust,
                                       priv->dx +
-                                        tidy_adjustment_get_value (hadjust));
-          tidy_adjustment_set_value (vadjust,
+                                        champlain_adjustment_get_value (hadjust));
+          champlain_adjustment_set_value (vadjust,
                                       priv->dy +
-                                        tidy_adjustment_get_value (vadjust));
+                                        champlain_adjustment_get_value (vadjust));
           priv->dx = (priv->dx / priv->decel_rate);
           priv->dy = (priv->dy / priv->decel_rate);
         }
 
       /* Check if we've hit the upper or lower bounds and stop the timeline */
-      tidy_adjustment_get_values (hadjust, &value, &lower, &upper,
+      champlain_adjustment_get_values (hadjust, &value, &lower, &upper,
                                    NULL, NULL, &page_size);
       if (((priv->dx > 0) && (value < upper - page_size)) ||
           ((priv->dx < 0) && (value > lower)))
@@ -563,7 +563,7 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
 
       if (stop)
         {
-          tidy_adjustment_get_values (vadjust, &value, &lower, &upper,
+          champlain_adjustment_get_values (vadjust, &value, &lower, &upper,
                                        NULL, NULL, &page_size);
           if (((priv->dy > 0) && (value < upper - page_size)) ||
               ((priv->dy < 0) && (value > lower)))
@@ -581,9 +581,9 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
 static gboolean
 button_release_event_cb (ClutterActor *actor,
                          ClutterButtonEvent *event,
-                         TidyFingerScroll *scroll)
+                         ChamplainFingerScroll *scroll)
 {
-  TidyFingerScrollPrivate *priv = scroll->priv;
+  ChamplainFingerScrollPrivate *priv = scroll->priv;
   gboolean decelerating = FALSE;
   gboolean moved = TRUE;
 
@@ -610,7 +610,7 @@ button_release_event_cb (ClutterActor *actor,
         {
           double frac, x_origin, y_origin;
           GTimeVal release_time, motion_time;
-          TidyAdjustment *hadjust, *vadjust;
+          ChamplainAdjustment *hadjust, *vadjust;
           glong time_diff;
           gint i;
 
@@ -623,8 +623,8 @@ button_release_event_cb (ClutterActor *actor,
           motion_time = (GTimeVal){ 0, 0 };
           for (i = 0; i < priv->last_motion; i++)
             {
-              TidyFingerScrollMotion *motion =
-                &g_array_index (priv->motion_buffer, TidyFingerScrollMotion, i);
+              ChamplainFingerScrollMotion *motion =
+                &g_array_index (priv->motion_buffer, ChamplainFingerScrollMotion, i);
 
               /* FIXME: This doesn't guard against overflows - Should
                *        either fix that, or calculate the correct maximum
@@ -661,7 +661,7 @@ button_release_event_cb (ClutterActor *actor,
               priv->dy = (y_origin - y) / frac;
 
               /* Get adjustments to do step-increment snapping */
-              tidy_viewport_get_adjustments (TIDY_VIEWPORT (priv->child),
+              champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->child),
                                                &hadjust,
                                                &vadjust);
 
@@ -712,7 +712,7 @@ button_release_event_cb (ClutterActor *actor,
 
                   /* Solving for dx */
                   d = a * priv->dx;
-                  tidy_adjustment_get_values (hadjust, &value, &lower, NULL,
+                  champlain_adjustment_get_values (hadjust, &value, &lower, NULL,
                                               &step_increment, NULL, NULL);
                   d = ((rint (((value + d) - lower) / step_increment) *
                         step_increment) + lower) - value;
@@ -720,7 +720,7 @@ button_release_event_cb (ClutterActor *actor,
 
                   /* Solving for dy */
                   d = a * (priv->dy);
-                  tidy_adjustment_get_values (vadjust, &value, &lower, NULL,
+                  champlain_adjustment_get_values (vadjust, &value, &lower, NULL,
                                               &step_increment, NULL, NULL);
                   d = ((rint (((value + d) - lower) / step_increment) *
                         step_increment) + lower) - value;
@@ -738,13 +738,13 @@ button_release_event_cb (ClutterActor *actor,
                   y = priv->decel_rate;
                   a = (1.0 - 1.0 / pow (y, 4 + 1)) / (1.0 - 1.0 / y);
 
-                  tidy_adjustment_get_values (hadjust, &value, &lower, NULL,
+                  champlain_adjustment_get_values (hadjust, &value, &lower, NULL,
                                               &step_increment, NULL, NULL);
                   d = ((rint ((value - lower) / step_increment) *
                         step_increment) + lower) - value;
                   priv->dx = (d / a);
 
-                  tidy_adjustment_get_values (vadjust, &value, &lower, NULL,
+                  champlain_adjustment_get_values (vadjust, &value, &lower, NULL,
                                               &step_increment, NULL, NULL);
                   d = ((rint ((value - lower) / step_increment) *
                         step_increment) + lower) - value;
@@ -784,7 +784,7 @@ button_release_event_cb (ClutterActor *actor,
 }
 
 static gboolean
-after_event_cb (TidyFingerScroll *scroll)
+after_event_cb (ChamplainFingerScroll *scroll)
 {
   /* Check the pointer grab - if something else has grabbed it - for example,
    * a scroll-bar or some such, don't do our funky stuff.
@@ -805,13 +805,13 @@ after_event_cb (TidyFingerScroll *scroll)
 static gboolean
 captured_event_cb (ClutterActor     *actor,
                    ClutterEvent     *event,
-                   TidyFingerScroll *scroll)
+                   ChamplainFingerScroll *scroll)
 {
-  TidyFingerScrollPrivate *priv = scroll->priv;
+  ChamplainFingerScrollPrivate *priv = scroll->priv;
 
   if (event->type == CLUTTER_BUTTON_PRESS)
     {
-      TidyFingerScrollMotion *motion;
+      ChamplainFingerScrollMotion *motion;
       ClutterButtonEvent *bevent = (ClutterButtonEvent *)event;
 
       if (bevent->source != actor)
@@ -819,7 +819,7 @@ captured_event_cb (ClutterActor     *actor,
 
       /* Reset motion buffer */
       priv->last_motion = 0;
-      motion = &g_array_index (priv->motion_buffer, TidyFingerScrollMotion, 0);
+      motion = &g_array_index (priv->motion_buffer, ChamplainFingerScrollMotion, 0);
 
       if ((bevent->button == 1) &&
           (clutter_actor_transform_stage_point (actor,
@@ -861,13 +861,13 @@ captured_event_cb (ClutterActor     *actor,
 }
 
 static void
-tidy_finger_scroll_init (TidyFingerScroll *self)
+champlain_finger_scroll_init (ChamplainFingerScroll *self)
 {
   ClutterActor *scrollbar;
-  TidyFingerScrollPrivate *priv = self->priv = FINGER_SCROLL_PRIVATE (self);
+  ChamplainFingerScrollPrivate *priv = self->priv = FINGER_SCROLL_PRIVATE (self);
 
   priv->motion_buffer = g_array_sized_new (FALSE, TRUE,
-                                           sizeof (TidyFingerScrollMotion), 3);
+                                           sizeof (ChamplainFingerScrollMotion), 3);
   g_array_set_size (priv->motion_buffer, 3);
   priv->decel_rate = 1.1f;
   priv->child = NULL;
@@ -882,18 +882,18 @@ tidy_finger_scroll_init (TidyFingerScroll *self)
 }
 
 ClutterActor *
-tidy_finger_scroll_new (gboolean kinetic)
+champlain_finger_scroll_new (gboolean kinetic)
 {
-  return CLUTTER_ACTOR (g_object_new (TIDY_TYPE_FINGER_SCROLL,
+  return CLUTTER_ACTOR (g_object_new (CHAMPLAIN_TYPE_FINGER_SCROLL,
                                       "mode", kinetic, NULL));
 }
 
 void
-tidy_finger_scroll_stop (TidyFingerScroll *scroll)
+champlain_finger_scroll_stop (ChamplainFingerScroll *scroll)
 {
-  TidyFingerScrollPrivate *priv;
+  ChamplainFingerScrollPrivate *priv;
 
-  g_return_if_fail (TIDY_IS_FINGER_SCROLL (scroll));
+  g_return_if_fail (CHAMPLAIN_IS_FINGER_SCROLL (scroll));
 
   priv = scroll->priv;
 

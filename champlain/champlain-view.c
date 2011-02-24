@@ -67,9 +67,9 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <math.h>
-#include <tidy-finger-scroll.h>
-#include <tidy-viewport.h>
-#include <tidy-adjustment.h>
+#include <champlain-finger-scroll.h>
+#include <champlain-viewport.h>
+#include <champlain-adjustment.h>
 
 //#define VIEW_LOG 
 #ifdef VIEW_LOG
@@ -264,7 +264,7 @@ update_viewport (ChamplainView *view,
   if (relocate || force_relocate)
     {
       g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
-      tidy_viewport_set_origin (TIDY_VIEWPORT (priv->viewport),
+      champlain_viewport_set_origin (CHAMPLAIN_VIEWPORT (priv->viewport),
           priv->viewport_x,
           priv->viewport_y);
       g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
@@ -283,7 +283,7 @@ update_viewport (ChamplainView *view,
 
 
 static void
-panning_completed (G_GNUC_UNUSED TidyFingerScroll *scroll,
+panning_completed (G_GNUC_UNUSED ChamplainFingerScroll *scroll,
     ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -292,7 +292,7 @@ panning_completed (G_GNUC_UNUSED TidyFingerScroll *scroll,
   gfloat absolute_x, absolute_y;
   gfloat x, y;
 
-  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y);
+  champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
   absolute_x = x + priv->anchor_x + priv->viewport_width / 2.0;
   absolute_y = y + priv->anchor_y + priv->viewport_height / 2.0;
@@ -330,11 +330,11 @@ resize_viewport (ChamplainView *view)
   gdouble lower_y = 0;
   gdouble upper_x = G_MAXINT16;
   gdouble upper_y = G_MAXINT16;
-  TidyAdjustment *hadjust, *vadjust;
+  ChamplainAdjustment *hadjust, *vadjust;
 
   ChamplainViewPrivate *priv = view->priv;
 
-  tidy_viewport_get_adjustments (TIDY_VIEWPORT (priv->viewport), &hadjust,
+  champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->viewport), &hadjust,
       &vadjust);
 
   if (priv->zoom_level < 8)
@@ -351,7 +351,7 @@ resize_viewport (ChamplainView *view)
 
   /*
    * block emmision of signal by priv->viewport with viewport_pos_changed_cb()
-   * callback - the signal can be emitted by updating TidyAdjustment, but
+   * callback - the signal can be emitted by updating ChamplainAdjustment, but
    * calling the callback now would be a disaster since we don't have updated
    * anchor yet
    */
@@ -525,14 +525,14 @@ champlain_view_dispose (GObject *object)
 
   if (priv->kinetic_scroll != NULL)
     {
-      tidy_finger_scroll_stop (TIDY_FINGER_SCROLL (priv->kinetic_scroll));
+      champlain_finger_scroll_stop (CHAMPLAIN_FINGER_SCROLL (priv->kinetic_scroll));
       g_object_unref (priv->kinetic_scroll);
       priv->kinetic_scroll = NULL;
     }
 
   if (priv->viewport != NULL)
     {
-      tidy_viewport_stop (TIDY_VIEWPORT (priv->viewport));
+      champlain_viewport_stop (CHAMPLAIN_VIEWPORT (priv->viewport));
       g_object_unref (priv->viewport);
       priv->viewport = NULL;
     }
@@ -1018,7 +1018,7 @@ champlain_view_init (ChamplainView *view)
   clutter_actor_show (priv->viewport_container);
 
   /* Setup viewport */
-  priv->viewport = g_object_ref (tidy_viewport_new ());
+  priv->viewport = g_object_ref (champlain_viewport_new ());
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->viewport_container);
   
   g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
@@ -1031,7 +1031,7 @@ champlain_view_init (ChamplainView *view)
   clutter_actor_raise (priv->user_layers, priv->map_layer);
 
   /* Setup kinetic scroll */
-  priv->kinetic_scroll = g_object_ref (tidy_finger_scroll_new (FALSE));
+  priv->kinetic_scroll = g_object_ref (champlain_finger_scroll_new (FALSE));
 
   g_signal_connect (priv->kinetic_scroll, "scroll-event",
       G_CALLBACK (scroll_event), view);
@@ -1084,7 +1084,7 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
   ChamplainViewPrivate *priv = view->priv;
   gfloat x, y;
 
-  tidy_viewport_get_origin (TIDY_VIEWPORT (priv->viewport), &x, &y);
+  champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
   if (fabs (x - priv->viewport_x) > 100 ||
       fabs (y - priv->viewport_y) > 100 ||
