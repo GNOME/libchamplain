@@ -10,8 +10,7 @@ tidy_headers_public = \
 	$(srcdir)/tidy-scrollable.h		\
 	$(srcdir)/tidy-scroll-view.h		\
 	$(srcdir)/tidy-viewport.h		\
-	$(srcdir)/tidy-private.h		\
-	$(srcdir)/tidy-debug.h
+	$(srcdir)/tidy-private.h
 
 tidy_sources = \
 	$(srcdir)/tidy-adjustment.c \
