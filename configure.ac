@@ -214,7 +214,7 @@ AC_CONFIG_FILES([build/Makefile
                  champlain/Makefile
                  champlain/champlain-version.h
                  demos/Makefile
-                 mx/Makefile
+                 tidy/Makefile
                  docs/Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml

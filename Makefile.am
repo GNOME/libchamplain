@@ -1,4 +1,4 @@
-SUBDIRS = build mx champlain
+SUBDIRS = build tidy champlain
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
