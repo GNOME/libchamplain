@@ -24,7 +24,7 @@
 #define __TIDY_FINGER_SCROLL_H__
 
 #include <glib-object.h>
-#include <tidy/tidy-scroll-view.h>
+#include <clutter/clutter.h>
 
 G_BEGIN_DECLS
 
@@ -43,14 +43,14 @@ typedef struct _TidyFingerScrollClass     TidyFingerScrollClass;
 struct _TidyFingerScroll
 {
   /*< private >*/
-  TidyScrollView parent_instance;
+  ClutterActor parent_instance;
   
   TidyFingerScrollPrivate *priv;
 };
 
 struct _TidyFingerScrollClass
 {
-  TidyScrollViewClass parent_class;
+  ClutterActorClass parent_class;
 };
 
 GType tidy_finger_scroll_get_type (void) G_GNUC_CONST;

@@ -24,11 +24,15 @@
 #include "tidy-enum-types.h"
 #include "tidy-marshal.h"
 #include "tidy-scrollable.h"
-#include "tidy-scroll-view.h"
 #include <clutter/clutter.h>
 #include <math.h>
 
-G_DEFINE_TYPE (TidyFingerScroll, tidy_finger_scroll, TIDY_TYPE_SCROLL_VIEW)
+static void clutter_container_iface_init (ClutterContainerIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (TidyFingerScroll, tidy_finger_scroll, CLUTTER_TYPE_ACTOR,
+                         G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER,
+                                                clutter_container_iface_init))
+
 
 #define FINGER_SCROLL_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
                                   TIDY_TYPE_FINGER_SCROLL, \
@@ -55,6 +59,7 @@ struct _TidyFingerScrollPrivate
   gdouble                dy;
   gdouble                decel_rate;
 
+  ClutterActor *child;
 };
 
 enum {
@@ -124,6 +129,9 @@ tidy_finger_scroll_dispose (GObject *object)
 {
   TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (object)->priv;
 
+  if (priv->child)
+    clutter_container_remove_actor (CLUTTER_CONTAINER (object), priv->child);
+
   if (priv->deceleration_timeline)
     {
       clutter_timeline_stop (priv->deceleration_timeline);
@@ -146,9 +154,103 @@ tidy_finger_scroll_finalize (GObject *object)
 
 
 static void
+tidy_finger_scroll_paint (ClutterActor *actor)
+{
+  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (actor)->priv;
+
+  if (priv->child)
+    clutter_actor_paint (priv->child);
+}
+
+
+static void
+tidy_finger_scroll_pick (ClutterActor *actor, const ClutterColor *color)
+{
+  /* Chain up so we get a bounding box pained (if we are reactive) */
+  CLUTTER_ACTOR_CLASS (tidy_finger_scroll_parent_class)->pick (actor, color);
+
+  /* Trigger pick on children */
+  tidy_finger_scroll_paint (actor);
+}
+
+
+static void
+tidy_finger_scroll_get_preferred_width (ClutterActor *actor,
+                                      gfloat   for_height,
+                                      gfloat  *min_width_p,
+                                      gfloat  *natural_width_p)
+{
+
+  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (actor)->priv;
+
+  if (!priv->child)
+    return;
+
+
+  /* Our natural width is the natural width of the child */
+  clutter_actor_get_preferred_width (priv->child,
+                                     for_height,
+                                     NULL,
+                                     natural_width_p);
+
+}
+
+static void
+tidy_finger_scroll_get_preferred_height (ClutterActor *actor,
+                                       gfloat   for_width,
+                                       gfloat  *min_height_p,
+                                       gfloat  *natural_height_p)
+{
+
+  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (actor)->priv;
+
+  if (!priv->child)
+    return;
+
+
+  /* Our natural height is the natural height of the child */
+  clutter_actor_get_preferred_height (priv->child,
+                                      for_width,
+                                      NULL,
+                                      natural_height_p);
+}
+
+static void
+tidy_finger_scroll_allocate (ClutterActor          *actor,
+                           const ClutterActorBox *box,
+                           ClutterAllocationFlags flags)
+{
+  ClutterActorBox child_box;
+
+  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (actor)->priv;
+
+  /* Chain up */
+  CLUTTER_ACTOR_CLASS (tidy_finger_scroll_parent_class)->
+    allocate (actor, box, flags);
+
+  /* Child */
+  child_box.x1 = 0;
+  child_box.x2 = box->x2 - box->x1;
+  child_box.y1 = 0;
+  child_box.y2 = box->y2 - box->y1;
+
+  if (priv->child)
+    {
+      clutter_actor_allocate (priv->child, &child_box, flags);
+      clutter_actor_set_clip (priv->child,
+                              child_box.x1,
+                              child_box.y1,
+                              child_box.x2 - child_box.x1,
+                              child_box.y2 - child_box.y1);
+    }
+
+}
+
+static void
 tidy_finger_scroll_class_init (TidyFingerScrollClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
 
   g_type_class_add_private (klass, sizeof (TidyFingerScrollPrivate));
 
@@ -156,6 +258,12 @@ tidy_finger_scroll_class_init (TidyFingerScrollClass *klass)
   object_class->set_property = tidy_finger_scroll_set_property;
   object_class->dispose = tidy_finger_scroll_dispose;
   object_class->finalize = tidy_finger_scroll_finalize;
+
+  actor_class->paint = tidy_finger_scroll_paint;
+  actor_class->pick = tidy_finger_scroll_pick;
+  actor_class->get_preferred_width = tidy_finger_scroll_get_preferred_width;
+  actor_class->get_preferred_height = tidy_finger_scroll_get_preferred_height;
+  actor_class->allocate = tidy_finger_scroll_allocate;
 
   g_object_class_install_property (object_class,
                                    PROP_MODE,
@@ -192,6 +300,112 @@ tidy_finger_scroll_class_init (TidyFingerScrollClass *klass)
           g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 }
 
+
+static void
+tidy_finger_scroll_add_actor (ClutterContainer *container,
+                            ClutterActor     *actor)
+{
+  TidyFingerScroll *self = TIDY_FINGER_SCROLL (container);
+  TidyFingerScrollPrivate *priv = self->priv;
+
+  if (priv->child)
+    {
+      g_warning ("Attempting to add an actor of type %s to "
+                 "a TidyFingerScroll that already contains "
+                 "an actor of type %s.",
+                 g_type_name (G_OBJECT_TYPE (actor)),
+                 g_type_name (G_OBJECT_TYPE (priv->child)));
+    }
+  else
+    {
+      if (TIDY_IS_SCROLLABLE(actor))
+        {
+          priv->child = actor;
+          clutter_actor_set_parent (actor, CLUTTER_ACTOR (container));
+
+          /* Notify that child has been set */
+          g_signal_emit_by_name (container, "actor-added", priv->child);
+
+          clutter_actor_queue_relayout (CLUTTER_ACTOR (container));
+        }
+      else
+        {
+          g_warning ("Attempting to add an actor to "
+                     "a TidyFingerScroll, but the actor does "
+                     "not implement TidyScrollable.");
+        }
+    }
+}
+
+static void
+tidy_finger_scroll_remove_actor (ClutterContainer *container,
+                               ClutterActor     *actor)
+{
+  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (container)->priv;
+
+  if (actor == priv->child)
+    {
+      g_object_ref (priv->child);
+
+
+      clutter_actor_unparent (priv->child);
+
+      g_signal_emit_by_name (container, "actor-removed", priv->child);
+
+      g_object_unref (priv->child);
+      priv->child = NULL;
+
+      if (CLUTTER_ACTOR_IS_VISIBLE (container))
+        clutter_actor_queue_relayout (CLUTTER_ACTOR (container));
+    }
+}
+
+static void
+tidy_finger_scroll_foreach (ClutterContainer *container,
+                          ClutterCallback   callback,
+                          gpointer          callback_data)
+{
+  TidyFingerScrollPrivate *priv = TIDY_FINGER_SCROLL (container)->priv;
+
+  if (priv->child)
+    callback (priv->child, callback_data);
+}
+
+static void
+tidy_finger_scroll_lower (ClutterContainer *container,
+                        ClutterActor     *actor,
+                        ClutterActor     *sibling)
+{
+  /* single child */
+}
+
+static void
+tidy_finger_scroll_raise (ClutterContainer *container,
+                        ClutterActor     *actor,
+                        ClutterActor     *sibling)
+{
+  /* single child */
+}
+
+static void
+tidy_finger_scroll_sort_depth_order (ClutterContainer *container)
+{
+  /* single child */
+}
+
+static void
+clutter_container_iface_init (ClutterContainerIface *iface)
+{
+  iface->add = tidy_finger_scroll_add_actor;
+  iface->remove = tidy_finger_scroll_remove_actor;
+  iface->foreach = tidy_finger_scroll_foreach;
+  iface->lower = tidy_finger_scroll_lower;
+  iface->raise = tidy_finger_scroll_raise;
+  iface->sort_depth_order = tidy_finger_scroll_sort_depth_order;
+}
+
+
+
 static gboolean
 motion_event_cb (ClutterActor *actor,
                  ClutterMotionEvent *event,
@@ -207,15 +421,13 @@ motion_event_cb (ClutterActor *actor,
                                            &x, &y))
     {
       TidyFingerScrollMotion *motion;
-      ClutterActor *child =
-        tidy_scroll_view_get_child (TIDY_SCROLL_VIEW(scroll));
 
-      if (child)
+      if (priv->child)
         {
           gdouble dx, dy;
           TidyAdjustment *hadjust, *vadjust;
 
-          tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (child),
+          tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->child),
                                            &hadjust,
                                            &vadjust);
 
@@ -251,15 +463,15 @@ motion_event_cb (ClutterActor *actor,
 static void
 clamp_adjustments (TidyFingerScroll *scroll)
 {
-  ClutterActor *child = tidy_scroll_view_get_child (TIDY_SCROLL_VIEW (scroll));
-
-  if (child)
+  TidyFingerScrollPrivate *priv = scroll->priv;
+  
+  if (priv->child)
     {
       guint fps, n_frames;
       TidyAdjustment *hadj, *vadj;
       gboolean snap;
 
-      tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (child),
+      tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->child),
                                        &hadj, &vadj);
 
       /* FIXME: Hard-coded value here */
@@ -317,16 +529,15 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
                            TidyFingerScroll *scroll)
 {
   TidyFingerScrollPrivate *priv = scroll->priv;
-  ClutterActor *child = tidy_scroll_view_get_child (TIDY_SCROLL_VIEW(scroll));
 
-  if (child)
+  if (priv->child)
     {
       gdouble    value, lower, upper, page_size;
       TidyAdjustment *hadjust, *vadjust;
       gint i;
       gboolean stop = TRUE;
 
-      tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (child),
+      tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->child),
                                        &hadjust,
                                        &vadjust);
 
@@ -372,7 +583,6 @@ button_release_event_cb (ClutterActor *actor,
                          TidyFingerScroll *scroll)
 {
   TidyFingerScrollPrivate *priv = scroll->priv;
-  ClutterActor *child = tidy_scroll_view_get_child (TIDY_SCROLL_VIEW(scroll));
   gboolean decelerating = FALSE;
   gboolean moved = TRUE;
 
@@ -388,7 +598,7 @@ button_release_event_cb (ClutterActor *actor,
 
   clutter_ungrab_pointer ();
 
-  if (priv->kinetic && child)
+  if (priv->kinetic && priv->child)
     {
       gfloat x, y;
 
@@ -450,7 +660,7 @@ button_release_event_cb (ClutterActor *actor,
               priv->dy = (y_origin - y) / frac;
 
               /* Get adjustments to do step-increment snapping */
-              tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (child),
+              tidy_scrollable_get_adjustments (TIDY_SCROLLABLE (priv->child),
                                                &hadjust,
                                                &vadjust);
 
@@ -659,6 +869,7 @@ tidy_finger_scroll_init (TidyFingerScroll *self)
                                            sizeof (TidyFingerScrollMotion), 3);
   g_array_set_size (priv->motion_buffer, 3);
   priv->decel_rate = 1.1f;
+  priv->child = NULL;
 
   clutter_actor_set_reactive (CLUTTER_ACTOR (self), TRUE);
   g_signal_connect (CLUTTER_ACTOR (self),
