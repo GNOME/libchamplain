@@ -173,6 +173,12 @@ champlain_viewport_dispose (GObject *gobject)
       priv->vadjustment = NULL;
     }
 
+  if (priv->content_group)
+    {
+      clutter_actor_destroy (priv->content_group);
+      priv->content_group = NULL;
+    }
+
   G_OBJECT_CLASS (champlain_viewport_parent_class)->dispose (gobject);
 }
 

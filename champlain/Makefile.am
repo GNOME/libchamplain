@@ -43,7 +43,7 @@ libchamplain_headers_public = 				\
 	$(srcdir)/champlain-null-tile-source.h		\
 	$(srcdir)/champlain-network-bbox-tile-source.h	\
 	$(srcdir)/champlain-adjustment.h		\
-	$(srcdir)/champlain-finger-scroll.h		\
+	$(srcdir)/champlain-kinetic-scroll-view.h		\
 	$(srcdir)/champlain-viewport.h		\
 	$(srcdir)/champlain-bounding-box.h
 
@@ -91,7 +91,7 @@ libchamplain_sources =					\
 	$(srcdir)/champlain-network-bbox-tile-source.c	\
 	$(srcdir)/champlain-group.c			\
 	$(srcdir)/champlain-adjustment.c \
-	$(srcdir)/champlain-finger-scroll.c \
+	$(srcdir)/champlain-kinetic-scroll-view.c \
 	$(srcdir)/champlain-viewport.c	\
 	$(srcdir)/champlain-bounding-box.c
 

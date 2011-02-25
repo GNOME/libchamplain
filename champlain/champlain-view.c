@@ -67,7 +67,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <math.h>
-#include <champlain-finger-scroll.h>
+#include <champlain-kinetic-scroll-view.h>
 #include <champlain-viewport.h>
 #include <champlain-adjustment.h>
 
@@ -283,7 +283,7 @@ update_viewport (ChamplainView *view,
 
 
 static void
-panning_completed (G_GNUC_UNUSED ChamplainFingerScroll *scroll,
+panning_completed (G_GNUC_UNUSED ChamplainKineticScrollView *scroll,
     ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -525,7 +525,7 @@ champlain_view_dispose (GObject *object)
 
   if (priv->kinetic_scroll != NULL)
     {
-      champlain_finger_scroll_stop (CHAMPLAIN_FINGER_SCROLL (priv->kinetic_scroll));
+      champlain_kinetic_scroll_view_stop (CHAMPLAIN_KINETIC_SCROLL_VIEW (priv->kinetic_scroll));
       g_object_unref (priv->kinetic_scroll);
       priv->kinetic_scroll = NULL;
     }
@@ -1031,7 +1031,7 @@ champlain_view_init (ChamplainView *view)
   clutter_actor_raise (priv->user_layers, priv->map_layer);
 
   /* Setup kinetic scroll */
-  priv->kinetic_scroll = g_object_ref (champlain_finger_scroll_new (FALSE));
+  priv->kinetic_scroll = g_object_ref (champlain_kinetic_scroll_view_new (FALSE));
 
   g_signal_connect (priv->kinetic_scroll, "scroll-event",
       G_CALLBACK (scroll_event), view);

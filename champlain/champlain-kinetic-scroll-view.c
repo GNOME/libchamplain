@@ -1,4 +1,4 @@
-/* champlain-finger-scroll.c: Finger scrolling container actor
+/* champlain-kinetic-scroll-view.c: Finger scrolling container actor
  *
  * Copyright (C) 2008 OpenedHand
  *
@@ -20,7 +20,7 @@
  * Written by: Chris Lord <chris@openedhand.com>
  */
 
-#include "champlain-finger-scroll.h"
+#include "champlain-kinetic-scroll-view.h"
 #include "champlain-enum-types.h"
 #include "champlain-marshal.h"
 #include "champlain-adjustment.h"
@@ -30,23 +30,23 @@
 
 static void clutter_container_iface_init (ClutterContainerIface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (ChamplainFingerScroll, champlain_finger_scroll, CLUTTER_TYPE_ACTOR,
+G_DEFINE_TYPE_WITH_CODE (ChamplainKineticScrollView, champlain_kinetic_scroll_view, CLUTTER_TYPE_ACTOR,
                          G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER,
                                                 clutter_container_iface_init))
 
 
-#define FINGER_SCROLL_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
-                                  CHAMPLAIN_TYPE_FINGER_SCROLL, \
-                                  ChamplainFingerScrollPrivate))
+#define KINETIC_SCROLL_VIEW_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
+                                  CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW, \
+                                  ChamplainKineticScrollViewPrivate))
 
 typedef struct {
   /* Units to store the origin of a click when scrolling */
   gfloat x;
   gfloat y;
   GTimeVal    time;
-} ChamplainFingerScrollMotion;
+} ChamplainKineticScrollViewMotion;
 
-struct _ChamplainFingerScrollPrivate
+struct _ChamplainKineticScrollViewPrivate
 {
   /* Scroll mode */
   gboolean kinetic;
@@ -79,10 +79,10 @@ enum
 static guint signals[LAST_SIGNAL] = { 0, };
 
 static void
-champlain_finger_scroll_get_property (GObject *object, guint property_id,
+champlain_kinetic_scroll_view_get_property (GObject *object, guint property_id,
                                  GValue *value, GParamSpec *pspec)
 {
-  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (object)->priv;
+  ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (object)->priv;
 
   switch (property_id)
     {
@@ -101,10 +101,10 @@ champlain_finger_scroll_get_property (GObject *object, guint property_id,
 }
 
 static void
-champlain_finger_scroll_set_property (GObject *object, guint property_id,
+champlain_kinetic_scroll_view_set_property (GObject *object, guint property_id,
                                  const GValue *value, GParamSpec *pspec)
 {
-  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (object)->priv;
+  ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (object)->priv;
 
   switch (property_id)
     {
@@ -126,9 +126,9 @@ champlain_finger_scroll_set_property (GObject *object, guint property_id,
 }
 
 static void
-champlain_finger_scroll_dispose (GObject *object)
+champlain_kinetic_scroll_view_dispose (GObject *object)
 {
-  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (object)->priv;
+  ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (object)->priv;
 
   if (priv->child)
     clutter_container_remove_actor (CLUTTER_CONTAINER (object), priv->child);
@@ -140,24 +140,24 @@ champlain_finger_scroll_dispose (GObject *object)
       priv->deceleration_timeline = NULL;
     }
 
-  G_OBJECT_CLASS (champlain_finger_scroll_parent_class)->dispose (object);
+  G_OBJECT_CLASS (champlain_kinetic_scroll_view_parent_class)->dispose (object);
 }
 
 static void
-champlain_finger_scroll_finalize (GObject *object)
+champlain_kinetic_scroll_view_finalize (GObject *object)
 {
-  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (object)->priv;
+  ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (object)->priv;
 
   g_array_free (priv->motion_buffer, TRUE);
 
-  G_OBJECT_CLASS (champlain_finger_scroll_parent_class)->finalize (object);
+  G_OBJECT_CLASS (champlain_kinetic_scroll_view_parent_class)->finalize (object);
 }
 
 
 static void
-champlain_finger_scroll_paint (ClutterActor *actor)
+champlain_kinetic_scroll_view_paint (ClutterActor *actor)
 {
-  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (actor)->priv;
+  ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (actor)->priv;
 
   if (priv->child)
     clutter_actor_paint (priv->child);
@@ -165,24 +165,24 @@ champlain_finger_scroll_paint (ClutterActor *actor)
 
 
 static void
-champlain_finger_scroll_pick (ClutterActor *actor, const ClutterColor *color)
+champlain_kinetic_scroll_view_pick (ClutterActor *actor, const ClutterColor *color)
 {
   /* Chain up so we get a bounding box pained (if we are reactive) */
-  CLUTTER_ACTOR_CLASS (champlain_finger_scroll_parent_class)->pick (actor, color);
+  CLUTTER_ACTOR_CLASS (champlain_kinetic_scroll_view_parent_class)->pick (actor, color);
 
   /* Trigger pick on children */
-  champlain_finger_scroll_paint (actor);
+  champlain_kinetic_scroll_view_paint (actor);
 }
 
 
 static void
-champlain_finger_scroll_get_preferred_width (ClutterActor *actor,
+champlain_kinetic_scroll_view_get_preferred_width (ClutterActor *actor,
                                       gfloat   for_height,
                                       gfloat  *min_width_p,
                                       gfloat  *natural_width_p)
 {
 
-  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (actor)->priv;
+  ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (actor)->priv;
 
   if (!priv->child)
     return;
@@ -197,13 +197,13 @@ champlain_finger_scroll_get_preferred_width (ClutterActor *actor,
 }
 
 static void
-champlain_finger_scroll_get_preferred_height (ClutterActor *actor,
+champlain_kinetic_scroll_view_get_preferred_height (ClutterActor *actor,
                                        gfloat   for_width,
                                        gfloat  *min_height_p,
                                        gfloat  *natural_height_p)
 {
 
-  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (actor)->priv;
+  ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (actor)->priv;
 
   if (!priv->child)
     return;
@@ -217,16 +217,16 @@ champlain_finger_scroll_get_preferred_height (ClutterActor *actor,
 }
 
 static void
-champlain_finger_scroll_allocate (ClutterActor          *actor,
+champlain_kinetic_scroll_view_allocate (ClutterActor          *actor,
                            const ClutterActorBox *box,
                            ClutterAllocationFlags flags)
 {
   ClutterActorBox child_box;
 
-  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (actor)->priv;
+  ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (actor)->priv;
 
   /* Chain up */
-  CLUTTER_ACTOR_CLASS (champlain_finger_scroll_parent_class)->
+  CLUTTER_ACTOR_CLASS (champlain_kinetic_scroll_view_parent_class)->
     allocate (actor, box, flags);
 
   /* Child */
@@ -248,28 +248,28 @@ champlain_finger_scroll_allocate (ClutterActor          *actor,
 }
 
 static void
-champlain_finger_scroll_class_init (ChamplainFingerScrollClass *klass)
+champlain_kinetic_scroll_view_class_init (ChamplainKineticScrollViewClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainFingerScrollPrivate));
+  g_type_class_add_private (klass, sizeof (ChamplainKineticScrollViewPrivate));
 
-  object_class->get_property = champlain_finger_scroll_get_property;
-  object_class->set_property = champlain_finger_scroll_set_property;
-  object_class->dispose = champlain_finger_scroll_dispose;
-  object_class->finalize = champlain_finger_scroll_finalize;
+  object_class->get_property = champlain_kinetic_scroll_view_get_property;
+  object_class->set_property = champlain_kinetic_scroll_view_set_property;
+  object_class->dispose = champlain_kinetic_scroll_view_dispose;
+  object_class->finalize = champlain_kinetic_scroll_view_finalize;
 
-  actor_class->paint = champlain_finger_scroll_paint;
-  actor_class->pick = champlain_finger_scroll_pick;
-  actor_class->get_preferred_width = champlain_finger_scroll_get_preferred_width;
-  actor_class->get_preferred_height = champlain_finger_scroll_get_preferred_height;
-  actor_class->allocate = champlain_finger_scroll_allocate;
+  actor_class->paint = champlain_kinetic_scroll_view_paint;
+  actor_class->pick = champlain_kinetic_scroll_view_pick;
+  actor_class->get_preferred_width = champlain_kinetic_scroll_view_get_preferred_width;
+  actor_class->get_preferred_height = champlain_kinetic_scroll_view_get_preferred_height;
+  actor_class->allocate = champlain_kinetic_scroll_view_allocate;
 
   g_object_class_install_property (object_class,
                                    PROP_MODE,
                                    g_param_spec_boolean ("mode",
-                                                      "ChamplainFingerScrollMode",
+                                                      "ChamplainKineticScrollViewMode",
                                                       "Scrolling mode",
                                                       FALSE,
                                                       G_PARAM_READWRITE));
@@ -303,16 +303,16 @@ champlain_finger_scroll_class_init (ChamplainFingerScrollClass *klass)
 
 
 static void
-champlain_finger_scroll_add_actor (ClutterContainer *container,
+champlain_kinetic_scroll_view_add_actor (ClutterContainer *container,
                             ClutterActor     *actor)
 {
-  ChamplainFingerScroll *self = CHAMPLAIN_FINGER_SCROLL (container);
-  ChamplainFingerScrollPrivate *priv = self->priv;
+  ChamplainKineticScrollView *self = CHAMPLAIN_KINETIC_SCROLL_VIEW (container);
+  ChamplainKineticScrollViewPrivate *priv = self->priv;
 
   if (priv->child)
     {
       g_warning ("Attempting to add an actor of type %s to "
-                 "a ChamplainFingerScroll that already contains "
+                 "a ChamplainKineticScrollView that already contains "
                  "an actor of type %s.",
                  g_type_name (G_OBJECT_TYPE (actor)),
                  g_type_name (G_OBJECT_TYPE (priv->child)));
@@ -332,17 +332,17 @@ champlain_finger_scroll_add_actor (ClutterContainer *container,
       else
         {
           g_warning ("Attempting to add an actor to "
-                     "a ChamplainFingerScroll, but the actor does "
+                     "a ChamplainKineticScrollView, but the actor does "
                      "not implement ChamplainViewport.");
         }
     }
 }
 
 static void
-champlain_finger_scroll_remove_actor (ClutterContainer *container,
+champlain_kinetic_scroll_view_remove_actor (ClutterContainer *container,
                                ClutterActor     *actor)
 {
-  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (container)->priv;
+  ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (container)->priv;
 
   if (actor == priv->child)
     {
@@ -362,18 +362,18 @@ champlain_finger_scroll_remove_actor (ClutterContainer *container,
 }
 
 static void
-champlain_finger_scroll_foreach (ClutterContainer *container,
+champlain_kinetic_scroll_view_foreach (ClutterContainer *container,
                           ClutterCallback   callback,
                           gpointer          callback_data)
 {
-  ChamplainFingerScrollPrivate *priv = CHAMPLAIN_FINGER_SCROLL (container)->priv;
+  ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (container)->priv;
 
   if (priv->child)
     callback (priv->child, callback_data);
 }
 
 static void
-champlain_finger_scroll_lower (ClutterContainer *container,
+champlain_kinetic_scroll_view_lower (ClutterContainer *container,
                         ClutterActor     *actor,
                         ClutterActor     *sibling)
 {
@@ -381,7 +381,7 @@ champlain_finger_scroll_lower (ClutterContainer *container,
 }
 
 static void
-champlain_finger_scroll_raise (ClutterContainer *container,
+champlain_kinetic_scroll_view_raise (ClutterContainer *container,
                         ClutterActor     *actor,
                         ClutterActor     *sibling)
 {
@@ -389,7 +389,7 @@ champlain_finger_scroll_raise (ClutterContainer *container,
 }
 
 static void
-champlain_finger_scroll_sort_depth_order (ClutterContainer *container)
+champlain_kinetic_scroll_view_sort_depth_order (ClutterContainer *container)
 {
   /* single child */
 }
@@ -397,12 +397,12 @@ champlain_finger_scroll_sort_depth_order (ClutterContainer *container)
 static void
 clutter_container_iface_init (ClutterContainerIface *iface)
 {
-  iface->add = champlain_finger_scroll_add_actor;
-  iface->remove = champlain_finger_scroll_remove_actor;
-  iface->foreach = champlain_finger_scroll_foreach;
-  iface->lower = champlain_finger_scroll_lower;
-  iface->raise = champlain_finger_scroll_raise;
-  iface->sort_depth_order = champlain_finger_scroll_sort_depth_order;
+  iface->add = champlain_kinetic_scroll_view_add_actor;
+  iface->remove = champlain_kinetic_scroll_view_remove_actor;
+  iface->foreach = champlain_kinetic_scroll_view_foreach;
+  iface->lower = champlain_kinetic_scroll_view_lower;
+  iface->raise = champlain_kinetic_scroll_view_raise;
+  iface->sort_depth_order = champlain_kinetic_scroll_view_sort_depth_order;
 }
 
 
@@ -410,18 +410,18 @@ clutter_container_iface_init (ClutterContainerIface *iface)
 static gboolean
 motion_event_cb (ClutterActor *actor,
                  ClutterMotionEvent *event,
-                 ChamplainFingerScroll *scroll)
+                 ChamplainKineticScrollView *scroll)
 {
   gfloat x, y;
 
-  ChamplainFingerScrollPrivate *priv = scroll->priv;
+  ChamplainKineticScrollViewPrivate *priv = scroll->priv;
 
   if (clutter_actor_transform_stage_point (actor,
                                            event->x,
                                            event->y,
                                            &x, &y))
     {
-      ChamplainFingerScrollMotion *motion;
+      ChamplainKineticScrollViewMotion *motion;
 
       if (priv->child)
         {
@@ -433,7 +433,7 @@ motion_event_cb (ClutterActor *actor,
                                            &vadjust);
 
           motion = &g_array_index (priv->motion_buffer,
-                                   ChamplainFingerScrollMotion, priv->last_motion);
+                                   ChamplainKineticScrollViewMotion, priv->last_motion);
           dx = (motion->x - x) +
                champlain_adjustment_get_value (hadjust);
           dy = (motion->y - y) +
@@ -452,7 +452,7 @@ motion_event_cb (ClutterActor *actor,
         }
 
       motion = &g_array_index (priv->motion_buffer,
-                               ChamplainFingerScrollMotion, priv->last_motion);
+                               ChamplainKineticScrollViewMotion, priv->last_motion);
       motion->x = x;
       motion->y = y;
       g_get_current_time (&motion->time);
@@ -462,9 +462,9 @@ motion_event_cb (ClutterActor *actor,
 }
 
 static void
-clamp_adjustments (ChamplainFingerScroll *scroll)
+clamp_adjustments (ChamplainKineticScrollView *scroll)
 {
-  ChamplainFingerScrollPrivate *priv = scroll->priv;
+  ChamplainKineticScrollViewPrivate *priv = scroll->priv;
   
   if (priv->child)
     {
@@ -515,7 +515,7 @@ clamp_adjustments (ChamplainFingerScroll *scroll)
 
 static void
 deceleration_completed_cb (ClutterTimeline *timeline,
-                           ChamplainFingerScroll *scroll)
+                           ChamplainKineticScrollView *scroll)
 {
   clamp_adjustments (scroll);
   g_object_unref (timeline);
@@ -527,9 +527,9 @@ deceleration_completed_cb (ClutterTimeline *timeline,
 static void
 deceleration_new_frame_cb (ClutterTimeline *timeline,
                            gint frame_num,
-                           ChamplainFingerScroll *scroll)
+                           ChamplainKineticScrollView *scroll)
 {
-  ChamplainFingerScrollPrivate *priv = scroll->priv;
+  ChamplainKineticScrollViewPrivate *priv = scroll->priv;
 
   if (priv->child)
     {
@@ -581,9 +581,9 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
 static gboolean
 button_release_event_cb (ClutterActor *actor,
                          ClutterButtonEvent *event,
-                         ChamplainFingerScroll *scroll)
+                         ChamplainKineticScrollView *scroll)
 {
-  ChamplainFingerScrollPrivate *priv = scroll->priv;
+  ChamplainKineticScrollViewPrivate *priv = scroll->priv;
   gboolean decelerating = FALSE;
   gboolean moved = TRUE;
 
@@ -623,8 +623,8 @@ button_release_event_cb (ClutterActor *actor,
           motion_time = (GTimeVal){ 0, 0 };
           for (i = 0; i < priv->last_motion; i++)
             {
-              ChamplainFingerScrollMotion *motion =
-                &g_array_index (priv->motion_buffer, ChamplainFingerScrollMotion, i);
+              ChamplainKineticScrollViewMotion *motion =
+                &g_array_index (priv->motion_buffer, ChamplainKineticScrollViewMotion, i);
 
               /* FIXME: This doesn't guard against overflows - Should
                *        either fix that, or calculate the correct maximum
@@ -784,7 +784,7 @@ button_release_event_cb (ClutterActor *actor,
 }
 
 static gboolean
-after_event_cb (ChamplainFingerScroll *scroll)
+after_event_cb (ChamplainKineticScrollView *scroll)
 {
   /* Check the pointer grab - if something else has grabbed it - for example,
    * a scroll-bar or some such, don't do our funky stuff.
@@ -805,13 +805,13 @@ after_event_cb (ChamplainFingerScroll *scroll)
 static gboolean
 captured_event_cb (ClutterActor     *actor,
                    ClutterEvent     *event,
-                   ChamplainFingerScroll *scroll)
+                   ChamplainKineticScrollView *scroll)
 {
-  ChamplainFingerScrollPrivate *priv = scroll->priv;
+  ChamplainKineticScrollViewPrivate *priv = scroll->priv;
 
   if (event->type == CLUTTER_BUTTON_PRESS)
     {
-      ChamplainFingerScrollMotion *motion;
+      ChamplainKineticScrollViewMotion *motion;
       ClutterButtonEvent *bevent = (ClutterButtonEvent *)event;
 
       if (bevent->source != actor)
@@ -819,7 +819,7 @@ captured_event_cb (ClutterActor     *actor,
 
       /* Reset motion buffer */
       priv->last_motion = 0;
-      motion = &g_array_index (priv->motion_buffer, ChamplainFingerScrollMotion, 0);
+      motion = &g_array_index (priv->motion_buffer, ChamplainKineticScrollViewMotion, 0);
 
       if ((bevent->button == 1) &&
           (clutter_actor_transform_stage_point (actor,
@@ -861,12 +861,12 @@ captured_event_cb (ClutterActor     *actor,
 }
 
 static void
-champlain_finger_scroll_init (ChamplainFingerScroll *self)
+champlain_kinetic_scroll_view_init (ChamplainKineticScrollView *self)
 {
-  ChamplainFingerScrollPrivate *priv = self->priv = FINGER_SCROLL_PRIVATE (self);
+  ChamplainKineticScrollViewPrivate *priv = self->priv = KINETIC_SCROLL_VIEW_PRIVATE (self);
 
   priv->motion_buffer = g_array_sized_new (FALSE, TRUE,
-                                           sizeof (ChamplainFingerScrollMotion), 3);
+                                           sizeof (ChamplainKineticScrollViewMotion), 3);
   g_array_set_size (priv->motion_buffer, 3);
   priv->decel_rate = 1.1f;
   priv->child = NULL;
@@ -881,18 +881,18 @@ champlain_finger_scroll_init (ChamplainFingerScroll *self)
 }
 
 ClutterActor *
-champlain_finger_scroll_new (gboolean kinetic)
+champlain_kinetic_scroll_view_new (gboolean kinetic)
 {
-  return CLUTTER_ACTOR (g_object_new (CHAMPLAIN_TYPE_FINGER_SCROLL,
+  return CLUTTER_ACTOR (g_object_new (CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW,
                                       "mode", kinetic, NULL));
 }
 
 void
-champlain_finger_scroll_stop (ChamplainFingerScroll *scroll)
+champlain_kinetic_scroll_view_stop (ChamplainKineticScrollView *scroll)
 {
-  ChamplainFingerScrollPrivate *priv;
+  ChamplainKineticScrollViewPrivate *priv;
 
-  g_return_if_fail (CHAMPLAIN_IS_FINGER_SCROLL (scroll));
+  g_return_if_fail (CHAMPLAIN_IS_KINETIC_SCROLL_VIEW (scroll));
 
   priv = scroll->priv;
 
