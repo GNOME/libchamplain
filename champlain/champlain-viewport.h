@@ -42,14 +42,14 @@ typedef struct _ChamplainViewportClass     ChamplainViewportClass;
 
 struct _ChamplainViewport
 {
-  ClutterGroup parent;
+  ClutterActor parent;
 
   ChamplainViewportPrivate *priv;
 };
 
 struct _ChamplainViewportClass
 {
-  ClutterGroupClass parent_class;
+  ClutterActorClass parent_class;
 };
 
 GType champlain_viewport_get_type (void) G_GNUC_CONST;
@@ -72,6 +72,8 @@ void champlain_viewport_get_adjustments (ChamplainViewport *viewport,
 void champlain_viewport_set_adjustments (ChamplainViewport *viewport,
                             ChamplainAdjustment *hadjustment,
                             ChamplainAdjustment *vadjustment);
+
+void champlain_viewport_set_child (ChamplainViewport *viewport, ClutterActor *child);
 
 G_END_DECLS
 

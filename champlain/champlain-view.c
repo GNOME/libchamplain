@@ -1019,7 +1019,7 @@ champlain_view_init (ChamplainView *view)
 
   /* Setup viewport */
   priv->viewport = g_object_ref (champlain_viewport_new ());
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport), priv->viewport_container);
+  champlain_viewport_set_child (CHAMPLAIN_VIEWPORT (priv->viewport), priv->viewport_container);
   
   g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
 

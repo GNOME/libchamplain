@@ -30,9 +30,9 @@
 #include "champlain-private.h"
 
 
-G_DEFINE_TYPE (ChamplainViewport, champlain_viewport, CLUTTER_TYPE_GROUP)
+G_DEFINE_TYPE (ChamplainViewport, champlain_viewport, CLUTTER_TYPE_ACTOR)
 
-#define VIEWPORT_PRIVATE(o) \
+#define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_VIEWPORT, \
   ChamplainViewportPrivate))
 
@@ -45,6 +45,8 @@ struct _ChamplainViewportPrivate
   ChamplainAdjustment *vadjustment;
 
   gboolean sync_adjustments;
+  ClutterActor *child;
+  ClutterActor *content_group;
 };
 
 enum
@@ -174,34 +176,86 @@ champlain_viewport_dispose (GObject *gobject)
   G_OBJECT_CLASS (champlain_viewport_parent_class)->dispose (gobject);
 }
 
+
 static void
-champlain_viewport_paint (ClutterActor *self)
+paint (ClutterActor *self)
 {
-  ChamplainViewportPrivate *priv = CHAMPLAIN_VIEWPORT (self)->priv;
-
-  cogl_push_matrix ();
-
-  cogl_translate ((priv->x) * -1.0,
-                  (priv->y) * -1.0,
-                  0.0);
-
-  CLUTTER_ACTOR_CLASS (champlain_viewport_parent_class)->paint (self);
-
-  cogl_pop_matrix ();
+  ChamplainViewportPrivate *priv = GET_PRIVATE (self);
+  
+  clutter_actor_paint (priv->content_group);
 }
 
-static void
-champlain_viewport_pick (ClutterActor       *self,
-                    const ClutterColor *color)
-{
-  champlain_viewport_paint (self);
-}
 
 static void
-champlain_viewport_allocate (ClutterActor          *self,
+pick (ClutterActor *self, 
+    const ClutterColor *color)
+{
+  ChamplainViewportPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_viewport_parent_class)->pick (self, color);
+
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+get_preferred_width (ClutterActor *self,
+    gfloat for_height,
+    gfloat *min_width_p,
+    gfloat *natural_width_p)
+{
+  ChamplainViewportPrivate *priv = GET_PRIVATE (self);
+
+  clutter_actor_get_preferred_width (CLUTTER_ACTOR (priv->content_group),
+      for_height,
+      min_width_p,
+      natural_width_p);
+}
+
+
+static void
+get_preferred_height (ClutterActor *self,
+    gfloat for_width,
+    gfloat *min_height_p,
+    gfloat *natural_height_p)
+{
+  ChamplainViewportPrivate *priv = GET_PRIVATE (self);
+
+  clutter_actor_get_preferred_height (CLUTTER_ACTOR (priv->content_group),
+      for_width,
+      min_height_p,
+      natural_height_p);
+}
+
+
+static void
+map (ClutterActor *self)
+{
+  ChamplainViewportPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_viewport_parent_class)->map (self);
+
+  clutter_actor_map (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+unmap (ClutterActor *self)
+{
+  ChamplainViewportPrivate *priv = GET_PRIVATE (self);
+
+  CLUTTER_ACTOR_CLASS (champlain_viewport_parent_class)->unmap (self);
+
+  clutter_actor_unmap (CLUTTER_ACTOR (priv->content_group));
+}
+
+
+static void
+allocate (ClutterActor          *self,
                         const ClutterActorBox *box,
                         ClutterAllocationFlags flags)
 {
+  ClutterActorBox child_box;
   CoglFixed prev_value;
 
   ChamplainViewportPrivate *priv = CHAMPLAIN_VIEWPORT (self)->priv;
@@ -236,6 +290,13 @@ champlain_viewport_allocate (ClutterActor          *self,
           champlain_adjustment_set_value (priv->vadjustment, prev_value);
         }
     }
+
+  child_box.x1 = 0;
+  child_box.x2 = box->x2 - box->x1;
+  child_box.y1 = 0;
+  child_box.y2 = box->y2 - box->y1;
+
+  clutter_actor_allocate (CLUTTER_ACTOR (priv->content_group), &child_box, flags);
 }
 
 static void
@@ -250,9 +311,13 @@ champlain_viewport_class_init (ChamplainViewportClass *klass)
   gobject_class->set_property = champlain_viewport_set_property;
   gobject_class->dispose = champlain_viewport_dispose;
 
-  actor_class->paint = champlain_viewport_paint;
-  actor_class->pick = champlain_viewport_pick;
-  actor_class->allocate = champlain_viewport_allocate;
+  actor_class->get_preferred_width = get_preferred_width;
+  actor_class->get_preferred_height = get_preferred_height;
+  actor_class->allocate = allocate;
+  actor_class->paint = paint;
+  actor_class->pick = pick;
+  actor_class->map = map;
+  actor_class->unmap = unmap;
 
   g_object_class_install_property (gobject_class,
                                    PROP_X_ORIGIN,
@@ -478,9 +543,14 @@ clip_notify_cb (ClutterActor *actor,
 static void
 champlain_viewport_init (ChamplainViewport *self)
 {
-  self->priv = VIEWPORT_PRIVATE (self);
+  self->priv = GET_PRIVATE (self);
 
   self->priv->sync_adjustments = TRUE;
+
+  self->priv->child = NULL;
+  self->priv->content_group = clutter_group_new ();
+  clutter_actor_set_parent (CLUTTER_ACTOR (self->priv->content_group), CLUTTER_ACTOR (self));
+  clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
 
   g_signal_connect (self, "notify::clip",
                     G_CALLBACK (clip_notify_cb), self);
@@ -526,6 +596,9 @@ champlain_viewport_set_origin (ChamplainViewport *viewport,
     }
 
   g_object_thaw_notify (G_OBJECT (viewport));
+  
+  if (priv->child)
+    clutter_actor_set_position (priv->child, -x, -y);
 
   clutter_actor_queue_redraw (CLUTTER_ACTOR (viewport));
 }
@@ -546,4 +619,17 @@ champlain_viewport_get_origin (ChamplainViewport *viewport,
 
   if (y)
     *y = priv->y;
+}
+
+
+void 
+champlain_viewport_set_child (ChamplainViewport *viewport, ClutterActor *child)
+{
+  ChamplainViewportPrivate *priv = viewport->priv;
+  
+  if (priv->child)
+    clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), priv->child);
+    
+  priv->child = child;
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), child);  
 }

@@ -863,7 +863,6 @@ captured_event_cb (ClutterActor     *actor,
 static void
 champlain_finger_scroll_init (ChamplainFingerScroll *self)
 {
-  ClutterActor *scrollbar;
   ChamplainFingerScrollPrivate *priv = self->priv = FINGER_SCROLL_PRIVATE (self);
 
   priv->motion_buffer = g_array_sized_new (FALSE, TRUE,
