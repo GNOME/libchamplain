@@ -903,11 +903,10 @@ champlain_tile_display_content (ChamplainTile *self)
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->content_actor);
 
-  clutter_actor_set_opacity (CLUTTER_ACTOR (self), 0);
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
+  clutter_actor_set_opacity (CLUTTER_ACTOR (priv->content_actor), 0);
   if (priv->fade_in)
     {
-      animation = clutter_actor_animate (CLUTTER_ACTOR (self),
+      animation = clutter_actor_animate (CLUTTER_ACTOR (priv->content_actor),
           CLUTTER_EASE_IN_CUBIC,
           500,
           "opacity", 255,
@@ -915,7 +914,7 @@ champlain_tile_display_content (ChamplainTile *self)
     }
   else
     {
-      animation = clutter_actor_animate (CLUTTER_ACTOR (self),
+      animation = clutter_actor_animate (CLUTTER_ACTOR (priv->content_actor),
           CLUTTER_LINEAR,
           150,
           "opacity", 255,
