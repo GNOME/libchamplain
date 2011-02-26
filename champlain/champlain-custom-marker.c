@@ -106,7 +106,6 @@ raise_actor (ClutterContainer *container,
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
   
   clutter_container_raise_child (priv->content_group, actor, sibling);  
-  clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
 
 static void
@@ -117,7 +116,6 @@ lower_actor (ClutterContainer *container,
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
   
   clutter_container_lower_child (priv->content_group, actor, sibling);  
-  clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
 
 static void
@@ -126,7 +124,6 @@ sort_depth_order (ClutterContainer *container)
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
   
   clutter_container_sort_depth_order (priv->content_group);  
-  clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
 
 static void

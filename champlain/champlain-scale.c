@@ -368,7 +368,6 @@ redraw_scale (ChamplainScale *scale)
   cairo_destroy (cr);
 
   priv->redraw_scheduled = FALSE;
-  clutter_actor_queue_redraw (CLUTTER_ACTOR (scale));
 }
 
 

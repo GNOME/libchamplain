@@ -736,7 +736,6 @@ redraw_path (ChamplainPathLayer *layer)
   cairo_destroy (cr);
 
   priv->redraw_scheduled = FALSE;
-  clutter_actor_queue_redraw (CLUTTER_ACTOR (layer));
   
   return FALSE;
 }
