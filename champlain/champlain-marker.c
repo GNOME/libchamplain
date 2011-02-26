@@ -482,7 +482,6 @@ capture_release_event_cb (ClutterActor        *stage,
                                         capture_release_event_cb,
                                         marker);
   
-  clutter_set_motion_events_enabled (TRUE);
   if (priv->moved)
     g_signal_emit_by_name (marker, "drag-finish", event);
   else
@@ -542,8 +541,6 @@ button_press_event_cb (ClutterActor        *actor,
                             "captured-event",
                             G_CALLBACK (capture_release_event_cb),
                             marker);
-
-          clutter_set_motion_events_enabled (FALSE);
         }
     }
   else
