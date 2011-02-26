@@ -225,7 +225,7 @@ champlain_scale_class_init (ChamplainScaleClass *klass)
 }
 
 
-static void
+static gboolean
 redraw_scale (ChamplainScale *scale)
 {
   static gfloat previous_m_per_pixel = 0.0;
@@ -247,8 +247,10 @@ redraw_scale (ChamplainScale *scale)
   gfloat offset;
   ChamplainMapSource *map_source;
 
+  priv->redraw_scheduled = FALSE;
+
   if (!priv->view)
-    return;
+    return FALSE;
 
   zoom_level = champlain_view_get_zoom_level (priv->view);
   map_source = champlain_view_get_map_source (priv->view);
@@ -260,7 +262,7 @@ redraw_scale (ChamplainScale *scale)
    * since at low levels the value changes alot, and not at high levels */
   if (fabs (m_per_pixel - previous_m_per_pixel) < 10 &&
       previous_zoom_level == zoom_level)
-    return;
+    return FALSE;
 
   previous_m_per_pixel = m_per_pixel;
   previous_zoom_level = zoom_level;
@@ -367,7 +369,7 @@ redraw_scale (ChamplainScale *scale)
 
   cairo_destroy (cr);
 
-  priv->redraw_scheduled = FALSE;
+  return FALSE;
 }
 
 
