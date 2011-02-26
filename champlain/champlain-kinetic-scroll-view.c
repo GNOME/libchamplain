@@ -429,7 +429,7 @@ motion_event_cb (ClutterActor *stage,
 
       if (!priv->in_drag)
         {
-          guint threshold = 8; // default value
+          guint threshold = 4;
 
           motion = &g_array_index (priv->motion_buffer,
                                    ChamplainKineticScrollViewMotion, 0);
