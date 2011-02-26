@@ -1682,7 +1682,6 @@ champlain_view_add_layer (ChamplainView *view,
       CLUTTER_ACTOR (layer));
   champlain_layer_set_view (layer, view);
   clutter_actor_raise_top (CLUTTER_ACTOR (layer));
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (view));
 }
 
 
@@ -1708,7 +1707,6 @@ champlain_view_remove_layer (ChamplainView *view,
 
   clutter_container_remove_actor (CLUTTER_CONTAINER (view->priv->user_layers),
       CLUTTER_ACTOR (layer));
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (view));
 }
 
 

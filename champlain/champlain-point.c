@@ -243,8 +243,6 @@ draw_point (ChamplainPoint *point)
   cairo_stroke (cr);
 
   cairo_destroy (cr);
-
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (point));
 }
 
 

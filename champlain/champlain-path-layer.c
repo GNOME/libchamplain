@@ -687,10 +687,7 @@ redraw_path (ChamplainPathLayer *layer)
   clutter_cairo_texture_get_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), &last_width, &last_height);
 
   if ((guint)width != last_width || (guint)height != last_height)
-    {
-      clutter_cairo_texture_set_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), width, height);
-      clutter_actor_queue_relayout (CLUTTER_ACTOR (layer));
-    }
+    clutter_cairo_texture_set_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), width, height);
 
   champlain_view_get_viewport_origin (priv->view, &x, &y);
   clutter_actor_set_position (priv->path_actor, x, y);

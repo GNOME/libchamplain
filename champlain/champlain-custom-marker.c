@@ -77,7 +77,6 @@ add_actor (ClutterContainer *container,
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
   
   clutter_container_add_actor (priv->content_group, actor);  
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (container));
 }
 
 static void
@@ -87,7 +86,6 @@ remove_actor (ClutterContainer *container,
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
   
   clutter_container_remove_actor (priv->content_group, actor);  
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (container));
 }
 
 static void
