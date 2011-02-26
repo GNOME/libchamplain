@@ -675,6 +675,8 @@ redraw_path (ChamplainPathLayer *layer)
   gint x, y;
   guint last_width, last_height;
   
+  priv->redraw_scheduled = FALSE;
+  
   /* layer not yet added to the view */
   if (view == NULL)
     return FALSE;
@@ -734,8 +736,6 @@ redraw_path (ChamplainPathLayer *layer)
     cairo_stroke (cr);
 
   cairo_destroy (cr);
-
-  priv->redraw_scheduled = FALSE;
   
   return FALSE;
 }
