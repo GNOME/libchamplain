@@ -1,8 +1,6 @@
 /*
  * Copyright (C) 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
- *
- * This file is inspired by clutter-color.c which is
- * Copyright (C) 2006 OpenedHand, and has the same license.
+ * Copyright (C) 2011 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
