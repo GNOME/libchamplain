@@ -219,10 +219,10 @@ AC_CONFIG_FILES([build/Makefile
                  docs/reference/version.xml
                  docs/reference-gtk/Makefile
                  docs/reference-gtk/version.xml
-                 champlain.pc
-                 champlain-uninstalled.pc
-                 champlain-gtk.pc
-                 champlain-gtk-uninstalled.pc
+                 champlain-$CHAMPLAIN_API_VERSION.pc:champlain.pc.in
+                 champlain-$CHAMPLAIN_API_VERSION-uninstalled.pc:champlain-uninstalled.pc.in
+                 champlain-gtk-$CHAMPLAIN_API_VERSION.pc:champlain-gtk.pc.in
+                 champlain-gtk-$CHAMPLAIN_API_VERSION-uninstalled.pc:champlain-gtk-uninstalled.pc.in
                  champlain-gtk/Makefile
                  bindings/Makefile
                  bindings/vala/Makefile
@@ -233,8 +233,8 @@ AC_CONFIG_FILES([build/Makefile
                  bindings/vala/champlain-gtk/Makefile
                  bindings/vala/champlain-gtk/create.sh
                  bindings/vala/demos/Makefile
-                 champlain-memphis.pc
-                 champlain-memphis-uninstalled.pc])
+                 champlain-memphis-$CHAMPLAIN_API_VERSION.pc:champlain-memphis.pc.in
+                 champlain-memphis-$CHAMPLAIN_API_VERSION-uninstalled.pc:champlain-memphis-uninstalled.pc.in])
 AC_CONFIG_FILES([Makefile],
                 [chmod +x bindings/vala/champlain/create.sh
                  chmod +x bindings/vala/champlain-gtk/create.sh
