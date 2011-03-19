@@ -206,6 +206,39 @@ unmap (ClutterActor *self)
 
 
 static void
+redraw_license (ChamplainLicense *license)
+{
+  ChamplainLicensePrivate *priv = license->priv;
+  gchar *text;
+  gfloat width, height;
+  ChamplainMapSource *map_source;
+  
+  if (!priv->view)
+    return;
+
+  map_source = champlain_view_get_map_source (priv->view);
+  
+  if (!map_source)
+    return;
+  
+  if (priv->extra_text)
+    text = g_strjoin ("\n",
+          priv->extra_text,
+          champlain_map_source_get_license (map_source),
+          NULL);
+  else
+    text = g_strdup (champlain_map_source_get_license (map_source));
+
+  clutter_text_set_text (CLUTTER_TEXT (priv->license_actor), text);
+  clutter_actor_get_size (priv->license_actor, &width, &height);
+  clutter_actor_set_size (CLUTTER_ACTOR (license), width + 2 * WIDTH_PADDING, height + 2 * HEIGHT_PADDING);
+  clutter_actor_set_position (priv->license_actor, WIDTH_PADDING, HEIGHT_PADDING);
+
+  g_free (text);
+}
+
+
+static void
 redraw_license_cb (G_GNUC_UNUSED GObject *gobject,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainLicense *license)
@@ -277,39 +310,6 @@ champlain_license_class_init (ChamplainLicenseClass *klass)
           "Additional license text",
           "",
           CHAMPLAIN_PARAM_READWRITE));
-}
-
-
-static void
-redraw_license (ChamplainLicense *license)
-{
-  ChamplainLicensePrivate *priv = license->priv;
-  gchar *text;
-  gfloat width, height;
-  ChamplainMapSource *map_source;
-  
-  if (!priv->view)
-    return;
-
-  map_source = champlain_view_get_map_source (priv->view);
-  
-  if (!map_source)
-    return;
-  
-  if (priv->extra_text)
-    text = g_strjoin ("\n",
-          priv->extra_text,
-          champlain_map_source_get_license (map_source),
-          NULL);
-  else
-    text = g_strdup (champlain_map_source_get_license (map_source));
-
-  clutter_text_set_text (CLUTTER_TEXT (priv->license_actor), text);
-  clutter_actor_get_size (priv->license_actor, &width, &height);
-  clutter_actor_set_size (CLUTTER_ACTOR (license), width + 2 * WIDTH_PADDING, height + 2 * HEIGHT_PADDING);
-  clutter_actor_set_position (priv->license_actor, WIDTH_PADDING, HEIGHT_PADDING);
-
-  g_free (text);
 }
 
 
