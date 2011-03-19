@@ -67,12 +67,12 @@ enum
 static ClutterColor DEFAULT_FILL_COLOR = { 0xcc, 0x00, 0x00, 0xaa };
 static ClutterColor DEFAULT_STROKE_COLOR = { 0xa4, 0x00, 0x00, 0xff };
 
-//static guint signals[LAST_SIGNAL] = { 0, };
+/* static guint signals[LAST_SIGNAL] = { 0, }; */
 
 struct _ChamplainPathLayerPrivate
 {
   ChamplainView *view;
-  
+
   gboolean closed_path;
   ClutterColor *stroke_color;
   gboolean fill;
@@ -80,7 +80,7 @@ struct _ChamplainPathLayerPrivate
   gboolean stroke;
   gdouble stroke_width;
   gboolean visible;
-  
+
   ClutterGroup *content_group;
   ClutterActor *path_actor;
   GList *nodes;
@@ -105,7 +105,7 @@ champlain_path_layer_get_property (GObject *object,
 {
   ChamplainPathLayer *self = CHAMPLAIN_PATH_LAYER (object);
   ChamplainPathLayerPrivate *priv = self->priv;
-  
+
   switch (property_id)
     {
     case PROP_CLOSED_PATH:
@@ -135,7 +135,7 @@ champlain_path_layer_get_property (GObject *object,
     case PROP_VISIBLE:
       g_value_set_boolean (value, priv->visible);
       break;
-      
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -150,7 +150,7 @@ champlain_path_layer_set_property (GObject *object,
 {
   ChamplainPathLayer *self = CHAMPLAIN_PATH_LAYER (object);
   ChamplainPathLayerPrivate *priv = self->priv;
-  
+
   switch (property_id)
     {
     case PROP_CLOSED_PATH:
@@ -183,10 +183,10 @@ champlain_path_layer_set_property (GObject *object,
       break;
 
     case PROP_VISIBLE:
-        champlain_path_layer_set_visible (CHAMPLAIN_PATH_LAYER (object),
-            g_value_get_boolean (value));
+      champlain_path_layer_set_visible (CHAMPLAIN_PATH_LAYER (object),
+          g_value_get_boolean (value));
       break;
-      
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -197,13 +197,13 @@ static void
 paint (ClutterActor *self)
 {
   ChamplainPathLayerPrivate *priv = GET_PRIVATE (self);
-  
+
   clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
 }
 
 
 static void
-pick (ClutterActor *self, 
+pick (ClutterActor *self,
     const ClutterColor *color)
 {
   ChamplainPathLayerPrivate *priv = GET_PRIVATE (self);
@@ -286,13 +286,12 @@ unmap (ClutterActor *self)
 }
 
 
-
 static void
 champlain_path_layer_dispose (GObject *object)
 {
   ChamplainPathLayer *self = CHAMPLAIN_PATH_LAYER (object);
   ChamplainPathLayerPrivate *priv = self->priv;
-  
+
   if (priv->view != NULL)
     {
       set_view (CHAMPLAIN_LAYER (self), NULL);
@@ -313,7 +312,7 @@ champlain_path_layer_finalize (GObject *object)
 {
   ChamplainPathLayer *self = CHAMPLAIN_PATH_LAYER (object);
   ChamplainPathLayerPrivate *priv = self->priv;
-  
+
   clutter_color_free (priv->stroke_color);
   clutter_color_free (priv->fill_color);
   g_list_free (priv->nodes);
@@ -330,12 +329,12 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
   ChamplainLayerClass *layer_class = CHAMPLAIN_LAYER_CLASS (klass);
 
   g_type_class_add_private (klass, sizeof (ChamplainPathLayerPrivate));
-  
+
   object_class->finalize = champlain_path_layer_finalize;
   object_class->dispose = champlain_path_layer_dispose;
   object_class->get_property = champlain_path_layer_get_property;
   object_class->set_property = champlain_path_layer_set_property;
-  
+
   actor_class->get_preferred_width = get_preferred_width;
   actor_class->get_preferred_height = get_preferred_height;
   actor_class->allocate = allocate;
@@ -343,7 +342,7 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
   actor_class->pick = pick;
   actor_class->map = map;
   actor_class->unmap = unmap;
-  
+
   layer_class->set_view = set_view;
   layer_class->get_bounding_box = get_bounding_box;
 
@@ -449,7 +448,6 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
           "The path's visibility",
           TRUE,
           CHAMPLAIN_PARAM_READWRITE));
-
 }
 
 
@@ -457,7 +455,7 @@ static void
 champlain_path_layer_init (ChamplainPathLayer *self)
 {
   ChamplainPathLayerPrivate *priv;
-  
+
   self->priv = GET_PRIVATE (self);
   priv = self->priv;
   priv->view = NULL;
@@ -475,8 +473,8 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
 
-  //TODO destroy + ref()
-  priv->path_actor =  clutter_cairo_texture_new (256, 256);
+  /* TODO destroy + ref() */
+  priv->path_actor = clutter_cairo_texture_new (256, 256);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->path_actor);
 
   clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
@@ -526,7 +524,7 @@ add_node (ChamplainPathLayer *layer,
 
   if (append)
     priv->nodes = g_list_append (priv->nodes, location);
-  else  
+  else
     priv->nodes = g_list_insert (priv->nodes, location, position);
   schedule_redraw (layer);
 }
@@ -560,21 +558,21 @@ champlain_path_layer_add_node (ChamplainPathLayer *layer,
  *
  * Since: 0.10
  */
-void 
+void
 champlain_path_layer_remove_all (ChamplainPathLayer *layer)
 {
   ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
-  
+
   g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
 
   for (elem = priv->nodes; elem != NULL; elem = elem->next)
     {
       GObject *node = G_OBJECT (elem->data);
-      
+
       g_signal_handlers_disconnect_by_func (node,
           G_CALLBACK (position_notify), layer);
-          
+
       g_object_unref (node);
     }
 
@@ -590,7 +588,7 @@ champlain_path_layer_remove_all (ChamplainPathLayer *layer)
  *
  * Gets a copy of the list of all #ChamplainLocation objects inserted into the layer. You should
  * free the list but not its contents.
- * 
+ *
  * Returns: (transfer container) (element-type ChamplainLocation): the list
  *
  * Since: 0.10
@@ -618,7 +616,7 @@ champlain_path_layer_remove_node (ChamplainPathLayer *layer,
     ChamplainLocation *location)
 {
   ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
-  
+
   g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
   g_return_if_fail (CHAMPLAIN_IS_LOCATION (location));
 
@@ -641,7 +639,7 @@ champlain_path_layer_remove_node (ChamplainPathLayer *layer,
  *
  * Since: 0.10
  */
-void 
+void
 champlain_path_layer_insert_node (ChamplainPathLayer *layer,
     ChamplainLocation *location,
     guint position)
@@ -653,14 +651,12 @@ champlain_path_layer_insert_node (ChamplainPathLayer *layer,
 }
 
 
-
-
 static void
 relocate_cb (G_GNUC_UNUSED GObject *gobject,
     ChamplainPathLayer *layer)
 {
   g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
-    
+
   schedule_redraw (layer);
 }
 
@@ -675,9 +671,9 @@ redraw_path (ChamplainPathLayer *layer)
   ChamplainView *view = priv->view;
   gint x, y;
   guint last_width, last_height;
-  
+
   priv->redraw_scheduled = FALSE;
-  
+
   /* layer not yet added to the view */
   if (view == NULL)
     return FALSE;
@@ -686,10 +682,10 @@ redraw_path (ChamplainPathLayer *layer)
 
   if (!priv->visible || width == 0.0 || height == 0.0)
     return FALSE;
-    
+
   clutter_cairo_texture_get_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), &last_width, &last_height);
 
-  if ((guint)width != last_width || (guint)height != last_height)
+  if ((guint) width != last_width || (guint) height != last_height)
     clutter_cairo_texture_set_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), width, height);
 
   champlain_view_get_viewport_origin (priv->view, &x, &y);
@@ -697,11 +693,11 @@ redraw_path (ChamplainPathLayer *layer)
 
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (priv->path_actor));
 
-  /* Clear the drawing area */  
+  /* Clear the drawing area */
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-  cairo_paint(cr);
+  cairo_paint (cr);
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
-  
+
   for (elem = priv->nodes; elem != NULL; elem = elem->next)
     {
       ChamplainLocation *location = CHAMPLAIN_LOCATION (elem->data);
@@ -737,7 +733,7 @@ redraw_path (ChamplainPathLayer *layer)
     cairo_stroke (cr);
 
   cairo_destroy (cr);
-  
+
   return FALSE;
 }
 
@@ -765,33 +761,33 @@ redraw_path_cb (G_GNUC_UNUSED GObject *gobject,
 }
 
 
-static void 
+static void
 set_view (ChamplainLayer *layer,
     ChamplainView *view)
 {
   g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer) && (CHAMPLAIN_IS_VIEW (view) || view == NULL));
-  
+
   ChamplainPathLayer *path_layer = CHAMPLAIN_PATH_LAYER (layer);
-  
+
   if (path_layer->priv->view != NULL)
     {
       g_signal_handlers_disconnect_by_func (path_layer->priv->view,
-        G_CALLBACK (relocate_cb), path_layer);
+          G_CALLBACK (relocate_cb), path_layer);
       g_object_unref (path_layer->priv->view);
     }
-  
+
   path_layer->priv->view = view;
 
   if (view != NULL)
     {
       g_object_ref (view);
-  
+
       g_signal_connect (view, "layer-relocated",
-        G_CALLBACK (relocate_cb), layer);
+          G_CALLBACK (relocate_cb), layer);
 
       g_signal_connect (view, "notify::latitude",
-        G_CALLBACK (redraw_path_cb), layer);
-        
+          G_CALLBACK (redraw_path_cb), layer);
+
       schedule_redraw (path_layer);
     }
 }
@@ -803,18 +799,18 @@ get_bounding_box (ChamplainLayer *layer)
   ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
   GList *elem;
   ChamplainBoundingBox *bbox;
-  
+
   bbox = champlain_bounding_box_new ();
 
   for (elem = priv->nodes; elem != NULL; elem = elem->next)
     {
       ChamplainLocation *location = CHAMPLAIN_LOCATION (elem->data);
       gdouble lat, lon;
-      
+
       g_object_get (G_OBJECT (location), "latitude", &lat, "longitude", &lon,
           NULL);
-          
-      champlain_bounding_box_extend (bbox, lat, lon); 
+
+      champlain_bounding_box_extend (bbox, lat, lon);
     }
 
   if (bbox->left == bbox->right)
@@ -1080,11 +1076,10 @@ champlain_path_layer_set_visible (ChamplainPathLayer *layer,
  *
  * Since: 0.10
  */
-gboolean 
+gboolean
 champlain_path_layer_get_visible (ChamplainPathLayer *layer)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer), FALSE);
 
   return layer->priv->visible;
 }
-

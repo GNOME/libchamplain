@@ -46,7 +46,7 @@ typedef struct _ChamplainLocationIface ChamplainLocationIface;
  * @get_latitude: virtual function for obtaining latitude.
  * @get_longitude: virtual function for obtaining longitude.
  * @set_location: virtual function for setting position.
- * 
+ *
  * An interface common to objects having latitude and longitude.
  */
 struct _ChamplainLocationIface
@@ -55,11 +55,11 @@ struct _ChamplainLocationIface
   GTypeInterface g_iface;
 
   /*< public >*/
-  gdouble (* get_latitude) (ChamplainLocation *location);
-  gdouble (* get_longitude) (ChamplainLocation *location);
-  void (* set_location) (ChamplainLocation *location,
-    gdouble latitude,
-    gdouble longitude);
+  gdouble (*get_latitude)(ChamplainLocation *location);
+  gdouble (*get_longitude)(ChamplainLocation *location);
+  void (*set_location)(ChamplainLocation *location,
+      gdouble latitude,
+      gdouble longitude);
 };
 
 GType champlain_location_get_type (void) G_GNUC_CONST;

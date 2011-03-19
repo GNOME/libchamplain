@@ -39,8 +39,8 @@ enum
   PROP_MIN_ZOOM_LEVEL,
   PROP_MAX_ZOOM_LEVEL,
   PROP_TILE_SIZE,
-  PROP_PROJECTION, 
-  PROP_CONSTRUCTOR, 
+  PROP_PROJECTION,
+  PROP_CONSTRUCTOR,
   PROP_DATA,
 };
 
@@ -211,7 +211,7 @@ champlain_map_source_desc_set_property (GObject *object,
 static void
 champlain_map_source_desc_dispose (GObject *object)
 {
-//  ChamplainMapSourceDesc *desc = CHAMPLAIN_MAP_SOURCE_DESC (object);
+/*  ChamplainMapSourceDesc *desc = CHAMPLAIN_MAP_SOURCE_DESC (object); */
 
   G_OBJECT_CLASS (champlain_map_source_desc_parent_class)->dispose (object);
 }
@@ -221,13 +221,13 @@ static void
 champlain_map_source_desc_finalize (GObject *object)
 {
   ChamplainMapSourceDescPrivate *priv = CHAMPLAIN_MAP_SOURCE_DESC (object)->priv;
-  
+
   g_free (priv->id);
   g_free (priv->name);
   g_free (priv->license);
   g_free (priv->license_uri);
   g_free (priv->uri_format);
-  
+
   G_OBJECT_CLASS (champlain_map_source_desc_parent_class)->finalize (object);
 }
 
@@ -273,7 +273,7 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           "Map source name",
           "",
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
-          
+
   /**
    * ChamplainMapSourceDesc:license:
    *
@@ -288,7 +288,7 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           "Map source license",
           "",
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
-          
+
   /**
    * ChamplainMapSourceDesc:license-uri:
    *
@@ -331,7 +331,7 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
       g_param_spec_uint ("min-zoom-level",
           "Min zoom level",
           "The lowest allowed level of zoom",
-          0, 20, 0, 
+          0, 20, 0,
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
   /**
@@ -346,7 +346,7 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
       g_param_spec_uint ("max-zoom-level",
           "Max zoom level",
           "The highest allowed level of zoom",
-          0, 20, 20, 
+          0, 20, 20,
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
   /**
@@ -430,7 +430,6 @@ champlain_map_source_desc_init (ChamplainMapSourceDesc *desc)
   priv->projection = CHAMPLAIN_MAP_PROJECTION_MERCATOR;
   priv->constructor = NULL;
   priv->data = NULL;
-
 }
 
 
@@ -448,7 +447,7 @@ champlain_map_source_desc_init (ChamplainMapSourceDesc *desc)
  * @constructor: the map source's constructor
  * @data: user data passed to the constructor
  *
- * Constructor of #ChamplainMapSourceDesc which describes a #ChamplainMapSource.  
+ * Constructor of #ChamplainMapSourceDesc which describes a #ChamplainMapSource.
  * This is returned by #champlain_map_source_factory_get_registered
  *
  * Returns: a constructed #ChamplainMapSourceDesc object
@@ -457,26 +456,26 @@ champlain_map_source_desc_init (ChamplainMapSourceDesc *desc)
  */
 ChamplainMapSourceDesc *
 champlain_map_source_desc_new_full (
-  gchar *id,
-  gchar *name,
-  gchar *license,
-  gchar *license_uri,
-  guint min_zoom,
-  guint max_zoom,
-  guint tile_size,
-  ChamplainMapProjection projection,
-  gchar *uri_format,
-  ChamplainMapSourceConstructor constructor,
-  gpointer data)
+    gchar *id,
+    gchar *name,
+    gchar *license,
+    gchar *license_uri,
+    guint min_zoom,
+    guint max_zoom,
+    guint tile_size,
+    ChamplainMapProjection projection,
+    gchar *uri_format,
+    ChamplainMapSourceConstructor constructor,
+    gpointer data)
 {
-  return g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE_DESC, 
-      "id", id, 
+  return g_object_new (CHAMPLAIN_TYPE_MAP_SOURCE_DESC,
+      "id", id,
       "name", name,
       "license", license,
       "license-uri", license_uri,
       "min-zoom-level", min_zoom,
       "max-zoom-level", max_zoom,
-      "tile-size", tile_size, 
+      "tile-size", tile_size,
       "projection", projection,
       "uri-format", uri_format,
       "constructor", constructor,
@@ -685,12 +684,12 @@ champlain_map_source_desc_get_data (ChamplainMapSourceDesc *desc)
  *
  * Since: 0.10
  */
-ChamplainMapSourceConstructor 
+ChamplainMapSourceConstructor
 champlain_map_source_desc_get_constructor (ChamplainMapSourceDesc *desc)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE_DESC (desc), NULL);
 
-  return desc->priv->constructor;    
+  return desc->priv->constructor;
 }
 
 
@@ -839,4 +838,3 @@ set_constructor (ChamplainMapSourceDesc *desc,
 
   g_object_notify (G_OBJECT (desc), "constructor");
 }
-

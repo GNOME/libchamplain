@@ -251,10 +251,10 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
    * Since: 0.4
    */
   pspec = g_param_spec_string ("id",
-      "Id",
-      "The id of the tile source",
-      "",
-      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        "Id",
+        "The id of the tile source",
+        "",
+        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_ID, pspec);
 
   /**
@@ -265,10 +265,10 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
    * Since: 0.4
    */
   pspec = g_param_spec_string ("name",
-      "Name",
-      "The name of the tile source",
-      "",
-      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        "Name",
+        "The name of the tile source",
+        "",
+        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_NAME, pspec);
 
   /**
@@ -279,10 +279,10 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
    * Since: 0.4
    */
   pspec = g_param_spec_string ("license",
-      "License",
-      "The usage license of the tile source",
-      "",
-      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        "License",
+        "The usage license of the tile source",
+        "",
+        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_LICENSE, pspec);
 
   /**
@@ -293,10 +293,10 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
    * Since: 0.4
    */
   pspec = g_param_spec_string ("license-uri",
-      "License-uri",
-      "The usage license's uri for more information",
-      "",
-      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        "License-uri",
+        "The usage license's uri for more information",
+        "",
+        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_LICENSE_URI, pspec);
 
   /**
@@ -307,12 +307,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
    * Since: 0.4
    */
   pspec = g_param_spec_uint ("min-zoom-level",
-      "Minimum Zoom Level",
-      "The minimum zoom level",
-      0,
-      50,
-      0,
-      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        "Minimum Zoom Level",
+        "The minimum zoom level",
+        0,
+        50,
+        0,
+        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_MIN_ZOOM_LEVEL, pspec);
 
   /**
@@ -323,12 +323,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
    * Since: 0.4
    */
   pspec = g_param_spec_uint ("max-zoom-level",
-      "Maximum Zoom Level",
-      "The maximum zoom level",
-      0,
-      50,
-      18,
-      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        "Maximum Zoom Level",
+        "The maximum zoom level",
+        0,
+        50,
+        18,
+        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_MAX_ZOOM_LEVEL, pspec);
 
   /**
@@ -339,12 +339,12 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
    * Since: 0.4
    */
   pspec = g_param_spec_uint ("tile-size",
-      "Tile Size",
-      "The tile size",
-      0,
-      2048,
-      256,
-      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        "Tile Size",
+        "The tile size",
+        0,
+        2048,
+        256,
+        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_TILE_SIZE, pspec);
 
   /**
@@ -355,11 +355,11 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
    * Since: 0.4
    */
   pspec = g_param_spec_enum ("projection",
-      "Projection",
-      "The map projection",
-      CHAMPLAIN_TYPE_MAP_PROJECTION,
-      CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        "Projection",
+        "The map projection",
+        CHAMPLAIN_TYPE_MAP_PROJECTION,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_MAP_PROJECTION, pspec);
 
   /**
@@ -370,10 +370,10 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
    * Since: 0.6
    */
   pspec = g_param_spec_object ("cache",
-      "Cache",
-      "Cache used for tile sorage",
-      CHAMPLAIN_TYPE_TILE_CACHE,
-      G_PARAM_READWRITE);
+        "Cache",
+        "Cache used for tile sorage",
+        CHAMPLAIN_TYPE_TILE_CACHE,
+        G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_CACHE, pspec);
 }
 

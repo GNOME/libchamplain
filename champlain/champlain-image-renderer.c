@@ -132,7 +132,7 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
 
   if (!priv->data || priv->size == 0)
     goto finish;
-    
+
   loader = gdk_pixbuf_loader_new ();
   if (!gdk_pixbuf_loader_write (loader,
           (const guchar *) priv->data,

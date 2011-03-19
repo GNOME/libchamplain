@@ -86,7 +86,7 @@ void champlain_scale_set_max_width (ChamplainScale *scale,
     guint value);
 void champlain_scale_set_unit (ChamplainScale *scale,
     ChamplainUnit unit);
-    
+
 guint champlain_scale_get_max_width (ChamplainScale *scale);
 ChamplainUnit champlain_scale_get_unit (ChamplainScale *scale);
 

@@ -28,7 +28,7 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW            (champlain_kinetic_scroll_view_get_type())
+#define CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW            (champlain_kinetic_scroll_view_get_type ())
 #define CHAMPLAIN_KINETIC_SCROLL_VIEW(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW, ChamplainKineticScrollView))
 #define CHAMPLAIN_IS_KINETIC_SCROLL_VIEW(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW))
 #define CHAMPLAIN_KINETIC_SCROLL_VIEW_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW, ChamplainKineticScrollViewClass))
@@ -36,15 +36,15 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_KINETIC_SCROLL_VIEW_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW, ChamplainKineticScrollViewClass))
 
 
-typedef struct _ChamplainKineticScrollView          ChamplainKineticScrollView;
-typedef struct _ChamplainKineticScrollViewPrivate   ChamplainKineticScrollViewPrivate;
-typedef struct _ChamplainKineticScrollViewClass     ChamplainKineticScrollViewClass;
+typedef struct _ChamplainKineticScrollView ChamplainKineticScrollView;
+typedef struct _ChamplainKineticScrollViewPrivate ChamplainKineticScrollViewPrivate;
+typedef struct _ChamplainKineticScrollViewClass ChamplainKineticScrollViewClass;
 
 struct _ChamplainKineticScrollView
 {
   /*< private >*/
   ClutterActor parent_instance;
-  
+
   ChamplainKineticScrollViewPrivate *priv;
 };
 
@@ -55,9 +55,9 @@ struct _ChamplainKineticScrollViewClass
 
 GType champlain_kinetic_scroll_view_get_type (void) G_GNUC_CONST;
 
-ClutterActor *champlain_kinetic_scroll_view_new  (gboolean kinetic);
+ClutterActor *champlain_kinetic_scroll_view_new (gboolean kinetic);
 
-void          champlain_kinetic_scroll_view_stop (ChamplainKineticScrollView *scroll);
+void champlain_kinetic_scroll_view_stop (ChamplainKineticScrollView *scroll);
 
 G_END_DECLS
 

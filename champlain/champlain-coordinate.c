@@ -19,7 +19,7 @@
 /**
  * SECTION:champlain-coordinate
  * @short_description: The simpliest implementation of #ChamplainLocation
- * 
+ *
  * #ChamplainCoordinate is a simple object implementing #ChamplainLocation.
  */
 
@@ -47,8 +47,8 @@ static gdouble get_longitude (ChamplainLocation *location);
 static void location_interface_init (ChamplainLocationIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (ChamplainCoordinate, champlain_coordinate, G_TYPE_INITIALLY_UNOWNED,
-                         G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION,
-                                                location_interface_init));
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION,
+        location_interface_init));
 
 #define CHAMPLAIN_COORDINATE_GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_COORDINATE, ChamplainCoordinatePrivate))
@@ -77,7 +77,7 @@ champlain_coordinate_get_property (GObject *object,
     case PROP_LATITUDE:
       g_value_set_double (value, priv->lat);
       break;
-      
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -96,18 +96,18 @@ champlain_coordinate_set_property (GObject *object,
   switch (prop_id)
     {
     case PROP_LONGITUDE:
-    {
-      gdouble lon = g_value_get_double (value);
-      set_location (CHAMPLAIN_LOCATION (coordinate), priv->lat, lon);
-      break;
-    }
+      {
+        gdouble lon = g_value_get_double (value);
+        set_location (CHAMPLAIN_LOCATION (coordinate), priv->lat, lon);
+        break;
+      }
 
     case PROP_LATITUDE:
-    {
-      gdouble lat = g_value_get_double (value);
-      set_location (CHAMPLAIN_LOCATION (coordinate), lat, priv->lon);
-      break;
-    }
+      {
+        gdouble lat = g_value_get_double (value);
+        set_location (CHAMPLAIN_LOCATION (coordinate), lat, priv->lon);
+        break;
+      }
 
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -189,12 +189,12 @@ champlain_coordinate_class_init (ChamplainCoordinateClass *coordinate_class)
   object_class->set_property = champlain_coordinate_set_property;
 
   g_object_class_override_property (object_class,
-                                    PROP_LONGITUDE,
-                                    "longitude");
+      PROP_LONGITUDE,
+      "longitude");
 
   g_object_class_override_property (object_class,
-                                    PROP_LATITUDE,
-                                    "latitude");
+      PROP_LATITUDE,
+      "latitude");
 }
 
 
@@ -208,6 +208,7 @@ champlain_coordinate_init (ChamplainCoordinate *coordinate)
   priv->lat = 0;
   priv->lon = 0;
 }
+
 
 /**
  * champlain_coordinate_new:
@@ -229,8 +230,8 @@ champlain_coordinate_new ()
  * champlain_coordinate_new_full:
  * @latitude: the latitude coordinate
  * @longitude: the longitude coordinate
- * 
- * Creates a new instance of #ChamplainCoordinate initialized with the given 
+ *
+ * Creates a new instance of #ChamplainCoordinate initialized with the given
  * coordinates.
  *
  * Returns: the created instance.
@@ -238,11 +239,11 @@ champlain_coordinate_new ()
  * Since: 0.10
  */
 ChamplainCoordinate *
-champlain_coordinate_new_full (gdouble latitude, 
+champlain_coordinate_new_full (gdouble latitude,
     gdouble longitude)
 {
-  return CHAMPLAIN_COORDINATE (g_object_new (CHAMPLAIN_TYPE_COORDINATE, 
-      "latitude", latitude, 
-      "longitude", longitude, 
-      NULL));
+  return CHAMPLAIN_COORDINATE (g_object_new (CHAMPLAIN_TYPE_COORDINATE,
+          "latitude", latitude,
+          "longitude", longitude,
+          NULL));
 }

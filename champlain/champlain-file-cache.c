@@ -210,9 +210,9 @@ init_cache (ChamplainFileCache *file_cache)
   g_return_if_fail (create_cache_dir (priv->cache_dir));
 
   filename = g_build_filename (priv->cache_dir,
-      "cache.db", NULL);
+        "cache.db", NULL);
   error = sqlite3_open_v2 (filename, &priv->db,
-      SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+        SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
   g_free (filename);
 
   if (error == SQLITE_ERROR)
@@ -247,8 +247,8 @@ init_cache (ChamplainFileCache *file_cache)
     }
 
   error = sqlite3_prepare_v2 (priv->db,
-      "SELECT etag FROM tiles WHERE filename = ?", -1,
-      &priv->stmt_select, NULL);
+        "SELECT etag FROM tiles WHERE filename = ?", -1,
+        &priv->stmt_select, NULL);
   if (error != SQLITE_OK)
     {
       priv->stmt_select = NULL;
@@ -258,8 +258,8 @@ init_cache (ChamplainFileCache *file_cache)
     }
 
   error = sqlite3_prepare_v2 (priv->db,
-      "UPDATE tiles SET popularity = popularity + 1 WHERE filename = ?", -1,
-      &priv->stmt_update, NULL);
+        "UPDATE tiles SET popularity = popularity + 1 WHERE filename = ?", -1,
+        &priv->stmt_update, NULL);
   if (error != SQLITE_OK)
     {
       priv->stmt_update = NULL;
@@ -284,8 +284,8 @@ champlain_file_cache_constructed (GObject *object)
       priv->cache_dir = g_strdup ("/home/user/MyDocs/.Maps/");
 #else
       priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S,
-          g_get_user_cache_dir (),
-          "champlain", NULL);
+            g_get_user_cache_dir (),
+            "champlain", NULL);
 #endif
     }
 
@@ -322,12 +322,12 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
    * Since: 0.4
    */
   pspec = g_param_spec_uint ("size-limit",
-      "Size Limit",
-      "The cache's size limit (Mb)",
-      1,
-      G_MAXINT,
-      100000000,
-      G_PARAM_CONSTRUCT | G_PARAM_READWRITE);
+        "Size Limit",
+        "The cache's size limit (Mb)",
+        1,
+        G_MAXINT,
+        100000000,
+        G_PARAM_CONSTRUCT | G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_SIZE_LIMIT, pspec);
 
   /**
@@ -338,10 +338,10 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
    * Since: 0.6
    */
   pspec = g_param_spec_string ("cache-dir",
-      "Cache Directory",
-      "The directory of the cache",
-      cache_dir,
-      G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
+        "Cache Directory",
+        "The directory of the cache",
+        cache_dir,
+        G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_CACHE_DIR, pspec);
 
   tile_cache_class->store_tile = store_tile;
@@ -389,10 +389,10 @@ champlain_file_cache_new_full (guint size_limit,
   ChamplainFileCache *cache;
 
   cache = g_object_new (CHAMPLAIN_TYPE_FILE_CACHE,
-      "size-limit", size_limit,
-      "cache-dir", cache_dir,
-      "renderer", renderer,
-      NULL);
+        "size-limit", size_limit,
+        "cache-dir", cache_dir,
+        "renderer", renderer,
+        NULL);
   return cache;
 }
 
@@ -470,14 +470,14 @@ get_filename (ChamplainFileCache *file_cache,
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE (file_cache);
 
   gchar *filename = g_strdup_printf ("%s" G_DIR_SEPARATOR_S
-      "%s" G_DIR_SEPARATOR_S
-      "%d" G_DIR_SEPARATOR_S
-      "%d" G_DIR_SEPARATOR_S "%d.png",
-      priv->cache_dir,
-      champlain_map_source_get_id (map_source),
-      champlain_tile_get_zoom_level (tile),
-      champlain_tile_get_x (tile),
-      champlain_tile_get_y (tile));
+        "%s" G_DIR_SEPARATOR_S
+        "%d" G_DIR_SEPARATOR_S
+        "%d" G_DIR_SEPARATOR_S "%d.png",
+        priv->cache_dir,
+        champlain_map_source_get_id (map_source),
+        champlain_tile_get_zoom_level (tile),
+        champlain_tile_get_x (tile),
+        champlain_tile_get_y (tile));
   return filename;
 }
 
@@ -548,8 +548,8 @@ tile_rendered_cb (ChamplainTile *tile,
 
   /* Retrieve modification time */
   info = g_file_query_info (file,
-      G_FILE_ATTRIBUTE_TIME_MODIFIED,
-      G_FILE_QUERY_INFO_NONE, NULL, NULL);
+        G_FILE_ATTRIBUTE_TIME_MODIFIED,
+        G_FILE_QUERY_INFO_NONE, NULL, NULL);
   if (info)
     {
       g_file_info_get_modification_time (info, &modified_time);
@@ -644,7 +644,7 @@ file_loaded_cb (GFile *file,
     {
       gchar *path;
 
-      path = g_file_get_path(file);
+      path = g_file_get_path (file);
       DEBUG ("Failed to load tile %s, error: %s", path, error->message);
       g_free (path);
       contents = NULL;
@@ -728,7 +728,7 @@ refresh_tile_time (ChamplainTileCache *tile_cache,
   g_free (filename);
 
   info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED,
-      G_FILE_QUERY_INFO_NONE, NULL, NULL);
+        G_FILE_QUERY_INFO_NONE, NULL, NULL);
 
   if (info)
     {
@@ -740,7 +740,7 @@ refresh_tile_time (ChamplainTileCache *tile_cache,
       g_file_set_attributes_from_info (file, info, G_FILE_QUERY_INFO_NONE, NULL, NULL);
 
       g_object_unref (info);
-   }
+    }
 
   g_object_unref (file);
 
@@ -810,9 +810,9 @@ store_tile (ChamplainTileCache *tile_cache,
   g_object_unref (ostream);
 
   query = sqlite3_mprintf ("REPLACE INTO tiles (filename, etag, size) VALUES (%Q, %Q, %d)",
-      filename,
-      champlain_tile_get_etag (tile),
-      size);
+        filename,
+        champlain_tile_get_etag (tile),
+        size);
   sqlite3_exec (priv->db, query, NULL, NULL, &error);
   if (error != NULL)
     {
@@ -1006,7 +1006,7 @@ champlain_file_cache_purge (ChamplainFileCache *file_cache)
   sqlite3_finalize (stmt);
 
   query = sqlite3_mprintf ("UPDATE tiles SET popularity = popularity - %d",
-      highest_popularity);
+        highest_popularity);
   sqlite3_exec (priv->db, query, NULL, NULL, &error);
   if (error != NULL)
     {

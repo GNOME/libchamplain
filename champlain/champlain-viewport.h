@@ -29,16 +29,16 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_VIEWPORT            (champlain_viewport_get_type())
+#define CHAMPLAIN_TYPE_VIEWPORT            (champlain_viewport_get_type ())
 #define CHAMPLAIN_VIEWPORT(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewport))
 #define CHAMPLAIN_IS_VIEWPORT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_VIEWPORT))
 #define CHAMPLAIN_VIEWPORT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewportClass))
 #define CHAMPLAIN_IS_VIEWPORT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_VIEWPORT))
 #define CHAMPLAIN_VIEWPORT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewportClass))
 
-typedef struct _ChamplainViewport          ChamplainViewport;
-typedef struct _ChamplainViewportPrivate   ChamplainViewportPrivate;
-typedef struct _ChamplainViewportClass     ChamplainViewportClass;
+typedef struct _ChamplainViewport ChamplainViewport;
+typedef struct _ChamplainViewportPrivate ChamplainViewportPrivate;
+typedef struct _ChamplainViewportClass ChamplainViewportClass;
 
 struct _ChamplainViewport
 {
@@ -54,28 +54,28 @@ struct _ChamplainViewportClass
 
 GType champlain_viewport_get_type (void) G_GNUC_CONST;
 
-ClutterActor * champlain_viewport_new         (void);
+ClutterActor *champlain_viewport_new (void);
 
-void           champlain_viewport_set_origin  (ChamplainViewport *viewport,
-                                          float          x,
-                                          float          y);
+void champlain_viewport_set_origin (ChamplainViewport *viewport,
+    float x,
+    float y);
 
-void           champlain_viewport_get_origin  (ChamplainViewport *viewport,
-                                          gfloat         *x,
-                                          gfloat         *y);
-void           champlain_viewport_stop        (ChamplainViewport *viewport);
+void champlain_viewport_get_origin (ChamplainViewport *viewport,
+    gfloat *x,
+    gfloat *y);
+void champlain_viewport_stop (ChamplainViewport *viewport);
 
 void champlain_viewport_get_adjustments (ChamplainViewport *viewport,
-                            ChamplainAdjustment **hadjustment,
-                            ChamplainAdjustment **vadjustment);
+    ChamplainAdjustment **hadjustment,
+    ChamplainAdjustment **vadjustment);
 
 void champlain_viewport_set_adjustments (ChamplainViewport *viewport,
-                            ChamplainAdjustment *hadjustment,
-                            ChamplainAdjustment *vadjustment);
+    ChamplainAdjustment *hadjustment,
+    ChamplainAdjustment *vadjustment);
 
-void champlain_viewport_set_child (ChamplainViewport *viewport, ClutterActor *child);
+void champlain_viewport_set_child (ChamplainViewport *viewport,
+    ClutterActor *child);
 
 G_END_DECLS
 
 #endif /* __CHAMPLAIN_VIEWPORT_H__ */
-

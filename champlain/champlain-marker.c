@@ -85,8 +85,8 @@ static gdouble get_longitude (ChamplainLocation *location);
 static void location_interface_init (ChamplainLocationIface *iface);
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_ACTOR,
-                         G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION,
-                                                location_interface_init));
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION,
+        location_interface_init));
 
 #define CHAMPLAIN_MARKER_GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
@@ -98,7 +98,7 @@ struct _ChamplainMarkerPrivate
   gboolean selected;
   gboolean selectable;
   gboolean draggable;
-  
+
   gfloat click_x;
   gfloat click_y;
   gboolean moved;
@@ -201,11 +201,11 @@ champlain_marker_get_property (GObject *object,
     case PROP_SELECTABLE:
       g_value_set_boolean (value, priv->selectable);
       break;
-      
+
     case PROP_DRAGGABLE:
       g_value_set_boolean (value, priv->draggable);
       break;
-      
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -224,39 +224,39 @@ champlain_marker_set_property (GObject *object,
   switch (prop_id)
     {
     case PROP_LONGITUDE:
-    {
-      gdouble lon = g_value_get_double (value);
-      set_location (CHAMPLAIN_LOCATION (marker), priv->lat, lon);
-      break;
-    }
+      {
+        gdouble lon = g_value_get_double (value);
+        set_location (CHAMPLAIN_LOCATION (marker), priv->lat, lon);
+        break;
+      }
 
     case PROP_LATITUDE:
-    {
-      gdouble lat = g_value_get_double (value);
-      set_location (CHAMPLAIN_LOCATION (marker), lat, priv->lon);
-      break;
-    }
+      {
+        gdouble lat = g_value_get_double (value);
+        set_location (CHAMPLAIN_LOCATION (marker), lat, priv->lon);
+        break;
+      }
 
     case PROP_SELECTED:
-    {
-      gboolean bvalue = g_value_get_boolean (value);
-      champlain_marker_set_selected (marker, bvalue);
-      break;
-    }
+      {
+        gboolean bvalue = g_value_get_boolean (value);
+        champlain_marker_set_selected (marker, bvalue);
+        break;
+      }
 
     case PROP_SELECTABLE:
-    {
-      gboolean bvalue = g_value_get_boolean (value);
-      champlain_marker_set_selectable (marker, bvalue);
-      break;
-    }
+      {
+        gboolean bvalue = g_value_get_boolean (value);
+        champlain_marker_set_selectable (marker, bvalue);
+        break;
+      }
 
     case PROP_DRAGGABLE:
-    {
-      gboolean bvalue = g_value_get_boolean (value);
-      champlain_marker_set_draggable (marker, bvalue);
-      break;
-    }
+      {
+        gboolean bvalue = g_value_get_boolean (value);
+        champlain_marker_set_draggable (marker, bvalue);
+        break;
+      }
 
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -348,7 +348,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
       g_param_spec_boolean ("selected", "Selected",
           "The sighlighted state of the marker",
           FALSE, CHAMPLAIN_PARAM_READWRITE));
-          
+
   /**
    * ChamplainMarker:selectable:
    *
@@ -375,7 +375,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
 
   /**
    * ChamplainMarker::button-press:
-   * @event: the underlying ClutterEvent 
+   * @event: the underlying ClutterEvent
    *
    * Emitted when button is pressed.
    *
@@ -388,7 +388,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
 
   /**
    * ChamplainMarker::button-release:
-   * @event: the underlying ClutterEvent 
+   * @event: the underlying ClutterEvent
    *
    * Emitted when button is released. This signal is not emmitted at the end of dragging.
    *
@@ -401,9 +401,9 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
 
   /**
    * ChamplainMarker::drag-motion:
-   * @dx: by how much the marker has been moved in the x direction 
-   * @dy: by how much the marker has been moved in the y direction 
-   * @event: the underlying ClutterEvent 
+   * @dx: by how much the marker has been moved in the x direction
+   * @dy: by how much the marker has been moved in the y direction
+   * @event: the underlying ClutterEvent
    *
    * Emmitted when the marker is dragged by mouse. dx and dy specify by how much
    * the marker has been dragged since last time.
@@ -414,10 +414,10 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
     g_signal_new ("drag-motion", G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
         _champlain_marshal_VOID__DOUBLE_DOUBLE_BOXED, G_TYPE_NONE, 3, G_TYPE_DOUBLE, G_TYPE_DOUBLE, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
-        
+
   /**
    * ChamplainMarker::drag-finish:
-   * @event: the underlying ClutterEvent 
+   * @event: the underlying ClutterEvent
    *
    * Emitted when marker dragging ends (i.e. the button is released at the end
    * of dragging).
@@ -429,21 +429,21 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
         g_cclosure_marshal_VOID__BOXED, G_TYPE_NONE, 1, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
 
-        
-  g_object_class_override_property (object_class,
-                                    PROP_LONGITUDE,
-                                    "longitude");
 
   g_object_class_override_property (object_class,
-                                    PROP_LATITUDE,
-                                    "latitude");
+      PROP_LONGITUDE,
+      "longitude");
+
+  g_object_class_override_property (object_class,
+      PROP_LATITUDE,
+      "latitude");
 }
 
 
 static gboolean
-motion_event_cb (ClutterActor        *stage,
-                 ClutterMotionEvent  *event,
-                 ChamplainMarker *marker)
+motion_event_cb (ClutterActor *stage,
+    ClutterMotionEvent *event,
+    ChamplainMarker *marker)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
   gfloat x, y;
@@ -452,9 +452,9 @@ motion_event_cb (ClutterActor        *stage,
     return FALSE;
 
   if (clutter_actor_transform_stage_point (CLUTTER_ACTOR (marker),
-                                           event->x,
-                                           event->y,
-                                           &x, &y))
+          event->x,
+          event->y,
+          &x, &y))
     {
       g_signal_emit_by_name (marker, "drag-motion", x - priv->click_x, y - priv->click_y, event);
       priv->moved = TRUE;
@@ -465,9 +465,9 @@ motion_event_cb (ClutterActor        *stage,
 
 
 static gboolean
-capture_release_event_cb (ClutterActor        *stage,
-                         ClutterButtonEvent  *event,
-                         ChamplainMarker *marker)
+capture_release_event_cb (ClutterActor *stage,
+    ClutterButtonEvent *event,
+    ChamplainMarker *marker)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
 
@@ -476,34 +476,34 @@ capture_release_event_cb (ClutterActor        *stage,
     return FALSE;
 
   g_signal_handlers_disconnect_by_func (stage,
-                                        motion_event_cb,
-                                        marker);
+      motion_event_cb,
+      marker);
   g_signal_handlers_disconnect_by_func (stage,
-                                        capture_release_event_cb,
-                                        marker);
-  
+      capture_release_event_cb,
+      marker);
+
   if (priv->moved)
     g_signal_emit_by_name (marker, "drag-finish", event);
   else
     g_signal_emit_by_name (marker, "button-release", event);
-  
+
   return TRUE;
 }
 
 
 static gboolean
-button_release_event_cb (ClutterActor        *actor,
-                       ClutterButtonEvent        *event,
-                       ChamplainMarker *marker)
+button_release_event_cb (ClutterActor *actor,
+    ClutterButtonEvent *event,
+    ChamplainMarker *marker)
 {
   if ((event->type != CLUTTER_BUTTON_RELEASE) ||
       (event->button != 1))
     return FALSE;
 
   g_signal_handlers_disconnect_by_func (marker,
-                                        button_release_event_cb,
-                                        marker);
-  
+      button_release_event_cb,
+      marker);
+
   g_signal_emit_by_name (marker, "button-release", event);
 
   return TRUE;
@@ -511,12 +511,12 @@ button_release_event_cb (ClutterActor        *actor,
 
 
 static gboolean
-button_press_event_cb (ClutterActor        *actor,
-                       ClutterEvent        *event,
-                       ChamplainMarker *marker)
+button_press_event_cb (ClutterActor *actor,
+    ClutterEvent *event,
+    ChamplainMarker *marker)
 {
   ChamplainMarkerPrivate *priv = marker->priv;
-  ClutterButtonEvent *bevent = (ClutterButtonEvent *)event;
+  ClutterButtonEvent *bevent = (ClutterButtonEvent *) event;
   ClutterActor *stage = clutter_actor_get_stage (actor);
 
   if (event->type != CLUTTER_BUTTON_PRESS ||
@@ -526,34 +526,34 @@ button_press_event_cb (ClutterActor        *actor,
       return FALSE;
     }
 
-  if (priv->draggable) 
+  if (priv->draggable)
     {
       if (clutter_actor_transform_stage_point (actor, bevent->x, bevent->y,
-                                               &priv->click_x, &priv->click_y))
+              &priv->click_x, &priv->click_y))
         {
           priv->moved = FALSE;
           g_signal_connect (stage,
-                            "captured-event",
-                            G_CALLBACK (motion_event_cb),
-                            marker);
-                            
+              "captured-event",
+              G_CALLBACK (motion_event_cb),
+              marker);
+
           g_signal_connect (stage,
-                            "captured-event",
-                            G_CALLBACK (capture_release_event_cb),
-                            marker);
+              "captured-event",
+              G_CALLBACK (capture_release_event_cb),
+              marker);
         }
     }
   else
     {
       g_signal_connect (marker,
-                "button-release-event",
-                G_CALLBACK (button_release_event_cb),
-                marker);
+          "button-release-event",
+          G_CALLBACK (button_release_event_cb),
+          marker);
     }
 
   if (priv->selectable)
     champlain_marker_set_selected (marker, TRUE);
-    
+
   if (priv->selectable || priv->draggable)
     clutter_actor_raise (CLUTTER_ACTOR (marker), NULL);
 
@@ -575,15 +575,14 @@ champlain_marker_init (ChamplainMarker *marker)
   priv->selected = FALSE;
   priv->selectable = TRUE;
   priv->draggable = FALSE;
-  
-  clutter_actor_set_reactive (CLUTTER_ACTOR (marker), TRUE);
-  
-  g_signal_connect (marker,
-                    "button-press-event",
-                    G_CALLBACK (button_press_event_cb),
-                    marker);
-}
 
+  clutter_actor_set_reactive (CLUTTER_ACTOR (marker), TRUE);
+
+  g_signal_connect (marker,
+      "button-press-event",
+      G_CALLBACK (button_press_event_cb),
+      marker);
+}
 
 
 /**
@@ -632,7 +631,7 @@ champlain_marker_get_selected (ChamplainMarker *marker)
  * @marker: a #ChamplainMarker
  * @value: the selectable state
  *
- * Sets the marker as selectable or not. 
+ * Sets the marker as selectable or not.
  *
  * Since: 0.10
  */
@@ -666,12 +665,13 @@ champlain_marker_get_selectable (ChamplainMarker *marker)
   return marker->priv->selectable;
 }
 
+
 /**
  * champlain_marker_set_draggable:
  * @marker: a #ChamplainMarker
  * @value: the draggable state
  *
- * Sets the marker as draggable or not. 
+ * Sets the marker as draggable or not.
  *
  * Since: 0.10
  */
@@ -704,6 +704,7 @@ champlain_marker_get_draggable (ChamplainMarker *marker)
 
   return marker->priv->draggable;
 }
+
 
 /**
  * champlain_marker_animate_in:
@@ -819,8 +820,8 @@ champlain_marker_animate_out_with_delay (ChamplainMarker *marker,
   timeline = clutter_timeline_new (750);
   clutter_timeline_set_delay (timeline, delay);
   animation = clutter_actor_animate_with_timeline (CLUTTER_ACTOR (marker),
-      CLUTTER_EASE_IN_BACK, timeline, "opacity", 0, "y", y - 100,
-      "scale-x", 2.0, "scale-y", 2.0, NULL);
+        CLUTTER_EASE_IN_BACK, timeline, "opacity", 0, "y", y - 100,
+        "scale-x", 2.0, "scale-y", 2.0, NULL);
   g_signal_connect (animation, "completed",
       G_CALLBACK (on_animation_completed), marker);
 }

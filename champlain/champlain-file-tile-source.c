@@ -104,16 +104,16 @@ champlain_file_tile_source_new_full (const gchar *id,
   ChamplainFileTileSource *source;
 
   source = g_object_new (CHAMPLAIN_TYPE_FILE_TILE_SOURCE,
-      "id", id,
-      "name", name,
-      "license", license,
-      "license-uri", license_uri,
-      "min-zoom-level", min_zoom,
-      "max-zoom-level", max_zoom,
-      "tile-size", tile_size,
-      "projection", projection,
-      "renderer", renderer,
-      NULL);
+        "id", id,
+        "name", name,
+        "license", license,
+        "license-uri", license_uri,
+        "min-zoom-level", min_zoom,
+        "max-zoom-level", max_zoom,
+        "tile-size", tile_size,
+        "projection", projection,
+        "renderer", renderer,
+        NULL);
   return source;
 }
 

@@ -83,7 +83,7 @@ champlain_renderer_set_data (ChamplainRenderer *renderer,
  *
  * Renders the texture for the provided tile and calls champlain_tile_set_content()
  * to set the content of the tile. When the rendering is finished, the renderer
- * emits the #ChamplainTile::render-complete signal. The tile has to be displayed manually by 
+ * emits the #ChamplainTile::render-complete signal. The tile has to be displayed manually by
  * calling champlain_tile_display_content().
  *
  * Since: 0.8

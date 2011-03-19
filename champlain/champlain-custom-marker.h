@@ -56,7 +56,7 @@ struct _ChamplainCustomMarker
 {
   ChamplainMarker parent;
 
-  ChamplainCustomMarkerPrivate *priv;  
+  ChamplainCustomMarkerPrivate *priv;
 };
 
 struct _ChamplainCustomMarkerClass

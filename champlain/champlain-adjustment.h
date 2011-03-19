@@ -28,16 +28,16 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_ADJUSTMENT            (champlain_adjustment_get_type())
+#define CHAMPLAIN_TYPE_ADJUSTMENT            (champlain_adjustment_get_type ())
 #define CHAMPLAIN_ADJUSTMENT(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustment))
 #define CHAMPLAIN_IS_ADJUSTMENT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_ADJUSTMENT))
 #define CHAMPLAIN_ADJUSTMENT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentClass))
 #define CHAMPLAIN_IS_ADJUSTMENT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_ADJUSTMENT))
 #define CHAMPLAIN_ADJUSTMENT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentClass))
 
-typedef struct _ChamplainAdjustment          ChamplainAdjustment;
-typedef struct _ChamplainAdjustmentPrivate   ChamplainAdjustmentPrivate;
-typedef struct _ChamplainAdjustmentClass     ChamplainAdjustmentClass;
+typedef struct _ChamplainAdjustment ChamplainAdjustment;
+typedef struct _ChamplainAdjustmentPrivate ChamplainAdjustmentPrivate;
+typedef struct _ChamplainAdjustmentClass ChamplainAdjustmentClass;
 
 /**
  * ChamplainAdjustment:
@@ -66,51 +66,50 @@ struct _ChamplainAdjustmentClass
   GObjectClass parent_class;
 
   /*< public >*/
-  void (* changed) (ChamplainAdjustment *adjustment);
+  void (*changed)(ChamplainAdjustment *adjustment);
 };
 
 GType champlain_adjustment_get_type (void) G_GNUC_CONST;
 
-ChamplainAdjustment *champlain_adjustment_new          (gdouble         value,
-                                              gdouble         lower,
-                                              gdouble         upper,
-                                              gdouble         step_increment,
-                                              gdouble         page_increment,
-                                              gdouble         page_size);
-gdouble         champlain_adjustment_get_value    (ChamplainAdjustment *adjustment);
-void            champlain_adjustment_set_value    (ChamplainAdjustment *adjustment,
-                                              gdouble         value);
-void            champlain_adjustment_set_values   (ChamplainAdjustment *adjustment,
-                                              gdouble         value,
-                                              gdouble         lower,
-                                              gdouble         upper,
-                                              gdouble         step_increment,
-                                              gdouble         page_increment,
-                                              gdouble         page_size);
-void            champlain_adjustment_get_values   (ChamplainAdjustment *adjustment,
-                                              gdouble        *value,
-                                              gdouble        *lower,
-                                              gdouble        *upper,
-                                              gdouble        *step_increment,
-                                              gdouble        *page_increment,
-                                              gdouble        *page_size);
+ChamplainAdjustment *champlain_adjustment_new (gdouble value,
+    gdouble lower,
+    gdouble upper,
+    gdouble step_increment,
+    gdouble page_increment,
+    gdouble page_size);
+gdouble champlain_adjustment_get_value (ChamplainAdjustment *adjustment);
+void champlain_adjustment_set_value (ChamplainAdjustment *adjustment,
+    gdouble value);
+void champlain_adjustment_set_values (ChamplainAdjustment *adjustment,
+    gdouble value,
+    gdouble lower,
+    gdouble upper,
+    gdouble step_increment,
+    gdouble page_increment,
+    gdouble page_size);
+void champlain_adjustment_get_values (ChamplainAdjustment *adjustment,
+    gdouble *value,
+    gdouble *lower,
+    gdouble *upper,
+    gdouble *step_increment,
+    gdouble *page_increment,
+    gdouble *page_size);
 
-void            champlain_adjustment_interpolate  (ChamplainAdjustment *adjustment,
-                                              gdouble         value,
-                                              guint           n_frames,
-                                              guint           fps);
+void champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
+    gdouble value,
+    guint n_frames,
+    guint fps);
 
-gboolean        champlain_adjustment_get_elastic  (ChamplainAdjustment *adjustment);
-void            champlain_adjustment_set_elastic  (ChamplainAdjustment *adjustment,
-                                              gboolean        elastic);
+gboolean champlain_adjustment_get_elastic (ChamplainAdjustment *adjustment);
+void champlain_adjustment_set_elastic (ChamplainAdjustment *adjustment,
+    gboolean elastic);
 
-gboolean        champlain_adjustment_clamp        (ChamplainAdjustment *adjustment,
-                                              gboolean        interpolate,
-                                              guint           n_frames,
-                                              guint           fps);
-void            champlain_adjustment_interpolate_stop (ChamplainAdjustment *adjustment);
+gboolean champlain_adjustment_clamp (ChamplainAdjustment *adjustment,
+    gboolean interpolate,
+    guint n_frames,
+    guint fps);
+void champlain_adjustment_interpolate_stop (ChamplainAdjustment *adjustment);
 
 G_END_DECLS
 
 #endif /* __CHAMPLAIN_ADJUSTMENT_H__ */
-

@@ -59,7 +59,7 @@ struct _ChamplainLicensePrivate
   gchar *extra_text; /* Extra license text */
   ClutterActor *license_actor;
   ClutterGroup *content_group;
-  
+
   ChamplainView *view;
 };
 
@@ -116,13 +116,13 @@ static void
 paint (ClutterActor *self)
 {
   ChamplainLicensePrivate *priv = GET_PRIVATE (self);
-  
+
   clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
 }
 
 
 static void
-pick (ClutterActor *self, 
+pick (ClutterActor *self,
     const ClutterColor *color)
 {
   ChamplainLicensePrivate *priv = GET_PRIVATE (self);
@@ -212,15 +212,15 @@ redraw_license (ChamplainLicense *license)
   gchar *text;
   gfloat width, height;
   ChamplainMapSource *map_source;
-  
+
   if (!priv->view)
     return;
 
   map_source = champlain_view_get_map_source (priv->view);
-  
+
   if (!map_source)
     return;
-  
+
   if (priv->extra_text)
     text = g_strjoin ("\n",
           priv->extra_text,
@@ -351,7 +351,7 @@ champlain_license_init (ChamplainLicense *license)
 
 /**
  * champlain_license_new:
- * 
+ *
  * Creates an instance of #ChamplainLicense.
  *
  * Returns: a new #ChamplainLicense.
@@ -369,18 +369,18 @@ champlain_license_new (void)
  * champlain_license_connect_view:
  * @license: The license
  * @view: a #ChamplainView
- * 
+ *
  * This method connects to the necessary signals of #ChamplainView to make the
  * license change automatically when the map source changes.
  *
  * Since: 0.10
  */
-void 
+void
 champlain_license_connect_view (ChamplainLicense *license,
     ChamplainView *view)
 {
   g_return_if_fail (CHAMPLAIN_IS_LICENSE (license));
-  
+
   license->priv->view = view;
 
   g_signal_connect (view, "notify::map-source",
@@ -392,19 +392,19 @@ champlain_license_connect_view (ChamplainLicense *license,
 /**
  * champlain_license_disconnect_view:
  * @license: The license
- * 
+ *
  * This method disconnects from the signals previously connected by champlain_license_connect_view().
  *
  * Since: 0.10
  */
-void 
+void
 champlain_license_disconnect_view (ChamplainLicense *license)
 {
   g_return_if_fail (CHAMPLAIN_IS_LICENSE (license));
-  
+
   g_signal_handlers_disconnect_by_func (license->priv->view,
-                                        redraw_license_cb,
-                                        license);
+      redraw_license_cb,
+      license);
   license->priv->view = NULL;
 }
 
@@ -434,6 +434,7 @@ champlain_license_set_extra_text (ChamplainLicense *license,
   redraw_license (license);
 }
 
+
 /**
  * champlain_license_get_extra_text:
  * @license: a #ChamplainLicense
@@ -451,5 +452,3 @@ champlain_license_get_extra_text (ChamplainLicense *license)
 
   return license->priv->extra_text;
 }
-
-

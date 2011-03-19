@@ -19,7 +19,7 @@
 /**
  * SECTION:champlain-location
  * @short_description: An interface common to objects having latitude and longitude
- * 
+ *
  * By implementing #ChamplainLocation the object declares that it has latitude
  * and longitude and can be used to specify location on the map.
  */
@@ -27,7 +27,7 @@
 #include "champlain-location.h"
 #include "champlain-private.h"
 
-typedef ChamplainLocationIface  ChamplainLocationInterface;
+typedef ChamplainLocationIface ChamplainLocationInterface;
 G_DEFINE_INTERFACE (ChamplainLocation, champlain_location, G_TYPE_OBJECT);
 
 
@@ -70,14 +70,14 @@ champlain_location_default_init (ChamplainLocationInterface *iface)
  *
  * Since: 0.10
  */
-void 
+void
 champlain_location_set_location (ChamplainLocation *location,
     gdouble latitude,
     gdouble longitude)
 {
   CHAMPLAIN_LOCATION_GET_IFACE (location)->set_location (location,
-                                                         latitude,
-                                                         longitude);
+      latitude,
+      longitude);
 }
 
 
@@ -91,7 +91,7 @@ champlain_location_set_location (ChamplainLocation *location,
  *
  * Since: 0.10
  */
-gdouble 
+gdouble
 champlain_location_get_latitude (ChamplainLocation *location)
 {
   return CHAMPLAIN_LOCATION_GET_IFACE (location)->get_latitude (location);
@@ -108,9 +108,8 @@ champlain_location_get_latitude (ChamplainLocation *location)
  *
  * Since: 0.10
  */
-gdouble 
+gdouble
 champlain_location_get_longitude (ChamplainLocation *location)
 {
   return CHAMPLAIN_LOCATION_GET_IFACE (location)->get_longitude (location);
 }
-

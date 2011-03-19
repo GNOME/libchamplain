@@ -214,21 +214,21 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
           G_PARAM_READWRITE));
 
   /**
-  * ChamplainNetworkBboxTileSource:state:
-  *
-  * The map source's state. Useful to know if the data source is loading
-  * or not.
-  *
-  * Since: 0.8
-  */
+   * ChamplainNetworkBboxTileSource:state:
+   *
+   * The map source's state. Useful to know if the data source is loading
+   * or not.
+   *
+   * Since: 0.8
+   */
   g_object_class_install_property (object_class,
-       PROP_STATE,
-       g_param_spec_enum ("state",
-           "map data source's state",
-           "The state of the map data source",
-           CHAMPLAIN_TYPE_STATE,
-           CHAMPLAIN_STATE_NONE,
-           G_PARAM_READWRITE));
+      PROP_STATE,
+      g_param_spec_enum ("state",
+          "map data source's state",
+          "The state of the map data source",
+          CHAMPLAIN_TYPE_STATE,
+          CHAMPLAIN_STATE_NONE,
+          G_PARAM_READWRITE));
 }
 
 
@@ -243,11 +243,11 @@ champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
   /* informationfreeway.org is a load-balancer for different api servers */
   priv->proxy_uri = g_strdup ("");
   priv->soup_session = soup_session_async_new_with_options (
-      "proxy-uri", soup_uri_new (priv->proxy_uri),
+        "proxy-uri", soup_uri_new (priv->proxy_uri),
 #ifdef HAVE_LIBSOUP_GNOME
-      SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
+        SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
 #endif
-      NULL);
+        NULL);
   g_object_set (G_OBJECT (priv->soup_session),
       "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
       "max-conns-per-host", 2, NULL);
@@ -288,15 +288,15 @@ champlain_network_bbox_tile_source_new_full (const gchar *id,
   ChamplainNetworkBboxTileSource *source;
 
   source = g_object_new (CHAMPLAIN_TYPE_NETWORK_BBOX_TILE_SOURCE, "id", id,
-      "name", name,
-      "license", license,
-      "license-uri", license_uri,
-      "min-zoom-level", min_zoom,
-      "max-zoom-level", max_zoom,
-      "tile-size", tile_size,
-      "projection", projection,
-      "renderer", renderer,
-      NULL);
+        "name", name,
+        "license", license,
+        "license-uri", license_uri,
+        "min-zoom-level", min_zoom,
+        "max-zoom-level", max_zoom,
+        "tile-size", tile_size,
+        "projection", projection,
+        "renderer", renderer,
+        NULL);
   return source;
 }
 
@@ -328,7 +328,7 @@ load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
  * champlain_network_bbox_tile_source_load_map_data:
  * @map_data_source: a #ChamplainNetworkBboxTileSource
  * @bbox: bounding box of the requested area
- * 
+ *
  * Asynchronously loads map data within a bounding box from the server.
  * The box must not exceed an edge size of 0.25 degree. There are also
  * limitations on the maximum number of nodes that can be requested.
@@ -354,8 +354,8 @@ champlain_network_bbox_tile_source_load_map_data (
   gchar *url;
 
   url = g_strdup_printf (
-      "http://api.openstreetmap.org/api/0.6/map?bbox=%f,%f,%f,%f",
-      bbox->left, bbox->bottom, bbox->right, bbox->top);
+        "http://api.openstreetmap.org/api/0.6/map?bbox=%f,%f,%f,%f",
+        bbox->left, bbox->bottom, bbox->right, bbox->top);
   msg = soup_message_new ("GET", url);
 
   DEBUG ("Request BBox data: '%s'", url);

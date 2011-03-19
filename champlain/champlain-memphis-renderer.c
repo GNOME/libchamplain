@@ -256,7 +256,7 @@ champlain_memphis_renderer_init (ChamplainMemphisRenderer *renderer)
   priv->renderer = memphis_renderer_new_full (priv->rules, memphis_map_new ());
 
   priv->thpool = g_thread_pool_new (memphis_worker_thread, renderer,
-      MAX_THREADS, FALSE, NULL);
+        MAX_THREADS, FALSE, NULL);
 
   priv->bbox = NULL;
 }
@@ -337,8 +337,8 @@ tile_loaded_cb (gpointer worker_data)
       cairo_image_surface_get_stride (cst) * cairo_image_surface_get_height (cst));
 
   pixbuf = gdk_pixbuf_new_from_data (cairo_image_surface_get_data (cst),
-      GDK_COLORSPACE_RGB, TRUE, 8, size, size,
-      cairo_image_surface_get_stride (cst), NULL, NULL);
+        GDK_COLORSPACE_RGB, TRUE, 8, size, size,
+        cairo_image_surface_get_stride (cst), NULL, NULL);
 
   if (!gdk_pixbuf_save_to_buffer (pixbuf, &buffer, &buffer_size, "png", NULL, NULL))
     goto finish;

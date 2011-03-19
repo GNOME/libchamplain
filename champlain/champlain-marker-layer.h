@@ -74,7 +74,7 @@ typedef enum
 struct _ChamplainMarkerLayer
 {
   ChamplainLayer parent;
-  
+
   ChamplainMarkerLayerPrivate *priv;
 };
 

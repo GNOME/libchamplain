@@ -62,8 +62,8 @@ typedef struct _ChamplainMemphisRuleAttr ChamplainMemphisRuleAttr;
  * @CHAMPLAIN_MEMPHIS_RULE_TYPE_NODE: MEMPHIS_RULE_TYPE_NODE
  * @CHAMPLAIN_MEMPHIS_RULE_TYPE_WAY: MEMPHIS_RULE_TYPE_WAY
  * @CHAMPLAIN_MEMPHIS_RULE_TYPE_RELATION: MEMPHIS_RULE_TYPE_RELATION
- * 
- * A wrapper of the MemphisRuleType union. For details see the libmemphis 
+ *
+ * A wrapper of the MemphisRuleType union. For details see the libmemphis
  * documentation.
  *
  * Since: 0.8
@@ -98,8 +98,8 @@ struct _ChamplainMemphisRendererClass
  * @color_alpha: color_alpha
  * @style: style
  * @size: size
- * 
- * A wrapper of the MemphisRuleAttr structure. For details see the libmemphis 
+ *
+ * A wrapper of the MemphisRuleAttr structure. For details see the libmemphis
  * documentation.
  *
  * Since: 0.8
@@ -125,8 +125,8 @@ struct _ChamplainMemphisRuleAttr
  * @line: line
  * @border: border
  * @text: text
- * 
- * A wrapper of the MemphisRule structure. For details see the libmemphis 
+ *
+ * A wrapper of the MemphisRule structure. For details see the libmemphis
  * documentation.
  *
  * Since: 0.8

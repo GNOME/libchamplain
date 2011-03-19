@@ -62,7 +62,7 @@ struct _ChamplainScalePrivate
   gfloat text_height;
   ClutterGroup *content_group;
   gboolean redraw_scheduled;
-  
+
   ChamplainView *view;
 };
 
@@ -130,13 +130,13 @@ static void
 paint (ClutterActor *self)
 {
   ChamplainScalePrivate *priv = GET_PRIVATE (self);
-  
+
   clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
 }
 
 
 static void
-pick (ClutterActor *self, 
+pick (ClutterActor *self,
     const ClutterColor *color)
 {
   ChamplainScalePrivate *priv = GET_PRIVATE (self);
@@ -237,7 +237,7 @@ champlain_scale_dispose (GObject *object)
 static void
 champlain_scale_finalize (GObject *object)
 {
-//  ChamplainScalePrivate *priv = CHAMPLAIN_SCALE (object)->priv;
+/*  ChamplainScalePrivate *priv = CHAMPLAIN_SCALE (object)->priv; */
 
   G_OBJECT_CLASS (champlain_scale_parent_class)->finalize (object);
 }
@@ -248,7 +248,7 @@ champlain_scale_class_init (ChamplainScaleClass *klass)
 {
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  
+
   g_type_class_add_private (klass, sizeof (ChamplainScalePrivate));
 
   object_class->finalize = champlain_scale_finalize;
@@ -297,7 +297,6 @@ champlain_scale_class_init (ChamplainScaleClass *klass)
           CHAMPLAIN_TYPE_UNIT,
           CHAMPLAIN_UNIT_KM,
           G_PARAM_READWRITE));
-
 }
 
 
@@ -332,7 +331,7 @@ redraw_scale (ChamplainScale *scale)
   map_source = champlain_view_get_map_source (priv->view);
   g_object_get (G_OBJECT (priv->view), "latitude", &lat, "longitude", &lon, NULL);
   m_per_pixel = champlain_map_source_get_meters_per_pixel (map_source,
-      zoom_level, lat, lon);
+        zoom_level, lat, lon);
 
   /* Don't redraw too often, 1 meters difference is a good value
    * since at low levels the value changes alot, and not at high levels */
@@ -414,7 +413,7 @@ redraw_scale (ChamplainScale *scale)
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (line));
 
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-  cairo_paint(cr);
+  cairo_paint (cr);
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
 
   cairo_set_source_rgb (cr, 0, 0, 0);
@@ -483,7 +482,7 @@ create_scale (ChamplainScale *scale)
   clutter_actor_get_size (text, &width, &priv->text_height);
   clutter_actor_set_position (text, SCALE_INSIDE_PADDING - width / 2, SCALE_INSIDE_PADDING);
 
-  scale_actor = clutter_cairo_texture_new (priv->max_scale_width + 2 * SCALE_INSIDE_PADDING, SCALE_HEIGHT + priv->text_height + GAP_SIZE + 2*SCALE_INSIDE_PADDING);
+  scale_actor = clutter_cairo_texture_new (priv->max_scale_width + 2 * SCALE_INSIDE_PADDING, SCALE_HEIGHT + priv->text_height + GAP_SIZE + 2 * SCALE_INSIDE_PADDING);
   clutter_actor_set_name (scale_actor, "scale-line");
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), scale_actor);
 
@@ -505,14 +504,14 @@ champlain_scale_init (ChamplainScale *scale)
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (scale));
   clutter_actor_queue_relayout (CLUTTER_ACTOR (scale));
-  
+
   create_scale (scale);
 }
 
 
 /**
  * champlain_scale_new:
- * 
+ *
  * Creates an instance of #ChamplainScale.
  *
  * Returns: a new #ChamplainScale.
@@ -618,18 +617,18 @@ redraw_scale_cb (G_GNUC_UNUSED GObject *gobject,
  * champlain_scale_connect_view:
  * @scale: The scale
  * @view: a #ChamplainView
- * 
+ *
  * This method connects to the necessary signals of #ChamplainView to make the
  * scale adapt to the current latitude and longitude.
  *
  * Since: 0.10
  */
-void 
+void
 champlain_scale_connect_view (ChamplainScale *scale,
     ChamplainView *view)
 {
   g_return_if_fail (CHAMPLAIN_IS_SCALE (scale));
-  
+
   scale->priv->view = view;
   g_signal_connect (view, "notify::latitude",
       G_CALLBACK (redraw_scale_cb), scale);
@@ -640,18 +639,18 @@ champlain_scale_connect_view (ChamplainScale *scale,
 /**
  * champlain_scale_disconnect_view:
  * @scale: The scale
- * 
+ *
  * This method disconnects from the signals previously connected by champlain_scale_connect_view().
  *
  * Since: 0.10
  */
-void 
+void
 champlain_scale_disconnect_view (ChamplainScale *scale)
 {
   g_return_if_fail (CHAMPLAIN_IS_SCALE (scale));
-  
+
   g_signal_handlers_disconnect_by_func (scale->priv->view,
-                                        redraw_scale_cb,
-                                        scale);
+      redraw_scale_cb,
+      scale);
   scale->priv->view = NULL;
 }

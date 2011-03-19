@@ -68,7 +68,7 @@ GType champlain_point_get_type (void);
 
 ClutterActor *champlain_point_new (void);
 
-ClutterActor *champlain_point_new_full (gdouble size, 
+ClutterActor *champlain_point_new_full (gdouble size,
     const ClutterColor *color);
 
 void champlain_point_set_color (ChamplainPoint *point,

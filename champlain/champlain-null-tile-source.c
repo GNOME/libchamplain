@@ -88,8 +88,8 @@ champlain_null_tile_source_new_full (ChamplainRenderer *renderer)
   ChamplainNullTileSource *source;
 
   source = g_object_new (CHAMPLAIN_TYPE_NULL_TILE_SOURCE,
-      "renderer", renderer,
-      NULL);
+        "renderer", renderer,
+        NULL);
   return source;
 }
 
@@ -163,4 +163,3 @@ fill_tile (ChamplainMapSource *map_source,
       champlain_tile_display_content (tile);
     }
 }
-

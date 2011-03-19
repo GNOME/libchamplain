@@ -60,7 +60,7 @@ struct _ChamplainLayerClass
 
   void (*set_view)(ChamplainLayer *layer,
       ChamplainView *view);
-  ChamplainBoundingBox * (*get_bounding_box) (ChamplainLayer *layer);
+  ChamplainBoundingBox * (*get_bounding_box)(ChamplainLayer * layer);
 };
 
 GType champlain_layer_get_type (void);

@@ -19,10 +19,10 @@
 /**
  * SECTION:champlain-custom-marker
  * @short_description: #ChamplainCustomMarker is a marker implementing the
- * #ClutterContainer interface. 
- * 
- * #ChamplainCustomMarker is a marker implementing the #ClutterContainer 
- * interface. You can insert your custom actors into the container. Don't forget 
+ * #ClutterContainer interface.
+ *
+ * #ChamplainCustomMarker is a marker implementing the #ClutterContainer
+ * interface. You can insert your custom actors into the container. Don't forget
  * to set the anchor position in the marker using #clutter_actor_set_anchor_point.
  */
 
@@ -56,13 +56,12 @@ struct _ChamplainCustomMarkerPrivate
   ClutterContainer *content_group;
 };
 
-static void
-clutter_container_iface_init (ClutterContainerIface *iface);
+static void clutter_container_iface_init (ClutterContainerIface *iface);
 
 
 G_DEFINE_TYPE_WITH_CODE (ChamplainCustomMarker, champlain_custom_marker, CHAMPLAIN_TYPE_MARKER,
-                         G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER,
-                                                clutter_container_iface_init));
+    G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER,
+        clutter_container_iface_init));
 
 
 #define GET_PRIVATE(obj) \
@@ -75,18 +74,20 @@ add_actor (ClutterContainer *container,
     ClutterActor *actor)
 {
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
-  
-  clutter_container_add_actor (priv->content_group, actor);  
+
+  clutter_container_add_actor (priv->content_group, actor);
 }
+
 
 static void
 remove_actor (ClutterContainer *container,
     ClutterActor *actor)
 {
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
-  
-  clutter_container_remove_actor (priv->content_group, actor);  
+
+  clutter_container_remove_actor (priv->content_group, actor);
 }
+
 
 static void
 foreach_actor (ClutterContainer *container,
@@ -94,9 +95,10 @@ foreach_actor (ClutterContainer *container,
     gpointer user_data)
 {
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
-  
-  clutter_container_foreach (priv->content_group, callback, user_data);  
+
+  clutter_container_foreach (priv->content_group, callback, user_data);
 }
+
 
 static void
 raise_actor (ClutterContainer *container,
@@ -104,9 +106,10 @@ raise_actor (ClutterContainer *container,
     ClutterActor *sibling)
 {
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
-  
-  clutter_container_raise_child (priv->content_group, actor, sibling);  
+
+  clutter_container_raise_child (priv->content_group, actor, sibling);
 }
+
 
 static void
 lower_actor (ClutterContainer *container,
@@ -114,17 +117,19 @@ lower_actor (ClutterContainer *container,
     ClutterActor *sibling)
 {
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
-  
-  clutter_container_lower_child (priv->content_group, actor, sibling);  
+
+  clutter_container_lower_child (priv->content_group, actor, sibling);
 }
+
 
 static void
 sort_depth_order (ClutterContainer *container)
 {
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (container);
-  
-  clutter_container_sort_depth_order (priv->content_group);  
+
+  clutter_container_sort_depth_order (priv->content_group);
 }
+
 
 static void
 clutter_container_iface_init (ClutterContainerIface *iface)
@@ -146,9 +151,10 @@ paint (ClutterActor *actor)
   clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
 }
 
+
 static void
-pick (ClutterActor       *actor,
-                         const ClutterColor *color)
+pick (ClutterActor *actor,
+    const ClutterColor *color)
 {
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (actor);
 
@@ -157,11 +163,12 @@ pick (ClutterActor       *actor,
   clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
 }
 
+
 static void
 get_preferred_width (ClutterActor *actor,
-                                        gfloat        for_height,
-                                        gfloat       *min_width,
-                                        gfloat       *natural_width)
+    gfloat for_height,
+    gfloat *min_width,
+    gfloat *natural_width)
 {
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (actor);
 
@@ -171,11 +178,12 @@ get_preferred_width (ClutterActor *actor,
       natural_width);
 }
 
+
 static void
 get_preferred_height (ClutterActor *actor,
-                                         gfloat        for_width,
-                                         gfloat       *min_height,
-                                         gfloat       *natural_height)
+    gfloat for_width,
+    gfloat *min_height,
+    gfloat *natural_height)
 {
   ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (actor);
 
@@ -184,6 +192,7 @@ get_preferred_height (ClutterActor *actor,
       min_height,
       natural_height);
 }
+
 
 static void
 allocate (ClutterActor *actor,
@@ -231,7 +240,7 @@ static void
 champlain_custom_marker_dispose (GObject *object)
 {
   ChamplainCustomMarkerPrivate *priv = CHAMPLAIN_CUSTOM_MARKER (object)->priv;
-  
+
   if (priv->content_group)
     {
       clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
@@ -245,7 +254,7 @@ champlain_custom_marker_dispose (GObject *object)
 static void
 champlain_custom_marker_finalize (GObject *object)
 {
-//  ChamplainCustomMarkerPrivate *priv = CHAMPLAIN_CUSTOM_MARKER (object)->priv;
+/*  ChamplainCustomMarkerPrivate *priv = CHAMPLAIN_CUSTOM_MARKER (object)->priv; */
 
   G_OBJECT_CLASS (champlain_custom_marker_parent_class)->finalize (object);
 }
@@ -256,7 +265,7 @@ champlain_custom_marker_class_init (ChamplainCustomMarkerClass *klass)
 {
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  
+
   g_type_class_add_private (klass, sizeof (ChamplainCustomMarkerPrivate));
 
   object_class->finalize = champlain_custom_marker_finalize;
@@ -286,7 +295,7 @@ champlain_custom_marker_init (ChamplainCustomMarker *custom_marker)
 
 /**
  * champlain_custom_marker_new:
- * 
+ *
  * Creates an instance of #ChamplainCustomMarker.
  *
  * Returns: a new #ChamplainCustomMarker.

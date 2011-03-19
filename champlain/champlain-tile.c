@@ -73,7 +73,7 @@ struct _ChamplainTilePrivate
 
   ChamplainState state; /* The tile state: loading, validation, done */
   /* The tile actor that will be displayed after champlain_tile_display_content () */
-  ClutterActor *content_actor; 
+  ClutterActor *content_actor;
   ClutterGroup *content_group; /* A group used for the fade in effect */
   gboolean fade_in;
 
@@ -181,13 +181,13 @@ static void
 paint (ClutterActor *self)
 {
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
-  
+
   clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
 }
 
 
 static void
-pick (ClutterActor *self, 
+pick (ClutterActor *self,
     const ClutterColor *color)
 {
   ChamplainTilePrivate *priv = GET_PRIVATE (self);
@@ -461,7 +461,7 @@ champlain_tile_class_init (ChamplainTileClass *klass)
    * @data: the result of the rendering
    * @size: size of data
    * @error: TRUE if there was an error during rendering
-   * 
+   *
    * The #ChamplainTile::render-complete signal is emitted when rendering of the tile is
    * completed by the renderer.
    *
@@ -889,18 +889,18 @@ champlain_tile_display_content (ChamplainTile *self)
   if (priv->fade_in)
     {
       animation = clutter_actor_animate (CLUTTER_ACTOR (priv->content_actor),
-          CLUTTER_EASE_IN_CUBIC,
-          500,
-          "opacity", 255,
-          NULL);
+            CLUTTER_EASE_IN_CUBIC,
+            500,
+            "opacity", 255,
+            NULL);
     }
   else
     {
       animation = clutter_actor_animate (CLUTTER_ACTOR (priv->content_actor),
-          CLUTTER_LINEAR,
-          150,
-          "opacity", 255,
-          NULL);
+            CLUTTER_LINEAR,
+            150,
+            "opacity", 255,
+            NULL);
     }
 
   g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), self);

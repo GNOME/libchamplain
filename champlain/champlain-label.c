@@ -101,8 +101,8 @@ struct _ChamplainLabelPrivate
   ClutterActor *shadow;
   ClutterActor *background;
   guint redraw_id;
-  
-  ClutterGroup *content_group;  
+
+  ClutterGroup *content_group;
 };
 
 G_DEFINE_TYPE (ChamplainLabel, champlain_label, CHAMPLAIN_TYPE_MARKER);
@@ -245,13 +245,13 @@ static void
 paint (ClutterActor *self)
 {
   ChamplainLabelPrivate *priv = GET_PRIVATE (self);
-  
+
   clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
 }
 
 
 static void
-pick (ClutterActor *self, 
+pick (ClutterActor *self,
     const ClutterColor *color)
 {
   ChamplainLabelPrivate *priv = GET_PRIVATE (self);
@@ -423,7 +423,7 @@ champlain_label_class_init (ChamplainLabelClass *klass)
 {
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  
+
   g_type_class_add_private (klass, sizeof (ChamplainLabelPrivate));
 
   object_class->finalize = champlain_label_finalize;
@@ -636,7 +636,7 @@ draw_shadow (ChamplainLabel *label,
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (shadow));
 
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-  cairo_paint(cr);
+  cairo_paint (cr);
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
 
   cairo_matrix_init (&matrix,
@@ -684,7 +684,7 @@ draw_background (ChamplainLabel *label,
   cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (bg));
 
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-  cairo_paint(cr);
+  cairo_paint (cr);
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
 
   /* If selected, add the selection color to the marker's color */

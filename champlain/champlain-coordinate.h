@@ -69,7 +69,7 @@ GType champlain_coordinate_get_type (void);
 
 ChamplainCoordinate *champlain_coordinate_new (void);
 
-ChamplainCoordinate *champlain_coordinate_new_full (gdouble latitude, 
+ChamplainCoordinate *champlain_coordinate_new_full (gdouble latitude,
     gdouble longitude);
 
 G_END_DECLS

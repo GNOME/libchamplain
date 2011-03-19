@@ -103,8 +103,7 @@ typedef struct
 
 static void fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile);
-static void
-tile_state_notify (ChamplainTile *tile,
+static void tile_state_notify (ChamplainTile *tile,
     G_GNUC_UNUSED GParamSpec *pspec,
     TileCancelledData *data);
 
@@ -229,10 +228,10 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
    * Since: 0.4
    */
   pspec = g_param_spec_string ("uri-format",
-      "URI Format",
-      "The URI format",
-      "",
-      (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        "URI Format",
+        "The URI format",
+        "",
+        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
   g_object_class_install_property (object_class, PROP_URI_FORMAT, pspec);
 
   /**
@@ -243,10 +242,10 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
    * Since: 0.4
    */
   pspec = g_param_spec_boolean ("offline",
-      "Offline",
-      "Offline",
-      FALSE,
-      G_PARAM_READWRITE);
+        "Offline",
+        "Offline",
+        FALSE,
+        G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_OFFLINE, pspec);
 
   /**
@@ -257,10 +256,10 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
    * Since: 0.4
    */
   pspec = g_param_spec_string ("proxy-uri",
-      "Proxy URI",
-      "The proxy URI to use to access network",
-      "",
-      G_PARAM_READWRITE);
+        "Proxy URI",
+        "The proxy URI to use to access network",
+        "",
+        G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_PROXY_URI, pspec);
 }
 
@@ -277,11 +276,11 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
   priv->offline = FALSE;
 
   priv->soup_session = soup_session_async_new_with_options (
-      "proxy-uri", NULL,
+        "proxy-uri", NULL,
 #ifdef HAVE_LIBSOUP_GNOME
-      SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
+        SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
 #endif
-      NULL);
+        NULL);
   g_object_set (G_OBJECT (priv->soup_session),
       "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
       "max-conns-per-host", 2, NULL); /* This is as required by OSM */
@@ -322,17 +321,17 @@ champlain_network_tile_source_new_full (const gchar *id,
   ChamplainNetworkTileSource *source;
 
   source = g_object_new (CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE,
-      "id", id,
-      "name", name,
-      "license", license,
-      "license-uri", license_uri,
-      "min-zoom-level", min_zoom,
-      "max-zoom-level", max_zoom,
-      "tile-size", tile_size,
-      "projection", projection,
-      "uri-format", uri_format,
-      "renderer", renderer,
-      NULL);
+        "id", id,
+        "name", name,
+        "license", license,
+        "license-uri", license_uri,
+        "min-zoom-level", min_zoom,
+        "max-zoom-level", max_zoom,
+        "tile-size", tile_size,
+        "projection", projection,
+        "uri-format", uri_format,
+        "renderer", renderer,
+        NULL);
   return source;
 }
 
@@ -723,9 +722,9 @@ fill_tile (ChamplainMapSource *map_source,
       gchar *uri;
 
       uri = get_tile_uri (tile_source,
-          champlain_tile_get_x (tile),
-          champlain_tile_get_y (tile),
-          champlain_tile_get_zoom_level (tile));
+            champlain_tile_get_x (tile),
+            champlain_tile_get_y (tile),
+            champlain_tile_get_zoom_level (tile));
       msg = soup_message_new (SOUP_METHOD_GET, uri);
       g_free (uri);
 

@@ -34,7 +34,7 @@ G_DEFINE_TYPE (ChamplainViewport, champlain_viewport, CLUTTER_TYPE_ACTOR)
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_VIEWPORT, \
-  ChamplainViewportPrivate))
+       ChamplainViewportPrivate))
 
 struct _ChamplainViewportPrivate
 {
@@ -61,10 +61,10 @@ enum
 };
 
 static void
-champlain_viewport_get_property (GObject    *object,
-                            guint       prop_id,
-                            GValue     *value,
-                            GParamSpec *pspec)
+champlain_viewport_get_property (GObject *object,
+    guint prop_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainAdjustment *adjustment;
 
@@ -80,17 +80,17 @@ champlain_viewport_get_property (GObject    *object,
       g_value_set_int (value, priv->y);
       break;
 
-    case PROP_HADJUST :
+    case PROP_HADJUST:
       champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (object), &adjustment, NULL);
       g_value_set_object (value, adjustment);
       break;
 
-    case PROP_VADJUST :
+    case PROP_VADJUST:
       champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (object), NULL, &adjustment);
       g_value_set_object (value, adjustment);
       break;
 
-    case PROP_SYNC_ADJUST :
+    case PROP_SYNC_ADJUST:
       g_value_set_boolean (value, priv->sync_adjustments);
       break;
 
@@ -100,11 +100,12 @@ champlain_viewport_get_property (GObject    *object,
     }
 }
 
+
 static void
-champlain_viewport_set_property (GObject      *object,
-                            guint         prop_id,
-                            const GValue *value,
-                            GParamSpec   *pspec)
+champlain_viewport_set_property (GObject *object,
+    guint prop_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainViewport *viewport = CHAMPLAIN_VIEWPORT (object);
   ChamplainViewportPrivate *priv = viewport->priv;
@@ -113,29 +114,29 @@ champlain_viewport_set_property (GObject      *object,
     {
     case PROP_X_ORIGIN:
       champlain_viewport_set_origin (viewport,
-                                 g_value_get_int (value),
-                                 priv->y);
+          g_value_get_int (value),
+          priv->y);
       break;
 
     case PROP_Y_ORIGIN:
       champlain_viewport_set_origin (viewport,
-                                 priv->x,
-                                 g_value_get_int (value));
+          priv->x,
+          g_value_get_int (value));
       break;
 
-    case PROP_HADJUST :
+    case PROP_HADJUST:
       champlain_viewport_set_adjustments (CHAMPLAIN_VIEWPORT (object),
-                                  g_value_get_object (value),
-                                  priv->vadjustment);
+          g_value_get_object (value),
+          priv->vadjustment);
       break;
 
-    case PROP_VADJUST :
+    case PROP_VADJUST:
       champlain_viewport_set_adjustments (CHAMPLAIN_VIEWPORT (object),
-                                  priv->hadjustment,
-                                  g_value_get_object (value));
+          priv->hadjustment,
+          g_value_get_object (value));
       break;
 
-    case PROP_SYNC_ADJUST :
+    case PROP_SYNC_ADJUST:
       priv->sync_adjustments = g_value_get_boolean (value);
       break;
 
@@ -145,6 +146,7 @@ champlain_viewport_set_property (GObject      *object,
     }
 }
 
+
 void
 champlain_viewport_stop (ChamplainViewport *viewport)
 {
@@ -153,6 +155,7 @@ champlain_viewport_stop (ChamplainViewport *viewport)
   champlain_adjustment_interpolate_stop (priv->hadjustment);
   champlain_adjustment_interpolate_stop (priv->vadjustment);
 }
+
 
 static void
 champlain_viewport_dispose (GObject *gobject)
@@ -187,13 +190,13 @@ static void
 paint (ClutterActor *self)
 {
   ChamplainViewportPrivate *priv = GET_PRIVATE (self);
-  
+
   clutter_actor_paint (priv->content_group);
 }
 
 
 static void
-pick (ClutterActor *self, 
+pick (ClutterActor *self,
     const ClutterColor *color)
 {
   ChamplainViewportPrivate *priv = GET_PRIVATE (self);
@@ -257,9 +260,9 @@ unmap (ClutterActor *self)
 
 
 static void
-allocate (ClutterActor          *self,
-                        const ClutterActorBox *box,
-                        ClutterAllocationFlags flags)
+allocate (ClutterActor *self,
+    const ClutterActorBox *box,
+    ClutterAllocationFlags flags)
 {
   ClutterActorBox child_box;
   CoglFixed prev_value;
@@ -268,7 +271,7 @@ allocate (ClutterActor          *self,
 
   /* Chain up */
   CLUTTER_ACTOR_CLASS (champlain_viewport_parent_class)->
-    allocate (self, box, flags);
+      allocate (self, box, flags);
 
   /* Refresh adjustments */
   if (priv->sync_adjustments)
@@ -276,9 +279,9 @@ allocate (ClutterActor          *self,
       if (priv->hadjustment)
         {
           g_object_set (G_OBJECT (priv->hadjustment),
-                       "lower", 0.0,
-                       "upper", (box->x2 - box->x1),
-                       NULL);
+              "lower", 0.0,
+              "upper", (box->x2 - box->x1),
+              NULL);
 
           /* Make sure value is clamped */
           prev_value = champlain_adjustment_get_value (priv->hadjustment);
@@ -288,9 +291,9 @@ allocate (ClutterActor          *self,
       if (priv->vadjustment)
         {
           g_object_set (G_OBJECT (priv->vadjustment),
-                       "lower", 0.0,
-                       "upper", (box->y2 - box->y1),
-                       NULL);
+              "lower", 0.0,
+              "upper", (box->y2 - box->y1),
+              NULL);
 
           prev_value = champlain_adjustment_get_value (priv->vadjustment);
           champlain_adjustment_set_value (priv->vadjustment, prev_value);
@@ -304,6 +307,7 @@ allocate (ClutterActor          *self,
 
   clutter_actor_allocate (CLUTTER_ACTOR (priv->content_group), &child_box, flags);
 }
+
 
 static void
 champlain_viewport_class_init (ChamplainViewportClass *klass)
@@ -326,57 +330,57 @@ champlain_viewport_class_init (ChamplainViewportClass *klass)
   actor_class->unmap = unmap;
 
   g_object_class_install_property (gobject_class,
-                                   PROP_X_ORIGIN,
-                                   g_param_spec_int ("x-origin",
-                                                     "X Origin",
-                                                     "Origin's X coordinate in pixels",
-                                                     -G_MAXINT, G_MAXINT,
-                                                     0,
-                                                     G_PARAM_READWRITE));
+      PROP_X_ORIGIN,
+      g_param_spec_int ("x-origin",
+          "X Origin",
+          "Origin's X coordinate in pixels",
+          -G_MAXINT, G_MAXINT,
+          0,
+          G_PARAM_READWRITE));
 
   g_object_class_install_property (gobject_class,
-                                   PROP_Y_ORIGIN,
-                                   g_param_spec_int ("y-origin",
-                                                     "Y Origin",
-                                                     "Origin's Y coordinate in pixels",
-                                                     -G_MAXINT, G_MAXINT,
-                                                     0,
-                                                     G_PARAM_READWRITE));
+      PROP_Y_ORIGIN,
+      g_param_spec_int ("y-origin",
+          "Y Origin",
+          "Origin's Y coordinate in pixels",
+          -G_MAXINT, G_MAXINT,
+          0,
+          G_PARAM_READWRITE));
 
   g_object_class_install_property (gobject_class,
-                                   PROP_SYNC_ADJUST,
-                                   g_param_spec_boolean ("sync-adjustments",
-                                                         "Synchronise "
-                                                         "adjustments",
-                                                         "Whether to "
-                                                         "synchronise "
-                                                         "adjustments with "
-                                                         "viewport size",
-                                                         TRUE,
-                                                         G_PARAM_READWRITE));
+      PROP_SYNC_ADJUST,
+      g_param_spec_boolean ("sync-adjustments",
+          "Synchronise "
+          "adjustments",
+          "Whether to "
+          "synchronise "
+          "adjustments with "
+          "viewport size",
+          TRUE,
+          G_PARAM_READWRITE));
 
   g_object_class_install_property (gobject_class,
-                                   PROP_HADJUST,
-                                   g_param_spec_object ("hadjustment",
-                                                        "ChamplainAdjustment",
-                                                        "Horizontal adjustment",
-                                                        CHAMPLAIN_TYPE_ADJUSTMENT,
-                                                        G_PARAM_READWRITE));
+      PROP_HADJUST,
+      g_param_spec_object ("hadjustment",
+          "ChamplainAdjustment",
+          "Horizontal adjustment",
+          CHAMPLAIN_TYPE_ADJUSTMENT,
+          G_PARAM_READWRITE));
 
   g_object_class_install_property (gobject_class,
-                                   PROP_VADJUST,
-                                   g_param_spec_object ("vadjustment",
-                                                        "ChamplainAdjustment",
-                                                        "Vertical adjustment",
-                                                        CHAMPLAIN_TYPE_ADJUSTMENT,
-                                                        G_PARAM_READWRITE));
-
+      PROP_VADJUST,
+      g_param_spec_object ("vadjustment",
+          "ChamplainAdjustment",
+          "Vertical adjustment",
+          CHAMPLAIN_TYPE_ADJUSTMENT,
+          G_PARAM_READWRITE));
 }
+
 
 static void
 hadjustment_value_notify_cb (ChamplainAdjustment *adjustment,
-                             GParamSpec     *pspec,
-                             ChamplainViewport   *viewport)
+    GParamSpec *pspec,
+    ChamplainViewport *viewport)
 {
   ChamplainViewportPrivate *priv = viewport->priv;
   gdouble value;
@@ -384,13 +388,14 @@ hadjustment_value_notify_cb (ChamplainAdjustment *adjustment,
   value = champlain_adjustment_get_value (adjustment);
 
   champlain_viewport_set_origin (viewport,
-                             value,
-                             priv->y);
+      value,
+      priv->y);
 }
+
 
 static void
 vadjustment_value_notify_cb (ChamplainAdjustment *adjustment, GParamSpec *arg1,
-                             ChamplainViewport *viewport)
+    ChamplainViewport *viewport)
 {
   ChamplainViewportPrivate *priv = viewport->priv;
   gdouble value;
@@ -398,14 +403,15 @@ vadjustment_value_notify_cb (ChamplainAdjustment *adjustment, GParamSpec *arg1,
   value = champlain_adjustment_get_value (adjustment);
 
   champlain_viewport_set_origin (viewport,
-                             priv->x,
-                             value);
+      priv->x,
+      value);
 }
+
 
 void
 champlain_viewport_set_adjustments (ChamplainViewport *viewport,
-                            ChamplainAdjustment *hadjustment,
-                            ChamplainAdjustment *vadjustment)
+    ChamplainAdjustment *hadjustment,
+    ChamplainAdjustment *vadjustment)
 {
   ChamplainViewportPrivate *priv = CHAMPLAIN_VIEWPORT (viewport)->priv;
 
@@ -414,8 +420,8 @@ champlain_viewport_set_adjustments (ChamplainViewport *viewport,
       if (priv->hadjustment)
         {
           g_signal_handlers_disconnect_by_func (priv->hadjustment,
-                                                hadjustment_value_notify_cb,
-                                                viewport);
+              hadjustment_value_notify_cb,
+              viewport);
           g_object_unref (priv->hadjustment);
         }
 
@@ -423,8 +429,8 @@ champlain_viewport_set_adjustments (ChamplainViewport *viewport,
         {
           g_object_ref (hadjustment);
           g_signal_connect (hadjustment, "notify::value",
-                            G_CALLBACK (hadjustment_value_notify_cb),
-                            viewport);
+              G_CALLBACK (hadjustment_value_notify_cb),
+              viewport);
         }
 
       priv->hadjustment = hadjustment;
@@ -435,8 +441,8 @@ champlain_viewport_set_adjustments (ChamplainViewport *viewport,
       if (priv->vadjustment)
         {
           g_signal_handlers_disconnect_by_func (priv->vadjustment,
-                                                vadjustment_value_notify_cb,
-                                                viewport);
+              vadjustment_value_notify_cb,
+              viewport);
           g_object_unref (priv->vadjustment);
         }
 
@@ -444,24 +450,25 @@ champlain_viewport_set_adjustments (ChamplainViewport *viewport,
         {
           g_object_ref (vadjustment);
           g_signal_connect (vadjustment, "notify::value",
-                            G_CALLBACK (vadjustment_value_notify_cb),
-                            viewport);
+              G_CALLBACK (vadjustment_value_notify_cb),
+              viewport);
         }
 
       priv->vadjustment = vadjustment;
     }
 }
 
+
 void
 champlain_viewport_get_adjustments (ChamplainViewport *viewport,
-                            ChamplainAdjustment **hadjustment,
-                            ChamplainAdjustment **vadjustment)
+    ChamplainAdjustment **hadjustment,
+    ChamplainAdjustment **vadjustment)
 {
   ChamplainViewportPrivate *priv;
 
   g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
 
-  priv = ((ChamplainViewport *)viewport)->priv;
+  priv = ((ChamplainViewport *) viewport)->priv;
 
   if (hadjustment)
     {
@@ -472,19 +479,19 @@ champlain_viewport_get_adjustments (ChamplainViewport *viewport,
           ChamplainAdjustment *adjustment;
           guint width, stage_width, increment;
 
-          width = clutter_actor_get_width (CLUTTER_ACTOR(viewport));
+          width = clutter_actor_get_width (CLUTTER_ACTOR (viewport));
           stage_width = clutter_actor_get_width (clutter_stage_get_default ());
-          increment = MAX (1, MIN(stage_width, width));
+          increment = MAX (1, MIN (stage_width, width));
 
           adjustment = champlain_adjustment_new (priv->x,
-                                            0,
-                                            width,
-                                            1,
-                                            increment,
-                                            increment);
+                0,
+                width,
+                1,
+                increment,
+                increment);
           champlain_viewport_set_adjustments (viewport,
-                                      adjustment,
-                                      priv->vadjustment);
+              adjustment,
+              priv->vadjustment);
           *hadjustment = adjustment;
         }
     }
@@ -498,19 +505,19 @@ champlain_viewport_get_adjustments (ChamplainViewport *viewport,
           ChamplainAdjustment *adjustment;
           guint height, stage_height, increment;
 
-          height = clutter_actor_get_height (CLUTTER_ACTOR(viewport));
+          height = clutter_actor_get_height (CLUTTER_ACTOR (viewport));
           stage_height = clutter_actor_get_height (clutter_stage_get_default ());
-          increment = MAX (1, MIN(stage_height, height));
+          increment = MAX (1, MIN (stage_height, height));
 
           adjustment = champlain_adjustment_new (priv->y,
-                                            0,
-                                            height,
-                                            1,
-                                            increment,
-                                            increment);
+                0,
+                height,
+                1,
+                increment,
+                increment);
           champlain_viewport_set_adjustments (viewport,
-                                      priv->hadjustment,
-                                      adjustment);
+              priv->hadjustment,
+              adjustment);
           *vadjustment = adjustment;
         }
     }
@@ -519,8 +526,8 @@ champlain_viewport_get_adjustments (ChamplainViewport *viewport,
 
 static void
 clip_notify_cb (ClutterActor *actor,
-                GParamSpec   *pspec,
-                ChamplainViewport *self)
+    GParamSpec *pspec,
+    ChamplainViewport *self)
 {
   gfloat width, height;
   ChamplainViewportPrivate *priv = self->priv;
@@ -531,20 +538,21 @@ clip_notify_cb (ClutterActor *actor,
   if (!clutter_actor_has_clip (actor))
     {
       if (priv->hadjustment)
-        g_object_set (priv->hadjustment, "page-size", (gdouble)1.0, NULL);
+        g_object_set (priv->hadjustment, "page-size", (gdouble) 1.0, NULL);
       if (priv->vadjustment)
-        g_object_set (priv->vadjustment, "page-size", (gdouble)1.0, NULL);
+        g_object_set (priv->vadjustment, "page-size", (gdouble) 1.0, NULL);
       return;
     }
 
   clutter_actor_get_clip (actor, NULL, NULL, &width, &height);
 
   if (priv->hadjustment)
-    g_object_set (priv->hadjustment, "page-size", (gdouble)width, NULL);
+    g_object_set (priv->hadjustment, "page-size", (gdouble) width, NULL);
 
   if (priv->vadjustment)
-    g_object_set (priv->vadjustment, "page-size", (gdouble)height, NULL);
+    g_object_set (priv->vadjustment, "page-size", (gdouble) height, NULL);
 }
+
 
 static void
 champlain_viewport_init (ChamplainViewport *self)
@@ -559,8 +567,9 @@ champlain_viewport_init (ChamplainViewport *self)
   clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
 
   g_signal_connect (self, "notify::clip",
-                    G_CALLBACK (clip_notify_cb), self);
+      G_CALLBACK (clip_notify_cb), self);
 }
+
 
 ClutterActor *
 champlain_viewport_new (void)
@@ -568,10 +577,11 @@ champlain_viewport_new (void)
   return g_object_new (CHAMPLAIN_TYPE_VIEWPORT, NULL);
 }
 
+
 void
 champlain_viewport_set_origin (ChamplainViewport *viewport,
-                          float x,
-                          float y)
+    float x,
+    float y)
 {
   ChamplainViewportPrivate *priv;
 
@@ -588,7 +598,7 @@ champlain_viewport_set_origin (ChamplainViewport *viewport,
 
       if (priv->hadjustment)
         champlain_adjustment_set_value (priv->hadjustment,
-                                    x);
+            x);
     }
 
   if (y != priv->y)
@@ -598,21 +608,22 @@ champlain_viewport_set_origin (ChamplainViewport *viewport,
 
       if (priv->vadjustment)
         champlain_adjustment_set_value (priv->vadjustment,
-                                    y);
+            y);
     }
 
   g_object_thaw_notify (G_OBJECT (viewport));
-  
+
   if (priv->child)
     clutter_actor_set_position (priv->child, -x, -y);
 
   clutter_actor_queue_redraw (CLUTTER_ACTOR (viewport));
 }
 
+
 void
 champlain_viewport_get_origin (ChamplainViewport *viewport,
-                          float *x,
-                          float *y)
+    float *x,
+    float *y)
 {
   ChamplainViewportPrivate *priv;
 
@@ -628,14 +639,14 @@ champlain_viewport_get_origin (ChamplainViewport *viewport,
 }
 
 
-void 
+void
 champlain_viewport_set_child (ChamplainViewport *viewport, ClutterActor *child)
 {
   ChamplainViewportPrivate *priv = viewport->priv;
-  
+
   if (priv->child)
     clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), priv->child);
-    
+
   priv->child = child;
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), child);  
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), child);
 }

@@ -60,7 +60,7 @@ typedef struct _ChamplainPathLayerClass ChamplainPathLayerClass;
 struct _ChamplainPathLayer
 {
   ChamplainLayer parent;
-  
+
   ChamplainPathLayerPrivate *priv;
 };
 
@@ -104,7 +104,7 @@ void champlain_path_layer_set_stroke_width (ChamplainPathLayer *layer,
     gdouble value);
 
 gboolean champlain_path_layer_get_visible (ChamplainPathLayer *layer);
-void champlain_path_layer_set_visible (ChamplainPathLayer *layer, 
+void champlain_path_layer_set_visible (ChamplainPathLayer *layer,
     gboolean value);
 
 G_END_DECLS

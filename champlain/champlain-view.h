@@ -126,17 +126,19 @@ gdouble champlain_view_x_to_longitude (ChamplainView *view,
     gdouble x);
 gdouble champlain_view_y_to_latitude (ChamplainView *view,
     gdouble y);
-gdouble champlain_view_longitude_to_x (ChamplainView *view, 
+gdouble champlain_view_longitude_to_x (ChamplainView *view,
     gdouble longitude);
-gdouble champlain_view_latitude_to_y (ChamplainView *view, 
+gdouble champlain_view_latitude_to_y (ChamplainView *view,
     gdouble latitude);
 
-void champlain_view_get_viewport_origin (ChamplainView *view, gint *x, gint *y);
+void champlain_view_get_viewport_origin (ChamplainView *view,
+    gint *x,
+    gint *y);
 
 void champlain_view_bin_layout_add (ChamplainView *view,
-  ClutterActor *child,
-  ClutterBinAlignment x_align,
-  ClutterBinAlignment y_align);
+    ClutterActor *child,
+    ClutterBinAlignment x_align,
+    ClutterBinAlignment y_align);
 
 ChamplainLicense *champlain_view_get_license_actor (ChamplainView *view);
 

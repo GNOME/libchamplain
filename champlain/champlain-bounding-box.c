@@ -38,9 +38,9 @@ champlain_bounding_box_get_type (void)
   if (G_UNLIKELY (type == 0))
     {
       type = g_boxed_type_register_static (
-          g_intern_static_string ("ChamplainBoundingBox"),
-          (GBoxedCopyFunc) champlain_bounding_box_copy,
-          (GBoxedFreeFunc) champlain_bounding_box_free);
+            g_intern_static_string ("ChamplainBoundingBox"),
+            (GBoxedCopyFunc) champlain_bounding_box_copy,
+            (GBoxedFreeFunc) champlain_bounding_box_free);
     }
 
   return type;
@@ -61,9 +61,9 @@ ChamplainBoundingBox *
 champlain_bounding_box_new (void)
 {
   ChamplainBoundingBox *bbox;
-  
+
   bbox = g_slice_new (ChamplainBoundingBox);
-  
+
   bbox->left = CHAMPLAIN_MAX_LONGITUDE;
   bbox->right = CHAMPLAIN_MIN_LONGITUDE;
   bbox->bottom = CHAMPLAIN_MAX_LATITUDE;
@@ -149,10 +149,10 @@ champlain_bounding_box_compose (ChamplainBoundingBox *bbox,
     ChamplainBoundingBox *other)
 {
   g_return_if_fail (CHAMPLAIN_BOUNDING_BOX (bbox));
-  
+
   if (other->left < bbox->left)
     bbox->left = other->left;
-    
+
   if (other->right > bbox->right)
     bbox->right = other->right;
 
@@ -175,11 +175,12 @@ champlain_bounding_box_compose (ChamplainBoundingBox *bbox,
  *
  * Since: 0.10
  */
-void champlain_bounding_box_extend (ChamplainBoundingBox *bbox,
+void
+champlain_bounding_box_extend (ChamplainBoundingBox *bbox,
     gdouble latitude, gdouble longitude)
 {
   g_return_if_fail (CHAMPLAIN_BOUNDING_BOX (bbox));
-  
+
   if (longitude < bbox->left)
     bbox->left = longitude;
 
@@ -210,9 +211,8 @@ champlain_bounding_box_is_valid (ChamplainBoundingBox *bbox)
   g_return_val_if_fail (CHAMPLAIN_BOUNDING_BOX (bbox), FALSE);
 
   return (bbox->left < bbox->right) && (bbox->bottom < bbox->top) &&
-      (bbox->left > CHAMPLAIN_MIN_LONGITUDE) && (bbox->left < CHAMPLAIN_MAX_LONGITUDE) &&
-      (bbox->right > CHAMPLAIN_MIN_LONGITUDE) && (bbox->right < CHAMPLAIN_MAX_LONGITUDE) &&
-      (bbox->bottom > CHAMPLAIN_MIN_LATITUDE) && (bbox->bottom < CHAMPLAIN_MAX_LATITUDE) &&
-      (bbox->top > CHAMPLAIN_MIN_LATITUDE) && (bbox->top < CHAMPLAIN_MAX_LATITUDE);
+         (bbox->left > CHAMPLAIN_MIN_LONGITUDE) && (bbox->left < CHAMPLAIN_MAX_LONGITUDE) &&
+         (bbox->right > CHAMPLAIN_MIN_LONGITUDE) && (bbox->right < CHAMPLAIN_MAX_LONGITUDE) &&
+         (bbox->bottom > CHAMPLAIN_MIN_LATITUDE) && (bbox->bottom < CHAMPLAIN_MAX_LATITUDE) &&
+         (bbox->top > CHAMPLAIN_MIN_LATITUDE) && (bbox->top < CHAMPLAIN_MAX_LATITUDE);
 }
-

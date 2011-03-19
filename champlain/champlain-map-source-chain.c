@@ -23,7 +23,7 @@
  * This map source simplifies creation of map chains by providing two
  * functions for their creation and modification in a stack-like manner:
  * champlain_map_source_chain_push() and champlain_map_source_chain_pop().
- * For instance, to create a chain consisting of #ChamplainMemoryCache, 
+ * For instance, to create a chain consisting of #ChamplainMemoryCache,
  * #ChamplainFileCache and #ChamplainNetworkTileSource, the map
  * sources have to be pushed into the chain in the reverse order starting
  * from #ChamplainNetworkTileSource. After its creation, #ChamplainMapSourceChain
@@ -111,7 +111,7 @@ champlain_map_source_chain_init (ChamplainMapSourceChain *source_chain)
 
   priv->stack_top = NULL;
   priv->stack_bottom = NULL;
-  
+
   g_signal_connect (source_chain, "notify::next-source",
       G_CALLBACK (on_set_next_source_cb), NULL);
 }
@@ -255,7 +255,7 @@ on_set_next_source_cb (ChamplainMapSourceChain *source_chain,
   ChamplainMapSourceChainPrivate *priv = source_chain->priv;
   ChamplainMapSource *map_source = CHAMPLAIN_MAP_SOURCE (source_chain);
   ChamplainMapSource *next_source;
-  
+
   next_source = champlain_map_source_get_next_source (map_source);
 
   if (priv->stack_bottom)

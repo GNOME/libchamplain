@@ -194,10 +194,10 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
    * Since: 0.6
    */
   pspec = g_param_spec_object ("next-source",
-      "Next Source",
-      "Next source in the loading chain",
-      CHAMPLAIN_TYPE_MAP_SOURCE,
-      G_PARAM_READWRITE);
+        "Next Source",
+        "Next source in the loading chain",
+        CHAMPLAIN_TYPE_MAP_SOURCE,
+        G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_NEXT_SOURCE, pspec);
 
   /**
@@ -208,10 +208,10 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
    * Since: 0.8
    */
   pspec = g_param_spec_object ("renderer",
-      "Tile renderer",
-      "Tile renderer used to render tiles",
-      CHAMPLAIN_TYPE_RENDERER,
-      G_PARAM_READWRITE);
+        "Tile renderer",
+        "Tile renderer used to render tiles",
+        CHAMPLAIN_TYPE_RENDERER,
+        G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_RENDERER, pspec);
 }
 
@@ -527,9 +527,9 @@ champlain_map_source_get_y (ChamplainMapSource *map_source,
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0);
 
   latitude = CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
-  
+
   /* FIXME: support other projections */
-  return ((1.0 - log (tan (latitude * M_PI / 180.0) + 1.0 / cos (latitude * M_PI / 180.0)) / M_PI) / 
+  return ((1.0 - log (tan (latitude * M_PI / 180.0) + 1.0 / cos (latitude * M_PI / 180.0)) / M_PI) /
           2.0 * pow (2.0, zoom_level)) * champlain_map_source_get_tile_size (map_source);
 }
 
@@ -553,12 +553,12 @@ champlain_map_source_get_longitude (ChamplainMapSource *map_source,
     gdouble x)
 {
   gdouble longitude;
-    
+
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0.0);
   /* FIXME: support other projections */
   gdouble dx = (gdouble) x / champlain_map_source_get_tile_size (map_source);
-  longitude =  dx / pow (2.0, zoom_level) * 360.0 - 180.0;
-  
+  longitude = dx / pow (2.0, zoom_level) * 360.0 - 180.0;
+
   return CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
 }
 
@@ -582,13 +582,13 @@ champlain_map_source_get_latitude (ChamplainMapSource *map_source,
     gdouble y)
 {
   gdouble latitude;
-  
+
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0.0);
   /* FIXME: support other projections */
   gdouble dy = (gdouble) y / champlain_map_source_get_tile_size (map_source);
   gdouble n = M_PI - 2.0 * M_PI * dy / pow (2.0, zoom_level);
-  latitude = 180.0 / M_PI * atan (0.5 * (exp (n) - exp (-n)));
-  
+  latitude = 180.0 / M_PI *atan (0.5 * (exp (n) - exp (-n)));
+
   return CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
 }
 
@@ -659,7 +659,7 @@ champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source,
 {
   g_return_val_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source), 0.0);
 
-  /* 
+  /*
    * Width is in pixels. (1 px)
    * m/px = radius_at_latitude / width_in_pixels
    * k = radius of earth = 6 378.1 km
@@ -668,7 +668,7 @@ champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source,
 
   gdouble tile_size = champlain_map_source_get_tile_size (map_source);
   /* FIXME: support other projections */
-  return 2.0 * M_PI *EARTH_RADIUS * sin (M_PI / 2.0 - M_PI / 180.0 * latitude) /
+  return 2.0 *M_PI *EARTH_RADIUS *sin (M_PI / 2.0 - M_PI / 180.0 *latitude) /
          (tile_size * champlain_map_source_get_row_count (map_source, zoom_level));
 }
 

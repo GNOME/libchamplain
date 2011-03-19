@@ -29,30 +29,30 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_GROUP champlain_group_get_type()
+#define CHAMPLAIN_TYPE_GROUP champlain_group_get_type ()
 
 #define CHAMPLAIN_GROUP(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), \
-  CHAMPLAIN_TYPE_GROUP, ChamplainGroup))
+       CHAMPLAIN_TYPE_GROUP, ChamplainGroup))
 
 #define CHAMPLAIN_GROUP_CLASS(klass) \
   (G_TYPE_CHECK_CLASS_CAST ((klass), \
-  CHAMPLAIN_TYPE_GROUP, ChamplainGroupClass))
+       CHAMPLAIN_TYPE_GROUP, ChamplainGroupClass))
 
 #define CHAMPLAIN_IS_GROUP(obj) \
   (G_TYPE_CHECK_INSTANCE_TYPE ((obj), \
-  CHAMPLAIN_TYPE_GROUP))
+       CHAMPLAIN_TYPE_GROUP))
 
 #define CHAMPLAIN_IS_GROUP_CLASS(klass) \
   (G_TYPE_CHECK_CLASS_TYPE ((klass), \
-  CHAMPLAIN_TYPE_GROUP))
+       CHAMPLAIN_TYPE_GROUP))
 
 #define CHAMPLAIN_GROUP_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), \
-  CHAMPLAIN_TYPE_GROUP, ChamplainGroupClass))
+       CHAMPLAIN_TYPE_GROUP, ChamplainGroupClass))
 
-typedef struct _ChamplainGroup        ChamplainGroup;
-typedef struct _ChamplainGroupClass   ChamplainGroupClass;
+typedef struct _ChamplainGroup ChamplainGroup;
+typedef struct _ChamplainGroupClass ChamplainGroupClass;
 typedef struct _ChamplainGroupPrivate ChamplainGroupPrivate;
 
 /**
@@ -84,30 +84,30 @@ struct _ChamplainGroupClass
   ClutterActorClass parent_class;
 
   /* padding for future expansion */
-  void (*_clutter_reserved1) (void);
-  void (*_clutter_reserved2) (void);
-  void (*_clutter_reserved3) (void);
-  void (*_clutter_reserved4) (void);
-  void (*_clutter_reserved5) (void);
-  void (*_clutter_reserved6) (void);
+  void (*_clutter_reserved1)(void);
+  void (*_clutter_reserved2)(void);
+  void (*_clutter_reserved3)(void);
+  void (*_clutter_reserved4)(void);
+  void (*_clutter_reserved5)(void);
+  void (*_clutter_reserved6)(void);
 };
 
-GType         champlain_group_get_type         (void) G_GNUC_CONST;
-ClutterActor *champlain_group_new              (void);
-ClutterActor *champlain_group_get_nth_child    (ChamplainGroup    *self,
-                                              gint             index_);
-gint          champlain_group_get_n_children   (ChamplainGroup    *self);
-void          champlain_group_remove_all       (ChamplainGroup    *group);
+GType champlain_group_get_type (void) G_GNUC_CONST;
+ClutterActor *champlain_group_new (void);
+ClutterActor *champlain_group_get_nth_child (ChamplainGroup *self,
+    gint index_);
+gint champlain_group_get_n_children (ChamplainGroup *self);
+void champlain_group_remove_all (ChamplainGroup *group);
 
 /* for Mr. Mallum */
-#define champlain_group_add(group,actor)                  G_STMT_START {  \
-  ClutterActor *_actor = (ClutterActor *) (actor);                      \
-  if (CHAMPLAIN_IS_GROUP ((group)) && CLUTTER_IS_ACTOR ((_actor)))        \
-    {                                                                   \
-      ClutterContainer *_container = (ClutterContainer *) (group);      \
-      clutter_container_add_actor (_container, _actor);                 \
-    }                                                   } G_STMT_END
+#define champlain_group_add(group, actor)                  G_STMT_START {  \
+    ClutterActor *_actor = (ClutterActor *) (actor);                      \
+    if (CHAMPLAIN_IS_GROUP ((group)) && CLUTTER_IS_ACTOR ((_actor)))        \
+      {                                                                   \
+        ClutterContainer *_container = (ClutterContainer *) (group);      \
+        clutter_container_add_actor (_container, _actor);                 \
+      } } G_STMT_END
 
-G_END_DECLS
+  G_END_DECLS
 
 #endif /* __CHAMPLAIN_GROUP_H__ */

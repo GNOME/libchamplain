@@ -46,12 +46,12 @@ struct _ChamplainAdjustmentPrivate
 
   /* For interpolation */
   ClutterTimeline *interpolation;
-  gdouble     dx;
-  gdouble     old_position;
-  gdouble     new_position;
+  gdouble dx;
+  gdouble old_position;
+  gdouble new_position;
 
   /* For elasticity */
-  gboolean      elastic;
+  gboolean elastic;
   ClutterAlpha *bounce_alpha;
 };
 
@@ -78,22 +78,22 @@ enum
 
 static guint signals[LAST_SIGNAL] = { 0, };
 
-static void champlain_adjustment_set_lower          (ChamplainAdjustment *adjustment,
-                                                gdouble         lower);
-static void champlain_adjustment_set_upper          (ChamplainAdjustment *adjustment,
-                                                gdouble         upper);
+static void champlain_adjustment_set_lower (ChamplainAdjustment *adjustment,
+    gdouble lower);
+static void champlain_adjustment_set_upper (ChamplainAdjustment *adjustment,
+    gdouble upper);
 static void champlain_adjustment_set_step_increment (ChamplainAdjustment *adjustment,
-                                                gdouble         step);
+    gdouble step);
 static void champlain_adjustment_set_page_increment (ChamplainAdjustment *adjustment,
-                                                gdouble         page);
-static void champlain_adjustment_set_page_size      (ChamplainAdjustment *adjustment,
-                                                gdouble         size);
+    gdouble page);
+static void champlain_adjustment_set_page_size (ChamplainAdjustment *adjustment,
+    gdouble size);
 
 static void
-champlain_adjustment_get_property (GObject    *object,
-                              guint       prop_id,
-                              GValue     *value,
-                              GParamSpec *pspec)
+champlain_adjustment_get_property (GObject *object,
+    guint prop_id,
+    GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainAdjustmentPrivate *priv = CHAMPLAIN_ADJUSTMENT (object)->priv;
 
@@ -133,11 +133,12 @@ champlain_adjustment_get_property (GObject    *object,
     }
 }
 
+
 static void
-champlain_adjustment_set_property (GObject      *object,
-                              guint         prop_id,
-                              const GValue *value,
-                              GParamSpec   *pspec)
+champlain_adjustment_set_property (GObject *object,
+    guint prop_id,
+    const GValue *value,
+    GParamSpec *pspec)
 {
   ChamplainAdjustment *adj = CHAMPLAIN_ADJUSTMENT (object);
 
@@ -177,10 +178,12 @@ champlain_adjustment_set_property (GObject      *object,
     }
 }
 
+
 static void
 stop_interpolation (ChamplainAdjustment *adjustment)
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
+
   if (priv->interpolation)
     {
       clutter_timeline_stop (priv->interpolation);
@@ -195,19 +198,22 @@ stop_interpolation (ChamplainAdjustment *adjustment)
     }
 }
 
+
 void
 champlain_adjustment_interpolate_stop (ChamplainAdjustment *adjustment)
 {
   stop_interpolation (adjustment);
 }
 
+
 static void
 champlain_adjustment_dispose (GObject *object)
 {
   stop_interpolation (CHAMPLAIN_ADJUSTMENT (object));
-  
+
   G_OBJECT_CLASS (champlain_adjustment_parent_class)->dispose (object);
 }
+
 
 static void
 champlain_adjustment_class_init (ChamplainAdjustmentClass *klass)
@@ -219,81 +225,82 @@ champlain_adjustment_class_init (ChamplainAdjustmentClass *klass)
   object_class->get_property = champlain_adjustment_get_property;
   object_class->set_property = champlain_adjustment_set_property;
   object_class->dispose = champlain_adjustment_dispose;
-  
+
   g_object_class_install_property (object_class,
-                                   PROP_LOWER,
-                                   g_param_spec_double ("lower",
-                                                        "Lower",
-                                                        "Lower bound",
-                                                        -G_MAXDOUBLE,
-                                                        G_MAXDOUBLE,
-                                                        0.0,
-                                                        CHAMPLAIN_PARAM_READWRITE));
+      PROP_LOWER,
+      g_param_spec_double ("lower",
+          "Lower",
+          "Lower bound",
+          -G_MAXDOUBLE,
+          G_MAXDOUBLE,
+          0.0,
+          CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
-                                   PROP_UPPER,
-                                   g_param_spec_double ("upper",
-                                                        "Upper",
-                                                        "Upper bound",
-                                                        -G_MAXDOUBLE,
-                                                        G_MAXDOUBLE,
-                                                        0.0,
-                                                        CHAMPLAIN_PARAM_READWRITE));
+      PROP_UPPER,
+      g_param_spec_double ("upper",
+          "Upper",
+          "Upper bound",
+          -G_MAXDOUBLE,
+          G_MAXDOUBLE,
+          0.0,
+          CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
-                                   PROP_VALUE,
-                                   g_param_spec_double ("value",
-                                                        "Value",
-                                                        "Current value",
-                                                        -G_MAXDOUBLE,
-                                                        G_MAXDOUBLE,
-                                                        0.0,
-                                                        CHAMPLAIN_PARAM_READWRITE));
+      PROP_VALUE,
+      g_param_spec_double ("value",
+          "Value",
+          "Current value",
+          -G_MAXDOUBLE,
+          G_MAXDOUBLE,
+          0.0,
+          CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
-                                   PROP_STEP_INC,
-                                   g_param_spec_double ("step-increment",
-                                                        "Step Increment",
-                                                        "Step increment",
-                                                        -G_MAXDOUBLE,
-                                                        G_MAXDOUBLE,
-                                                        0.0,
-                                                        CHAMPLAIN_PARAM_READWRITE));
+      PROP_STEP_INC,
+      g_param_spec_double ("step-increment",
+          "Step Increment",
+          "Step increment",
+          -G_MAXDOUBLE,
+          G_MAXDOUBLE,
+          0.0,
+          CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
-                                   PROP_PAGE_INC,
-                                   g_param_spec_double ("page-increment",
-                                                        "Page Increment",
-                                                        "Page increment",
-                                                        -G_MAXDOUBLE,
-                                                        G_MAXDOUBLE,
-                                                        0.0,
-                                                        CHAMPLAIN_PARAM_READWRITE));
+      PROP_PAGE_INC,
+      g_param_spec_double ("page-increment",
+          "Page Increment",
+          "Page increment",
+          -G_MAXDOUBLE,
+          G_MAXDOUBLE,
+          0.0,
+          CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
-                                   PROP_PAGE_SIZE,
-                                   g_param_spec_double ("page-size",
-                                                        "Page Size",
-                                                        "Page size",
-                                                        -G_MAXDOUBLE,
-                                                        G_MAXDOUBLE,
-                                                        0.0,
-                                                        CHAMPLAIN_PARAM_READWRITE));
+      PROP_PAGE_SIZE,
+      g_param_spec_double ("page-size",
+          "Page Size",
+          "Page size",
+          -G_MAXDOUBLE,
+          G_MAXDOUBLE,
+          0.0,
+          CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
-                                   PROP_ELASTIC,
-                                   g_param_spec_boolean ("elastic",
-                                                         "Elastic",
-                                                         "Make interpolation "
-                                                         "behave in an "
-                                                         "'elastic' way and "
-                                                         "stop clamping value.",
-                                                         FALSE,
-                                                         CHAMPLAIN_PARAM_READWRITE));
+      PROP_ELASTIC,
+      g_param_spec_boolean ("elastic",
+          "Elastic",
+          "Make interpolation "
+          "behave in an "
+          "'elastic' way and "
+          "stop clamping value.",
+          FALSE,
+          CHAMPLAIN_PARAM_READWRITE));
 
   signals[CHANGED] =
     g_signal_new ("changed",
-                  G_TYPE_FROM_CLASS (klass),
-                  G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (ChamplainAdjustmentClass, changed),
-                  NULL, NULL,
-                  g_cclosure_marshal_VOID__VOID,
-                  G_TYPE_NONE, 0);
+        G_TYPE_FROM_CLASS (klass),
+        G_SIGNAL_RUN_LAST,
+        G_STRUCT_OFFSET (ChamplainAdjustmentClass, changed),
+        NULL, NULL,
+        g_cclosure_marshal_VOID__VOID,
+        G_TYPE_NONE, 0);
 }
+
 
 static void
 champlain_adjustment_init (ChamplainAdjustment *self)
@@ -301,23 +308,25 @@ champlain_adjustment_init (ChamplainAdjustment *self)
   self->priv = ADJUSTMENT_PRIVATE (self);
 }
 
+
 ChamplainAdjustment *
 champlain_adjustment_new (gdouble value,
-                     gdouble lower,
-                     gdouble upper,
-                     gdouble step_increment,
-                     gdouble page_increment,
-                     gdouble page_size)
+    gdouble lower,
+    gdouble upper,
+    gdouble step_increment,
+    gdouble page_increment,
+    gdouble page_size)
 {
   return g_object_new (CHAMPLAIN_TYPE_ADJUSTMENT,
-                       "value", value,
-                       "lower", lower,
-                       "upper", upper,
-                       "step-increment", step_increment,
-                       "page-increment", page_increment,
-                       "page-size", page_size,
-                       NULL);
+      "value", value,
+      "lower", lower,
+      "upper", upper,
+      "step-increment", step_increment,
+      "page-increment", page_increment,
+      "page-size", page_size,
+      NULL);
 }
+
 
 gdouble
 champlain_adjustment_get_value (ChamplainAdjustment *adjustment)
@@ -327,9 +336,10 @@ champlain_adjustment_get_value (ChamplainAdjustment *adjustment)
   return adjustment->priv->value;
 }
 
+
 void
 champlain_adjustment_set_value (ChamplainAdjustment *adjustment,
-                           double value)
+    double value)
 {
   ChamplainAdjustmentPrivate *priv;
 
@@ -341,7 +351,7 @@ champlain_adjustment_set_value (ChamplainAdjustment *adjustment,
 
   if (!priv->elastic)
     value = CLAMP (value, priv->lower, MAX (priv->lower,
-                                            priv->upper - priv->page_size));
+              priv->upper - priv->page_size));
 
   if (priv->value != value)
     {
@@ -350,10 +360,11 @@ champlain_adjustment_set_value (ChamplainAdjustment *adjustment,
     }
 }
 
+
 static void
 champlain_adjustment_clamp_page (ChamplainAdjustment *adjustment,
-                            double lower,
-                            double upper)
+    double lower,
+    double upper)
 {
   gboolean changed;
   ChamplainAdjustmentPrivate *priv;
@@ -385,9 +396,10 @@ champlain_adjustment_clamp_page (ChamplainAdjustment *adjustment,
     g_object_notify (G_OBJECT (adjustment), "value");
 }
 
+
 static void
 champlain_adjustment_set_lower (ChamplainAdjustment *adjustment,
-                           gdouble         lower)
+    gdouble lower)
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
@@ -403,9 +415,10 @@ champlain_adjustment_set_lower (ChamplainAdjustment *adjustment,
     }
 }
 
+
 static void
 champlain_adjustment_set_upper (ChamplainAdjustment *adjustment,
-                           gdouble         upper)
+    gdouble upper)
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
@@ -421,9 +434,10 @@ champlain_adjustment_set_upper (ChamplainAdjustment *adjustment,
     }
 }
 
+
 static void
 champlain_adjustment_set_step_increment (ChamplainAdjustment *adjustment,
-                                    gdouble         step)
+    gdouble step)
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
@@ -437,9 +451,10 @@ champlain_adjustment_set_step_increment (ChamplainAdjustment *adjustment,
     }
 }
 
+
 static void
 champlain_adjustment_set_page_increment (ChamplainAdjustment *adjustment,
-                                    gdouble        page)
+    gdouble page)
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
@@ -453,9 +468,10 @@ champlain_adjustment_set_page_increment (ChamplainAdjustment *adjustment,
     }
 }
 
+
 static void
 champlain_adjustment_set_page_size (ChamplainAdjustment *adjustment,
-                               gdouble         size)
+    gdouble size)
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
@@ -471,14 +487,15 @@ champlain_adjustment_set_page_size (ChamplainAdjustment *adjustment,
     }
 }
 
+
 void
 champlain_adjustment_get_values (ChamplainAdjustment *adjustment,
-                            gdouble        *value,
-                            gdouble        *lower,
-                            gdouble        *upper,
-                            gdouble        *step_increment,
-                            gdouble        *page_increment,
-                            gdouble        *page_size)
+    gdouble *value,
+    gdouble *lower,
+    gdouble *upper,
+    gdouble *step_increment,
+    gdouble *page_increment,
+    gdouble *page_size)
 {
   ChamplainAdjustmentPrivate *priv;
 
@@ -505,10 +522,11 @@ champlain_adjustment_get_values (ChamplainAdjustment *adjustment,
     *page_size = priv->page_size;
 }
 
+
 static void
 interpolation_new_frame_cb (ClutterTimeline *timeline,
-                            gint             frame_num,
-                            ChamplainAdjustment  *adjustment)
+    gint frame_num,
+    ChamplainAdjustment *adjustment)
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
@@ -523,21 +541,23 @@ interpolation_new_frame_cb (ClutterTimeline *timeline,
     }
   else
     champlain_adjustment_set_value (adjustment,
-                                priv->old_position +
-                                frame_num * priv->dx);
+        priv->old_position +
+        frame_num * priv->dx);
   priv->interpolation = timeline;
 }
 
+
 static void
 interpolation_completed_cb (ClutterTimeline *timeline,
-                            ChamplainAdjustment  *adjustment)
+    ChamplainAdjustment *adjustment)
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
- 
+
   stop_interpolation (adjustment);
   champlain_adjustment_set_value (adjustment,
-                              priv->new_position);
+      priv->new_position);
 }
+
 
 /* Note, there's super-optimal code that does a similar thing in
  * clutter-alpha.c
@@ -546,26 +566,26 @@ interpolation_completed_cb (ClutterTimeline *timeline,
  * better. Leaving code here in case this is revisited.
  */
 /*
-static guint32
-bounce_alpha_func (ClutterAlpha *alpha,
+   static guint32
+   bounce_alpha_func (ClutterAlpha *alpha,
                    gpointer      user_data)
-{
-  gdouble progress, angle;
-  ClutterTimeline *timeline = clutter_alpha_get_timeline (alpha);
-  
-  progress = clutter_timeline_get_progressx (timeline);
-  angle = clutter_qmulx (CFX_PI_2 + CFX_PI_4/2, progress);
-  
-  return clutter_sinx (angle) +
+   {
+   gdouble progress, angle;
+   ClutterTimeline *timeline = clutter_alpha_get_timeline (alpha);
+
+   progress = clutter_timeline_get_progressx (timeline);
+   angle = clutter_qmulx (CFX_PI_2 + CFX_PI_4/2, progress);
+
+   return clutter_sinx (angle) +
     (CFX_ONE - clutter_sinx (CFX_PI_2 + CFX_PI_4/2));
-}
-*/
+   }
+ */
 
 void
 champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
-                              gdouble         value,
-                              guint           n_frames,
-                              guint           fps)
+    gdouble value,
+    guint n_frames,
+    guint fps)
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
@@ -581,23 +601,24 @@ champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
   priv->new_position = value;
 
   priv->dx = (priv->new_position - priv->old_position) * n_frames;
-  priv->interpolation = clutter_timeline_new (((float)n_frames / fps) * 1000);
+  priv->interpolation = clutter_timeline_new (((float) n_frames / fps) * 1000);
 
   if (priv->elastic)
     priv->bounce_alpha = clutter_alpha_new_full (priv->interpolation,
-                                                 CLUTTER_EASE_OUT_SINE);
+          CLUTTER_EASE_OUT_SINE);
 
   g_signal_connect (priv->interpolation,
-                    "new-frame",
-                    G_CALLBACK (interpolation_new_frame_cb),
-                    adjustment);
+      "new-frame",
+      G_CALLBACK (interpolation_new_frame_cb),
+      adjustment);
   g_signal_connect (priv->interpolation,
-                    "completed",
-                    G_CALLBACK (interpolation_completed_cb),
-                    adjustment);
+      "completed",
+      G_CALLBACK (interpolation_completed_cb),
+      adjustment);
 
   clutter_timeline_start (priv->interpolation);
 }
+
 
 gboolean
 champlain_adjustment_get_elastic (ChamplainAdjustment *adjustment)
@@ -605,18 +626,20 @@ champlain_adjustment_get_elastic (ChamplainAdjustment *adjustment)
   return adjustment->priv->elastic;
 }
 
+
 void
 champlain_adjustment_set_elastic (ChamplainAdjustment *adjustment,
-                             gboolean        elastic)
+    gboolean elastic)
 {
   adjustment->priv->elastic = elastic;
 }
 
+
 gboolean
 champlain_adjustment_clamp (ChamplainAdjustment *adjustment,
-                       gboolean        interpolate,
-                       guint           n_frames,
-                       guint           fps)
+    gboolean interpolate,
+    guint n_frames,
+    guint fps)
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
   gdouble dest = priv->value;
@@ -630,9 +653,9 @@ champlain_adjustment_clamp (ChamplainAdjustment *adjustment,
     {
       if (interpolate)
         champlain_adjustment_interpolate (adjustment,
-                                      dest,
-                                      n_frames,
-                                      fps);
+            dest,
+            n_frames,
+            fps);
       else
         champlain_adjustment_set_value (adjustment, dest);
 

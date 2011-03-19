@@ -30,7 +30,7 @@
  * This is a shameless coppy of ClutterGroup. The only difference is that
  * it doesn't sort actors by depth, which slows down things in libchamplain
  * considerably.
- * 
+ *
  */
 
 #ifdef HAVE_CONFIG_H
@@ -64,30 +64,30 @@ enum
 static void clutter_container_iface_init (ClutterContainerIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (ChamplainGroup, champlain_group, CLUTTER_TYPE_ACTOR,
-                         G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER,
-                                                clutter_container_iface_init));
+    G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER,
+        clutter_container_iface_init));
 
 /*
-static gint
-sort_by_depth (gconstpointer a,
+   static gint
+   sort_by_depth (gconstpointer a,
                gconstpointer b)
-{
-  gfloat depth_a = clutter_actor_get_depth (CLUTTER_ACTOR(a));
-  gfloat depth_b = clutter_actor_get_depth (CLUTTER_ACTOR(b));
+   {
+   gfloat depth_a = clutter_actor_get_depth (CLUTTER_ACTOR(a));
+   gfloat depth_b = clutter_actor_get_depth (CLUTTER_ACTOR(b));
 
-  if (depth_a < depth_b)
+   if (depth_a < depth_b)
     return -1;
 
-  if (depth_a > depth_b)
+   if (depth_a > depth_b)
     return 1;
 
-  return 0;
-}
-*/
+   return 0;
+   }
+ */
 
 static void
 champlain_group_real_add (ClutterContainer *container,
-                        ClutterActor     *actor)
+    ClutterActor *actor)
 {
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (container)->priv;
 
@@ -108,9 +108,10 @@ champlain_group_real_add (ClutterContainer *container,
   g_object_unref (actor);
 }
 
+
 static void
 champlain_group_real_remove (ClutterContainer *container,
-                           ClutterActor     *actor)
+    ClutterActor *actor)
 {
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (container)->priv;
 
@@ -135,10 +136,11 @@ champlain_group_real_remove (ClutterContainer *container,
   g_object_unref (actor);
 }
 
+
 static void
 champlain_group_real_foreach (ClutterContainer *container,
-                            ClutterCallback   callback,
-                            gpointer          user_data)
+    ClutterCallback callback,
+    gpointer user_data)
 {
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (container)->priv;
 
@@ -149,10 +151,11 @@ champlain_group_real_foreach (ClutterContainer *container,
   g_list_foreach (priv->children, (GFunc) callback, user_data);
 }
 
+
 static void
 champlain_group_real_raise (ClutterContainer *container,
-                          ClutterActor     *actor,
-                          ClutterActor     *sibling)
+    ClutterActor *actor,
+    ClutterActor *sibling)
 {
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (container)->priv;
 
@@ -192,10 +195,11 @@ champlain_group_real_raise (ClutterContainer *container,
   clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
 
+
 static void
 champlain_group_real_lower (ClutterContainer *container,
-                          ClutterActor     *actor,
-                          ClutterActor     *sibling)
+    ClutterActor *actor,
+    ClutterActor *sibling)
 {
   ChamplainGroup *self = CHAMPLAIN_GROUP (container);
   ChamplainGroupPrivate *priv = self->priv;
@@ -231,15 +235,17 @@ champlain_group_real_lower (ClutterContainer *container,
   clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
 
+
 static void
 champlain_group_real_sort_depth_order (ClutterContainer *container)
 {
-//  ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (container)->priv;
+/*  ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (container)->priv; */
 
-//  priv->children = g_list_sort (priv->children, sort_by_depth);
+/*  priv->children = g_list_sort (priv->children, sort_by_depth); */
 
-//  clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
+/*  clutter_actor_queue_redraw (CLUTTER_ACTOR (container)); */
 }
+
 
 static void
 clutter_container_iface_init (ClutterContainerIface *iface)
@@ -252,6 +258,7 @@ clutter_container_iface_init (ClutterContainerIface *iface)
   iface->sort_depth_order = champlain_group_real_sort_depth_order;
 }
 
+
 static void
 champlain_group_real_paint (ClutterActor *actor)
 {
@@ -260,9 +267,10 @@ champlain_group_real_paint (ClutterActor *actor)
   g_list_foreach (priv->children, (GFunc) clutter_actor_paint, NULL);
 }
 
+
 static void
-champlain_group_real_pick (ClutterActor       *actor,
-                         const ClutterColor *pick)
+champlain_group_real_pick (ClutterActor *actor,
+    const ClutterColor *pick)
 {
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (actor)->priv;
 
@@ -272,38 +280,41 @@ champlain_group_real_pick (ClutterActor       *actor,
   g_list_foreach (priv->children, (GFunc) clutter_actor_paint, NULL);
 }
 
+
 static void
 champlain_group_real_get_preferred_width (ClutterActor *actor,
-                                        gfloat        for_height,
-                                        gfloat       *min_width,
-                                        gfloat       *natural_width)
+    gfloat for_height,
+    gfloat *min_width,
+    gfloat *natural_width)
 {
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (actor)->priv;
 
   clutter_layout_manager_get_preferred_width (priv->layout,
-                                              CLUTTER_CONTAINER (actor),
-                                              for_height,
-                                              min_width, natural_width);
+      CLUTTER_CONTAINER (actor),
+      for_height,
+      min_width, natural_width);
 }
+
 
 static void
 champlain_group_real_get_preferred_height (ClutterActor *actor,
-                                         gfloat        for_width,
-                                         gfloat       *min_height,
-                                         gfloat       *natural_height)
+    gfloat for_width,
+    gfloat *min_height,
+    gfloat *natural_height)
 {
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (actor)->priv;
 
   clutter_layout_manager_get_preferred_height (priv->layout,
-                                               CLUTTER_CONTAINER (actor),
-                                               for_width,
-                                               min_height, natural_height);
+      CLUTTER_CONTAINER (actor),
+      for_width,
+      min_height, natural_height);
 }
 
+
 static void
-champlain_group_real_allocate (ClutterActor           *actor,
-                             const ClutterActorBox  *allocation,
-                             ClutterAllocationFlags  flags)
+champlain_group_real_allocate (ClutterActor *actor,
+    const ClutterActorBox *allocation,
+    ClutterAllocationFlags flags)
 {
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (actor)->priv;
   ClutterActorClass *klass;
@@ -315,9 +326,10 @@ champlain_group_real_allocate (ClutterActor           *actor,
     return;
 
   clutter_layout_manager_allocate (priv->layout,
-                                   CLUTTER_CONTAINER (actor),
-                                   allocation, flags);
+      CLUTTER_CONTAINER (actor),
+      allocation, flags);
 }
+
 
 static void
 champlain_group_dispose (GObject *object)
@@ -343,25 +355,25 @@ champlain_group_dispose (GObject *object)
   G_OBJECT_CLASS (champlain_group_parent_class)->dispose (object);
 }
 
+
 static void
 champlain_group_real_show_all (ClutterActor *actor)
 {
   clutter_container_foreach (CLUTTER_CONTAINER (actor),
-                             CLUTTER_CALLBACK (clutter_actor_show),
-                             NULL);
+      CLUTTER_CALLBACK (clutter_actor_show),
+      NULL);
   clutter_actor_show (actor);
 }
+
 
 static void
 champlain_group_real_hide_all (ClutterActor *actor)
 {
   clutter_actor_hide (actor);
   clutter_container_foreach (CLUTTER_CONTAINER (actor),
-                             CLUTTER_CALLBACK (clutter_actor_hide),
-                             NULL);
+      CLUTTER_CALLBACK (clutter_actor_hide),
+      NULL);
 }
-
-
 
 
 static void
@@ -381,8 +393,8 @@ champlain_group_class_init (ChamplainGroupClass *klass)
   actor_class->hide_all = champlain_group_real_hide_all;
 
   gobject_class->dispose = champlain_group_dispose;
-
 }
+
 
 static void
 champlain_group_init (ChamplainGroup *self)
@@ -393,8 +405,9 @@ champlain_group_init (ChamplainGroup *self)
   g_object_ref_sink (self->priv->layout);
 
   clutter_layout_manager_set_container (self->priv->layout,
-                                        CLUTTER_CONTAINER (self));
+      CLUTTER_CONTAINER (self));
 }
+
 
 /**
  * champlain_group_new:
@@ -408,6 +421,7 @@ champlain_group_new (void)
 {
   return g_object_new (CHAMPLAIN_TYPE_GROUP, NULL);
 }
+
 
 /**
  * champlain_group_remove_all:
@@ -432,6 +446,7 @@ champlain_group_remove_all (ChamplainGroup *group)
     }
 }
 
+
 /**
  * champlain_group_get_n_children:
  * @self: A #ChamplainGroup
@@ -450,6 +465,7 @@ champlain_group_get_n_children (ChamplainGroup *self)
   return g_list_length (self->priv->children);
 }
 
+
 /**
  * champlain_group_get_nth_child:
  * @self: A #ChamplainGroup
@@ -464,7 +480,7 @@ champlain_group_get_n_children (ChamplainGroup *self)
  */
 ClutterActor *
 champlain_group_get_nth_child (ChamplainGroup *self,
-			     gint          index_)
+    gint index_)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_GROUP (self), NULL);
 

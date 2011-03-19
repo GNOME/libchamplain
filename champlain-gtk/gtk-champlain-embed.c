@@ -251,11 +251,11 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 
 static void
 gdk_to_clutter_color (GdkColor *gtk_color,
-                      ClutterColor *color)
+    ClutterColor *color)
 {
-  color->red   = CLAMP (((gtk_color->red   / 65535.0) * 255), 0, 255);
+  color->red = CLAMP (((gtk_color->red / 65535.0) * 255), 0, 255);
   color->green = CLAMP (((gtk_color->green / 65535.0) * 255), 0, 255);
-  color->blue  = CLAMP (((gtk_color->blue  / 65535.0) * 255), 0, 255);
+  color->blue = CLAMP (((gtk_color->blue / 65535.0) * 255), 0, 255);
   color->alpha = 255;
 }
 
@@ -267,7 +267,7 @@ view_realize_cb (GtkWidget *widget,
   ClutterColor color = { 0, 0, 0, };
   GtkChamplainEmbedPrivate *priv = view->priv;
   GtkStyle *style;
- 
+
   /* Setup mouse cursor to a hand */
   gdk_window_set_cursor (gtk_widget_get_window (priv->clutter_embed), priv->cursor_hand_open);
 

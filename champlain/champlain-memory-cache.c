@@ -23,7 +23,7 @@
  * #ChamplainMemoryCache is a cache that stores and retrieves tiles from the
  * memory. The cache contents is not preserved between application restarts
  * so this cache serves mostly as a quick access temporary cache to the
- * most recently used tiles. 
+ * most recently used tiles.
  */
 
 #define DEBUG_FLAG CHAMPLAIN_DEBUG_CACHE
@@ -156,12 +156,12 @@ champlain_memory_cache_class_init (ChamplainMemoryCacheClass *klass)
    * Since: 0.8
    */
   pspec = g_param_spec_uint ("size-limit",
-      "Size Limit",
-      "Maximal number of stored tiles",
-      1,
-      G_MAXINT,
-      100,
-      G_PARAM_CONSTRUCT | G_PARAM_READWRITE);
+        "Size Limit",
+        "Maximal number of stored tiles",
+        1,
+        G_MAXINT,
+        100,
+        G_PARAM_CONSTRUCT | G_PARAM_READWRITE);
   g_object_class_install_property (object_class, PROP_SIZE_LIMIT, pspec);
 
   tile_cache_class->store_tile = store_tile;
@@ -190,9 +190,9 @@ champlain_memory_cache_new_full (guint size_limit,
   ChamplainMemoryCache *cache;
 
   cache = g_object_new (CHAMPLAIN_TYPE_MEMORY_CACHE,
-      "size-limit", size_limit,
-      "renderer", renderer,
-      NULL);
+        "size-limit", size_limit,
+        "renderer", renderer,
+        NULL);
 
   return cache;
 }
@@ -262,10 +262,10 @@ generate_queue_key (ChamplainMemoryCache *memory_cache,
   gchar *key;
 
   key = g_strdup_printf ("%d/%d/%d/%s",
-      champlain_tile_get_zoom_level (tile),
-      champlain_tile_get_x (tile),
-      champlain_tile_get_y (tile),
-      champlain_map_source_get_id (map_source));
+        champlain_tile_get_zoom_level (tile),
+        champlain_tile_get_x (tile),
+        champlain_tile_get_y (tile),
+        champlain_map_source_get_id (map_source));
   return key;
 }
 

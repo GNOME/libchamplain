@@ -82,17 +82,17 @@ typedef ChamplainMapSource * (*ChamplainMapSourceConstructor)
 GType champlain_map_source_desc_get_type (void);
 
 ChamplainMapSourceDesc *champlain_map_source_desc_new_full (
-  gchar *id,
-  gchar *name,
-  gchar *license,
-  gchar *license_uri,
-  guint min_zoom,
-  guint max_zoom,
-  guint tile_size,
-  ChamplainMapProjection projection,
-  gchar *uri_format,
-  ChamplainMapSourceConstructor constructor,
-  gpointer data);
+    gchar *id,
+    gchar *name,
+    gchar *license,
+    gchar *license_uri,
+    guint min_zoom,
+    guint max_zoom,
+    guint tile_size,
+    ChamplainMapProjection projection,
+    gchar *uri_format,
+    ChamplainMapSourceConstructor constructor,
+    gpointer data);
 
 const gchar *champlain_map_source_desc_get_id (ChamplainMapSourceDesc *desc);
 const gchar *champlain_map_source_desc_get_name (ChamplainMapSourceDesc *desc);
