@@ -1,3 +1,11 @@
+libchamplain 0.8.2 (2011-03-20)
+===============================
+
+Stable release
+
+Changes:
+* Fix painting problems with Clutter 1.6 (Jiří Techet)
+
 libchamplain 0.8.1 (2011-01-18)
 ===============================
 
