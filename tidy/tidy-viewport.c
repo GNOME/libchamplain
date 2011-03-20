@@ -207,15 +207,7 @@ tidy_viewport_paint (ClutterActor *self)
 {
   TidyViewportPrivate *priv = TIDY_VIEWPORT (self)->priv;
 
-  cogl_push_matrix ();
-
-  cogl_translate ((priv->x) * -1.0,
-                  (priv->y) * -1.0,
-                  (priv->z) * -1.0);
-
   CLUTTER_ACTOR_CLASS (tidy_viewport_parent_class)->paint (self);
-
-  cogl_pop_matrix ();
 }
 
 static void
@@ -535,6 +527,7 @@ tidy_viewport_set_origin (TidyViewport *viewport,
                           float z)
 {
   TidyViewportPrivate *priv;
+  GList *children, *child;
 
   g_return_if_fail (TIDY_IS_VIEWPORT (viewport));
 
@@ -570,6 +563,11 @@ tidy_viewport_set_origin (TidyViewport *viewport,
 
   g_object_thaw_notify (G_OBJECT (viewport));
 
+  children = clutter_container_get_children (CLUTTER_CONTAINER (viewport));
+  for (child = children; child != NULL; child = g_list_next (child))
+    clutter_actor_set_position (CLUTTER_ACTOR (child->data), -x, -y);
+  g_list_free (children);
+  
   clutter_actor_queue_redraw (CLUTTER_ACTOR (viewport));
 }
 
