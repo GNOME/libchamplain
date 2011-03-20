@@ -43,5 +43,6 @@
   <part>
     <title>API Reference</title>
     <xi:include href="xml/gtk-champlain-embed.xml"/>
+    <xi:include href="xml/annotation-glossary.xml"><xi:fallback /></xi:include>
   </part>
 </book>

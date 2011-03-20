@@ -59,8 +59,18 @@ endif
 
 # Header files to ignore when scanning. Use base file name, no paths
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES= $(ignored_headers) champlain-debug.h champlain-enum-types.h champlain-private.h \
-	champlain.h champlain-marshal.h champlain-defines.h champlain-features.h champlain-group.h
+IGNORE_HFILES= $(ignored_headers) \
+	champlain-debug.h \
+	champlain-enum-types.h \
+	champlain-private.h \
+	champlain.h \
+	champlain-marshal.h \
+	champlain-defines.h \
+	champlain-features.h \
+	champlain-group.h \
+	champlain-adjustment.h \
+	champlain-kinetic-scroll-view.h \
+	champlain-viewport.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png

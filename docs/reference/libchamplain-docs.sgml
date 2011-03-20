@@ -106,8 +106,9 @@
     <xi:include href="xml/champlain-tile.xml"/>
     <xi:include href="xml/champlain-bounding-box.xml"/>
     <xi:include href="xml/champlain-version.xml"/>
+    <xi:include href="xml/annotation-glossary.xml"><xi:fallback /></xi:include>
   </part>
-  
+
   <index>
     <title>Index</title>
   </index>
