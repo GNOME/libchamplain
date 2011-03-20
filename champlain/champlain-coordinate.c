@@ -47,16 +47,15 @@ static gdouble get_longitude (ChamplainLocation *location);
 static void location_interface_init (ChamplainLocationIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (ChamplainCoordinate, champlain_coordinate, G_TYPE_INITIALLY_UNOWNED,
-    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION,
-        location_interface_init));
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION, location_interface_init));
 
 #define CHAMPLAIN_COORDINATE_GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_COORDINATE, ChamplainCoordinatePrivate))
 
 struct _ChamplainCoordinatePrivate
 {
-  gdouble lon;
-  gdouble lat;
+  gdouble longitude;
+  gdouble latitude;
 };
 
 static void
@@ -71,11 +70,11 @@ champlain_coordinate_get_property (GObject *object,
   switch (prop_id)
     {
     case PROP_LONGITUDE:
-      g_value_set_double (value, priv->lon);
+      g_value_set_double (value, priv->longitude);
       break;
 
     case PROP_LATITUDE:
-      g_value_set_double (value, priv->lat);
+      g_value_set_double (value, priv->latitude);
       break;
 
     default:
@@ -97,15 +96,15 @@ champlain_coordinate_set_property (GObject *object,
     {
     case PROP_LONGITUDE:
       {
-        gdouble lon = g_value_get_double (value);
-        set_location (CHAMPLAIN_LOCATION (coordinate), priv->lat, lon);
+        gdouble longitude = g_value_get_double (value);
+        set_location (CHAMPLAIN_LOCATION (coordinate), priv->latitude, longitude);
         break;
       }
 
     case PROP_LATITUDE:
       {
-        gdouble lat = g_value_get_double (value);
-        set_location (CHAMPLAIN_LOCATION (coordinate), lat, priv->lon);
+        gdouble latitude = g_value_get_double (value);
+        set_location (CHAMPLAIN_LOCATION (coordinate), latitude, priv->longitude);
         break;
       }
 
@@ -124,8 +123,8 @@ set_location (ChamplainLocation *location,
 
   ChamplainCoordinatePrivate *priv = CHAMPLAIN_COORDINATE (location)->priv;
 
-  priv->lon = longitude;
-  priv->lat = latitude;
+  priv->longitude = longitude;
+  priv->latitude = latitude;
 
   g_object_notify (G_OBJECT (location), "latitude");
   g_object_notify (G_OBJECT (location), "longitude");
@@ -139,7 +138,7 @@ get_latitude (ChamplainLocation *location)
 
   ChamplainCoordinatePrivate *priv = CHAMPLAIN_COORDINATE (location)->priv;
 
-  return priv->lat;
+  return priv->latitude;
 }
 
 
@@ -150,7 +149,7 @@ get_longitude (ChamplainLocation *location)
 
   ChamplainCoordinatePrivate *priv = CHAMPLAIN_COORDINATE (location)->priv;
 
-  return priv->lon;
+  return priv->longitude;
 }
 
 
@@ -205,8 +204,8 @@ champlain_coordinate_init (ChamplainCoordinate *coordinate)
 
   coordinate->priv = priv;
 
-  priv->lat = 0;
-  priv->lon = 0;
+  priv->latitude = 0.0;
+  priv->longitude = 0.0;
 }
 
 
