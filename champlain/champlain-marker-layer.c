@@ -214,6 +214,8 @@ champlain_marker_layer_dispose (GObject *object)
   ChamplainMarkerLayer *self = CHAMPLAIN_MARKER_LAYER (object);
   ChamplainMarkerLayerPrivate *priv = self->priv;
 
+  champlain_marker_layer_remove_all (CHAMPLAIN_MARKER_LAYER (object));
+
   if (priv->view != NULL)
     {
       set_view (CHAMPLAIN_LAYER (self), NULL);
@@ -289,10 +291,8 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
   priv->mode = CHAMPLAIN_SELECTION_NONE;
   priv->view = NULL;
 
-  /* TODO destroy + ref() */
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
-
   clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
 }
 
@@ -370,9 +370,7 @@ marker_selected_cb (ChamplainMarker *marker,
     ChamplainMarkerLayer *layer)
 {
   if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
-    {
-      set_selected_all_but_one (layer, marker, FALSE);
-    }
+    set_selected_all_but_one (layer, marker, FALSE);
 }
 
 
@@ -491,6 +489,9 @@ champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
 
       g_signal_handlers_disconnect_by_func (marker,
           G_CALLBACK (marker_position_notify), layer);
+
+      g_signal_handlers_disconnect_by_func (marker,
+          G_CALLBACK (marker_move_by_cb), layer);
     }
 
   champlain_group_remove_all (CHAMPLAIN_GROUP (priv->content_group));
@@ -578,6 +579,9 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
   g_signal_handlers_disconnect_by_func (G_OBJECT (marker),
       G_CALLBACK (marker_position_notify), layer);
 
+  g_signal_handlers_disconnect_by_func (marker,
+      G_CALLBACK (marker_move_by_cb), layer);
+
   clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), CLUTTER_ACTOR (marker));
 }
 
@@ -626,7 +630,6 @@ void
 champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
-
   GList *elem;
   guint delay = 0;
   GList *markers;
@@ -819,16 +822,12 @@ champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  gboolean select;
-
   if (layer->priv->mode == mode)
     return;
   layer->priv->mode = mode;
 
-  select = mode != CHAMPLAIN_SELECTION_NONE &&
-    mode != CHAMPLAIN_SELECTION_SINGLE;
-
-  set_selected_all_but_one (layer, NULL, select);
+  if (mode != CHAMPLAIN_SELECTION_MULTIPLE)
+    set_selected_all_but_one (layer, NULL, FALSE);
 
   g_object_notify (G_OBJECT (layer), "selection-mode");
 }
@@ -847,9 +846,7 @@ champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
 ChamplainSelectionMode
 champlain_marker_layer_get_selection_mode (ChamplainMarkerLayer *layer)
 {
-  g_return_val_if_fail (
-      CHAMPLAIN_IS_MARKER_LAYER (layer),
-      CHAMPLAIN_SELECTION_SINGLE);
+  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer), CHAMPLAIN_SELECTION_SINGLE);
   return layer->priv->mode;
 }
 

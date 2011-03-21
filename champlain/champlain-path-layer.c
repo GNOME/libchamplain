@@ -292,10 +292,11 @@ champlain_path_layer_dispose (GObject *object)
   ChamplainPathLayer *self = CHAMPLAIN_PATH_LAYER (object);
   ChamplainPathLayerPrivate *priv = self->priv;
 
+  if (priv->nodes)
+    champlain_path_layer_remove_all (CHAMPLAIN_PATH_LAYER (object));
+
   if (priv->view != NULL)
-    {
-      set_view (CHAMPLAIN_LAYER (self), NULL);
-    }
+    set_view (CHAMPLAIN_LAYER (self), NULL);
 
   if (priv->content_group)
     {
@@ -315,7 +316,6 @@ champlain_path_layer_finalize (GObject *object)
 
   clutter_color_free (priv->stroke_color);
   clutter_color_free (priv->fill_color);
-  g_list_free (priv->nodes);
 
   G_OBJECT_CLASS (champlain_path_layer_parent_class)->finalize (object);
 }
@@ -473,7 +473,6 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
 
-  /* TODO destroy + ref() */
   priv->path_actor = clutter_cairo_texture_new (256, 256);
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->path_actor);
 
@@ -773,6 +772,10 @@ set_view (ChamplainLayer *layer,
     {
       g_signal_handlers_disconnect_by_func (path_layer->priv->view,
           G_CALLBACK (relocate_cb), path_layer);
+
+      g_signal_handlers_disconnect_by_func (path_layer->priv->view,
+          G_CALLBACK (redraw_path_cb), path_layer);
+
       g_object_unref (path_layer->priv->view);
     }
 

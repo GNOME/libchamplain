@@ -230,6 +230,12 @@ champlain_scale_dispose (GObject *object)
       priv->content_group = NULL;
     }
 
+  if (priv->view)
+    {
+      champlain_scale_disconnect_view (CHAMPLAIN_SCALE (object));
+      priv->view = NULL;
+    }
+
   G_OBJECT_CLASS (champlain_scale_parent_class)->dispose (object);
 }
 
@@ -629,7 +635,7 @@ champlain_scale_connect_view (ChamplainScale *scale,
 {
   g_return_if_fail (CHAMPLAIN_IS_SCALE (scale));
 
-  scale->priv->view = view;
+  scale->priv->view = g_object_ref (view);
   g_signal_connect (view, "notify::latitude",
       G_CALLBACK (redraw_scale_cb), scale);
   schedule_redraw (scale);
@@ -652,5 +658,6 @@ champlain_scale_disconnect_view (ChamplainScale *scale)
   g_signal_handlers_disconnect_by_func (scale->priv->view,
       redraw_scale_cb,
       scale);
+  g_object_unref (scale->priv->view);
   scale->priv->view = NULL;
 }
