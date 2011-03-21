@@ -340,22 +340,13 @@ champlain_label_dispose (GObject *object)
   ChamplainLabelPrivate *priv = CHAMPLAIN_LABEL (object)->priv;
 
   if (priv->background)
-    {
-      g_object_unref (priv->background);
-      priv->background = NULL;
-    }
+    priv->background = NULL;
 
   if (priv->shadow)
-    {
-      g_object_unref (priv->shadow);
-      priv->shadow = NULL;
-    }
+    priv->shadow = NULL;
 
   if (priv->text_actor)
-    {
-      g_object_unref (priv->text_actor);
-      priv->text_actor = NULL;
-    }
+    priv->text_actor = NULL;
 
   if (priv->image)
     {
@@ -660,10 +651,9 @@ draw_shadow (ChamplainLabel *label,
     {
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group),
           priv->shadow);
-      g_object_unref (priv->shadow);
     }
 
-  priv->shadow = g_object_ref (shadow);
+  priv->shadow = shadow;
 }
 
 
@@ -720,10 +710,9 @@ draw_background (ChamplainLabel *label,
     {
       clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group),
           priv->background);
-      g_object_unref (priv->background);
     }
 
-  priv->background = g_object_ref (bg);
+  priv->background = bg;
 }
 
 
@@ -750,7 +739,6 @@ draw_label (ChamplainLabel *label)
       if (priv->text_actor == NULL)
         {
           priv->text_actor = clutter_text_new_with_text (priv->font_name, priv->text);
-          g_object_ref (priv->text_actor);
         }
 
       text = CLUTTER_TEXT (priv->text_actor);
@@ -803,14 +791,12 @@ draw_label (ChamplainLabel *label)
       if (priv->background != NULL)
         {
           clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), priv->background);
-          g_object_unref (G_OBJECT (priv->background));
           priv->background = NULL;
         }
 
       if (priv->shadow != NULL)
         {
           clutter_container_remove_actor (CLUTTER_CONTAINER (priv->content_group), priv->shadow);
-          g_object_unref (G_OBJECT (priv->shadow));
           priv->shadow = NULL;
         }
     }

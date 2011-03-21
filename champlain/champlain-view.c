@@ -165,8 +165,6 @@ struct _ChamplainViewPrivate
   gint viewport_width;
   gint viewport_height;
 
-  ClutterActor *viewport_container;
-
   ClutterActor *user_layers; /* Contains the markers */
 
   gboolean keep_center_on_resize;
@@ -512,42 +510,28 @@ champlain_view_dispose (GObject *object)
     }
 
   if (priv->view_box != NULL)
-    {
-      g_object_unref (priv->view_box);
-      priv->view_box = NULL;
-    }
+    priv->view_box = NULL;
 
   if (priv->license_actor != NULL)
-    {
-      g_object_unref (priv->license_actor);
-      priv->license_actor = NULL;
-    }
+    priv->license_actor = NULL;
 
   if (priv->kinetic_scroll != NULL)
     {
       champlain_kinetic_scroll_view_stop (CHAMPLAIN_KINETIC_SCROLL_VIEW (priv->kinetic_scroll));
-      g_object_unref (priv->kinetic_scroll);
       priv->kinetic_scroll = NULL;
     }
 
   if (priv->viewport != NULL)
     {
       champlain_viewport_stop (CHAMPLAIN_VIEWPORT (priv->viewport));
-      g_object_unref (priv->viewport);
       priv->viewport = NULL;
     }
 
   if (priv->map_layer != NULL)
-    {
-      g_object_unref (priv->map_layer);
-      priv->map_layer = NULL;
-    }
+    priv->map_layer = NULL;
 
   if (priv->user_layers != NULL)
-    {
-      g_object_unref (priv->user_layers);
-      priv->user_layers = NULL;
-    }
+    priv->user_layers = NULL;
 
   if (priv->goto_context != NULL)
     champlain_view_stop_go_to (view);
@@ -967,6 +951,7 @@ champlain_view_init (ChamplainView *view)
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   ChamplainMapSourceFactory *factory;
   ChamplainMapSource *source;
+  ClutterActor *viewport_container;
 
   champlain_debug_set_flags (g_getenv ("CHAMPLAIN_DEBUG"));
 
@@ -1000,25 +985,25 @@ champlain_view_init (ChamplainView *view)
   priv->update_viewport_timer = g_timer_new ();
 
   /* Setup map layer */
-  priv->map_layer = g_object_ref (champlain_group_new ());
+  priv->map_layer = champlain_group_new ();
   clutter_actor_show (priv->map_layer);
 
   /* Setup user_layers */
-  priv->user_layers = g_object_ref (clutter_group_new ());
+  priv->user_layers = clutter_group_new ();
   clutter_actor_show (priv->user_layers);
 
-  priv->viewport_container = g_object_ref (clutter_group_new ());
+  viewport_container = clutter_group_new ();
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport_container),
+  clutter_container_add_actor (CLUTTER_CONTAINER (viewport_container),
       priv->map_layer);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport_container),
+  clutter_container_add_actor (CLUTTER_CONTAINER (viewport_container),
       priv->user_layers);
 
-  clutter_actor_show (priv->viewport_container);
+  clutter_actor_show (viewport_container);
 
   /* Setup viewport */
-  priv->viewport = g_object_ref (champlain_viewport_new ());
-  champlain_viewport_set_child (CHAMPLAIN_VIEWPORT (priv->viewport), priv->viewport_container);
+  priv->viewport = champlain_viewport_new ();
+  champlain_viewport_set_child (CHAMPLAIN_VIEWPORT (priv->viewport), viewport_container);
 
   g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
 
@@ -1030,7 +1015,7 @@ champlain_view_init (ChamplainView *view)
   clutter_actor_raise (priv->user_layers, priv->map_layer);
 
   /* Setup kinetic scroll */
-  priv->kinetic_scroll = g_object_ref (champlain_kinetic_scroll_view_new (FALSE));
+  priv->kinetic_scroll = champlain_kinetic_scroll_view_new (FALSE);
 
   g_signal_connect (priv->kinetic_scroll, "scroll-event",
       G_CALLBACK (scroll_event), view);
@@ -1050,7 +1035,7 @@ champlain_view_init (ChamplainView *view)
   /* Setup stage */
   priv->layout_manager = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_CENTER,
         CLUTTER_BIN_ALIGNMENT_CENTER);
-  priv->view_box = g_object_ref (clutter_box_new (priv->layout_manager));
+  priv->view_box = clutter_box_new (priv->layout_manager);
 
   clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->kinetic_scroll,
       CLUTTER_BIN_ALIGNMENT_FILL,
@@ -1062,7 +1047,7 @@ champlain_view_init (ChamplainView *view)
   resize_viewport (view);
 
   /* Setup license */
-  priv->license_actor = g_object_ref (champlain_license_new ());
+  priv->license_actor = champlain_license_new ();
   champlain_license_connect_view (CHAMPLAIN_LICENSE (priv->license_actor), view);
   champlain_view_bin_layout_add (view, priv->license_actor,
       CLUTTER_BIN_ALIGNMENT_END,
