@@ -79,6 +79,7 @@ struct _ChamplainTilePrivate
 
   GTimeVal *modified_time; /* The last modified time of the cache */
   gchar *etag; /* The HTTP ETag sent by the server */
+  gboolean content_displayed;
 };
 
 static void
@@ -275,11 +276,12 @@ champlain_tile_dispose (GObject *object)
 {
   ChamplainTilePrivate *priv = CHAMPLAIN_TILE (object)->priv;
 
-  if (priv->content_actor)
+  if (!priv->content_displayed && priv->content_actor)
     {
-      g_object_unref (priv->content_actor);
+      clutter_actor_destroy (priv->content_actor);
       priv->content_actor = NULL;
     }
+
   if (priv->content_group)
     {
       clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
@@ -490,6 +492,7 @@ champlain_tile_init (ChamplainTile *self)
   priv->modified_time = NULL;
   priv->etag = NULL;
   priv->fade_in = FALSE;
+  priv->content_displayed = FALSE;
 
   priv->content_actor = NULL;
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
@@ -845,11 +848,12 @@ champlain_tile_set_content (ChamplainTile *self,
 
   ChamplainTilePrivate *priv = self->priv;
 
-  if (priv->content_actor)
+  if (!priv->content_displayed && priv->content_actor)
     clutter_actor_destroy (priv->content_actor);
 
   priv->content_actor = g_object_ref_sink (actor);
-
+  priv->content_displayed = FALSE;
+  
   g_object_notify (G_OBJECT (self), "content");
 }
 
@@ -880,10 +884,12 @@ champlain_tile_display_content (ChamplainTile *self)
   ChamplainTilePrivate *priv = self->priv;
   ClutterAnimation *animation;
 
-  if (!priv->content_actor)
+  if (!priv->content_actor || priv->content_displayed)
     return;
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->content_actor);
+  g_object_unref (priv->content_actor);
+  priv->content_displayed = TRUE;
 
   clutter_actor_set_opacity (CLUTTER_ACTOR (priv->content_actor), 0);
   if (priv->fade_in)
@@ -904,9 +910,6 @@ champlain_tile_display_content (ChamplainTile *self)
     }
 
   g_signal_connect (animation, "completed", G_CALLBACK (fade_in_completed), self);
-
-  g_object_unref (priv->content_actor);
-  priv->content_actor = NULL;
 }
 
 
