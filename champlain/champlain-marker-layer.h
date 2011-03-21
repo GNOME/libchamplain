@@ -110,8 +110,7 @@ void champlain_marker_layer_unselect_all_markers (ChamplainMarkerLayer *layer);
 
 void champlain_marker_layer_set_selection_mode (ChamplainMarkerLayer *layer,
     ChamplainSelectionMode mode);
-ChamplainSelectionMode champlain_marker_layer_get_selection_mode (
-    ChamplainMarkerLayer *layer);
+ChamplainSelectionMode champlain_marker_layer_get_selection_mode (ChamplainMarkerLayer *layer);
 
 G_END_DECLS
 

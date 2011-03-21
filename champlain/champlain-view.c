@@ -2615,3 +2615,66 @@ champlain_view_get_license_actor (ChamplainView *view)
 
   return CHAMPLAIN_LICENSE (view->priv->license_actor);
 }
+
+
+/**
+ * champlain_view_get_center_latitude:
+ * @view: The view
+ *
+ * Gets the latitude of the view's center.
+ *
+ * Returns: the latitude.
+ *
+ * Since: 0.10
+ */
+gdouble
+champlain_view_get_center_latitude (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+
+  return view->priv->latitude;
+}
+
+
+/**
+ * champlain_view_get_center_longitude:
+ * @view: The view
+ *
+ * Gets the longitude of the view's center.
+ *
+ * Returns: the latitude.
+ *
+ * Since: 0.10
+ */
+gdouble
+champlain_view_get_center_longitude (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+
+  return view->priv->longitude;
+}
+
+
+/**
+ * champlain_view_get_state:
+ * @view: The view
+ *
+ * Gets the view's state.
+ *
+ * Returns: the state.
+ *
+ * Since: 0.10
+ */
+ChamplainState
+champlain_view_get_state (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), CHAMPLAIN_STATE_NONE);
+
+  return view->priv->state;
+}

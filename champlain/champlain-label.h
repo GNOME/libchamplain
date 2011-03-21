@@ -121,6 +121,7 @@ PangoWrapMode champlain_label_get_wrap_mode (ChamplainLabel *label);
 PangoEllipsizeMode champlain_label_get_ellipsize (ChamplainLabel *label);
 gboolean champlain_label_get_single_line_mode (ChamplainLabel *label);
 gboolean champlain_label_get_draw_background (ChamplainLabel *label);
+PangoAttrList *champlain_label_get_attributes (ChamplainLabel *label);
 
 
 G_END_DECLS

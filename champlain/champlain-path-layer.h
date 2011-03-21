@@ -107,6 +107,10 @@ gboolean champlain_path_layer_get_visible (ChamplainPathLayer *layer);
 void champlain_path_layer_set_visible (ChamplainPathLayer *layer,
     gboolean value);
 
+gboolean champlain_path_layer_get_closed (ChamplainPathLayer *layer);
+void champlain_path_layer_set_closed (ChamplainPathLayer *layer,
+    gboolean value);
+
 G_END_DECLS
 
 #endif

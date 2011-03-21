@@ -148,13 +148,11 @@ champlain_path_layer_set_property (GObject *object,
     G_GNUC_UNUSED const GValue *value,
     GParamSpec *pspec)
 {
-  ChamplainPathLayer *self = CHAMPLAIN_PATH_LAYER (object);
-  ChamplainPathLayerPrivate *priv = self->priv;
-
   switch (property_id)
     {
     case PROP_CLOSED_PATH:
-      priv->closed_path = g_value_get_boolean (value);
+      champlain_path_layer_set_closed (CHAMPLAIN_PATH_LAYER (object),
+          g_value_get_boolean (value));
       break;
 
     case PROP_FILL:
@@ -1085,4 +1083,43 @@ champlain_path_layer_get_visible (ChamplainPathLayer *layer)
   g_return_val_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer), FALSE);
 
   return layer->priv->visible;
+}
+
+
+/**
+ * champlain_path_layer_set_closed:
+ * @layer: a #ChamplainPathLayer
+ * @value: TRUE to make the path closed
+ *
+ * Makes the path closed.
+ *
+ * Since: 0.10
+ */
+void
+champlain_path_layer_set_closed (ChamplainPathLayer *layer,
+    gboolean value)
+{
+  g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
+
+  layer->priv->closed_path = value;
+  g_object_notify (G_OBJECT (layer), "closed");
+}
+
+
+/**
+ * champlain_path_layer_get_closed:
+ * @layer: a #ChamplainPathLayer
+ *
+ * Gets information whether the path is closed.
+ *
+ * Returns: TRUE when the path is closed, FALSE otherwise
+ *
+ * Since: 0.10
+ */
+gboolean
+champlain_path_layer_get_closed (ChamplainPathLayer *layer)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer), FALSE);
+
+  return layer->priv->closed_path;
 }

@@ -79,6 +79,8 @@ void champlain_view_go_to (ChamplainView *view,
     gdouble latitude,
     gdouble longitude);
 void champlain_view_stop_go_to (ChamplainView *view);
+gdouble champlain_view_get_center_latitude (ChamplainView *view);
+gdouble champlain_view_get_center_longitude (ChamplainView *view);
 
 void champlain_view_zoom_in (ChamplainView *view);
 void champlain_view_zoom_out (ChamplainView *view);
@@ -119,6 +121,7 @@ gdouble champlain_view_get_deceleration (ChamplainView *view);
 gboolean champlain_view_get_kinetic_mode (ChamplainView *view);
 gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
 gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
+ChamplainState champlain_view_get_state (ChamplainView *view);
 
 void champlain_view_reload_tiles (ChamplainView *view);
 

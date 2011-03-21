@@ -1603,3 +1603,22 @@ champlain_label_get_draw_background (ChamplainLabel *label)
 
   return label->priv->draw_background;
 }
+
+
+/**
+ * champlain_label_get_attributes:
+ * @label: The label
+ *
+ * Gets the label's text attributes.
+ *
+ * Returns: the label's text attributes.
+ *
+ * Since: 0.10
+ */
+PangoAttrList *
+champlain_label_get_attributes (ChamplainLabel *label)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LABEL (label), NULL);
+
+  return label->priv->attributes;
+}
