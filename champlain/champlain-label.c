@@ -986,9 +986,7 @@ champlain_label_new_with_image (ClutterActor *actor)
   ChamplainLabel *label = CHAMPLAIN_LABEL (champlain_label_new ());
 
   if (actor != NULL)
-    {
-      champlain_label_set_image (label, actor);
-    }
+    champlain_label_set_image (label, actor);
 
   return CLUTTER_ACTOR (label);
 }

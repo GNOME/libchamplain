@@ -142,7 +142,10 @@ champlain_kinetic_scroll_view_dispose (GObject *object)
   ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (object)->priv;
 
   if (priv->child)
-    clutter_container_remove_actor (CLUTTER_CONTAINER (object), priv->child);
+    {
+      clutter_container_remove_actor (CLUTTER_CONTAINER (object), priv->child);
+      priv->child = NULL;
+    }
 
   if (priv->deceleration_timeline)
     {
@@ -359,7 +362,6 @@ champlain_kinetic_scroll_view_remove_actor (ClutterContainer *container,
   if (actor == priv->child)
     {
       g_object_ref (priv->child);
-
 
       clutter_actor_unparent (priv->child);
 

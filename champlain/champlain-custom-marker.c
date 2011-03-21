@@ -60,13 +60,11 @@ static void clutter_container_iface_init (ClutterContainerIface *iface);
 
 
 G_DEFINE_TYPE_WITH_CODE (ChamplainCustomMarker, champlain_custom_marker, CHAMPLAIN_TYPE_MARKER,
-    G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER,
-        clutter_container_iface_init));
+    G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER, clutter_container_iface_init));
 
 
 #define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_CUSTOM_MARKER, ChamplainCustomMarkerPrivate))
-
 
 
 static void
