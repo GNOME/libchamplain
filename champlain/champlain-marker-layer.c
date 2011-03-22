@@ -933,8 +933,8 @@ get_bounding_box (ChamplainLayer *layer)
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
       gdouble lat, lon;
 
-      g_object_get (G_OBJECT (marker), "latitude", &lat, "longitude", &lon,
-          NULL);
+      lat = champlain_location_get_latitude (CHAMPLAIN_LOCATION (marker));
+      lon = champlain_location_get_longitude (CHAMPLAIN_LOCATION (marker));
 
       champlain_bounding_box_extend (bbox, lat, lon);
     }

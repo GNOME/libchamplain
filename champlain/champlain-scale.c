@@ -335,7 +335,8 @@ redraw_scale (ChamplainScale *scale)
 
   zoom_level = champlain_view_get_zoom_level (priv->view);
   map_source = champlain_view_get_map_source (priv->view);
-  g_object_get (G_OBJECT (priv->view), "latitude", &lat, "longitude", &lon, NULL);
+  lat = champlain_view_get_center_latitude (priv->view);
+  lon = champlain_view_get_center_longitude (priv->view);
   m_per_pixel = champlain_map_source_get_meters_per_pixel (map_source,
         zoom_level, lat, lon);
 

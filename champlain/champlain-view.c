@@ -1936,9 +1936,11 @@ view_load_visible_tiles (ChamplainView *view)
 
               DEBUG ("Loading tile %d, %d, %d", priv->zoom_level, x, y);
               tile = champlain_tile_new ();
-              g_object_set (G_OBJECT (tile), "x", x, "y", y,
-                  "zoom-level", priv->zoom_level,
-                  "size", size, NULL);
+              champlain_tile_set_x (tile, x);
+              champlain_tile_set_y (tile, y);
+              champlain_tile_set_zoom_level (tile, priv->zoom_level);
+              champlain_tile_set_size (tile, size);
+                  
               g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
               clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
               view_position_tile (view, tile);
