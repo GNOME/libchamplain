@@ -50,6 +50,7 @@ enum
 {
   PROP_0,
   PROP_LICENSE_EXTRA,
+  PROP_ALIGNMENT,
 };
 
 /* static guint champlain_license_signals[LAST_SIGNAL] = { 0, }; */
@@ -58,6 +59,7 @@ struct _ChamplainLicensePrivate
 {
   gchar *extra_text; /* Extra license text */
   ClutterActor *license_actor;
+  PangoAlignment alignment;
 
   ChamplainView *view;
 };
@@ -85,6 +87,10 @@ champlain_license_get_property (GObject *object,
       g_value_set_string (value, priv->extra_text);
       break;
 
+    case PROP_ALIGNMENT:
+      g_value_set_enum (value, priv->alignment);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -103,6 +109,10 @@ champlain_license_set_property (GObject *object,
     {
     case PROP_LICENSE_EXTRA:
       champlain_license_set_extra_text (license, g_value_get_string (value));
+      break;
+
+    case PROP_ALIGNMENT:
+      champlain_license_set_alignment (license, g_value_get_enum (value));
       break;
 
     default:
@@ -315,6 +325,22 @@ champlain_license_class_init (ChamplainLicenseClass *klass)
           "Additional license text",
           "",
           CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+   * ChamplainLicense:alignment:
+   *
+   * The license's alignment
+   *
+   * Since: 0.10
+   */
+  g_object_class_install_property (object_class, 
+      PROP_ALIGNMENT,
+      g_param_spec_enum ("alignment", 
+          "Alignment", 
+          "The license's alignment",
+          PANGO_TYPE_ALIGNMENT, 
+          PANGO_ALIGN_LEFT, 
+          CHAMPLAIN_PARAM_READWRITE));
 }
 
 
@@ -326,10 +352,11 @@ champlain_license_init (ChamplainLicense *license)
   license->priv = priv;
   priv->extra_text = NULL;
   priv->view = NULL;
+  priv->alignment = PANGO_ALIGN_RIGHT;
 
   priv->license_actor = clutter_text_new ();
   clutter_text_set_font_name (CLUTTER_TEXT (priv->license_actor), "sans 8");
-  clutter_text_set_line_alignment (CLUTTER_TEXT (priv->license_actor), PANGO_ALIGN_RIGHT);
+  clutter_text_set_line_alignment (CLUTTER_TEXT (priv->license_actor), priv->alignment);
   clutter_actor_set_opacity (priv->license_actor, 128);
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->license_actor), CLUTTER_ACTOR (license));
   clutter_actor_queue_relayout (CLUTTER_ACTOR (license));
@@ -439,4 +466,44 @@ champlain_license_get_extra_text (ChamplainLicense *license)
   g_return_val_if_fail (CHAMPLAIN_IS_LICENSE (license), FALSE);
 
   return license->priv->extra_text;
+}
+
+
+/**
+ * champlain_license_set_alignment:
+ * @license: The license
+ * @alignment: The license's alignment
+ *
+ * Set the license's text alignment.
+ *
+ * Since: 0.10
+ */
+void
+champlain_license_set_alignment (ChamplainLicense *license,
+    PangoAlignment alignment)
+{
+  g_return_if_fail (CHAMPLAIN_IS_LICENSE (license));
+
+  license->priv->alignment = alignment;
+  clutter_text_set_line_alignment (CLUTTER_TEXT (license->priv->license_actor), alignment);
+  g_object_notify (G_OBJECT (license), "alignment");
+}
+
+
+/**
+ * champlain_license_get_alignment:
+ * @license: The license
+ *
+ * Get the license's text alignment.
+ *
+ * Returns: the license's text alignment.
+ *
+ * Since: 0.10
+ */
+PangoAlignment
+champlain_license_get_alignment (ChamplainLicense *license)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_LICENSE (license), FALSE);
+
+  return license->priv->alignment;
 }

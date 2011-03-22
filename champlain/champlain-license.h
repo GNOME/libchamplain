@@ -71,8 +71,11 @@ ClutterActor *champlain_license_new (void);
 
 void champlain_license_set_extra_text (ChamplainLicense *license,
     const gchar *text);
-
 const gchar *champlain_license_get_extra_text (ChamplainLicense *license);
+
+void champlain_license_set_alignment (ChamplainLicense *license,
+    PangoAlignment alignment);
+PangoAlignment champlain_license_get_alignment (ChamplainLicense *license);
 
 void champlain_license_connect_view (ChamplainLicense *license,
     ChamplainView *view);
