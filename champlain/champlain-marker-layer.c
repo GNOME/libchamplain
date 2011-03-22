@@ -60,7 +60,7 @@ struct _ChamplainMarkerLayerPrivate
   ChamplainSelectionMode mode;
   ChamplainView *view;
 
-  ClutterGroup *content_group;
+  ChamplainGroup *content_group;
 };
 
 
@@ -291,7 +291,7 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
   priv->mode = CHAMPLAIN_SELECTION_NONE;
   priv->view = NULL;
 
-  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
+  priv->content_group = CHAMPLAIN_GROUP (champlain_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
   clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
 }
