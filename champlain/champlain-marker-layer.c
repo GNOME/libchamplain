@@ -214,15 +214,12 @@ champlain_marker_layer_dispose (GObject *object)
   ChamplainMarkerLayer *self = CHAMPLAIN_MARKER_LAYER (object);
   ChamplainMarkerLayerPrivate *priv = self->priv;
 
-  champlain_marker_layer_remove_all (CHAMPLAIN_MARKER_LAYER (object));
-
   if (priv->view != NULL)
-    {
-      set_view (CHAMPLAIN_LAYER (self), NULL);
-    }
+    set_view (CHAMPLAIN_LAYER (self), NULL);
 
   if (priv->content_group)
     {
+      champlain_marker_layer_remove_all (CHAMPLAIN_MARKER_LAYER (object));
       clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
       priv->content_group = NULL;
     }

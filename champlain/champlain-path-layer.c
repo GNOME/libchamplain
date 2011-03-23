@@ -511,9 +511,6 @@ add_node (ChamplainPathLayer *layer,
 {
   ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
 
-  g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
-  g_return_if_fail (CHAMPLAIN_IS_LOCATION (location));
-
   g_signal_connect (G_OBJECT (location), "notify::latitude",
       G_CALLBACK (position_notify), layer);
 

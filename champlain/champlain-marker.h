@@ -89,7 +89,6 @@ void champlain_marker_animate_out (ChamplainMarker *marker);
 void champlain_marker_animate_out_with_delay (ChamplainMarker *marker,
     guint delay);
 
-
 void champlain_marker_set_selection_color (ClutterColor *color);
 const ClutterColor *champlain_marker_get_selection_color (void);
 

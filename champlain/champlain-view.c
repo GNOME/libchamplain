@@ -135,6 +135,13 @@ typedef struct
 struct _ChamplainViewPrivate
 {
   ClutterActor *view_box;
+  ClutterActor *kinetic_scroll; /* Contains the viewport */
+  ClutterActor *viewport;  /* Contains the map_layer, license and markers */
+  ClutterActor *map_layer; /* Contains tiles actors (grouped by zoom level) */
+  ClutterActor *user_layers; /* Contains the markers */
+  ClutterActor *license_actor; /* Contains the license info */
+
+  ClutterLayoutManager *layout_manager;
 
   ChamplainMapSource *map_source; /* Current map tile source */
   gboolean kinetic_mode;
@@ -156,22 +163,13 @@ struct _ChamplainViewPrivate
   guint anchor_zoom_level; /* the zoom_level for which the current anchor has
                                 been computed for */
 
-  ClutterActor *kinetic_scroll; /* Contains the viewport */
-  ClutterActor *viewport;  /* Contains the map_layer, license and markers */
-  ClutterActor *map_layer; /* Contains tiles actors (grouped by zoom level) */
-
   gint viewport_x;
   gint viewport_y;
   gint viewport_width;
   gint viewport_height;
 
-  ClutterActor *user_layers; /* Contains the markers */
-
   gboolean keep_center_on_resize;
-
   gboolean zoom_on_double_click;
-
-  ClutterActor *license_actor; /* Contains the license info */
 
   ChamplainState state; /* View's global state */
 
@@ -179,7 +177,6 @@ struct _ChamplainViewPrivate
   GoToContext *goto_context;
 
   gint tiles_loading;
-  ClutterLayoutManager *layout_manager;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR);
@@ -503,17 +500,14 @@ champlain_view_dispose (GObject *object)
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
 
-  if (priv->map_source != NULL)
+  if (priv->goto_context != NULL)
+    champlain_view_stop_go_to (view);
+
+  if (priv->update_viewport_timer != NULL)
     {
-      g_object_unref (priv->map_source);
-      priv->map_source = NULL;
+      g_timer_destroy (priv->update_viewport_timer);
+      priv->update_viewport_timer = NULL;
     }
-
-  if (priv->view_box != NULL)
-    priv->view_box = NULL;
-
-  if (priv->license_actor != NULL)
-    priv->license_actor = NULL;
 
   if (priv->kinetic_scroll != NULL)
     {
@@ -527,20 +521,22 @@ champlain_view_dispose (GObject *object)
       priv->viewport = NULL;
     }
 
-  if (priv->map_layer != NULL)
-    priv->map_layer = NULL;
-
-  if (priv->user_layers != NULL)
-    priv->user_layers = NULL;
-
-  if (priv->goto_context != NULL)
-    champlain_view_stop_go_to (view);
-
-  if (priv->update_viewport_timer != NULL)
+  if (priv->map_source != NULL)
     {
-      g_timer_destroy (priv->update_viewport_timer);
-      priv->update_viewport_timer = NULL;
+      g_object_unref (priv->map_source);
+      priv->map_source = NULL;
     }
+
+  if (priv->view_box != NULL)
+    {
+      clutter_actor_unparent (CLUTTER_ACTOR (priv->view_box));
+      priv->view_box = NULL;
+    }
+
+  priv->map_layer = NULL;
+  priv->license_actor = NULL;
+  priv->user_layers = NULL;
+  priv->layout_manager = NULL;
 
   G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
 }
