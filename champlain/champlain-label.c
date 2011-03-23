@@ -101,6 +101,8 @@ struct _ChamplainLabelPrivate
   ClutterActor *shadow;
   ClutterActor *background;
   guint redraw_id;
+  guint total_width;
+  guint total_height;
 
   ClutterGroup *content_group;
 };
@@ -241,6 +243,7 @@ champlain_label_set_property (GObject *object,
 }
 
 
+
 static void
 paint (ClutterActor *self)
 {
@@ -250,15 +253,40 @@ paint (ClutterActor *self)
 }
 
 
+#define RADIUS 10
+#define PADDING (RADIUS / 2)
+
 static void
 pick (ClutterActor *self,
     const ClutterColor *color)
 {
   ChamplainLabelPrivate *priv = GET_PRIVATE (self);
+  gfloat width, height;
 
-  CLUTTER_ACTOR_CLASS (champlain_label_parent_class)->pick (self, color);
+  if (!clutter_actor_should_pick_paint (self))
+    return;
 
-  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
+  width = priv->total_width;
+  height = priv->total_height;
+
+  cogl_path_new ();
+
+  cogl_set_source_color4ub (color->red,
+      color->green,
+      color->blue,
+      color->alpha);
+
+  cogl_path_move_to (RADIUS, 0);
+  cogl_path_line_to (width - RADIUS, 0);
+  cogl_path_arc (width - RADIUS, RADIUS, RADIUS, RADIUS, -90, 0);
+  cogl_path_line_to (width, height - RADIUS);
+  cogl_path_arc (width - RADIUS, height - RADIUS, RADIUS, RADIUS, 0, 90);
+  cogl_path_line_to (RADIUS, height);
+  cogl_path_arc (RADIUS, height - RADIUS, RADIUS, RADIUS, 90, 180);
+  cogl_path_line_to (0, RADIUS);
+  cogl_path_arc (RADIUS, RADIUS, RADIUS, RADIUS, 180, 270);
+  cogl_path_close ();
+  cogl_path_fill ();
 }
 
 
@@ -339,14 +367,9 @@ champlain_label_dispose (GObject *object)
 {
   ChamplainLabelPrivate *priv = CHAMPLAIN_LABEL (object)->priv;
 
-  if (priv->background)
-    priv->background = NULL;
-
-  if (priv->shadow)
-    priv->shadow = NULL;
-
-  if (priv->text_actor)
-    priv->text_actor = NULL;
+  priv->background = NULL;
+  priv->shadow = NULL;
+  priv->text_actor = NULL;
 
   if (priv->image)
     {
@@ -564,9 +587,6 @@ champlain_label_class_init (ChamplainLabelClass *klass)
 }
 
 
-#define RADIUS 10
-#define PADDING (RADIUS / 2)
-
 static void
 draw_box (cairo_t *cr,
     gint width,
@@ -780,6 +800,8 @@ draw_label (ChamplainLabel *label)
     }
 
   point = (total_height + 2 * PADDING) / 4.0;
+  priv->total_width = total_width;
+  priv->total_height = total_height;
 
   if (priv->draw_background)
     {
@@ -898,6 +920,8 @@ champlain_label_init (ChamplainLabel *label)
   priv->content_group = CLUTTER_GROUP (clutter_group_new ());
   clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (label));
   clutter_actor_queue_relayout (CLUTTER_ACTOR (label));
+  priv->total_width = 0;
+  priv->total_height = 0;
 
   g_signal_connect (label, "notify::selected", G_CALLBACK (notify_selected), NULL);
 }
