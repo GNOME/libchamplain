@@ -59,6 +59,7 @@ struct _ChamplainLicensePrivate
 {
   gchar *extra_text; /* Extra license text */
   ClutterActor *license_actor;
+  ClutterGroup *content_group;
   PangoAlignment alignment;
 
   ChamplainView *view;
@@ -126,7 +127,7 @@ paint (ClutterActor *self)
 {
   ChamplainLicensePrivate *priv = GET_PRIVATE (self);
 
-  clutter_actor_paint (CLUTTER_ACTOR (priv->license_actor));
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
 }
 
 
@@ -138,7 +139,7 @@ pick (ClutterActor *self,
 
   CLUTTER_ACTOR_CLASS (champlain_license_parent_class)->pick (self, color);
 
-  clutter_actor_paint (CLUTTER_ACTOR (priv->license_actor));
+  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
 }
 
 
@@ -150,7 +151,7 @@ get_preferred_width (ClutterActor *self,
 {
   ChamplainLicensePrivate *priv = GET_PRIVATE (self);
 
-  clutter_actor_get_preferred_width (CLUTTER_ACTOR (priv->license_actor),
+  clutter_actor_get_preferred_width (CLUTTER_ACTOR (priv->content_group),
       for_height,
       min_width_p,
       natural_width_p);
@@ -165,7 +166,7 @@ get_preferred_height (ClutterActor *self,
 {
   ChamplainLicensePrivate *priv = GET_PRIVATE (self);
 
-  clutter_actor_get_preferred_height (CLUTTER_ACTOR (priv->license_actor),
+  clutter_actor_get_preferred_height (CLUTTER_ACTOR (priv->content_group),
       for_width,
       min_height_p,
       natural_height_p);
@@ -188,7 +189,7 @@ allocate (ClutterActor *self,
   child_box.y1 = 0;
   child_box.y2 = box->y2 - box->y1;
 
-  clutter_actor_allocate (CLUTTER_ACTOR (priv->license_actor), &child_box, flags);
+  clutter_actor_allocate (CLUTTER_ACTOR (priv->content_group), &child_box, flags);
 }
 
 
@@ -199,7 +200,7 @@ map (ClutterActor *self)
 
   CLUTTER_ACTOR_CLASS (champlain_license_parent_class)->map (self);
 
-  clutter_actor_map (CLUTTER_ACTOR (priv->license_actor));
+  clutter_actor_map (CLUTTER_ACTOR (priv->content_group));
 }
 
 
@@ -210,7 +211,7 @@ unmap (ClutterActor *self)
 
   CLUTTER_ACTOR_CLASS (champlain_license_parent_class)->unmap (self);
 
-  clutter_actor_unmap (CLUTTER_ACTOR (priv->license_actor));
+  clutter_actor_unmap (CLUTTER_ACTOR (priv->content_group));
 }
 
 
@@ -261,11 +262,13 @@ champlain_license_dispose (GObject *object)
 {
   ChamplainLicensePrivate *priv = CHAMPLAIN_LICENSE (object)->priv;
 
-  if (priv->license_actor)
+  if (priv->content_group)
     {
-      clutter_actor_unparent (CLUTTER_ACTOR (priv->license_actor));
-      priv->license_actor = NULL;
+      clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
+      priv->content_group = NULL;
     }
+
+  priv->license_actor = NULL;
 
   if (priv->view)
     {
@@ -353,12 +356,15 @@ champlain_license_init (ChamplainLicense *license)
   priv->extra_text = NULL;
   priv->view = NULL;
   priv->alignment = PANGO_ALIGN_RIGHT;
+  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
+  clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (license));
 
   priv->license_actor = clutter_text_new ();
   clutter_text_set_font_name (CLUTTER_TEXT (priv->license_actor), "sans 8");
   clutter_text_set_line_alignment (CLUTTER_TEXT (priv->license_actor), priv->alignment);
   clutter_actor_set_opacity (priv->license_actor, 128);
-  clutter_actor_set_parent (CLUTTER_ACTOR (priv->license_actor), CLUTTER_ACTOR (license));
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->license_actor);
+  
   clutter_actor_queue_relayout (CLUTTER_ACTOR (license));
 }
 
