@@ -70,6 +70,7 @@ champlain_label_get_wrap_mode
 champlain_label_get_ellipsize
 champlain_label_get_single_line_mode
 champlain_label_get_draw_background
+champlain_label_get_attributes
 <SUBSECTION Standard>
 CHAMPLAIN_LABEL
 CHAMPLAIN_IS_LABEL
@@ -152,6 +153,9 @@ champlain_view_latitude_to_y
 champlain_view_get_viewport_origin
 champlain_view_bin_layout_add
 champlain_view_get_license_actor
+champlain_view_get_center_latitude
+champlain_view_get_center_longitude
+champlain_view_get_state
 <SUBSECTION Standard>
 CHAMPLAIN_VIEW
 CHAMPLAIN_IS_VIEW
@@ -495,6 +499,8 @@ ChamplainLicense
 champlain_license_new
 champlain_license_set_extra_text
 champlain_license_get_extra_text
+champlain_license_set_alignment
+champlain_license_get_alignment
 champlain_license_connect_view
 champlain_license_disconnect_view
 <SUBSECTION Standard>
@@ -739,6 +745,8 @@ champlain_path_layer_get_stroke_width
 champlain_path_layer_set_stroke_width
 champlain_path_layer_get_visible
 champlain_path_layer_set_visible
+champlain_path_layer_get_closed
+champlain_path_layer_set_closed
 <SUBSECTION Standard>
 CHAMPLAIN_PATH_LAYER
 CHAMPLAIN_IS_PATH_LAYER
