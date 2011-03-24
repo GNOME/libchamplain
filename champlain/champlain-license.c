@@ -452,6 +452,7 @@ champlain_license_set_extra_text (ChamplainLicense *license,
     g_free (priv->extra_text);
 
   priv->extra_text = g_strdup (text);
+  g_object_notify (G_OBJECT (license), "extra-text");
   redraw_license (license);
 }
 

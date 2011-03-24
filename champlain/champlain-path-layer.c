@@ -857,6 +857,25 @@ champlain_path_layer_set_fill_color (ChamplainPathLayer *layer,
 
 
 /**
+ * champlain_path_layer_get_fill_color:
+ * @layer: a #ChamplainPathLayer
+ *
+ * Gets the path's fill color.
+ *
+ * Returns: the path's fill color.
+ *
+ * Since: 0.10
+ */
+ClutterColor *
+champlain_path_layer_get_fill_color (ChamplainPathLayer *layer)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer), NULL);
+
+  return layer->priv->fill_color;
+}
+
+
+/**
  * champlain_path_layer_set_stroke_color:
  * @layer: a #ChamplainPathLayer
  * @color: (allow-none): The path's stroke color or NULL to reset to the
@@ -882,25 +901,6 @@ champlain_path_layer_set_stroke_color (ChamplainPathLayer *layer,
 
   priv->stroke_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (layer), "stroke-color");
-}
-
-
-/**
- * champlain_path_layer_get_fill_color:
- * @layer: a #ChamplainPathLayer
- *
- * Gets the path's fill color.
- *
- * Returns: the path's fill color.
- *
- * Since: 0.10
- */
-ClutterColor *
-champlain_path_layer_get_fill_color (ChamplainPathLayer *layer)
-{
-  g_return_val_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer), NULL);
-
-  return layer->priv->fill_color;
 }
 
 

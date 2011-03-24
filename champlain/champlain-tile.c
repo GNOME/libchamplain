@@ -470,10 +470,16 @@ champlain_tile_class_init (ChamplainTileClass *klass)
    * Since: 0.10
    */
   champlain_tile_signals[RENDER_COMPLETE] =
-    g_signal_new ("render-complete", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        _champlain_marshal_VOID__POINTER_UINT_BOOLEAN, G_TYPE_NONE,
-        3, G_TYPE_POINTER, G_TYPE_UINT, G_TYPE_BOOLEAN);
+    g_signal_new ("render-complete", 
+        G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 
+        0, 
+        NULL, 
+        NULL,
+        _champlain_marshal_VOID__POINTER_UINT_BOOLEAN, 
+        G_TYPE_NONE,
+        3, 
+        G_TYPE_POINTER, G_TYPE_UINT, G_TYPE_BOOLEAN);
 }
 
 
@@ -740,8 +746,12 @@ champlain_tile_new_full (guint x,
     guint size,
     guint zoom_level)
 {
-  return g_object_new (CHAMPLAIN_TYPE_TILE, "x", x, "y", y, "zoom-level",
-      zoom_level, "size", size, NULL);
+  return g_object_new (CHAMPLAIN_TYPE_TILE, 
+      "x", x, 
+      "y", y, 
+      "zoom-level", zoom_level, 
+      "size", size, 
+      NULL);
 }
 
 

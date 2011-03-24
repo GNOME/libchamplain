@@ -282,8 +282,10 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
 #endif
         NULL);
   g_object_set (G_OBJECT (priv->soup_session),
-      "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
-      "max-conns-per-host", 2, NULL); /* This is as required by OSM */
+      "user-agent", 
+      "libchamplain/" CHAMPLAIN_VERSION_S,
+      "max-conns-per-host", 2,    /* This is as required by OSM */ 
+      NULL); 
 }
 
 

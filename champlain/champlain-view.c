@@ -352,11 +352,21 @@ resize_viewport (ChamplainView *view)
    */
   g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 
-  g_object_set (hadjust, "lower", lower_x, "upper", upper_x,
-      "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
+  g_object_set (hadjust, 
+      "lower", lower_x, 
+      "upper", upper_x,
+      "page-size", 1.0, 
+      "step-increment", 1.0, 
+      "elastic", TRUE, 
+      NULL);
 
-  g_object_set (vadjust, "lower", lower_y, "upper", upper_y,
-      "page-size", 1.0, "step-increment", 1.0, "elastic", TRUE, NULL);
+  g_object_set (vadjust, 
+      "lower", lower_y, 
+      "upper", upper_y,
+      "page-size", 1.0, 
+      "step-increment", 1.0, 
+      "elastic", TRUE, 
+      NULL);
 
   g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 }
@@ -1603,6 +1613,7 @@ champlain_view_set_min_zoom_level (ChamplainView *view,
     return;
 
   priv->min_zoom_level = min_zoom_level;
+  g_object_notify (G_OBJECT (view), "min-zoom-level");
 
   if (priv->zoom_level < min_zoom_level)
     champlain_view_set_zoom_level (view, min_zoom_level);
@@ -1634,6 +1645,7 @@ champlain_view_set_max_zoom_level (ChamplainView *view,
     return;
 
   priv->max_zoom_level = max_zoom_level;
+  g_object_notify (G_OBJECT (view), "max-zoom-level");
 
   if (priv->zoom_level > max_zoom_level)
     champlain_view_set_zoom_level (view, max_zoom_level);
@@ -2151,6 +2163,7 @@ champlain_view_set_deceleration (ChamplainView *view,
       rate < 2.0 && rate > 1.0001);
 
   g_object_set (view->priv->kinetic_scroll, "deceleration", rate, NULL);
+  g_object_notify (G_OBJECT (view), "deceleration");
 }
 
 
@@ -2175,6 +2188,7 @@ champlain_view_set_kinetic_mode (ChamplainView *view,
 
   priv->kinetic_mode = kinetic;
   g_object_set (view->priv->kinetic_scroll, "mode", kinetic, NULL);
+  g_object_notify (G_OBJECT (view), "kinetic-mode");
 }
 
 
@@ -2196,6 +2210,7 @@ champlain_view_set_keep_center_on_resize (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   view->priv->keep_center_on_resize = value;
+  g_object_notify (G_OBJECT (view), "keep-center-on-resize");
 }
 
 
@@ -2217,6 +2232,7 @@ champlain_view_set_zoom_on_double_click (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   view->priv->zoom_on_double_click = value;
+  g_object_notify (G_OBJECT (view), "zoom-on-double-click");
 }
 
 

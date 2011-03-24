@@ -749,8 +749,13 @@ champlain_marker_animate_in_with_delay (ChamplainMarker *marker,
   timeline = clutter_timeline_new (1000);
   clutter_timeline_set_delay (timeline, delay);
   clutter_actor_animate_with_timeline (CLUTTER_ACTOR (marker),
-      CLUTTER_EASE_OUT_BOUNCE, timeline, "opacity", 255, "y", y,
-      "scale-x", 1.0, "scale-y", 1.0, NULL);
+      CLUTTER_EASE_OUT_BOUNCE, 
+      timeline, 
+      "opacity", 255, 
+      "y", y,
+      "scale-x", 1.0, 
+      "scale-y", 1.0, 
+      NULL);
 }
 
 
@@ -820,8 +825,13 @@ champlain_marker_animate_out_with_delay (ChamplainMarker *marker,
   timeline = clutter_timeline_new (750);
   clutter_timeline_set_delay (timeline, delay);
   animation = clutter_actor_animate_with_timeline (CLUTTER_ACTOR (marker),
-        CLUTTER_EASE_IN_BACK, timeline, "opacity", 0, "y", y - 100,
-        "scale-x", 2.0, "scale-y", 2.0, NULL);
+        CLUTTER_EASE_IN_BACK, 
+        timeline, 
+        "opacity", 0, 
+        "y", y - 100,
+        "scale-x", 2.0, 
+        "scale-y", 2.0, 
+        NULL);
   g_signal_connect (animation, "completed",
       G_CALLBACK (on_animation_completed), marker);
 }

@@ -549,6 +549,7 @@ champlain_scale_set_max_width (ChamplainScale *scale,
 
   scale->priv->max_scale_width = value;
   create_scale (scale);
+  g_object_notify (G_OBJECT (scale), "max-width");
   schedule_redraw (scale);
 }
 
@@ -569,6 +570,7 @@ champlain_scale_set_unit (ChamplainScale *scale,
   g_return_if_fail (CHAMPLAIN_IS_SCALE (scale));
 
   scale->priv->scale_unit = unit;
+  g_object_notify (G_OBJECT (scale), "unit");
   schedule_redraw (scale);
 }
 

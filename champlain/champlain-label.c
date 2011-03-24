@@ -1082,6 +1082,7 @@ champlain_label_set_text (ChamplainLabel *label,
     g_free (priv->text);
 
   priv->text = g_strdup (text);
+  g_object_notify (G_OBJECT (label), "text");
   champlain_label_queue_redraw (label);
 }
 
@@ -1288,7 +1289,7 @@ champlain_label_set_wrap_mode (ChamplainLabel *label,
   g_return_if_fail (CHAMPLAIN_IS_LABEL (label));
 
   label->priv->wrap_mode = wrap_mode;
-  g_object_notify (G_OBJECT (label), "wrap");
+  g_object_notify (G_OBJECT (label), "wrap-mode");
   champlain_label_queue_redraw (label);
 }
 

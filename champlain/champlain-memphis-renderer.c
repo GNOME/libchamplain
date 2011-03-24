@@ -753,4 +753,5 @@ set_bounding_box (ChamplainMemphisRenderer *renderer, ChamplainBoundingBox *bbox
 
   champlain_bounding_box_free (priv->bbox);
   priv->bbox = champlain_bounding_box_copy (bbox);
+  g_object_notify (G_OBJECT (renderer), "bounding-box");
 }
