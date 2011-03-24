@@ -139,10 +139,19 @@ pick (ClutterActor *self,
     const ClutterColor *color)
 {
   ChamplainPointPrivate *priv = GET_PRIVATE (self);
+  gdouble radius = priv->size / 2.0;
 
-  CLUTTER_ACTOR_CLASS (champlain_point_parent_class)->pick (self, color);
+  cogl_path_new ();
 
-  clutter_actor_paint (CLUTTER_ACTOR (priv->point_actor));
+  cogl_set_source_color4ub (color->red,
+      color->green,
+      color->blue,
+      color->alpha);
+
+  cogl_path_move_to (radius, radius);
+  cogl_path_arc (radius, radius, radius, radius, 0, 360.0);
+  cogl_path_close ();
+  cogl_path_fill ();
 }
 
 
