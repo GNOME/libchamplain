@@ -138,13 +138,21 @@ gtk_champlain_embed_dispose (GObject *object)
 
   if (priv->cursor_hand_open != NULL)
     {
+#if (GTK_MAJOR_VERSION == 2)
       gdk_cursor_unref (priv->cursor_hand_open);
+#else
+      g_object_unref (priv->cursor_hand_open);
+#endif
       priv->cursor_hand_open = NULL;
     }
 
   if (priv->cursor_hand_closed != NULL)
     {
+#if (GTK_MAJOR_VERSION == 2)
       gdk_cursor_unref (priv->cursor_hand_closed);
+#else
+      g_object_unref (priv->cursor_hand_closed);
+#endif
       priv->cursor_hand_closed = NULL;
     }
 
@@ -249,15 +257,27 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 }
 
 
+#if (GTK_MAJOR_VERSION == 2)
 static void
-gdk_to_clutter_color (GdkColor *gtk_color,
+gdk_to_clutter_color (GdkColor *gdk_color,
     ClutterColor *color)
 {
-  color->red = CLAMP (((gtk_color->red / 65535.0) * 255), 0, 255);
-  color->green = CLAMP (((gtk_color->green / 65535.0) * 255), 0, 255);
-  color->blue = CLAMP (((gtk_color->blue / 65535.0) * 255), 0, 255);
+  color->red = CLAMP ((gdk_color->red / 65535.0) * 255, 0, 255);
+  color->green = CLAMP ((gdk_color->green / 65535.0) * 255, 0, 255);
+  color->blue = CLAMP ((gdk_color->blue / 65535.0) * 255, 0, 255);
   color->alpha = 255;
 }
+#else
+static void
+gdk_rgba_to_clutter_color (GdkRGBA *gdk_rgba_color,
+    ClutterColor *color)
+{
+  color->red = CLAMP (gdk_rgba_color->red * 255, 0, 255);
+  color->green = CLAMP (gdk_rgba_color->green * 255, 0, 255);
+  color->blue = CLAMP (gdk_rgba_color->blue * 255, 0, 255);
+  color->alpha = CLAMP (gdk_rgba_color->alpha * 255, 0, 255);
+}
+#endif
 
 
 static void
@@ -266,10 +286,9 @@ view_realize_cb (GtkWidget *widget,
 {
   ClutterColor color = { 0, 0, 0, };
   GtkChamplainEmbedPrivate *priv = view->priv;
-  GtkStyle *style;
 
-  /* Setup mouse cursor to a hand */
-  gdk_window_set_cursor (gtk_widget_get_window (priv->clutter_embed), priv->cursor_hand_open);
+#if (GTK_MAJOR_VERSION == 2)
+  GtkStyle *style;
 
   /* Set selection color */
   style = gtk_widget_get_style (widget);
@@ -279,8 +298,24 @@ view_realize_cb (GtkWidget *widget,
 
   gdk_to_clutter_color (&style->bg[GTK_STATE_SELECTED], &color);
   champlain_marker_set_selection_color (&color);
+#else
+  GtkStyleContext *style;
+  GdkRGBA gdk_rgba_color;
 
-  /* To be added later: bg[active] (for selected markers, but focus is on another widget) */
+  /* Set selection color */
+  style = gtk_widget_get_style_context (widget);
+  
+  gtk_style_context_get_color (style, GTK_STATE_FLAG_SELECTED, &gdk_rgba_color);
+  gdk_rgba_to_clutter_color (&gdk_rgba_color, &color);
+  champlain_marker_set_selection_text_color (&color);
+
+  gtk_style_context_get_background_color (style, GTK_STATE_FLAG_SELECTED, &gdk_rgba_color);
+  gdk_rgba_to_clutter_color (&gdk_rgba_color, &color);
+  champlain_marker_set_selection_color (&color);
+#endif
+
+  /* Setup mouse cursor to a hand */
+  gdk_window_set_cursor (gtk_widget_get_window (priv->clutter_embed), priv->cursor_hand_open);
 }
 
 
