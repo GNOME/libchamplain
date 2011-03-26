@@ -61,6 +61,14 @@ typedef enum
   CHAMPLAIN_MAP_PROJECTION_MERCATOR
 } ChamplainMapProjection;
 
+/**
+ * ChamplainMapSource:
+ *
+ * The #ChamplainMapSource structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.4
+ */
 struct _ChamplainMapSource
 {
   GInitiallyUnowned parent_instance;

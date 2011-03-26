@@ -48,6 +48,14 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainNullTileSourcePrivate ChamplainNullTileSourcePrivate;
 
+/**
+ * ChamplainNullTileSource:
+ *
+ * The #ChamplainNullTileSource structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.8
+ */
 typedef struct _ChamplainNullTileSource ChamplainNullTileSource;
 typedef struct _ChamplainNullTileSourceClass ChamplainNullTileSourceClass;
 

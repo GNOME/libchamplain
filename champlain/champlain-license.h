@@ -53,6 +53,14 @@ typedef struct _ChamplainLicense ChamplainLicense;
 typedef struct _ChamplainLicenseClass ChamplainLicenseClass;
 
 
+/**
+ * ChamplainLicense:
+ *
+ * The #ChamplainLicense structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.10
+ */
 struct _ChamplainLicense
 {
   ClutterActor parent;

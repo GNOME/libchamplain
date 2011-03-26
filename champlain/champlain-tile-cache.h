@@ -50,6 +50,14 @@ typedef struct _ChamplainTileCachePrivate ChamplainTileCachePrivate;
 typedef struct _ChamplainTileCache ChamplainTileCache;
 typedef struct _ChamplainTileCacheClass ChamplainTileCacheClass;
 
+/**
+ * ChamplainTileCache:
+ *
+ * The #ChamplainTileCache structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.6
+ */
 struct _ChamplainTileCache
 {
   ChamplainMapSource parent_instance;

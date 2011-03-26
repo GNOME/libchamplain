@@ -52,6 +52,14 @@ typedef struct _ChamplainPointPrivate ChamplainPointPrivate;
 typedef struct _ChamplainPoint ChamplainPoint;
 typedef struct _ChamplainPointClass ChamplainPointClass;
 
+/**
+ * ChamplainPoint:
+ *
+ * The #ChamplainPoint structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.10
+ */
 struct _ChamplainPoint
 {
   ChamplainMarker parent;

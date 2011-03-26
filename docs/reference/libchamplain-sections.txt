@@ -647,6 +647,7 @@ ChamplainImageRendererPrivate
 <FILE>champlain-map-source-desc</FILE>
 <TITLE>ChamplainMapSourceDesc</TITLE>
 ChamplainMapSourceDesc
+ChamplainMapSourceConstructor
 CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR
 champlain_map_source_desc_new_full
 champlain_map_source_desc_get_id

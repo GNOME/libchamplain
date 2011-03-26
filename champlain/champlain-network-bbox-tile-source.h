@@ -49,6 +49,14 @@ typedef struct _ChamplainNetworkBboxTileSourcePrivate ChamplainNetworkBboxTileSo
 typedef struct _ChamplainNetworkBboxTileSource ChamplainNetworkBboxTileSource;
 typedef struct _ChamplainNetworkBboxTileSourceClass ChamplainNetworkBboxTileSourceClass;
 
+/**
+ * ChamplainNetworkBboxTileSource:
+ *
+ * The #ChamplainNetworkBboxTileSource structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.8
+ */
 struct _ChamplainNetworkBboxTileSource
 {
   ChamplainTileSource parent;

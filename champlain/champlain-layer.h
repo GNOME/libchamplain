@@ -49,6 +49,14 @@ G_BEGIN_DECLS
 typedef struct _ChamplainLayer ChamplainLayer;
 typedef struct _ChamplainLayerClass ChamplainLayerClass;
 
+/**
+ * ChamplainLayer:
+ *
+ * The #ChamplainLayer structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.10
+ */
 struct _ChamplainLayer
 {
   ClutterActor parent;

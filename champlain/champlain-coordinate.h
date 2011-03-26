@@ -53,6 +53,14 @@ typedef struct _ChamplainCoordinate ChamplainCoordinate;
 typedef struct _ChamplainCoordinateClass ChamplainCoordinateClass;
 
 
+/**
+ * ChamplainCoordinate:
+ *
+ * The #ChamplainCoordinate structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.10
+ */
 struct _ChamplainCoordinate
 {
   GInitiallyUnowned parent;

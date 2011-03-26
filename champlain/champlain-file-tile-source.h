@@ -52,6 +52,14 @@ typedef struct _ChamplainFileTileSourcePrivate ChamplainFileTileSourcePrivate;
 typedef struct _ChamplainFileTileSource ChamplainFileTileSource;
 typedef struct _ChamplainFileTileSourceClass ChamplainFileTileSourceClass;
 
+/**
+ * ChamplainFileTileSource:
+ *
+ * The #ChamplainFileTileSource structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.8
+ */
 struct _ChamplainFileTileSource
 {
   ChamplainTileSource parent;

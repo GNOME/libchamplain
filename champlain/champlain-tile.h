@@ -68,6 +68,14 @@ typedef enum
 } ChamplainState;
 
 
+/**
+ * ChamplainTile:
+ *
+ * The #ChamplainTile structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.4
+ */
 struct _ChamplainTile
 {
   ClutterActor parent;

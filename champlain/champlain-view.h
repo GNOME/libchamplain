@@ -56,6 +56,14 @@ G_BEGIN_DECLS
 typedef struct _ChamplainViewPrivate ChamplainViewPrivate;
 
 
+/**
+ * ChamplainView:
+ *
+ * The #ChamplainView structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.1
+ */
 struct _ChamplainView
 {
   ClutterActor parent;

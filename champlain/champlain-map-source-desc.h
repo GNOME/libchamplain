@@ -51,6 +51,14 @@ typedef struct _ChamplainMapSourceDescPrivate ChamplainMapSourceDescPrivate;
 typedef struct _ChamplainMapSourceDesc ChamplainMapSourceDesc;
 typedef struct _ChamplainMapSourceDescClass ChamplainMapSourceDescClass;
 
+/**
+ * ChamplainMapSourceDesc:
+ *
+ * The #ChamplainMapSourceDesc structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.10
+ */
 struct _ChamplainMapSourceDesc
 {
   GObject parent_instance;
@@ -74,9 +82,15 @@ struct _ChamplainMapSourceDescClass
  *
  * Since: 0.10
  */
-typedef ChamplainMapSource * (*ChamplainMapSourceConstructor)
-  (ChamplainMapSourceDesc *desc);
+typedef ChamplainMapSource* (*ChamplainMapSourceConstructor) (ChamplainMapSourceDesc *desc);
 
+/**
+ * CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR:
+ *
+ * Conversion macro to #ChamplainMapSourceConstructor.
+ *
+ * Since: 0.10
+ */
 #define CHAMPLAIN_MAP_SOURCE_CONSTRUCTOR (f) ((ChamplainMapSourceConstructor) (f))
 
 GType champlain_map_source_desc_get_type (void);

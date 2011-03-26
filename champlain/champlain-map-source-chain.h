@@ -51,6 +51,14 @@ typedef struct _ChamplainMapSourceChainPrivate ChamplainMapSourceChainPrivate;
 typedef struct _ChamplainMapSourceChain ChamplainMapSourceChain;
 typedef struct _ChamplainMapSourceChainClass ChamplainMapSourceChainClass;
 
+/**
+ * ChamplainMapSourceChain:
+ *
+ * The #ChamplainMapSourceChain structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.6
+ */
 struct _ChamplainMapSourceChain
 {
   ChamplainMapSource parent_instance;

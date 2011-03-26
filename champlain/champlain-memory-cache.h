@@ -50,6 +50,14 @@ typedef struct _ChamplainMemoryCachePrivate ChamplainMemoryCachePrivate;
 typedef struct _ChamplainMemoryCache ChamplainMemoryCache;
 typedef struct _ChamplainMemoryCacheClass ChamplainMemoryCacheClass;
 
+/**
+ * ChamplainMemoryCache:
+ *
+ * The #ChamplainMemoryCache structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.8
+ */
 struct _ChamplainMemoryCache
 {
   ChamplainTileCache parent_instance;

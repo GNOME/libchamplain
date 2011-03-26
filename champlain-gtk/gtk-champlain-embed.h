@@ -52,6 +52,14 @@ typedef struct _GtkChamplainEmbed GtkChamplainEmbed;
 
 typedef struct _GtkChamplainEmbedClass GtkChamplainEmbedClass;
 
+/**
+ * GtkChamplainEmbed:
+ *
+ * The #GtkChamplainEmbed structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.4
+ */
 struct _GtkChamplainEmbed
 {
   GtkAlignment bin;

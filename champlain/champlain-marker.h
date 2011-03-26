@@ -55,6 +55,14 @@ typedef struct _ChamplainMarker ChamplainMarker;
 typedef struct _ChamplainMarkerClass ChamplainMarkerClass;
 
 
+/**
+ * ChamplainMarker:
+ *
+ * The #ChamplainMarker structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.10
+ */
 struct _ChamplainMarker
 {
   ClutterActor parent;

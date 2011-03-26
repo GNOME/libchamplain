@@ -48,6 +48,14 @@ typedef struct _ChamplainRenderer ChamplainRenderer;
 typedef struct _ChamplainRendererClass ChamplainRendererClass;
 
 
+/**
+ * ChamplainRenderer:
+ *
+ * The #ChamplainRenderer structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.8
+ */
 struct _ChamplainRenderer
 {
   GInitiallyUnowned parent;

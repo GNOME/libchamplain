@@ -65,6 +65,14 @@ typedef enum
   CHAMPLAIN_UNIT_MILES,
 } ChamplainUnit;
 
+/**
+ * ChamplainScale:
+ *
+ * The #ChamplainScale structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.10
+ */
 struct _ChamplainScale
 {
   ClutterActor parent;

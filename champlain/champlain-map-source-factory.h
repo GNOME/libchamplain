@@ -55,6 +55,14 @@ typedef struct _ChamplainMapSourceFactoryPrivate ChamplainMapSourceFactoryPrivat
 typedef struct _ChamplainMapSourceFactory ChamplainMapSourceFactory;
 typedef struct _ChamplainMapSourceFactoryClass ChamplainMapSourceFactoryClass;
 
+/**
+ * ChamplainMapSourceFactory:
+ *
+ * The #ChamplainMapSourceFactory structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.4
+ */
 struct _ChamplainMapSourceFactory
 {
   GObject parent;

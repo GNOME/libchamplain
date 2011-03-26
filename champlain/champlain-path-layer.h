@@ -57,6 +57,14 @@ typedef struct _ChamplainPathLayer ChamplainPathLayer;
 typedef struct _ChamplainPathLayerClass ChamplainPathLayerClass;
 
 
+/**
+ * ChamplainPathLayer:
+ *
+ * The #ChamplainPathLayer structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.10
+ */
 struct _ChamplainPathLayer
 {
   ChamplainLayer parent;

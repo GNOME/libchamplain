@@ -50,6 +50,14 @@ typedef struct _ChamplainErrorTileRendererPrivate ChamplainErrorTileRendererPriv
 typedef struct _ChamplainErrorTileRenderer ChamplainErrorTileRenderer;
 typedef struct _ChamplainErrorTileRendererClass ChamplainErrorTileRendererClass;
 
+/**
+ * ChamplainErrorTileRenderer:
+ *
+ * The #ChamplainErrorTileRenderer structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.8
+ */
 struct _ChamplainErrorTileRenderer
 {
   ChamplainRenderer parent;

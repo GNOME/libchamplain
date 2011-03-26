@@ -51,6 +51,14 @@ typedef struct _ChamplainFileCachePrivate ChamplainFileCachePrivate;
 typedef struct _ChamplainFileCache ChamplainFileCache;
 typedef struct _ChamplainFileCacheClass ChamplainFileCacheClass;
 
+/**
+ * ChamplainFileCache:
+ *
+ * The #ChamplainFileCache structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.6
+ */
 struct _ChamplainFileCache
 {
   ChamplainTileCache parent_instance;

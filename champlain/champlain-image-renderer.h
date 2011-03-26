@@ -50,6 +50,14 @@ typedef struct _ChamplainImageRendererPrivate ChamplainImageRendererPrivate;
 typedef struct _ChamplainImageRenderer ChamplainImageRenderer;
 typedef struct _ChamplainImageRendererClass ChamplainImageRendererClass;
 
+/**
+ * ChamplainImageRenderer:
+ *
+ * The #ChamplainImageRenderer structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.8
+ */
 struct _ChamplainImageRenderer
 {
   ChamplainRenderer parent;

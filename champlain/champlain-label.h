@@ -53,6 +53,14 @@ typedef struct _ChamplainLabelPrivate ChamplainLabelPrivate;
 typedef struct _ChamplainLabel ChamplainLabel;
 typedef struct _ChamplainLabelClass ChamplainLabelClass;
 
+/**
+ * ChamplainLabel:
+ *
+ * The #ChamplainLabel structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.10
+ */
 struct _ChamplainLabel
 {
   ChamplainMarker parent;

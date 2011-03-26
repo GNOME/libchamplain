@@ -52,6 +52,14 @@ typedef struct _ChamplainTileSourcePrivate ChamplainTileSourcePrivate;
 typedef struct _ChamplainTileSource ChamplainTileSource;
 typedef struct _ChamplainTileSourceClass ChamplainTileSourceClass;
 
+/**
+ * ChamplainTileSource:
+ *
+ * The #ChamplainTileSource structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.6
+ */
 struct _ChamplainTileSource
 {
   ChamplainMapSource parent_instance;

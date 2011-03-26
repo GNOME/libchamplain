@@ -52,6 +52,14 @@ typedef struct _ChamplainCustomMarkerPrivate ChamplainCustomMarkerPrivate;
 typedef struct _ChamplainCustomMarker ChamplainCustomMarker;
 typedef struct _ChamplainCustomMarkerClass ChamplainCustomMarkerClass;
 
+/**
+ * ChamplainCustomMarker:
+ *
+ * The #ChamplainCustomMarker structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.10
+ */
 struct _ChamplainCustomMarker
 {
   ChamplainMarker parent;

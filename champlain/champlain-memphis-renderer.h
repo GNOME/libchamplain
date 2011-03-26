@@ -76,6 +76,14 @@ typedef enum
   CHAMPLAIN_MEMPHIS_RULE_TYPE_RELATION
 } ChamplainMemphisRuleType;
 
+/**
+ * ChamplainMemphisRenderer:
+ *
+ * The #ChamplainMemphisRenderer structure contains only private data
+ * and should be accessed using the provided API
+ *
+ * Since: 0.8
+ */
 struct _ChamplainMemphisRenderer
 {
   ChamplainRenderer parent;
