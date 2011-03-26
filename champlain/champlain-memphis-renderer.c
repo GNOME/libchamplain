@@ -692,7 +692,7 @@ champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *renderer,
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_RENDERER (renderer));
 
-  ChamplainMemphisRendererPrivate *priv = GET_PRIVATE (renderer);
+  ChamplainMemphisRendererPrivate *priv = renderer->priv;
 
   renderer->priv->tile_size = size;
 

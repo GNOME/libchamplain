@@ -514,7 +514,7 @@ add_node (ChamplainPathLayer *layer,
     gboolean append,
     guint position)
 {
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainPathLayerPrivate *priv = layer->priv;
 
   g_signal_connect (G_OBJECT (location), "notify::latitude",
       G_CALLBACK (position_notify), layer);
@@ -560,7 +560,7 @@ champlain_path_layer_add_node (ChamplainPathLayer *layer,
 void
 champlain_path_layer_remove_all (ChamplainPathLayer *layer)
 {
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainPathLayerPrivate *priv = layer->priv;
   GList *elem;
 
   g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
@@ -595,7 +595,7 @@ champlain_path_layer_remove_all (ChamplainPathLayer *layer)
 GList *
 champlain_path_layer_get_nodes (ChamplainPathLayer *layer)
 {
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainPathLayerPrivate *priv = layer->priv;
 
   return g_list_copy (priv->nodes);
 }
@@ -614,7 +614,7 @@ void
 champlain_path_layer_remove_node (ChamplainPathLayer *layer,
     ChamplainLocation *location)
 {
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainPathLayerPrivate *priv = layer->priv;
 
   g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
   g_return_if_fail (CHAMPLAIN_IS_LOCATION (location));

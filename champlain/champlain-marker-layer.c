@@ -333,7 +333,7 @@ set_selected_all_but_one (ChamplainMarkerLayer *layer,
     ChamplainMarker *not_selected,
     gboolean select)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
   GList *elem;
   GList *markers;
 
@@ -438,7 +438,7 @@ void
 champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
     ChamplainMarker *marker)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
@@ -470,7 +470,7 @@ champlain_marker_layer_add_marker (ChamplainMarkerLayer *layer,
 void
 champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
   GList *elem;
   GList *markers;
 
@@ -511,7 +511,7 @@ champlain_marker_layer_remove_all (ChamplainMarkerLayer *layer)
 GList *
 champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
 
   return clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
 }
@@ -530,7 +530,7 @@ champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer)
 GList *
 champlain_marker_layer_get_selected (ChamplainMarkerLayer *layer)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
   GList *elem;
   GList *markers;
   GList *selected = NULL;
@@ -566,7 +566,7 @@ void
 champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
     ChamplainMarker *marker)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
@@ -595,7 +595,7 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
 void
 champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
   GList *elem;
   guint delay = 0;
   GList *markers;
@@ -627,7 +627,7 @@ champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer)
 void
 champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
   GList *elem;
   guint delay = 0;
   GList *markers;
@@ -659,7 +659,7 @@ champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer)
 void
 champlain_marker_layer_show_all_markers (ChamplainMarkerLayer *layer)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
   GList *elem;
   GList *markers;
 
@@ -689,7 +689,7 @@ champlain_marker_layer_show_all_markers (ChamplainMarkerLayer *layer)
 void
 champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
   GList *elem;
   GList *markers;
 
@@ -719,7 +719,7 @@ champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer)
 void
 champlain_marker_layer_set_all_markers_draggable (ChamplainMarkerLayer *layer)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
   GList *elem;
   GList *markers;
 
@@ -749,7 +749,7 @@ champlain_marker_layer_set_all_markers_draggable (ChamplainMarkerLayer *layer)
 void
 champlain_marker_layer_set_all_markers_undraggable (ChamplainMarkerLayer *layer)
 {
-  ChamplainMarkerLayerPrivate *priv = GET_PRIVATE (layer);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
   GList *elem;
   GList *markers;
 
