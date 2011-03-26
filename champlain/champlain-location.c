@@ -15,7 +15,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 /**
  * SECTION:champlain-location
  * @short_description: An interface common to objects having latitude and longitude
@@ -28,6 +27,7 @@
 #include "champlain-private.h"
 
 typedef ChamplainLocationIface ChamplainLocationInterface;
+
 G_DEFINE_INTERFACE (ChamplainLocation, champlain_location, G_TYPE_OBJECT);
 
 
@@ -42,9 +42,13 @@ champlain_location_default_init (ChamplainLocationInterface *iface)
    * Since: 0.10
    */
   g_object_interface_install_property (iface,
-      g_param_spec_double ("longitude", "Longitude",
+      g_param_spec_double ("longitude", 
+          "Longitude",
           "The longitude coordonate",
-          -180.0f, 180.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
+          -180.0f, 
+          180.0f, 
+          0.0f, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLocation:latitude:
@@ -54,9 +58,13 @@ champlain_location_default_init (ChamplainLocationInterface *iface)
    * Since: 0.10
    */
   g_object_interface_install_property (iface,
-      g_param_spec_double ("latitude", "Latitude",
+      g_param_spec_double ("latitude", 
+          "Latitude",
           "The latitude coordonate",
-          -90.0f, 90.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
+          -90.0f, 
+          90.0f, 
+          0.0f, 
+          CHAMPLAIN_PARAM_READWRITE));
 }
 
 

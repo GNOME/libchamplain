@@ -107,6 +107,7 @@ static guint signals[LAST_SIGNAL] = { 0, };
 
 #define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
+  
 #define ZOOM_LEVEL_OUT_OF_RANGE(priv, level) \
   (level < priv->min_zoom_level || \
            level > priv->max_zoom_level || \
@@ -770,7 +771,10 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       g_param_spec_double ("longitude",
           "Longitude",
           "The longitude coordonate of the map",
-          -180.0f, 180.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
+          -180.0f, 
+          180.0f, 
+          0.0f, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainView:latitude:
@@ -784,7 +788,10 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       g_param_spec_double ("latitude",
           "Latitude",
           "The latitude coordonate of the map",
-          -90.0f, 90.0f, 0.0f, CHAMPLAIN_PARAM_READWRITE));
+          -90.0f, 
+          90.0f, 
+          0.0f, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainView:zoom-level:
@@ -798,7 +805,10 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       g_param_spec_uint ("zoom-level",
           "Zoom level",
           "The level of zoom of the map",
-          0, 20, 3, CHAMPLAIN_PARAM_READWRITE));
+          0, 
+          20, 
+          3, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainView:min-zoom-level:
@@ -812,7 +822,10 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       g_param_spec_uint ("min-zoom-level",
           "Min zoom level",
           "The lowest allowed level of zoom",
-          0, 20, 0, CHAMPLAIN_PARAM_READWRITE));
+          0, 
+          20, 
+          0, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainView:max-zoom-level:
@@ -826,7 +839,10 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       g_param_spec_uint ("max-zoom-level",
           "Max zoom level",
           "The highest allowed level of zoom",
-          0, 20, 20, CHAMPLAIN_PARAM_READWRITE));
+          0, 
+          20, 
+          20, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainView:map-source:
@@ -855,7 +871,8 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       g_param_spec_boolean ("kinetic-mode",
           "Kinetic Mode",
           "Determines whether the view should use kinetic mode.",
-          FALSE, CHAMPLAIN_PARAM_READWRITE));
+          FALSE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainView:deceleration:
@@ -869,7 +886,10 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       g_param_spec_double ("deceleration",
           "Deceleration rate",
           "Rate at which the view will decelerate in kinetic mode.",
-          1.0001, 2.0, 1.1, CHAMPLAIN_PARAM_READWRITE));
+          1.0001, 
+          2.0, 
+          1.1, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainView:keep-center-on-resize:
@@ -884,7 +904,8 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
           "Keep center on resize",
           "Keep the current centered position "
           "upon resizing",
-          TRUE, CHAMPLAIN_PARAM_READWRITE));
+          TRUE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainView:zoom-on-double-click:
@@ -898,7 +919,8 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       g_param_spec_boolean ("zoom-on-double-click",
           "Zoom in on double click",
           "Zoom in and recenter on double click on the map",
-          TRUE, CHAMPLAIN_PARAM_READWRITE));
+          TRUE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainView:state
@@ -928,9 +950,13 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
    * Since: 0.4
    */
   signals[ANIMATION_COMPLETED] =
-    g_signal_new ("animation-completed", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 0);
+    g_signal_new ("animation-completed", 
+        G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED, 
+        0, NULL, NULL,
+        g_cclosure_marshal_VOID__OBJECT, 
+        G_TYPE_NONE, 
+        0);
 
   /**
    * ChamplainView::layer-relocated:
@@ -943,9 +969,13 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
    * Since: 0.10
    */
   signals[LAYER_RELOCATED] =
-    g_signal_new ("layer-relocated", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+    g_signal_new ("layer-relocated", 
+        G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 
+        0, NULL, NULL,
+        g_cclosure_marshal_VOID__VOID, 
+        G_TYPE_NONE, 
+        0);
 }
 
 

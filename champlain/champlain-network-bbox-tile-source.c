@@ -245,12 +245,15 @@ champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
   priv->soup_session = soup_session_async_new_with_options (
         "proxy-uri", soup_uri_new (priv->proxy_uri),
 #ifdef HAVE_LIBSOUP_GNOME
-        SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
+        SOUP_SESSION_ADD_FEATURE_BY_TYPE, 
+        SOUP_TYPE_PROXY_RESOLVER_GNOME,
 #endif
         NULL);
   g_object_set (G_OBJECT (priv->soup_session),
-      "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
-      "max-conns-per-host", 2, NULL);
+      "user-agent", 
+      "libchamplain/" CHAMPLAIN_VERSION_S,
+      "max-conns-per-host", 2, 
+      NULL);
 
   priv->state = CHAMPLAIN_STATE_NONE;
 }

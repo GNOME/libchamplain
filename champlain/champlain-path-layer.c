@@ -44,7 +44,8 @@
 
 G_DEFINE_TYPE (ChamplainPathLayer, champlain_path_layer, CHAMPLAIN_TYPE_LAYER)
 
-#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_PATH_LAYER, ChamplainPathLayerPrivate))
+#define GET_PRIVATE(obj) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_PATH_LAYER, ChamplainPathLayerPrivate))
 
 enum
 {
@@ -356,7 +357,8 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
       g_param_spec_boolean ("closed",
           "Closed Path",
           "The Path is Closed",
-          FALSE, CHAMPLAIN_PARAM_READWRITE));
+          FALSE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainPathLayer:fill:
@@ -370,7 +372,8 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
       g_param_spec_boolean ("fill",
           "Fill",
           "The shape is filled",
-          FALSE, CHAMPLAIN_PARAM_READWRITE));
+          FALSE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainPathLayer:stroke:
@@ -384,7 +387,8 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
       g_param_spec_boolean ("stroke",
           "Stroke",
           "The shape is stroked",
-          TRUE, CHAMPLAIN_PARAM_READWRITE));
+          TRUE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainPathLayer:stroke-color:
@@ -428,7 +432,8 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
       g_param_spec_double ("stroke-width",
           "Stroke Width",
           "The path's stroke width",
-          0, 100.0,
+          0, 
+          100.0,
           2.0,
           CHAMPLAIN_PARAM_READWRITE));
 

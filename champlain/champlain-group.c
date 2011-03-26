@@ -43,7 +43,7 @@
 
 #include <clutter/clutter.h>
 
-#define CHAMPLAIN_GROUP_GET_PRIVATE(obj) \
+#define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_GROUP, ChamplainGroupPrivate))
 
 struct _ChamplainGroupPrivate
@@ -64,8 +64,7 @@ enum
 static void clutter_container_iface_init (ClutterContainerIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (ChamplainGroup, champlain_group, CLUTTER_TYPE_ACTOR,
-    G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER,
-        clutter_container_iface_init));
+    G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER, clutter_container_iface_init));
 
 /*
    static gint
@@ -399,7 +398,7 @@ champlain_group_class_init (ChamplainGroupClass *klass)
 static void
 champlain_group_init (ChamplainGroup *self)
 {
-  self->priv = CHAMPLAIN_GROUP_GET_PRIVATE (self);
+  self->priv = GET_PRIVATE (self);
 
   self->priv->layout = clutter_fixed_layout_new ();
   g_object_ref_sink (self->priv->layout);

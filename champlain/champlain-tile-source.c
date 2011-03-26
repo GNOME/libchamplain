@@ -30,7 +30,8 @@
 
 G_DEFINE_ABSTRACT_TYPE (ChamplainTileSource, champlain_tile_source, CHAMPLAIN_TYPE_MAP_SOURCE);
 
-#define GET_PRIVATE(obj)    (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_TILE_SOURCE, ChamplainTileSourcePrivate))
+#define GET_PRIVATE(obj) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_TILE_SOURCE, ChamplainTileSourcePrivate))
 
 enum
 {
@@ -254,7 +255,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
         "Id",
         "The id of the tile source",
         "",
-        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
   g_object_class_install_property (object_class, PROP_ID, pspec);
 
   /**
@@ -268,7 +269,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
         "Name",
         "The name of the tile source",
         "",
-        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
   g_object_class_install_property (object_class, PROP_NAME, pspec);
 
   /**
@@ -282,7 +283,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
         "License",
         "The usage license of the tile source",
         "",
-        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
   g_object_class_install_property (object_class, PROP_LICENSE, pspec);
 
   /**
@@ -296,7 +297,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
         "License-uri",
         "The usage license's uri for more information",
         "",
-        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
   g_object_class_install_property (object_class, PROP_LICENSE_URI, pspec);
 
   /**
@@ -312,7 +313,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
         0,
         50,
         0,
-        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
   g_object_class_install_property (object_class, PROP_MIN_ZOOM_LEVEL, pspec);
 
   /**
@@ -328,7 +329,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
         0,
         50,
         18,
-        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
   g_object_class_install_property (object_class, PROP_MAX_ZOOM_LEVEL, pspec);
 
   /**
@@ -344,7 +345,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
         0,
         2048,
         256,
-        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
   g_object_class_install_property (object_class, PROP_TILE_SIZE, pspec);
 
   /**
@@ -359,7 +360,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
         "The map projection",
         CHAMPLAIN_TYPE_MAP_PROJECTION,
         CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
   g_object_class_install_property (object_class, PROP_MAP_PROJECTION, pspec);
 
   /**

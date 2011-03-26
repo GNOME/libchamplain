@@ -33,7 +33,8 @@
 
 G_DEFINE_TYPE (ChamplainAdjustment, champlain_adjustment, G_TYPE_OBJECT)
 
-#define ADJUSTMENT_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentPrivate))
+#define ADJUSTMENT_PRIVATE(o) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentPrivate))
 
 struct _ChamplainAdjustmentPrivate
 {

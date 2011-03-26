@@ -173,7 +173,9 @@ champlain_error_tile_renderer_init (ChamplainErrorTileRenderer *self)
 ChamplainErrorTileRenderer *
 champlain_error_tile_renderer_new (guint tile_size)
 {
-  return g_object_new (CHAMPLAIN_TYPE_ERROR_TILE_RENDERER, "tile-size", tile_size, NULL);
+  return g_object_new (CHAMPLAIN_TYPE_ERROR_TILE_RENDERER, 
+      "tile-size", tile_size, 
+      NULL);
 }
 
 

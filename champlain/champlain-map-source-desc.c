@@ -331,7 +331,9 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
       g_param_spec_uint ("min-zoom-level",
           "Min zoom level",
           "The lowest allowed level of zoom",
-          0, 20, 0,
+          0, 
+          20, 
+          0,
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
   /**
@@ -346,7 +348,9 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
       g_param_spec_uint ("max-zoom-level",
           "Max zoom level",
           "The highest allowed level of zoom",
-          0, 20, 20,
+          0, 
+          20, 
+          20,
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
   /**

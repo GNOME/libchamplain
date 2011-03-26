@@ -29,7 +29,7 @@ G_BEGIN_DECLS
 
 typedef struct _ChamplainBoundingBox ChamplainBoundingBox;
 
-#define CHAMPLAIN_BOUNDING_BOX(obj)     ((ChamplainBoundingBox *) (obj))
+#define CHAMPLAIN_BOUNDING_BOX(obj) ((ChamplainBoundingBox *) (obj))
 
 /**
  * ChamplainBoundingBox:

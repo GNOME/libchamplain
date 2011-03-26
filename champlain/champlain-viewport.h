@@ -29,12 +29,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_VIEWPORT            (champlain_viewport_get_type ())
-#define CHAMPLAIN_VIEWPORT(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewport))
-#define CHAMPLAIN_IS_VIEWPORT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_VIEWPORT))
-#define CHAMPLAIN_VIEWPORT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewportClass))
-#define CHAMPLAIN_IS_VIEWPORT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_VIEWPORT))
-#define CHAMPLAIN_VIEWPORT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewportClass))
+#define CHAMPLAIN_TYPE_VIEWPORT champlain_viewport_get_type ()
+  
+#define CHAMPLAIN_VIEWPORT(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewport))
+  
+#define CHAMPLAIN_IS_VIEWPORT(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_VIEWPORT))
+  
+#define CHAMPLAIN_VIEWPORT_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewportClass))
+  
+#define CHAMPLAIN_IS_VIEWPORT_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_VIEWPORT))
+  
+#define CHAMPLAIN_VIEWPORT_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewportClass))
 
 typedef struct _ChamplainViewport ChamplainViewport;
 typedef struct _ChamplainViewportPrivate ChamplainViewportPrivate;

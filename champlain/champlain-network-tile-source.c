@@ -231,7 +231,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
         "URI Format",
         "The URI format",
         "",
-        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
   g_object_class_install_property (object_class, PROP_URI_FORMAT, pspec);
 
   /**
@@ -278,7 +278,8 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
   priv->soup_session = soup_session_async_new_with_options (
         "proxy-uri", NULL,
 #ifdef HAVE_LIBSOUP_GNOME
-        SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_PROXY_RESOLVER_GNOME,
+        SOUP_SESSION_ADD_FEATURE_BY_TYPE, 
+        SOUP_TYPE_PROXY_RESOLVER_GNOME,
 #endif
         NULL);
   g_object_set (G_OBJECT (priv->soup_session),

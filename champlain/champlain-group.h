@@ -32,24 +32,19 @@ G_BEGIN_DECLS
 #define CHAMPLAIN_TYPE_GROUP champlain_group_get_type ()
 
 #define CHAMPLAIN_GROUP(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST ((obj), \
-       CHAMPLAIN_TYPE_GROUP, ChamplainGroup))
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_GROUP, ChamplainGroup))
 
 #define CHAMPLAIN_GROUP_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST ((klass), \
-       CHAMPLAIN_TYPE_GROUP, ChamplainGroupClass))
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_GROUP, ChamplainGroupClass))
 
 #define CHAMPLAIN_IS_GROUP(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), \
-       CHAMPLAIN_TYPE_GROUP))
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_GROUP))
 
 #define CHAMPLAIN_IS_GROUP_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE ((klass), \
-       CHAMPLAIN_TYPE_GROUP))
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_GROUP))
 
 #define CHAMPLAIN_GROUP_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS ((obj), \
-       CHAMPLAIN_TYPE_GROUP, ChamplainGroupClass))
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_GROUP, ChamplainGroupClass))
 
 typedef struct _ChamplainGroup ChamplainGroup;
 typedef struct _ChamplainGroupClass ChamplainGroupClass;

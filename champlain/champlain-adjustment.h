@@ -28,12 +28,22 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_ADJUSTMENT            (champlain_adjustment_get_type ())
-#define CHAMPLAIN_ADJUSTMENT(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustment))
-#define CHAMPLAIN_IS_ADJUSTMENT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_ADJUSTMENT))
-#define CHAMPLAIN_ADJUSTMENT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentClass))
-#define CHAMPLAIN_IS_ADJUSTMENT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_ADJUSTMENT))
-#define CHAMPLAIN_ADJUSTMENT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentClass))
+#define CHAMPLAIN_TYPE_ADJUSTMENT champlain_adjustment_get_type ()
+
+#define CHAMPLAIN_ADJUSTMENT(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustment))
+  
+#define CHAMPLAIN_IS_ADJUSTMENT(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_ADJUSTMENT))
+  
+#define CHAMPLAIN_ADJUSTMENT_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentClass))
+  
+#define CHAMPLAIN_IS_ADJUSTMENT_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CHAMPLAIN_TYPE_ADJUSTMENT))
+  
+#define CHAMPLAIN_ADJUSTMENT_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentClass))
 
 typedef struct _ChamplainAdjustment ChamplainAdjustment;
 typedef struct _ChamplainAdjustmentPrivate ChamplainAdjustmentPrivate;

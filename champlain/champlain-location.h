@@ -27,10 +27,16 @@
 
 G_BEGIN_DECLS
 
-#define CHAMPLAIN_TYPE_LOCATION            (champlain_location_get_type ())
-#define CHAMPLAIN_LOCATION(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_LOCATION, ChamplainLocation))
-#define CHAMPLAIN_IS_LOCATION(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_LOCATION))
-#define CHAMPLAIN_LOCATION_GET_IFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), CHAMPLAIN_TYPE_LOCATION, ChamplainLocationIface))
+#define CHAMPLAIN_TYPE_LOCATION (champlain_location_get_type ())
+
+#define CHAMPLAIN_LOCATION(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CHAMPLAIN_TYPE_LOCATION, ChamplainLocation))
+
+#define CHAMPLAIN_IS_LOCATION(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CHAMPLAIN_TYPE_LOCATION))
+
+#define CHAMPLAIN_LOCATION_GET_IFACE(inst) \
+  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), CHAMPLAIN_TYPE_LOCATION, ChamplainLocationIface))
 
 typedef struct _ChamplainLocation ChamplainLocation; /* Dummy object */
 typedef struct _ChamplainLocationIface ChamplainLocationIface;

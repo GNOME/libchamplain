@@ -85,10 +85,9 @@ static gdouble get_longitude (ChamplainLocation *location);
 static void location_interface_init (ChamplainLocationIface *iface);
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_ACTOR,
-    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION,
-        location_interface_init));
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION, location_interface_init));
 
-#define CHAMPLAIN_MARKER_GET_PRIVATE(obj) \
+#define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
 
 struct _ChamplainMarkerPrivate
@@ -345,9 +344,11 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_SELECTED,
-      g_param_spec_boolean ("selected", "Selected",
+      g_param_spec_boolean ("selected", 
+          "Selected",
           "The sighlighted state of the marker",
-          FALSE, CHAMPLAIN_PARAM_READWRITE));
+          FALSE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainMarker:selectable:
@@ -357,9 +358,11 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_SELECTABLE,
-      g_param_spec_boolean ("selectable", "Selectable",
+      g_param_spec_boolean ("selectable", 
+          "Selectable",
           "The draggable state of the marker",
-          FALSE, CHAMPLAIN_PARAM_READWRITE));
+          FALSE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainMarker:draggable:
@@ -369,9 +372,11 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_DRAGGABLE,
-      g_param_spec_boolean ("draggable", "Draggable",
+      g_param_spec_boolean ("draggable", 
+          "Draggable",
           "The draggable state of the marker",
-          FALSE, CHAMPLAIN_PARAM_READWRITE));
+          FALSE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainMarker::button-press:
@@ -382,9 +387,14 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    * Since: 0.10
    */
   signals[BUTTON_PRESS_SIGNAL] =
-    g_signal_new ("button-press", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__BOXED, G_TYPE_NONE, 1, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
+    g_signal_new ("button-press", 
+        G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 
+        0, NULL, NULL,
+        g_cclosure_marshal_VOID__BOXED, 
+        G_TYPE_NONE, 
+        1, 
+        CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
 
   /**
    * ChamplainMarker::button-release:
@@ -395,9 +405,14 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    * Since: 0.10
    */
   signals[BUTTON_RELEASE_SIGNAL] =
-    g_signal_new ("button-release", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__BOXED, G_TYPE_NONE, 1, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
+    g_signal_new ("button-release", 
+        G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 
+        0, NULL, NULL,
+        g_cclosure_marshal_VOID__BOXED, 
+        G_TYPE_NONE, 
+        1, 
+        CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
 
   /**
    * ChamplainMarker::drag-motion:
@@ -411,9 +426,14 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    * Since: 0.10
    */
   signals[DRAG_MOTION_SIGNAL] =
-    g_signal_new ("drag-motion", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        _champlain_marshal_VOID__DOUBLE_DOUBLE_BOXED, G_TYPE_NONE, 3, G_TYPE_DOUBLE, G_TYPE_DOUBLE, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
+    g_signal_new ("drag-motion", 
+        G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 
+        0, NULL, NULL,
+        _champlain_marshal_VOID__DOUBLE_DOUBLE_BOXED, 
+        G_TYPE_NONE, 
+        3, 
+        G_TYPE_DOUBLE, G_TYPE_DOUBLE, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
 
   /**
    * ChamplainMarker::drag-finish:
@@ -425,9 +445,14 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
    * Since: 0.10
    */
   signals[DRAG_FINISH_SIGNAL] =
-    g_signal_new ("drag-finish", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-        g_cclosure_marshal_VOID__BOXED, G_TYPE_NONE, 1, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
+    g_signal_new ("drag-finish", 
+        G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 
+        0, NULL, NULL,
+        g_cclosure_marshal_VOID__BOXED, 
+        G_TYPE_NONE, 
+        1, 
+        CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
 
 
   g_object_class_override_property (object_class,
@@ -456,7 +481,8 @@ motion_event_cb (ClutterActor *stage,
           event->y,
           &x, &y))
     {
-      g_signal_emit_by_name (marker, "drag-motion", x - priv->click_x, y - priv->click_y, event);
+      g_signal_emit_by_name (marker, "drag-motion", 
+          x - priv->click_x, y - priv->click_y, event);
       priv->moved = TRUE;
     }
 
@@ -566,7 +592,7 @@ button_press_event_cb (ClutterActor *actor,
 static void
 champlain_marker_init (ChamplainMarker *marker)
 {
-  ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER_GET_PRIVATE (marker);
+  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
 
   marker->priv = priv;
 

@@ -29,12 +29,10 @@
 #include "champlain-viewport.h"
 #include "champlain-private.h"
 
-
 G_DEFINE_TYPE (ChamplainViewport, champlain_viewport, CLUTTER_TYPE_ACTOR)
 
 #define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_VIEWPORT, \
-       ChamplainViewportPrivate))
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewportPrivate))
 
 struct _ChamplainViewportPrivate
 {

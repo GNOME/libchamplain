@@ -461,8 +461,11 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_TEXT,
-      g_param_spec_string ("text", "Text", "The text of the label",
-          "", CHAMPLAIN_PARAM_READWRITE));
+      g_param_spec_string ("text", 
+          "Text", 
+          "The text of the label",
+          "", 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:image:
@@ -472,8 +475,11 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_IMAGE,
-      g_param_spec_object ("image", "Image", "The image of the label",
-          CLUTTER_TYPE_ACTOR, CHAMPLAIN_PARAM_READWRITE));
+      g_param_spec_object ("image", 
+          "Image", 
+          "The image of the label",
+          CLUTTER_TYPE_ACTOR, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:use-markup:
@@ -483,8 +489,11 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_USE_MARKUP,
-      g_param_spec_boolean ("use-markup", "Use Markup", "The text uses markup",
-          FALSE, CHAMPLAIN_PARAM_READWRITE));
+      g_param_spec_boolean ("use-markup", 
+          "Use Markup", 
+          "The text uses markup",
+          FALSE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:alignment:
@@ -494,8 +503,12 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_ALIGNMENT,
-      g_param_spec_enum ("alignment", "Alignment", "The label's alignment",
-          PANGO_TYPE_ALIGNMENT, PANGO_ALIGN_LEFT, CHAMPLAIN_PARAM_READWRITE));
+      g_param_spec_enum ("alignment", 
+          "Alignment", 
+          "The label's alignment",
+          PANGO_TYPE_ALIGNMENT, 
+          PANGO_ALIGN_LEFT, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:color:
@@ -505,8 +518,11 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_COLOR,
-      clutter_param_spec_color ("color", "Color", "The label's color",
-          &DEFAULT_COLOR, CHAMPLAIN_PARAM_READWRITE));
+      clutter_param_spec_color ("color", 
+          "Color", 
+          "The label's color",
+          &DEFAULT_COLOR, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:text-color:
@@ -516,8 +532,11 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_TEXT_COLOR,
-      clutter_param_spec_color ("text-color", "Text Color", "The label's text color",
-          &DEFAULT_TEXT_COLOR, CHAMPLAIN_PARAM_READWRITE));
+      clutter_param_spec_color ("text-color", 
+          "Text Color", 
+          "The label's text color",
+          &DEFAULT_TEXT_COLOR, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:font-name:
@@ -527,8 +546,11 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_FONT_NAME,
-      g_param_spec_string ("font-name", "Font Name", "The label's text font name",
-          "Sans 11", CHAMPLAIN_PARAM_READWRITE));
+      g_param_spec_string ("font-name", 
+          "Font Name", 
+          "The label's text font name",
+          "Sans 11", 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:wrap:
@@ -538,8 +560,11 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_WRAP,
-      g_param_spec_boolean ("wrap", "Wrap", "The label's text wrap",
-          FALSE, CHAMPLAIN_PARAM_READWRITE));
+      g_param_spec_boolean ("wrap", 
+          "Wrap", 
+          "The label's text wrap",
+          FALSE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:wrap-mode:
@@ -549,8 +574,12 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_WRAP_MODE,
-      g_param_spec_enum ("wrap-mode", "Wrap Mode", "The label's text wrap mode",
-          PANGO_TYPE_WRAP_MODE, PANGO_WRAP_WORD, CHAMPLAIN_PARAM_READWRITE));
+      g_param_spec_enum ("wrap-mode", 
+          "Wrap Mode", 
+          "The label's text wrap mode",
+          PANGO_TYPE_WRAP_MODE, 
+          PANGO_WRAP_WORD, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:ellipsize:
@@ -560,8 +589,12 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_ELLIPSIZE,
-      g_param_spec_enum ("ellipsize", "Ellipsize Mode", "The label's text ellipsize mode",
-          PANGO_TYPE_ELLIPSIZE_MODE, PANGO_ELLIPSIZE_NONE, CHAMPLAIN_PARAM_READWRITE));
+      g_param_spec_enum ("ellipsize", 
+          "Ellipsize Mode", 
+          "The label's text ellipsize mode",
+          PANGO_TYPE_ELLIPSIZE_MODE, 
+          PANGO_ELLIPSIZE_NONE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:draw-background:
@@ -571,8 +604,11 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_DRAW_BACKGROUND,
-      g_param_spec_boolean ("draw-background", "Draw Background", "The label has a background",
-          TRUE, CHAMPLAIN_PARAM_READWRITE));
+      g_param_spec_boolean ("draw-background", 
+          "Draw Background", 
+          "The label has a background",
+          TRUE, 
+          CHAMPLAIN_PARAM_READWRITE));
 
   /**
    * ChamplainLabel:single-line-mode:
@@ -582,8 +618,11 @@ champlain_label_class_init (ChamplainLabelClass *klass)
    * Since: 0.10
    */
   g_object_class_install_property (object_class, PROP_SINGLE_LINE_MODE,
-      g_param_spec_boolean ("single-line-mode", "Single Line Mode", "The label's single line mode",
-          TRUE, CHAMPLAIN_PARAM_READWRITE));
+      g_param_spec_boolean ("single-line-mode", 
+          "Single Line Mode", 
+          "The label's single line mode",
+          TRUE, 
+          CHAMPLAIN_PARAM_READWRITE));
 }
 
 

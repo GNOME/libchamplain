@@ -31,13 +31,11 @@
 static void clutter_container_iface_init (ClutterContainerIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (ChamplainKineticScrollView, champlain_kinetic_scroll_view, CLUTTER_TYPE_ACTOR,
-    G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER,
-        clutter_container_iface_init))
+    G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER, clutter_container_iface_init))
 
 
-#define KINETIC_SCROLL_VIEW_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
-                                            CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW, \
-                                            ChamplainKineticScrollViewPrivate))
+#define GET_PRIVATE(o) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW, ChamplainKineticScrollViewPrivate))
 
 typedef struct
 {
@@ -310,8 +308,10 @@ champlain_kinetic_scroll_view_class_init (ChamplainKineticScrollViewClass *klass
           G_PARAM_READWRITE));
 
   signals[PANNING_COMPLETED] =
-    g_signal_new ("panning-completed", G_OBJECT_CLASS_TYPE (object_class),
-        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+    g_signal_new ("panning-completed", 
+        G_OBJECT_CLASS_TYPE (object_class),
+        G_SIGNAL_RUN_LAST, 
+        0, NULL, NULL,
         g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 }
 
@@ -882,7 +882,7 @@ button_press_event_cb (ClutterActor *actor,
 static void
 champlain_kinetic_scroll_view_init (ChamplainKineticScrollView *self)
 {
-  ChamplainKineticScrollViewPrivate *priv = self->priv = KINETIC_SCROLL_VIEW_PRIVATE (self);
+  ChamplainKineticScrollViewPrivate *priv = self->priv = GET_PRIVATE (self);
 
   priv->motion_buffer = g_array_sized_new (FALSE, TRUE,
         sizeof (ChamplainKineticScrollViewMotion), 3);
