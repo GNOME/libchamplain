@@ -1,3 +1,22 @@
+libchamplain 0.9.1 (2011-03-28)
+===============================
+
+Unstable release
+Vala bindings have not been updated yet.
+
+Changes:
+* Fix the redrawing bug caused by more aggressive clutter clipping (Jiří Techet)
+* Return to tidy from mx - it's less code which has to be maintained (Jiří Techet)
+* Port event handling from mx to tidy (Jiří Techet)
+* Reduce the amount of tidy source files and move them to the champlain
+  directory (Jiří Techet)
+* Custom pick implementation for markers so markers are selected only
+  when clicked inside them (Jiří Techet)
+* Fixes of several memory leaks on object destruction (Jiří Techet)
+* Deprecated symbols removal from ChamplainGtk (Jiří Techet)
+* Minimal Python demo added (Jiří Techet)
+* Minor bugfixes, cleanups, documentation additions, alignment fixes (Jiří Techet)
+
 libchamplain 0.9.0 (2011-02-21)
 ===============================
 
