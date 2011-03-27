@@ -122,9 +122,6 @@ main (int argc,
   /* draw a line */
   layer = champlain_path_layer_new ();
   /* Cheap approx of Highway 10 */
-  int i = 0;
-  for (i = 0; i < 50000; i++)
-    append_point (layer, 45.4095 + i / 10000.0, -73.3197 + i / 10000.0);
   append_point (layer, 45.4104, -73.2846);
   append_point (layer, 45.4178, -73.2239);
   append_point (layer, 45.4176, -73.2181);

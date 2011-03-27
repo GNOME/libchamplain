@@ -29,6 +29,7 @@
 #define COL_NAME 1
 
 static ChamplainPathLayer *path_layer;
+static ChamplainPathLayer *path;
 static gboolean destroying = FALSE;
 
 /*
@@ -49,11 +50,13 @@ toggle_layer (GtkToggleButton *widget,
   if (gtk_toggle_button_get_active (widget))
     {
       champlain_path_layer_set_visible (path_layer, TRUE);
+      champlain_path_layer_set_visible (path, TRUE);
       champlain_marker_layer_animate_in_all_markers (CHAMPLAIN_MARKER_LAYER (layer));
     }
   else
     {
       champlain_path_layer_set_visible (path_layer, FALSE);
+      champlain_path_layer_set_visible (path, FALSE);
       champlain_marker_layer_animate_out_all_markers (CHAMPLAIN_MARKER_LAYER (layer));
     }
 }
@@ -219,7 +222,6 @@ main (int argc,
   ChamplainMarkerLayer *layer;
   ClutterActor *scale;
   ChamplainLicense *license_actor;
-  ChamplainPathLayer *path;
 
   g_thread_init (NULL);
   gtk_clutter_init (&argc, &argv);
@@ -295,6 +297,7 @@ main (int argc,
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
   button = gtk_toggle_button_new_with_label ("Markers");
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (button), TRUE);
   g_signal_connect (button, "toggled", G_CALLBACK (toggle_layer), layer);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
