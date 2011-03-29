@@ -34,7 +34,7 @@ DISTCLEANFILES = $(pcfiles) $(other_pcfiles)
 all: $(other_pcfiles)
 
 # Have the demos build at the end as they depend on optional parts
-SUBDIRS += docs demos bindings
+SUBDIRS += docs demos
 
 dist-hook:
 	@if test -d "$(srcdir)/.git"; \

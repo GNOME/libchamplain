@@ -1,4 +1,0 @@
-export PKG_CONFIG_PATH=$(readlink -f ../../../)
-
-vala-gen-introspect champlain-gtk-@CHAMPLAIN_API_VERSION@ champlain-gtk-@CHAMPLAIN_API_VERSION@
-vapigen --library champlain-gtk-@CHAMPLAIN_API_VERSION@ --pkg clutter-gtk-0.10 --pkg gtk+-3.0 --pkg champlain-@CHAMPLAIN_API_VERSION@ --vapidir=../champlain champlain-gtk-@CHAMPLAIN_API_VERSION@/champlain-gtk-@CHAMPLAIN_API_VERSION@.gi --metadata champlain-gtk-@CHAMPLAIN_API_VERSION@/champlain-gtk-@CHAMPLAIN_API_VERSION@.metadata

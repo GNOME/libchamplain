@@ -1,4 +1,0 @@
-export PKG_CONFIG_PATH=$(readlink -f ../../../)
-
-vala-gen-introspect champlain-memphis-@CHAMPLAIN_API_VERSION@ champlain-memphis-@CHAMPLAIN_API_VERSION@
-vapigen --library champlain-memphis-@CHAMPLAIN_API_VERSION@ --pkg champlain-@CHAMPLAIN_API_VERSION@ --vapidir=../champlain champlain-memphis-@CHAMPLAIN_API_VERSION@/champlain-memphis-@CHAMPLAIN_API_VERSION@.gi --metadata champlain-memphis-@CHAMPLAIN_API_VERSION@/champlain-memphis-@CHAMPLAIN_API_VERSION@.metadata

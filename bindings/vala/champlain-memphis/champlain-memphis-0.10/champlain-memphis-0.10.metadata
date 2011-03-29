@@ -1,5 +1,0 @@
-Champlain cheader_filename="champlain/champlain.h"
-ChamplainMemphisRenderer cheader_filename="champlain/champlain-memphis-renderer.h"
-
-champlain_bounding_box_get_center.lat is_out="1"
-champlain_bounding_box_get_center.lon is_out="1"

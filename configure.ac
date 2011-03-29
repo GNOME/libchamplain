@@ -244,22 +244,9 @@ AC_CONFIG_FILES([build/Makefile
                  champlain-gtk-$CHAMPLAIN_API_VERSION.pc:champlain-gtk.pc.in
                  champlain-gtk-$CHAMPLAIN_API_VERSION-uninstalled.pc:champlain-gtk-uninstalled.pc.in
                  champlain-gtk/Makefile
-                 bindings/Makefile
-                 bindings/vala/Makefile
-                 bindings/vala/champlain/Makefile
-                 bindings/vala/champlain/create.sh
-                 bindings/vala/champlain-memphis/Makefile
-                 bindings/vala/champlain-memphis/create.sh
-                 bindings/vala/champlain-gtk/Makefile
-                 bindings/vala/champlain-gtk/create.sh
-                 bindings/vala/demos/Makefile
                  champlain-memphis-$CHAMPLAIN_API_VERSION.pc:champlain-memphis.pc.in
                  champlain-memphis-$CHAMPLAIN_API_VERSION-uninstalled.pc:champlain-memphis-uninstalled.pc.in])
-AC_CONFIG_FILES([Makefile],
-                [chmod +x bindings/vala/champlain/create.sh
-                 chmod +x bindings/vala/champlain-gtk/create.sh
-                 chmod +x bindings/vala/champlain-memphis/create.sh
-                ])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
 echo ""

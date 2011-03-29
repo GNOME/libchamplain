@@ -46,5 +46,16 @@ local_rendering_LDADD = $(GTK_LIBS) $(MEMPHIS_LIBS) $(DEPS_LIBS) \
 endif
 endif
 
+if ENABLE_VALA_DEMOS
+noinst_PROGRAMS += launcher-vala
+launcher_vala_SOURCES = launcher.vala markers.vala
+VALAFLAGS = \
+  --vapidir=../champlain \
+  --pkg atk --pkg clutter-1.0 --pkg champlain-@CHAMPLAIN_API_VERSION@
+launcher_vala_LDADD = \
+       $(DEPS_LIBS) \
+       $(top_builddir)/champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
+endif
+
 EXTRA_DIST = markers.h launcher.js minimal.py default-rules.xml high-contrast.xml las_palmas.osm schaffhausen.osm
 
