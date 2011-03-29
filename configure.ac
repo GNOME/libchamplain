@@ -164,18 +164,38 @@ AC_SUBST(MEMPHIS_LIBS)
 AM_CONDITIONAL(ENABLE_MEMPHIS, test "x$enable_memphis" = "xyes")
 
 # -----------------------------------------------------------
+# Enable vala bindings (default to "no")
+# -----------------------------------------------------------
+
+AC_ARG_ENABLE(vala,
+  AS_HELP_STRING([--enable-vala], [Build Vala bindings [default=no]]),
+    enable_vala=$enableval, enable_vala=no )
+
+if test "x$enable_vala" = "xyes"; then
+  if test "x$enable_introspection" = "xno"; then
+    AC_MSG_ERROR([Cannot build vala bindings without gobject introspection])    
+  fi
+
+  AC_PATH_PROG(VAPIGEN, vapigen, vapigen)
+  AC_SUBST(VAPIGEN)
+fi
+
+AM_CONDITIONAL(ENABLE_VALA, test "x$enable_vala" = "xyes")
+
+# -----------------------------------------------------------
 # Enable vala demos (default to "no")
 # -----------------------------------------------------------
 
-AC_PATH_PROG(VAPIGEN, vapigen, vapigen)
-AC_SUBST(VAPIGEN)
-
 AC_ARG_ENABLE(vala-demos,
-  AS_HELP_STRING([--enable-vala-demos],[Build vala bindings demos]),
+  AS_HELP_STRING([--enable-vala-demos],[Build vala demos [default=no]]),
     enable_vala_demos=$enableval, enable_vala_demos=no )
 
 if test "x$enable_vala_demos" = "xyes"; then
-  AM_PROG_VALAC([0.8.0])
+  AM_PROG_VALAC([0.11.0])
+
+  if test "x$enable_vala" = "xno"; then
+    AC_MSG_ERROR([Cannot build demos without vala support])
+  fi
 
   if test "x$VALAC" = "x" ; then
     AC_MSG_ERROR([Cannot find the "valac" compiler in your PATH])
@@ -256,7 +276,7 @@ echo "Extra tile sources:"
 echo "  Memphis source: ${enable_memphis}"
 echo ""
 echo "Bindings:"
-echo "         Vala bindings: yes"
+echo "         Vala bindings: ${enable_vala}"
 echo "            Vala demos: ${enable_vala_demos}"
 echo " gobject-introspection: ${enable_introspection}"
 echo ""
