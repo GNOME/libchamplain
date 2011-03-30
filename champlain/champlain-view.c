@@ -201,6 +201,8 @@ struct _ChamplainViewPrivate
 
   /* Lines and shapes */
   ClutterActor *polygon_layer;  /* Contains the polygons */
+  
+  ClutterActor *layer_group;
 
   gint tiles_loading;
 };
@@ -833,6 +835,12 @@ champlain_view_dispose (GObject *object)
       tidy_viewport_stop (TIDY_VIEWPORT (priv->viewport));
       g_object_unref (priv->viewport);
       priv->viewport = NULL;
+    }
+
+  if (priv->layer_group != NULL)
+    {
+      g_object_unref (priv->layer_group);
+      priv->layer_group = NULL;
     }
 
   if (priv->map_layer != NULL)
@@ -1572,6 +1580,8 @@ champlain_view_init (ChamplainView *view)
   priv->tiles_loading = 0;
   priv->update_viewport_timer = g_timer_new();
 
+  priv->layer_group = g_object_ref (clutter_group_new ());
+
   /* Setup map layer */
   priv->map_layer = g_object_ref (clutter_group_new ());
   clutter_actor_show (priv->map_layer);
@@ -1593,16 +1603,19 @@ champlain_view_init (ChamplainView *view)
   g_signal_connect (priv->viewport, "notify::y-origin",
       G_CALLBACK (viewport_pos_changed_cb), view);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->layer_group),
       priv->map_layer);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->layer_group),
       priv->polygon_layer);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->layer_group),
       priv->user_layers);
 
+  clutter_container_add_actor (CLUTTER_CONTAINER (priv->viewport),
+      priv->layer_group);
+      
   clutter_actor_raise (priv->polygon_layer, priv->map_layer);
   clutter_actor_raise (priv->user_layers, priv->map_layer);
-
+  
   /* Setup finger scroll */
   priv->finger_scroll = g_object_ref (tidy_finger_scroll_new (priv->scroll_mode));
 
