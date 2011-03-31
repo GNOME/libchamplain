@@ -65,9 +65,10 @@ function map_view_button_release_cb (actor, event)
   if (event.button != 1 || event.click_count > 1)
     return false;
 
-  let[ok, lat, lon] = view.get_coords_from_event (event);
-  if (ok)
-    log ("Map clicked at %f, %f \n", lat, lon);
+  let lat = view.y_to_latitude (event.y);
+  let lon = view.x_to_longitude (event.x);
+
+  log ("Map clicked at %f, %f \n", lat, lon);
 
   return true;
 }
@@ -125,7 +126,7 @@ view.connect ("button-release-event", Lang.bind (view,
 
 /* Finish initialising the map view */
 view.zoom_level = 12;
-view.scroll_mode = Champlain.ScrollMode.KINETIC;
+view.kinetic_mode = true;
 view.center_on (45.466, -73.75);
 
 stage.show ();
