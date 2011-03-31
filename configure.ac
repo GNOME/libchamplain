@@ -230,7 +230,8 @@ CHAMPLAIN_CONFIG_COMMANDS([champlain/champlain-features.h],
 
 # ----------------------------------------------------------
 
-AC_CONFIG_FILES([build/Makefile
+AC_CONFIG_FILES([Makefile
+                 build/Makefile
                  champlain/Makefile
                  champlain/champlain-version.h
                  demos/Makefile
@@ -246,7 +247,6 @@ AC_CONFIG_FILES([build/Makefile
                  champlain-gtk/Makefile
                  champlain-memphis-$CHAMPLAIN_API_VERSION.pc:champlain-memphis.pc.in
                  champlain-memphis-$CHAMPLAIN_API_VERSION-uninstalled.pc:champlain-memphis-uninstalled.pc.in])
-AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
 echo ""
