@@ -206,7 +206,7 @@ EXTRA_DIST += champlain-@CHAMPLAIN_API_VERSION@.vapi
 CLEANFILES += $(dist_vapi_DATA)
 
 champlain-@CHAMPLAIN_API_VERSION@.vapi:	Champlain-@CHAMPLAIN_API_VERSION@.gir
-	$(AM_V_GEN) ( $(VAPIGEN) --library champlain-@CHAMPLAIN_API_VERSION@ --pkg clutter-1.0 --pkg atk $(srcdir)/Champlain-@CHAMPLAIN_API_VERSION@.gir )
+	$(AM_V_GEN) ( $(VAPIGEN) --library champlain-@CHAMPLAIN_API_VERSION@ --pkg clutter-1.0 --pkg atk $(builddir)/Champlain-@CHAMPLAIN_API_VERSION@.gir )
 
 endif
 

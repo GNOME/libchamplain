@@ -109,7 +109,7 @@ EXTRA_DIST += champlain-gtk-@CHAMPLAIN_API_VERSION@.vapi
 CLEANFILES += $(dist_vapi_DATA)
 
 champlain-gtk-@CHAMPLAIN_API_VERSION@.vapi:	GtkChamplain-@CHAMPLAIN_API_VERSION@.gir
-	$(AM_V_GEN) ( $(VAPIGEN) --library champlain-gtk-@CHAMPLAIN_API_VERSION@ --vapidir=$(top_srcdir)/champlain --pkg champlain-0.10 --pkg clutter-gtk-1.0 --pkg gtk+-3.0 --pkg atk --girdir=$(top_srcdir)/champlain $(srcdir)/GtkChamplain-@CHAMPLAIN_API_VERSION@.gir )
+	$(AM_V_GEN) ( $(VAPIGEN) --library champlain-gtk-@CHAMPLAIN_API_VERSION@ --vapidir=$(top_builddir)/champlain --pkg champlain-0.10 --pkg clutter-gtk-1.0 --pkg gtk+-3.0 --pkg atk --girdir=$(top_builddir)/champlain $(builddir)/GtkChamplain-@CHAMPLAIN_API_VERSION@.gir )
 
 endif
 
