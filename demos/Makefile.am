@@ -48,7 +48,7 @@ endif
 
 if ENABLE_VALA_DEMOS
 noinst_PROGRAMS += launcher-vala
-launcher_vala_SOURCES = launcher.vala markers.vala
+launcher_vala_SOURCES = launcher-vala.vala markers-vala.vala
 VALAFLAGS = \
   --vapidir=../champlain \
   --pkg atk --pkg clutter-1.0 --pkg champlain-@CHAMPLAIN_API_VERSION@

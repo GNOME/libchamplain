@@ -67,7 +67,7 @@ public class Launcher : GLib.Object
     stage.add_actor (buttons);
 
     /* Create the markers and marker layer */
-    var layer = new  MarkerLayer ();
+    var layer = new  DemoLayer ();
     view.add_layer (layer);
 
     /* Connect to the click event */
@@ -76,7 +76,7 @@ public class Launcher : GLib.Object
 
     /* Finish initialising the map view */
     view.zoom_level = 7;
-    view.scroll_mode = Champlain.ScrollMode.KINETIC;
+    view.kinetic_mode = true;
     view.center_on (45.466, -73.75);
   }
 
@@ -91,9 +91,11 @@ public class Launcher : GLib.Object
 
     if (event.button != 1 || event.click_count > 1)
       return false;
+      
+    lat = view.y_to_latitude (event.y);
+    lon = view.x_to_longitude (event.x);
 
-    if (view.get_coords_at ((uint) event.x, (uint) event.y, out lat, out lon))
-      GLib.print ("Map clicked at %f, %f \n", lat, lon);
+    GLib.print ("Map clicked at %f, %f \n", lat, lon);
 
     return true;
   }

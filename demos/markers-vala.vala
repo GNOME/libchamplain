@@ -19,47 +19,47 @@
 using GLib;
 using Clutter;
 
-class MarkerLayer : Champlain.SelectionLayer
+class DemoLayer : Champlain.MarkerLayer
 {
-  public MarkerLayer ()
+  public DemoLayer ()
   {
     Clutter.Color orange = { 0xf3, 0x94, 0x07, 0xbb };
-    var marker = new Champlain.Marker.with_text (
+    var marker = new Champlain.Label.with_text (
         "Montréal\n<span size=\"xx-small\">Québec</span>",
         "Serif 14", null, null);
     marker.set_use_markup (true);
     marker.set_alignment (Pango.Alignment.RIGHT);
     marker.set_color (orange);
-    marker.set_position (45.528178, -73.563788);
+    marker.set_location (45.528178, -73.563788);
     add_marker (marker);
 
     try {
-      marker = new Champlain.Marker.from_file (
+      marker = new Champlain.Label.from_file (
           "/usr/share/icons/gnome/24x24/emblems/emblem-generic.png");
     } catch (GLib.Error e) {
       GLib.warning ("%s", e.message);
     }
     marker.set_text ("New York");
-    marker.set_position (40.77, -73.98);
+    marker.set_location (40.77, -73.98);
     add_marker (marker);
 
     try {
-      marker = new Champlain.Marker.from_file (
+      marker = new Champlain.Label.from_file (
           "/usr/share/icons/gnome/24x24/emblems/emblem-important.png");
     } catch (GLib.Error e) {
       GLib.warning ("%s", e.message);
     }
-    marker.set_position (47.130885, -70.764141);
+    marker.set_location (47.130885, -70.764141);
     add_marker (marker);
 
     try {
-      marker = new Champlain.Marker.from_file (
+      marker = new Champlain.Label.from_file (
           "/usr/share/icons/gnome/24x24/emblems/emblem-favorite.png");
     } catch (GLib.Error e) {
       GLib.warning ("%s", e.message);
     }
     marker.set_draw_background (false);
-    marker.set_position (45.41484, -71.918907);
+    marker.set_location (45.41484, -71.918907);
     add_marker (marker);
   }
 }
