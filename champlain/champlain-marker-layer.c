@@ -512,8 +512,10 @@ GList *
 champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer)
 {
   ChamplainMarkerLayerPrivate *priv = layer->priv;
-
-  return clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
+  GList *lst;
+  
+  lst = clutter_container_get_children (CLUTTER_CONTAINER (priv->content_group));
+  return g_list_reverse (lst);
 }
 
 
@@ -544,7 +546,7 @@ champlain_marker_layer_get_selected (ChamplainMarkerLayer *layer)
       ChamplainMarker *marker = CHAMPLAIN_MARKER (elem->data);
 
       if (champlain_marker_get_selected (marker))
-        selected = g_list_append (selected, marker);
+        selected = g_list_prepend (selected, marker);
     }
 
   g_list_free (markers);

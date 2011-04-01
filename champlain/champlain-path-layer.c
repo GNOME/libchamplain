@@ -511,7 +511,7 @@ position_notify (ChamplainLocation *location,
 static void
 add_node (ChamplainPathLayer *layer,
     ChamplainLocation *location,
-    gboolean append,
+    gboolean prepend,
     guint position)
 {
   ChamplainPathLayerPrivate *priv = layer->priv;
@@ -521,8 +521,8 @@ add_node (ChamplainPathLayer *layer,
 
   g_object_ref_sink (location);
 
-  if (append)
-    priv->nodes = g_list_append (priv->nodes, location);
+  if (prepend)
+    priv->nodes = g_list_prepend (priv->nodes, location);
   else
     priv->nodes = g_list_insert (priv->nodes, location, position);
   schedule_redraw (layer);
@@ -595,9 +595,10 @@ champlain_path_layer_remove_all (ChamplainPathLayer *layer)
 GList *
 champlain_path_layer_get_nodes (ChamplainPathLayer *layer)
 {
-  ChamplainPathLayerPrivate *priv = layer->priv;
-
-  return g_list_copy (priv->nodes);
+  GList *lst;
+  
+  lst = g_list_copy (layer->priv->nodes);
+  return g_list_reverse (lst);
 }
 
 
