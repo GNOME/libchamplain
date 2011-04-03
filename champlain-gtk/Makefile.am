@@ -60,13 +60,12 @@ libchamplain_gtk_HEADERS = $(libchamplain_gtk_headers_public)
 
 nodist_libchamplain_gtk_HEADERS = $(libchamplain_gtk_headers_built)
 
+# Make the g-ir-scanner to find the not yet installed pkg-config files.
+PKG_CONFIG_PATH := $(top_builddir):$(PKG_CONFIG_PATH)
 
 if HAVE_INTROSPECTION
 
 -include $(INTROSPECTION_MAKEFILE)
-
-# Make the g-ir-scanner to find the not yet installed pkg-config files.
-export PKG_CONFIG_PATH=$(top_builddir)
 
 INTROSPECTION_GIRS =
 INTROSPECTION_SCANNER_ARGS = --warn-all --add-include-path=$(top_builddir)/champlain
