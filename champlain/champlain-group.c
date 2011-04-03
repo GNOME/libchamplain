@@ -49,6 +49,7 @@
 struct _ChamplainGroupPrivate
 {
   GList *children;
+  GList *children_end;
 
   ClutterLayoutManager *layout;
 };
@@ -91,8 +92,18 @@ champlain_group_real_add (ClutterContainer *container,
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (container)->priv;
 
   g_object_ref (actor);
-
-  priv->children = g_list_append (priv->children, actor);
+  
+  if (priv->children_end)
+    {
+      priv->children_end = g_list_append (priv->children_end, actor);
+      priv->children_end = g_list_next (priv->children_end);
+    }
+  else
+    {
+      priv->children = g_list_append (priv->children, actor);
+      priv->children_end = priv->children;
+    }  
+    
   clutter_actor_set_parent (actor, CLUTTER_ACTOR (container));
 
   /* queue a relayout, to get the correct positioning inside
@@ -113,10 +124,19 @@ champlain_group_real_remove (ClutterContainer *container,
     ClutterActor *actor)
 {
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (container)->priv;
-
+  GList *link;
+  
   g_object_ref (actor);
 
-  priv->children = g_list_remove (priv->children, actor);
+  link = g_list_find (priv->children, actor);
+  if (link)
+    {
+      if (link == priv->children_end)
+        priv->children_end = g_list_previous (priv->children_end);
+        
+      priv->children = g_list_delete_link (priv->children, link);
+    }
+  
   clutter_actor_unparent (actor);
 
   /* queue a relayout, to get the correct positioning inside
@@ -157,20 +177,30 @@ champlain_group_real_raise (ClutterContainer *container,
     ClutterActor *sibling)
 {
   ChamplainGroupPrivate *priv = CHAMPLAIN_GROUP (container)->priv;
-
-  priv->children = g_list_remove (priv->children, actor);
-
-  /* Raise at the top */
-  if (!sibling)
+  GList *link;
+  
+  link = g_list_find (priv->children, actor);
+  if (link)
     {
-      GList *last_item;
+      if (link == priv->children_end)
+        priv->children_end = g_list_previous (priv->children_end);
+        
+      priv->children = g_list_delete_link (priv->children, link);
+    }
 
-      last_item = g_list_last (priv->children);
-
-      if (last_item)
-        sibling = last_item->data;
-
-      priv->children = g_list_append (priv->children, actor);
+  /* Raise to the top */
+  if (!sibling || !priv->children_end || sibling == priv->children_end->data)
+    {
+      if (priv->children)
+        {
+          priv->children_end = g_list_append (priv->children_end, actor);
+          priv->children_end = g_list_next (priv->children_end);
+        }
+      else
+        {
+          priv->children = g_list_append (priv->children, actor);
+          priv->children_end = priv->children;
+        }  
     }
   else
     {
@@ -178,18 +208,6 @@ champlain_group_real_raise (ClutterContainer *container,
 
       priv->children = g_list_insert (priv->children, actor, index_);
     }
-
-  /* set Z ordering a value below, this will then call sort
-   * as values are equal ordering shouldn't change but Z
-   * values will be correct.
-   *
-   * FIXME: optimise
-   */
-/*  if (sibling &&
-      clutter_actor_get_depth (sibling) != clutter_actor_get_depth (actor))
-    {
-      clutter_actor_set_depth (actor, clutter_actor_get_depth (sibling));
-    }*/
 
   clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
@@ -202,20 +220,23 @@ champlain_group_real_lower (ClutterContainer *container,
 {
   ChamplainGroup *self = CHAMPLAIN_GROUP (container);
   ChamplainGroupPrivate *priv = self->priv;
-
-  priv->children = g_list_remove (priv->children, actor);
+  GList *link;
+  
+  link = g_list_find (priv->children, actor);
+  if (link)
+    {
+      if (link == priv->children_end)
+        priv->children_end = g_list_previous (priv->children_end);
+        
+      priv->children = g_list_delete_link (priv->children, link);
+    }
 
   /* Push to bottom */
-  if (!sibling)
+  if (!sibling || !priv->children_end)
     {
-      GList *last_item;
-
-      last_item = g_list_first (priv->children);
-
-      if (last_item)
-        sibling = last_item->data;
-
       priv->children = g_list_prepend (priv->children, actor);
+      if (!priv->children_end)
+        priv->children_end = priv->children;
     }
   else
     {
@@ -223,13 +244,6 @@ champlain_group_real_lower (ClutterContainer *container,
 
       priv->children = g_list_insert (priv->children, actor, index_);
     }
-
-  /* See comment in group_raise for this */
-/*  if (sibling &&
-      clutter_actor_get_depth (sibling) != clutter_actor_get_depth (actor))
-    {
-      clutter_actor_set_depth (actor, clutter_actor_get_depth (sibling));
-    }*/
 
   clutter_actor_queue_redraw (CLUTTER_ACTOR (container));
 }
@@ -342,6 +356,7 @@ champlain_group_dispose (GObject *object)
       g_list_free (priv->children);
 
       priv->children = NULL;
+      priv->children_end = NULL;
     }
 
   if (priv->layout)
@@ -403,6 +418,9 @@ champlain_group_init (ChamplainGroup *self)
   self->priv->layout = clutter_fixed_layout_new ();
   g_object_ref_sink (self->priv->layout);
 
+  self->priv->children = NULL;
+  self->priv->children_end = NULL;
+
   clutter_layout_manager_set_container (self->priv->layout,
       CLUTTER_CONTAINER (self));
 }
@@ -443,6 +461,8 @@ champlain_group_remove_all (ChamplainGroup *group)
 
       clutter_container_remove_actor (CLUTTER_CONTAINER (group), child);
     }
+    
+  group->priv->children_end = NULL;
 }
 
 
