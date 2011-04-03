@@ -1,3 +1,13 @@
+libchamplain 0.10.0 (2011-04-04)
+===============================
+
+Stable release
+
+Changes:
+* Vala bindings generated from gir's (Lorenzo Masini)
+* Various build-related fixes (Jiří Techet, Danilo Segan)
+* Performance improvements in path node and marker addition code (Jiří Techet)
+
 libchamplain 0.9.1 (2011-03-28)
 ===============================
 
