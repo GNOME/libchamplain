@@ -81,7 +81,7 @@ GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_PACKAGES = gobject-2.0 gtk+-3.0 ch
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_FILES = $(introspection_sources)
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_INCLUDES = Clutter-1.0 Gtk-3.0 Champlain-@CHAMPLAIN_API_VERSION@
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_EXPORT_PACKAGES = champlain-gtk-@CHAMPLAIN_API_VERSION@
-GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_SCANNERFLAGS = --identifier-prefix=GtkChamplain --symbol-prefix=gtk_champlain --c-include="champlain-gtk/champlain-gtk.h" --include-uninstalled=$(top_builddir)/champlain/Champlain-@CHAMPLAIN_API_VERSION@.gir
+GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_SCANNERFLAGS = --library-path=$(top_builddir)/champlain --identifier-prefix=GtkChamplain --symbol-prefix=gtk_champlain --c-include="champlain-gtk/champlain-gtk.h" --include-uninstalled=$(top_builddir)/champlain/Champlain-@CHAMPLAIN_API_VERSION@.gir
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_CFLAGS = \
 	$(SOUP_CFLAGS) $(GTK_CFLAGS) $(DEPS_CFLAGS) \
 	-I$(top_srcdir) -I$(top_builddir)\
