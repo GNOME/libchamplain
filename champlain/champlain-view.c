@@ -2067,8 +2067,8 @@ remove_all_tiles (ChamplainView *view)
       ChamplainTile *tile = CHAMPLAIN_TILE (child->data);
 
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-      clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
     }
+  champlain_group_remove_all (CHAMPLAIN_GROUP (priv->map_layer));
   g_list_free (children);
 }
 
