@@ -193,10 +193,6 @@ AC_ARG_ENABLE(vala-demos,
 if test "x$enable_vala_demos" = "xyes"; then
   AM_PROG_VALAC([0.11.0])
 
-  if test "x$enable_vala" = "xno"; then
-    AC_MSG_ERROR([Cannot build demos without vala support])
-  fi
-
   if test "x$VALAC" = "x" ; then
     AC_MSG_ERROR([Cannot find the "valac" compiler in your PATH])
   fi
