@@ -54,7 +54,7 @@ enum
 /* static guint gtk_champlain_embed_embed_signals[LAST_SIGNAL] = { 0, }; */
 
 #define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), GTK_TYPE_CHAMPLAIN_EMBED, GtkChamplainEmbedPrivate))
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), GTK_CHAMPLAIN_TYPE_EMBED, GtkChamplainEmbedPrivate))
 
 struct _GtkChamplainEmbedPrivate
 {
@@ -364,7 +364,7 @@ mouse_button_cb (GtkWidget *widget,
 GtkWidget *
 gtk_champlain_embed_new ()
 {
-  return g_object_new (GTK_TYPE_CHAMPLAIN_EMBED, NULL);
+  return g_object_new (GTK_CHAMPLAIN_TYPE_EMBED, NULL);
 }
 
 
