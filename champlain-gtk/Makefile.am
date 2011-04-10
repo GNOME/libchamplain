@@ -104,12 +104,12 @@ CLEANFILES += $(gir_DATA) $(typelib_DATA)
 
 endif
 
-if ENABLE_VALA
-
 vapidir = $(datadir)/vala/vapi
 dist_vapi_DATA = champlain-gtk-@CHAMPLAIN_API_VERSION@.vapi
-
 EXTRA_DIST += champlain-gtk-@CHAMPLAIN_API_VERSION@.vapi
+
+if ENABLE_VALA
+
 CLEANFILES += $(dist_vapi_DATA)
 
 champlain-gtk-@CHAMPLAIN_API_VERSION@.vapi:	GtkChamplain-@CHAMPLAIN_API_VERSION@.gir
