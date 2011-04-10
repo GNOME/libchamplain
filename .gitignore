@@ -10,7 +10,6 @@ autom4te.cache
 *.la
 *.stamp
 *.gir
-*.vapi
 *.typelib
 *.gi
 *~
