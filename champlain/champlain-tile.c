@@ -788,7 +788,7 @@ champlain_tile_set_modified_time (ChamplainTile *self,
     const GTimeVal *time_)
 {
   g_return_if_fail (CHAMPLAIN_TILE (self));
-  g_return_if_fail (time != NULL);
+  g_return_if_fail (time_ != NULL);
 
   ChamplainTilePrivate *priv = self->priv;
 
