@@ -915,7 +915,7 @@ champlain_label_queue_redraw (ChamplainLabel *label)
   if (!priv->redraw_id)
     {
       priv->redraw_id =
-        g_idle_add_full (G_PRIORITY_DEFAULT,
+        g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
             (GSourceFunc) redraw_on_idle,
             g_object_ref (label),
             (GDestroyNotify) g_object_unref);
