@@ -615,7 +615,7 @@ champlain_view_allocate (ClutterActor *actor,
 
   if (priv->viewport_width != width || priv->viewport_height != height)
     {
-      g_idle_add_full (G_PRIORITY_HIGH_IDLE,
+      g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
           (GSourceFunc) _update_idle_cb,
           g_object_ref (view),
           (GDestroyNotify) g_object_unref);
@@ -1980,8 +1980,7 @@ view_load_visible_tiles (ChamplainView *view)
               g_object_ref (tile);
               g_object_ref (priv->map_source);
 
-              /* set priority high, otherwise tiles will be loaded after panning is done */
-              g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) fill_tile_cb, data, NULL);
+              g_idle_add_full (CLUTTER_PRIORITY_REDRAW, (GSourceFunc) fill_tile_cb, data, NULL);
             }
 
           x += dirs[turn % 4 + 1];

@@ -818,7 +818,7 @@ static void
 on_animation_completed (G_GNUC_UNUSED ClutterAnimation *animation,
     ChamplainMarker *marker)
 {
-  g_idle_add_full (G_PRIORITY_DEFAULT,
+  g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
       (GSourceFunc) on_idle,
       g_object_ref (marker),
       (GDestroyNotify) g_object_unref);

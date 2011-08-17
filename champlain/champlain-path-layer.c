@@ -744,7 +744,7 @@ schedule_redraw (ChamplainPathLayer *layer)
   if (!layer->priv->redraw_scheduled)
     {
       layer->priv->redraw_scheduled = TRUE;
-      g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+      g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
           (GSourceFunc) redraw_path,
           g_object_ref (layer),
           (GDestroyNotify) g_object_unref);

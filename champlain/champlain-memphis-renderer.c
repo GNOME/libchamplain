@@ -396,7 +396,7 @@ memphis_worker_thread (gpointer worker_data,
       cairo_destroy (cr);
     }
 
-  clutter_threads_add_idle_full (G_PRIORITY_DEFAULT, tile_loaded_cb, data, NULL);
+  clutter_threads_add_idle_full (CLUTTER_PRIORITY_REDRAW, tile_loaded_cb, data, NULL);
 }
 
 
