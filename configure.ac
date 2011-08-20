@@ -18,7 +18,7 @@ AC_CONFIG_SRCDIR([champlain/champlain.h])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([-Wno-portability])
+AM_INIT_AUTOMAKE([-Wno-portability no-dist-gzip dist-xz])
 
 LT_PREREQ([2.2.6])
 LT_INIT([dlopen])
