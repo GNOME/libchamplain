@@ -99,6 +99,7 @@ enum
   PROP_KINETIC_MODE,
   PROP_KEEP_CENTER_ON_RESIZE,
   PROP_ZOOM_ON_DOUBLE_CLICK,
+  PROP_ANIMATE_ZOOM,
   PROP_STATE,
 };
 
@@ -172,6 +173,7 @@ struct _ChamplainViewPrivate
 
   gboolean keep_center_on_resize;
   gboolean zoom_on_double_click;
+  gboolean animate_zoom;
 
   ChamplainState state; /* View's global state */
 
@@ -180,7 +182,7 @@ struct _ChamplainViewPrivate
 
   gint tiles_loading;
   
-  ClutterActor *zoom_animation_actor;
+  ClutterActor *zoom_overlay_actor;
   ClutterAnimation *zoom_animation;
   guint anim_start_zoom_level;
   gdouble zoom_actor_longitude;
@@ -440,6 +442,10 @@ champlain_view_get_property (GObject *object,
       g_value_set_boolean (value, priv->zoom_on_double_click);
       break;
 
+    case PROP_ANIMATE_ZOOM:
+      g_value_set_boolean (value, priv->animate_zoom);
+      break;
+
     case PROP_STATE:
       g_value_set_enum (value, priv->state);
       break;
@@ -505,6 +511,10 @@ champlain_view_set_property (GObject *object,
       champlain_view_set_zoom_on_double_click (view, g_value_get_boolean (value));
       break;
 
+    case PROP_ANIMATE_ZOOM:
+      champlain_view_set_animate_zoom (view, g_value_get_boolean (value));
+      break;
+      
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -911,8 +921,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       PROP_KEEP_CENTER_ON_RESIZE,
       g_param_spec_boolean ("keep-center-on-resize",
           "Keep center on resize",
-          "Keep the current centered position "
-          "upon resizing",
+          "Keep the current centered position upon resizing",
           TRUE, 
           CHAMPLAIN_PARAM_READWRITE));
 
@@ -928,6 +937,21 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       g_param_spec_boolean ("zoom-on-double-click",
           "Zoom in on double click",
           "Zoom in and recenter on double click on the map",
+          TRUE, 
+          CHAMPLAIN_PARAM_READWRITE));
+
+  /**
+   * ChamplainView:animate-zoom:
+   *
+   * Animate zoom change when zooming in/out.
+   *
+   * Since: 0.12
+   */
+  g_object_class_install_property (object_class,
+      PROP_ANIMATE_ZOOM,
+      g_param_spec_boolean ("animate-zoom",
+          "Animate zoom level change",
+          "Animate zoom change when zooming in/out",
           TRUE, 
           CHAMPLAIN_PARAM_READWRITE));
 
@@ -1012,6 +1036,7 @@ champlain_view_init (ChamplainView *view)
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
   priv->keep_center_on_resize = TRUE;
   priv->zoom_on_double_click = TRUE;
+  priv->animate_zoom = TRUE;
   priv->license_actor = NULL;
   priv->view_box = NULL;
   priv->kinetic_mode = FALSE;
@@ -1092,8 +1117,8 @@ champlain_view_init (ChamplainView *view)
       CLUTTER_BIN_ALIGNMENT_FILL,
       CLUTTER_BIN_ALIGNMENT_FILL);
 
-  priv->zoom_animation_actor = clutter_group_new ();
-  clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->zoom_animation_actor,
+  priv->zoom_overlay_actor = clutter_group_new ();
+  clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->zoom_overlay_actor,
       CLUTTER_BIN_ALIGNMENT_FILL,
       CLUTTER_BIN_ALIGNMENT_FILL);
 
@@ -2252,6 +2277,28 @@ champlain_view_set_zoom_on_double_click (ChamplainView *view,
 
 
 /**
+ * champlain_view_set_animate_zoom:
+ * @view: a #ChamplainView
+ * @value: a #gboolean
+ *
+ * Should the view animate zoom level changes.
+ *
+ * Since: 0.12
+ */
+void
+champlain_view_set_animate_zoom (ChamplainView *view,
+    gboolean value)
+{
+  DEBUG_LOG ()
+
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  view->priv->animate_zoom = value;
+  g_object_notify (G_OBJECT (view), "animate-zoom");
+}
+
+
+/**
  * champlain_view_ensure_visible:
  * @view: a #ChamplainView
  * @bbox: bounding box of the area that should be visible
@@ -2353,18 +2400,15 @@ champlain_view_ensure_layers_visible (ChamplainView *view,
 
 
 static void
-zoom_animation_completed (G_GNUC_UNUSED ClutterAnimation *animation, 
-    ChamplainView *view)
+position_zoom_actor (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
   gint x, y;
-
-  priv->zoom_animation = NULL;
   
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, priv->zoom_actor_longitude) - priv->anchor_x;
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->zoom_actor_latitude) - priv->anchor_y;
   
-  ClutterActor *zoom_actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->zoom_animation_actor), 0);
+  ClutterActor *zoom_actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->zoom_overlay_actor), 0);
   clutter_group_remove_all (CLUTTER_GROUP (priv->zoom_layer));
   clutter_actor_reparent (zoom_actor, priv->zoom_layer);
 
@@ -2380,7 +2424,18 @@ zoom_animation_completed (G_GNUC_UNUSED ClutterAnimation *animation,
 
 
 static void
-start_zoom_animation (ChamplainView *view, 
+zoom_animation_completed (G_GNUC_UNUSED ClutterAnimation *animation, 
+    ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->zoom_animation = NULL;
+  position_zoom_actor (view);  
+}
+
+
+static void
+show_zoom_actor (ChamplainView *view, 
     guint zoom_level, 
     gint x_diff, 
     gint y_diff)
@@ -2411,9 +2466,9 @@ start_zoom_animation (ChamplainView *view,
       priv->zoom_actor_longitude = champlain_view_x_to_longitude (view, x_first * size - x_coord);
       priv->zoom_actor_latitude = champlain_view_y_to_latitude (view, y_first * size - y_coord);
 
-      clutter_group_remove_all (CLUTTER_GROUP (priv->zoom_animation_actor));
+      clutter_group_remove_all (CLUTTER_GROUP (priv->zoom_overlay_actor));
       zoom_actor = clutter_group_new ();
-      clutter_group_add (CLUTTER_GROUP (priv->zoom_animation_actor), zoom_actor);
+      clutter_group_add (CLUTTER_GROUP (priv->zoom_overlay_actor), zoom_actor);
       
       children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
 
@@ -2441,27 +2496,32 @@ start_zoom_animation (ChamplainView *view,
           NULL);
     }
   else
-    zoom_actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->zoom_animation_actor), 0);
+    zoom_actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->zoom_overlay_actor), 0);
 
   deltazoom = pow (2.0, (gdouble)zoom_level - priv->anim_start_zoom_level);
 
-  clutter_actor_set_opacity (priv->kinetic_scroll, 0);
-  
-  priv->zoom_animation = clutter_actor_animate (CLUTTER_ACTOR (zoom_actor),
-            CLUTTER_EASE_IN_OUT_QUAD,
-            350,
-            "scale-x", deltazoom,
-            "scale-y", deltazoom,
-            NULL);
+  if (priv->animate_zoom)
+    {
+      clutter_actor_set_opacity (priv->kinetic_scroll, 0);
+      
+      priv->zoom_animation = clutter_actor_animate (CLUTTER_ACTOR (zoom_actor),
+                CLUTTER_EASE_IN_OUT_QUAD,
+                350,
+                "scale-x", deltazoom,
+                "scale-y", deltazoom,
+                NULL);
 
-  clutter_actor_animate (CLUTTER_ACTOR (priv->kinetic_scroll),
-            CLUTTER_EASE_IN_EXPO,
-            350,
-            "opacity", 255,
-            NULL);
-  
-  if (!animation_running)
-    g_signal_connect (priv->zoom_animation, "completed", G_CALLBACK (zoom_animation_completed), view);
+      clutter_actor_animate (CLUTTER_ACTOR (priv->kinetic_scroll),
+                CLUTTER_EASE_IN_EXPO,
+                350,
+                "opacity", 255,
+                NULL);
+      
+      if (!animation_running)
+        g_signal_connect (priv->zoom_animation, "completed", G_CALLBACK (zoom_animation_completed), view);
+    }
+  else
+    clutter_actor_set_scale (zoom_actor, deltazoom, deltazoom);
 }
 
 
@@ -2501,7 +2561,7 @@ view_set_zoom_level_at (ChamplainView *view,
       y_diff = priv->viewport_height / 2 - y;
     }
 
-  start_zoom_animation (view, zoom_level, x_diff, y_diff);
+  show_zoom_actor (view, zoom_level, x_diff, y_diff);
 
   priv->zoom_level = zoom_level;
 
@@ -2522,6 +2582,9 @@ view_set_zoom_level_at (ChamplainView *view,
 
   resize_viewport (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
+
+  if (!priv->animate_zoom)
+    position_zoom_actor (view);
 
   g_object_notify (G_OBJECT (view), "zoom-level");
   return TRUE;
@@ -2696,6 +2759,27 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
 
   return view->priv->zoom_on_double_click;
+}
+
+
+/**
+ * champlain_view_get_animate_zoom:
+ * @view: The view
+ *
+ * Checks whether the view animates zoom level changes.
+ *
+ * Returns: TRUE if the view animates zooms, FALSE otherwise.
+ *
+ * Since: 0.12
+ */
+gboolean
+champlain_view_get_animate_zoom (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
+
+  return view->priv->animate_zoom;
 }
 
 
