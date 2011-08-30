@@ -131,7 +131,7 @@ nodist_libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	$(libchamplain_headers_built)	\
 	$(libchamplain_sources_built)
 
-libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS)
+libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS) $(LIBM)
 
 libchamplain_@CHAMPLAIN_API_VERSION@_la_LDFLAGS = \
 	-version-info $(LIBRARY_VERSION)\
