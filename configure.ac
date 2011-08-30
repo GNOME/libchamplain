@@ -56,6 +56,9 @@ AC_SUBST(LIBRARY_VERSION)
 
 # Checks for libraries.
 
+AC_CHECK_LIBM
+AC_SUBST(LIBM)
+
 PKG_CHECK_MODULES(DEPS,
   [   glib-2.0 >= 2.16
       gobject-2.0 >= 2.10
