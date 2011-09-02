@@ -200,9 +200,10 @@ endif
 vapidir = $(datadir)/vala/vapi
 dist_vapi_DATA = champlain-@CHAMPLAIN_API_VERSION@.vapi
 EXTRA_DIST += champlain-@CHAMPLAIN_API_VERSION@.vapi
-MAINTAINERCLEANFILES = $(dist_vapi_DATA)
 
 if ENABLE_VALA
+
+CLEANFILES += $(dist_vapi_DATA)
 
 champlain-@CHAMPLAIN_API_VERSION@.vapi:	Champlain-@CHAMPLAIN_API_VERSION@.gir
 	$(AM_V_GEN) ( $(VAPIGEN) --library champlain-@CHAMPLAIN_API_VERSION@ --pkg clutter-1.0 --pkg atk --pkg pangocairo $(builddir)/Champlain-@CHAMPLAIN_API_VERSION@.gir )

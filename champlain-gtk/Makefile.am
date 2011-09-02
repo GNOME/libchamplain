@@ -107,9 +107,10 @@ endif
 vapidir = $(datadir)/vala/vapi
 dist_vapi_DATA = champlain-gtk-@CHAMPLAIN_API_VERSION@.vapi
 EXTRA_DIST += champlain-gtk-@CHAMPLAIN_API_VERSION@.vapi
-MAINTAINERCLEANFILES = $(dist_vapi_DATA)
 
 if ENABLE_VALA
+
+CLEANFILES += $(dist_vapi_DATA)
 
 champlain-gtk-@CHAMPLAIN_API_VERSION@.vapi:	GtkChamplain-@CHAMPLAIN_API_VERSION@.gir
 	$(AM_V_GEN) ( $(VAPIGEN) --library champlain-gtk-@CHAMPLAIN_API_VERSION@ --vapidir=$(top_builddir)/champlain --pkg champlain-@CHAMPLAIN_API_VERSION@ --pkg clutter-gtk-1.0 --pkg gtk+-3.0 --pkg atk --pkg pangocairo --girdir=$(top_builddir)/champlain $(builddir)/GtkChamplain-@CHAMPLAIN_API_VERSION@.gir )
