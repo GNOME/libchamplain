@@ -125,7 +125,9 @@ public class Launcher : GLib.Object
 
   public static int main (string[] args)
   {
-    Clutter.init (ref args);
+    if (Clutter.init (ref args) != InitError.SUCCESS)
+      return 1;
+
     var launcher = new Launcher ();
     launcher.show ();
     Clutter.main ();
