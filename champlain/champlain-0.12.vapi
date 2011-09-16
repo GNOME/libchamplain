@@ -577,9 +577,9 @@ namespace Champlain {
 		public abstract double get_longitude ();
 		public abstract void set_location (double latitude, double longitude);
 		[NoAccessorMethod]
-		public double latitude { get; set; }
+		public abstract double latitude { get; set; }
 		[NoAccessorMethod]
-		public double longitude { get; set; }
+		public abstract double longitude { get; set; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h")]
 	public struct MemphisRule {
