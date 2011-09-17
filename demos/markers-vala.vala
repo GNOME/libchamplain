@@ -35,7 +35,7 @@ class DemoLayer : Champlain.MarkerLayer
 
     try {
       marker = new Champlain.Label.from_file (
-          "/usr/share/icons/gnome/24x24/emblems/emblem-generic.png");
+          "icons/emblem-generic.png");
     } catch (GLib.Error e) {
       GLib.warning ("%s", e.message);
     }
@@ -45,7 +45,7 @@ class DemoLayer : Champlain.MarkerLayer
 
     try {
       marker = new Champlain.Label.from_file (
-          "/usr/share/icons/gnome/24x24/emblems/emblem-important.png");
+          "icons/emblem-important.png");
     } catch (GLib.Error e) {
       GLib.warning ("%s", e.message);
     }
@@ -54,7 +54,7 @@ class DemoLayer : Champlain.MarkerLayer
 
     try {
       marker = new Champlain.Label.from_file (
-          "/usr/share/icons/gnome/24x24/emblems/emblem-favorite.png");
+          "icons/emblem-favorite.png");
     } catch (GLib.Error e) {
       GLib.warning ("%s", e.message);
     }
