@@ -17,7 +17,7 @@ libchamplain requires:
 If you are building libchamplain-gtk, you will also need:
 
   * gtk >= 3.0
-  * clutter-gtk >= 0.91.6
+  * clutter-gtk >= 1.0
 
 If you are building libchamplain with local rendering support, you will
 also need:
