@@ -476,6 +476,8 @@ create_scale (ChamplainScale *scale)
   gfloat width;
   ChamplainScalePrivate *priv = scale->priv;
 
+  clutter_group_remove_all (priv->content_group);
+  
   text = clutter_text_new_with_text ("Sans 9", "X km");
   clutter_actor_set_name (text, "scale-far-label");
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), text);
