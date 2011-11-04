@@ -127,7 +127,6 @@ main (int argc, char *argv[])
   ChamplainMarkerLayer *layer;
   GpsCallbackData callback_data;
 
-  g_thread_init (NULL);
   if (clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;
 

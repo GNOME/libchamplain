@@ -223,7 +223,6 @@ main (int argc,
   ClutterActor *scale;
   ChamplainLicense *license_actor;
 
-  g_thread_init (NULL);
   gtk_clutter_init (&argc, &argv);
 
   /* create the main, top level, window */

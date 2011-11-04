@@ -95,7 +95,6 @@ main (int argc,
   ChamplainPathLayer *path;
   gfloat width, total_width = 0;
 
-  g_thread_init (NULL);
   if (clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;
 
