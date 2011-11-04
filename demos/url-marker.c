@@ -243,7 +243,6 @@ main (int argc, char *argv[])
   ChamplainMarkerLayer *layer;
   SoupSession *session;
 
-  g_thread_init (NULL);
   if (clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;
 

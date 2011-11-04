@@ -730,7 +730,6 @@ main (int argc,
 {
   GtkWidget *widget, *hbox, *bbox, *menubox, *button, *viewport, *label;
 
-  g_thread_init (NULL);
   gtk_clutter_init (&argc, &argv);
 
   /* create the main, top level, window */
