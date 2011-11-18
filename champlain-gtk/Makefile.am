@@ -49,7 +49,7 @@ libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_LDFLAGS= \
 	-no-undefined \
 	-export-symbols-regex ^gtk_champlain_.*
 
-AM_CPPFLAGS = $(GTK_CFLAGS) $(WARN_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_GTK_COMPILATION
+AM_CPPFLAGS = $(DEPS_CFLAGS) $(GTK_CFLAGS) $(WARN_CFLAGS) -I$(top_srcdir) -DCHAMPLAIN_GTK_COMPILATION
 
 
 lib_LTLIBRARIES = libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
