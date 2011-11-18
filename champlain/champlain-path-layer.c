@@ -859,6 +859,8 @@ champlain_path_layer_set_fill_color (ChamplainPathLayer *layer,
 
   priv->fill_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (layer), "fill-color");
+
+  schedule_redraw (layer);
 }
 
 
@@ -907,6 +909,8 @@ champlain_path_layer_set_stroke_color (ChamplainPathLayer *layer,
 
   priv->stroke_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (layer), "stroke-color");
+
+  schedule_redraw (layer);
 }
 
 
@@ -946,6 +950,8 @@ champlain_path_layer_set_stroke (ChamplainPathLayer *layer,
 
   layer->priv->stroke = value;
   g_object_notify (G_OBJECT (layer), "stroke");
+
+  schedule_redraw (layer);
 }
 
 
@@ -985,6 +991,8 @@ champlain_path_layer_set_fill (ChamplainPathLayer *layer,
 
   layer->priv->fill = value;
   g_object_notify (G_OBJECT (layer), "fill");
+
+  schedule_redraw (layer);
 }
 
 
@@ -1024,6 +1032,8 @@ champlain_path_layer_set_stroke_width (ChamplainPathLayer *layer,
 
   layer->priv->stroke_width = value;
   g_object_notify (G_OBJECT (layer), "stroke-width");
+
+  schedule_redraw (layer);
 }
 
 
@@ -1106,6 +1116,8 @@ champlain_path_layer_set_closed (ChamplainPathLayer *layer,
 
   layer->priv->closed_path = value;
   g_object_notify (G_OBJECT (layer), "closed");
+
+  schedule_redraw (layer);
 }
 
 
