@@ -800,28 +800,13 @@ champlain_marker_animate_out (ChamplainMarker *marker)
 }
 
 
-static gboolean
-on_idle (ChamplainMarker *marker)
-{
-  /* Notify the view that the position changed so that the marker's
-   * position is reset, it has to happen on idle as Clutter seems to
-   * set actors position after calling animation_completed */
-  clutter_actor_hide (CLUTTER_ACTOR (marker));
-
-  g_object_notify (G_OBJECT (marker), "latitude");
-  g_object_notify (G_OBJECT (marker), "longitude");
-  return FALSE;
-}
-
-
 static void
 on_animation_completed (G_GNUC_UNUSED ClutterAnimation *animation,
     ChamplainMarker *marker)
 {
-  g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
-      (GSourceFunc) on_idle,
-      g_object_ref (marker),
-      (GDestroyNotify) g_object_unref);
+  clutter_actor_hide (CLUTTER_ACTOR (marker));
+
+  clutter_actor_move_by (CLUTTER_ACTOR (marker), 0, 100);
 }
 
 
@@ -858,6 +843,6 @@ champlain_marker_animate_out_with_delay (ChamplainMarker *marker,
         "scale-x", 2.0, 
         "scale-y", 2.0, 
         NULL);
-  g_signal_connect (animation, "completed",
+  g_signal_connect_after (animation, "completed",
       G_CALLBACK (on_animation_completed), marker);
 }
