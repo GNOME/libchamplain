@@ -525,7 +525,7 @@ static void
 champlain_view_dispose (GObject *object)
 {
   DEBUG_LOG ()
-
+  
   ChamplainView *view = CHAMPLAIN_VIEW (object);
   ChamplainViewPrivate *priv = view->priv;
 
@@ -661,6 +661,8 @@ champlain_view_realize (ClutterActor *actor)
    */
 
   clutter_actor_realize (actor);
+
+  clutter_actor_grab_key_focus (priv->kinetic_scroll);
 
   /* Setup the viewport according to the zoom level */
   /* resize_viewport (view); */
@@ -1103,8 +1105,6 @@ champlain_view_init (ChamplainView *view)
   g_signal_connect (priv->kinetic_scroll, "button-press-event",
       G_CALLBACK (kinetic_scroll_button_press_cb), view);
 
-  clutter_stage_set_key_focus (CLUTTER_STAGE (clutter_stage_get_default ()),
-      priv->kinetic_scroll);
   g_signal_connect (priv->kinetic_scroll, "key-press-event",
       G_CALLBACK (kinetic_scroll_key_press_cb), view);
 

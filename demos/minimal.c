@@ -26,8 +26,9 @@ main (int argc, char *argv[])
   if (clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;
 
-  stage = clutter_stage_get_default ();
+  stage = clutter_stage_new ();
   clutter_actor_set_size (stage, 800, 600);
+  g_signal_connect (stage, "destroy", G_CALLBACK (clutter_main_quit), NULL);
 
   /* Create the map view */
   actor = champlain_view_new ();
@@ -36,8 +37,6 @@ main (int argc, char *argv[])
 
   clutter_actor_show (stage);
   clutter_main ();
-
-  clutter_actor_destroy (actor);
 
   return 0;
 }

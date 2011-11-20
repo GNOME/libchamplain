@@ -18,12 +18,12 @@
 
 #include <champlain/champlain.h>
 
+static ClutterActor *stage;
+
 static ClutterActor *
 create_actor ()
 {
-  ClutterActor *actor, *stage;
-
-  stage = clutter_stage_get_default ();
+  ClutterActor *actor;
 
   /* Create the map view */
   actor = champlain_view_new ();
@@ -59,13 +59,12 @@ callback (void *data)
 int
 main (int argc, char *argv[])
 {
-  ClutterActor *stage;
-
   if (clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;
 
-  stage = clutter_stage_get_default ();
+  stage = clutter_stage_new ();
   clutter_actor_set_size (stage, 800, 600);
+  g_signal_connect (stage, "destroy", G_CALLBACK (clutter_main_quit), NULL);
 
   g_timeout_add (100, (GSourceFunc) callback, NULL);
 
