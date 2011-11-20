@@ -782,6 +782,9 @@ draw_label (ChamplainLabel *label)
   ChamplainMarker *marker = CHAMPLAIN_MARKER (label);
   guint height = 0, point = 0;
   guint total_width = 0, total_height = 0;
+  
+  if (!priv->content_group)
+    return;
 
   if (priv->image != NULL)
     {

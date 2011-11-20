@@ -675,7 +675,7 @@ redraw_path (ChamplainPathLayer *layer)
   priv->redraw_scheduled = FALSE;
 
   /* layer not yet added to the view */
-  if (view == NULL)
+  if (view == NULL || !priv->content_group)
     return FALSE;
 
   clutter_actor_get_size (CLUTTER_ACTOR (view), &width, &height);

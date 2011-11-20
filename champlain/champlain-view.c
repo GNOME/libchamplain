@@ -589,6 +589,9 @@ _update_idle_cb (ChamplainView *view)
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
+  
+  if (!priv->kinetic_scroll)
+    return FALSE;
 
   clutter_actor_set_size (priv->kinetic_scroll,
       priv->viewport_width,

@@ -858,6 +858,9 @@ champlain_tile_set_content (ChamplainTile *self,
 
   ChamplainTilePrivate *priv = self->priv;
 
+  if (!priv->content_group)
+    return;
+
   if (!priv->content_displayed && priv->content_actor)
     clutter_actor_destroy (priv->content_actor);
 
@@ -872,6 +875,9 @@ static void
 fade_in_completed (G_GNUC_UNUSED ClutterAnimation *animation, ChamplainTile *self)
 {
   ChamplainTilePrivate *priv = self->priv;
+  
+  if (!priv->content_group)
+    return;
 
   if (clutter_group_get_n_children (CLUTTER_GROUP (priv->content_group)) > 1)
     clutter_actor_destroy (clutter_group_get_nth_child (CLUTTER_GROUP (priv->content_group), 0));
@@ -894,7 +900,7 @@ champlain_tile_display_content (ChamplainTile *self)
   ChamplainTilePrivate *priv = self->priv;
   ClutterAnimation *animation;
 
-  if (!priv->content_actor || priv->content_displayed)
+  if (!priv->content_actor || priv->content_displayed || !priv->content_group)
     return;
 
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->content_actor);
