@@ -475,10 +475,12 @@ champlain_viewport_get_adjustments (ChamplainViewport *viewport,
       else
         {
           ChamplainAdjustment *adjustment;
+          ClutterActor *stage;
           guint width, stage_width, increment;
 
           width = clutter_actor_get_width (CLUTTER_ACTOR (viewport));
-          stage_width = clutter_actor_get_width (clutter_stage_get_default ());
+          stage = clutter_actor_get_stage (CLUTTER_ACTOR (viewport));
+          stage_width =  (stage != NULL) ? clutter_actor_get_width (stage) : 1;
           increment = MAX (1, MIN (stage_width, width));
 
           adjustment = champlain_adjustment_new (priv->x,
@@ -501,10 +503,12 @@ champlain_viewport_get_adjustments (ChamplainViewport *viewport,
       else
         {
           ChamplainAdjustment *adjustment;
+          ClutterActor *stage;
           guint height, stage_height, increment;
 
           height = clutter_actor_get_height (CLUTTER_ACTOR (viewport));
-          stage_height = clutter_actor_get_height (clutter_stage_get_default ());
+          stage = clutter_actor_get_stage (CLUTTER_ACTOR (viewport));
+          stage_height = (stage != NULL) ? clutter_actor_get_height (stage) : 1;
           increment = MAX (1, MIN (stage_height, height));
 
           adjustment = champlain_adjustment_new (priv->y,
