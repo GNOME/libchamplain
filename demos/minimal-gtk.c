@@ -29,7 +29,8 @@ main (int argc, char *argv[])
   GtkWidget *window, *widget;
 
   /* initialize threads and clutter */
-  gtk_clutter_init (&argc, &argv);
+  if (gtk_clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
+    return 1;
 
   /* create the top-level window and quit the main loop when it's closed */
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
