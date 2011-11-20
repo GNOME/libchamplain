@@ -330,7 +330,7 @@ redraw_scale (ChamplainScale *scale)
 
   priv->redraw_scheduled = FALSE;
 
-  if (!priv->view)
+  if (!priv->view || !priv->content_group)
     return FALSE;
 
   zoom_level = champlain_view_get_zoom_level (priv->view);

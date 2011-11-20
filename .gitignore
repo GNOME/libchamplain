@@ -44,6 +44,7 @@ demos/url-marker
 demos/local-rendering
 demos/minimal
 demos/minimal-gtk
+demos/create-destroy-test
 demos/launcher-vala
 demos/launcher-vala.c
 demos/markers-vala.c

@@ -1,4 +1,4 @@
-noinst_PROGRAMS = minimal launcher animated-marker polygons url-marker
+noinst_PROGRAMS = minimal launcher animated-marker polygons url-marker create-destroy-test
 
 INCLUDES = -I$(top_srcdir)
 
@@ -20,6 +20,9 @@ polygons_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.
 url_marker_SOURCES = url-marker.c
 url_marker_CPPFLAGS = $(DEPS_CFLAGS) $(SOUP_CFLAGS)
 url_marker_LDADD = $(SOUP_LIBS) $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
+
+create_destroy_test_SOURCES = create-destroy-test.c
+create_destroy_test_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 
 if ENABLE_GTK
 noinst_PROGRAMS += minimal-gtk
