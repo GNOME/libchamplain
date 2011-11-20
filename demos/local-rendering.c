@@ -237,7 +237,7 @@ gtk_memphis_prop_new (gint type, ChamplainMemphisRuleAttr *attr)
   GtkWidget *hbox, *cb, *sb1, *sb2, *sb3;
   GdkColor gcolor;
 
-  hbox = gtk_hbox_new (FALSE, 0);
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 
   gcolor.red = ((guint16) attr->color_red) << 8;
   gcolor.green = ((guint16) attr->color_green) << 8;
@@ -353,7 +353,7 @@ create_rule_edit_window (ChamplainMemphisRule *rule, gchar *id,
       gtk_table_attach_defaults (GTK_TABLE (table), props, 1, 2, 4, 5);
     }
 
-  GtkWidget *vbox = gtk_hbox_new (TRUE, 0);
+  GtkWidget *vbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 
   button = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
   gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
@@ -364,7 +364,7 @@ create_rule_edit_window (ChamplainMemphisRule *rule, gchar *id,
       G_CALLBACK (rule_apply_cb), renderer);
   gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
 
-  GtkWidget *mainbox = gtk_vbox_new (FALSE, 0);
+  GtkWidget *mainbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (mainbox), table, FALSE, FALSE, 0);
   gtk_box_pack_start (GTK_BOX (mainbox), vbox, FALSE, FALSE, 0);
 
@@ -730,7 +730,8 @@ main (int argc,
 {
   GtkWidget *widget, *hbox, *bbox, *menubox, *button, *viewport, *label;
 
-  gtk_clutter_init (&argc, &argv);
+  if (gtk_clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
+    return 1;
 
   /* create the main, top level, window */
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -748,13 +749,13 @@ main (int argc,
   g_signal_connect (G_OBJECT (window), "destroy", G_CALLBACK (on_destroy),
       NULL);
 
-  hbox = gtk_hbox_new (FALSE, 10);
-  menubox = gtk_vbox_new (FALSE, 10);
-  memphis_box = gtk_vbox_new (FALSE, 10);
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
+  menubox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 10);
+  memphis_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 10);
   gtk_widget_set_no_show_all (memphis_box, TRUE);
-  memphis_net_box = gtk_hbox_new (FALSE, 10);
+  memphis_net_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
   gtk_widget_set_no_show_all (memphis_net_box, TRUE);
-  memphis_local_box = gtk_hbox_new (FALSE, 10);
+  memphis_local_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
   gtk_widget_set_no_show_all (memphis_local_box, TRUE);
 
   widget = gtk_champlain_embed_new ();
@@ -766,7 +767,7 @@ main (int argc,
   gtk_widget_set_size_request (widget, 640, 480);
 
   /* first line of buttons */
-  bbox = gtk_hbox_new (FALSE, 10);
+  bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
   button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_IN);
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_in), champlain_view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
@@ -828,7 +829,7 @@ main (int argc,
   gtk_box_pack_start (GTK_BOX (memphis_box), button, FALSE, FALSE, 0);
 
   /* bg chooser */
-  bbox = gtk_hbox_new (FALSE, 10);
+  bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
 
   label = gtk_label_new (NULL);
   gtk_label_set_markup (GTK_LABEL (label), "Background color");
@@ -843,7 +844,7 @@ main (int argc,
 
   /* rules list */
   label = gtk_label_new ("Rules");
-  bbox = gtk_hbox_new (FALSE, 10);
+  bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
   gtk_box_pack_start (GTK_BOX (bbox), label, FALSE, FALSE, 0);
   gtk_box_pack_start (GTK_BOX (memphis_box), bbox, FALSE, FALSE, 0);
 

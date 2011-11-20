@@ -223,7 +223,8 @@ main (int argc,
   ClutterActor *scale;
   ChamplainLicense *license_actor;
 
-  gtk_clutter_init (&argc, &argv);
+  if (gtk_clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
+    return 1;
 
   /* create the main, top level, window */
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -241,7 +242,7 @@ main (int argc,
   g_signal_connect (G_OBJECT (window), "destroy", G_CALLBACK (on_destroy),
       NULL);
 
-  vbox = gtk_vbox_new (FALSE, 10);
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 10);
 
   widget = gtk_champlain_embed_new ();
   view = gtk_champlain_embed_get_view (GTK_CHAMPLAIN_EMBED (widget));
@@ -286,7 +287,7 @@ main (int argc,
 
   gtk_widget_set_size_request (widget, 640, 480);
 
-  bbox = gtk_hbox_new (FALSE, 10);
+  bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
   button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_IN);
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_in), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);

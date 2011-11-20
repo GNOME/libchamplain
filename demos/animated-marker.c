@@ -30,8 +30,6 @@ create_marker ()
   ClutterActor *marker;
   ClutterActor *bg;
   ClutterTimeline *timeline;
-  ClutterBehaviour *behaviour;
-  ClutterAlpha *alpha;
   cairo_t *cr;
 
   /* Create the marker */
@@ -86,13 +84,15 @@ create_marker ()
   /* Animate the echo circle */
   timeline = clutter_timeline_new (1000);
   clutter_timeline_set_loop (timeline, TRUE);
-  alpha = clutter_alpha_new_full (timeline, CLUTTER_EASE_OUT_SINE);
-
-  behaviour = clutter_behaviour_scale_new (alpha, 0.5, 0.5, 2.0, 2.0);
-  clutter_behaviour_apply (behaviour, bg);
-
-  behaviour = clutter_behaviour_opacity_new (alpha, 255, 0);
-  clutter_behaviour_apply (behaviour, bg);
+  clutter_actor_set_opacity (CLUTTER_ACTOR (bg), 255);
+  clutter_actor_set_scale (CLUTTER_ACTOR (bg), 0.5, 0.5);
+  clutter_actor_animate_with_timeline (CLUTTER_ACTOR (bg),
+      CLUTTER_EASE_OUT_SINE, 
+      timeline, 
+      "opacity", 0, 
+      "scale-x", 2.0, 
+      "scale-y", 2.0, 
+      NULL);
 
   clutter_timeline_start (timeline);
 
