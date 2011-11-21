@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+# To run this example, you need to set the GI_TYPELIB_PATH environment
+# variable to point to the gir directory:
+#
+# export GI_TYPELIB_PATH=$GI_TYPELIB_PATH:/usr/local/lib/girepository-1.0/
+
 from gi.repository import GtkClutter
 GtkClutter.init([])
 from gi.repository import GObject, Gtk, GtkChamplain 
