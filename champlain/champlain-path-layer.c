@@ -81,6 +81,8 @@ struct _ChamplainPathLayerPrivate
   gboolean stroke;
   gdouble stroke_width;
   gboolean visible;
+  gdouble *dash;
+  guint num_dashes;
 
   ClutterGroup *content_group;
   ClutterActor *path_actor;
@@ -315,6 +317,7 @@ champlain_path_layer_finalize (GObject *object)
 
   clutter_color_free (priv->stroke_color);
   clutter_color_free (priv->fill_color);
+  g_free (priv->dash);
 
   G_OBJECT_CLASS (champlain_path_layer_parent_class)->finalize (object);
 }
@@ -469,6 +472,8 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   priv->stroke_width = 2.0;
   priv->nodes = NULL;
   priv->redraw_scheduled = FALSE;
+  priv->dash = NULL;
+  priv->num_dashes = 0;
 
   priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
@@ -728,6 +733,7 @@ redraw_path (ChamplainPathLayer *layer)
       priv->stroke_color->alpha / 255.0);
 
   cairo_set_line_width (cr, priv->stroke_width);
+  cairo_set_dash(cr, priv->dash, priv->num_dashes, 0);
 
   if (priv->stroke)
     cairo_stroke (cr);
@@ -1137,4 +1143,69 @@ champlain_path_layer_get_closed (ChamplainPathLayer *layer)
   g_return_val_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer), FALSE);
 
   return layer->priv->closed_path;
+}
+
+
+/**
+ * champlain_path_layer_set_dash:
+ * @layer: a #ChamplainPathLayer
+ * @dash_pattern: (element-type guint): list of integer values representing lengths
+ *     of dashes/spaces (see cairo documentation of cairo_set_dash())
+ *
+ * Sets dashed line pattern in a way similar to cairo_set_dash() of cairo. This 
+ * method supports only integer values for segment lengths. The values have to be
+ * passed inside the data pointer of the list (using the GUINT_TO_POINTER conversion)
+ * 
+ * Pass NULL to use solid line.
+ * 
+ * Since: 0.14
+ */
+void
+champlain_path_layer_set_dash (ChamplainPathLayer *layer,
+    GList *dash_pattern)
+{
+  g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
+
+  ChamplainPathLayerPrivate *priv = layer->priv;
+  GList *iter;
+  guint i;
+
+  if (priv->dash)
+    g_free (priv->dash);
+  priv->dash = NULL;  
+
+  priv->num_dashes = g_list_length (dash_pattern);
+
+  if (dash_pattern == NULL) 
+    return;
+
+  priv->dash = g_new (gdouble, priv->num_dashes);
+  for (iter = dash_pattern, i = 0; iter != NULL; iter = iter->next, i++)
+    (priv->dash)[i] = (gdouble) GPOINTER_TO_UINT (iter->data);
+}
+
+
+/**
+ * champlain_path_layer_get_dash:
+ * @layer: a #ChamplainPathLayer
+ *
+ * Returns the list of dash segment lengths.
+ * 
+ * Returns: (transfer container) (element-type guint): the list
+ *
+ * Since: 0.14
+ */
+GList *
+champlain_path_layer_get_dash (ChamplainPathLayer *layer)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer), NULL);
+  
+  ChamplainPathLayerPrivate *priv = layer->priv;
+  GList *list = NULL;
+  guint i;
+  
+  for (i = 0; i < priv->num_dashes; i++)
+    list = g_list_append(list, GUINT_TO_POINTER((guint)(priv->dash)[i]));
+  
+  return list;
 }

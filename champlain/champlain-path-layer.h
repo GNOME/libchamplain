@@ -119,6 +119,10 @@ gboolean champlain_path_layer_get_closed (ChamplainPathLayer *layer);
 void champlain_path_layer_set_closed (ChamplainPathLayer *layer,
     gboolean value);
 
+GList *champlain_path_layer_get_dash (ChamplainPathLayer *layer);
+void champlain_path_layer_set_dash (ChamplainPathLayer *layer,
+    GList *dash_pattern);
+
 G_END_DECLS
 
 #endif
