@@ -83,6 +83,7 @@ main (int argc,
   ClutterActor *actor, *stage, *buttons, *button;
   ChamplainPathLayer *layer;
   gfloat width, total_width = 0;;
+  GList *dash = NULL;
 
   if (clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;
@@ -131,9 +132,13 @@ main (int argc,
   append_point (layer, 45.3994, -73.1877);
   append_point (layer, 45.4000, -73.1815);
   append_point (layer, 45.4151, -73.1218);
-  champlain_path_layer_set_stroke_width (layer, 5.0);
+  champlain_path_layer_set_stroke_width (layer, 4.0);
   champlain_view_add_layer (CHAMPLAIN_VIEW (actor), CHAMPLAIN_LAYER (layer));
 
+  dash = g_list_append(dash, GUINT_TO_POINTER(6));
+  dash = g_list_append(dash, GUINT_TO_POINTER(2));
+  champlain_path_layer_set_dash (layer, dash);
+  
   /* draw a path */
   layer = champlain_path_layer_new ();
   append_point (layer, 45.1386, -73.9196);
