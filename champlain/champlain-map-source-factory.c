@@ -323,7 +323,7 @@ champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *factory)
  * The id should not contain any character that can't be in a filename as it
  * will be used as the cache directory name for that map source.
  *
- * Returns: (transfer full): a ready to use #ChamplainMapSource matching the given name, returns
+ * Returns: (transfer none): a ready to use #ChamplainMapSource matching the given name, returns
  * NULL is none match.
  *
  * Since: 0.4
@@ -360,7 +360,7 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  *
  * Creates a cached map source.
  *
- * Returns: (transfer full): a ready to use #ChamplainMapSourceChain consisting of
+ * Returns: (transfer none): a ready to use #ChamplainMapSourceChain consisting of
  * #ChamplainMemoryCache, #ChamplainFileCache, #ChamplainMapSource matching the given name, and
  * an error tile source created with champlain_map_source_factory_create_error_source ().
  *
@@ -406,7 +406,7 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
  *
  * Creates a map source generating error tiles.
  *
- * Returns: (transfer full): a ready to use map source generating error tiles.
+ * Returns: (transfer none): a ready to use map source generating error tiles.
  *
  * Since: 0.8
  */
