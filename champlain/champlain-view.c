@@ -266,7 +266,6 @@ update_viewport (ChamplainView *view,
   priv->viewport_x = x - priv->anchor_x - priv->viewport_width / 2.0;
   priv->viewport_y = y - priv->anchor_y - priv->viewport_height / 2.0;
 
-
   if (relocate || force_relocate)
     {
       g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
@@ -2455,19 +2454,36 @@ show_zoom_actor (ChamplainView *view,
       GList *children, *child;
       gint size;
       gdouble x_coord, y_coord;
-      gint x_first, y_first;
+      gint x_first, y_first, max_x_end, max_y_end;
 
       size = champlain_map_source_get_tile_size (priv->map_source);
 
       x_coord = priv->viewport_x + priv->anchor_x;
       y_coord = priv->viewport_y + priv->anchor_y;
 
+      if (x_coord < 0)
+        x_coord = 0;
+      if (y_coord < 0)
+        y_coord = 0;
+
       x_first = x_coord / size;
       y_first = y_coord / size;
+      
+      max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+      max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
+
+      if (x_first > max_x_end)
+        x_first = max_x_end;
+      if (y_first > max_y_end)
+        y_first = max_y_end;
 
       priv->anim_start_zoom_level = priv->zoom_level;
-      priv->zoom_actor_longitude = champlain_view_x_to_longitude (view, x_first * size - x_coord);
-      priv->zoom_actor_latitude = champlain_view_y_to_latitude (view, y_first * size - y_coord);
+      priv->zoom_actor_longitude = champlain_map_source_get_longitude (priv->map_source,
+        priv->zoom_level,
+        x_first * size);
+      priv->zoom_actor_latitude = champlain_map_source_get_latitude (priv->map_source,
+        priv->zoom_level,
+        y_first * size);
 
       clutter_group_remove_all (CLUTTER_GROUP (priv->zoom_overlay_actor));
       zoom_actor = clutter_group_new ();
@@ -2487,9 +2503,9 @@ show_zoom_actor (ChamplainView *view,
         }
 
       g_list_free (children);
-
-      gdouble deltax = x_first * size - x_coord;
-      gdouble deltay = y_first * size - y_coord;
+      
+      gdouble deltax = x_first * size - priv->viewport_x - priv->anchor_x;
+      gdouble deltay = y_first * size - priv->viewport_y - priv->anchor_y;
       
       clutter_actor_set_position (zoom_actor, deltax, deltay);
       
@@ -2507,6 +2523,8 @@ show_zoom_actor (ChamplainView *view,
     {
       clutter_actor_set_opacity (priv->kinetic_scroll, 0);
       
+      clutter_group_remove_all (CLUTTER_GROUP (priv->zoom_layer));
+
       priv->zoom_animation = clutter_actor_animate (CLUTTER_ACTOR (zoom_actor),
                 CLUTTER_EASE_IN_OUT_QUAD,
                 350,
