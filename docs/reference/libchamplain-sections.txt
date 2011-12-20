@@ -750,6 +750,8 @@ champlain_path_layer_get_visible
 champlain_path_layer_set_visible
 champlain_path_layer_get_closed
 champlain_path_layer_set_closed
+champlain_path_layer_get_dash
+champlain_path_layer_set_dash
 <SUBSECTION Standard>
 CHAMPLAIN_PATH_LAYER
 CHAMPLAIN_IS_PATH_LAYER
