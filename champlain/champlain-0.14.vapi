@@ -143,8 +143,10 @@ namespace Champlain {
 		public Label.with_image (Clutter.Actor actor);
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
 		public Label.with_text (string text, string? font, Clutter.Color? text_color, Clutter.Color? label_color);
+		public Pango.Alignment alignment { get; set; }
 		public Clutter.Color color { get; set; }
 		public bool draw_background { get; set; }
+		public Pango.EllipsizeMode ellipsize { get; set; }
 		public string font_name { get; set; }
 		public Clutter.Actor image { get; set; }
 		public bool single_line_mode { get; set; }
@@ -152,6 +154,7 @@ namespace Champlain {
 		public Clutter.Color text_color { get; set; }
 		public bool use_markup { get; set; }
 		public bool wrap { get; set; }
+		public Pango.WrapMode wrap_mode { get; set; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_layer_get_type ()")]
 	public abstract class Layer : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Scriptable {
@@ -170,6 +173,7 @@ namespace Champlain {
 		public unowned string get_extra_text ();
 		public void set_alignment (Pango.Alignment alignment);
 		public void set_extra_text (string text);
+		public Pango.Alignment alignment { get; set; }
 		public string extra_text { get; set; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_map_source_get_type ()")]
@@ -236,9 +240,9 @@ namespace Champlain {
 	public class MapSourceFactory : GLib.Object {
 		[CCode (has_construct_function = false)]
 		protected MapSourceFactory ();
-		public Champlain.MapSource create (string id);
-		public Champlain.MapSource create_cached_source (string id);
-		public Champlain.MapSource create_error_source (uint tile_size);
+		public unowned Champlain.MapSource create (string id);
+		public unowned Champlain.MapSource create_cached_source (string id);
+		public unowned Champlain.MapSource create_error_source (uint tile_size);
 		public static Champlain.MapSourceFactory dup_default ();
 		public GLib.SList<weak Champlain.MapSourceDesc> get_registered ();
 		public bool register (Champlain.MapSourceDesc desc);
@@ -363,6 +367,7 @@ namespace Champlain {
 		public PathLayer ();
 		public void add_node (Champlain.Location location);
 		public bool get_closed ();
+		public GLib.List<weak uint> get_dash ();
 		public bool get_fill ();
 		public Clutter.Color get_fill_color ();
 		public GLib.List<weak Champlain.Location> get_nodes ();
@@ -374,6 +379,7 @@ namespace Champlain {
 		public void remove_all ();
 		public void remove_node (Champlain.Location location);
 		public void set_closed (bool value);
+		public void set_dash (GLib.List<uint> dash_pattern);
 		public void set_fill (bool value);
 		public void set_fill_color (Clutter.Color? color);
 		public void set_stroke (bool value);
@@ -632,42 +638,42 @@ namespace Champlain {
 		KM,
 		MILES
 	}
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAJOR_VERSION")]
 	public const int MAJOR_VERSION;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL")]
 	public const string MAP_SOURCE_MEMPHIS_LOCAL;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK")]
 	public const string MAP_SOURCE_MEMPHIS_NETWORK;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_MFF_RELIEF")]
 	public const string MAP_SOURCE_MFF_RELIEF;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OAM")]
 	public const string MAP_SOURCE_OAM;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP")]
 	public const string MAP_SOURCE_OSM_CYCLE_MAP;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK")]
 	public const string MAP_SOURCE_OSM_MAPNIK;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST")]
 	public const string MAP_SOURCE_OSM_MAPQUEST;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER")]
 	public const string MAP_SOURCE_OSM_OSMARENDER;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP")]
 	public const string MAP_SOURCE_OSM_TRANSPORT_MAP;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAX_LATITUDE")]
 	public const double MAX_LATITUDE;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAX_LONGITUDE")]
 	public const double MAX_LONGITUDE;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MICRO_VERSION")]
 	public const int MICRO_VERSION;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MINOR_VERSION")]
 	public const int MINOR_VERSION;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MIN_LATITUDE")]
 	public const double MIN_LATITUDE;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MIN_LONGITUDE")]
 	public const double MIN_LONGITUDE;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_VERSION")]
 	public const double VERSION;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_VERSION_HEX")]
 	public const int VERSION_HEX;
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_VERSION_S")]
 	public const string VERSION_S;
 }
