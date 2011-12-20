@@ -1,3 +1,18 @@
+libchamplain 0.12.1 (2011-12-20)
+===============================
+
+Stable release
+
+Changes:
+* Fix scale drawing (Jiří Techet)
+* Don't call g_thread_init (Colin Walters)
+* Redraw path when its properties change (Jiří Techet)
+* Fix crashes on ChamplainView destruction (Jiří Techet)
+* Add dashed lines drawing to paths (Jiří Techet)
+* Fix factory methods for introspection-based bindings (Jiří Techet)
+* Fix wrong zoom actor placement at low zoom levels (Jiří Techet)
+* Minor fixes and improvements (Jiří Techet)
+
 libchamplain 0.12.0 (2011-09-17)
 ===============================
 
