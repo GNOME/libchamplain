@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
 
 from gi.repository import GtkClutter, Clutter
 GtkClutter.init([]) # Must be initialized before importing those:
@@ -45,24 +44,15 @@ class LauncherGTK:
 
         self.path_layer = Champlain.PathLayer()
         # Cheap approx of Highway 10
-        self.path_layer.add_node(Champlain.Coordinate.new_full(45.4095,
-                -73.3197))
-        self.path_layer.add_node(Champlain.Coordinate.new_full(45.4104,
-                -73.2846))
-        self.path_layer.add_node(Champlain.Coordinate.new_full(45.4178,
-                -73.2239))
-        self.path_layer.add_node(Champlain.Coordinate.new_full(45.4176,
-                -73.2181))
-        self.path_layer.add_node(Champlain.Coordinate.new_full(45.4151,
-                -73.2126))
-        self.path_layer.add_node(Champlain.Coordinate.new_full(45.4016,
-                -73.1926))
-        self.path_layer.add_node(Champlain.Coordinate.new_full(45.3994,
-                -73.1877))
-        self.path_layer.add_node(Champlain.Coordinate.new_full(45.4000,
-                -73.1815))
-        self.path_layer.add_node(Champlain.Coordinate.new_full(45.4151,
-                -73.1218))
+        self.add_node(self.path_layer, 45.4095, -73.3197)
+        self.add_node(self.path_layer, 45.4104, -73.2846)
+        self.add_node(self.path_layer, 45.4178, -73.2239)
+        self.add_node(self.path_layer, 45.4176, -73.2181)
+        self.add_node(self.path_layer, 45.4151, -73.2126)
+        self.add_node(self.path_layer, 45.4016, -73.1926)
+        self.add_node(self.path_layer, 45.3994, -73.1877)
+        self.add_node(self.path_layer, 45.4000, -73.1815)
+        self.add_node(self.path_layer, 45.4151, -73.1218)
         self.view.add_layer(self.path_layer)
 
         embed.set_size_request(640, 480)
@@ -110,6 +100,10 @@ class LauncherGTK:
         self.window.add(vbox)
 
         self.window.show_all()
+    
+    def add_node(self, path_layer, lat, lon):
+        coord = Champlain.Coordinate.new_full(lat, lon)
+        path_layer.add_node(coord)
 
     def zoom_in(self, widget):
         self.view.zoom_in()
@@ -140,14 +134,13 @@ class LauncherGTK:
         id = model.get_value(iter, 0)
         map_source_factory = Champlain.MapSourceFactory.dup_default()
         source = map_source_factory.create_cached_source(id);
-        # Crashes
-        #self.view.set_property("map-source", source)
+        self.view.set_property("map-source", source)
 
     def map_zoom_changed(self, widget, value):
         self.spinbutton.set_value(self.view.get_property("zoom-level"))
 
     def view_state_changed(self, view, paramspec, image):
-        state = view.get_property("state")
+        state = view.get_state()
         if state == Champlain.State.LOADING:
             image.set_from_stock(Gtk.STOCK_NETWORK, Gtk.IconSize.BUTTON)
         else:
