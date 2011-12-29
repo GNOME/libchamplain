@@ -1,5 +1,7 @@
 noinst_PROGRAMS = minimal launcher animated-marker polygons url-marker create-destroy-test
 
+SUBDIRS = icons
+
 INCLUDES = -I$(top_srcdir)
 
 AM_CPPFLAGS = $(DEPS_CFLAGS) $(WARN_CFLAGS)
@@ -60,5 +62,5 @@ launcher_vala_LDADD = \
        $(top_builddir)/champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 endif
 
-EXTRA_DIST = markers.h launcher.js minimal.py default-rules.xml high-contrast.xml las_palmas.osm schaffhausen.osm
+EXTRA_DIST = markers.h launcher.js minimal.py launcher-gtk.py markers.py default-rules.xml high-contrast.xml las_palmas.osm schaffhausen.osm
 
