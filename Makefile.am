@@ -19,7 +19,7 @@ endif
 pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
 
-DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc --enable-gtk --enable-vala --enable-vala-demos --enable-introspection --enable-memphis
+DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc --enable-gtk --enable-introspection --enable-vala-demos --enable-memphis
 
 EXTRA_DIST = \
 	champlain-gtk.pc.in \
