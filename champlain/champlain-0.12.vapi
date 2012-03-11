@@ -587,7 +587,7 @@ namespace Champlain {
 		[NoAccessorMethod]
 		public abstract double longitude { get; set; }
 	}
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", has_type_id = false)]
 	public struct MemphisRule {
 		public weak string keys;
 		public weak string values;
@@ -597,7 +597,7 @@ namespace Champlain {
 		public Champlain.MemphisRuleAttr border;
 		public Champlain.MemphisRuleAttr text;
 	}
-	[CCode (cheader_filename = "champlain/champlain.h")]
+	[CCode (cheader_filename = "champlain/champlain.h", has_type_id = false)]
 	public struct MemphisRuleAttr {
 		public uint8 z_min;
 		public uint8 z_max;
