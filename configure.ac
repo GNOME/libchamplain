@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 m4_define([champlain_major_version], [0])
 m4_define([champlain_minor_version], [12])
-m4_define([champlain_micro_version], [1])
+m4_define([champlain_micro_version], [2])
 m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
 m4_define([champlain_minor_api_version], [m4_eval(champlain_minor_version + champlain_minor_version%2)])
@@ -36,7 +36,7 @@ AM_PROG_CC_C_O
 # - If binary compatibility has been broken (eg removed or changed interfaces)
 #   change to C+1:0:0
 # - If the interface is the same as the previous version, change to C:R+1:A
-LIBRARY_VERSION=1:0:1
+LIBRARY_VERSION=1:1:1
 CHAMPLAIN_API_VERSION=champlain_api_version
 CHAMPLAIN_API_VERSION_NORM=champlain_major_version[_]champlain_minor_api_version
 CHAMPLAIN_MAJOR_VERSION=champlain_major_version

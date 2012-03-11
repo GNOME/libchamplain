@@ -1,3 +1,15 @@
+libchamplain 0.12.2 (2012-03-12)
+===============================
+
+Stable release
+
+Changes:
+* Call vapigen with --pkg cogl-pango-1.0 (Alexandre Rostovtsev) 
+* Don't call vapigen during distcheck and use pre-generated vapi
+  instead to become independent of vala version during distcheck 
+  (Jiří Techet)
+* Minor changes here and there (Jiří Techet)
+
 libchamplain 0.12.1 (2011-12-20)
 ===============================
 
