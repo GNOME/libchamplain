@@ -28,7 +28,7 @@ main (int argc, char *argv[])
 {
   GtkWidget *window, *widget;
 
-  /* initialize threads and clutter */
+  /* initialize clutter */
   if (gtk_clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;
 
