@@ -338,7 +338,7 @@ champlain_map_source_chain_push (ChamplainMapSourceChain *source_chain,
  * champlain_map_source_chain_pop:
  * @source_chain: a #ChamplainMapSourceChain
  *
- * Pops the map source from the top of the stack from the chain.
+ * Pops a map source from the top of the stack from the chain.
  *
  * Since: 0.6
  */

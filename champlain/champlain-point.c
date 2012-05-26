@@ -18,7 +18,7 @@
 
 /**
  * SECTION:champlain-point
- * @short_description: Simple point to mark a coordinate
+ * @short_description: A simple point to mark a coordinate
  *
  * #ChamplainPoint is a simple variant of #ChamplainMarker. Contrary to
  * #ChamplainLabel, it is not capable of labelling the point with text and

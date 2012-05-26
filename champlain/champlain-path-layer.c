@@ -540,6 +540,7 @@ add_node (ChamplainPathLayer *layer,
  * @location: a #ChamplainLocation
  *
  * Adds a #ChamplainLocation object to the layer.
+ * The node is prepended to the list.
  *
  * Since: 0.10
  */

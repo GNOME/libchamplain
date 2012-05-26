@@ -987,7 +987,7 @@ champlain_label_new (void)
 
 /**
  * champlain_label_new_with_text:
- * @text: the text of the text
+ * @text: the text of the label
  * @font: (allow-none): the font to use to draw the text, for example "Courrier Bold 11", can be NULL
  * @text_color: (allow-none): a #ClutterColor, the color of the text, can be NULL
  * @label_color: (allow-none): a #ClutterColor, the color of the label, can be NULL
@@ -1023,7 +1023,7 @@ champlain_label_new_with_text (const gchar *text,
 
 /**
  * champlain_label_new_with_image:
- * @actor: The actor of the image.
+ * @actor: The image as a @ClutterActor.
  *
  * Creates a new instance of #ChamplainLabel with image.
  *
@@ -1077,8 +1077,8 @@ champlain_label_new_from_file (const gchar *filename,
 
 /**
  * champlain_label_new_full:
- * @text: The text
- * @actor: The image
+ * @text: The text of the label
+ * @actor: The image as a @ClutterActor
  *
  * Creates a new instance of #ChamplainLabel consisting of a custom #ClutterActor.
  *
@@ -1105,8 +1105,8 @@ champlain_label_new_full (const gchar *text,
 
 /**
  * champlain_label_set_text:
- * @label: The label
- * @text: The text
+ * @label: a #ChamplainLabel
+ * @text: The new text of the label
  *
  * Sets the label's text.
  *
@@ -1131,7 +1131,7 @@ champlain_label_set_text (ChamplainLabel *label,
 
 /**
  * champlain_label_set_image:
- * @label: The label.
+ * @label: a #ChamplainLabel
  * @image: (allow-none): The image as a @ClutterActor or NULL to remove the current image.
  *
  * Sets the label's image.
@@ -1164,7 +1164,7 @@ champlain_label_set_image (ChamplainLabel *label,
 
 /**
  * champlain_label_set_use_markup:
- * @label: The label
+ * @label: a #ChamplainLabel
  * @use_markup: The value
  *
  * Sets if the label's text uses markup.
@@ -1185,10 +1185,10 @@ champlain_label_set_use_markup (ChamplainLabel *label,
 
 /**
  * champlain_label_set_alignment:
- * @label: The label
+ * @label: a #ChamplainLabel
  * @alignment: The label's alignment
  *
- * Set the label's text alignment.
+ * Sets the label's text alignment.
  *
  * Since: 0.10
  */
@@ -1206,11 +1206,11 @@ champlain_label_set_alignment (ChamplainLabel *label,
 
 /**
  * champlain_label_set_color:
- * @label: The label
+ * @label: a #ChamplainLabel
  * @color: (allow-none): The label's background color or NULL to reset the background to the
  *         default color. The color parameter is copied.
  *
- * Set the label's background color.
+ * Sets the label's background color.
  *
  * Since: 0.10
  */
@@ -1236,11 +1236,11 @@ champlain_label_set_color (ChamplainLabel *label,
 
 /**
  * champlain_label_set_text_color:
- * @label: The label
+ * @label: a #ChamplainLabel
  * @color: (allow-none): The label's text color or NULL to reset the text to the default
  *         color. The color parameter is copied.
  *
- * Set the label's text color.
+ * Sets the label's text color.
  *
  * Since: 0.10
  */
@@ -1266,11 +1266,11 @@ champlain_label_set_text_color (ChamplainLabel *label,
 
 /**
  * champlain_label_set_font_name:
- * @label: The label
+ * @label: a #ChamplainLabel
  * @font_name: (allow-none): The label's font name or NULL to reset the font to the default
  *             value.
  *
- * Set the label's font name such as "Sans 12".
+ * Sets the label's font name such as "Sans 12".
  *
  * Since: 0.10
  */
@@ -1296,10 +1296,10 @@ champlain_label_set_font_name (ChamplainLabel *label,
 
 /**
  * champlain_label_set_wrap:
- * @label: The label
+ * @label: a #ChamplainLabel
  * @wrap: The label's wrap.
  *
- * Set if the label's text wrap.
+ * Sets if the label's text wrap.
  *
  * Since: 0.10
  */
@@ -1317,10 +1317,10 @@ champlain_label_set_wrap (ChamplainLabel *label,
 
 /**
  * champlain_label_set_wrap_mode:
- * @label: The label
- * @wrap_mode: The label's wrap.
+ * @label: a #ChamplainLabel
+ * @wrap_mode: The label's wrap mode.
  *
- * Set the label's text color.
+ * Sets the label's text wrap mode.
  *
  * Since: 0.10
  */
@@ -1338,10 +1338,10 @@ champlain_label_set_wrap_mode (ChamplainLabel *label,
 
 /**
  * champlain_label_set_attributes:
- * @label: The label
+ * @label: a #ChamplainLabel
  * @list: The label's text attributes.
  *
- * Set the label's text attribute.
+ * Sets the label's text attributes.
  *
  * Since: 0.10
  */
@@ -1368,10 +1368,10 @@ champlain_label_set_attributes (ChamplainLabel *label,
 
 /**
  * champlain_label_set_ellipsize:
- * @label: The label
+ * @label: a #ChamplainLabel
  * @mode: The label's ellipsize mode.
  *
- * Set the label's text ellipsize mode.
+ * Sets the label's text ellipsize mode.
  *
  * Since: 0.10
  */
@@ -1389,10 +1389,10 @@ champlain_label_set_ellipsize (ChamplainLabel *label,
 
 /**
  * champlain_label_set_single_line_mode:
- * @label: The label
+ * @label: a #ChamplainLabel
  * @mode: The label's single line mode
  *
- * Set if the label's text is on a single line.
+ * Sets if the label's text is on a single line.
  *
  * Since: 0.10
  */
@@ -1411,10 +1411,10 @@ champlain_label_set_single_line_mode (ChamplainLabel *label,
 
 /**
  * champlain_label_set_draw_background:
- * @label: The label
+ * @label: a #ChamplainLabel
  * @background: value.
  *
- * Set if the label has a background.
+ * Sets if the label has a background.
  *
  * Since: 0.10
  */
@@ -1432,7 +1432,7 @@ champlain_label_set_draw_background (ChamplainLabel *label,
 
 /**
  * champlain_label_get_image:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
  * Get the label's image.
  *
@@ -1451,7 +1451,7 @@ champlain_label_get_image (ChamplainLabel *label)
 
 /**
  * champlain_label_get_use_markup:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
  * Check whether the label uses markup.
  *
@@ -1470,7 +1470,7 @@ champlain_label_get_use_markup (ChamplainLabel *label)
 
 /**
  * champlain_label_get_text:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
  * Get the label's text.
  *
@@ -1489,7 +1489,7 @@ champlain_label_get_text (ChamplainLabel *label)
 
 /**
  * champlain_label_get_alignment:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
  * Get the label's text alignment.
  *
@@ -1508,11 +1508,11 @@ champlain_label_get_alignment (ChamplainLabel *label)
 
 /**
  * champlain_label_get_color:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
- * Gets the label's color.
+ * Gets the label's background color.
  *
- * Returns: the label's color.
+ * Returns: the label's background color.
  *
  * Since: 0.10
  */
@@ -1527,7 +1527,7 @@ champlain_label_get_color (ChamplainLabel *label)
 
 /**
  * champlain_label_get_text_color:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
  * Gets the label's text color.
  *
@@ -1546,7 +1546,7 @@ champlain_label_get_text_color (ChamplainLabel *label)
 
 /**
  * champlain_label_get_font_name:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
  * Gets the label's font name.
  *
@@ -1565,9 +1565,9 @@ champlain_label_get_font_name (ChamplainLabel *label)
 
 /**
  * champlain_label_get_wrap:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
- * Check whether the label text wraps.
+ * Checks whether the label text wraps.
  *
  * Returns: if the label's text wraps.
  *
@@ -1584,9 +1584,9 @@ champlain_label_get_wrap (ChamplainLabel *label)
 
 /**
  * champlain_label_get_wrap_mode:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
- * Get the label's text wrap mode.
+ * Gets the label's text wrap mode.
  *
  * Returns: the label's text wrap mode.
  *
@@ -1603,9 +1603,9 @@ champlain_label_get_wrap_mode (ChamplainLabel *label)
 
 /**
  * champlain_label_get_ellipsize:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
- * Get the label's text ellipsize mode.
+ * Gets the label's text ellipsize mode.
  *
  * Returns: the label's text ellipsize mode.
  *
@@ -1622,7 +1622,7 @@ champlain_label_get_ellipsize (ChamplainLabel *label)
 
 /**
  * champlain_label_get_single_line_mode:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
  * Checks the label's single line mode.
  *
@@ -1641,7 +1641,7 @@ champlain_label_get_single_line_mode (ChamplainLabel *label)
 
 /**
  * champlain_label_get_draw_background:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
  * Checks whether the label has a background.
  *
@@ -1660,7 +1660,7 @@ champlain_label_get_draw_background (ChamplainLabel *label)
 
 /**
  * champlain_label_get_attributes:
- * @label: The label
+ * @label: a #ChamplainLabel
  *
  * Gets the label's text attributes.
  *

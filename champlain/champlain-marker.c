@@ -19,9 +19,9 @@
 
 /**
  * SECTION:champlain-marker
- * @short_description: A marker to identify points of interest on a map
+ * @short_description: Base class of libchamplain markers
  *
- * Markers reprensent points of interest on a map. Markers need to be
+ * Markers represent points of interest on a map. Markers need to be
  * placed on a layer (a #ChamplainMarkerLayer). Layers have to be added to a
  * #champlainview for the markers to show on the map.
  *
@@ -734,7 +734,7 @@ champlain_marker_get_draggable (ChamplainMarker *marker)
 
 /**
  * champlain_marker_animate_in:
- * @marker: The marker
+ * @marker: a #ChamplainMarker
  *
  * Animates the marker as if it were falling from the sky onto the map.
  *
@@ -749,7 +749,7 @@ champlain_marker_animate_in (ChamplainMarker *marker)
 
 /**
  * champlain_marker_animate_in_with_delay :
- * @marker: The marker
+ * @marker: a #ChamplainMarker
  * @delay: The delay in milliseconds
  *
  * Animates the marker as if it were falling from the sky onto the map after
@@ -787,7 +787,7 @@ champlain_marker_animate_in_with_delay (ChamplainMarker *marker,
 
 /**
  * champlain_marker_animate_out:
- * @marker: The marker
+ * @marker: a #ChamplainMarker
  *
  * Animates the marker as if it were drawn through the sky.
  *
@@ -812,7 +812,7 @@ on_animation_completed (G_GNUC_UNUSED ClutterAnimation *animation,
 
 /**
  * champlain_marker_animate_out_with_delay :
- * @marker: The marker
+ * @marker: a #ChamplainMarker
  * @delay: The delay in milliseconds
  *
  * Animates the marker as if it were drawn through the sky after

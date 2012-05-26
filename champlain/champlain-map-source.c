@@ -36,7 +36,7 @@
  * delegate the work to the next map source in the chain by invoking the
  * same function on it.
 
- * To undertand the concept of chains, consider for instance a chain
+ * To understand the concept of chains, consider for instance a chain
  * consisting of #ChamplainFileCache whose next source is
  * #ChamplainNetworkTileSource whose next source is an error tile source
  * created with champlain_map_source_factory_create_error_source ().
@@ -676,7 +676,7 @@ champlain_map_source_get_meters_per_pixel (ChamplainMapSource *map_source,
 /**
  * champlain_map_source_fill_tile:
  * @map_source: a #ChamplainMapSource
- * @tile: A #ChamplainTile
+ * @tile: a #ChamplainTile
  *
  * Fills the tile with image data (either from cache, network or rendered
  * locally).

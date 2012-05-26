@@ -286,7 +286,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
  * A method to obtain the singleton object.
  *
  * Returns: (transfer full): the singleton #ChamplainMapSourceFactory, it should be freed
- * using #g_object_unref when not needed.
+ * using #g_object_unref() when not needed.
  *
  * Since: 0.4
  */
@@ -320,7 +320,7 @@ champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *factory)
  * @factory: the Factory
  * @id: the wanted map source id
  *
- * The id should not contain any character that can't be in a filename as it
+ * Note: The id should not contain any character that can't be in a filename as it
  * will be used as the cache directory name for that map source.
  *
  * Returns: (transfer none): a ready to use #ChamplainMapSource matching the given name, returns

@@ -42,7 +42,7 @@
  * an error occurs during download, an error tile will be displayed.
  *
  * The button-press-event and button-release-event signals are emitted each
- * time a mouse button is pressed on the @view.
+ * time a mouse button is pressed and released on the @view.
  */
 
 #include "config.h"
@@ -998,7 +998,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   /**
    * ChamplainView::layer-relocated:
    *
-   * Indicates that the layers hav been "relocated". In practice this means that
+   * Indicates that the layers have been "relocated". In practice this means that
    * every layer should connect to this signal and redraw itself when the signal is
    * emitted. Layer relocation happens when zooming in/out and when panning for more
    * than MAX_INT pixels.
@@ -1613,9 +1613,9 @@ champlain_view_zoom_out (ChamplainView *view)
 /**
  * champlain_view_set_zoom_level:
  * @view: a #ChamplainView
- * @zoom_level: a guint
+ * @zoom_level: the level of zoom, a guint between 1 and 20
  *
- * Changes the current zoom level
+ * Changes the current level of zoom
  *
  * Since: 0.4
  */
@@ -1634,9 +1634,9 @@ champlain_view_set_zoom_level (ChamplainView *view,
 /**
  * champlain_view_set_min_zoom_level:
  * @view: a #ChamplainView
- * @zoom_level: a guint
+ * @zoom_level: the level of zoom
  *
- * Changes the lowest allowed zoom level
+ * Changes the lowest allowed level of zoom
  *
  * Since: 0.4
  */
@@ -1666,9 +1666,9 @@ champlain_view_set_min_zoom_level (ChamplainView *view,
 /**
  * champlain_view_set_max_zoom_level:
  * @view: a #ChamplainView
- * @zoom_level: a guint
+ * @zoom_level: the level of zoom
  *
- * Changes the highest allowed zoom level
+ * Changes the highest allowed level of zoom
  *
  * Since: 0.4
  */
@@ -1725,7 +1725,7 @@ champlain_view_add_layer (ChamplainView *view,
  * @view: a #ChamplainView
  * @layer: a #ChamplainLayer
  *
- * Removes the layer from the view
+ * Removes the given layer from the view
  *
  * Since: 0.4.1
  */
@@ -2141,7 +2141,7 @@ tile_state_notify (ChamplainTile *tile,
  * @view: a #ChamplainView
  * @map_source: a #ChamplainMapSource
  *
- * Changes the currently used map source.  #g_object_unref will be called on
+ * Changes the currently used map source. #g_object_unref() will be called on
  * the previous one.
  *
  * Since: 0.4
@@ -2304,9 +2304,9 @@ champlain_view_set_animate_zoom (ChamplainView *view,
  * champlain_view_ensure_visible:
  * @view: a #ChamplainView
  * @bbox: bounding box of the area that should be visible
- * @animate: perform animation
+ * @animate: TRUE to perform animation, FALSE otherwise
  *
- * Changes the map's zoom level and center to make sure the two given area
+ * Changes the map's zoom level and center to make sure the given area
  * is visible
  *
  * Since: 0.10
@@ -2363,7 +2363,7 @@ champlain_view_ensure_visible (ChamplainView *view,
 /**
  * champlain_view_ensure_layers_visible:
  * @view: a #ChamplainView
- * @animate: perform animation
+ * @animate: TRUE to perform animation, FALSE otherwise
  *
  * Changes the map's zoom level and center to make sure that the bounding
  * boxes of all inserted layers are visible.
@@ -2614,7 +2614,7 @@ view_set_zoom_level_at (ChamplainView *view,
 
 /**
  * champlain_view_get_zoom_level:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Gets the view's current zoom level.
  *
@@ -2635,7 +2635,7 @@ champlain_view_get_zoom_level (ChamplainView *view)
 
 /**
  * champlain_view_get_min_zoom_level:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Gets the view's minimal allowed zoom level.
  *
@@ -2656,11 +2656,11 @@ champlain_view_get_min_zoom_level (ChamplainView *view)
 
 /**
  * champlain_view_get_max_zoom_level:
- * @view: The view
+ * @view: a #ChamplainView
  *
- * Gets the view's maximal allowed zoom level.
+ * Gets the view's maximum allowed zoom level.
  *
- * Returns: the view's maximal allowed zoom level.
+ * Returns: the view's maximum allowed zoom level.
  *
  * Since: 0.4
  */
@@ -2677,12 +2677,12 @@ champlain_view_get_max_zoom_level (ChamplainView *view)
 
 /**
  * champlain_view_get_map_source:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Gets the view's current map source.
  *
  * Returns: (transfer none): the view's current map source. If you need to keep a reference to the
- * map source then you have to call #g_object_ref.
+ * map source then you have to call #g_object_ref().
  *
  * Since: 0.4
  */
@@ -2699,7 +2699,7 @@ champlain_view_get_map_source (ChamplainView *view)
 
 /**
  * champlain_view_get_deceleration:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Gets the view's deceleration rate.
  *
@@ -2722,7 +2722,7 @@ champlain_view_get_deceleration (ChamplainView *view)
 
 /**
  * champlain_view_get_kinetic_mode:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Gets the view's scroll mode behaviour.
  *
@@ -2743,7 +2743,7 @@ champlain_view_get_kinetic_mode (ChamplainView *view)
 
 /**
  * champlain_view_get_keep_center_on_resize:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Checks whether to keep the center on resize
  *
@@ -2764,7 +2764,7 @@ champlain_view_get_keep_center_on_resize (ChamplainView *view)
 
 /**
  * champlain_view_get_zoom_on_double_click:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Checks whether the view zooms on double click.
  *
@@ -2785,7 +2785,7 @@ champlain_view_get_zoom_on_double_click (ChamplainView *view)
 
 /**
  * champlain_view_get_animate_zoom:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Checks whether the view animates zoom level changes.
  *
@@ -2806,12 +2806,12 @@ champlain_view_get_animate_zoom (ChamplainView *view)
 
 /**
  * champlain_view_bin_layout_add:
- * @view: The view
+ * @view: a #ChamplainView
  * @child: The child to be inserted
  * @x_align: x alignment
  * @y_align: y alignment
  *
- * This function iserts a custom actor to the undrelying #ClutterBinLayout
+ * This function inserts a custom actor to the undrelying #ClutterBinLayout
  * manager. The inserted actors appear on top of the map. See clutter_bin_layout_add()
  * for reference.
  *
@@ -2838,7 +2838,7 @@ champlain_view_bin_layout_add (ChamplainView *view,
 
 /**
  * champlain_view_get_license_actor:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Returns the #ChamplainLicense actor which is inserted by default into the
  * layout manager. It can be manipulated using standard #ClutterActor methods
@@ -2861,7 +2861,7 @@ champlain_view_get_license_actor (ChamplainView *view)
 
 /**
  * champlain_view_get_center_latitude:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Gets the latitude of the view's center.
  *
@@ -2882,11 +2882,11 @@ champlain_view_get_center_latitude (ChamplainView *view)
 
 /**
  * champlain_view_get_center_longitude:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Gets the longitude of the view's center.
  *
- * Returns: the latitude.
+ * Returns: the longitude.
  *
  * Since: 0.10
  */
@@ -2903,7 +2903,7 @@ champlain_view_get_center_longitude (ChamplainView *view)
 
 /**
  * champlain_view_get_state:
- * @view: The view
+ * @view: a #ChamplainView
  *
  * Gets the view's state.
  *

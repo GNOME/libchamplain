@@ -642,9 +642,9 @@ champlain_tile_source_set_min_zoom_level (ChamplainTileSource *tile_source,
 /**
  * champlain_tile_source_set_max_zoom_level:
  * @tile_source: a #ChamplainTileSource
- * @zoom_level: the maximal zoom level
+ * @zoom_level: the maximum zoom level
  *
- * Sets the tile source's maximal zoom level.
+ * Sets the tile source's maximum zoom level.
  *
  * Since: 0.6
  */

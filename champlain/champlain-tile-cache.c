@@ -20,7 +20,7 @@
  * SECTION:champlain-tile-cache
  * @short_description: A base class of tile caches
  *
- * This class defines properties and methods common to all caches (that is, map
+ * This class defines properties and methods commons to all caches (that is, map
  * sources that permit storage and retrieval of tiles). Tiles are typically
  * stored by #ChamplainTileSource objects.
  */

@@ -315,7 +315,7 @@ champlain_marker_layer_new ()
  * champlain_marker_layer_new_full:
  * @mode: Selection mode
  *
- * Creates a new instance of #ChamplainMarkerLayer.
+ * Creates a new instance of #ChamplainMarkerLayer with the specified selection mode.
  *
  * Returns: a new #ChamplainMarkerLayer ready to be used as a container for the markers.
  *
@@ -523,7 +523,7 @@ champlain_marker_layer_get_markers (ChamplainMarkerLayer *layer)
  * champlain_marker_layer_get_selected:
  * @layer: a #ChamplainMarkerLayer
  *
- * Gets a list of selected markers.
+ * Gets a list of selected markers in the layer.
  *
  * Returns: (transfer container) (element-type ChamplainMarker): the list
  *
@@ -590,7 +590,7 @@ champlain_marker_layer_remove_marker (ChamplainMarkerLayer *layer,
  * champlain_marker_layer_animate_in_all_markers:
  * @layer: a #ChamplainMarkerLayer
  *
- * Fade in all markers with an animation
+ * Fade in all markers in the layer with an animation
  *
  * Since: 0.10
  */
@@ -622,7 +622,7 @@ champlain_marker_layer_animate_in_all_markers (ChamplainMarkerLayer *layer)
  * champlain_marker_layer_animate_out_all_markers:
  * @layer: a #ChamplainMarkerLayer
  *
- * Fade out all markers with an animation
+ * Fade out all markers in the layer with an animation
  *
  * Since: 0.10
  */
@@ -654,7 +654,7 @@ champlain_marker_layer_animate_out_all_markers (ChamplainMarkerLayer *layer)
  * champlain_marker_layer_show_all_markers:
  * @layer: a #ChamplainMarkerLayer
  *
- * Calls clutter_actor_show on all markers
+ * Shows all markers in the layer
  *
  * Since: 0.10
  */
@@ -684,7 +684,7 @@ champlain_marker_layer_show_all_markers (ChamplainMarkerLayer *layer)
  * champlain_marker_layer_hide_all_markers:
  * @layer: a #ChamplainMarkerLayer
  *
- * Calls clutter_actor_hide on all markers
+ * Hides all the markers in the layer
  *
  * Since: 0.10
  */
@@ -714,7 +714,7 @@ champlain_marker_layer_hide_all_markers (ChamplainMarkerLayer *layer)
  * champlain_marker_layer_set_all_markers_draggable:
  * @layer: a #ChamplainMarkerLayer
  *
- * Sets all markers draggable
+ * Sets all markers draggable in the layer
  *
  * Since: 0.10
  */
@@ -744,7 +744,7 @@ champlain_marker_layer_set_all_markers_draggable (ChamplainMarkerLayer *layer)
  * champlain_marker_layer_set_all_markers_undraggable:
  * @layer: a #ChamplainMarkerLayer
  *
- * Sets all markers undraggable
+ * Sets all markers undraggable in the layer
  *
  * Since: 0.10
  */
@@ -774,7 +774,7 @@ champlain_marker_layer_set_all_markers_undraggable (ChamplainMarkerLayer *layer)
  * champlain_marker_layer_unselect_all_markers:
  * @layer: a #ChamplainMarkerLayer
  *
- * Unselects all markers.
+ * Unselects all markers in the layer.
  *
  * Since: 0.10
  */
