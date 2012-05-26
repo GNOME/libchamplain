@@ -18,7 +18,7 @@
 
 /**
  * SECTION:champlain-coordinate
- * @short_description: The simpliest implementation of #ChamplainLocation
+ * @short_description: The simplest implementation of #ChamplainLocation
  *
  * #ChamplainCoordinate is a simple object implementing #ChamplainLocation.
  */

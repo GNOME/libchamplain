@@ -433,7 +433,7 @@ champlain_license_disconnect_view (ChamplainLicense *license)
 /**
  * champlain_license_set_extra_text:
  * @license: a #ChamplainLicense
- * @text: a license
+ * @text: the additional license text
  *
  * Show the additional license text on the map view.  The text will preceed the
  * map's licence when displayed. Use "\n" to separate the lines.
@@ -478,8 +478,8 @@ champlain_license_get_extra_text (ChamplainLicense *license)
 
 /**
  * champlain_license_set_alignment:
- * @license: The license
- * @alignment: The license's alignment
+ * @license: a #ChamplainLicense
+ * @alignment: The license's text alignment
  *
  * Set the license's text alignment.
  *

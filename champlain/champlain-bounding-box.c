@@ -119,7 +119,7 @@ champlain_bounding_box_free (ChamplainBoundingBox *bbox)
  * @latitude: (out): the latitude of the box center
  * @longitude: (out): the longitude of the box center
  *
- * Sets the latitude and longitude of the box to @lat and @lon.
+ * Gets the center's latitude and longitude of the box to @latitude and @longitude.
  *
  * Since: 0.6
  */
@@ -167,8 +167,8 @@ champlain_bounding_box_compose (ChamplainBoundingBox *bbox,
 /**
  * champlain_bounding_box_extend:
  * @bbox: a #ChamplainBoundingBox
- * @latitude: latitude
- * @longitude: longitude
+ * @latitude: the latitude of the point
+ * @longitude: the longitude of the point
  *
  * Extend the bounding box so it contains a point with @latitude and @longitude.
  * Do nothing if the point is already inside the bounding box.
@@ -199,7 +199,7 @@ champlain_bounding_box_extend (ChamplainBoundingBox *bbox,
  * champlain_bounding_box_is_valid:
  * @bbox: a #ChamplainBoundingBox
  *
- * Checks whether bbox represents a valid bounding box on the map.
+ * Checks whether @bbox represents a valid bounding box on the map.
  *
  * Returns: TRUE when the bounding box is valid, FALSE otherwise.
  *

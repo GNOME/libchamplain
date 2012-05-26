@@ -537,7 +537,7 @@ champlain_scale_new (void)
 /**
  * champlain_scale_set_max_width:
  * @scale: a #ChamplainScale
- * @value: a #guint in pixels
+ * @value: the number of pixels
  *
  * Sets the maximum width of the scale on the screen in pixels
  *
@@ -561,7 +561,7 @@ champlain_scale_set_max_width (ChamplainScale *scale,
  * @scale: a #ChamplainScale
  * @unit: a #ChamplainUnit
  *
- * Sets the scales unit.
+ * Sets the scale unit.
  *
  * Since: 0.10
  */
@@ -579,11 +579,11 @@ champlain_scale_set_unit (ChamplainScale *scale,
 
 /**
  * champlain_scale_get_max_width:
- * @scale: The scale
+ * @scale: a #ChamplainScale
  *
- * Gets the maximal scale width.
+ * Gets the maximum scale width.
  *
- * Returns: The max scale width in pixels.
+ * Returns: The maximum scale width in pixels.
  *
  * Since: 0.10
  */
@@ -598,7 +598,7 @@ champlain_scale_get_max_width (ChamplainScale *scale)
 
 /**
  * champlain_scale_get_unit:
- * @scale: The scale
+ * @scale: a #ChamplainScale
  *
  * Gets the unit used by the scale.
  *
@@ -626,7 +626,7 @@ redraw_scale_cb (G_GNUC_UNUSED GObject *gobject,
 
 /**
  * champlain_scale_connect_view:
- * @scale: The scale
+ * @scale: a #ChamplainScale
  * @view: a #ChamplainView
  *
  * This method connects to the necessary signals of #ChamplainView to make the
@@ -649,7 +649,7 @@ champlain_scale_connect_view (ChamplainScale *scale,
 
 /**
  * champlain_scale_disconnect_view:
- * @scale: The scale
+ * @scale: a #ChamplainScale
  *
  * This method disconnects from the signals previously connected by champlain_scale_connect_view().
  *

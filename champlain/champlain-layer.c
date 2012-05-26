@@ -63,7 +63,7 @@ champlain_layer_class_init (ChamplainLayerClass *klass)
  * #ChamplainView calls this method to pass a reference to itself to the layer
  * when the layer is added to the view. When the layer is removed from the
  * view, it passes NULL to the layer. Custom layers can implement this method
- * and perform the necessary initialization. This method schould not be called
+ * and perform the necessary initialization. This method should not be called
  * by user code.
  *
  * Since: 0.10

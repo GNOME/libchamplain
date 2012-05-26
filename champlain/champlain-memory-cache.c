@@ -151,7 +151,7 @@ champlain_memory_cache_class_init (ChamplainMemoryCacheClass *klass)
   /**
    * ChamplainMemoryCache:size-limit:
    *
-   * The maximal number of tiles that are stored in the cache.
+   * The maximum number of tiles that are stored in the cache.
    *
    * Since: 0.8
    */
@@ -174,7 +174,7 @@ champlain_memory_cache_class_init (ChamplainMemoryCacheClass *klass)
 
 /**
  * champlain_memory_cache_new_full:
- * @size_limit: maximal number of tiles stored in the cache
+ * @size_limit: maximum number of tiles stored in the cache
  * @renderer: the #ChamplainRenderer used for tiles rendering
  *
  * Constructor of #ChamplainMemoryCache.
@@ -214,9 +214,9 @@ champlain_memory_cache_init (ChamplainMemoryCache *memory_cache)
  * champlain_memory_cache_get_size_limit:
  * @memory_cache: a #ChamplainMemoryCache
  *
- * Gets the maximal number of tiles stored in the cache.
+ * Gets the maximum number of tiles stored in the cache.
  *
- * Returns: maximal number of stored tiles
+ * Returns: maximum number of stored tiles
  *
  * Since: 0.8
  */
@@ -232,9 +232,9 @@ champlain_memory_cache_get_size_limit (ChamplainMemoryCache *memory_cache)
 /**
  * champlain_memory_cache_set_size_limit:
  * @memory_cache: a #ChamplainMemoryCache
- * @size_limit: maximal number of tiles stored in the cache
+ * @size_limit: maximum number of tiles stored in the cache
  *
- * Sets the maximal number of tiles stored in the cache.
+ * Sets the maximum number of tiles stored in the cache.
  *
  * Since: 0.8
  */

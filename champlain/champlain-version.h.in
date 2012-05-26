@@ -40,7 +40,7 @@
 /**
  * CHAMPLAIN_MINOR_VERSION:
  *
- * The minor version of libchamplin (2, if %CHAMPLAIN_VERSION is 1.2.3)
+ * The minor version of libchamplain (2, if %CHAMPLAIN_VERSION is 1.2.3)
  */
 #define CHAMPLAIN_MINOR_VERSION   (@CHAMPLAIN_MINOR_VERSION@)
 
