@@ -120,7 +120,7 @@ class LauncherGTK:
             self.layer.animate_out_all_markers()
 
     def mouse_click_cb(self, actor, event, view):
-        x, y = event.get_coords()
+        x, y = event.x, event.y
         lat, lon = view.x_to_longitude(x), view.y_to_latitude(y)
         print "Mouse click at: %f %f" % (lon, lat)
         return True
