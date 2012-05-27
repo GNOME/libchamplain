@@ -24,7 +24,7 @@
  * The #ChamplainView is a ClutterActor to display maps.  It supports two modes
  * of scrolling:
  * <itemizedlist>
- *   <listitem><para>Push: the normal behavior where the maps doesn't move
+ *   <listitem><para>Push: the normal behavior where the maps don't move
  *   after the user stopped scrolling;</para></listitem>
  *   <listitem><para>Kinetic: the iPhone-like behavior where the maps
  *   decelerate after the user stopped scrolling.</para></listitem>
