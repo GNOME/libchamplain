@@ -7,6 +7,8 @@ from gi.repository import GObject, Gtk, Champlain, GtkChamplain
 
 from markers import create_marker_layer
 
+import os, sys
+os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
 class LauncherGTK:
 

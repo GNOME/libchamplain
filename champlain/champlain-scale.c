@@ -482,7 +482,7 @@ create_scale (ChamplainScale *scale)
   clutter_actor_set_name (text, "scale-far-label");
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), text);
 
-  text = clutter_text_new_with_text ("Sans 9", "X km");
+  text = clutter_text_new_with_text ("Sans 9", "X");
   clutter_actor_set_name (text, "scale-mid-label");
   clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), text);
 
