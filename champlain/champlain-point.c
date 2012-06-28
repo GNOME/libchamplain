@@ -418,7 +418,14 @@ champlain_point_set_size (ChamplainPoint *point,
 {
   g_return_if_fail (CHAMPLAIN_IS_POINT (point));
 
+  ChamplainPointPrivate *priv = point->priv;
+
+  if (priv->point_actor)
+    clutter_actor_unparent (CLUTTER_ACTOR (priv->point_actor));
+
   point->priv->size = size;
+  priv->point_actor = clutter_cairo_texture_new (size, size);
+  clutter_actor_set_parent (CLUTTER_ACTOR (priv->point_actor), CLUTTER_ACTOR (point));
   g_object_notify (G_OBJECT (point), "size");
   draw_point (point);
 }
