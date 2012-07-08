@@ -170,7 +170,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         17,
         256,
         CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "http://tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png",
+        "http://a.tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png",
         champlain_map_source_new_generic,
         NULL);
   champlain_map_source_factory_register (factory, desc);
@@ -198,7 +198,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         18,
         256,
         CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "http://andy.sandbox.cloudmade.com/tiles/cycle/#Z#/#X#/#Y#.png",
+        "http://tile.opencyclemap.org/cycle/#Z#/#X#/#Y#.png",
         champlain_map_source_new_generic,
         NULL);
   champlain_map_source_factory_register (factory, desc);
