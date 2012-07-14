@@ -1,3 +1,15 @@
+libchamplain 0.12.3 (2012-07-14)
+===============================
+
+Stable release
+
+Changes:
+* Fix OpenCycleMap source URL (Thomas Bechtold)
+* Fix ChmplainPoint resizing issue (Jiří Techet)
+* Many minor documentation improvements (Pablo Castellano)
+* New polygons.py Python demo
+* Other minor fixes and improvements (Pablo Castellano, Jiří Techet)
+
 libchamplain 0.12.2 (2012-03-12)
 ===============================
 
