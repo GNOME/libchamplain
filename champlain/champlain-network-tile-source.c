@@ -511,6 +511,10 @@ get_tile_uri (ChamplainNetworkTileSource *tile_source,
         number = x;
       if (strcmp (token, "Y") == 0)
         number = y;
+      if (strcmp (token, "TMSY") == 0){
+        int ymax = 1 << z;
+        number = ymax - y - 1;
+      }
       if (strcmp (token, "Z") == 0)
         number = z;
 
