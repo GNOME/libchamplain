@@ -317,7 +317,7 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
    *
    * The cache size limit in bytes.
    *
-   * Note: this new value will not be applied until you call #champlain_cache_purge
+   * Note: this new value will not be applied until you call champlain_file_cache_purge()
    *
    * Since: 0.4
    */
