@@ -367,7 +367,8 @@ champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *tile_s
  * A URI format is a URI where x, y and zoom level information have been
  * marked for parsing and insertion.  There can be an unlimited number of
  * marked items in a URI format.  They are delimited by "#" before and after
- * the variable name. There are 3 defined variable names: X, Y, and Z.
+ * the variable name. There are 4 defined variable names: X, Y, Z, and TMSY for
+ * Y in TMS coordinates.
  *
  * For example, this is the OpenStreetMap URI format:
  * "http://tile.openstreetmap.org/\#Z\#/\#X\#/\#Y\#.png"
