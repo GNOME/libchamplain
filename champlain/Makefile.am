@@ -145,6 +145,7 @@ AM_CPPFLAGS = 				\
 	-DDATADIR=\""$(datadir)"\"	\
 	-I$(top_srcdir)			\
 	-DCHAMPLAIN_COMPILATION 	\
+	-DCLUTTER_DISABLE_DEPRECATION_WARNINGS 	\
 	$(WARN_CFLAGS)
 
 
