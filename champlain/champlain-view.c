@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
  * Copyright (C) 2010-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2012 Collabora Ltd. <http://www.collabora.co.uk/>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -115,6 +116,8 @@ static guint signals[LAST_SIGNAL] = { 0, };
    level < champlain_map_source_get_min_zoom_level (priv->map_source) || \
            level > champlain_map_source_get_max_zoom_level (priv->map_source))
 
+#define CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE 8
+
 /* Between state values for go_to */
 typedef struct
 {
@@ -141,6 +144,7 @@ struct _ChamplainViewPrivate
   ClutterActor *viewport;  /* Contains the map_layer, license and markers */
   ClutterActor *map_layer; /* Contains tiles actors (grouped by zoom level) */
   ClutterActor *user_layers; /* Contains the markers */
+  ClutterActor *background_layer; /* Contains back ground layer */
   ClutterActor *zoom_layer; 
   ClutterActor *license_actor; /* Contains the license info */
 
@@ -235,6 +239,12 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble longitude,
     guint duration);
 static gboolean fill_tile_cb (FillTileCallbackData *data);
+static void view_position_background_tile (ChamplainView *view,
+    ClutterActor *actor,
+    gint x,
+    gint y,
+    gint size);
+static ClutterActor *fill_background_tile (gint size);
 
 
 /* Updates the internals after the viewport changed */
@@ -1070,8 +1080,13 @@ champlain_view_init (ChamplainView *view)
   priv->zoom_layer = clutter_group_new ();
   clutter_actor_show (priv->zoom_layer);
 
+  priv->background_layer = clutter_group_new ();
+  clutter_actor_show (priv->background_layer);
+
   viewport_container = clutter_group_new ();
 
+  clutter_container_add_actor (CLUTTER_CONTAINER (viewport_container),
+      priv->background_layer);
   clutter_container_add_actor (CLUTTER_CONTAINER (viewport_container),
       priv->zoom_layer);
   clutter_container_add_actor (CLUTTER_CONTAINER (viewport_container),
@@ -1888,6 +1903,52 @@ champlain_view_get_viewport_origin (ChamplainView *view,
     *y = priv->viewport_y;
 }
 
+static ClutterActor *
+fill_background_tile (gint size)
+{
+  DEBUG_LOG ()
+
+  ClutterActor *actor = NULL;
+  cairo_t *cr;
+  cairo_pattern_t *pat;
+  gint no_of_squares = size / CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE;
+  gint row, column;
+
+  actor = clutter_cairo_texture_new (size, size);
+
+  /* Create the background tile */
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (actor));
+  pat = cairo_pattern_create_linear (size / 2.0, 0.0, size, size / 2.0);
+  cairo_pattern_add_color_stop_rgb (pat, 0, 0.662, 0.662, 0.662);
+  cairo_set_source (cr, pat);
+  cairo_rectangle (cr, 0, 0, size, size);
+  cairo_fill (cr);
+  cairo_pattern_destroy (pat);
+
+  /* Filling the tile */
+  cairo_set_source_rgb (cr, 0.411, 0.411, 0.411);
+  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+
+  for (row = 0; row < no_of_squares; ++row)
+    {
+      for (column = 0; column < no_of_squares; column++)
+        {
+          /* drawing square alternatively */
+          if ((row % 2 == 0 && column % 2 == 0) ||
+              (row % 2 != 0 && column % 2 != 0))
+            cairo_rectangle (cr,
+                column * CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE,
+                row * CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE,
+                CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE,
+                CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE);
+        }
+      cairo_fill (cr);
+    }
+  cairo_stroke (cr);
+  cairo_destroy (cr);
+
+  return actor;
+}
 
 static void
 view_load_visible_tiles (ChamplainView *view)
@@ -1897,7 +1958,8 @@ view_load_visible_tiles (ChamplainView *view)
   ChamplainViewPrivate *priv = view->priv;
   gint size;
   GList *children, *child;
-  gint x_count, y_count, x_first, y_first, x_end, y_end, max_x_end, max_y_end;
+  gint children_count;
+  gint tiles_count, x_count, y_count, x_first, y_first, x_end, y_end, max_x_end, max_y_end;
   gboolean *tile_map;
   gint arm_size, arm_max, turn;
   gint dirs[5] = { 0, 1, 0, -1, 0 };
@@ -1940,7 +2002,44 @@ view_load_visible_tiles (ChamplainView *view)
 
   DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_end, y_end);
 
-  tile_map = g_slice_alloc0 (sizeof (gboolean) * x_count * y_count);
+  tiles_count = x_count * y_count;
+  tile_map = g_slice_alloc0 (sizeof (gboolean) * tiles_count);
+
+  /* fill background tiles */
+  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->background_layer));
+  if (children == NULL)
+    children_count = 0;
+  else
+    children_count = g_list_length (children);
+  if (children_count < tiles_count)
+    {
+      /* add missing background tiles */
+      for (i = children_count; i < tiles_count; ++i)
+        clutter_container_add_actor (CLUTTER_CONTAINER (priv->background_layer),
+            CLUTTER_ACTOR (fill_background_tile (size)));
+    }
+  else if (children_count > tiles_count)
+    {
+      /* remove extra background tiles */
+      for (i = 0, child = children ; i < (children_count - tiles_count) || child != NULL;
+              ++i, child = g_list_next (child))
+        clutter_container_remove_actor (CLUTTER_CONTAINER (priv->background_layer),
+            CLUTTER_ACTOR (CLUTTER_ACTOR (child->data)));
+    }
+
+  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->background_layer));
+  if (children)
+    {
+      child = children;
+      for (x = x_first; x < x_end; ++x)
+        {
+          for (y = y_first; y < y_end; ++y)
+            {
+              view_position_background_tile (view, CLUTTER_ACTOR (child->data), x, y, size);
+              child = g_list_next (child);
+            }
+        }
+    }
 
   /* Get rid of old tiles first */
   children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
@@ -2064,6 +2163,19 @@ view_position_tile (ChamplainView *view,
       (y * size) - priv->anchor_y);
 }
 
+static void
+view_position_background_tile (ChamplainView *view,
+    ClutterActor *actor,
+    gint x,
+    gint y,
+    gint size)
+{
+  ChamplainViewPrivate *priv = view->priv;
+
+  clutter_actor_set_position (actor,
+      (x * size) - priv->anchor_x,
+      (y * size) - priv->anchor_y);
+}
 
 static void
 remove_all_tiles (ChamplainView *view)
