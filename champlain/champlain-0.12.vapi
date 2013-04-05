@@ -646,8 +646,6 @@ namespace Champlain {
 	public const string MAP_SOURCE_MEMPHIS_NETWORK;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_MFF_RELIEF")]
 	public const string MAP_SOURCE_MFF_RELIEF;
-	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OAM")]
-	public const string MAP_SOURCE_OAM;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP")]
 	public const string MAP_SOURCE_OSM_CYCLE_MAP;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK")]

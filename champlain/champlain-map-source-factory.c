@@ -231,23 +231,6 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         NULL);
   champlain_map_source_factory_register (factory, desc);
 
-#if 0
-/* Disabling until OpenArealMap works again */
-  desc = champlain_map_source_desc_new_full (
-        CHAMPLAIN_MAP_SOURCE_OAM,
-        "OpenAerialMap",
-        "(CC) BY 3.0 OpenAerialMap contributors",
-        "http://creativecommons.org/licenses/by/3.0/",
-        0,
-        17,
-        256,
-        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg",
-        champlain_map_source_new_generic,
-        NULL);
-  champlain_map_source_factory_register (factory, desc);
-#endif
-
   desc = champlain_map_source_desc_new_full (
         CHAMPLAIN_MAP_SOURCE_MFF_RELIEF,
         "Maps for Free Relief",
