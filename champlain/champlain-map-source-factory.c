@@ -190,6 +190,20 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
   champlain_map_source_factory_register (factory, desc);
 
   desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP,
+        "MapQuest Open Aerial",
+        "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
+        "http://creativecommons.org/licenses/by-sa/2.0/",
+        0,
+        18,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "http://otile1.mqcdn.com/tiles/1.0.0/sat/#Z#/#X#/#Y#.jpg",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
         CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
         "OpenStreetMap Cycle Map",
         "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",

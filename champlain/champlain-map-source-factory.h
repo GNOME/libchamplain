@@ -109,6 +109,12 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST "osm-mapquest"
 /**
+ * CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP:
+ *
+ * Mapquest Open Aerial
+ */
+#define CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP "osm-aerialmap"
+/**
  * CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP:
  *
  * OpenStreetMap Cycle Map
@@ -136,6 +142,7 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap I"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap II"
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST "Mapquest OSM"
+#define CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP "Open Aerial Map"
 #define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "OpenCycleMap"
 #define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "Public Transport"
 #define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
