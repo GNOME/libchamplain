@@ -50,7 +50,7 @@ pixbuf_new_from_message (SoupMessage *message,
   /*  Use a pixbuf loader that can load images of the same mime-type as the
       message.
    */
-  mime_type = soup_message_headers_get (message->response_headers,
+  mime_type = soup_message_headers_get_one (message->response_headers,
         "Content-Type");
   loader = gdk_pixbuf_loader_new_with_mime_type (mime_type, error);
   if (loader != NULL)

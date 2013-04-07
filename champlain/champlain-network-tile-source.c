@@ -623,7 +623,7 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
     }
 
   /* Verify if the server sent an etag and save it */
-  etag = soup_message_headers_get (msg->response_headers, "ETag");
+  etag = soup_message_headers_get_one (msg->response_headers, "ETag");
   DEBUG ("Received ETag %s", etag);
 
   renderer = champlain_map_source_get_renderer (map_source);
