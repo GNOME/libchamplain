@@ -354,7 +354,7 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
   /**
-   * ChamplainMapSourceDesc:projection
+   * ChamplainMapSourceDesc:projection:
    *
    * The map projection of the map source
    *

@@ -221,7 +221,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   map_source_class->fill_tile = fill_tile;
 
   /**
-   * ChamplainNetworkTileSource:uri-format
+   * ChamplainNetworkTileSource:uri-format:
    *
    * The uri format of the tile source, see #champlain_network_tile_source_set_uri_format
    *
@@ -235,7 +235,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   g_object_class_install_property (object_class, PROP_URI_FORMAT, pspec);
 
   /**
-   * ChamplainNetworkTileSource:offline
+   * ChamplainNetworkTileSource:offline:
    *
    * Specifies whether the network tile source can access network
    *
@@ -249,7 +249,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   g_object_class_install_property (object_class, PROP_OFFLINE, pspec);
 
   /**
-   * ChamplainNetworkTileSource:proxy-uri
+   * ChamplainNetworkTileSource:proxy-uri:
    *
    * The proxy uri used to access network
    *

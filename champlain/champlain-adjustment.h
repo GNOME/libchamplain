@@ -65,7 +65,7 @@ struct _ChamplainAdjustment
 };
 
 /**
- * ChamplainAdjustmentClass
+ * ChamplainAdjustmentClass:
  * @changed: Class handler for the ::changed signal.
  *
  * Base class for #ChamplainAdjustment.

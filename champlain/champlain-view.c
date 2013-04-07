@@ -960,7 +960,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
-   * ChamplainView:state
+   * ChamplainView:state:
    *
    * The view's global state. Useful to inform using if the view is busy loading
    * tiles or not.
