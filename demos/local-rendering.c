@@ -31,6 +31,12 @@
 #define COL_ID 0
 #define COL_NAME 1
 
+#if !GTK_CHECK_VERSION(3,4,0)
+  #define GTK_COLOR_CHOOSER(x) GTK_COLOR_BUTTON(x)
+  #define gtk_color_chooser_set_rgba(chooser, color) gtk_color_button_set_rgba (chooser, color);
+  #define gtk_color_chooser_get_rgba(chooser, color) gtk_color_button_get_rgba (chooser, color);
+#endif
+
 guint map_index = 0;
 guint rules_index = 0;
 static const char *maps[] = { "schaffhausen.osm", "las_palmas.osm" };
@@ -63,23 +69,24 @@ on_destroy (GtkWidget *widget, gpointer data)
 
 
 static void
-color_gdk_to_clutter (const GdkColor *gdk_color,
+color_gdk_to_clutter (const GdkRGBA *gdk_color,
     ClutterColor *clutter_color)
 {
-  clutter_color->red = CLAMP (((gdk_color->red / 65535.0) * 255), 0, 255);
-  clutter_color->green = CLAMP (((gdk_color->green / 65535.0) * 255), 0, 255);
-  clutter_color->blue = CLAMP (((gdk_color->blue / 65535.0) * 255), 0, 255);
-  clutter_color->alpha = 255;
+  clutter_color->red = CLAMP ((gdk_color->red * 255), 0, 255);
+  clutter_color->green = CLAMP ((gdk_color->green * 255), 0, 255);
+  clutter_color->blue = CLAMP ((gdk_color->blue * 255), 0, 255);
+  clutter_color->alpha = CLAMP ((gdk_color->alpha * 255), 0, 255);
 }
 
 
 static void
 color_clutter_to_gdk (const ClutterColor *clutter_color,
-    GdkColor *gdk_color)
+    GdkRGBA *gdk_color)
 {
-  gdk_color->red = ((guint16) clutter_color->red) << 8;
-  gdk_color->green = ((guint16) clutter_color->green) << 8;
-  gdk_color->blue = ((guint16) clutter_color->blue) << 8;
+  gdk_color->red = clutter_color->red / 255.0;
+  gdk_color->green = clutter_color->green / 255.0;
+  gdk_color->blue = clutter_color->blue / 255.0;
+  gdk_color->alpha = clutter_color->alpha / 255.0;
 }
 
 
@@ -141,7 +148,7 @@ load_rules_into_gui (ChamplainView *view)
   GList *ids, *ptr;
   GtkTreeModel *store;
   GtkTreeIter iter;
-  GdkColor gdk_color;
+  GdkRGBA gdk_color;
   ClutterColor *clutter_color;
   ChamplainMemphisRenderer *renderer;
 
@@ -153,7 +160,7 @@ load_rules_into_gui (ChamplainView *view)
   color_clutter_to_gdk (clutter_color, &gdk_color);
   clutter_color_free (clutter_color);
 
-  gtk_color_button_set_color (GTK_COLOR_BUTTON (bg_button), &gdk_color);
+  gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (bg_button), &gdk_color);
 
   store = gtk_tree_view_get_model (GTK_TREE_VIEW (rules_tree_view));
   gtk_list_store_clear (GTK_LIST_STORE (store));
@@ -184,43 +191,43 @@ static void
 rule_apply_cb (GtkWidget *widget, ChamplainMemphisRenderer *renderer)
 {
   ChamplainMemphisRule *rule = current_rule;
-  GdkColor color;
+  GdkRGBA color;
 
   if (rule->polygon)
     {
-      gtk_color_button_get_color (GTK_COLOR_BUTTON (polycolor), &color);
-      rule->polygon->color_red = color.red >> 8;
-      rule->polygon->color_green = color.green >> 8;
-      rule->polygon->color_blue = color.blue >> 8;
+      gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (polycolor), &color);
+      rule->polygon->color_red = color.red * 255;
+      rule->polygon->color_green = color.green * 255;
+      rule->polygon->color_blue = color.blue * 255;
       rule->polygon->z_min = gtk_spin_button_get_value (GTK_SPIN_BUTTON (polyminz));
       rule->polygon->z_max = gtk_spin_button_get_value (GTK_SPIN_BUTTON (polymaxz));
     }
   if (rule->line)
     {
-      gtk_color_button_get_color (GTK_COLOR_BUTTON (linecolor), &color);
-      rule->line->color_red = color.red >> 8;
-      rule->line->color_green = color.green >> 8;
-      rule->line->color_blue = color.blue >> 8;
+      gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (linecolor), &color);
+      rule->line->color_red = color.red * 255;
+      rule->line->color_green = color.green * 255;
+      rule->line->color_blue = color.blue * 255;
       rule->line->size = gtk_spin_button_get_value (GTK_SPIN_BUTTON (linesize));
       rule->line->z_min = gtk_spin_button_get_value (GTK_SPIN_BUTTON (lineminz));
       rule->line->z_max = gtk_spin_button_get_value (GTK_SPIN_BUTTON (linemaxz));
     }
   if (rule->border)
     {
-      gtk_color_button_get_color (GTK_COLOR_BUTTON (bordercolor), &color);
-      rule->border->color_red = color.red >> 8;
-      rule->border->color_green = color.green >> 8;
-      rule->border->color_blue = color.blue >> 8;
+      gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (bordercolor), &color);
+      rule->border->color_red = color.red * 255;
+      rule->border->color_green = color.green * 255;
+      rule->border->color_blue = color.blue * 255;
       rule->border->size = gtk_spin_button_get_value (GTK_SPIN_BUTTON (bordersize));
       rule->border->z_min = gtk_spin_button_get_value (GTK_SPIN_BUTTON (borderminz));
       rule->border->z_max = gtk_spin_button_get_value (GTK_SPIN_BUTTON (bordermaxz));
     }
   if (rule->text)
     {
-      gtk_color_button_get_color (GTK_COLOR_BUTTON (textcolor), &color);
-      rule->text->color_red = color.red >> 8;
-      rule->text->color_green = color.green >> 8;
-      rule->text->color_blue = color.blue >> 8;
+      gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (textcolor), &color);
+      rule->text->color_red = color.red * 255;
+      rule->text->color_green = color.green * 255;
+      rule->text->color_blue = color.blue * 255;
       rule->text->size = gtk_spin_button_get_value (GTK_SPIN_BUTTON (textsize));
       rule->text->z_min = gtk_spin_button_get_value (GTK_SPIN_BUTTON (textminz));
       rule->text->z_max = gtk_spin_button_get_value (GTK_SPIN_BUTTON (textmaxz));
@@ -235,14 +242,14 @@ GtkWidget *
 gtk_memphis_prop_new (gint type, ChamplainMemphisRuleAttr *attr)
 {
   GtkWidget *hbox, *cb, *sb1, *sb2, *sb3;
-  GdkColor gcolor;
+  GdkRGBA gcolor;
 
   hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 
-  gcolor.red = ((guint16) attr->color_red) << 8;
-  gcolor.green = ((guint16) attr->color_green) << 8;
-  gcolor.blue = ((guint16) attr->color_blue) << 8;
-  cb = gtk_color_button_new_with_color (&gcolor);
+  gcolor.red = attr->color_red / 255.0;
+  gcolor.green = attr->color_green / 255.0;
+  gcolor.blue = attr->color_blue / 255.0;
+  cb = gtk_color_button_new_with_rgba (&gcolor);
   gtk_box_pack_start (GTK_BOX (hbox), cb, FALSE, FALSE, 0);
 
   if (type != 0)
@@ -294,7 +301,7 @@ static void
 create_rule_edit_window (ChamplainMemphisRule *rule, gchar *id,
     ChamplainMemphisRenderer *renderer)
 {
-  GtkWidget *label, *table, *props, *button;
+  GtkWidget *label, *grid, *props, *button;
 
   current_rule = rule;
 
@@ -308,9 +315,9 @@ create_rule_edit_window (ChamplainMemphisRule *rule, gchar *id,
   g_signal_connect (G_OBJECT (rule_edit_window), "destroy",
       G_CALLBACK (rule_window_close_cb), NULL);
 
-  table = gtk_table_new (6, 2, FALSE);
-  gtk_table_set_col_spacings (GTK_TABLE (table), 8);
-  gtk_table_set_row_spacings (GTK_TABLE (table), 8);
+  grid = gtk_grid_new (); //6,2
+  gtk_grid_set_column_spacing (GTK_GRID (grid), 8);
+  gtk_grid_set_row_spacing (GTK_GRID (grid), 8);
   label = gtk_label_new (NULL);
 
   if (rule->type == CHAMPLAIN_MEMPHIS_RULE_TYPE_WAY)
@@ -322,35 +329,35 @@ create_rule_edit_window (ChamplainMemphisRule *rule, gchar *id,
   else
     gtk_label_set_markup (GTK_LABEL (label), "<b>Unknown type</b>");
 
-  gtk_table_attach_defaults (GTK_TABLE (table), label, 0, 2, 0, 1);
+  gtk_grid_attach (GTK_GRID (grid), label, 0, 0, 2, 1);
 
   if (rule->polygon != NULL)
     {
       label = gtk_label_new ("Polygon: ");
-      gtk_table_attach_defaults (GTK_TABLE (table), label, 0, 1, 1, 2);
+      gtk_grid_attach (GTK_GRID (grid), label, 0, 1, 1, 1);
       props = gtk_memphis_prop_new (0, rule->polygon);
-      gtk_table_attach_defaults (GTK_TABLE (table), props, 1, 2, 1, 2);
+      gtk_grid_attach (GTK_GRID (grid), props, 1, 1, 1, 1);
     }
   if (rule->line != NULL)
     {
       label = gtk_label_new ("Line: ");
-      gtk_table_attach_defaults (GTK_TABLE (table), label, 0, 1, 2, 3);
+      gtk_grid_attach (GTK_GRID (grid), label, 0, 2, 1, 1);
       props = gtk_memphis_prop_new (1, rule->line);
-      gtk_table_attach_defaults (GTK_TABLE (table), props, 1, 2, 2, 3);
+      gtk_grid_attach (GTK_GRID (grid), props, 1, 2, 1, 1);
     }
   if (rule->border != NULL)
     {
       label = gtk_label_new ("Border: ");
-      gtk_table_attach_defaults (GTK_TABLE (table), label, 0, 1, 3, 4);
+      gtk_grid_attach (GTK_GRID (grid), label, 0, 3, 1, 1);
       props = gtk_memphis_prop_new (2, rule->border);
-      gtk_table_attach_defaults (GTK_TABLE (table), props, 1, 2, 3, 4);
+      gtk_grid_attach (GTK_GRID (grid), props, 1, 3, 1, 1);
     }
   if (rule->text != NULL)
     {
       label = gtk_label_new ("Text: ");
-      gtk_table_attach_defaults (GTK_TABLE (table), label, 0, 1, 4, 5);
+      gtk_grid_attach (GTK_GRID (grid), label, 0, 4, 1, 1);
       props = gtk_memphis_prop_new (3, rule->text);
-      gtk_table_attach_defaults (GTK_TABLE (table), props, 1, 2, 4, 5);
+      gtk_grid_attach (GTK_GRID (grid), props, 1, 4, 1, 1);
     }
 
   GtkWidget *vbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
@@ -365,7 +372,7 @@ create_rule_edit_window (ChamplainMemphisRule *rule, gchar *id,
   gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
 
   GtkWidget *mainbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_pack_start (GTK_BOX (mainbox), table, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (mainbox), grid, FALSE, FALSE, 0);
   gtk_box_pack_start (GTK_BOX (mainbox), vbox, FALSE, FALSE, 0);
 
   gtk_container_add (GTK_CONTAINER (rule_edit_window), mainbox);
@@ -407,9 +414,9 @@ request_osm_data_cb (GtkWidget *widget, ChamplainView *view)
 void
 bg_color_set_cb (GtkColorButton *widget, ChamplainView *view)
 {
-  GdkColor gdk_color;
+  GdkRGBA gdk_color;
 
-  gtk_color_button_get_color (widget, &gdk_color);
+  gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (widget), &gdk_color);
 
   if (strncmp (champlain_map_source_get_id (tile_source), "memphis", 7) == 0)
     {
