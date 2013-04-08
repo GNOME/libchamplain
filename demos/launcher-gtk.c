@@ -27,6 +27,7 @@
 #define N_COLS 2
 #define COL_ID 0
 #define COL_NAME 1
+#define TILE_SQUARE_SIZE 8
 
 static ChamplainPathLayer *path_layer;
 static ChamplainPathLayer *path;
@@ -212,6 +213,52 @@ append_point (ChamplainPathLayer *layer, gdouble lon, gdouble lat)
 }
 
 
+static ClutterTexture *
+fill_background_tile (gint size)
+{
+  ClutterActor *actor = NULL;
+  cairo_t *cr;
+  cairo_pattern_t *pat;
+  gint no_of_squares = size / TILE_SQUARE_SIZE;
+  gint row, column;
+
+  actor = clutter_cairo_texture_new (size, size);
+
+  /* Create the background tile */
+  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (actor));
+  pat = cairo_pattern_create_linear (size / 2.0, 0.0, size, size / 2.0);
+  cairo_pattern_add_color_stop_rgb (pat, 0, 0.662, 0.662, 0.662);
+  cairo_set_source (cr, pat);
+  cairo_rectangle (cr, 0, 0, size, size);
+  cairo_fill (cr);
+  cairo_pattern_destroy (pat);
+
+  /* Filling the tile */
+  cairo_set_source_rgb (cr, 0.411, 0.411, 0.411);
+  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+
+  for (row = 0; row < no_of_squares; ++row)
+    {
+      for (column = 0; column < no_of_squares; column++)
+        {
+          /* drawing square alternatively */
+          if ((row % 2 == 0 && column % 2 == 0) ||
+              (row % 2 != 0 && column % 2 != 0))
+            cairo_rectangle (cr,
+                column * TILE_SQUARE_SIZE,
+                row * TILE_SQUARE_SIZE,
+                TILE_SQUARE_SIZE,
+                TILE_SQUARE_SIZE);
+        }
+      cairo_fill (cr);
+    }
+  cairo_stroke (cr);
+  cairo_destroy (cr);
+
+  return CLUTTER_TEXTURE(actor);
+}
+
+
 int
 main (int argc,
     char *argv[])
@@ -222,6 +269,8 @@ main (int argc,
   ChamplainMarkerLayer *layer;
   ClutterActor *scale;
   ChamplainLicense *license_actor;
+  gint size;
+  ChamplainMapSource *map_source;
 
   if (gtk_clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;
@@ -271,6 +320,8 @@ main (int argc,
   layer = create_marker_layer (view, &path);
   champlain_view_add_layer (view, CHAMPLAIN_LAYER (path));
   champlain_view_add_layer (view, CHAMPLAIN_LAYER (layer));
+  
+  champlain_view_set_background_tile (view, fill_background_tile (256));
 
   path_layer = champlain_path_layer_new ();
   /* Cheap approx of Highway 10 */

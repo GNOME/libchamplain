@@ -117,11 +117,14 @@ void champlain_view_set_zoom_on_double_click (ChamplainView *view,
     gboolean value);
 void champlain_view_set_animate_zoom (ChamplainView *view,
     gboolean value);
+void champlain_view_set_background_tile (ChamplainView *view,
+    ClutterTexture *background);
 
 void champlain_view_add_layer (ChamplainView *view,
     ChamplainLayer *layer);
 void champlain_view_remove_layer (ChamplainView *view,
     ChamplainLayer *layer);
+
 
 guint champlain_view_get_zoom_level (ChamplainView *view);
 guint champlain_view_get_min_zoom_level (ChamplainView *view);
@@ -133,6 +136,7 @@ gboolean champlain_view_get_keep_center_on_resize (ChamplainView *view);
 gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
 gboolean champlain_view_get_animate_zoom (ChamplainView *view);
 ChamplainState champlain_view_get_state (ChamplainView *view);
+ClutterTexture *champlain_view_get_background_tile (ChamplainView *view);
 
 void champlain_view_reload_tiles (ChamplainView *view);
 

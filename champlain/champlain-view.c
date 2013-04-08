@@ -102,6 +102,7 @@ enum
   PROP_ZOOM_ON_DOUBLE_CLICK,
   PROP_ANIMATE_ZOOM,
   PROP_STATE,
+  PROP_BACKGROUND_TILE,
 };
 
 #define PADDING 10
@@ -115,8 +116,6 @@ static guint signals[LAST_SIGNAL] = { 0, };
            level > priv->max_zoom_level || \
    level < champlain_map_source_get_min_zoom_level (priv->map_source) || \
            level > champlain_map_source_get_max_zoom_level (priv->map_source))
-
-#define CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE 8
 
 /* Between state values for go_to */
 typedef struct
@@ -147,6 +146,8 @@ struct _ChamplainViewPrivate
   ClutterActor *background_layer; /* Contains back ground layer */
   ClutterActor *zoom_layer; 
   ClutterActor *license_actor; /* Contains the license info */
+
+  ClutterTexture *background_tile_actor; 
 
   ClutterLayoutManager *layout_manager;
 
@@ -239,12 +240,6 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble longitude,
     guint duration);
 static gboolean fill_tile_cb (FillTileCallbackData *data);
-static void view_position_background_tile (ChamplainView *view,
-    ClutterActor *actor,
-    gint x,
-    gint y,
-    gint size);
-static ClutterActor *fill_background_tile (gint size);
 
 
 /* Updates the internals after the viewport changed */
@@ -459,6 +454,10 @@ champlain_view_get_property (GObject *object,
       g_value_set_enum (value, priv->state);
       break;
 
+    case PROP_BACKGROUND_TILE:
+      g_value_set_object (value, priv->background_tile_actor);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -524,6 +523,10 @@ champlain_view_set_property (GObject *object,
       champlain_view_set_animate_zoom (view, g_value_get_boolean (value));
       break;
       
+    case PROP_BACKGROUND_TILE:
+      champlain_view_set_background_tile (view, g_value_get_object (value));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -569,6 +572,12 @@ champlain_view_dispose (GObject *object)
     {
       clutter_actor_unparent (CLUTTER_ACTOR (priv->view_box));
       priv->view_box = NULL;
+    }
+    
+  if (priv->background_tile_actor)
+    {
+      clutter_actor_destroy (CLUTTER_ACTOR (priv->background_tile_actor));
+      priv->background_tile_actor = NULL;
     }
 
   priv->map_layer = NULL;
@@ -987,6 +996,21 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
           G_PARAM_READABLE));
 
   /**
+   * ChamplainView:background-tile:
+   *
+   * The pattern displayed in the background of the map.
+   *
+   * Since: 0.12.4
+   */
+  g_object_class_install_property (object_class,
+      PROP_BACKGROUND_TILE,
+      g_param_spec_object ("background-tile",
+          "Background tile",
+          "The tile's background pattern",
+          CLUTTER_TYPE_ACTOR,
+          G_PARAM_READWRITE));
+
+  /**
    * ChamplainView::animation-completed:
    *
    * The #ChamplainView::animation-completed signal is emitted when any animation in the view
@@ -1068,6 +1092,7 @@ champlain_view_init (ChamplainView *view)
   priv->tiles_loading = 0;
   priv->update_viewport_timer = g_timer_new ();
   priv->zoom_animation = NULL;
+  priv->background_tile_actor = NULL;
 
   /* Setup map layer */
   priv->map_layer = champlain_group_new ();
@@ -1903,52 +1928,70 @@ champlain_view_get_viewport_origin (ChamplainView *view,
     *y = priv->viewport_y;
 }
 
-static ClutterActor *
-fill_background_tile (gint size)
+
+static void
+fill_background_tiles (ChamplainView *view)
 {
   DEBUG_LOG ()
 
-  ClutterActor *actor = NULL;
-  cairo_t *cr;
-  cairo_pattern_t *pat;
-  gint no_of_squares = size / CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE;
-  gint row, column;
+  ChamplainViewPrivate *priv = view->priv;
+  GList *children, *child;
+  gint children_count;
+  gint tiles_count, x_count, y_count, x_first, y_first;
+  gdouble x_coord, y_coord;
+  gint i, x, y, size;
 
-  actor = clutter_cairo_texture_new (size, size);
+  size = clutter_actor_get_width (CLUTTER_ACTOR (priv->background_tile_actor));
+  
+  x_coord = priv->viewport_x + priv->anchor_x;
+  y_coord = priv->viewport_y + priv->anchor_y;
 
-  /* Create the background tile */
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (actor));
-  pat = cairo_pattern_create_linear (size / 2.0, 0.0, size, size / 2.0);
-  cairo_pattern_add_color_stop_rgb (pat, 0, 0.662, 0.662, 0.662);
-  cairo_set_source (cr, pat);
-  cairo_rectangle (cr, 0, 0, size, size);
-  cairo_fill (cr);
-  cairo_pattern_destroy (pat);
+  x_count = ceil ((float) priv->viewport_width / size) + 2;
+  y_count = ceil ((float) priv->viewport_height / size) + 2;
+  tiles_count = x_count * y_count;
 
-  /* Filling the tile */
-  cairo_set_source_rgb (cr, 0.411, 0.411, 0.411);
-  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+  x_first = x_coord / size - 1;
+  y_first = y_coord / size - 1;
 
-  for (row = 0; row < no_of_squares; ++row)
+  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->background_layer));
+  children_count = g_list_length (children);
+  if (children_count < tiles_count)
     {
-      for (column = 0; column < no_of_squares; column++)
+      /* add missing background tiles */
+      for (i = children_count; i < tiles_count; ++i)
         {
-          /* drawing square alternatively */
-          if ((row % 2 == 0 && column % 2 == 0) ||
-              (row % 2 != 0 && column % 2 != 0))
-            cairo_rectangle (cr,
-                column * CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE,
-                row * CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE,
-                CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE,
-                CHAMPLAIN_BACKGROUND_TILE_SQUARE_SIZE);
-        }
-      cairo_fill (cr);
-    }
-  cairo_stroke (cr);
-  cairo_destroy (cr);
+          ClutterActor *clone = clutter_texture_new ();
+          CoglHandle handle = clutter_texture_get_cogl_texture (priv->background_tile_actor);
+          clutter_texture_set_cogl_texture (CLUTTER_TEXTURE (clone), handle);
 
-  return actor;
+          clutter_container_add_actor (CLUTTER_CONTAINER (priv->background_layer), clone);
+        }
+    }
+  else if (children_count > tiles_count)
+    {
+      /* remove extra background tiles */
+      for (i = tiles_count; i < children_count; ++i)
+        {
+          child = clutter_container_get_children (CLUTTER_CONTAINER (priv->background_layer));
+          clutter_container_remove_actor (CLUTTER_CONTAINER (priv->background_layer),
+              CLUTTER_ACTOR (child->data));
+        }
+    }
+
+  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->background_layer));
+  child = children;
+  for (x = x_first; x < x_first + x_count; ++x)
+    {
+      for (y = y_first; y < y_first + y_count; ++y)
+        {
+          clutter_actor_set_position (CLUTTER_ACTOR (child->data),
+              (x * size) - priv->anchor_x,
+              (y * size) - priv->anchor_y);
+          child = g_list_next (child);
+        }
+    }
 }
+
 
 static void
 view_load_visible_tiles (ChamplainView *view)
@@ -1958,8 +2001,7 @@ view_load_visible_tiles (ChamplainView *view)
   ChamplainViewPrivate *priv = view->priv;
   gint size;
   GList *children, *child;
-  gint children_count;
-  gint tiles_count, x_count, y_count, x_first, y_first, x_end, y_end, max_x_end, max_y_end;
+  gint x_count, y_count, x_first, y_first, x_end, y_end, max_x_end, max_y_end;
   gboolean *tile_map;
   gint arm_size, arm_max, turn;
   gint dirs[5] = { 0, 1, 0, -1, 0 };
@@ -2002,43 +2044,12 @@ view_load_visible_tiles (ChamplainView *view)
 
   DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_end, y_end);
 
-  tiles_count = x_count * y_count;
-  tile_map = g_slice_alloc0 (sizeof (gboolean) * tiles_count);
+  tile_map = g_slice_alloc0 (sizeof (gboolean) * x_count * y_count);
 
   /* fill background tiles */
-  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->background_layer));
-  if (children == NULL)
-    children_count = 0;
-  else
-    children_count = g_list_length (children);
-  if (children_count < tiles_count)
+  if (priv->background_tile_actor != NULL)
     {
-      /* add missing background tiles */
-      for (i = children_count; i < tiles_count; ++i)
-        clutter_container_add_actor (CLUTTER_CONTAINER (priv->background_layer),
-            CLUTTER_ACTOR (fill_background_tile (size)));
-    }
-  else if (children_count > tiles_count)
-    {
-      /* remove extra background tiles */
-      for (i = 0, child = children ; i < (children_count - tiles_count) || child != NULL;
-              ++i, child = g_list_next (child))
-        clutter_container_remove_actor (CLUTTER_CONTAINER (priv->background_layer),
-            CLUTTER_ACTOR (CLUTTER_ACTOR (child->data)));
-    }
-
-  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->background_layer));
-  if (children)
-    {
-      child = children;
-      for (x = x_first; x < x_end; ++x)
-        {
-          for (y = y_first; y < y_end; ++y)
-            {
-              view_position_background_tile (view, CLUTTER_ACTOR (child->data), x, y, size);
-              child = g_list_next (child);
-            }
-        }
+      fill_background_tiles (view);
     }
 
   /* Get rid of old tiles first */
@@ -2163,19 +2174,6 @@ view_position_tile (ChamplainView *view,
       (y * size) - priv->anchor_y);
 }
 
-static void
-view_position_background_tile (ChamplainView *view,
-    ClutterActor *actor,
-    gint x,
-    gint y,
-    gint size)
-{
-  ChamplainViewPrivate *priv = view->priv;
-
-  clutter_actor_set_position (actor,
-      (x * size) - priv->anchor_x,
-      (y * size) - priv->anchor_y);
-}
 
 static void
 remove_all_tiles (ChamplainView *view)
@@ -2513,6 +2511,55 @@ champlain_view_ensure_layers_visible (ChamplainView *view,
 }
 
 
+/**
+ * champlain_view_set_background_tile:
+ * @view: a #ChamplainView
+ * @background: The background texture
+ *
+ * Sets the background texture displayed behind the map.
+ *
+ * Since: 0.12.4
+ */
+void 
+champlain_view_set_background_tile (ChamplainView *view,
+    ClutterTexture *background)
+{
+  DEBUG_LOG ()
+
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = view->priv;
+  
+  if (priv->background_tile_actor)
+    clutter_actor_destroy (CLUTTER_ACTOR (priv->background_tile_actor));
+
+  priv->background_tile_actor = g_object_ref_sink (background);
+}
+
+
+/**
+ * champlain_view_get_background_tile:
+ * @view: a #ChamplainView
+ *
+ * Gets the current background texture displayed behind the map.
+ *
+ * Returns: (transfer none): The texture.
+ * 
+ * Since: 0.12.4
+ */
+ClutterTexture *
+champlain_view_get_background_tile (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  return priv->background_tile_actor;
+}
+
+
 static void
 position_zoom_actor (ChamplainView *view)
 {
@@ -2633,7 +2680,7 @@ show_zoom_actor (ChamplainView *view,
 
   if (priv->animate_zoom)
     {
-      clutter_actor_set_opacity (priv->kinetic_scroll, 0);
+      clutter_actor_set_opacity (priv->map_layer, 0);
       
       clutter_group_remove_all (CLUTTER_GROUP (priv->zoom_layer));
 
@@ -2644,7 +2691,7 @@ show_zoom_actor (ChamplainView *view,
                 "scale-y", deltazoom,
                 NULL);
 
-      clutter_actor_animate (CLUTTER_ACTOR (priv->kinetic_scroll),
+      clutter_actor_animate (CLUTTER_ACTOR (priv->map_layer),
                 CLUTTER_EASE_IN_EXPO,
                 350,
                 "opacity", 255,
