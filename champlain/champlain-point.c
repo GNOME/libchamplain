@@ -152,37 +152,6 @@ pick (ClutterActor *self,
   cogl_path_fill ();
 }
 
-
-static void
-get_preferred_width (ClutterActor *self,
-    gfloat for_height,
-    gfloat *min_width_p,
-    gfloat *natural_width_p)
-{
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_get_preferred_width (priv->point_actor,
-      for_height,
-      min_width_p,
-      natural_width_p);
-}
-
-
-static void
-get_preferred_height (ClutterActor *self,
-    gfloat for_width,
-    gfloat *min_height_p,
-    gfloat *natural_height_p)
-{
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_get_preferred_height (priv->point_actor,
-      for_width,
-      min_height_p,
-      natural_height_p);
-}
-
-
 static void
 allocate (ClutterActor *self,
     const ClutterActorBox *box,
@@ -200,28 +169,6 @@ allocate (ClutterActor *self,
   child_box.y2 = box->y2 - box->y1;
 
   clutter_actor_allocate (priv->point_actor, &child_box, flags);
-}
-
-
-static void
-map (ClutterActor *self)
-{
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_point_parent_class)->map (self);
-
-  clutter_actor_map (priv->point_actor);
-}
-
-
-static void
-unmap (ClutterActor *self)
-{
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_point_parent_class)->unmap (self);
-
-  clutter_actor_unmap (priv->point_actor);
 }
 
 
@@ -269,13 +216,9 @@ champlain_point_class_init (ChamplainPointClass *klass)
   object_class->get_property = champlain_point_get_property;
   object_class->set_property = champlain_point_set_property;
 
-  actor_class->get_preferred_width = get_preferred_width;
-  actor_class->get_preferred_height = get_preferred_height;
   actor_class->allocate = allocate;
   actor_class->paint = paint;
   actor_class->pick = pick;
-  actor_class->map = map;
-  actor_class->unmap = unmap;
 
   g_object_class_install_property (object_class, PROP_COLOR,
       clutter_param_spec_color ("color", 
