@@ -64,9 +64,10 @@ struct _ChamplainKineticScrollViewClass
 
 GType champlain_kinetic_scroll_view_get_type (void) G_GNUC_CONST;
 
-ClutterActor *champlain_kinetic_scroll_view_new (gboolean kinetic);
+ClutterActor *champlain_kinetic_scroll_view_new (gboolean kinetic,
+    ClutterActor *viewport);
 
-void champlain_kinetic_scroll_view_stop (ChamplainKineticScrollView *scroll);
+void champlain_kinetic_scroll_view_stop (ChamplainKineticScrollView *self);
 
 G_END_DECLS
 

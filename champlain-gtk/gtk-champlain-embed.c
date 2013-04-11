@@ -205,12 +205,12 @@ set_view (GtkChamplainEmbed *embed,
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
 
   if (priv->view != NULL)
-    clutter_container_remove_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
+    clutter_actor_remove_child (stage, CLUTTER_ACTOR (priv->view));
 
   priv->view = view;
   clutter_actor_set_size (CLUTTER_ACTOR (priv->view), priv->width, priv->height);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), CLUTTER_ACTOR (priv->view));
+  clutter_actor_add_child (stage, CLUTTER_ACTOR (priv->view));
 }
 
 
@@ -251,7 +251,7 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 
   /* Setup stage */
   stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
-  clutter_stage_set_color (CLUTTER_STAGE (stage), &stage_color);
+  clutter_actor_set_background_color (stage, &stage_color);
 
   gtk_container_add (GTK_CONTAINER (embed), priv->clutter_embed);
 }

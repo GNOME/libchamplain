@@ -53,7 +53,6 @@ struct _ChamplainAdjustmentPrivate
 
   /* For elasticity */
   gboolean elastic;
-  ClutterAlpha *bounce_alpha;
 };
 
 enum
@@ -190,12 +189,6 @@ stop_interpolation (ChamplainAdjustment *adjustment)
       clutter_timeline_stop (priv->interpolation);
       g_object_unref (priv->interpolation);
       priv->interpolation = NULL;
-
-      if (priv->bounce_alpha)
-        {
-          g_object_unref (priv->bounce_alpha);
-          priv->bounce_alpha = NULL;
-        }
     }
 }
 
@@ -532,9 +525,9 @@ interpolation_new_frame_cb (ClutterTimeline *timeline,
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
   priv->interpolation = NULL;
-  if (priv->elastic && priv->bounce_alpha)
+  if (priv->elastic)
     {
-      gdouble progress = clutter_alpha_get_alpha (priv->bounce_alpha) / 1;
+      gdouble progress = clutter_timeline_get_progress (timeline);
       gdouble dx = priv->old_position +
         (priv->new_position - priv->old_position) *
         progress;
@@ -605,8 +598,7 @@ champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
   priv->interpolation = clutter_timeline_new (((float) n_frames / fps) * 1000);
 
   if (priv->elastic)
-    priv->bounce_alpha = clutter_alpha_new_full (priv->interpolation,
-          CLUTTER_EASE_OUT_SINE);
+    clutter_timeline_set_progress_mode (priv->interpolation, CLUTTER_EASE_OUT_SINE);
 
   g_signal_connect (priv->interpolation,
       "new-frame",

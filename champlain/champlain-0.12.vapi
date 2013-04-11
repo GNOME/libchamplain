@@ -106,7 +106,7 @@ namespace Champlain {
 		public signal void panning_completed ();
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_label_get_type ()")]
-	public class Label : Champlain.Marker, Atk.Implementor, Champlain.Location, Clutter.Animatable, Clutter.Scriptable {
+	public class Label : Champlain.Marker, Atk.Implementor, Champlain.Location, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
 		public Label ();
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
@@ -157,14 +157,14 @@ namespace Champlain {
 		public Pango.WrapMode wrap_mode { get; set; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_layer_get_type ()")]
-	public abstract class Layer : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Scriptable {
+	public abstract class Layer : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false)]
 		protected Layer ();
 		public virtual Champlain.BoundingBox get_bounding_box ();
 		public virtual void set_view (Champlain.View view);
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_license_get_type ()")]
-	public class License : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Scriptable {
+	public class License : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
 		public License ();
 		public void connect_view (Champlain.View view);
@@ -248,7 +248,7 @@ namespace Champlain {
 		public bool register (Champlain.MapSourceDesc desc);
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_marker_get_type ()")]
-	public abstract class Marker : Clutter.Actor, Atk.Implementor, Champlain.Location, Clutter.Animatable, Clutter.Scriptable {
+	public abstract class Marker : Clutter.Actor, Atk.Implementor, Champlain.Location, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false)]
 		protected Marker ();
 		public void animate_in ();
@@ -268,13 +268,13 @@ namespace Champlain {
 		public bool draggable { get; set; }
 		public bool selectable { get; set; }
 		public bool selected { get; set; }
-		public signal void button_press (Clutter.Event since);
-		public signal void button_release (Clutter.Event since);
-		public signal void drag_finish (Clutter.Event since);
-		public signal void drag_motion (double dy, double event, Clutter.Event since);
+		public signal void button_press (Clutter.Event object);
+		public signal void button_release (Clutter.Event object);
+		public signal void drag_finish (Clutter.Event object);
+		public signal void drag_motion (double object, double p0, Clutter.Event p1);
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_marker_layer_get_type ()")]
-	public class MarkerLayer : Champlain.Layer, Atk.Implementor, Clutter.Animatable, Clutter.Scriptable {
+	public class MarkerLayer : Champlain.Layer, Atk.Implementor, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false)]
 		public MarkerLayer ();
 		public void add_marker (Champlain.Marker marker);
@@ -362,7 +362,7 @@ namespace Champlain {
 		public NullTileSource.full (Champlain.Renderer renderer);
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_path_layer_get_type ()")]
-	public class PathLayer : Champlain.Layer, Atk.Implementor, Clutter.Animatable, Clutter.Scriptable {
+	public class PathLayer : Champlain.Layer, Atk.Implementor, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false)]
 		public PathLayer ();
 		public void add_node (Champlain.Location location);
@@ -395,7 +395,7 @@ namespace Champlain {
 		public bool visible { get; set; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_point_get_type ()")]
-	public class Point : Champlain.Marker, Atk.Implementor, Champlain.Location, Clutter.Animatable, Clutter.Scriptable {
+	public class Point : Champlain.Marker, Atk.Implementor, Champlain.Location, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
 		public Point ();
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
@@ -415,7 +415,7 @@ namespace Champlain {
 		public virtual void set_data (string data, uint size);
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_scale_get_type ()")]
-	public class Scale : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Scriptable {
+	public class Scale : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
 		public Scale ();
 		public void connect_view (Champlain.View view);
@@ -427,7 +427,7 @@ namespace Champlain {
 		public uint max_width { get; set; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_tile_get_type ()")]
-	public class Tile : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Scriptable {
+	public class Tile : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false)]
 		public Tile ();
 		public void display_content ();
@@ -499,7 +499,7 @@ namespace Champlain {
 		public uint tile_size { get; set construct; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_view_get_type ()")]
-	public class View : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Scriptable {
+	public class View : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
 		public View ();
 		public void add_layer (Champlain.Layer layer);
@@ -508,6 +508,7 @@ namespace Champlain {
 		public void ensure_layers_visible (bool animate);
 		public void ensure_visible (Champlain.BoundingBox bbox, bool animate);
 		public bool get_animate_zoom ();
+		public unowned Clutter.Texture get_background_tile ();
 		public double get_center_latitude ();
 		public double get_center_longitude ();
 		public double get_deceleration ();
@@ -527,6 +528,7 @@ namespace Champlain {
 		public void reload_tiles ();
 		public void remove_layer (Champlain.Layer layer);
 		public void set_animate_zoom (bool value);
+		public void set_background_tile (Clutter.Texture background);
 		public void set_deceleration (double rate);
 		public void set_keep_center_on_resize (bool value);
 		public void set_kinetic_mode (bool kinetic);
@@ -541,6 +543,7 @@ namespace Champlain {
 		public void zoom_in ();
 		public void zoom_out ();
 		public bool animate_zoom { get; set; }
+		public Clutter.Actor background_tile { get; set; }
 		public double deceleration { get; set; }
 		public bool keep_center_on_resize { get; set; }
 		public bool kinetic_mode { get; set; }
@@ -557,7 +560,7 @@ namespace Champlain {
 		public signal void layer_relocated ();
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_viewport_get_type ()")]
-	public class Viewport : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Scriptable {
+	public class Viewport : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
 		public Viewport ();
 		public void get_adjustments (Champlain.Adjustment hadjustment, Champlain.Adjustment vadjustment);
@@ -646,6 +649,8 @@ namespace Champlain {
 	public const string MAP_SOURCE_MEMPHIS_NETWORK;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_MFF_RELIEF")]
 	public const string MAP_SOURCE_MFF_RELIEF;
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP")]
+	public const string MAP_SOURCE_OSM_AERIAL_MAP;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP")]
 	public const string MAP_SOURCE_OSM_CYCLE_MAP;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK")]
@@ -656,8 +661,6 @@ namespace Champlain {
 	public const string MAP_SOURCE_OSM_OSMARENDER;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP")]
 	public const string MAP_SOURCE_OSM_TRANSPORT_MAP;
-	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP")]
-	public const string MAP_SOURCE_OSM_AERIAL_MAP;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAX_LATITUDE")]
 	public const double MAX_LATITUDE;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAX_LONGITUDE")]

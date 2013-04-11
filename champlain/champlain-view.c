@@ -62,7 +62,6 @@
 #include "champlain-private.h"
 #include "champlain-tile.h"
 #include "champlain-license.h"
-#include "champlain-group.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
@@ -121,7 +120,6 @@ static guint signals[LAST_SIGNAL] = { 0, };
 typedef struct
 {
   ChamplainView *view;
-  ClutterAlpha *alpha;
   ClutterTimeline *timeline;
   gdouble to_latitude;
   gdouble to_longitude;
@@ -138,7 +136,6 @@ typedef struct
 
 struct _ChamplainViewPrivate
 {
-  ClutterActor *view_box;
   ClutterActor *kinetic_scroll; /* Contains the viewport */
   ClutterActor *viewport;  /* Contains the map_layer, license and markers */
   ClutterActor *map_layer; /* Contains tiles actors (grouped by zoom level) */
@@ -148,8 +145,6 @@ struct _ChamplainViewPrivate
   ClutterActor *license_actor; /* Contains the license info */
 
   ClutterTexture *background_tile_actor; 
-
-  ClutterLayoutManager *layout_manager;
 
   ChamplainMapSource *map_source; /* Current map tile source */
   gboolean kinetic_mode;
@@ -188,7 +183,7 @@ struct _ChamplainViewPrivate
   gint tiles_loading;
   
   ClutterActor *zoom_overlay_actor;
-  ClutterAnimation *zoom_animation;
+  gboolean animating_zoom;
   guint anim_start_zoom_level;
   gdouble zoom_actor_longitude;
   gdouble zoom_actor_latitude;
@@ -568,12 +563,6 @@ champlain_view_dispose (GObject *object)
       priv->map_source = NULL;
     }
 
-  if (priv->view_box != NULL)
-    {
-      clutter_actor_unparent (CLUTTER_ACTOR (priv->view_box));
-      priv->view_box = NULL;
-    }
-    
   if (priv->background_tile_actor)
     {
       clutter_actor_destroy (CLUTTER_ACTOR (priv->background_tile_actor));
@@ -584,7 +573,6 @@ champlain_view_dispose (GObject *object)
   priv->license_actor = NULL;
   priv->user_layers = NULL;
   priv->zoom_layer = NULL;
-  priv->layout_manager = NULL;
 
   G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
 }
@@ -623,44 +611,6 @@ _update_idle_cb (ChamplainView *view)
     view_load_visible_tiles (view);
 
   return FALSE;
-}
-
-
-static void
-champlain_view_allocate (ClutterActor *actor,
-    const ClutterActorBox *box,
-    ClutterAllocationFlags flags)
-{
-  DEBUG_LOG ()
-
-  ChamplainView *view = CHAMPLAIN_VIEW (actor);
-  ChamplainViewPrivate *priv = view->priv;
-  ClutterActorBox child_box;
-  gint width, height;
-
-  /* Chain up */
-  CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->allocate (actor, box, flags);
-
-  width = box->x2 - box->x1;
-  height = box->y2 - box->y1;
-
-  if (priv->viewport_width != width || priv->viewport_height != height)
-    {
-      g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
-          (GSourceFunc) _update_idle_cb,
-          g_object_ref (view),
-          (GDestroyNotify) g_object_unref);
-    }
-
-  child_box.x1 = 0;
-  child_box.x2 = width;
-  child_box.y1 = 0;
-  child_box.y2 = height;
-
-  priv->viewport_width = width;
-  priv->viewport_height = height;
-
-  clutter_actor_allocate (CLUTTER_ACTOR (priv->view_box), &child_box, flags);
 }
 
 
@@ -736,49 +686,6 @@ champlain_view_get_preferred_height (ClutterActor *actor,
 
 
 static void
-paint (ClutterActor *self)
-{
-  ChamplainViewPrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_paint (CLUTTER_ACTOR (priv->view_box));
-}
-
-
-static void
-pick (ClutterActor *self,
-    const ClutterColor *color)
-{
-  ChamplainViewPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->pick (self, color);
-
-  clutter_actor_paint (CLUTTER_ACTOR (priv->view_box));
-}
-
-
-static void
-map (ClutterActor *self)
-{
-  ChamplainViewPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->map (self);
-
-  clutter_actor_map (CLUTTER_ACTOR (priv->view_box));
-}
-
-
-static void
-unmap (ClutterActor *self)
-{
-  ChamplainViewPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->unmap (self);
-
-  clutter_actor_unmap (CLUTTER_ACTOR (priv->view_box));
-}
-
-
-static void
 champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 {
   DEBUG_LOG ()
@@ -792,14 +699,9 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   object_class->set_property = champlain_view_set_property;
 
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (champlainViewClass);
-  actor_class->allocate = champlain_view_allocate;
   actor_class->get_preferred_width = champlain_view_get_preferred_width;
   actor_class->get_preferred_height = champlain_view_get_preferred_height;
   actor_class->realize = champlain_view_realize;
-  actor_class->paint = paint;
-  actor_class->pick = pick;
-  actor_class->map = map;
-  actor_class->unmap = unmap;
 
   /**
    * ChamplainView:longitude:
@@ -1051,6 +953,29 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
 
 static void
+view_size_changed_cb (ChamplainView *view,
+    G_GNUC_UNUSED GParamSpec *pspec)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  gint width, height;
+  
+  width = clutter_actor_get_width (CLUTTER_ACTOR (view));
+  height = clutter_actor_get_height (CLUTTER_ACTOR (view));
+  
+  if (priv->viewport_width != width || priv->viewport_height != height)
+    {
+      g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
+          (GSourceFunc) _update_idle_cb,
+          g_object_ref (view),
+          (GDestroyNotify) g_object_unref);
+    }
+    
+  priv->viewport_width = width;
+  priv->viewport_height = height;
+}
+
+
+static void
 champlain_view_init (ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -1059,6 +984,7 @@ champlain_view_init (ChamplainView *view)
   ChamplainMapSourceFactory *factory;
   ChamplainMapSource *source;
   ClutterActor *viewport_container;
+  ClutterLayoutManager *layout;
 
   champlain_debug_set_flags (g_getenv ("CHAMPLAIN_DEBUG"));
 
@@ -1076,7 +1002,6 @@ champlain_view_init (ChamplainView *view)
   priv->zoom_on_double_click = TRUE;
   priv->animate_zoom = TRUE;
   priv->license_actor = NULL;
-  priv->view_box = NULL;
   priv->kinetic_mode = FALSE;
   priv->viewport_x = 0;
   priv->viewport_y = 0;
@@ -1091,33 +1016,36 @@ champlain_view_init (ChamplainView *view)
   priv->goto_context = NULL;
   priv->tiles_loading = 0;
   priv->update_viewport_timer = g_timer_new ();
-  priv->zoom_animation = NULL;
+  priv->animating_zoom = FALSE;
   priv->background_tile_actor = NULL;
 
+  g_signal_connect (view, "notify::width", G_CALLBACK (view_size_changed_cb), NULL);
+  g_signal_connect (view, "notify::height", G_CALLBACK (view_size_changed_cb), NULL);
+
+  layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_CENTER,
+                                   CLUTTER_BIN_ALIGNMENT_CENTER);
+  clutter_actor_set_layout_manager (CLUTTER_ACTOR (view), layout);
+
   /* Setup map layer */
-  priv->map_layer = champlain_group_new ();
+  priv->map_layer = clutter_actor_new ();
   clutter_actor_show (priv->map_layer);
 
   /* Setup user_layers */
-  priv->user_layers = clutter_group_new ();
+  priv->user_layers = clutter_actor_new ();
   clutter_actor_show (priv->user_layers);
 
-  priv->zoom_layer = clutter_group_new ();
+  priv->zoom_layer = clutter_actor_new ();
   clutter_actor_show (priv->zoom_layer);
 
-  priv->background_layer = clutter_group_new ();
+  priv->background_layer = clutter_actor_new ();
   clutter_actor_show (priv->background_layer);
 
-  viewport_container = clutter_group_new ();
+  viewport_container = clutter_actor_new ();
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (viewport_container),
-      priv->background_layer);
-  clutter_container_add_actor (CLUTTER_CONTAINER (viewport_container),
-      priv->zoom_layer);
-  clutter_container_add_actor (CLUTTER_CONTAINER (viewport_container),
-      priv->map_layer);
-  clutter_container_add_actor (CLUTTER_CONTAINER (viewport_container),
-      priv->user_layers);
+  clutter_actor_add_child (viewport_container, priv->background_layer);
+  clutter_actor_add_child (viewport_container, priv->zoom_layer);
+  clutter_actor_add_child (viewport_container, priv->map_layer);
+  clutter_actor_add_child (viewport_container, priv->user_layers);
 
   clutter_actor_show (viewport_container);
 
@@ -1125,17 +1053,15 @@ champlain_view_init (ChamplainView *view)
   priv->viewport = champlain_viewport_new ();
   champlain_viewport_set_child (CHAMPLAIN_VIEWPORT (priv->viewport), viewport_container);
 
-  g_object_set (G_OBJECT (priv->viewport), "sync-adjustments", FALSE, NULL);
-
   g_signal_connect (priv->viewport, "notify::x-origin",
       G_CALLBACK (viewport_pos_changed_cb), view);
   g_signal_connect (priv->viewport, "notify::y-origin",
       G_CALLBACK (viewport_pos_changed_cb), view);
 
-  clutter_actor_raise (priv->user_layers, priv->map_layer);
+  clutter_actor_set_child_above_sibling (viewport_container, priv->user_layers, priv->map_layer);
 
   /* Setup kinetic scroll */
-  priv->kinetic_scroll = champlain_kinetic_scroll_view_new (FALSE);
+  priv->kinetic_scroll = champlain_kinetic_scroll_view_new (FALSE, priv->viewport);
 
   g_signal_connect (priv->kinetic_scroll, "scroll-event",
       G_CALLBACK (scroll_event), view);
@@ -1143,28 +1069,15 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (panning_completed), view);
   g_signal_connect (priv->kinetic_scroll, "button-press-event",
       G_CALLBACK (kinetic_scroll_button_press_cb), view);
-
   g_signal_connect (priv->kinetic_scroll, "key-press-event",
       G_CALLBACK (kinetic_scroll_key_press_cb), view);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->kinetic_scroll),
-      priv->viewport);
-
   /* Setup stage */
-  priv->layout_manager = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_CENTER,
-        CLUTTER_BIN_ALIGNMENT_CENTER);
-  priv->view_box = clutter_box_new (priv->layout_manager);
-      
-  clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->kinetic_scroll,
-      CLUTTER_BIN_ALIGNMENT_FILL,
-      CLUTTER_BIN_ALIGNMENT_FILL);
+  clutter_actor_add_child (CLUTTER_ACTOR (view), priv->kinetic_scroll);
 
-  priv->zoom_overlay_actor = clutter_group_new ();
-  clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (priv->layout_manager), priv->zoom_overlay_actor,
-      CLUTTER_BIN_ALIGNMENT_FILL,
-      CLUTTER_BIN_ALIGNMENT_FILL);
+  priv->zoom_overlay_actor = clutter_actor_new ();
+  clutter_actor_add_child (CLUTTER_ACTOR (view), priv->zoom_overlay_actor);
 
-  clutter_actor_set_parent (CLUTTER_ACTOR (priv->view_box), CLUTTER_ACTOR (view));
   clutter_actor_queue_relayout (CLUTTER_ACTOR (view));
 
   resize_viewport (view);
@@ -1480,7 +1393,7 @@ timeline_new_frame (G_GNUC_UNUSED ClutterTimeline *timeline,
   gdouble lat;
   gdouble lon;
 
-  alpha = clutter_alpha_get_alpha (ctx->alpha);
+  alpha = clutter_timeline_get_progress (timeline);
   lat = ctx->to_latitude - ctx->from_latitude;
   lon = ctx->to_longitude - ctx->from_longitude;
 
@@ -1524,7 +1437,6 @@ champlain_view_stop_go_to (ChamplainView *view)
   clutter_timeline_stop (priv->goto_context->timeline);
 
   g_object_unref (priv->goto_context->timeline);
-  g_object_unref (priv->goto_context->alpha);
 
   g_signal_emit_by_name (view, "animation-completed::go-to", NULL);
 
@@ -1601,7 +1513,7 @@ champlain_view_go_to_with_duration (ChamplainView *view,
    * is higher and if the points are far away
    */
   ctx->timeline = clutter_timeline_new (duration);
-  ctx->alpha = clutter_alpha_new_full (ctx->timeline, CLUTTER_EASE_IN_OUT_CIRC);
+  clutter_timeline_set_progress_mode (ctx->timeline, CLUTTER_EASE_IN_OUT_CIRC);
 
   g_signal_connect (ctx->timeline, "new-frame", G_CALLBACK (timeline_new_frame),
       ctx);
@@ -1753,10 +1665,9 @@ champlain_view_add_layer (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   g_return_if_fail (CHAMPLAIN_IS_LAYER (layer));
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (view->priv->user_layers),
-      CLUTTER_ACTOR (layer));
+  clutter_actor_add_child (view->priv->user_layers, CLUTTER_ACTOR (layer));
   champlain_layer_set_view (layer, view);
-  clutter_actor_raise_top (CLUTTER_ACTOR (layer));
+  clutter_actor_set_child_above_sibling (view->priv->user_layers, CLUTTER_ACTOR (layer), NULL);
 }
 
 
@@ -1780,8 +1691,7 @@ champlain_view_remove_layer (ChamplainView *view,
 
   champlain_layer_set_view (layer, NULL);
 
-  clutter_container_remove_actor (CLUTTER_CONTAINER (view->priv->user_layers),
-      CLUTTER_ACTOR (layer));
+  clutter_actor_remove_child (view->priv->user_layers, CLUTTER_ACTOR (layer));
 }
 
 
@@ -1953,7 +1863,7 @@ fill_background_tiles (ChamplainView *view)
   x_first = x_coord / size - 1;
   y_first = y_coord / size - 1;
 
-  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->background_layer));
+  children = clutter_actor_get_children (priv->background_layer);
   children_count = g_list_length (children);
   if (children_count < tiles_count)
     {
@@ -1964,7 +1874,7 @@ fill_background_tiles (ChamplainView *view)
           CoglHandle handle = clutter_texture_get_cogl_texture (priv->background_tile_actor);
           clutter_texture_set_cogl_texture (CLUTTER_TEXTURE (clone), handle);
 
-          clutter_container_add_actor (CLUTTER_CONTAINER (priv->background_layer), clone);
+          clutter_actor_add_child (priv->background_layer, clone);
         }
     }
   else if (children_count > tiles_count)
@@ -1972,13 +1882,12 @@ fill_background_tiles (ChamplainView *view)
       /* remove extra background tiles */
       for (i = tiles_count; i < children_count; ++i)
         {
-          child = clutter_container_get_children (CLUTTER_CONTAINER (priv->background_layer));
-          clutter_container_remove_actor (CLUTTER_CONTAINER (priv->background_layer),
-              CLUTTER_ACTOR (child->data));
+          clutter_actor_remove_child (priv->background_layer, 
+              clutter_actor_get_first_child (priv->background_layer));
         }
     }
 
-  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->background_layer));
+  children = clutter_actor_get_children (priv->background_layer);
   child = children;
   for (x = x_first; x < x_first + x_count; ++x)
     {
@@ -2053,7 +1962,7 @@ view_load_visible_tiles (ChamplainView *view)
     }
 
   /* Get rid of old tiles first */
-  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
+  children = clutter_actor_get_children (priv->map_layer);
   for (child = children; child != NULL; child = g_list_next (child))
     {
       ChamplainTile *tile = CHAMPLAIN_TILE (child->data);
@@ -2068,7 +1977,7 @@ view_load_visible_tiles (ChamplainView *view)
         {
           /* inform map source to terminate loading the tile */
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-          clutter_container_remove_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
+          clutter_actor_remove_child (priv->map_layer, CLUTTER_ACTOR (tile));
         }
       else
         {
@@ -2103,7 +2012,7 @@ view_load_visible_tiles (ChamplainView *view)
               champlain_tile_set_size (tile, size);
                   
               g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
-              clutter_container_add_actor (CLUTTER_CONTAINER (priv->map_layer), CLUTTER_ACTOR (tile));
+              clutter_actor_add_child (priv->map_layer, CLUTTER_ACTOR (tile));
               view_position_tile (view, tile);
 
               /* updates champlain_view state automatically as
@@ -2183,14 +2092,14 @@ remove_all_tiles (ChamplainView *view)
   ChamplainViewPrivate *priv = view->priv;
   GList *children, *child;
 
-  children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
+  children = clutter_actor_get_children (priv->map_layer);
   for (child = children; child != NULL; child = g_list_next (child))
     {
       ChamplainTile *tile = CHAMPLAIN_TILE (child->data);
 
       champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
     }
-  champlain_group_remove_all (CHAMPLAIN_GROUP (priv->map_layer));
+  clutter_actor_destroy_all_children (priv->map_layer);
   g_list_free (children);
 }
 
@@ -2491,7 +2400,7 @@ champlain_view_ensure_layers_visible (ChamplainView *view,
 
   bbox = champlain_bounding_box_new ();
 
-  layers = clutter_container_get_children (CLUTTER_CONTAINER (view->priv->user_layers));
+  layers = clutter_actor_get_children (view->priv->user_layers);
 
   for (elem = layers; elem != NULL; elem = elem->next)
     {
@@ -2565,13 +2474,17 @@ position_zoom_actor (ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
   gint x, y;
+  ClutterActor *zoom_actor;
   
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, priv->zoom_actor_longitude) - priv->anchor_x;
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->zoom_actor_latitude) - priv->anchor_y;
   
-  ClutterActor *zoom_actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->zoom_overlay_actor), 0);
-  clutter_group_remove_all (CLUTTER_GROUP (priv->zoom_layer));
-  clutter_actor_reparent (zoom_actor, priv->zoom_layer);
+  clutter_actor_destroy_all_children (priv->zoom_layer);
+  zoom_actor = clutter_actor_get_first_child (priv->zoom_overlay_actor);
+  g_object_ref (zoom_actor);
+  clutter_actor_remove_child(priv->zoom_overlay_actor, zoom_actor);
+  clutter_actor_add_child (priv->zoom_layer, zoom_actor);
+  g_object_unref (zoom_actor);
 
   g_object_set (G_OBJECT (zoom_actor), 
       "scale-center-x", 0.0, 
@@ -2585,13 +2498,16 @@ position_zoom_actor (ChamplainView *view)
 
 
 static void
-zoom_animation_completed (G_GNUC_UNUSED ClutterAnimation *animation, 
+zoom_animation_completed (ClutterActor *actor,
+    const gchar *transition_name,
+    gboolean is_finished,
     ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
-
-  priv->zoom_animation = NULL;
+  priv->animating_zoom = FALSE;
   position_zoom_actor (view);  
+
+  g_signal_handlers_disconnect_by_func (actor, zoom_animation_completed, view);
 }
 
 
@@ -2604,11 +2520,10 @@ show_zoom_actor (ChamplainView *view,
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
-  gboolean animation_running = priv->zoom_animation != NULL;
   ClutterActor *zoom_actor = NULL;
   gdouble deltazoom;
   
-  if (!animation_running)
+  if (!priv->animating_zoom)
     {
       GList *children, *child;
       gint size;
@@ -2644,11 +2559,11 @@ show_zoom_actor (ChamplainView *view,
         priv->zoom_level,
         y_first * size);
 
-      clutter_group_remove_all (CLUTTER_GROUP (priv->zoom_overlay_actor));
-      zoom_actor = clutter_group_new ();
-      clutter_group_add (CLUTTER_GROUP (priv->zoom_overlay_actor), zoom_actor);
+      clutter_actor_destroy_all_children (priv->zoom_overlay_actor);
+      zoom_actor = clutter_actor_new ();
+      clutter_actor_add_child (priv->zoom_overlay_actor, zoom_actor);
       
-      children = clutter_container_get_children (CLUTTER_CONTAINER (priv->map_layer));
+      children = clutter_actor_get_children (priv->map_layer);
 
       for (child = children; child != NULL; child = g_list_next (child))
         {
@@ -2657,7 +2572,10 @@ show_zoom_actor (ChamplainView *view,
           gint tile_y = champlain_tile_get_y (tile);
 
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-          clutter_actor_reparent (CLUTTER_ACTOR (tile), zoom_actor);
+          g_object_ref (CLUTTER_ACTOR (tile));
+          clutter_actor_remove_child(priv->map_layer, CLUTTER_ACTOR (tile));
+          clutter_actor_add_child (zoom_actor, CLUTTER_ACTOR (tile));
+          g_object_unref (CLUTTER_ACTOR (tile));
           clutter_actor_set_position (CLUTTER_ACTOR (tile), (tile_x - x_first) * size, (tile_y - y_first) * size);
         }
 
@@ -2674,31 +2592,32 @@ show_zoom_actor (ChamplainView *view,
           NULL);
     }
   else
-    zoom_actor = clutter_group_get_nth_child (CLUTTER_GROUP (priv->zoom_overlay_actor), 0);
+    zoom_actor = clutter_actor_get_first_child (priv->zoom_overlay_actor);
 
   deltazoom = pow (2.0, (gdouble)zoom_level - priv->anim_start_zoom_level);
 
   if (priv->animate_zoom)
     {
       clutter_actor_set_opacity (priv->map_layer, 0);
-      
-      clutter_group_remove_all (CLUTTER_GROUP (priv->zoom_layer));
 
-      priv->zoom_animation = clutter_actor_animate (CLUTTER_ACTOR (zoom_actor),
-                CLUTTER_EASE_IN_OUT_QUAD,
-                350,
-                "scale-x", deltazoom,
-                "scale-y", deltazoom,
-                NULL);
+      clutter_actor_destroy_all_children (priv->zoom_layer);
 
-      clutter_actor_animate (CLUTTER_ACTOR (priv->map_layer),
-                CLUTTER_EASE_IN_EXPO,
-                350,
-                "opacity", 255,
-                NULL);
-      
-      if (!animation_running)
-        g_signal_connect (priv->zoom_animation, "completed", G_CALLBACK (zoom_animation_completed), view);
+      clutter_actor_save_easing_state (zoom_actor);
+      clutter_actor_set_easing_mode (zoom_actor, CLUTTER_EASE_IN_OUT_QUAD);
+      clutter_actor_set_easing_duration (zoom_actor, 350);
+      clutter_actor_set_scale (zoom_actor, deltazoom, deltazoom);
+      clutter_actor_restore_easing_state (zoom_actor);
+
+      clutter_actor_save_easing_state (priv->map_layer);
+      clutter_actor_set_easing_mode (priv->map_layer, CLUTTER_EASE_IN_EXPO);
+      clutter_actor_set_easing_duration (priv->map_layer, 350);
+      clutter_actor_set_opacity (priv->map_layer, 255);
+      clutter_actor_restore_easing_state (priv->map_layer);
+        
+      if (!priv->animating_zoom)
+        g_signal_connect (zoom_actor, "transition-stopped::scale-x", G_CALLBACK (zoom_animation_completed), view);
+        
+      priv->animating_zoom = TRUE;
     }
   else
     clutter_actor_set_scale (zoom_actor, deltazoom, deltazoom);
@@ -2963,6 +2882,25 @@ champlain_view_get_animate_zoom (ChamplainView *view)
 }
 
 
+static ClutterActorAlign
+bin_alignment_to_actor_align (ClutterBinAlignment alignment)
+{
+    switch (alignment)
+      {
+        case CLUTTER_BIN_ALIGNMENT_FILL:
+            return CLUTTER_ACTOR_ALIGN_FILL;
+        case CLUTTER_BIN_ALIGNMENT_START:
+            return CLUTTER_ACTOR_ALIGN_START;
+        case CLUTTER_BIN_ALIGNMENT_END:
+            return CLUTTER_ACTOR_ALIGN_END;
+        case CLUTTER_BIN_ALIGNMENT_CENTER:
+            return CLUTTER_ACTOR_ALIGN_CENTER;
+        default:
+            return CLUTTER_ACTOR_ALIGN_START;
+      }
+}
+
+
 /**
  * champlain_view_bin_layout_add:
  * @view: a #ChamplainView
@@ -2982,16 +2920,15 @@ champlain_view_bin_layout_add (ChamplainView *view,
     ClutterBinAlignment x_align,
     ClutterBinAlignment y_align)
 {
-  ChamplainViewPrivate *priv = view->priv;
-  ClutterBinLayout *layout_manager;
-
   DEBUG_LOG ()
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
-  layout_manager = CLUTTER_BIN_LAYOUT (priv->layout_manager);
-  clutter_bin_layout_add (layout_manager, child, x_align, y_align);
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (view));
+  clutter_actor_set_x_expand (child, TRUE);
+  clutter_actor_set_y_expand (child, TRUE);
+  clutter_actor_set_x_align (child, bin_alignment_to_actor_align (x_align));
+  clutter_actor_set_y_align (child, bin_alignment_to_actor_align (y_align));
+  clutter_actor_add_child (CLUTTER_ACTOR (view), child);
 }
 
 

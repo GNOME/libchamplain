@@ -129,6 +129,8 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
   GError *gerror = NULL;
   ClutterActor *actor = NULL;
   GdkPixbuf *pixbuf;
+  ClutterContent *content;
+  gfloat width, height;
 
   if (!priv->data || priv->size == 0)
     goto finish;
@@ -157,16 +159,22 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
 
   /* Load the image into clutter */
   pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
-  actor = clutter_texture_new ();
-  if (!clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (actor),
+  if (!pixbuf)
+    {
+      g_warning ("NULL pixbuf");
+      goto finish;
+    }
+  
+  content = clutter_image_new ();
+  if (!clutter_image_set_data (CLUTTER_IMAGE (content),
           gdk_pixbuf_get_pixels (pixbuf),
-          gdk_pixbuf_get_has_alpha (pixbuf),
+          gdk_pixbuf_get_has_alpha (pixbuf)
+            ? COGL_PIXEL_FORMAT_RGBA_8888
+            : COGL_PIXEL_FORMAT_RGB_888,
           gdk_pixbuf_get_width (pixbuf),
           gdk_pixbuf_get_height (pixbuf),
           gdk_pixbuf_get_rowstride (pixbuf),
-          gdk_pixbuf_get_bits_per_sample (pixbuf) *
-          gdk_pixbuf_get_n_channels (pixbuf) / 8,
-          0, &gerror))
+          &gerror))
     {
       if (gerror)
         {
@@ -174,11 +182,19 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
           g_error_free (gerror);
         }
 
-      g_object_unref (actor);
-      actor = NULL;
+      g_object_unref (content);
       goto finish;
     }
 
+  clutter_content_get_preferred_size (content, &width, &height);
+  actor = clutter_actor_new ();
+  clutter_actor_set_size (actor, width, height);
+  clutter_actor_set_content (actor, content);
+  clutter_content_invalidate (content);
+  g_object_unref (content);
+  /* has to be set for proper opacity */
+  clutter_actor_set_offscreen_redirect (actor, CLUTTER_OFFSCREEN_REDIRECT_AUTOMATIC_FOR_OPACITY);
+  
   error = FALSE;
 
 finish:

@@ -312,12 +312,12 @@ tile_loaded_cb (gpointer worker_data)
   gpointer ret_data = NULL;
   guint ret_size = 0;
   gboolean ret_error = TRUE;
-  cairo_t *cr_clutter;
   ClutterActor *actor;
   guint size = data->size;
   GdkPixbuf *pixbuf = NULL;
   gchar *buffer = NULL;
   gsize buffer_size;
+  ClutterContent *content;
 
   g_slice_free (WorkerThreadData, data);
 
@@ -330,14 +330,6 @@ tile_loaded_cb (gpointer worker_data)
   if (!cst)
     goto finish;
 
-  /* draw the clutter texture */
-  actor = clutter_cairo_texture_new (size, size);
-
-  cr_clutter = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (actor));
-  cairo_set_source_surface (cr_clutter, cst, 0, 0);
-  cairo_paint (cr_clutter);
-  cairo_destroy (cr_clutter);
-
   /* modify directly the buffer of cairo surface - we don't use it any more
      and we close the surface anyway */
   argb_to_rgba (cairo_image_surface_get_data (cst),
@@ -349,6 +341,26 @@ tile_loaded_cb (gpointer worker_data)
 
   if (!gdk_pixbuf_save_to_buffer (pixbuf, &buffer, &buffer_size, "png", NULL, NULL))
     goto finish;
+    
+  content = clutter_image_new ();
+  if (!clutter_image_set_data (CLUTTER_IMAGE (content),
+          gdk_pixbuf_get_pixels (pixbuf),
+          gdk_pixbuf_get_has_alpha (pixbuf)
+            ? COGL_PIXEL_FORMAT_RGBA_8888
+            : COGL_PIXEL_FORMAT_RGB_888,
+          gdk_pixbuf_get_width (pixbuf),
+          gdk_pixbuf_get_height (pixbuf),
+          gdk_pixbuf_get_rowstride (pixbuf),
+          NULL))
+    {
+      g_object_unref (content);
+      goto finish;
+    }
+
+  actor = clutter_actor_new ();
+  clutter_actor_set_size (actor, size, size);
+  clutter_actor_set_content (actor, content);
+  g_object_unref (content);
 
   champlain_tile_set_content (tile, actor);
 

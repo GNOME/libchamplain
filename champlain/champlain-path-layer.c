@@ -37,7 +37,6 @@
 #include "champlain-enum-types.h"
 #include "champlain-private.h"
 #include "champlain-view.h"
-#include "champlain-group.h"
 
 #include <clutter/clutter.h>
 #include <glib.h>
@@ -83,16 +82,18 @@ struct _ChamplainPathLayerPrivate
   gboolean visible;
   gdouble *dash;
   guint num_dashes;
-
-  ClutterGroup *content_group;
+  
+  ClutterContent *canvas;
   ClutterActor *path_actor;
   GList *nodes;
-  gboolean redraw_scheduled;
 };
 
 
-static gboolean redraw_path (ChamplainPathLayer *layer);
-static void schedule_redraw (ChamplainPathLayer *layer);
+static gboolean redraw_path (ClutterCanvas *canvas,
+    cairo_t *cr,
+    int w,
+    int h,
+    ChamplainPathLayer *layer);
 
 static void set_view (ChamplainLayer *layer,
     ChamplainView *view);
@@ -195,99 +196,6 @@ champlain_path_layer_set_property (GObject *object,
 
 
 static void
-paint (ClutterActor *self)
-{
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
-}
-
-
-static void
-pick (ClutterActor *self,
-    const ClutterColor *color)
-{
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_path_layer_parent_class)->pick (self, color);
-
-  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
-}
-
-
-static void
-get_preferred_width (ClutterActor *self,
-    gfloat for_height,
-    gfloat *min_width_p,
-    gfloat *natural_width_p)
-{
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_get_preferred_width (CLUTTER_ACTOR (priv->content_group),
-      for_height,
-      min_width_p,
-      natural_width_p);
-}
-
-
-static void
-get_preferred_height (ClutterActor *self,
-    gfloat for_width,
-    gfloat *min_height_p,
-    gfloat *natural_height_p)
-{
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_get_preferred_height (CLUTTER_ACTOR (priv->content_group),
-      for_width,
-      min_height_p,
-      natural_height_p);
-}
-
-
-static void
-allocate (ClutterActor *self,
-    const ClutterActorBox *box,
-    ClutterAllocationFlags flags)
-{
-  ClutterActorBox child_box;
-
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_path_layer_parent_class)->allocate (self, box, flags);
-
-  child_box.x1 = 0;
-  child_box.x2 = box->x2 - box->x1;
-  child_box.y1 = 0;
-  child_box.y2 = box->y2 - box->y1;
-
-  clutter_actor_allocate (CLUTTER_ACTOR (priv->content_group), &child_box, flags);
-}
-
-
-static void
-map (ClutterActor *self)
-{
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_path_layer_parent_class)->map (self);
-
-  clutter_actor_map (CLUTTER_ACTOR (priv->content_group));
-}
-
-
-static void
-unmap (ClutterActor *self)
-{
-  ChamplainPathLayerPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_path_layer_parent_class)->unmap (self);
-
-  clutter_actor_unmap (CLUTTER_ACTOR (priv->content_group));
-}
-
-
-static void
 champlain_path_layer_dispose (GObject *object)
 {
   ChamplainPathLayer *self = CHAMPLAIN_PATH_LAYER (object);
@@ -299,10 +207,10 @@ champlain_path_layer_dispose (GObject *object)
   if (priv->view != NULL)
     set_view (CHAMPLAIN_LAYER (self), NULL);
 
-  if (priv->content_group)
+  if (priv->canvas)
     {
-      clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
-      priv->content_group = NULL;
+      g_object_unref (priv->canvas);
+      priv->canvas = NULL;
     }
 
   G_OBJECT_CLASS (champlain_path_layer_parent_class)->dispose (object);
@@ -326,7 +234,6 @@ champlain_path_layer_finalize (GObject *object)
 static void
 champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
 {
-  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ChamplainLayerClass *layer_class = CHAMPLAIN_LAYER_CLASS (klass);
 
@@ -336,14 +243,6 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
   object_class->dispose = champlain_path_layer_dispose;
   object_class->get_property = champlain_path_layer_get_property;
   object_class->set_property = champlain_path_layer_set_property;
-
-  actor_class->get_preferred_width = get_preferred_width;
-  actor_class->get_preferred_height = get_preferred_height;
-  actor_class->allocate = allocate;
-  actor_class->paint = paint;
-  actor_class->pick = pick;
-  actor_class->map = map;
-  actor_class->unmap = unmap;
 
   layer_class->set_view = set_view;
   layer_class->get_bounding_box = get_bounding_box;
@@ -471,20 +370,20 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   priv->stroke = TRUE;
   priv->stroke_width = 2.0;
   priv->nodes = NULL;
-  priv->redraw_scheduled = FALSE;
   priv->dash = NULL;
   priv->num_dashes = 0;
 
   priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
 
-  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
-  clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (self));
+  priv->canvas = clutter_canvas_new ();
+  clutter_canvas_set_size (CLUTTER_CANVAS (priv->canvas), 255, 255);
+  g_signal_connect (priv->canvas, "draw", G_CALLBACK (redraw_path), self);
 
-  priv->path_actor = clutter_cairo_texture_new (256, 256);
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), priv->path_actor);
-
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (self));
+  priv->path_actor = clutter_actor_new ();
+  clutter_actor_set_size (priv->path_actor, 255, 255);
+  clutter_actor_set_content (priv->path_actor, priv->canvas);
+  clutter_actor_add_child (CLUTTER_ACTOR (self), priv->path_actor);
 }
 
 
@@ -505,11 +404,28 @@ champlain_path_layer_new ()
 
 
 static void
+invalidate_canvas (ChamplainPathLayer *layer)
+{
+  ChamplainPathLayerPrivate *priv = layer->priv;
+  gfloat width, height;
+  
+  width = 256;
+  height = 256;
+  if (priv->view != NULL)
+    clutter_actor_get_size (CLUTTER_ACTOR (priv->view), &width, &height);
+
+  clutter_canvas_set_size (CLUTTER_CANVAS (priv->canvas), width, height);
+  clutter_actor_set_size (priv->path_actor, width, height);
+  clutter_content_invalidate (priv->canvas);
+}
+
+
+static void
 position_notify (ChamplainLocation *location,
     G_GNUC_UNUSED GParamSpec *pspec,
     ChamplainPathLayer *layer)
 {
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
@@ -530,7 +446,7 @@ add_node (ChamplainPathLayer *layer,
     priv->nodes = g_list_prepend (priv->nodes, location);
   else
     priv->nodes = g_list_insert (priv->nodes, location, position);
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
@@ -583,7 +499,7 @@ champlain_path_layer_remove_all (ChamplainPathLayer *layer)
 
   g_list_free (priv->nodes);
   priv->nodes = NULL;
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
@@ -631,7 +547,7 @@ champlain_path_layer_remove_node (ChamplainPathLayer *layer,
 
   priv->nodes = g_list_remove (priv->nodes, location);
   g_object_unref (location);
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
@@ -663,41 +579,31 @@ relocate_cb (G_GNUC_UNUSED GObject *gobject,
 {
   g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
 
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
 static gboolean
-redraw_path (ChamplainPathLayer *layer)
+redraw_path (ClutterCanvas *canvas,
+    cairo_t *cr,
+    int width,
+    int height,
+    ChamplainPathLayer *layer)
 {
   ChamplainPathLayerPrivate *priv = layer->priv;
-  cairo_t *cr;
-  gfloat width, height;
   GList *elem;
   ChamplainView *view = priv->view;
   gint x, y;
-  guint last_width, last_height;
-
-  priv->redraw_scheduled = FALSE;
-
+  
   /* layer not yet added to the view */
-  if (view == NULL || !priv->content_group)
+  if (view == NULL)
     return FALSE;
-
-  clutter_actor_get_size (CLUTTER_ACTOR (view), &width, &height);
 
   if (!priv->visible || width == 0.0 || height == 0.0)
     return FALSE;
 
-  clutter_cairo_texture_get_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), &last_width, &last_height);
-
-  if ((guint) width != last_width || (guint) height != last_height)
-    clutter_cairo_texture_set_surface_size (CLUTTER_CAIRO_TEXTURE (priv->path_actor), width, height);
-
   champlain_view_get_viewport_origin (priv->view, &x, &y);
   clutter_actor_set_position (priv->path_actor, x, y);
-
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (priv->path_actor));
 
   /* Clear the drawing area */
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
@@ -739,23 +645,7 @@ redraw_path (ChamplainPathLayer *layer)
   if (priv->stroke)
     cairo_stroke (cr);
 
-  cairo_destroy (cr);
-
   return FALSE;
-}
-
-
-static void
-schedule_redraw (ChamplainPathLayer *layer)
-{
-  if (!layer->priv->redraw_scheduled)
-    {
-      layer->priv->redraw_scheduled = TRUE;
-      g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
-          (GSourceFunc) redraw_path,
-          g_object_ref (layer),
-          (GDestroyNotify) g_object_unref);
-    }
 }
 
 
@@ -764,7 +654,7 @@ redraw_path_cb (G_GNUC_UNUSED GObject *gobject,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainPathLayer *layer)
 {
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
@@ -799,7 +689,7 @@ set_view (ChamplainLayer *layer,
       g_signal_connect (view, "notify::latitude",
           G_CALLBACK (redraw_path_cb), layer);
 
-      schedule_redraw (path_layer);
+      invalidate_canvas (path_layer);
     }
 }
 
@@ -867,7 +757,7 @@ champlain_path_layer_set_fill_color (ChamplainPathLayer *layer,
   priv->fill_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (layer), "fill-color");
 
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
@@ -917,7 +807,7 @@ champlain_path_layer_set_stroke_color (ChamplainPathLayer *layer,
   priv->stroke_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (layer), "stroke-color");
 
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
@@ -958,7 +848,7 @@ champlain_path_layer_set_stroke (ChamplainPathLayer *layer,
   layer->priv->stroke = value;
   g_object_notify (G_OBJECT (layer), "stroke");
 
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
@@ -999,7 +889,7 @@ champlain_path_layer_set_fill (ChamplainPathLayer *layer,
   layer->priv->fill = value;
   g_object_notify (G_OBJECT (layer), "fill");
 
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
@@ -1040,7 +930,7 @@ champlain_path_layer_set_stroke_width (ChamplainPathLayer *layer,
   layer->priv->stroke_width = value;
   g_object_notify (G_OBJECT (layer), "stroke-width");
 
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 
@@ -1124,7 +1014,7 @@ champlain_path_layer_set_closed (ChamplainPathLayer *layer,
   layer->priv->closed_path = value;
   g_object_notify (G_OBJECT (layer), "closed");
 
-  schedule_redraw (layer);
+  invalidate_canvas (layer);
 }
 
 

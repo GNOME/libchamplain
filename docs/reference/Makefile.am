@@ -67,7 +67,6 @@ IGNORE_HFILES= $(ignored_headers) \
 	champlain-marshal.h \
 	champlain-defines.h \
 	champlain-features.h \
-	champlain-group.h \
 	champlain-adjustment.h \
 	champlain-kinetic-scroll-view.h \
 	champlain-viewport.h

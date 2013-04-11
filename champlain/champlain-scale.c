@@ -60,8 +60,7 @@ struct _ChamplainScalePrivate
   ChamplainUnit scale_unit;
   guint max_scale_width;
   gfloat text_height;
-  ClutterGroup *content_group;
-  gboolean redraw_scheduled;
+  ClutterContent *canvas;
 
   ChamplainView *view;
 };
@@ -127,113 +126,20 @@ champlain_scale_set_property (GObject *object,
 
 
 static void
-paint (ClutterActor *self)
-{
-  ChamplainScalePrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
-}
-
-
-static void
-pick (ClutterActor *self,
-    const ClutterColor *color)
-{
-  ChamplainScalePrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_scale_parent_class)->pick (self, color);
-
-  clutter_actor_paint (CLUTTER_ACTOR (priv->content_group));
-}
-
-
-static void
-get_preferred_width (ClutterActor *self,
-    gfloat for_height,
-    gfloat *min_width_p,
-    gfloat *natural_width_p)
-{
-  ChamplainScalePrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_get_preferred_width (CLUTTER_ACTOR (priv->content_group),
-      for_height,
-      min_width_p,
-      natural_width_p);
-}
-
-
-static void
-get_preferred_height (ClutterActor *self,
-    gfloat for_width,
-    gfloat *min_height_p,
-    gfloat *natural_height_p)
-{
-  ChamplainScalePrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_get_preferred_height (CLUTTER_ACTOR (priv->content_group),
-      for_width,
-      min_height_p,
-      natural_height_p);
-}
-
-
-static void
-allocate (ClutterActor *self,
-    const ClutterActorBox *box,
-    ClutterAllocationFlags flags)
-{
-  ClutterActorBox child_box;
-
-  ChamplainScalePrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_scale_parent_class)->allocate (self, box, flags);
-
-  child_box.x1 = 0;
-  child_box.x2 = box->x2 - box->x1;
-  child_box.y1 = 0;
-  child_box.y2 = box->y2 - box->y1;
-
-  clutter_actor_allocate (CLUTTER_ACTOR (priv->content_group), &child_box, flags);
-}
-
-
-static void
-map (ClutterActor *self)
-{
-  ChamplainScalePrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_scale_parent_class)->map (self);
-
-  clutter_actor_map (CLUTTER_ACTOR (priv->content_group));
-}
-
-
-static void
-unmap (ClutterActor *self)
-{
-  ChamplainScalePrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_scale_parent_class)->unmap (self);
-
-  clutter_actor_unmap (CLUTTER_ACTOR (priv->content_group));
-}
-
-
-static void
 champlain_scale_dispose (GObject *object)
 {
   ChamplainScalePrivate *priv = CHAMPLAIN_SCALE (object)->priv;
-
-  if (priv->content_group)
-    {
-      clutter_actor_unparent (CLUTTER_ACTOR (priv->content_group));
-      priv->content_group = NULL;
-    }
 
   if (priv->view)
     {
       champlain_scale_disconnect_view (CHAMPLAIN_SCALE (object));
       priv->view = NULL;
+    }
+    
+  if (priv->canvas)
+    {
+      g_object_unref (priv->canvas);
+      priv->canvas = NULL;
     }
 
   G_OBJECT_CLASS (champlain_scale_parent_class)->dispose (object);
@@ -252,7 +158,6 @@ champlain_scale_finalize (GObject *object)
 static void
 champlain_scale_class_init (ChamplainScaleClass *klass)
 {
-  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   g_type_class_add_private (klass, sizeof (ChamplainScalePrivate));
@@ -261,14 +166,6 @@ champlain_scale_class_init (ChamplainScaleClass *klass)
   object_class->dispose = champlain_scale_dispose;
   object_class->get_property = champlain_scale_get_property;
   object_class->set_property = champlain_scale_set_property;
-
-  actor_class->get_preferred_width = get_preferred_width;
-  actor_class->get_preferred_height = get_preferred_height;
-  actor_class->allocate = allocate;
-  actor_class->paint = paint;
-  actor_class->pick = pick;
-  actor_class->map = map;
-  actor_class->unmap = unmap;
 
   /**
    * ChamplainScale:max-width:
@@ -307,19 +204,19 @@ champlain_scale_class_init (ChamplainScaleClass *klass)
 
 
 static gboolean
-redraw_scale (ChamplainScale *scale)
+redraw_scale (ClutterCanvas *canvas,
+    cairo_t *cr,
+    int w,
+    int h,
+    ChamplainScale *scale)
 {
-  static gfloat previous_m_per_pixel = 0.0;
-  static gint previous_zoom_level = 0.0;
-
   gboolean is_small_unit = TRUE;  /* indicates if using meters */
-  ClutterActor *text, *line;
+  ClutterActor *text;
   gfloat width, height;
   ChamplainScalePrivate *priv = scale->priv;
   gfloat m_per_pixel;
   gfloat scale_width = priv->max_scale_width;
   gchar *label;
-  cairo_t *cr;
   gfloat base;
   gfloat factor;
   gboolean final_unit = FALSE;
@@ -328,9 +225,7 @@ redraw_scale (ChamplainScale *scale)
   gfloat offset;
   ChamplainMapSource *map_source;
 
-  priv->redraw_scheduled = FALSE;
-
-  if (!priv->view || !priv->content_group)
+  if (!priv->view)
     return FALSE;
 
   zoom_level = champlain_view_get_zoom_level (priv->view);
@@ -339,15 +234,6 @@ redraw_scale (ChamplainScale *scale)
   lon = champlain_view_get_center_longitude (priv->view);
   m_per_pixel = champlain_map_source_get_meters_per_pixel (map_source,
         zoom_level, lat, lon);
-
-  /* Don't redraw too often, 1 meters difference is a good value
-   * since at low levels the value changes alot, and not at high levels */
-  if (fabs (m_per_pixel - previous_m_per_pixel) < 10 &&
-      previous_zoom_level == zoom_level)
-    return FALSE;
-
-  previous_m_per_pixel = m_per_pixel;
-  previous_zoom_level = zoom_level;
 
   if (priv->scale_unit == CHAMPLAIN_UNIT_MILES)
     m_per_pixel *= 3.28;  /* m_per_pixel is now in ft */
@@ -393,7 +279,7 @@ redraw_scale (ChamplainScale *scale)
         }
     } while (!final_unit);
 
-  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->content_group), "scale-far-label");
+  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (scale), "scale-far-label");
   label = g_strdup_printf ("%g", base);
   /* Get only digits width for centering */
   clutter_text_set_text (CLUTTER_TEXT (text), label);
@@ -408,7 +294,7 @@ redraw_scale (ChamplainScale *scale)
   g_free (label);
   clutter_actor_set_position (text, (scale_width - width / 2) + SCALE_INSIDE_PADDING, SCALE_INSIDE_PADDING);
 
-  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->content_group), "scale-mid-label");
+  text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (scale), "scale-mid-label");
   label = g_strdup_printf ("%g", base / 2.0);
   clutter_text_set_text (CLUTTER_TEXT (text), label);
   clutter_actor_get_size (text, &width, &height);
@@ -416,9 +302,6 @@ redraw_scale (ChamplainScale *scale)
   g_free (label);
 
   /* Draw the line */
-  line = clutter_container_find_child_by_name (CLUTTER_CONTAINER (priv->content_group), "scale-line");
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (line));
-
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
   cairo_paint (cr);
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
@@ -449,53 +332,47 @@ redraw_scale (ChamplainScale *scale)
   cairo_line_to (cr, scale_width + SCALE_INSIDE_PADDING, offset + SCALE_HEIGHT);
   cairo_stroke (cr);
 
-  cairo_destroy (cr);
-
   return FALSE;
-}
-
-
-static void
-schedule_redraw (ChamplainScale *scale)
-{
-  if (!scale->priv->redraw_scheduled)
-    {
-      scale->priv->redraw_scheduled = TRUE;
-      g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
-          (GSourceFunc) redraw_scale,
-          g_object_ref (scale),
-          (GDestroyNotify) g_object_unref);
-    }
 }
 
 
 static void
 create_scale (ChamplainScale *scale)
 {
-  ClutterActor *scale_actor, *text;
-  gfloat width;
+  ClutterActor *text, *scale_actor;
+  gfloat width, height;
   ChamplainScalePrivate *priv = scale->priv;
 
-  clutter_group_remove_all (priv->content_group);
+  clutter_actor_destroy_all_children (CLUTTER_ACTOR (scale));
   
   text = clutter_text_new_with_text ("Sans 9", "X km");
   clutter_actor_set_name (text, "scale-far-label");
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), text);
+  clutter_actor_add_child (CLUTTER_ACTOR (scale), text);
 
   text = clutter_text_new_with_text ("Sans 9", "X");
   clutter_actor_set_name (text, "scale-mid-label");
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), text);
+  clutter_actor_add_child (CLUTTER_ACTOR (scale), text);
 
   text = clutter_text_new_with_text ("Sans 9", "0");
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), text);
+  clutter_actor_add_child (CLUTTER_ACTOR (scale), text);
   clutter_actor_get_size (text, &width, &priv->text_height);
   clutter_actor_set_position (text, SCALE_INSIDE_PADDING - width / 2, SCALE_INSIDE_PADDING);
 
-  scale_actor = clutter_cairo_texture_new (priv->max_scale_width + 2 * SCALE_INSIDE_PADDING, SCALE_HEIGHT + priv->text_height + GAP_SIZE + 2 * SCALE_INSIDE_PADDING);
-  clutter_actor_set_name (scale_actor, "scale-line");
-  clutter_container_add_actor (CLUTTER_CONTAINER (priv->content_group), scale_actor);
+  width = priv->max_scale_width + 2 * SCALE_INSIDE_PADDING;
+  height = SCALE_HEIGHT + priv->text_height + GAP_SIZE + 2 * SCALE_INSIDE_PADDING;
+  
+  priv->canvas = clutter_canvas_new ();
+  clutter_canvas_set_size (CLUTTER_CANVAS (priv->canvas), width, height);
+  g_signal_connect (priv->canvas, "draw", G_CALLBACK (redraw_scale), scale);
+  
+  scale_actor = clutter_actor_new ();
+  clutter_actor_set_size (scale_actor, width, height);
+  clutter_actor_set_content (scale_actor, priv->canvas);
+  clutter_actor_add_child (CLUTTER_ACTOR (scale), scale_actor);
 
   clutter_actor_set_opacity (CLUTTER_ACTOR (scale), 200);
+
+  clutter_content_invalidate (priv->canvas);
 }
 
 
@@ -509,10 +386,6 @@ champlain_scale_init (ChamplainScale *scale)
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
   priv->max_scale_width = 100;
   priv->view = NULL;
-  priv->redraw_scheduled = FALSE;
-  priv->content_group = CLUTTER_GROUP (clutter_group_new ());
-  clutter_actor_set_parent (CLUTTER_ACTOR (priv->content_group), CLUTTER_ACTOR (scale));
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (scale));
 
   create_scale (scale);
 }
@@ -552,7 +425,6 @@ champlain_scale_set_max_width (ChamplainScale *scale,
   scale->priv->max_scale_width = value;
   create_scale (scale);
   g_object_notify (G_OBJECT (scale), "max-width");
-  schedule_redraw (scale);
 }
 
 
@@ -573,7 +445,7 @@ champlain_scale_set_unit (ChamplainScale *scale,
 
   scale->priv->scale_unit = unit;
   g_object_notify (G_OBJECT (scale), "unit");
-  schedule_redraw (scale);
+  clutter_content_invalidate (scale->priv->canvas);
 }
 
 
@@ -620,7 +492,7 @@ redraw_scale_cb (G_GNUC_UNUSED GObject *gobject,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainScale *scale)
 {
-  schedule_redraw (scale);
+  clutter_content_invalidate (scale->priv->canvas);
 }
 
 
@@ -643,7 +515,7 @@ champlain_scale_connect_view (ChamplainScale *scale,
   scale->priv->view = g_object_ref (view);
   g_signal_connect (view, "notify::latitude",
       G_CALLBACK (redraw_scale_cb), scale);
-  schedule_redraw (scale);
+  clutter_content_invalidate (scale->priv->canvas);
 }
 
 
