@@ -49,128 +49,27 @@ enum
   PROP_0,
 };
 
-/* static guint champlain_custom_marker_signals[LAST_SIGNAL] = { 0, }; */
-
 struct _ChamplainCustomMarkerPrivate
 {
   ClutterContainer *dummy;
 };
 
-static void clutter_container_iface_init (ClutterContainerIface *iface);
-
-
-G_DEFINE_TYPE_WITH_CODE (ChamplainCustomMarker, champlain_custom_marker, CHAMPLAIN_TYPE_MARKER,
-    G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTAINER, clutter_container_iface_init));
-
+G_DEFINE_TYPE (ChamplainCustomMarker, champlain_custom_marker, CHAMPLAIN_TYPE_MARKER)
 
 #define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_CUSTOM_MARKER, ChamplainCustomMarkerPrivate))
 
 
 static void
-add_actor (ClutterContainer *container,
-    ClutterActor *actor)
-{
-  clutter_actor_add_child (CLUTTER_ACTOR (container), actor);
-}
-
-
-static void
-remove_actor (ClutterContainer *container,
-    ClutterActor *actor)
-{
-  clutter_actor_remove_child (CLUTTER_ACTOR (container), actor);
-}
-
-
-static void
-foreach_actor (ClutterContainer *container,
-    ClutterCallback callback,
-    gpointer user_data)
-{
-  ClutterActor *child;
-
-  for (child = clutter_actor_get_first_child (CLUTTER_ACTOR (container)); 
-       child != NULL; 
-       child = clutter_actor_get_next_sibling (child))
-    {
-      callback (child, user_data);
-    }
-}
-
-
-static void
-raise_actor (ClutterContainer *container,
-    ClutterActor *actor,
-    ClutterActor *sibling)
-{
-  clutter_actor_set_child_above_sibling (CLUTTER_ACTOR (container), actor, sibling);
-}
-
-
-static void
-lower_actor (ClutterContainer *container,
-    ClutterActor *actor,
-    ClutterActor *sibling)
-{
-  clutter_actor_set_child_below_sibling (CLUTTER_ACTOR (container), actor, sibling);
-}
-
-
-static void
-sort_depth_order (ClutterContainer *container)
-{
-  /* NOOP */
-}
-
-static void
-clutter_container_iface_init (ClutterContainerIface *iface)
-{
-  iface->add = add_actor;
-  iface->remove = remove_actor;
-  iface->foreach = foreach_actor;
-  iface->raise = raise_actor;
-  iface->lower = lower_actor;
-  iface->sort_depth_order = sort_depth_order;
-}
-
-
-static void
-champlain_custom_marker_dispose (GObject *object)
-{
-/*  ChamplainCustomMarkerPrivate *priv = CHAMPLAIN_CUSTOM_MARKER (object)->priv; */
-
-  G_OBJECT_CLASS (champlain_custom_marker_parent_class)->dispose (object);
-}
-
-
-static void
-champlain_custom_marker_finalize (GObject *object)
-{
-/*  ChamplainCustomMarkerPrivate *priv = CHAMPLAIN_CUSTOM_MARKER (object)->priv; */
-
-  G_OBJECT_CLASS (champlain_custom_marker_parent_class)->finalize (object);
-}
-
-
-static void
 champlain_custom_marker_class_init (ChamplainCustomMarkerClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
   g_type_class_add_private (klass, sizeof (ChamplainCustomMarkerPrivate));
-
-  object_class->finalize = champlain_custom_marker_finalize;
-  object_class->dispose = champlain_custom_marker_dispose;
 }
 
 
 static void
 champlain_custom_marker_init (ChamplainCustomMarker *custom_marker)
 {
-  ChamplainCustomMarkerPrivate *priv = GET_PRIVATE (custom_marker);
-
-  custom_marker->priv = priv;
 }
 
 
