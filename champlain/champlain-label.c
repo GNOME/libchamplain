@@ -100,13 +100,10 @@ struct _ChamplainLabelPrivate
   PangoEllipsizeMode ellipsize;
   gboolean draw_background;
 
-  ClutterActor *text_actor;
-  ClutterActor *shadow;
-  ClutterActor *background;
   guint redraw_id;
-  guint total_width;
-  guint total_height;
-  guint point;
+  gint total_width;
+  gint total_height;
+  gint point;
 };
 
 G_DEFINE_TYPE (ChamplainLabel, champlain_label, CHAMPLAIN_TYPE_MARKER);
@@ -287,13 +284,9 @@ champlain_label_dispose (GObject *object)
 {
   ChamplainLabelPrivate *priv = CHAMPLAIN_LABEL (object)->priv;
 
-  priv->background = NULL;
-  priv->shadow = NULL;
-  priv->text_actor = NULL;
-
   if (priv->image)
     {
-      g_object_unref (priv->image);
+      clutter_actor_destroy (priv->image);
       priv->image = NULL;
     }
 
@@ -666,27 +659,31 @@ draw_label (ChamplainLabel *label)
 {
   ChamplainLabelPrivate *priv = label->priv;
   ChamplainMarker *marker = CHAMPLAIN_MARKER (label);
-  guint height = 0;
-  guint total_width = 0, total_height = 0;
+  gint height = 0;
+  gint total_width = 0, total_height = 0;
+  ClutterActor *text_actor, *shadow, *background;
+  
+  text_actor = NULL;
+  shadow = NULL;
+  background = NULL;
+  
+  clutter_actor_remove_all_children (CLUTTER_ACTOR (label));
   
   if (priv->image != NULL)
     {
       clutter_actor_set_position (priv->image, PADDING, PADDING);
       total_width = clutter_actor_get_width (priv->image) + 2 * PADDING;
       total_height = clutter_actor_get_height (priv->image) + 2 * PADDING;
-      if (clutter_actor_get_parent (priv->image) == NULL)
-        clutter_actor_add_child (CLUTTER_ACTOR (label), priv->image);
+      clutter_actor_add_child (CLUTTER_ACTOR (label), priv->image);
     }
 
   if (priv->text != NULL && strlen (priv->text) > 0)
     {
       ClutterText *text;
-      if (priv->text_actor == NULL)
-        {
-          priv->text_actor = clutter_text_new_with_text (priv->font_name, priv->text);
-        }
+      
+      text_actor = clutter_text_new_with_text (priv->font_name, priv->text);
 
-      text = CLUTTER_TEXT (priv->text_actor);
+      text = CLUTTER_TEXT (text_actor);
       clutter_text_set_font_name (text, priv->font_name);
       clutter_text_set_text (text, priv->text);
       clutter_text_set_line_alignment (text, priv->alignment);
@@ -696,49 +693,35 @@ draw_label (ChamplainLabel *label)
       clutter_text_set_attributes (text, priv->attributes);
       clutter_text_set_use_markup (text, priv->use_markup);
 
-      height = clutter_actor_get_height (priv->text_actor);
+      height = clutter_actor_get_height (text_actor);
       if (priv->image != NULL)
         {
-          clutter_actor_set_position (priv->text_actor, total_width, (total_height - height) / 2.0);
-          total_width += clutter_actor_get_width (priv->text_actor) + 2 * PADDING;
+          clutter_actor_set_position (text_actor, total_width, (total_height - height) / 2.0);
+          total_width += clutter_actor_get_width (text_actor) + 2 * PADDING;
         }
       else
         {
-          clutter_actor_set_position (priv->text_actor, 2 * PADDING, PADDING);
-          total_width += clutter_actor_get_width (priv->text_actor) + 4 * PADDING;
+          clutter_actor_set_position (text_actor, 2 * PADDING, PADDING);
+          total_width += clutter_actor_get_width (text_actor) + 4 * PADDING;
         }
 
       height += 2 * PADDING;
-      if (height > total_height)
-        total_height = height;
+      total_height = MAX (total_height, height);
 
-      clutter_text_set_color (CLUTTER_TEXT (priv->text_actor),
+      clutter_text_set_color (text,
           (champlain_marker_get_selected (marker) ? champlain_marker_get_selection_text_color () : priv->text_color));
-      if (clutter_actor_get_parent (priv->text_actor) == NULL)
-        clutter_actor_add_child (CLUTTER_ACTOR (label), priv->text_actor);
+      clutter_actor_add_child (CLUTTER_ACTOR (label), text_actor);
     }
-
-  if (priv->text_actor == NULL && priv->image == NULL)
+    
+  if (text_actor == NULL && priv->image == NULL)
     {
       total_width = 6 * PADDING;
       total_height = 6 * PADDING;
     }
-
+    
   priv->point = (total_height + 2 * PADDING) / 4.0;
   priv->total_width = total_width;
   priv->total_height = total_height;
-
-  if (priv->background != NULL)
-    {
-      clutter_actor_remove_child (CLUTTER_ACTOR (label), priv->background);
-      priv->background = NULL;
-    }
-
-  if (priv->shadow != NULL)
-    {
-      clutter_actor_remove_child (CLUTTER_ACTOR (label), priv->shadow);
-      priv->shadow = NULL;
-    }
 
   if (priv->draw_background)
     {
@@ -748,10 +731,10 @@ draw_label (ChamplainLabel *label)
       clutter_canvas_set_size (CLUTTER_CANVAS (canvas), total_width, total_height + priv->point);
       g_signal_connect (canvas, "draw", G_CALLBACK (draw_background), label);
 
-      priv->background = clutter_actor_new ();
-      clutter_actor_set_size (priv->background, total_width, total_height + priv->point);
-      clutter_actor_set_content (priv->background, canvas);
-      clutter_actor_add_child (CLUTTER_ACTOR (label), priv->background);
+      background = clutter_actor_new ();
+      clutter_actor_set_size (background, total_width, total_height + priv->point);
+      clutter_actor_set_content (background, canvas);
+      clutter_actor_add_child (CLUTTER_ACTOR (label), background);
       clutter_content_invalidate (canvas);
       g_object_unref (canvas);
       
@@ -759,20 +742,20 @@ draw_label (ChamplainLabel *label)
       clutter_canvas_set_size (CLUTTER_CANVAS (canvas), total_width + get_shadow_slope_width (label), total_height + priv->point);
       g_signal_connect (canvas, "draw", G_CALLBACK (draw_shadow), label);
 
-      priv->shadow = clutter_actor_new ();
-      clutter_actor_set_size (priv->shadow, total_width + get_shadow_slope_width (label), total_height + priv->point);
-      clutter_actor_set_content (priv->shadow, canvas);
-      clutter_actor_add_child (CLUTTER_ACTOR (label), priv->shadow);
-      clutter_actor_set_position (priv->shadow, 0, total_height / 2.0);
+      shadow = clutter_actor_new ();
+      clutter_actor_set_size (shadow, total_width + get_shadow_slope_width (label), total_height + priv->point);
+      clutter_actor_set_content (shadow, canvas);
+      clutter_actor_add_child (CLUTTER_ACTOR (label), shadow);
+      clutter_actor_set_position (shadow, 0, total_height / 2.0);
       clutter_content_invalidate (canvas);
       g_object_unref (canvas);
     }
           
-  if (priv->text_actor != NULL && priv->background != NULL)
-    clutter_actor_set_child_above_sibling (CLUTTER_ACTOR (label), priv->text_actor, priv->background);
-  if (priv->image != NULL && priv->background != NULL)
-    clutter_actor_set_child_above_sibling (CLUTTER_ACTOR (label), priv->image, priv->background);
-
+  if (text_actor != NULL && background != NULL)
+    clutter_actor_set_child_above_sibling (CLUTTER_ACTOR (label), text_actor, background);
+  if (priv->image != NULL && background != NULL)
+    clutter_actor_set_child_above_sibling (CLUTTER_ACTOR (label), priv->image, background);
+/*
   if (priv->draw_background)
     {
       if (priv->alignment == PANGO_ALIGN_RIGHT)
@@ -784,10 +767,25 @@ draw_label (ChamplainLabel *label)
     clutter_actor_set_anchor_point (CLUTTER_ACTOR (label),
         clutter_actor_get_width (priv->image) / 2.0 + PADDING,
         clutter_actor_get_height (priv->image) / 2.0 + PADDING);
-  else if (priv->text_actor != NULL)
+  else if (text_actor != NULL)
     clutter_actor_set_anchor_point (CLUTTER_ACTOR (label),
         0,
-        clutter_actor_get_height (priv->text_actor) / 2.0);
+        clutter_actor_get_height (text_actor) / 2.0);
+        */
+        
+  if (priv->draw_background)
+    {
+      if (priv->alignment == PANGO_ALIGN_RIGHT)
+        clutter_actor_set_translation (CLUTTER_ACTOR (label), -total_width, -total_height - priv->point, 0);
+      else
+        clutter_actor_set_translation (CLUTTER_ACTOR (label), 0, -total_height - priv->point, 0);
+    }
+  else if (priv->image != NULL)
+    clutter_actor_set_translation (CLUTTER_ACTOR (label), -clutter_actor_get_width (priv->image) / 2.0 - PADDING,
+        -clutter_actor_get_height (priv->image) / 2.0 - PADDING, 0);
+  else if (text_actor != NULL)
+    clutter_actor_set_translation (CLUTTER_ACTOR (label), 0, -clutter_actor_get_height (text_actor) / 2.0, 0);
+         
 }
 
 
@@ -847,7 +845,6 @@ champlain_label_init (ChamplainLabel *label)
 
   priv->text = NULL;
   priv->image = NULL;
-  priv->background = NULL;
   priv->use_markup = FALSE;
   priv->alignment = PANGO_ALIGN_LEFT;
   priv->attributes = NULL;
@@ -860,8 +857,6 @@ champlain_label_init (ChamplainLabel *label)
   priv->ellipsize = PANGO_ELLIPSIZE_NONE;
   priv->draw_background = TRUE;
   priv->redraw_id = 0;
-  priv->shadow = NULL;
-  priv->text_actor = NULL;
   priv->total_width = 0;
   priv->total_height = 0;
 
