@@ -216,8 +216,6 @@ draw (ClutterCanvas *canvas,
   gdouble radius = size / 2.0;
   const ClutterColor *color;
 
-  clutter_actor_set_anchor_point (CLUTTER_ACTOR (point), radius, radius);
-
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
   cairo_paint (cr);
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
@@ -265,6 +263,7 @@ champlain_point_init (ChamplainPoint *point)
   clutter_canvas_set_size (CLUTTER_CANVAS (priv->canvas), priv->size, priv->size);
   clutter_actor_set_size (CLUTTER_ACTOR (point), priv->size, priv->size);
   clutter_actor_set_content (CLUTTER_ACTOR (point), priv->canvas);
+  clutter_actor_set_translation (CLUTTER_ACTOR (point), -priv->size/2, -priv->size/2, 0.0);
   clutter_content_invalidate (priv->canvas);
 
   g_signal_connect (point, "notify::selected", G_CALLBACK (notify_selected), NULL);
