@@ -101,7 +101,7 @@ enum
   PROP_ZOOM_ON_DOUBLE_CLICK,
   PROP_ANIMATE_ZOOM,
   PROP_STATE,
-  PROP_BACKGROUND_TILE,
+  PROP_BACKGROUND_PATTERN,
 };
 
 #define PADDING 10
@@ -144,7 +144,7 @@ struct _ChamplainViewPrivate
   ClutterActor *zoom_layer; 
   ClutterActor *license_actor; /* Contains the license info */
 
-  ClutterTexture *background_tile_actor; 
+  ClutterContent *background_content; 
 
   ChamplainMapSource *map_source; /* Current map tile source */
   gboolean kinetic_mode;
@@ -449,8 +449,8 @@ champlain_view_get_property (GObject *object,
       g_value_set_enum (value, priv->state);
       break;
 
-    case PROP_BACKGROUND_TILE:
-      g_value_set_object (value, priv->background_tile_actor);
+    case PROP_BACKGROUND_PATTERN:
+      g_value_set_object (value, priv->background_content);
       break;
 
     default:
@@ -518,8 +518,8 @@ champlain_view_set_property (GObject *object,
       champlain_view_set_animate_zoom (view, g_value_get_boolean (value));
       break;
       
-    case PROP_BACKGROUND_TILE:
-      champlain_view_set_background_tile (view, g_value_get_object (value));
+    case PROP_BACKGROUND_PATTERN:
+      champlain_view_set_background_pattern (view, g_value_get_object (value));
       break;
 
     default:
@@ -563,10 +563,10 @@ champlain_view_dispose (GObject *object)
       priv->map_source = NULL;
     }
 
-  if (priv->background_tile_actor)
+  if (priv->background_content)
     {
-      clutter_actor_destroy (CLUTTER_ACTOR (priv->background_tile_actor));
-      priv->background_tile_actor = NULL;
+      g_object_unref (priv->background_content);
+      priv->background_content = NULL;
     }
 
   priv->map_layer = NULL;
@@ -898,16 +898,16 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
           G_PARAM_READABLE));
 
   /**
-   * ChamplainView:background-tile:
+   * ChamplainView:background-pattern:
    *
    * The pattern displayed in the background of the map.
    *
    * Since: 0.12.4
    */
   g_object_class_install_property (object_class,
-      PROP_BACKGROUND_TILE,
-      g_param_spec_object ("background-tile",
-          "Background tile",
+      PROP_BACKGROUND_PATTERN,
+      g_param_spec_object ("background-pattern",
+          "Background pattern",
           "The tile's background pattern",
           CLUTTER_TYPE_ACTOR,
           G_PARAM_READWRITE));
@@ -1017,7 +1017,7 @@ champlain_view_init (ChamplainView *view)
   priv->tiles_loading = 0;
   priv->update_viewport_timer = g_timer_new ();
   priv->animating_zoom = FALSE;
-  priv->background_tile_actor = NULL;
+  priv->background_content = NULL;
 
   g_signal_connect (view, "notify::width", G_CALLBACK (view_size_changed_cb), NULL);
   g_signal_connect (view, "notify::height", G_CALLBACK (view_size_changed_cb), NULL);
@@ -1849,10 +1849,11 @@ fill_background_tiles (ChamplainView *view)
   gint children_count;
   gint tiles_count, x_count, y_count, x_first, y_first;
   gdouble x_coord, y_coord;
-  gint i, x, y, size;
+  gint i, x, y;
+  gfloat size;
 
-  size = clutter_actor_get_width (CLUTTER_ACTOR (priv->background_tile_actor));
-  
+  clutter_content_get_preferred_size (priv->background_content, &size, &size);
+
   x_coord = priv->viewport_x + priv->anchor_x;
   y_coord = priv->viewport_y + priv->anchor_y;
 
@@ -1870,11 +1871,10 @@ fill_background_tiles (ChamplainView *view)
       /* add missing background tiles */
       for (i = children_count; i < tiles_count; ++i)
         {
-          ClutterActor *clone = clutter_texture_new ();
-          CoglHandle handle = clutter_texture_get_cogl_texture (priv->background_tile_actor);
-          clutter_texture_set_cogl_texture (CLUTTER_TEXTURE (clone), handle);
-
-          clutter_actor_add_child (priv->background_layer, clone);
+          ClutterActor *actor = clutter_actor_new ();
+          clutter_actor_set_size (actor, size, size);
+          clutter_actor_set_content (actor, priv->background_content);
+          clutter_actor_add_child (priv->background_layer, actor);
         }
     }
   else if (children_count > tiles_count)
@@ -1956,7 +1956,7 @@ view_load_visible_tiles (ChamplainView *view)
   tile_map = g_slice_alloc0 (sizeof (gboolean) * x_count * y_count);
 
   /* fill background tiles */
-  if (priv->background_tile_actor != NULL)
+  if (priv->background_content != NULL)
     {
       fill_background_tiles (view);
     }
@@ -2421,7 +2421,7 @@ champlain_view_ensure_layers_visible (ChamplainView *view,
 
 
 /**
- * champlain_view_set_background_tile:
+ * champlain_view_set_background_pattern:
  * @view: a #ChamplainView
  * @background: The background texture
  *
@@ -2430,8 +2430,8 @@ champlain_view_ensure_layers_visible (ChamplainView *view,
  * Since: 0.12.4
  */
 void 
-champlain_view_set_background_tile (ChamplainView *view,
-    ClutterTexture *background)
+champlain_view_set_background_pattern (ChamplainView *view,
+    ClutterContent *background)
 {
   DEBUG_LOG ()
 
@@ -2439,15 +2439,16 @@ champlain_view_set_background_tile (ChamplainView *view,
 
   ChamplainViewPrivate *priv = view->priv;
   
-  if (priv->background_tile_actor)
-    clutter_actor_destroy (CLUTTER_ACTOR (priv->background_tile_actor));
-
-  priv->background_tile_actor = g_object_ref_sink (background);
+  if (priv->background_content)
+    g_object_unref (priv->background_content);
+    
+  priv->background_content = g_object_ref_sink (background);
+  clutter_actor_destroy_all_children (priv->background_layer);
 }
 
 
 /**
- * champlain_view_get_background_tile:
+ * champlain_view_get_background_pattern:
  * @view: a #ChamplainView
  *
  * Gets the current background texture displayed behind the map.
@@ -2456,8 +2457,8 @@ champlain_view_set_background_tile (ChamplainView *view,
  * 
  * Since: 0.12.4
  */
-ClutterTexture *
-champlain_view_get_background_tile (ChamplainView *view)
+ClutterContent *
+champlain_view_get_background_pattern (ChamplainView *view)
 {
   DEBUG_LOG ()
 
@@ -2465,7 +2466,7 @@ champlain_view_get_background_tile (ChamplainView *view)
 
   ChamplainViewPrivate *priv = view->priv;
 
-  return priv->background_tile_actor;
+  return priv->background_content;
 }
 
 
