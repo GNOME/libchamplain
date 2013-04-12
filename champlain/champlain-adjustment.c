@@ -295,8 +295,8 @@ champlain_adjustment_set_value (ChamplainAdjustment *adjustment,
   stop_interpolation (adjustment);
 
   if (!priv->elastic)
-    value = CLAMP (value, priv->lower, MAX (priv->lower,
-              priv->upper));
+    value = CLAMP (value, MIN (priv->lower, priv->upper), 
+              MAX (priv->lower, priv->upper));
 
   if (priv->value != value)
     {

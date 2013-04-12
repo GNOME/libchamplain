@@ -344,14 +344,15 @@ resize_viewport (ChamplainView *view)
 
   if (priv->zoom_level < 8)
     {
-      lower_x = 0.0;
-      lower_y = 0.0;
-      upper_x = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level) *
-        champlain_map_source_get_tile_size (priv->map_source) -
-        priv->viewport_width;
-      upper_y = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
-        champlain_map_source_get_tile_size (priv->map_source) -
-        priv->viewport_height;
+      gdouble map_width = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level) *
+        champlain_map_source_get_tile_size (priv->map_source);
+      gdouble map_height = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
+        champlain_map_source_get_tile_size (priv->map_source);
+      
+      lower_x = MIN (-priv->viewport_width / 2.0, -priv->viewport_width + map_width / 2.0);
+      lower_y = MIN (-priv->viewport_height / 2.0, -priv->viewport_height + map_height / 2.0);
+      upper_x = MAX (map_width - priv->viewport_width / 2.0, map_width / 2.0);
+      upper_y = MAX (map_height - priv->viewport_height / 2.0, map_height / 2.0);
     }
 
   /*
@@ -1289,6 +1290,8 @@ view_update_anchor (ChamplainView *view,
 
   if (priv->zoom_level >= 8)
     need_anchor = TRUE;
+  else if (priv->anchor_x == 0 && priv->anchor_y == 0)
+    return FALSE;
 
   /* update anchor one viewport size before reaching the margin to be sure */
   if (priv->anchor_zoom_level != priv->zoom_level ||
