@@ -20,9 +20,7 @@
  * Written by: Chris Lord <chris@openedhand.com>
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #include <clutter/clutter.h>
 
@@ -312,20 +310,14 @@ champlain_viewport_get_adjustments (ChamplainViewport *viewport,
       else
         {
           ChamplainAdjustment *adjustment;
-          ClutterActor *stage;
-          guint width, stage_width, increment;
+          guint width;
 
           width = clutter_actor_get_width (CLUTTER_ACTOR (viewport));
-          stage = clutter_actor_get_stage (CLUTTER_ACTOR (viewport));
-          stage_width =  (stage != NULL) ? clutter_actor_get_width (stage) : 1;
-          increment = MAX (1, MIN (stage_width, width));
 
           adjustment = champlain_adjustment_new (priv->x,
                 0,
                 width,
-                1,
-                increment,
-                increment);
+                1);
           champlain_viewport_set_adjustments (viewport,
               adjustment,
               priv->vadjustment);
@@ -340,20 +332,14 @@ champlain_viewport_get_adjustments (ChamplainViewport *viewport,
       else
         {
           ChamplainAdjustment *adjustment;
-          ClutterActor *stage;
-          guint height, stage_height, increment;
+          guint height;
 
           height = clutter_actor_get_height (CLUTTER_ACTOR (viewport));
-          stage = clutter_actor_get_stage (CLUTTER_ACTOR (viewport));
-          stage_height = (stage != NULL) ? clutter_actor_get_height (stage) : 1;
-          increment = MAX (1, MIN (stage_height, height));
 
           adjustment = champlain_adjustment_new (priv->y,
                 0,
                 height,
-                1,
-                increment,
-                increment);
+                1);
           champlain_viewport_set_adjustments (viewport,
               priv->hadjustment,
               adjustment);
@@ -391,6 +377,10 @@ champlain_viewport_set_origin (ChamplainViewport *viewport,
 
   g_object_freeze_notify (G_OBJECT (viewport));
 
+  child = clutter_actor_get_first_child (CLUTTER_ACTOR (viewport));
+  if (child && (x != priv->x || y != priv->y))
+    clutter_actor_set_position (child, -x, -y);
+
   if (x != priv->x)
     {
       priv->x = x;
@@ -412,10 +402,6 @@ champlain_viewport_set_origin (ChamplainViewport *viewport,
     }
 
   g_object_thaw_notify (G_OBJECT (viewport));
-
-  child = clutter_actor_get_first_child (CLUTTER_ACTOR (viewport));
-  if (child)
-    clutter_actor_set_position (child, -x, -y);
 }
 
 

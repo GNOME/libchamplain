@@ -344,14 +344,14 @@ resize_viewport (ChamplainView *view)
 
   if (priv->zoom_level < 8)
     {
-      lower_x = -priv->viewport_width / 2.0;
-      lower_y = -priv->viewport_height / 2.0;
+      lower_x = 0.0;
+      lower_y = 0.0;
       upper_x = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level) *
         champlain_map_source_get_tile_size (priv->map_source) -
-        priv->viewport_width / 2.0;
+        priv->viewport_width;
       upper_y = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
         champlain_map_source_get_tile_size (priv->map_source) -
-        priv->viewport_height / 2.0;
+        priv->viewport_height;
     }
 
   /*
@@ -362,21 +362,8 @@ resize_viewport (ChamplainView *view)
    */
   g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 
-  g_object_set (hadjust, 
-      "lower", lower_x, 
-      "upper", upper_x,
-      "page-size", 1.0, 
-      "step-increment", 1.0, 
-      "elastic", TRUE, 
-      NULL);
-
-  g_object_set (vadjust, 
-      "lower", lower_y, 
-      "upper", upper_y,
-      "page-size", 1.0, 
-      "step-increment", 1.0, 
-      "elastic", TRUE, 
-      NULL);
+  champlain_adjustment_set_values (hadjust, champlain_adjustment_get_value (hadjust), lower_x, upper_x, 1.0);
+  champlain_adjustment_set_values (vadjust, champlain_adjustment_get_value (vadjust), lower_y, upper_y, 1.0);
 
   g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 }
@@ -2213,7 +2200,7 @@ champlain_view_set_deceleration (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view) &&
       rate < 2.0 && rate > 1.0001);
 
-  g_object_set (view->priv->kinetic_scroll, "deceleration", rate, NULL);
+  g_object_set (view->priv->kinetic_scroll, "decel-rate", rate, NULL);
   g_object_notify (G_OBJECT (view), "deceleration");
 }
 
@@ -2780,7 +2767,7 @@ champlain_view_get_deceleration (ChamplainView *view)
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
 
   gdouble decel = 0.0;
-  g_object_get (view->priv->kinetic_scroll, "deceleration", &decel, NULL);
+  g_object_get (view->priv->kinetic_scroll, "decel-rate", &decel, NULL);
   return decel;
 }
 

@@ -322,7 +322,7 @@ clamp_adjustments (ChamplainKineticScrollView *scroll)
           gdouble d, value, lower, step_increment;
 
           champlain_adjustment_get_values (hadj, &value, &lower, NULL,
-              &step_increment, NULL, NULL);
+              &step_increment);
           d = (rint ((value - lower) / step_increment) *
                step_increment) + lower;
           champlain_adjustment_set_value (hadj, d);
@@ -338,7 +338,7 @@ clamp_adjustments (ChamplainKineticScrollView *scroll)
           gdouble d, value, lower, step_increment;
 
           champlain_adjustment_get_values (vadj, &value, &lower, NULL,
-              &step_increment, NULL, NULL);
+              &step_increment);
           d = (rint ((value - lower) / step_increment) *
                step_increment) + lower;
           champlain_adjustment_set_value (vadj, d);
@@ -368,7 +368,7 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
 
   if (priv->child)
     {
-      gdouble value, lower, upper, page_size;
+      gdouble value, lower, upper;
       ChamplainAdjustment *hadjust, *vadjust;
       gint i;
       gboolean stop = TRUE;
@@ -391,16 +391,16 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
 
       /* Check if we've hit the upper or lower bounds and stop the timeline */
       champlain_adjustment_get_values (hadjust, &value, &lower, &upper,
-          NULL, NULL, &page_size);
-      if (((priv->dx > 0) && (value < upper - page_size)) ||
+          NULL);
+      if (((priv->dx > 0) && (value < upper)) ||
           ((priv->dx < 0) && (value > lower)))
         stop = FALSE;
 
       if (stop)
         {
           champlain_adjustment_get_values (vadjust, &value, &lower, &upper,
-              NULL, NULL, &page_size);
-          if (((priv->dy > 0) && (value < upper - page_size)) ||
+              NULL);
+          if (((priv->dy > 0) && (value < upper)) ||
               ((priv->dy < 0) && (value > lower)))
             stop = FALSE;
         }
@@ -555,7 +555,7 @@ button_release_event_cb (ClutterActor *stage,
                   /* Solving for dx */
                   d = a * priv->dx;
                   champlain_adjustment_get_values (hadjust, &value, &lower, NULL,
-                      &step_increment, NULL, NULL);
+                      &step_increment);
                   d = ((rint (((value + d) - lower) / step_increment) *
                         step_increment) + lower) - value;
                   priv->dx = (d / a);
@@ -563,7 +563,7 @@ button_release_event_cb (ClutterActor *stage,
                   /* Solving for dy */
                   d = a * (priv->dy);
                   champlain_adjustment_get_values (vadjust, &value, &lower, NULL,
-                      &step_increment, NULL, NULL);
+                      &step_increment);
                   d = ((rint (((value + d) - lower) / step_increment) *
                         step_increment) + lower) - value;
                   priv->dy = (d / a);
@@ -581,13 +581,13 @@ button_release_event_cb (ClutterActor *stage,
                   a = (1.0 - 1.0 / pow (y, 4 + 1)) / (1.0 - 1.0 / y);
 
                   champlain_adjustment_get_values (hadjust, &value, &lower, NULL,
-                      &step_increment, NULL, NULL);
+                      &step_increment);
                   d = ((rint ((value - lower) / step_increment) *
                         step_increment) + lower) - value;
                   priv->dx = (d / a);
 
                   champlain_adjustment_get_values (vadjust, &value, &lower, NULL,
-                      &step_increment, NULL, NULL);
+                      &step_increment);
                   d = ((rint ((value - lower) / step_increment) *
                         step_increment) + lower) - value;
                   priv->dy = (d / a);

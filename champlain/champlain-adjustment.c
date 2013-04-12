@@ -20,11 +20,8 @@
  * Written by: Chris Lord <chris@openedhand.com>, inspired by GtkAdjustment
  */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
-#include <glib-object.h>
 #include <clutter/clutter.h>
 
 #include "champlain-adjustment.h"
@@ -42,8 +39,6 @@ struct _ChamplainAdjustmentPrivate
   gdouble upper;
   gdouble value;
   gdouble step_increment;
-  gdouble page_increment;
-  gdouble page_size;
 
   /* For interpolation */
   ClutterTimeline *interpolation;
@@ -63,8 +58,6 @@ enum
   PROP_UPPER,
   PROP_VALUE,
   PROP_STEP_INC,
-  PROP_PAGE_INC,
-  PROP_PAGE_SIZE,
 
   PROP_ELASTIC,
 };
@@ -84,10 +77,6 @@ static void champlain_adjustment_set_upper (ChamplainAdjustment *adjustment,
     gdouble upper);
 static void champlain_adjustment_set_step_increment (ChamplainAdjustment *adjustment,
     gdouble step);
-static void champlain_adjustment_set_page_increment (ChamplainAdjustment *adjustment,
-    gdouble page);
-static void champlain_adjustment_set_page_size (ChamplainAdjustment *adjustment,
-    gdouble size);
 
 static void
 champlain_adjustment_get_property (GObject *object,
@@ -113,14 +102,6 @@ champlain_adjustment_get_property (GObject *object,
 
     case PROP_STEP_INC:
       g_value_set_double (value, priv->step_increment);
-      break;
-
-    case PROP_PAGE_INC:
-      g_value_set_double (value, priv->page_increment);
-      break;
-
-    case PROP_PAGE_SIZE:
-      g_value_set_double (value, priv->page_size);
       break;
 
     case PROP_ELASTIC:
@@ -158,14 +139,6 @@ champlain_adjustment_set_property (GObject *object,
 
     case PROP_STEP_INC:
       champlain_adjustment_set_step_increment (adj, g_value_get_double (value));
-      break;
-
-    case PROP_PAGE_INC:
-      champlain_adjustment_set_page_increment (adj, g_value_get_double (value));
-      break;
-
-    case PROP_PAGE_SIZE:
-      champlain_adjustment_set_page_size (adj, g_value_get_double (value));
       break;
 
     case PROP_ELASTIC:
@@ -257,24 +230,6 @@ champlain_adjustment_class_init (ChamplainAdjustmentClass *klass)
           0.0,
           CHAMPLAIN_PARAM_READWRITE));
   g_object_class_install_property (object_class,
-      PROP_PAGE_INC,
-      g_param_spec_double ("page-increment",
-          "Page Increment",
-          "Page increment",
-          -G_MAXDOUBLE,
-          G_MAXDOUBLE,
-          0.0,
-          CHAMPLAIN_PARAM_READWRITE));
-  g_object_class_install_property (object_class,
-      PROP_PAGE_SIZE,
-      g_param_spec_double ("page-size",
-          "Page Size",
-          "Page size",
-          -G_MAXDOUBLE,
-          G_MAXDOUBLE,
-          0.0,
-          CHAMPLAIN_PARAM_READWRITE));
-  g_object_class_install_property (object_class,
       PROP_ELASTIC,
       g_param_spec_boolean ("elastic",
           "Elastic",
@@ -307,17 +262,13 @@ ChamplainAdjustment *
 champlain_adjustment_new (gdouble value,
     gdouble lower,
     gdouble upper,
-    gdouble step_increment,
-    gdouble page_increment,
-    gdouble page_size)
+    gdouble step_increment)
 {
   return g_object_new (CHAMPLAIN_TYPE_ADJUSTMENT,
       "value", value,
       "lower", lower,
       "upper", upper,
       "step-increment", step_increment,
-      "page-increment", page_increment,
-      "page-size", page_size,
       NULL);
 }
 
@@ -345,7 +296,7 @@ champlain_adjustment_set_value (ChamplainAdjustment *adjustment,
 
   if (!priv->elastic)
     value = CLAMP (value, priv->lower, MAX (priv->lower,
-              priv->upper - priv->page_size));
+              priv->upper));
 
   if (priv->value != value)
     {
@@ -369,14 +320,14 @@ champlain_adjustment_clamp_page (ChamplainAdjustment *adjustment,
 
   stop_interpolation (adjustment);
 
-  lower = CLAMP (lower, priv->lower, priv->upper - priv->page_size);
-  upper = CLAMP (upper, priv->lower + priv->page_size, priv->upper);
+  lower = CLAMP (lower, priv->lower, priv->upper);
+  upper = CLAMP (upper, priv->lower, priv->upper);
 
   changed = FALSE;
 
-  if (priv->value + priv->page_size > upper)
+  if (priv->value > upper)
     {
-      priv->value = upper - priv->page_size;
+      priv->value = upper;
       changed = TRUE;
     }
 
@@ -446,39 +397,54 @@ champlain_adjustment_set_step_increment (ChamplainAdjustment *adjustment,
 }
 
 
-static void
-champlain_adjustment_set_page_increment (ChamplainAdjustment *adjustment,
-    gdouble page)
+void
+champlain_adjustment_set_values (ChamplainAdjustment *adjustment,
+    gdouble value,
+    gdouble lower,
+    gdouble upper,
+    gdouble step_increment)
 {
-  ChamplainAdjustmentPrivate *priv = adjustment->priv;
+  ChamplainAdjustmentPrivate *priv;
+  gboolean emit_changed = FALSE;
 
-  if (priv->page_increment != page)
+  g_return_if_fail (CHAMPLAIN_IS_ADJUSTMENT (adjustment));
+
+  priv = adjustment->priv;
+
+  stop_interpolation (adjustment);
+
+  g_object_freeze_notify (G_OBJECT (adjustment));
+
+  if (priv->lower != lower)
     {
-      priv->page_increment = page;
+      priv->lower = lower;
+      emit_changed = TRUE;
 
-      g_signal_emit (adjustment, signals[CHANGED], 0);
-
-      g_object_notify (G_OBJECT (adjustment), "page-increment");
+      g_object_notify (G_OBJECT (adjustment), "lower");
     }
-}
 
-
-static void
-champlain_adjustment_set_page_size (ChamplainAdjustment *adjustment,
-    gdouble size)
-{
-  ChamplainAdjustmentPrivate *priv = adjustment->priv;
-
-  if (priv->page_size != size)
+  if (priv->upper != upper)
     {
-      priv->page_size = size;
+      priv->upper = upper;
+      emit_changed = TRUE;
 
-      g_signal_emit (adjustment, signals[CHANGED], 0);
-
-      g_object_notify (G_OBJECT (adjustment), "page_size");
-
-      champlain_adjustment_clamp_page (adjustment, priv->lower, priv->upper);
+      g_object_notify (G_OBJECT (adjustment), "upper");
     }
+
+  if (priv->step_increment != step_increment)
+    {
+      priv->step_increment = step_increment;
+      emit_changed = TRUE;
+
+      g_object_notify (G_OBJECT (adjustment), "step-increment");
+    }
+
+  champlain_adjustment_set_value (adjustment, value);
+
+  if (emit_changed)
+    g_signal_emit (G_OBJECT (adjustment), signals[CHANGED], 0);
+
+  g_object_thaw_notify (G_OBJECT (adjustment));
 }
 
 
@@ -487,9 +453,7 @@ champlain_adjustment_get_values (ChamplainAdjustment *adjustment,
     gdouble *value,
     gdouble *lower,
     gdouble *upper,
-    gdouble *step_increment,
-    gdouble *page_increment,
-    gdouble *page_size)
+    gdouble *step_increment)
 {
   ChamplainAdjustmentPrivate *priv;
 
@@ -508,12 +472,6 @@ champlain_adjustment_get_values (ChamplainAdjustment *adjustment,
 
   if (step_increment)
     *step_increment = priv->step_increment;
-
-  if (page_increment)
-    *page_increment = priv->page_increment;
-
-  if (page_size)
-    *page_size = priv->page_size;
 }
 
 
@@ -552,28 +510,6 @@ interpolation_completed_cb (ClutterTimeline *timeline,
       priv->new_position);
 }
 
-
-/* Note, there's super-optimal code that does a similar thing in
- * clutter-alpha.c
- *
- * Tried this instead of CLUTTER_ALPHA_SINE_INC, but I think SINE_INC looks
- * better. Leaving code here in case this is revisited.
- */
-/*
-   static guint32
-   bounce_alpha_func (ClutterAlpha *alpha,
-                   gpointer      user_data)
-   {
-   gdouble progress, angle;
-   ClutterTimeline *timeline = clutter_alpha_get_timeline (alpha);
-
-   progress = clutter_timeline_get_progressx (timeline);
-   angle = clutter_qmulx (CFX_PI_2 + CFX_PI_4/2, progress);
-
-   return clutter_sinx (angle) +
-    (CFX_ONE - clutter_sinx (CFX_PI_2 + CFX_PI_4/2));
-   }
- */
 
 void
 champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
@@ -639,8 +575,8 @@ champlain_adjustment_clamp (ChamplainAdjustment *adjustment,
 
   if (priv->value < priv->lower)
     dest = priv->lower;
-  if (priv->value > priv->upper - priv->page_size)
-    dest = priv->upper - priv->page_size;
+  if (priv->value > priv->upper)
+    dest = priv->upper;
 
   if (dest != priv->value)
     {

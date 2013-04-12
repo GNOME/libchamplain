@@ -84,9 +84,7 @@ GType champlain_adjustment_get_type (void) G_GNUC_CONST;
 ChamplainAdjustment *champlain_adjustment_new (gdouble value,
     gdouble lower,
     gdouble upper,
-    gdouble step_increment,
-    gdouble page_increment,
-    gdouble page_size);
+    gdouble step_increment);
 gdouble champlain_adjustment_get_value (ChamplainAdjustment *adjustment);
 void champlain_adjustment_set_value (ChamplainAdjustment *adjustment,
     gdouble value);
@@ -94,16 +92,12 @@ void champlain_adjustment_set_values (ChamplainAdjustment *adjustment,
     gdouble value,
     gdouble lower,
     gdouble upper,
-    gdouble step_increment,
-    gdouble page_increment,
-    gdouble page_size);
+    gdouble step_increment);
 void champlain_adjustment_get_values (ChamplainAdjustment *adjustment,
     gdouble *value,
     gdouble *lower,
     gdouble *upper,
-    gdouble *step_increment,
-    gdouble *page_increment,
-    gdouble *page_size);
+    gdouble *step_increment);
 
 void champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
     gdouble value,
