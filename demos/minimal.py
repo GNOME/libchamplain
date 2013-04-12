@@ -6,10 +6,8 @@
 # export GI_TYPELIB_PATH=$GI_TYPELIB_PATH:/usr/local/lib/girepository-1.0/
 
 from gi.repository import GtkClutter
-GtkClutter.init([])
 from gi.repository import GObject, Gtk, GtkChamplain 
 
-GObject.threads_init()
 GtkClutter.init([])
 
 window = Gtk.Window(type=Gtk.WindowType.TOPLEVEL)

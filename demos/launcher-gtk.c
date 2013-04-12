@@ -63,7 +63,7 @@ toggle_layer (GtkToggleButton *widget,
 }
 
 
-gboolean
+static gboolean
 mouse_click_cb (ClutterActor *actor, ClutterButtonEvent *event, ChamplainView *view)
 {
   gdouble lat, lon;
@@ -165,7 +165,6 @@ build_combo_box (GtkComboBox *box)
 {
   ChamplainMapSourceFactory *factory;
   GSList *sources, *iter;
-  gint i = 0;
   GtkTreeStore *store;
   GtkTreeIter parent;
   GtkCellRenderer *cell;
@@ -266,8 +265,6 @@ main (int argc,
   ChamplainMarkerLayer *layer;
   ClutterActor *scale;
   ChamplainLicense *license_actor;
-  gint size;
-  ChamplainMapSource *map_source;
 
   if (gtk_clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;

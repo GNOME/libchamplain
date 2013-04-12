@@ -21,24 +21,13 @@
 
 #define MARKER_SIZE 10
 
-/* The marker is drawn with cairo.  It is composed of 1 static filled circle
- * and 1 stroked circle animated as an echo.
- */
-static ClutterActor *
-create_marker ()
+
+static gboolean
+draw_center (ClutterCanvas *canvas,
+    cairo_t *cr,
+    int width,
+    int height)
 {
-  ClutterActor *marker;
-  ClutterActor *bg;
-  ClutterTimeline *timeline;
-  cairo_t *cr;
-
-  /* Create the marker */
-  marker = champlain_custom_marker_new ();
-
-  /* Static filled circle ----------------------------------------------- */
-  bg = clutter_cairo_texture_new (MARKER_SIZE, MARKER_SIZE);
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (bg));
-
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
   cairo_paint(cr);
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
@@ -51,19 +40,18 @@ create_marker ()
   /* Fill the circle */
   cairo_set_source_rgba (cr, 0.1, 0.1, 0.9, 1.0);
   cairo_fill (cr);
+  
+  return TRUE;
+}
 
-  cairo_destroy (cr);
 
-  /* Add the circle to the marker */
-  clutter_actor_add_child (marker, bg);
-  clutter_actor_set_anchor_point_from_gravity (bg, CLUTTER_GRAVITY_CENTER);
-  clutter_actor_set_position (bg, 0, 0);
-
-  /* Echo circle -------------------------------------------------------- */
-  bg = clutter_cairo_texture_new (2 * MARKER_SIZE, 2 * MARKER_SIZE);
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (bg));
-
-  /* Draw the circle */
+static gboolean
+draw_circle (ClutterCanvas *canvas,
+    cairo_t *cr,
+    int width,
+    int height)
+{
+   /* Draw the circle */
   cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_arc (cr, MARKER_SIZE, MARKER_SIZE, 0.9 * MARKER_SIZE, 0, 2 * M_PI);
   cairo_close_path (cr);
@@ -73,28 +61,78 @@ create_marker ()
   cairo_set_source_rgba (cr, 0.1, 0.1, 0.7, 1.0);
   cairo_stroke (cr);
 
-  cairo_destroy (cr);
+  return TRUE;
+}
+
+
+/* The marker is drawn with cairo.  It is composed of 1 static filled circle
+ * and 1 stroked circle animated as an echo.
+ */
+static ClutterActor *
+create_marker ()
+{
+  ClutterActor *marker;
+  ClutterActor *bg;
+  ClutterContent *canvas;
+  ClutterTransition *transition;
+
+  /* Create the marker */
+  marker = champlain_custom_marker_new ();
+
+  /* Static filled circle ----------------------------------------------- */
+  canvas = clutter_canvas_new ();
+  clutter_canvas_set_size (CLUTTER_CANVAS (canvas), MARKER_SIZE, MARKER_SIZE);
+  g_signal_connect (canvas, "draw", G_CALLBACK (draw_center), NULL);
+
+  bg = clutter_actor_new ();
+  clutter_actor_set_size (bg, MARKER_SIZE, MARKER_SIZE);
+  clutter_actor_set_content (bg, canvas);
+  clutter_content_invalidate (canvas);
+  g_object_unref (canvas);
 
   /* Add the circle to the marker */
   clutter_actor_add_child (marker, bg);
-  clutter_actor_lower_bottom (bg); /* Ensure it is under the previous circle */
-  clutter_actor_set_position (bg, 0, 0);
-  clutter_actor_set_anchor_point_from_gravity (bg, CLUTTER_GRAVITY_CENTER);
+  clutter_actor_set_position (bg, -0.5 * MARKER_SIZE, -0.5 * MARKER_SIZE);
 
-  /* Animate the echo circle */
-  timeline = clutter_timeline_new (1000);
-  clutter_timeline_set_loop (timeline, TRUE);
-  clutter_actor_set_opacity (CLUTTER_ACTOR (bg), 255);
-  clutter_actor_set_scale (CLUTTER_ACTOR (bg), 0.5, 0.5);
-  clutter_actor_animate_with_timeline (CLUTTER_ACTOR (bg),
-      CLUTTER_EASE_OUT_SINE, 
-      timeline, 
-      "opacity", 0, 
-      "scale-x", 2.0, 
-      "scale-y", 2.0, 
-      NULL);
+  /* Echo circle -------------------------------------------------------- */
+  canvas = clutter_canvas_new ();
+  clutter_canvas_set_size (CLUTTER_CANVAS (canvas), 2 * MARKER_SIZE, 2 * MARKER_SIZE);
+  g_signal_connect (canvas, "draw", G_CALLBACK (draw_circle), NULL);
 
-  clutter_timeline_start (timeline);
+  bg = clutter_actor_new ();
+  clutter_actor_set_size (bg, 2 * MARKER_SIZE, 2 * MARKER_SIZE);
+  clutter_actor_set_content (bg, canvas);
+  clutter_content_invalidate (canvas);
+  g_object_unref (canvas);
+
+  /* Add the circle to the marker */
+  clutter_actor_add_child (marker, bg);
+  clutter_actor_set_pivot_point (bg, 0.5, 0.5);
+  clutter_actor_set_position (bg, -MARKER_SIZE, -MARKER_SIZE);
+
+  transition = clutter_property_transition_new ("opacity");
+  clutter_actor_set_easing_mode (bg, CLUTTER_EASE_OUT_SINE);
+  clutter_timeline_set_duration (CLUTTER_TIMELINE (transition), 1000);
+  clutter_timeline_set_repeat_count (CLUTTER_TIMELINE (transition), -1);
+  clutter_transition_set_from (transition, G_TYPE_UINT, 255);
+  clutter_transition_set_to (transition, G_TYPE_UINT, 0);
+  clutter_actor_add_transition (bg, "animate-opacity", transition);
+
+  transition = clutter_property_transition_new ("scale-x");
+  clutter_actor_set_easing_mode (bg, CLUTTER_EASE_OUT_SINE);
+  clutter_timeline_set_duration (CLUTTER_TIMELINE (transition), 1000);
+  clutter_timeline_set_repeat_count (CLUTTER_TIMELINE (transition), -1);
+  clutter_transition_set_from (transition, G_TYPE_FLOAT, 0.5);
+  clutter_transition_set_to (transition, G_TYPE_FLOAT, 2.0);
+  clutter_actor_add_transition (bg, "animate-scale-x", transition);
+
+  transition = clutter_property_transition_new ("scale-y");
+  clutter_actor_set_easing_mode (bg, CLUTTER_EASE_OUT_SINE);
+  clutter_timeline_set_duration (CLUTTER_TIMELINE (transition), 1000);
+  clutter_timeline_set_repeat_count (CLUTTER_TIMELINE (transition), -1);
+  clutter_transition_set_from (transition, G_TYPE_FLOAT, 0.5);
+  clutter_transition_set_to (transition, G_TYPE_FLOAT, 2.0);
+  clutter_actor_add_transition (bg, "animate-scale-y", transition);
 
   return marker;
 }

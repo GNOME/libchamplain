@@ -22,6 +22,7 @@
 #include <champlain/champlain-memphis-renderer.h>
 #include <champlain-gtk/champlain-gtk.h>
 #include <clutter-gtk/clutter-gtk.h>
+#include <memphis/memphis.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -181,7 +182,7 @@ static void
 rule_window_close_cb (GtkWidget *widget, gpointer data)
 {
   gtk_widget_destroy (rule_edit_window);
-  memphis_rule_free (current_rule);
+  memphis_rule_free (MEMPHIS_RULE (current_rule));
   current_rule = NULL;
   rule_edit_window = NULL;
 }
@@ -238,7 +239,7 @@ rule_apply_cb (GtkWidget *widget, ChamplainMemphisRenderer *renderer)
 }
 
 
-GtkWidget *
+static GtkWidget *
 gtk_memphis_prop_new (gint type, ChamplainMemphisRuleAttr *attr)
 {
   GtkWidget *hbox, *cb, *sb1, *sb2, *sb3;
@@ -411,7 +412,7 @@ request_osm_data_cb (GtkWidget *widget, ChamplainView *view)
 }
 
 
-void
+static void
 bg_color_set_cb (GtkColorButton *widget, ChamplainView *view)
 {
   GdkRGBA gdk_color;
@@ -610,7 +611,6 @@ build_source_combo_box (GtkComboBox *box)
 {
   ChamplainMapSourceFactory *factory;
   GSList *sources, *iter;
-  gint i = 0;
   GtkTreeStore *store;
   GtkTreeIter parent;
   GtkCellRenderer *cell;
@@ -698,7 +698,7 @@ build_rules_combo_box (GtkComboBox *box)
 }
 
 
-void
+static void
 list_item_selected_cb (GtkTreeView *tree_view,
     GtkTreePath *path,
     GtkTreeViewColumn *column,

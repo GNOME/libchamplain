@@ -30,21 +30,21 @@ public class Launcher : GLib.Object
   {
     float width, total_width = 0;
 
-    stage = Clutter.Stage.get_default ();
+    stage = new Clutter.Stage ();
     stage.title = "Champlain Vala Example";
     stage.set_size (800, 600);
 
     /* Create the map view */
     view = new Champlain.View ();
     view.set_size (800, 600);
-    stage.add_actor (view);
+    stage.add_child (view);
 
     /* Create the buttons */
-    var buttons = new Clutter.Group ();
+    var buttons = new Clutter.Actor ();
     buttons.set_position (PADDING, PADDING);
 
     var button = make_button ("Zoom in");
-    buttons.add_actor (button);
+    buttons.add_child (button);
     button.reactive = true;
     button.get_size (out width, null);
     total_width += width + PADDING;
@@ -54,7 +54,7 @@ public class Launcher : GLib.Object
       });
 
     button = make_button ("Zoom out");
-    buttons.add_actor (button);
+    buttons.add_child (button);
     button.reactive = true;
     button.set_position (total_width, 0);
     button.get_size (out width, null);
@@ -64,7 +64,7 @@ public class Launcher : GLib.Object
         return true;
       });
 
-    stage.add_actor (buttons);
+    stage.add_child (buttons);
 
     /* Create the markers and marker layer */
     var layer = new  DemoLayer ();
@@ -106,14 +106,15 @@ public class Launcher : GLib.Object
     Clutter.Color black = { 0x00, 0x00, 0x00, 0xff };
     float width, height;
 
-    var button = new Clutter.Group ();
+    var button = new Clutter.Actor ();
 
-    var button_bg = new Clutter.Rectangle.with_color (white);
-    button.add_actor (button_bg);
+    var button_bg = new Clutter.Actor ();
+    button_bg.set_background_color (white);
+    button.add_child (button_bg);
     button_bg.opacity = 0xcc;
 
     var button_text = new Clutter.Text.full ("Sans 10", text, black);
-    button.add_actor (button_text);
+    button.add_child (button_text);
     button_text.get_size (out width, out height);
 
     button_bg.set_size (width + PADDING * 2, height + PADDING * 2);
