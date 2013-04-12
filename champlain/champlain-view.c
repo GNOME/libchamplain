@@ -1028,17 +1028,13 @@ champlain_view_init (ChamplainView *view)
 
   /* Setup map layer */
   priv->map_layer = clutter_actor_new ();
-  clutter_actor_show (priv->map_layer);
 
   /* Setup user_layers */
   priv->user_layers = clutter_actor_new ();
-  clutter_actor_show (priv->user_layers);
 
   priv->zoom_layer = clutter_actor_new ();
-  clutter_actor_show (priv->zoom_layer);
 
   priv->background_layer = clutter_actor_new ();
-  clutter_actor_show (priv->background_layer);
 
   viewport_container = clutter_actor_new ();
 
@@ -1046,8 +1042,6 @@ champlain_view_init (ChamplainView *view)
   clutter_actor_add_child (viewport_container, priv->zoom_layer);
   clutter_actor_add_child (viewport_container, priv->map_layer);
   clutter_actor_add_child (viewport_container, priv->user_layers);
-
-  clutter_actor_show (viewport_container);
 
   /* Setup viewport */
   priv->viewport = champlain_viewport_new ();
@@ -1845,7 +1839,7 @@ fill_background_tiles (ChamplainView *view)
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
-  GList *children, *child;
+  ClutterActor *child;
   gint children_count;
   gint tiles_count, x_count, y_count, x_first, y_first;
   gdouble x_coord, y_coord;
@@ -1864,8 +1858,7 @@ fill_background_tiles (ChamplainView *view)
   x_first = x_coord / size - 1;
   y_first = y_coord / size - 1;
 
-  children = clutter_actor_get_children (priv->background_layer);
-  children_count = g_list_length (children);
+  children_count = clutter_actor_get_n_children (priv->background_layer);
   if (children_count < tiles_count)
     {
       /* add missing background tiles */
@@ -1887,16 +1880,15 @@ fill_background_tiles (ChamplainView *view)
         }
     }
 
-  children = clutter_actor_get_children (priv->background_layer);
-  child = children;
+  child = clutter_actor_get_first_child (priv->background_layer);
   for (x = x_first; x < x_first + x_count; ++x)
     {
       for (y = y_first; y < y_first + y_count; ++y)
         {
-          clutter_actor_set_position (CLUTTER_ACTOR (child->data),
+          clutter_actor_set_position (child,
               (x * size) - priv->anchor_x,
               (y * size) - priv->anchor_y);
-          child = g_list_next (child);
+          child = clutter_actor_get_next_sibling (child);
         }
     }
 }
@@ -1908,8 +1900,9 @@ view_load_visible_tiles (ChamplainView *view)
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
+  ClutterActorIter iter;
   gint size;
-  GList *children, *child;
+  ClutterActor *child;
   gint x_count, y_count, x_first, y_first, x_end, y_end, max_x_end, max_y_end;
   gboolean *tile_map;
   gint arm_size, arm_max, turn;
@@ -1962,10 +1955,10 @@ view_load_visible_tiles (ChamplainView *view)
     }
 
   /* Get rid of old tiles first */
-  children = clutter_actor_get_children (priv->map_layer);
-  for (child = children; child != NULL; child = g_list_next (child))
+  clutter_actor_iter_init (&iter, priv->map_layer);
+  while (clutter_actor_iter_next (&iter, &child))
     {
-      ChamplainTile *tile = CHAMPLAIN_TILE (child->data);
+      ChamplainTile *tile = CHAMPLAIN_TILE (child);
 
       gint tile_x = champlain_tile_get_x (tile);
       gint tile_y = champlain_tile_get_y (tile);
@@ -1977,7 +1970,7 @@ view_load_visible_tiles (ChamplainView *view)
         {
           /* inform map source to terminate loading the tile */
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-          clutter_actor_remove_child (priv->map_layer, CLUTTER_ACTOR (tile));
+          clutter_actor_iter_destroy (&iter);
         }
       else
         {
@@ -1985,9 +1978,7 @@ view_load_visible_tiles (ChamplainView *view)
           view_position_tile (view, tile);
         }
     }
-
-  g_list_free (children);
-
+  
   /* Load new tiles if needed */
   x = x_first + x_count / 2 - 1;
   y = y_first + y_count / 2 - 1;
@@ -2090,17 +2081,16 @@ remove_all_tiles (ChamplainView *view)
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
-  GList *children, *child;
+  ClutterActorIter iter;
+  ClutterActor *child;
 
-  children = clutter_actor_get_children (priv->map_layer);
-  for (child = children; child != NULL; child = g_list_next (child))
+  clutter_actor_iter_init (&iter, priv->map_layer);
+  while (clutter_actor_iter_next (&iter, &child))
     {
-      ChamplainTile *tile = CHAMPLAIN_TILE (child->data);
-
-      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+      champlain_tile_set_state (CHAMPLAIN_TILE (child), CHAMPLAIN_STATE_DONE);
     }
+
   clutter_actor_destroy_all_children (priv->map_layer);
-  g_list_free (children);
 }
 
 
@@ -2395,24 +2385,22 @@ champlain_view_ensure_layers_visible (ChamplainView *view,
 {
   DEBUG_LOG ()
 
-  GList *layers, *elem;
+  ClutterActorIter iter;
+  ClutterActor *child;
   ChamplainBoundingBox *bbox;
 
   bbox = champlain_bounding_box_new ();
 
-  layers = clutter_actor_get_children (view->priv->user_layers);
-
-  for (elem = layers; elem != NULL; elem = elem->next)
+  clutter_actor_iter_init (&iter, view->priv->user_layers);
+  while (clutter_actor_iter_next (&iter, &child))
     {
-      ChamplainLayer *layer = CHAMPLAIN_LAYER (elem->data);
+      ChamplainLayer *layer = CHAMPLAIN_LAYER (child);
       ChamplainBoundingBox *other;
 
       other = champlain_layer_get_bounding_box (layer);
       champlain_bounding_box_compose (bbox, other);
       champlain_bounding_box_free (other);
     }
-
-  g_list_free (layers);
 
   champlain_view_ensure_visible (view, bbox, animate);
 
@@ -2526,7 +2514,8 @@ show_zoom_actor (ChamplainView *view,
   
   if (!priv->animating_zoom)
     {
-      GList *children, *child;
+      ClutterActorIter iter;
+      ClutterActor *child;
       gint size;
       gdouble x_coord, y_coord;
       gint x_first, y_first, max_x_end, max_y_end;
@@ -2564,24 +2553,21 @@ show_zoom_actor (ChamplainView *view,
       zoom_actor = clutter_actor_new ();
       clutter_actor_add_child (priv->zoom_overlay_actor, zoom_actor);
       
-      children = clutter_actor_get_children (priv->map_layer);
-
-      for (child = children; child != NULL; child = g_list_next (child))
+      clutter_actor_iter_init (&iter, priv->map_layer);
+      while (clutter_actor_iter_next (&iter, &child))
         {
-          ChamplainTile *tile = CHAMPLAIN_TILE (child->data);
+          ChamplainTile *tile = CHAMPLAIN_TILE (child);
           gint tile_x = champlain_tile_get_x (tile);
           gint tile_y = champlain_tile_get_y (tile);
 
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
           g_object_ref (CLUTTER_ACTOR (tile));
-          clutter_actor_remove_child(priv->map_layer, CLUTTER_ACTOR (tile));
+          clutter_actor_iter_remove (&iter);
           clutter_actor_add_child (zoom_actor, CLUTTER_ACTOR (tile));
           g_object_unref (CLUTTER_ACTOR (tile));
           clutter_actor_set_position (CLUTTER_ACTOR (tile), (tile_x - x_first) * size, (tile_y - y_first) * size);
         }
-
-      g_list_free (children);
-      
+              
       gdouble deltax = x_first * size - priv->viewport_x - priv->anchor_x;
       gdouble deltay = y_first * size - priv->viewport_y - priv->anchor_y;
       
