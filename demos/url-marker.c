@@ -253,7 +253,7 @@ main (int argc, char *argv[])
   /* Create the map view */
   view = champlain_view_new ();
   clutter_actor_set_size (CLUTTER_ACTOR (view), 800, 600);
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), view);
+  clutter_actor_add_child (stage, view);
 
   /* Create the markers and marker layer */
   layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
@@ -271,7 +271,7 @@ main (int argc, char *argv[])
       "kinetic-mode", TRUE, NULL);
   champlain_view_center_on (CHAMPLAIN_VIEW (view), 48.22, 16.8);
 
-  clutter_actor_show_all (stage);
+  clutter_actor_show (stage);
   clutter_main ();
 
   g_object_unref (session);

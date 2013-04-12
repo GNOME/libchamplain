@@ -32,8 +32,8 @@ main (int argc, char *argv[])
 
   /* Create the map view */
   actor = champlain_view_new ();
-  clutter_actor_set_size (CLUTTER_ACTOR (actor), 800, 600);
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
+  clutter_actor_set_size (actor, 800, 600);
+  clutter_actor_add_child (stage, actor);
 
   clutter_actor_show (stage);
   clutter_main ();

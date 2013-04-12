@@ -68,14 +68,15 @@ make_button (char *text)
   ClutterColor black = { 0x00, 0x00, 0x00, 0xff };
   gfloat width, height;
 
-  button = clutter_group_new ();
+  button = clutter_actor_new ();
 
-  button_bg = clutter_rectangle_new_with_color (&white);
-  clutter_container_add_actor (CLUTTER_CONTAINER (button), button_bg);
+  button_bg = clutter_actor_new ();
+  clutter_actor_set_background_color (button_bg, &white);
+  clutter_actor_add_child (button, button_bg);
   clutter_actor_set_opacity (button_bg, 0xcc);
 
   button_text = clutter_text_new_full ("Sans 10", text, &black);
-  clutter_container_add_actor (CLUTTER_CONTAINER (button), button_text);
+  clutter_actor_add_child (button, button_text);
   clutter_actor_get_size (button_text, &width, &height);
 
   clutter_actor_set_size (button_bg, width + PADDING * 2, height + PADDING * 2);
@@ -105,14 +106,14 @@ main (int argc,
   /* Create the map view */
   actor = champlain_view_new ();
   clutter_actor_set_size (CLUTTER_ACTOR (actor), 800, 600);
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
+  clutter_actor_add_child (stage, actor);
 
   /* Create the buttons */
-  buttons = clutter_group_new ();
+  buttons = clutter_actor_new ();
   clutter_actor_set_position (buttons, PADDING, PADDING);
 
   button = make_button ("Zoom in");
-  clutter_container_add_actor (CLUTTER_CONTAINER (buttons), button);
+  clutter_actor_add_child (buttons, button);
   clutter_actor_set_reactive (button, TRUE);
   clutter_actor_get_size (button, &width, NULL);
   total_width += width + PADDING;
@@ -121,7 +122,7 @@ main (int argc,
       actor);
 
   button = make_button ("Zoom out");
-  clutter_container_add_actor (CLUTTER_CONTAINER (buttons), button);
+  clutter_actor_add_child (buttons, button);
   clutter_actor_set_reactive (button, TRUE);
   clutter_actor_set_position (button, total_width, 0);
   clutter_actor_get_size (button, &width, NULL);
@@ -129,7 +130,7 @@ main (int argc,
       G_CALLBACK (zoom_out),
       actor);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), buttons);
+  clutter_actor_add_child (stage, buttons);
 
   /* Create the markers and marker layer */
   layer = create_marker_layer (CHAMPLAIN_VIEW (actor), &path);

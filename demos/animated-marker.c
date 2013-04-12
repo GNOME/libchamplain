@@ -55,7 +55,7 @@ create_marker ()
   cairo_destroy (cr);
 
   /* Add the circle to the marker */
-  clutter_container_add_actor (CLUTTER_CONTAINER (marker), bg);
+  clutter_actor_add_child (marker, bg);
   clutter_actor_set_anchor_point_from_gravity (bg, CLUTTER_GRAVITY_CENTER);
   clutter_actor_set_position (bg, 0, 0);
 
@@ -76,7 +76,7 @@ create_marker ()
   cairo_destroy (cr);
 
   /* Add the circle to the marker */
-  clutter_container_add_actor (CLUTTER_CONTAINER (marker), bg);
+  clutter_actor_add_child (marker, bg);
   clutter_actor_lower_bottom (bg); /* Ensure it is under the previous circle */
   clutter_actor_set_position (bg, 0, 0);
   clutter_actor_set_anchor_point_from_gravity (bg, CLUTTER_GRAVITY_CENTER);
@@ -137,7 +137,7 @@ main (int argc, char *argv[])
   /* Create the map view */
   actor = champlain_view_new ();
   clutter_actor_set_size (CLUTTER_ACTOR (actor), 800, 600);
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
+  clutter_actor_add_child (stage, actor);
 
   /* Create the marker layer */
   layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
