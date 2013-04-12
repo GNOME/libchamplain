@@ -182,7 +182,7 @@ struct _ChamplainViewPrivate
 
   gint tiles_loading;
   
-  ClutterActor *zoom_overlay_actor;
+  ClutterActor *zoom_container_actor;
   gboolean animating_zoom;
   guint anim_start_zoom_level;
   gdouble zoom_actor_longitude;
@@ -1006,7 +1006,7 @@ champlain_view_init (ChamplainView *view)
   priv->update_viewport_timer = g_timer_new ();
   priv->animating_zoom = FALSE;
   priv->background_content = NULL;
-  priv->zoom_overlay_actor = NULL;
+  priv->zoom_container_actor = NULL;
 
   g_signal_connect (view, "notify::width", G_CALLBACK (view_size_changed_cb), NULL);
   g_signal_connect (view, "notify::height", G_CALLBACK (view_size_changed_cb), NULL);
@@ -1015,18 +1015,13 @@ champlain_view_init (ChamplainView *view)
                                    CLUTTER_BIN_ALIGNMENT_CENTER);
   clutter_actor_set_layout_manager (CLUTTER_ACTOR (view), layout);
 
-  /* Setup map layer */
+  /* Setup viewport layers*/
+  priv->background_layer = clutter_actor_new ();
+  priv->zoom_layer = clutter_actor_new ();
   priv->map_layer = clutter_actor_new ();
-
-  /* Setup user_layers */
   priv->user_layers = clutter_actor_new ();
 
-  priv->zoom_layer = clutter_actor_new ();
-
-  priv->background_layer = clutter_actor_new ();
-
   viewport_container = clutter_actor_new ();
-
   clutter_actor_add_child (viewport_container, priv->background_layer);
   clutter_actor_add_child (viewport_container, priv->zoom_layer);
   clutter_actor_add_child (viewport_container, priv->map_layer);
@@ -1040,8 +1035,6 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (viewport_pos_changed_cb), view);
   g_signal_connect (priv->viewport, "notify::y-origin",
       G_CALLBACK (viewport_pos_changed_cb), view);
-
-  clutter_actor_set_child_above_sibling (viewport_container, priv->user_layers, priv->map_layer);
 
   /* Setup kinetic scroll */
   priv->kinetic_scroll = champlain_kinetic_scroll_view_new (FALSE, priv->viewport);
@@ -1057,8 +1050,6 @@ champlain_view_init (ChamplainView *view)
 
   /* Setup stage */
   clutter_actor_add_child (CLUTTER_ACTOR (view), priv->kinetic_scroll);
-
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (view));
 
   resize_viewport (view);
 
@@ -2456,16 +2447,16 @@ position_zoom_actor (ChamplainView *view)
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->zoom_actor_latitude) - priv->anchor_y;
   
   clutter_actor_destroy_all_children (priv->zoom_layer);
-  g_object_ref (priv->zoom_overlay_actor);
-  clutter_actor_remove_child(CLUTTER_ACTOR (view), priv->zoom_overlay_actor);
-  clutter_actor_add_child (priv->zoom_layer, priv->zoom_overlay_actor);
-  g_object_unref (priv->zoom_overlay_actor);
+  g_object_ref (priv->zoom_container_actor);
+  clutter_actor_remove_child(CLUTTER_ACTOR (view), priv->zoom_container_actor);
+  clutter_actor_add_child (priv->zoom_layer, priv->zoom_container_actor);
+  g_object_unref (priv->zoom_container_actor);
 
-  ClutterActor *zoom_actor = clutter_actor_get_first_child (priv->zoom_overlay_actor);
+  ClutterActor *zoom_actor = clutter_actor_get_first_child (priv->zoom_container_actor);
   clutter_actor_set_position (zoom_actor, 0.0, 0.0);
-  clutter_actor_set_position (priv->zoom_overlay_actor, x, y);
-  clutter_actor_set_pivot_point (priv->zoom_overlay_actor, 0.0, 0.0);
-  priv->zoom_overlay_actor = NULL;
+  clutter_actor_set_position (priv->zoom_container_actor, x, y);
+  clutter_actor_set_pivot_point (priv->zoom_container_actor, 0.0, 0.0);
+  priv->zoom_container_actor = NULL;
 
   //clutter_actor_hide (priv->map_layer);
 }
@@ -2536,12 +2527,12 @@ show_zoom_actor (ChamplainView *view,
         priv->zoom_level,
         y_first * size);
 
-      if (priv->zoom_overlay_actor != NULL)
-          clutter_actor_destroy (priv->zoom_overlay_actor);
-      priv->zoom_overlay_actor = clutter_actor_new ();
-      clutter_actor_add_child (CLUTTER_ACTOR (view), priv->zoom_overlay_actor);
+      if (priv->zoom_container_actor != NULL)
+          clutter_actor_destroy (priv->zoom_container_actor);
+      priv->zoom_container_actor = clutter_actor_new ();
+      clutter_actor_add_child (CLUTTER_ACTOR (view), priv->zoom_container_actor);
       zoom_actor = clutter_actor_new ();
-      clutter_actor_add_child (priv->zoom_overlay_actor, zoom_actor);
+      clutter_actor_add_child (priv->zoom_container_actor, zoom_actor);
       
       clutter_actor_iter_init (&iter, priv->map_layer);
       while (clutter_actor_iter_next (&iter, &child))
@@ -2563,7 +2554,7 @@ show_zoom_actor (ChamplainView *view,
       
       clutter_actor_set_position (zoom_actor, deltax, deltay);
       
-      clutter_actor_set_pivot_point (priv->zoom_overlay_actor, 
+      clutter_actor_set_pivot_point (priv->zoom_container_actor, 
           (priv->viewport_width / 2.0 - x_diff) / priv->viewport_width,
           (priv->viewport_height / 2.0 - y_diff) / priv->viewport_height);
     }
@@ -2576,11 +2567,11 @@ show_zoom_actor (ChamplainView *view,
 
       clutter_actor_destroy_all_children (priv->zoom_layer);
 
-      clutter_actor_save_easing_state (priv->zoom_overlay_actor);
-      clutter_actor_set_easing_mode (priv->zoom_overlay_actor, CLUTTER_EASE_IN_OUT_QUAD);
-      clutter_actor_set_easing_duration (priv->zoom_overlay_actor, 350);
-      clutter_actor_set_scale (priv->zoom_overlay_actor, deltazoom, deltazoom);
-      clutter_actor_restore_easing_state (priv->zoom_overlay_actor);
+      clutter_actor_save_easing_state (priv->zoom_container_actor);
+      clutter_actor_set_easing_mode (priv->zoom_container_actor, CLUTTER_EASE_IN_OUT_QUAD);
+      clutter_actor_set_easing_duration (priv->zoom_container_actor, 350);
+      clutter_actor_set_scale (priv->zoom_container_actor, deltazoom, deltazoom);
+      clutter_actor_restore_easing_state (priv->zoom_container_actor);
 
       clutter_actor_save_easing_state (priv->map_layer);
       clutter_actor_set_easing_mode (priv->map_layer, CLUTTER_EASE_IN_EXPO);
@@ -2591,13 +2582,13 @@ show_zoom_actor (ChamplainView *view,
       if (!priv->animating_zoom)
         {
           clutter_actor_hide (priv->user_layers);
-          g_signal_connect (priv->zoom_overlay_actor, "transition-stopped::scale-x", G_CALLBACK (zoom_animation_completed), view);
+          g_signal_connect (priv->zoom_container_actor, "transition-stopped::scale-x", G_CALLBACK (zoom_animation_completed), view);
         }
         
       priv->animating_zoom = TRUE;
     }
   else
-    clutter_actor_set_scale (priv->zoom_overlay_actor, deltazoom, deltazoom);
+    clutter_actor_set_scale (priv->zoom_container_actor, deltazoom, deltazoom);
 }
 
 

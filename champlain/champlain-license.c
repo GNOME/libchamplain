@@ -253,8 +253,6 @@ champlain_license_init (ChamplainLicense *license)
   clutter_text_set_line_alignment (CLUTTER_TEXT (priv->license_actor), priv->alignment);
   clutter_actor_set_opacity (priv->license_actor, 128);
   clutter_actor_add_child (CLUTTER_ACTOR (license), priv->license_actor);
-  
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (license));
 }
 
 
