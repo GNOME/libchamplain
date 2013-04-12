@@ -2483,8 +2483,10 @@ zoom_animation_completed (ClutterActor *actor,
     ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
+
   priv->animating_zoom = FALSE;
   position_zoom_actor (view);  
+  clutter_actor_show (priv->user_layers);
 
   g_signal_handlers_disconnect_by_func (actor, zoom_animation_completed, view);
 }
@@ -2592,7 +2594,10 @@ show_zoom_actor (ChamplainView *view,
       clutter_actor_restore_easing_state (priv->map_layer);
         
       if (!priv->animating_zoom)
-        g_signal_connect (zoom_actor, "transition-stopped::scale-x", G_CALLBACK (zoom_animation_completed), view);
+        {
+          clutter_actor_hide (priv->user_layers);
+          g_signal_connect (zoom_actor, "transition-stopped::scale-x", G_CALLBACK (zoom_animation_completed), view);
+        }
         
       priv->animating_zoom = TRUE;
     }
