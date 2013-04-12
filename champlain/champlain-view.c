@@ -1818,11 +1818,11 @@ fill_background_tiles (ChamplainView *view)
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
+  ClutterActorIter iter;
   ClutterActor *child;
-  gint children_count;
-  gint tiles_count, x_count, y_count, x_first, y_first;
+  gint x_count, y_count, x_first, y_first;
   gdouble x_coord, y_coord;
-  gint i, x, y;
+  gint x, y;
   gfloat size;
 
   clutter_content_get_preferred_size (priv->background_content, &size, &size);
@@ -1832,43 +1832,36 @@ fill_background_tiles (ChamplainView *view)
 
   x_count = ceil ((float) priv->viewport_width / size) + 2;
   y_count = ceil ((float) priv->viewport_height / size) + 2;
-  tiles_count = x_count * y_count;
 
   x_first = x_coord / size - 1;
   y_first = y_coord / size - 1;
 
-  children_count = clutter_actor_get_n_children (priv->background_layer);
-  if (children_count < tiles_count)
-    {
-      /* add missing background tiles */
-      for (i = children_count; i < tiles_count; ++i)
-        {
-          ClutterActor *actor = clutter_actor_new ();
-          clutter_actor_set_size (actor, size, size);
-          clutter_actor_set_content (actor, priv->background_content);
-          clutter_actor_add_child (priv->background_layer, actor);
-        }
-    }
-  else if (children_count > tiles_count)
-    {
-      /* remove extra background tiles */
-      for (i = tiles_count; i < children_count; ++i)
-        {
-          clutter_actor_remove_child (priv->background_layer, 
-              clutter_actor_get_first_child (priv->background_layer));
-        }
-    }
+  clutter_actor_iter_init (&iter, priv->background_layer);
 
-  child = clutter_actor_get_first_child (priv->background_layer);
+  gboolean have_children = TRUE;
   for (x = x_first; x < x_first + x_count; ++x)
     {
       for (y = y_first; y < y_first + y_count; ++y)
         {
+          if (!have_children || !clutter_actor_iter_next (&iter, &child))
+            {
+              have_children = FALSE;
+              child = clutter_actor_new ();
+              clutter_actor_set_size (child, size, size);
+              clutter_actor_set_content (child, priv->background_content);
+              clutter_actor_add_child (priv->background_layer, child);
+            }
           clutter_actor_set_position (child,
               (x * size) - priv->anchor_x,
               (y * size) - priv->anchor_y);
           child = clutter_actor_get_next_sibling (child);
         }
+    }
+  
+  if (have_children)
+    {
+      while (clutter_actor_iter_next (&iter, &child))
+          clutter_actor_iter_destroy (&iter);
     }
 }
 
@@ -1929,9 +1922,7 @@ view_load_visible_tiles (ChamplainView *view)
 
   /* fill background tiles */
   if (priv->background_content != NULL)
-    {
       fill_background_tiles (view);
-    }
 
   /* Get rid of old tiles first */
   clutter_actor_iter_init (&iter, priv->map_layer);
