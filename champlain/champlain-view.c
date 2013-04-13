@@ -1823,22 +1823,22 @@ fill_background_tiles (ChamplainView *view)
   gint x_count, y_count, x_first, y_first;
   gdouble x_coord, y_coord;
   gint x, y;
-  gfloat size;
+  gfloat width, height;
+  gboolean have_children = TRUE;
 
-  clutter_content_get_preferred_size (priv->background_content, &size, &size);
+  clutter_content_get_preferred_size (priv->background_content, &width, &height);
 
   x_coord = priv->viewport_x + priv->anchor_x;
   y_coord = priv->viewport_y + priv->anchor_y;
 
-  x_count = ceil ((float) priv->viewport_width / size) + 2;
-  y_count = ceil ((float) priv->viewport_height / size) + 2;
+  x_count = ceil ((float) priv->viewport_width / width) + 2;
+  y_count = ceil ((float) priv->viewport_height / height) + 2;
 
-  x_first = x_coord / size - 1;
-  y_first = y_coord / size - 1;
+  x_first = x_coord / width - 1;
+  y_first = y_coord / height - 1;
 
   clutter_actor_iter_init (&iter, priv->background_layer);
 
-  gboolean have_children = TRUE;
   for (x = x_first; x < x_first + x_count; ++x)
     {
       for (y = y_first; y < y_first + y_count; ++y)
@@ -1847,13 +1847,13 @@ fill_background_tiles (ChamplainView *view)
             {
               have_children = FALSE;
               child = clutter_actor_new ();
-              clutter_actor_set_size (child, size, size);
+              clutter_actor_set_size (child, width, height);
               clutter_actor_set_content (child, priv->background_content);
               clutter_actor_add_child (priv->background_layer, child);
             }
           clutter_actor_set_position (child,
-              (x * size) - priv->anchor_x,
-              (y * size) - priv->anchor_y);
+              (x * width) - priv->anchor_x,
+              (y * height) - priv->anchor_y);
           child = clutter_actor_get_next_sibling (child);
         }
     }

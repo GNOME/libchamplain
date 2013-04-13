@@ -27,7 +27,7 @@
 #define N_COLS 2
 #define COL_ID 0
 #define COL_NAME 1
-#define TILE_SQUARE_SIZE 32
+#define TILE_SQUARE_SIZE 64
 
 static ChamplainPathLayer *path_layer;
 static ChamplainPathLayer *path;
@@ -219,14 +219,15 @@ draw_background_tile (ClutterCanvas *canvas,
     int height)
 {
   cairo_pattern_t *pat;
-  gint no_of_squares = width / TILE_SQUARE_SIZE;
+  gint no_of_squares_x = width / TILE_SQUARE_SIZE;
+  gint no_of_squares_y = height / TILE_SQUARE_SIZE;
   gint row, column;
 
   /* Create the background tile */
-  pat = cairo_pattern_create_linear (width / 2.0, 0.0, width, width / 2.0);
+  pat = cairo_pattern_create_linear (width / 2.0, 0.0, width, height / 2.0);
   cairo_pattern_add_color_stop_rgb (pat, 0, 0.662, 0.662, 0.662);
   cairo_set_source (cr, pat);
-  cairo_rectangle (cr, 0, 0, width, width);
+  cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
   cairo_pattern_destroy (pat);
 
@@ -234,9 +235,9 @@ draw_background_tile (ClutterCanvas *canvas,
   cairo_set_source_rgb (cr, 0.811, 0.811, 0.811);
   cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
 
-  for (row = 0; row < no_of_squares; ++row)
+  for (row = 0; row < no_of_squares_y; ++row)
     {
-      for (column = 0; column < no_of_squares; column++)
+      for (column = 0; column < no_of_squares_x; column++)
         {
           /* drawing square alternatively */
           if ((row % 2 == 0 && column % 2 == 0) ||
@@ -317,7 +318,7 @@ main (int argc,
   
   ClutterContent *canvas;
   canvas = clutter_canvas_new ();
-  clutter_canvas_set_size (CLUTTER_CANVAS (canvas), 256, 256);
+  clutter_canvas_set_size (CLUTTER_CANVAS (canvas), 512, 256);
   g_signal_connect (canvas, "draw", G_CALLBACK (draw_background_tile), NULL);
   clutter_content_invalidate (canvas);
 
