@@ -2031,7 +2031,7 @@ view_position_tile (ChamplainView *view,
   ClutterActor *actor;
   gint x;
   gint y;
-  guint size;
+  gint size;
 
   actor = CLUTTER_ACTOR (tile);
 
@@ -2485,31 +2485,18 @@ show_zoom_actor (ChamplainView *view,
       ClutterActor *zoom_actor = NULL;
       ClutterActorIter iter;
       ClutterActor *child;
-      gint size;
+      gdouble size;
       gdouble x_coord, y_coord;
-      gint x_first, y_first, max_x_end, max_y_end;
+      gdouble x_first, y_first;
 
       size = champlain_map_source_get_tile_size (priv->map_source);
 
       x_coord = priv->viewport_x + priv->anchor_x;
       y_coord = priv->viewport_y + priv->anchor_y;
 
-      if (x_coord < 0)
-        x_coord = 0;
-      if (y_coord < 0)
-        y_coord = 0;
-
       x_first = x_coord / size;
       y_first = y_coord / size;
       
-      max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
-      max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
-
-      if (x_first > max_x_end)
-        x_first = max_x_end;
-      if (y_first > max_y_end)
-        y_first = max_y_end;
-
       priv->anim_start_zoom_level = priv->zoom_level;
       priv->zoom_actor_longitude = champlain_map_source_get_longitude (priv->map_source,
         priv->zoom_level,
@@ -2529,8 +2516,8 @@ show_zoom_actor (ChamplainView *view,
       while (clutter_actor_iter_next (&iter, &child))
         {
           ChamplainTile *tile = CHAMPLAIN_TILE (child);
-          gint tile_x = champlain_tile_get_x (tile);
-          gint tile_y = champlain_tile_get_y (tile);
+          gdouble tile_x = champlain_tile_get_x (tile);
+          gdouble tile_y = champlain_tile_get_y (tile);
 
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
           g_object_ref (CLUTTER_ACTOR (tile));
