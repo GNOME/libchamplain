@@ -33,7 +33,7 @@ const Lang = imports.lang;
 const Clutter = imports.gi.Clutter;
 const Champlain = imports.gi.Champlain;
 
-Clutter.init (0, null);
+Clutter.init (null);
 
 const PADDING = 10;
 
