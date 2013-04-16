@@ -2962,3 +2962,46 @@ champlain_view_get_state (ChamplainView *view)
 
   return view->priv->state;
 }
+
+/**
+ * champlain_view_get_bounding_box:
+ * @view: a #ChamplainView
+ *
+ * Gets the bounding box for view @view at current zoom-level.
+ *
+ * Returns: (transfer full): the bounding box
+ *
+ * Since: 0.12
+ */
+ChamplainBoundingBox *
+champlain_view_get_bounding_box (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  ChamplainViewPrivate *priv = view->priv;
+  ChamplainBoundingBox *bbox;
+  gdouble x, y;
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
+
+  bbox = champlain_bounding_box_new ();
+
+  x = priv->viewport_x + priv->anchor_x;
+  y = priv->viewport_y + priv->anchor_y;
+
+  bbox->top = champlain_map_source_get_latitude (priv->map_source,
+    priv->zoom_level,
+    y);
+  bbox->bottom = champlain_map_source_get_latitude (priv->map_source,
+    priv->zoom_level,
+    y + priv->viewport_height);
+
+  bbox->left = champlain_map_source_get_longitude (priv->map_source,
+    priv->zoom_level,
+    x);
+  bbox->right = champlain_map_source_get_longitude (priv->map_source,
+    priv->zoom_level,
+    x + priv->viewport_width);
+
+  return bbox;
+}

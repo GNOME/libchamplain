@@ -160,6 +160,8 @@ void champlain_view_bin_layout_add (ChamplainView *view,
 
 ChamplainLicense *champlain_view_get_license_actor (ChamplainView *view);
 
+ChamplainBoundingBox *champlain_view_get_bounding_box (ChamplainView *view);
+
 G_END_DECLS
 
 #endif
