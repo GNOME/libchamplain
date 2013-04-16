@@ -730,7 +730,6 @@ draw_label (ChamplainLabel *label)
       canvas = clutter_canvas_new ();
       clutter_canvas_set_size (CLUTTER_CANVAS (canvas), total_width, total_height + priv->point);
       g_signal_connect (canvas, "draw", G_CALLBACK (draw_background), label);
-
       background = clutter_actor_new ();
       clutter_actor_set_size (background, total_width, total_height + priv->point);
       clutter_actor_set_content (background, canvas);
@@ -755,23 +754,6 @@ draw_label (ChamplainLabel *label)
     clutter_actor_set_child_above_sibling (CLUTTER_ACTOR (label), text_actor, background);
   if (priv->image != NULL && background != NULL)
     clutter_actor_set_child_above_sibling (CLUTTER_ACTOR (label), priv->image, background);
-/*
-  if (priv->draw_background)
-    {
-      if (priv->alignment == PANGO_ALIGN_RIGHT)
-        clutter_actor_set_anchor_point (CLUTTER_ACTOR (label), total_width, total_height + priv->point);
-      else
-        clutter_actor_set_anchor_point (CLUTTER_ACTOR (label), 0, total_height + priv->point);
-    }
-  else if (priv->image != NULL)
-    clutter_actor_set_anchor_point (CLUTTER_ACTOR (label),
-        clutter_actor_get_width (priv->image) / 2.0 + PADDING,
-        clutter_actor_get_height (priv->image) / 2.0 + PADDING);
-  else if (text_actor != NULL)
-    clutter_actor_set_anchor_point (CLUTTER_ACTOR (label),
-        0,
-        clutter_actor_get_height (text_actor) / 2.0);
-        */
         
   if (priv->draw_background)
     {
@@ -785,7 +767,6 @@ draw_label (ChamplainLabel *label)
         -clutter_actor_get_height (priv->image) / 2.0 - PADDING, 0);
   else if (text_actor != NULL)
     clutter_actor_set_translation (CLUTTER_ACTOR (label), 0, -clutter_actor_get_height (text_actor) / 2.0, 0);
-         
 }
 
 
@@ -861,6 +842,7 @@ champlain_label_init (ChamplainLabel *label)
   priv->total_height = 0;
 
   g_signal_connect (label, "notify::selected", G_CALLBACK (notify_selected), NULL);
+  champlain_label_queue_redraw (label);
 }
 
 
@@ -963,11 +945,11 @@ champlain_label_new_from_file (const gchar *filename,
   gfloat width, height;
   
   if (filename == NULL)
-    return NULL;
+    return CLUTTER_ACTOR (label);
 
   pixbuf = gdk_pixbuf_new_from_file (filename, error);
   if (pixbuf == NULL)
-    return NULL;
+    return CLUTTER_ACTOR (label);
     
   content = clutter_image_new ();
   clutter_image_set_data (CLUTTER_IMAGE (content),
