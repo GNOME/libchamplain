@@ -225,7 +225,7 @@ champlain_bounding_box_is_valid (ChamplainBoundingBox *bbox)
  *
  * Returns: TRUE when the bounding box covers given coordinates, FALSE otherwise.
  *
- * Since: 0.12
+ * Since: 0.12.4
  */
 gboolean
 champlain_bounding_box_covers(ChamplainBoundingBox *bbox,

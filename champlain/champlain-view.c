@@ -2971,7 +2971,7 @@ champlain_view_get_state (ChamplainView *view)
  *
  * Returns: (transfer full): the bounding box
  *
- * Since: 0.12
+ * Since: 0.12.4
  */
 ChamplainBoundingBox *
 champlain_view_get_bounding_box (ChamplainView *view)
