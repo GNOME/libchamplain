@@ -1037,7 +1037,7 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (viewport_pos_changed_cb), view);
 
   /* Setup kinetic scroll */
-  priv->kinetic_scroll = champlain_kinetic_scroll_view_new (FALSE, priv->viewport);
+  priv->kinetic_scroll = champlain_kinetic_scroll_view_new (FALSE, CHAMPLAIN_VIEWPORT (priv->viewport));
 
   g_signal_connect (priv->kinetic_scroll, "scroll-event",
       G_CALLBACK (scroll_event), view);

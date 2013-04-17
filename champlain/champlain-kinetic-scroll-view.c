@@ -55,8 +55,7 @@ struct _ChamplainKineticScrollViewPrivate
   gdouble dy;
   gdouble decel_rate;
 
-  ClutterActor *child;
-  gboolean in_drag;
+  ClutterActor *viewport;
 };
 
 enum
@@ -74,6 +73,11 @@ enum
 };
 
 static guint signals[LAST_SIGNAL] = { 0, };
+
+static gboolean
+button_release_event_cb (ClutterActor *stage,
+    ClutterButtonEvent *event,
+    ChamplainKineticScrollView *scroll);
 
 static void
 champlain_kinetic_scroll_view_get_property (GObject *object, guint property_id,
@@ -135,10 +139,10 @@ champlain_kinetic_scroll_view_dispose (GObject *object)
 {
   ChamplainKineticScrollViewPrivate *priv = CHAMPLAIN_KINETIC_SCROLL_VIEW (object)->priv;
 
-  if (priv->child)
+  if (priv->viewport)
     {
       clutter_actor_remove_all_children (CLUTTER_ACTOR (object));
-      priv->child = NULL;
+      priv->viewport = NULL;
     }
 
   if (priv->deceleration_timeline)
@@ -213,99 +217,18 @@ champlain_kinetic_scroll_view_class_init (ChamplainKineticScrollViewClass *klass
 }
 
 
-static gboolean
-motion_event_cb (ClutterActor *stage,
-    ClutterMotionEvent *event,
-    ChamplainKineticScrollView *scroll)
-{
-  ChamplainKineticScrollViewPrivate *priv = scroll->priv;
-  ClutterActor *actor = CLUTTER_ACTOR (scroll);
-  gfloat x, y;
-
-  if (event->type != CLUTTER_MOTION)
-    return FALSE;
-
-  if (clutter_actor_transform_stage_point (actor,
-          event->x,
-          event->y,
-          &x, &y))
-    {
-      ChamplainKineticScrollViewMotion *motion;
-
-      if (!priv->in_drag)
-        {
-          guint threshold = 4;
-
-          motion = &g_array_index (priv->motion_buffer,
-                ChamplainKineticScrollViewMotion, 0);
-
-          if ((ABS (motion->x - x) >= threshold) ||
-              (ABS (motion->y - y) >= threshold))
-            {
-              clutter_stage_set_motion_events_enabled (CLUTTER_STAGE (stage), TRUE);
-              priv->in_drag = TRUE;
-            }
-          else
-            return FALSE;
-        }
-
-      if (priv->child)
-        {
-          gdouble dx, dy;
-          ChamplainAdjustment *hadjust, *vadjust;
-
-          champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->child),
-              &hadjust,
-              &vadjust);
-
-          motion = &g_array_index (priv->motion_buffer,
-                ChamplainKineticScrollViewMotion, priv->last_motion);
-          if (hadjust)
-            {
-              dx = (motion->x - x) +
-                champlain_adjustment_get_value (hadjust);
-              champlain_adjustment_set_value (hadjust, dx);
-            }
-
-          if (vadjust)
-            {
-              dy = (motion->y - y) +
-                champlain_adjustment_get_value (vadjust);
-              champlain_adjustment_set_value (vadjust, dy);
-            }
-        }
-
-      priv->last_motion++;
-      if (priv->last_motion == priv->motion_buffer->len)
-        {
-          priv->motion_buffer = g_array_remove_index (priv->motion_buffer, 0);
-          g_array_set_size (priv->motion_buffer, priv->last_motion);
-          priv->last_motion--;
-        }
-
-      motion = &g_array_index (priv->motion_buffer,
-            ChamplainKineticScrollViewMotion, priv->last_motion);
-      motion->x = x;
-      motion->y = y;
-      g_get_current_time (&motion->time);
-    }
-
-  return TRUE;
-}
-
-
 static void
 clamp_adjustments (ChamplainKineticScrollView *scroll)
 {
   ChamplainKineticScrollViewPrivate *priv = scroll->priv;
 
-  if (priv->child)
+  if (priv->viewport)
     {
       guint fps, n_frames;
       ChamplainAdjustment *hadj, *vadj;
       gboolean snap;
 
-      champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->child),
+      champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->viewport),
           &hadj, &vadj);
 
       /* FIXME: Hard-coded value here */
@@ -347,6 +270,85 @@ clamp_adjustments (ChamplainKineticScrollView *scroll)
 }
 
 
+static gboolean
+motion_event_cb (ClutterActor *stage,
+    ClutterMotionEvent *event,
+    ChamplainKineticScrollView *scroll)
+{
+  ChamplainKineticScrollViewPrivate *priv = scroll->priv;
+  ClutterActor *actor = CLUTTER_ACTOR (scroll);
+  gfloat x, y;
+
+  if (event->type != CLUTTER_MOTION)
+    return FALSE;
+    
+  if (!(event->modifier_state & CLUTTER_BUTTON1_MASK))
+  {
+    /* It sometimes -very rarely - happens that we miss the release event for some
+     * reason. This is a sanity check to disconnect the event handlers when the 
+     * button is not pressed. */
+    g_signal_handlers_disconnect_by_func (stage,
+        motion_event_cb,
+        scroll);
+    g_signal_handlers_disconnect_by_func (stage,
+        button_release_event_cb,
+        scroll);
+    clamp_adjustments (scroll);
+    g_signal_emit_by_name (scroll, "panning-completed", NULL);
+  }
+  
+  if (clutter_actor_transform_stage_point (actor,
+          event->x,
+          event->y,
+          &x, &y))
+    {
+      ChamplainKineticScrollViewMotion *motion;
+
+      if (priv->viewport)
+        {
+          gdouble dx, dy;
+          ChamplainAdjustment *hadjust, *vadjust;
+
+          champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->viewport),
+              &hadjust,
+              &vadjust);
+
+          motion = &g_array_index (priv->motion_buffer,
+                ChamplainKineticScrollViewMotion, priv->last_motion);
+          if (hadjust)
+            {
+              dx = (motion->x - x) +
+                champlain_adjustment_get_value (hadjust);
+              champlain_adjustment_set_value (hadjust, dx);
+            }
+
+          if (vadjust)
+            {
+              dy = (motion->y - y) +
+                champlain_adjustment_get_value (vadjust);
+              champlain_adjustment_set_value (vadjust, dy);
+            }
+        }
+
+      priv->last_motion++;
+      if (priv->last_motion == priv->motion_buffer->len)
+        {
+          priv->motion_buffer = g_array_remove_index (priv->motion_buffer, 0);
+          g_array_set_size (priv->motion_buffer, priv->last_motion);
+          priv->last_motion--;
+        }
+
+      motion = &g_array_index (priv->motion_buffer,
+            ChamplainKineticScrollViewMotion, priv->last_motion);
+      motion->x = x;
+      motion->y = y;
+      g_get_current_time (&motion->time);
+    }
+
+  return TRUE;
+}
+
+
 static void
 deceleration_completed_cb (ClutterTimeline *timeline,
     ChamplainKineticScrollView *scroll)
@@ -366,14 +368,14 @@ deceleration_new_frame_cb (ClutterTimeline *timeline,
 {
   ChamplainKineticScrollViewPrivate *priv = scroll->priv;
 
-  if (priv->child)
+  if (priv->viewport)
     {
       gdouble value, lower, upper;
       ChamplainAdjustment *hadjust, *vadjust;
       gint i;
       gboolean stop = TRUE;
 
-      champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->child),
+      champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->viewport),
           &hadjust,
           &vadjust);
 
@@ -434,12 +436,7 @@ button_release_event_cb (ClutterActor *stage,
       button_release_event_cb,
       scroll);
 
-  if (!priv->in_drag)
-    return FALSE;
-
-  clutter_stage_set_motion_events_enabled (CLUTTER_STAGE (stage), TRUE);
-
-  if (priv->kinetic && priv->child)
+  if (priv->kinetic && priv->viewport)
     {
       gfloat x, y;
 
@@ -453,8 +450,6 @@ button_release_event_cb (ClutterActor *stage,
           ChamplainAdjustment *hadjust, *vadjust;
           glong time_diff;
           gint i;
-
-          priv->in_drag = TRUE;
 
           /* Get time delta */
           g_get_current_time (&release_time);
@@ -503,7 +498,7 @@ button_release_event_cb (ClutterActor *stage,
               priv->dy = (y_origin - y) / frac;
 
               /* Get adjustments to do step-increment snapping */
-              champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->child),
+              champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->viewport),
                   &hadjust,
                   &vadjust);
 
@@ -607,7 +602,6 @@ button_release_event_cb (ClutterActor *stage,
 
   /* Reset motion event buffer */
   priv->last_motion = 0;
-  priv->in_drag = FALSE;
 
   if (!decelerating)
     {
@@ -658,8 +652,6 @@ button_press_event_cb (ClutterActor *actor,
               "captured-event",
               G_CALLBACK (button_release_event_cb),
               scroll);
-
-          priv->in_drag = FALSE;
         }
     }
 
@@ -676,8 +668,7 @@ champlain_kinetic_scroll_view_init (ChamplainKineticScrollView *self)
         sizeof (ChamplainKineticScrollViewMotion), 3);
   g_array_set_size (priv->motion_buffer, 3);
   priv->decel_rate = 1.1f;
-  priv->child = NULL;
-  priv->in_drag = FALSE;
+  priv->viewport = NULL;
 
   clutter_actor_set_reactive (CLUTTER_ACTOR (self), TRUE);
   g_signal_connect (self, "button-press-event",
@@ -687,14 +678,14 @@ champlain_kinetic_scroll_view_init (ChamplainKineticScrollView *self)
 
 ClutterActor *
 champlain_kinetic_scroll_view_new (gboolean kinetic,
-    ClutterActor *viewport)
+    ChamplainViewport *viewport)
 {
   ClutterActor *scroll_view;
   
   scroll_view = CLUTTER_ACTOR (g_object_new (CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW,
           "mode", kinetic, NULL));
-  CHAMPLAIN_KINETIC_SCROLL_VIEW (scroll_view)->priv->child = viewport;
-  clutter_actor_add_child (CLUTTER_ACTOR (scroll_view), viewport);
+  CHAMPLAIN_KINETIC_SCROLL_VIEW (scroll_view)->priv->viewport = CLUTTER_ACTOR (viewport);
+  clutter_actor_add_child (scroll_view, CLUTTER_ACTOR (viewport));
 
   return scroll_view;
 }

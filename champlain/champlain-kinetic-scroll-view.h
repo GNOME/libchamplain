@@ -25,6 +25,7 @@
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
+#include <champlain-viewport.h>
 
 G_BEGIN_DECLS
 
@@ -65,7 +66,7 @@ struct _ChamplainKineticScrollViewClass
 GType champlain_kinetic_scroll_view_get_type (void) G_GNUC_CONST;
 
 ClutterActor *champlain_kinetic_scroll_view_new (gboolean kinetic,
-    ClutterActor *viewport);
+    ChamplainViewport *viewport);
 
 void champlain_kinetic_scroll_view_stop (ChamplainKineticScrollView *self);
 
