@@ -1449,10 +1449,10 @@ champlain_view_stop_go_to (ChamplainView *view)
 
   g_object_unref (priv->goto_context->timeline);
 
-  g_signal_emit_by_name (view, "animation-completed::go-to", NULL);
-
   g_slice_free (GoToContext, priv->goto_context);
   priv->goto_context = NULL;
+
+  g_signal_emit_by_name (view, "animation-completed::go-to", NULL);
 }
 
 
