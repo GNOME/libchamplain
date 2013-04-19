@@ -182,6 +182,8 @@ struct _ChamplainViewPrivate
 
   gint tiles_loading;
   
+  guint redraw_timeout;
+  
   ClutterActor *zoom_container_actor;
   gboolean animating_zoom;
   guint anim_start_zoom_level;
@@ -235,6 +237,7 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble longitude,
     guint duration);
 static gboolean fill_tile_cb (FillTileCallbackData *data);
+static gboolean redraw_timeout_cb(gpointer view);
 
 
 /* Updates the internals after the viewport changed */
@@ -555,6 +558,12 @@ champlain_view_dispose (GObject *object)
     {
       g_object_unref (priv->background_content);
       priv->background_content = NULL;
+    }
+    
+  if (priv->redraw_timeout != 0)
+    {
+      g_source_remove (priv->redraw_timeout);
+      priv->redraw_timeout = 0;
     }
 
   priv->map_layer = NULL;
@@ -1008,6 +1017,8 @@ champlain_view_init (ChamplainView *view)
   priv->background_content = NULL;
   priv->zoom_container_actor = NULL;
 
+  priv->redraw_timeout = g_timeout_add (350, redraw_timeout_cb, view);
+
   g_signal_connect (view, "notify::width", G_CALLBACK (view_size_changed_cb), NULL);
   g_signal_connect (view, "notify::height", G_CALLBACK (view_size_changed_cb), NULL);
 
@@ -1066,6 +1077,42 @@ champlain_view_init (ChamplainView *view)
 
 
 static void
+prepare_update (ChamplainView *view, 
+    gfloat x, 
+    gfloat y)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble absolute_x, absolute_y;
+
+  absolute_x = x + priv->anchor_x + priv->viewport_width / 2.0;
+  absolute_y = y + priv->anchor_y + priv->viewport_height / 2.0;
+
+  update_viewport (view, absolute_x, absolute_y, FALSE, TRUE);
+
+  g_timer_start (priv->update_viewport_timer);
+}
+
+
+static gboolean
+redraw_timeout_cb (gpointer data)
+{
+  DEBUG_LOG ()
+
+  ChamplainView *view = data;
+  ChamplainViewPrivate *priv = view->priv;
+  gfloat x, y;
+
+  champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
+
+  if ((fabs (x - priv->viewport_x) > 0 || fabs (y - priv->viewport_y) > 0) && 
+      g_timer_elapsed (priv->update_viewport_timer, NULL) > 0.30)
+    prepare_update (view, x, y);
+    
+  return TRUE;
+}
+
+
+static void
 viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainView *view)
@@ -1077,19 +1124,8 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
 
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
-  if (fabs (x - priv->viewport_x) > 100 ||
-      fabs (y - priv->viewport_y) > 100 ||
-      g_timer_elapsed (priv->update_viewport_timer, NULL) > 0.25)
-    {
-      gdouble absolute_x, absolute_y;
-
-      absolute_x = x + priv->anchor_x + priv->viewport_width / 2.0;
-      absolute_y = y + priv->anchor_y + priv->viewport_height / 2.0;
-
-      update_viewport (view, absolute_x, absolute_y, FALSE, TRUE);
-
-      g_timer_start (priv->update_viewport_timer);
-    }
+  if (fabs (x - priv->viewport_x) > 100 || fabs (y - priv->viewport_y) > 100)
+    prepare_update (view, x, y);
 }
 
 
