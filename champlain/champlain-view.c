@@ -2895,6 +2895,9 @@ bin_alignment_to_actor_align (ClutterBinAlignment alignment)
  * for reference.
  *
  * Since: 0.10
+ *
+ * Deprecated: 0.12.4: Use #ClutterActorAlign and the #ClutterActor
+ * API instead.
  */
 void
 champlain_view_bin_layout_add (ChamplainView *view,
