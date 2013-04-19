@@ -303,9 +303,11 @@ main (int argc,
   champlain_scale_connect_view (CHAMPLAIN_SCALE (scale), view);
   
   /* align to the bottom left */
-  champlain_view_bin_layout_add (view, scale,
-                                 CLUTTER_BIN_ALIGNMENT_START,
-                                 CLUTTER_BIN_ALIGNMENT_END);
+  clutter_actor_set_x_expand (scale, TRUE);
+  clutter_actor_set_y_expand (scale, TRUE);
+  clutter_actor_set_x_align (scale, CLUTTER_ACTOR_ALIGN_START);
+  clutter_actor_set_y_align (scale, CLUTTER_ACTOR_ALIGN_END);
+  clutter_actor_add_child (CLUTTER_ACTOR (view), scale);
   
   license_actor = champlain_view_get_license_actor (view);
   champlain_license_set_extra_text (license_actor, "Don't eat cereals with orange juice\nIt tastes bad");

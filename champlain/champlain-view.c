@@ -1067,9 +1067,11 @@ champlain_view_init (ChamplainView *view)
   /* Setup license */
   priv->license_actor = champlain_license_new ();
   champlain_license_connect_view (CHAMPLAIN_LICENSE (priv->license_actor), view);
-  champlain_view_bin_layout_add (view, priv->license_actor,
-      CLUTTER_BIN_ALIGNMENT_END,
-      CLUTTER_BIN_ALIGNMENT_END);
+  clutter_actor_set_x_expand (priv->license_actor, TRUE);
+  clutter_actor_set_y_expand (priv->license_actor, TRUE);
+  clutter_actor_set_x_align (priv->license_actor, CLUTTER_ACTOR_ALIGN_END);
+  clutter_actor_set_y_align (priv->license_actor, CLUTTER_ACTOR_ALIGN_END);
+  clutter_actor_add_child (CLUTTER_ACTOR (view), priv->license_actor);
 
   priv->state = CHAMPLAIN_STATE_DONE;
   g_object_notify (G_OBJECT (view), "state");
