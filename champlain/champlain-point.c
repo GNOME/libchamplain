@@ -330,6 +330,7 @@ champlain_point_set_size (ChamplainPoint *point,
   point->priv->size = size;
   clutter_canvas_set_size (CLUTTER_CANVAS (priv->canvas), size, size);
   clutter_actor_set_size (CLUTTER_ACTOR (point), priv->size, priv->size);
+  clutter_actor_set_translation (CLUTTER_ACTOR (point), -priv->size/2, -priv->size/2, 0.0);
   g_object_notify (G_OBJECT (point), "size");
   clutter_content_invalidate (priv->canvas);
 }
