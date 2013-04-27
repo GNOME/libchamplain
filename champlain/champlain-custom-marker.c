@@ -18,12 +18,12 @@
 
 /**
  * SECTION:champlain-custom-marker
- * @short_description: #ChamplainCustomMarker A marker implementing the
- * #ClutterContainer interface.
+ * @short_description: A marker implementing the
+ * #ClutterContainer interface. Deprecated.
  *
  * A marker implementing the #ClutterContainer interface. You can insert
- * your custom actors into the container. Don't forget to set the anchor
- * position in the marker using #clutter_actor_set_anchor_point.
+ * your custom actors into the container. Don't forget to set the marker's
+ * pointer position using #clutter_actor_set_translation.
  */
 
 #include "config.h"
@@ -81,6 +81,9 @@ champlain_custom_marker_init (ChamplainCustomMarker *custom_marker)
  * Returns: a new #ChamplainCustomMarker.
  *
  * Since: 0.10
+ * 
+ * Deprecated: 0.12.4: #ChamplainMarker is a concrete class now and can be used
+ * instead.
  */
 ClutterActor *
 champlain_custom_marker_new (void)

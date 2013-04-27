@@ -26,8 +26,9 @@
  * #champlainview for the markers to show on the map.
  *
  * A marker is nothing more than a regular #clutteractor. You can draw on
- * it what ever you want.  Set the markers position
- * on the map using #champlain_location_set_location.
+ * it what ever you want.  Set the marker's position
+ * on the map using #champlain_location_set_location. Don't forget to set the 
+ * marker's pointer position using #clutter_actor_set_translation.
  *
  * This is a base class of all markers. libchamplain has a more evoluted
  * type of markers with text and image support. See #ChamplainLabel for more details.

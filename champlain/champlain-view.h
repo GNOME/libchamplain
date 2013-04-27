@@ -153,11 +153,12 @@ void champlain_view_get_viewport_origin (ChamplainView *view,
     gint *x,
     gint *y);
 
+#ifndef GTK_DISABLE_DEPRECATED
 void champlain_view_bin_layout_add (ChamplainView *view,
     ClutterActor *child,
     ClutterBinAlignment x_align,
     ClutterBinAlignment y_align);
-
+#endif
 ChamplainLicense *champlain_view_get_license_actor (ChamplainView *view);
 
 ChamplainBoundingBox *champlain_view_get_bounding_box (ChamplainView *view);

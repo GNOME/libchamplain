@@ -220,6 +220,8 @@ champlain_bounding_box_is_valid (ChamplainBoundingBox *bbox)
 /**
  * champlain_bounding_box_covers:
  * @bbox: a #ChamplainBoundingBox
+ * @latitude: the latitude of the point
+ * @longitude: the longitude of the point
  *
  * Checks whether @bbox covers the given coordinates.
  *
