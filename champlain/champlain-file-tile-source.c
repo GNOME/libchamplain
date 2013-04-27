@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2009 Simon Wenner <simon@wenner.ch>
- * Copyright (C) 2010-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2010-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

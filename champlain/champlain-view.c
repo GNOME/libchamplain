@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
- * Copyright (C) 2010-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2010-2013 Jiri Techet <techet@gmail.com>
  * Copyright (C) 2012 Collabora Ltd. <http://www.collabora.co.uk/>
  *
  * This library is free software; you can redistribute it and/or
