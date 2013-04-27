@@ -25,7 +25,7 @@
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
-#include <champlain-viewport.h>
+#include <champlain/champlain-viewport.h>
 
 G_BEGIN_DECLS
 
