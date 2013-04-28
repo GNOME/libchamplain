@@ -184,7 +184,7 @@ struct _ChamplainViewPrivate
   
   guint redraw_timeout;
   
-  ClutterActor *zoom_container_actor;
+  ClutterActor *zoom_overlay_actor;
   gboolean animating_zoom;
   guint anim_start_zoom_level;
   gdouble zoom_actor_longitude;
@@ -1015,15 +1015,15 @@ champlain_view_init (ChamplainView *view)
   priv->update_viewport_timer = g_timer_new ();
   priv->animating_zoom = FALSE;
   priv->background_content = NULL;
-  priv->zoom_container_actor = NULL;
+  priv->zoom_overlay_actor = NULL;
 
   priv->redraw_timeout = g_timeout_add (350, redraw_timeout_cb, view);
 
   g_signal_connect (view, "notify::width", G_CALLBACK (view_size_changed_cb), NULL);
   g_signal_connect (view, "notify::height", G_CALLBACK (view_size_changed_cb), NULL);
 
-  layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_CENTER,
-                                   CLUTTER_BIN_ALIGNMENT_CENTER);
+  layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
+                                   CLUTTER_BIN_ALIGNMENT_FIXED);
   clutter_actor_set_layout_manager (CLUTTER_ACTOR (view), layout);
 
   /* Setup viewport layers*/
@@ -1061,6 +1061,8 @@ champlain_view_init (ChamplainView *view)
 
   /* Setup stage */
   clutter_actor_add_child (CLUTTER_ACTOR (view), priv->kinetic_scroll);
+  priv->zoom_overlay_actor = clutter_actor_new ();
+  clutter_actor_add_child (CLUTTER_ACTOR (view), priv->zoom_overlay_actor);
 
   resize_viewport (view);
 
@@ -2476,16 +2478,14 @@ position_zoom_actor (ChamplainView *view)
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->zoom_actor_latitude) - priv->anchor_y;
   
   clutter_actor_destroy_all_children (priv->zoom_layer);
-  g_object_ref (priv->zoom_container_actor);
-  clutter_actor_remove_child(CLUTTER_ACTOR (view), priv->zoom_container_actor);
-  clutter_actor_add_child (priv->zoom_layer, priv->zoom_container_actor);
-  g_object_unref (priv->zoom_container_actor);
+  ClutterActor *zoom_actor = clutter_actor_get_first_child (priv->zoom_overlay_actor);
+  g_object_ref (zoom_actor);
+  clutter_actor_remove_child(priv->zoom_overlay_actor, zoom_actor);
+  clutter_actor_add_child (priv->zoom_layer, zoom_actor);
+  g_object_unref (zoom_actor);
 
-  ClutterActor *zoom_actor = clutter_actor_get_first_child (priv->zoom_container_actor);
-  clutter_actor_set_position (zoom_actor, 0.0, 0.0);
-  clutter_actor_set_position (priv->zoom_container_actor, x, y);
-  clutter_actor_set_pivot_point (priv->zoom_container_actor, 0.0, 0.0);
-  priv->zoom_container_actor = NULL;
+  clutter_actor_set_pivot_point (zoom_actor, 0.0, 0.0);
+  clutter_actor_set_position (zoom_actor, x, y);
 
   //clutter_actor_hide (priv->map_layer);
 }
@@ -2516,25 +2516,39 @@ show_zoom_actor (ChamplainView *view,
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
+  ClutterActor *zoom_actor = NULL;
   gdouble deltazoom;
   
   if (!priv->animating_zoom)
     {
-      ClutterActor *zoom_actor = NULL;
       ClutterActorIter iter;
       ClutterActor *child;
       gdouble size;
       gdouble x_coord, y_coord;
-      gdouble x_first, y_first;
+      gdouble x_first, y_first, max_x_end, max_y_end;
+      gdouble zoom_actor_width, zoom_actor_height;
 
       size = champlain_map_source_get_tile_size (priv->map_source);
 
       x_coord = priv->viewport_x + priv->anchor_x;
       y_coord = priv->viewport_y + priv->anchor_y;
 
+      if (x_coord < 0)
+        x_coord = 0;
+      if (y_coord < 0)
+        y_coord = 0;
+
       x_first = x_coord / size;
       y_first = y_coord / size;
       
+      max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+      max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
+
+      if (x_first > max_x_end)
+        x_first = max_x_end;
+      if (y_first > max_y_end)
+        y_first = max_y_end;
+
       priv->anim_start_zoom_level = priv->zoom_level;
       priv->zoom_actor_longitude = champlain_map_source_get_longitude (priv->map_source,
         priv->zoom_level,
@@ -2543,12 +2557,9 @@ show_zoom_actor (ChamplainView *view,
         priv->zoom_level,
         y_first * size);
 
-      if (priv->zoom_container_actor != NULL)
-          clutter_actor_destroy (priv->zoom_container_actor);
-      priv->zoom_container_actor = clutter_actor_new ();
-      clutter_actor_add_child (CLUTTER_ACTOR (view), priv->zoom_container_actor);
+      clutter_actor_destroy_all_children (priv->zoom_overlay_actor);
       zoom_actor = clutter_actor_new ();
-      clutter_actor_add_child (priv->zoom_container_actor, zoom_actor);
+      clutter_actor_add_child (priv->zoom_overlay_actor, zoom_actor);
       
       clutter_actor_iter_init (&iter, priv->map_layer);
       while (clutter_actor_iter_next (&iter, &child))
@@ -2570,10 +2581,15 @@ show_zoom_actor (ChamplainView *view,
       
       clutter_actor_set_position (zoom_actor, deltax, deltay);
       
-      clutter_actor_set_pivot_point (priv->zoom_container_actor, 
-          (priv->viewport_width / 2.0 - x_diff) / priv->viewport_width,
-          (priv->viewport_height / 2.0 - y_diff) / priv->viewport_height);
+      zoom_actor_width = clutter_actor_get_width (zoom_actor);
+      zoom_actor_height = clutter_actor_get_height (zoom_actor);
+
+      clutter_actor_set_pivot_point (zoom_actor, 
+          (priv->viewport_width / 2.0 - deltax - x_diff) / zoom_actor_width,
+          (priv->viewport_height / 2.0 - deltay - y_diff) / zoom_actor_height);
     }
+  else
+    zoom_actor = clutter_actor_get_first_child (priv->zoom_overlay_actor);
 
   deltazoom = pow (2.0, (gdouble)zoom_level - priv->anim_start_zoom_level);
 
@@ -2583,11 +2599,11 @@ show_zoom_actor (ChamplainView *view,
 
       clutter_actor_destroy_all_children (priv->zoom_layer);
 
-      clutter_actor_save_easing_state (priv->zoom_container_actor);
-      clutter_actor_set_easing_mode (priv->zoom_container_actor, CLUTTER_EASE_IN_OUT_QUAD);
-      clutter_actor_set_easing_duration (priv->zoom_container_actor, 350);
-      clutter_actor_set_scale (priv->zoom_container_actor, deltazoom, deltazoom);
-      clutter_actor_restore_easing_state (priv->zoom_container_actor);
+      clutter_actor_save_easing_state (zoom_actor);
+      clutter_actor_set_easing_mode (zoom_actor, CLUTTER_EASE_IN_OUT_QUAD);
+      clutter_actor_set_easing_duration (zoom_actor, 350);
+      clutter_actor_set_scale (zoom_actor, deltazoom, deltazoom);
+      clutter_actor_restore_easing_state (zoom_actor);
 
       clutter_actor_save_easing_state (priv->map_layer);
       clutter_actor_set_easing_mode (priv->map_layer, CLUTTER_EASE_IN_EXPO);
@@ -2598,13 +2614,13 @@ show_zoom_actor (ChamplainView *view,
       if (!priv->animating_zoom)
         {
           clutter_actor_hide (priv->user_layers);
-          g_signal_connect (priv->zoom_container_actor, "transition-stopped::scale-x", G_CALLBACK (zoom_animation_completed), view);
+          g_signal_connect (zoom_actor, "transition-stopped::scale-x", G_CALLBACK (zoom_animation_completed), view);
         }
         
       priv->animating_zoom = TRUE;
     }
   else
-    clutter_actor_set_scale (priv->zoom_container_actor, deltazoom, deltazoom);
+    clutter_actor_set_scale (zoom_actor, deltazoom, deltazoom);
 }
 
 
