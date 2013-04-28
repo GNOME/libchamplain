@@ -2423,7 +2423,9 @@ champlain_view_ensure_layers_visible (ChamplainView *view,
  * @view: a #ChamplainView
  * @background: The background texture
  *
- * Sets the background texture displayed behind the map.
+ * Sets the background texture displayed behind the map. Setting the background
+ * pattern affects performence slightly - use reasonably large patterns for
+ * better performance.
  *
  * Since: 0.12.4
  */
