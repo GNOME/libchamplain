@@ -586,60 +586,6 @@ champlain_view_finalize (GObject *object)
 }
 
 
-static gboolean
-_update_idle_cb (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  ChamplainViewPrivate *priv = view->priv;
-  
-  if (!priv->kinetic_scroll)
-    return FALSE;
-
-  clutter_actor_set_size (priv->kinetic_scroll,
-      priv->viewport_width,
-      priv->viewport_height);
-
-  resize_viewport (view);
-
-  if (priv->keep_center_on_resize)
-    champlain_view_center_on (view, priv->latitude, priv->longitude);
-  else
-    view_load_visible_tiles (view);
-
-  return FALSE;
-}
-
-
-static void
-champlain_view_realize (ClutterActor *actor)
-{
-  DEBUG_LOG ()
-
-  ChamplainView *view = CHAMPLAIN_VIEW (actor);
-  ChamplainViewPrivate *priv = view->priv;
-
-  /*
-   * We should be calling this but it segfaults
-   * CLUTTER_ACTOR_CLASS (champlain_view_parent_class)->realize (actor);
-   * ClutterStage uses clutter_actor_realize.
-   */
-
-  clutter_actor_realize (actor);
-
-  clutter_actor_grab_key_focus (priv->kinetic_scroll);
-
-  /* Setup the viewport according to the zoom level */
-  /* resize_viewport (view); */
-
-  g_object_notify (G_OBJECT (view), "zoom-level");
-  g_object_notify (G_OBJECT (view), "map-source");
-
-  /* this call will launch the tiles loading */
-  champlain_view_center_on (view, priv->latitude, priv->longitude);
-}
-
-
 /* These return fixed sizes because either a.) We expect the user to size
  * explicitly with clutter_actor_get_size or b.) place it in a container that
  * allocates it whatever it wants.
@@ -698,7 +644,6 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (champlainViewClass);
   actor_class->get_preferred_width = champlain_view_get_preferred_width;
   actor_class->get_preferred_height = champlain_view_get_preferred_height;
-  actor_class->realize = champlain_view_realize;
 
   /**
    * ChamplainView:longitude:
@@ -950,6 +895,52 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 
 
 static void
+champlain_view_realized_cb (ChamplainView *view,
+    G_GNUC_UNUSED GParamSpec *pspec)
+{
+  DEBUG_LOG ()
+
+  ChamplainViewPrivate *priv = view->priv;
+  
+  if (!CLUTTER_ACTOR_IS_REALIZED (view))
+    return;
+
+  clutter_actor_grab_key_focus (priv->kinetic_scroll);
+
+  g_object_notify (G_OBJECT (view), "zoom-level");
+  g_object_notify (G_OBJECT (view), "map-source");
+
+  /* this call will launch the tiles loading */
+  champlain_view_center_on (view, priv->latitude, priv->longitude);
+}
+
+
+static gboolean
+_update_idle_cb (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  ChamplainViewPrivate *priv = view->priv;
+  
+  if (!priv->kinetic_scroll)
+    return FALSE;
+
+  clutter_actor_set_size (priv->kinetic_scroll,
+      priv->viewport_width,
+      priv->viewport_height);
+
+  resize_viewport (view);
+
+  if (priv->keep_center_on_resize)
+    champlain_view_center_on (view, priv->latitude, priv->longitude);
+  else
+    view_load_visible_tiles (view);
+
+  return FALSE;
+}
+
+
+static void
 view_size_changed_cb (ChamplainView *view,
     G_GNUC_UNUSED GParamSpec *pspec)
 {
@@ -1021,6 +1012,8 @@ champlain_view_init (ChamplainView *view)
 
   g_signal_connect (view, "notify::width", G_CALLBACK (view_size_changed_cb), NULL);
   g_signal_connect (view, "notify::height", G_CALLBACK (view_size_changed_cb), NULL);
+
+  g_signal_connect (view, "notify::realized", G_CALLBACK (champlain_view_realized_cb), NULL);
 
   layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
                                    CLUTTER_BIN_ALIGNMENT_FIXED);
@@ -1876,7 +1869,7 @@ fill_background_tiles (ChamplainView *view)
 
   x_first = x_coord / width - 1;
   y_first = y_coord / height - 1;
-
+  
   clutter_actor_iter_init (&iter, priv->background_layer);
 
   for (x = x_first; x < x_first + x_count; ++x)
