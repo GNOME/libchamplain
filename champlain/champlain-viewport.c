@@ -37,6 +37,9 @@ struct _ChamplainViewportPrivate
   gfloat x;
   gfloat y;
 
+  gint anchor_x;
+  gint anchor_y;
+  
   ChamplainAdjustment *hadjustment;
   ChamplainAdjustment *vadjustment;
 };
@@ -50,6 +53,12 @@ enum
   PROP_HADJUST,
   PROP_VADJUST,
 };
+
+
+static void set_origin (ChamplainViewport *viewport,
+    gdouble x,
+    gdouble y);
+
 
 static void
 champlain_viewport_get_property (GObject *object,
@@ -220,7 +229,7 @@ hadjustment_value_notify_cb (ChamplainAdjustment *adjustment,
 
   value = champlain_adjustment_get_value (adjustment);
 
-  champlain_viewport_set_origin (viewport,
+  set_origin (viewport,
       value,
       priv->y);
 }
@@ -235,7 +244,7 @@ vadjustment_value_notify_cb (ChamplainAdjustment *adjustment, GParamSpec *arg1,
 
   value = champlain_adjustment_get_value (adjustment);
 
-  champlain_viewport_set_origin (viewport,
+  set_origin (viewport,
       priv->x,
       value);
 }
@@ -353,6 +362,9 @@ static void
 champlain_viewport_init (ChamplainViewport *self)
 {
   self->priv = GET_PRIVATE (self);
+  
+  self->priv->anchor_x = 0;
+  self->priv->anchor_y = 0;
 }
 
 
@@ -365,18 +377,31 @@ champlain_viewport_new (void)
 
 void
 champlain_viewport_set_origin (ChamplainViewport *viewport,
-    float x,
-    float y)
+    gdouble x,
+    gdouble y)
 {
-  ChamplainViewportPrivate *priv;
-  ClutterActor *child;
-
   g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
+
+  ChamplainViewportPrivate *priv = viewport->priv;
+
+  set_origin (viewport, x - priv->anchor_x, y - priv->anchor_y);
+}
+
+
+static void
+set_origin (ChamplainViewport *viewport,
+    gdouble x,
+    gdouble y)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
+
+  ChamplainViewportPrivate *priv = viewport->priv;
+  ClutterActor *child;
 
   priv = viewport->priv;
 
   g_object_freeze_notify (G_OBJECT (viewport));
-
+  
   child = clutter_actor_get_first_child (CLUTTER_ACTOR (viewport));
   if (child && (x != priv->x || y != priv->y))
     clutter_actor_set_position (child, -x, -y);
@@ -407,20 +432,49 @@ champlain_viewport_set_origin (ChamplainViewport *viewport,
 
 void
 champlain_viewport_get_origin (ChamplainViewport *viewport,
-    float *x,
-    float *y)
+    gdouble *x,
+    gdouble *y)
 {
-  ChamplainViewportPrivate *priv;
-
   g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
 
-  priv = viewport->priv;
+  ChamplainViewportPrivate *priv = viewport->priv;
 
   if (x)
-    *x = priv->x;
+    *x = priv->x + priv->anchor_x;
 
   if (y)
-    *y = priv->y;
+    *y = priv->y + priv->anchor_y;
+}
+
+
+void
+champlain_viewport_set_anchor (ChamplainViewport *viewport,
+    gint x,
+    gint y)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
+
+  ChamplainViewportPrivate *priv = viewport->priv;
+
+  priv->anchor_x = x;
+  priv->anchor_y = y;
+}
+
+
+void
+champlain_viewport_get_anchor (ChamplainViewport *viewport,
+    gint *x,
+    gint *y)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
+
+  ChamplainViewportPrivate *priv = viewport->priv;
+
+  if (x)
+    *x = priv->anchor_x;
+
+  if (y)
+    *y = priv->anchor_y;
 }
 
 

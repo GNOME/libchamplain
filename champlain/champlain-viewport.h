@@ -67,12 +67,12 @@ GType champlain_viewport_get_type (void) G_GNUC_CONST;
 ClutterActor *champlain_viewport_new (void);
 
 void champlain_viewport_set_origin (ChamplainViewport *viewport,
-    float x,
-    float y);
+    gdouble x,
+    gdouble y);
 
 void champlain_viewport_get_origin (ChamplainViewport *viewport,
-    gfloat *x,
-    gfloat *y);
+    gdouble *x,
+    gdouble *y);
 void champlain_viewport_stop (ChamplainViewport *viewport);
 
 void champlain_viewport_get_adjustments (ChamplainViewport *viewport,
@@ -85,6 +85,14 @@ void champlain_viewport_set_adjustments (ChamplainViewport *viewport,
 
 void champlain_viewport_set_child (ChamplainViewport *viewport,
     ClutterActor *child);
+
+void champlain_viewport_set_anchor (ChamplainViewport *viewport,
+    gint x,
+    gint y);
+
+void champlain_viewport_get_anchor (ChamplainViewport *viewport,
+    gint *x,
+    gint *y);
 
 G_END_DECLS
 
