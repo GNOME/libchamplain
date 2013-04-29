@@ -170,6 +170,9 @@ struct _ChamplainViewPrivate
   gint viewport_y;
   gint viewport_width;
   gint viewport_height;
+  
+  gint bg_offset_x;
+  gint bg_offset_y;
 
   gboolean keep_center_on_resize;
   gboolean zoom_on_double_click;
@@ -252,6 +255,8 @@ update_viewport (ChamplainView *view,
 
   ChamplainViewPrivate *priv = view->priv;
   gboolean relocate;
+  gfloat bg_width = 1.0; 
+  gfloat bg_height = 1.0;
 
   if (set_coords)
     {
@@ -264,6 +269,12 @@ update_viewport (ChamplainView *view,
             y);
     }
 
+  /* remember the relative offset of the background tile */
+  if (priv->background_content)
+    clutter_content_get_preferred_size (priv->background_content, &bg_width, &bg_height);
+  gint old_bg_offset_x = (priv->viewport_x + priv->anchor_x + priv->bg_offset_x) % (gint)bg_width;
+  gint old_bg_offset_y = (priv->viewport_y + priv->anchor_y + priv->bg_offset_y) % (gint)bg_height;
+  
   relocate = view_update_anchor (view, x, y);
 
   priv->viewport_x = x - priv->anchor_x - priv->viewport_width / 2.0;
@@ -271,6 +282,16 @@ update_viewport (ChamplainView *view,
 
   if (relocate || force_relocate)
     {
+      /* compute the new relative offset of the background tile */
+      gint new_bg_offset_x = (priv->viewport_x + priv->anchor_x) % (gint)bg_width;
+      gint new_bg_offset_y = (priv->viewport_y + priv->anchor_y) % (gint)bg_height;
+      priv->bg_offset_x = (old_bg_offset_x - new_bg_offset_x) % (gint)bg_width;
+      priv->bg_offset_y = (old_bg_offset_y - new_bg_offset_y) % (gint)bg_height;
+      if (priv->bg_offset_x < 0)
+        priv->bg_offset_x += bg_width;
+      if (priv->bg_offset_y < 0)
+        priv->bg_offset_y += bg_height;
+
       g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
       champlain_viewport_set_origin (CHAMPLAIN_VIEWPORT (priv->viewport),
           priv->viewport_x,
@@ -1007,6 +1028,8 @@ champlain_view_init (ChamplainView *view)
   priv->animating_zoom = FALSE;
   priv->background_content = NULL;
   priv->zoom_overlay_actor = NULL;
+  priv->bg_offset_x = 0;
+  priv->bg_offset_y = 0;
 
   priv->redraw_timeout = g_timeout_add (350, redraw_timeout_cb, view);
 
@@ -1885,8 +1908,8 @@ fill_background_tiles (ChamplainView *view)
               clutter_actor_add_child (priv->background_layer, child);
             }
           clutter_actor_set_position (child,
-              (x * width) - priv->anchor_x,
-              (y * height) - priv->anchor_y);
+              (x * width) - priv->anchor_x - priv->bg_offset_x,
+              (y * height) - priv->anchor_y - priv->bg_offset_y);
           child = clutter_actor_get_next_sibling (child);
         }
     }
