@@ -34,8 +34,8 @@ G_DEFINE_TYPE (ChamplainViewport, champlain_viewport, CLUTTER_TYPE_ACTOR)
 
 struct _ChamplainViewportPrivate
 {
-  gfloat x;
-  gfloat y;
+  gdouble x;
+  gdouble y;
 
   gint anchor_x;
   gint anchor_y;
@@ -54,11 +54,20 @@ enum
   PROP_VADJUST,
 };
 
+enum
+{
+  /* normal signals */
+  RELOCATED,
+  LAST_SIGNAL
+};
 
-static void set_origin (ChamplainViewport *viewport,
+static guint signals[LAST_SIGNAL] = { 0, };
+
+static void
+set_origin (ChamplainViewport *viewport,
     gdouble x,
-    gdouble y);
-
+    gdouble y,
+    gboolean emit);
 
 static void
 champlain_viewport_get_property (GObject *object,
@@ -216,6 +225,15 @@ champlain_viewport_class_init (ChamplainViewportClass *klass)
           "Vertical adjustment",
           CHAMPLAIN_TYPE_ADJUSTMENT,
           G_PARAM_READWRITE));
+          
+  signals[RELOCATED] =
+    g_signal_new ("relocated", 
+        G_OBJECT_CLASS_TYPE (gobject_class),
+        G_SIGNAL_RUN_LAST, 
+        0, NULL, NULL,
+        g_cclosure_marshal_VOID__VOID, 
+        G_TYPE_NONE, 
+        0);
 }
 
 
@@ -229,9 +247,7 @@ hadjustment_value_notify_cb (ChamplainAdjustment *adjustment,
 
   value = champlain_adjustment_get_value (adjustment);
 
-  set_origin (viewport,
-      value,
-      priv->y);
+  set_origin (viewport, value, priv->y, TRUE);
 }
 
 
@@ -244,9 +260,7 @@ vadjustment_value_notify_cb (ChamplainAdjustment *adjustment, GParamSpec *arg1,
 
   value = champlain_adjustment_get_value (adjustment);
 
-  set_origin (viewport,
-      priv->x,
-      value);
+  set_origin (viewport, priv->x, value, TRUE);
 }
 
 
@@ -375,43 +389,42 @@ champlain_viewport_new (void)
 }
 
 
-void
-champlain_viewport_set_origin (ChamplainViewport *viewport,
-    gdouble x,
-    gdouble y)
-{
-  g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
-
-  ChamplainViewportPrivate *priv = viewport->priv;
-
-  set_origin (viewport, x - priv->anchor_x, y - priv->anchor_y);
-}
-
+#define ANCHOR_LIMIT G_MAXINT16
 
 static void
 set_origin (ChamplainViewport *viewport,
     gdouble x,
-    gdouble y)
+    gdouble y,
+    gboolean emit)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
 
   ChamplainViewportPrivate *priv = viewport->priv;
   ClutterActor *child;
+  gboolean relocated;
 
-  priv = viewport->priv;
-
-  g_object_freeze_notify (G_OBJECT (viewport));
+  relocated = (ABS (priv->anchor_x - x) > ANCHOR_LIMIT || ABS (priv->anchor_y - y) > ANCHOR_LIMIT);
+  if (relocated)
+    {
+      priv->anchor_x = x - ANCHOR_LIMIT / 2;
+      priv->anchor_y = y - ANCHOR_LIMIT / 2;
+    }
   
   child = clutter_actor_get_first_child (CLUTTER_ACTOR (viewport));
   if (child && (x != priv->x || y != priv->y))
-    clutter_actor_set_position (child, -x, -y);
+    clutter_actor_set_position (child, -x + priv->anchor_x, -y + priv->anchor_y);
+
+  g_object_freeze_notify (G_OBJECT (viewport));
+  g_object_freeze_notify (G_OBJECT (priv->hadjustment));
+  g_object_freeze_notify (G_OBJECT (priv->vadjustment));
 
   if (x != priv->x)
     {
       priv->x = x;
-      g_object_notify (G_OBJECT (viewport), "x-origin");
+      if (emit)
+        g_object_notify (G_OBJECT (viewport), "x-origin");
 
-      if (priv->hadjustment)
+      if (priv->hadjustment && !emit)
         champlain_adjustment_set_value (priv->hadjustment,
             x);
     }
@@ -419,14 +432,29 @@ set_origin (ChamplainViewport *viewport,
   if (y != priv->y)
     {
       priv->y = y;
-      g_object_notify (G_OBJECT (viewport), "y-origin");
+      if (emit)
+        g_object_notify (G_OBJECT (viewport), "y-origin");
 
-      if (priv->vadjustment)
+      if (priv->vadjustment && !emit)
         champlain_adjustment_set_value (priv->vadjustment,
             y);
     }
-
+    
   g_object_thaw_notify (G_OBJECT (viewport));
+  g_object_thaw_notify (G_OBJECT (priv->hadjustment));
+  g_object_thaw_notify (G_OBJECT (priv->vadjustment));
+  
+  if (relocated && emit)
+    g_signal_emit_by_name (viewport, "relocated", NULL);
+}
+
+
+void
+champlain_viewport_set_origin (ChamplainViewport *viewport,
+    gdouble x,
+    gdouble y)
+{
+  set_origin (viewport, x, y, FALSE);
 }
 
 
@@ -440,10 +468,10 @@ champlain_viewport_get_origin (ChamplainViewport *viewport,
   ChamplainViewportPrivate *priv = viewport->priv;
 
   if (x)
-    *x = priv->x + priv->anchor_x;
+    *x = priv->x;
 
   if (y)
-    *y = priv->y + priv->anchor_y;
+    *y = priv->y;
 }
 
 
