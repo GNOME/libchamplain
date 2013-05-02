@@ -1,6 +1,7 @@
 /* champlain-kinetic-scroll-view.h: Finger scrolling container actor
  *
  * Copyright (C) 2008 OpenedHand
+ * Copyright (C) 2011-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
