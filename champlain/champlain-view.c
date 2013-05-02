@@ -134,16 +134,19 @@ typedef struct
   ChamplainMapSource *map_source;
 } FillTileCallbackData;
 
+
 struct _ChamplainViewPrivate
 {
-  ClutterActor *kinetic_scroll;     /* Contains the viewport */
-  ClutterActor *viewport;           /* Contains the movable layers */
-  ClutterActor *map_layer;          /* Contains tile actors */
-  ClutterActor *user_layers;        /* Contains the layers with markers */
-  ClutterActor *background_layer;   /* Contains background pattern */
-  ClutterActor *zoom_layer;         /* Contains the zoomed map */
-  ClutterActor *license_actor;      /* Contains the license info */
-  ClutterActor *zoom_overlay_actor; /* Contains the temporarily shown zoom actor */
+                                /* ChamplainView */
+  ClutterActor *kinetic_scroll;     /* kinetic_scroll */
+  ClutterActor *viewport;               /* viewport */
+                                            /* viewport_container */  
+  ClutterActor *background_layer;               /* background_layer */
+  ClutterActor *zoom_layer;                     /* zoom_layer */
+  ClutterActor *map_layer;                      /* map_layer */
+  ClutterActor *user_layers;                    /* user_layers */
+  ClutterActor *zoom_overlay_actor; /* zoom_overlay_actor */
+  ClutterActor *license_actor;      /* license_actor */
 
   ClutterContent *background_content; 
 
