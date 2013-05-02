@@ -292,13 +292,13 @@ redraw_scale (ClutterCanvas *canvas,
         (is_small_unit ? "ft" : "miles"));
   clutter_text_set_text (CLUTTER_TEXT (text), label);
   g_free (label);
-  clutter_actor_set_position (text, (scale_width - width / 2) + SCALE_INSIDE_PADDING, SCALE_INSIDE_PADDING);
+  clutter_actor_set_position (text, ceil (scale_width - width / 2) + SCALE_INSIDE_PADDING, SCALE_INSIDE_PADDING);
 
   text = clutter_container_find_child_by_name (CLUTTER_CONTAINER (scale), "scale-mid-label");
   label = g_strdup_printf ("%g", base / 2.0);
   clutter_text_set_text (CLUTTER_TEXT (text), label);
   clutter_actor_get_size (text, &width, &height);
-  clutter_actor_set_position (text, (scale_width - width) / 2 + SCALE_INSIDE_PADDING, SCALE_INSIDE_PADDING);
+  clutter_actor_set_position (text, ceil ((scale_width - width) / 2) + SCALE_INSIDE_PADDING, SCALE_INSIDE_PADDING);
   g_free (label);
 
   /* Draw the line */
@@ -356,7 +356,7 @@ create_scale (ChamplainScale *scale)
   text = clutter_text_new_with_text ("Sans 9", "0");
   clutter_actor_add_child (CLUTTER_ACTOR (scale), text);
   clutter_actor_get_size (text, &width, &priv->text_height);
-  clutter_actor_set_position (text, SCALE_INSIDE_PADDING - width / 2, SCALE_INSIDE_PADDING);
+  clutter_actor_set_position (text, SCALE_INSIDE_PADDING - ceil (width / 2), SCALE_INSIDE_PADDING);
 
   width = priv->max_scale_width + 2 * SCALE_INSIDE_PADDING;
   height = SCALE_HEIGHT + priv->text_height + GAP_SIZE + 2 * SCALE_INSIDE_PADDING;
