@@ -86,6 +86,51 @@ make_button (char *text)
   return button;
 }
 
+#define TILE_SQUARE_SIZE 64
+
+static gboolean
+draw_background_tile (ClutterCanvas *canvas,
+    cairo_t *cr,
+    int width,
+    int height)
+{
+  cairo_pattern_t *pat;
+  gint no_of_squares_x = width / TILE_SQUARE_SIZE;
+  gint no_of_squares_y = height / TILE_SQUARE_SIZE;
+  gint row, column;
+
+  /* Create the background tile */
+  pat = cairo_pattern_create_linear (width / 2.0, 0.0, width, height / 2.0);
+  cairo_pattern_add_color_stop_rgb (pat, 0, 0.662, 0.662, 0.662);
+  cairo_set_source (cr, pat);
+  cairo_rectangle (cr, 0, 0, width, height);
+  cairo_fill (cr);
+  cairo_pattern_destroy (pat);
+
+  /* Filling the tile */
+  cairo_set_source_rgb (cr, 0.811, 0.811, 0.811);
+  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+
+  for (row = 0; row < no_of_squares_y; ++row)
+    {
+      for (column = 0; column < no_of_squares_x; column++)
+        {
+          /* drawing square alternatively */
+          if ((row % 2 == 0 && column % 2 == 0) ||
+              (row % 2 != 0 && column % 2 != 0))
+            cairo_rectangle (cr,
+                column * TILE_SQUARE_SIZE,
+                row * TILE_SQUARE_SIZE,
+                TILE_SQUARE_SIZE,
+                TILE_SQUARE_SIZE);
+        }
+      cairo_fill (cr);
+    }
+  cairo_stroke (cr);
+  
+  return TRUE;
+}
+
 
 int
 main (int argc,
@@ -131,6 +176,13 @@ main (int argc,
       actor);
 
   clutter_actor_add_child (stage, buttons);
+
+  ClutterContent *canvas;
+  canvas = clutter_canvas_new ();
+  clutter_canvas_set_size (CLUTTER_CANVAS (canvas), 512, 256);
+  g_signal_connect (canvas, "draw", G_CALLBACK (draw_background_tile), NULL);
+  clutter_content_invalidate (canvas);
+  champlain_view_set_background_pattern (CHAMPLAIN_VIEW (actor), canvas);
 
   /* Create the markers and marker layer */
   layer = create_marker_layer (CHAMPLAIN_VIEW (actor), &path);
