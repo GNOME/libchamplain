@@ -9,7 +9,7 @@ libchamplain requires:
   * glib >= 2.10
   * gio >= 2.16
   * gdk >= 3.0
-  * clutter >= 1.2
+  * clutter >= 1.12
   * cairo >= 1.4
   * sqlite >= 3.0
   * libsoup >= 2.33.5
