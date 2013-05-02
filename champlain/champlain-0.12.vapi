@@ -5,23 +5,19 @@ namespace Champlain {
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_adjustment_get_type ()")]
 	public class Adjustment : GLib.Object {
 		[CCode (has_construct_function = false)]
-		public Adjustment (double value, double lower, double upper, double step_increment, double page_increment, double page_size);
+		public Adjustment (double value, double lower, double upper, double step_increment);
 		public bool clamp (bool interpolate, uint n_frames, uint fps);
 		public bool get_elastic ();
 		public double get_value ();
-		public void get_values (double value, double lower, double upper, double step_increment, double page_increment, double page_size);
+		public void get_values (double value, double lower, double upper, double step_increment);
 		public void interpolate (double value, uint n_frames, uint fps);
 		public void interpolate_stop ();
 		public void set_elastic (bool elastic);
 		public void set_value (double value);
-		public void set_values (double value, double lower, double upper, double step_increment, double page_increment, double page_size);
+		public void set_values (double value, double lower, double upper, double step_increment);
 		public bool elastic { get; set; }
 		[NoAccessorMethod]
 		public double lower { get; set; }
-		[NoAccessorMethod]
-		public double page_increment { get; set; }
-		[NoAccessorMethod]
-		public double page_size { get; set; }
 		[NoAccessorMethod]
 		public double step_increment { get; set; }
 		[NoAccessorMethod]
@@ -40,6 +36,7 @@ namespace Champlain {
 		public BoundingBox ();
 		public void compose (Champlain.BoundingBox other);
 		public Champlain.BoundingBox copy ();
+		public bool covers (double latitude, double longitude);
 		public void extend (double latitude, double longitude);
 		public void free ();
 		public void get_center (out double latitude, out double longitude);
@@ -53,8 +50,10 @@ namespace Champlain {
 		public Coordinate.full (double latitude, double longitude);
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_custom_marker_get_type ()")]
+	[Deprecated (since = "0.12.4")]
 	public class CustomMarker : Champlain.Marker, Atk.Implementor, Champlain.Location, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
+		[Deprecated (since = "0.12.4")]
 		public CustomMarker ();
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_error_tile_renderer_get_type ()")]
@@ -95,7 +94,7 @@ namespace Champlain {
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_kinetic_scroll_view_get_type ()")]
 	public class KineticScrollView : Clutter.Actor, Atk.Implementor, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
-		public KineticScrollView (bool kinetic);
+		public KineticScrollView (bool kinetic, Champlain.Viewport viewport);
 		public void stop ();
 		[NoAccessorMethod]
 		public double decel_rate { get; set; }
@@ -248,9 +247,9 @@ namespace Champlain {
 		public bool register (Champlain.MapSourceDesc desc);
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_marker_get_type ()")]
-	public abstract class Marker : Clutter.Actor, Atk.Implementor, Champlain.Location, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
-		[CCode (has_construct_function = false)]
-		protected Marker ();
+	public class Marker : Clutter.Actor, Atk.Implementor, Champlain.Location, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
+		[CCode (has_construct_function = false, type = "ClutterActor*")]
+		public Marker ();
 		public void animate_in ();
 		public void animate_in_with_delay (uint delay);
 		public void animate_out ();
@@ -503,12 +502,14 @@ namespace Champlain {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
 		public View ();
 		public void add_layer (Champlain.Layer layer);
+		[Deprecated (since = "0.12.4")]
 		public void bin_layout_add (Clutter.Actor child, Clutter.BinAlignment x_align, Clutter.BinAlignment y_align);
 		public void center_on (double latitude, double longitude);
 		public void ensure_layers_visible (bool animate);
 		public void ensure_visible (Champlain.BoundingBox bbox, bool animate);
 		public bool get_animate_zoom ();
-		public unowned Clutter.Texture get_background_tile ();
+		public unowned Clutter.Content get_background_pattern ();
+		public Champlain.BoundingBox get_bounding_box ();
 		public double get_center_latitude ();
 		public double get_center_longitude ();
 		public double get_deceleration ();
@@ -528,7 +529,7 @@ namespace Champlain {
 		public void reload_tiles ();
 		public void remove_layer (Champlain.Layer layer);
 		public void set_animate_zoom (bool value);
-		public void set_background_tile (Clutter.Texture background);
+		public void set_background_pattern (Clutter.Content background);
 		public void set_deceleration (double rate);
 		public void set_keep_center_on_resize (bool value);
 		public void set_kinetic_mode (bool kinetic);
@@ -543,7 +544,7 @@ namespace Champlain {
 		public void zoom_in ();
 		public void zoom_out ();
 		public bool animate_zoom { get; set; }
-		public Clutter.Actor background_tile { get; set; }
+		public Clutter.Actor background_pattern { get; set; }
 		public double deceleration { get; set; }
 		public bool keep_center_on_resize { get; set; }
 		public bool kinetic_mode { get; set; }
@@ -564,21 +565,21 @@ namespace Champlain {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
 		public Viewport ();
 		public void get_adjustments (Champlain.Adjustment hadjustment, Champlain.Adjustment vadjustment);
-		public void get_origin (float x, float y);
+		public void get_anchor (int x, int y);
+		public void get_origin (double x, double y);
 		public void set_adjustments (Champlain.Adjustment hadjustment, Champlain.Adjustment vadjustment);
 		public void set_child (Clutter.Actor child);
-		public void set_origin (float x, float y);
+		public void set_origin (double x, double y);
 		public void stop ();
 		[NoAccessorMethod]
 		public Champlain.Adjustment hadjustment { owned get; set; }
-		[NoAccessorMethod]
-		public bool sync_adjustments { get; set; }
 		[NoAccessorMethod]
 		public Champlain.Adjustment vadjustment { owned get; set; }
 		[NoAccessorMethod]
 		public int x_origin { get; set; }
 		[NoAccessorMethod]
 		public int y_origin { get; set; }
+		public signal void relocated ();
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_location_get_type ()")]
 	public interface Location : GLib.Object {
