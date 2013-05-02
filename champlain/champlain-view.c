@@ -1802,17 +1802,17 @@ view_load_visible_tiles (ChamplainView *view)
 
   size = champlain_map_source_get_tile_size (priv->map_source);
 
+  max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+  max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
+
   x_count = ceil ((gfloat) priv->viewport_width / size) + 1;
   y_count = ceil ((gfloat) priv->viewport_height / size) + 1;
 
-  x_first = priv->viewport_x / size;
-  y_first = priv->viewport_y / size;
+  x_first = CLAMP (priv->viewport_x / size, 0, max_x_end);
+  y_first = CLAMP (priv->viewport_y / size, 0, max_y_end);
 
   x_end = x_first + x_count;
   y_end = y_first + y_count;
-
-  max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
-  max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
 
   x_end = CLAMP (x_end, x_first, max_x_end);
   y_end = CLAMP (y_end, y_first, max_y_end);
@@ -2390,12 +2390,16 @@ show_zoom_actor (ChamplainView *view,
       gint size;
       gint x_first, y_first;
       gdouble zoom_actor_width, zoom_actor_height;
+      gdouble max_x_end, max_y_end;
 
       size = champlain_map_source_get_tile_size (priv->map_source);
 
-      x_first = priv->viewport_x / size;
-      y_first = priv->viewport_y / size;
-      
+      max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+      max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
+
+      x_first = CLAMP (priv->viewport_x / size, 0, max_x_end);
+      y_first = CLAMP (priv->viewport_y / size, 0, max_y_end);
+
       priv->anim_start_zoom_level = priv->zoom_level;
       priv->zoom_actor_viewport_x = priv->viewport_x;
       priv->zoom_actor_viewport_y = priv->viewport_y;
