@@ -2006,6 +2006,7 @@ tile_state_notify (ChamplainTile *tile,
         priv->tiles_loading--;
       if (priv->tiles_loading == 0)
         {
+          clutter_actor_destroy_all_children (priv->zoom_layer);
           priv->state = CHAMPLAIN_STATE_DONE;
           g_object_notify (G_OBJECT (view), "state");
         }
