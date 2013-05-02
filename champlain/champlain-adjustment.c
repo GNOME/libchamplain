@@ -531,7 +531,7 @@ champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
   priv->new_position = value;
 
   priv->dx = (priv->new_position - priv->old_position) * n_frames;
-  priv->interpolation = clutter_timeline_new (((float) n_frames / fps) * 1000);
+  priv->interpolation = clutter_timeline_new (((gdouble) n_frames / fps) * 1000);
 
   if (priv->elastic)
     clutter_timeline_set_progress_mode (priv->interpolation, CLUTTER_EASE_OUT_SINE);

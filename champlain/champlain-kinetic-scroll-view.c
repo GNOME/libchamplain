@@ -194,8 +194,8 @@ champlain_kinetic_scroll_view_class_init (ChamplainKineticScrollViewClass *klass
           "Rate at which the view "
           "will decelerate in "
           "kinetic mode.",
-          G_MINFLOAT + 1,
-          G_MAXFLOAT,
+          G_MINDOUBLE + 1,
+          G_MAXDOUBLE,
           1.1,
           G_PARAM_READWRITE));
 

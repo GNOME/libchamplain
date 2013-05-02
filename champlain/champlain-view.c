@@ -185,8 +185,8 @@ struct _ChamplainViewPrivate
   
   gboolean animating_zoom;
   guint anim_start_zoom_level;
-  gdouble zoom_actor_viewport_x;
-  gdouble zoom_actor_viewport_y;
+  gint zoom_actor_viewport_x;
+  gint zoom_actor_viewport_y;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR);
@@ -239,8 +239,8 @@ static void remove_all_tiles (ChamplainView *view);
 /* Updates the internals after the viewport changed */
 static void
 update_viewport (ChamplainView *view,
-    gdouble x,
-    gdouble y,
+    gint x,
+    gint y,
     gboolean relocate)
 {
   DEBUG_LOG ()
@@ -310,7 +310,7 @@ panning_completed (G_GNUC_UNUSED ChamplainKineticScrollView *scroll,
 
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
-  update_viewport (view, ceil (x), ceil (y), FALSE);
+  update_viewport (view, x, y, FALSE);
 }
 
 
@@ -1087,7 +1087,7 @@ redraw_timeout_cb (gpointer data)
 
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
-  if ((fabs (x - priv->viewport_x) > 0 || fabs (y - priv->viewport_y) > 0) && 
+  if ((ABS (x - priv->viewport_x) > 0 || ABS (y - priv->viewport_y) > 0) && 
       g_timer_elapsed (priv->update_viewport_timer, NULL) > 0.30)
     {
       update_viewport (view, x, y, FALSE);
@@ -1110,7 +1110,7 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
 
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
-  if (fabs (x - priv->viewport_x) > 100 || fabs (y - priv->viewport_y) > 100)
+  if (ABS (x - priv->viewport_x) > 100 || ABS (y - priv->viewport_y) > 100)
     {
       update_viewport (view, x, y, FALSE);
       g_timer_start (priv->update_viewport_timer);
@@ -1740,21 +1740,17 @@ fill_background_tiles (ChamplainView *view)
   ClutterActorIter iter;
   ClutterActor *child;
   gint x_count, y_count, x_first, y_first;
-  gdouble x_coord, y_coord;
   gint x, y;
   gfloat width, height;
   gboolean have_children = TRUE;
 
   clutter_content_get_preferred_size (priv->background_content, &width, &height);
 
-  x_coord = priv->viewport_x;
-  y_coord = priv->viewport_y;
-
   x_count = ceil ((gfloat) priv->viewport_width / width) + 3;
   y_count = ceil ((gfloat) priv->viewport_height / height) + 3;
 
-  x_first = x_coord / width - 1;
-  y_first = y_coord / height - 1;
+  x_first = priv->viewport_x / width - 1;
+  y_first = priv->viewport_y / height - 1;
   
   clutter_actor_iter_init (&iter, priv->background_layer);
 
@@ -1800,23 +1796,14 @@ view_load_visible_tiles (ChamplainView *view)
   gint arm_size, arm_max, turn;
   gint dirs[5] = { 0, 1, 0, -1, 0 };
   int i, x, y;
-  gdouble x_coord, y_coord;
 
   size = champlain_map_source_get_tile_size (priv->map_source);
-
-  x_coord = priv->viewport_x;
-  y_coord = priv->viewport_y;
-
-  if (x_coord < 0)
-    x_coord = 0;
-  if (y_coord < 0)
-    y_coord = 0;
 
   x_count = ceil ((gfloat) priv->viewport_width / size) + 1;
   y_count = ceil ((gfloat) priv->viewport_height / size) + 1;
 
-  x_first = x_coord / size;
-  y_first = y_coord / size;
+  x_first = priv->viewport_x / size;
+  y_first = priv->viewport_y / size;
 
   x_end = x_first + x_count;
   y_end = y_first + y_count;
@@ -2405,23 +2392,14 @@ show_zoom_actor (ChamplainView *view,
     {
       ClutterActorIter iter;
       ClutterActor *child;
-      gdouble size;
-      gdouble x_coord, y_coord;
-      gdouble x_first, y_first, max_x_end, max_y_end;
+      gint size;
+      gint x_first, y_first, max_x_end, max_y_end;
       gdouble zoom_actor_width, zoom_actor_height;
 
       size = champlain_map_source_get_tile_size (priv->map_source);
 
-      x_coord = priv->viewport_x;
-      y_coord = priv->viewport_y;
-
-      if (x_coord < 0)
-        x_coord = 0;
-      if (y_coord < 0)
-        y_coord = 0;
-
-      x_first = x_coord / size;
-      y_first = y_coord / size;
+      x_first = priv->viewport_x / size;
+      y_first = priv->viewport_y / size;
       
       max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
       max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
@@ -2439,15 +2417,15 @@ show_zoom_actor (ChamplainView *view,
       zoom_actor = clutter_actor_new ();
       clutter_actor_add_child (priv->zoom_overlay_actor, zoom_actor);
 
-      gdouble deltax = x_first * size - priv->viewport_x;
-      gdouble deltay = y_first * size - priv->viewport_y;
+      gint deltax = x_first * size - priv->viewport_x;
+      gint deltay = y_first * size - priv->viewport_y;
       
       clutter_actor_iter_init (&iter, priv->map_layer);
       while (clutter_actor_iter_next (&iter, &child))
         {
           ChamplainTile *tile = CHAMPLAIN_TILE (child);
-          gdouble tile_x = champlain_tile_get_x (tile);
-          gdouble tile_y = champlain_tile_get_y (tile);
+          gint tile_x = champlain_tile_get_x (tile);
+          gint tile_y = champlain_tile_get_y (tile);
 
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
           g_object_ref (CLUTTER_ACTOR (tile));
@@ -2891,28 +2869,24 @@ champlain_view_get_bounding_box (ChamplainView *view)
 
   ChamplainViewPrivate *priv = view->priv;
   ChamplainBoundingBox *bbox;
-  gdouble x, y;
 
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
 
   bbox = champlain_bounding_box_new ();
 
-  x = priv->viewport_x;
-  y = priv->viewport_y;
-
   bbox->top = champlain_map_source_get_latitude (priv->map_source,
     priv->zoom_level,
-    y);
+    priv->viewport_y);
   bbox->bottom = champlain_map_source_get_latitude (priv->map_source,
     priv->zoom_level,
-    y + priv->viewport_height);
+    priv->viewport_y + priv->viewport_height);
 
   bbox->left = champlain_map_source_get_longitude (priv->map_source,
     priv->zoom_level,
-    x);
+    priv->viewport_x);
   bbox->right = champlain_map_source_get_longitude (priv->map_source,
     priv->zoom_level,
-    x + priv->viewport_width);
+    priv->viewport_x + priv->viewport_width);
 
   return bbox;
 }
