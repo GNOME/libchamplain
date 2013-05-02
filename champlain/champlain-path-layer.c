@@ -610,6 +610,8 @@ redraw_path (ClutterCanvas *canvas,
   cairo_paint (cr);
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
 
+  cairo_set_line_join (cr, CAIRO_LINE_JOIN_BEVEL);
+
   for (elem = priv->nodes; elem != NULL; elem = elem->next)
     {
       ChamplainLocation *location = CHAMPLAIN_LOCATION (elem->data);
