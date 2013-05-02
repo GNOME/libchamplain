@@ -292,6 +292,10 @@ champlain_license_connect_view (ChamplainLicense *license,
 
   g_signal_connect (view, "notify::map-source",
       G_CALLBACK (redraw_license_cb), license);
+  g_signal_connect (view, "notify::width",
+      G_CALLBACK (redraw_license_cb), license);
+  g_signal_connect (view, "notify::height",
+      G_CALLBACK (redraw_license_cb), license);
   redraw_license (license);
 }
 
