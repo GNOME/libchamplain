@@ -1134,14 +1134,18 @@ kinetic_scroll_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
 
 
 static void
-scroll_to (ChamplainView *view,
-    gint x,
-    gint y)
+champlain_view_scroll (ChamplainView *view,
+    gint deltax,
+    gint deltay)
 {
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
   gdouble lat, lon;
+  gint x, y;
+
+  x = priv->viewport_x + priv->viewport_width / 2.0 + deltax;
+  y = priv->viewport_y + priv->viewport_height / 2.0 + deltay;
 
   lat = champlain_map_source_get_latitude (priv->map_source, priv->zoom_level, y);
   lon = champlain_map_source_get_longitude (priv->map_source, priv->zoom_level, x);
@@ -1153,83 +1157,6 @@ scroll_to (ChamplainView *view,
 }
 
 
-/* These functions should be exposed in the next API break */
-static void
-champlain_view_scroll_left (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  gint x, y;
-  ChamplainViewPrivate *priv = view->priv;
-
-  x = priv->viewport_x + priv->viewport_width / 2.0;
-  y = priv->viewport_y + priv->viewport_height / 2.0;
-
-  x -= priv->viewport_width / 4.0;
-
-  scroll_to (view, x, y);
-}
-
-
-static void
-champlain_view_scroll_right (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  gint x, y;
-  ChamplainViewPrivate *priv = view->priv;
-
-  x = priv->viewport_x + priv->viewport_width / 2.0;
-  y = priv->viewport_y + priv->viewport_height / 2.0;
-
-  x += priv->viewport_width / 4.0;
-
-  scroll_to (view, x, y);
-}
-
-
-static void
-champlain_view_scroll_up (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  gint x, y;
-  ChamplainViewPrivate *priv = view->priv;
-
-  x = priv->viewport_x + priv->viewport_width / 2.0;
-  y = priv->viewport_y + priv->viewport_height / 2.0;
-
-  y -= priv->viewport_width / 4.0;
-
-  scroll_to (view, x, y);
-}
-
-
-static void
-champlain_view_scroll_down (ChamplainView *view)
-{
-  DEBUG_LOG ()
-
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-
-  gint x, y;
-  ChamplainViewPrivate *priv = view->priv;
-
-  x = priv->viewport_x + priv->viewport_width / 2.0;
-  y = priv->viewport_y + priv->viewport_height / 2.0;
-
-  y += priv->viewport_width / 4.0;
-
-  scroll_to (view, x, y);
-}
-
-
 static gboolean
 kinetic_scroll_key_press_cb (G_GNUC_UNUSED ClutterActor *actor,
     ClutterKeyEvent *event,
@@ -1237,10 +1164,12 @@ kinetic_scroll_key_press_cb (G_GNUC_UNUSED ClutterActor *actor,
 {
   DEBUG_LOG ()
 
+  ChamplainViewPrivate *priv = view->priv;
+
   switch (event->keyval)
     {
     case 65361: /* Left */
-      champlain_view_scroll_left (view);
+      champlain_view_scroll (view, -priv->viewport_width / 4.0, 0);
       return TRUE;
       break;
 
@@ -1248,12 +1177,12 @@ kinetic_scroll_key_press_cb (G_GNUC_UNUSED ClutterActor *actor,
       if (event->modifier_state & CLUTTER_CONTROL_MASK)
         champlain_view_zoom_in (view);
       else
-        champlain_view_scroll_up (view);
+        champlain_view_scroll (view, 0, -priv->viewport_width / 4.0);
       return TRUE;
       break;
 
     case 65363: /* Right */
-      champlain_view_scroll_right (view);
+      champlain_view_scroll (view, priv->viewport_width / 4.0, 0);
       return TRUE;
       break;
 
@@ -1261,7 +1190,7 @@ kinetic_scroll_key_press_cb (G_GNUC_UNUSED ClutterActor *actor,
       if (event->modifier_state & CLUTTER_CONTROL_MASK)
         champlain_view_zoom_out (view);
       else
-        champlain_view_scroll_down (view);
+        champlain_view_scroll (view, 0, priv->viewport_width / 4.0);
       return TRUE;
       break;
 
@@ -2044,9 +1973,7 @@ remove_all_tiles (ChamplainView *view)
 
   clutter_actor_iter_init (&iter, priv->map_layer);
   while (clutter_actor_iter_next (&iter, &child))
-    {
-      champlain_tile_set_state (CHAMPLAIN_TILE (child), CHAMPLAIN_STATE_DONE);
-    }
+    champlain_tile_set_state (CHAMPLAIN_TILE (child), CHAMPLAIN_STATE_DONE);
 
   clutter_actor_destroy_all_children (priv->map_layer);
 }
