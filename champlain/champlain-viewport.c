@@ -42,6 +42,8 @@ struct _ChamplainViewportPrivate
   
   ChamplainAdjustment *hadjustment;
   ChamplainAdjustment *vadjustment;
+  
+  ClutterActor *child;
 };
 
 enum
@@ -63,11 +65,6 @@ enum
 
 static guint signals[LAST_SIGNAL] = { 0, };
 
-static void
-set_origin (ChamplainViewport *viewport,
-    gdouble x,
-    gdouble y,
-    gboolean emit);
 
 static void
 champlain_viewport_get_property (GObject *object,
@@ -246,8 +243,9 @@ hadjustment_value_notify_cb (ChamplainAdjustment *adjustment,
   gdouble value;
 
   value = champlain_adjustment_get_value (adjustment);
-
-  set_origin (viewport, value, priv->y, TRUE);
+  
+  if (priv->x != value)
+    champlain_viewport_set_origin (viewport, value, priv->y);
 }
 
 
@@ -260,7 +258,8 @@ vadjustment_value_notify_cb (ChamplainAdjustment *adjustment, GParamSpec *arg1,
 
   value = champlain_adjustment_get_value (adjustment);
 
-  set_origin (viewport, priv->x, value, TRUE);
+  if (priv->y != value)
+    champlain_viewport_set_origin (viewport, priv->x, value);
 }
 
 
@@ -391,18 +390,19 @@ champlain_viewport_new (void)
 
 #define ANCHOR_LIMIT G_MAXINT16
 
-static void
-set_origin (ChamplainViewport *viewport,
+void
+champlain_viewport_set_origin (ChamplainViewport *viewport,
     gdouble x,
-    gdouble y,
-    gboolean emit)
+    gdouble y)
 {
   g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
 
   ChamplainViewportPrivate *priv = viewport->priv;
-  ClutterActor *child;
   gboolean relocated;
 
+  if (x == priv->x && y == priv->y)
+    return;
+    
   relocated = (ABS (priv->anchor_x - x) > ANCHOR_LIMIT || ABS (priv->anchor_y - y) > ANCHOR_LIMIT);
   if (relocated)
     {
@@ -410,9 +410,8 @@ set_origin (ChamplainViewport *viewport,
       priv->anchor_y = y - ANCHOR_LIMIT / 2;
     }
   
-  child = clutter_actor_get_first_child (CLUTTER_ACTOR (viewport));
-  if (child && (x != priv->x || y != priv->y))
-    clutter_actor_set_position (child, -x + priv->anchor_x, -y + priv->anchor_y);
+  if (priv->child)
+    clutter_actor_set_position (priv->child, -x + priv->anchor_x, -y + priv->anchor_y);
 
   g_object_freeze_notify (G_OBJECT (viewport));
   g_object_freeze_notify (G_OBJECT (priv->hadjustment));
@@ -421,10 +420,9 @@ set_origin (ChamplainViewport *viewport,
   if (x != priv->x)
     {
       priv->x = x;
-      if (emit)
-        g_object_notify (G_OBJECT (viewport), "x-origin");
+      g_object_notify (G_OBJECT (viewport), "x-origin");
 
-      if (priv->hadjustment && !emit)
+      if (priv->hadjustment)
         champlain_adjustment_set_value (priv->hadjustment,
             x);
     }
@@ -432,10 +430,9 @@ set_origin (ChamplainViewport *viewport,
   if (y != priv->y)
     {
       priv->y = y;
-      if (emit)
-        g_object_notify (G_OBJECT (viewport), "y-origin");
+      g_object_notify (G_OBJECT (viewport), "y-origin");
 
-      if (priv->vadjustment && !emit)
+      if (priv->vadjustment)
         champlain_adjustment_set_value (priv->vadjustment,
             y);
     }
@@ -444,17 +441,8 @@ set_origin (ChamplainViewport *viewport,
   g_object_thaw_notify (G_OBJECT (priv->hadjustment));
   g_object_thaw_notify (G_OBJECT (priv->vadjustment));
   
-  if (relocated && emit)
+  if (relocated)
     g_signal_emit_by_name (viewport, "relocated", NULL);
-}
-
-
-void
-champlain_viewport_set_origin (ChamplainViewport *viewport,
-    gdouble x,
-    gdouble y)
-{
-  set_origin (viewport, x, y, FALSE);
 }
 
 
@@ -472,20 +460,6 @@ champlain_viewport_get_origin (ChamplainViewport *viewport,
 
   if (y)
     *y = priv->y;
-}
-
-
-void
-champlain_viewport_set_anchor (ChamplainViewport *viewport,
-    gint x,
-    gint y)
-{
-  g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
-
-  ChamplainViewportPrivate *priv = viewport->priv;
-
-  priv->anchor_x = x;
-  priv->anchor_y = y;
 }
 
 
@@ -509,6 +483,11 @@ champlain_viewport_get_anchor (ChamplainViewport *viewport,
 void
 champlain_viewport_set_child (ChamplainViewport *viewport, ClutterActor *child)
 {
+  g_return_if_fail (CHAMPLAIN_IS_VIEWPORT (viewport));
+
+  ChamplainViewportPrivate *priv = viewport->priv;
+  
   clutter_actor_remove_all_children (CLUTTER_ACTOR (viewport));
   clutter_actor_add_child (CLUTTER_ACTOR (viewport), child);
+  priv->child = child;
 }

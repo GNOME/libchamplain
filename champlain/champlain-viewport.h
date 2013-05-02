@@ -86,10 +86,6 @@ void champlain_viewport_set_adjustments (ChamplainViewport *viewport,
 void champlain_viewport_set_child (ChamplainViewport *viewport,
     ClutterActor *child);
 
-void champlain_viewport_set_anchor (ChamplainViewport *viewport,
-    gint x,
-    gint y);
-
 void champlain_viewport_get_anchor (ChamplainViewport *viewport,
     gint *x,
     gint *y);
