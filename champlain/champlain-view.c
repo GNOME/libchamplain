@@ -912,7 +912,7 @@ champlain_view_realized_cb (ChamplainView *view,
   g_object_notify (G_OBJECT (view), "zoom-level");
   g_object_notify (G_OBJECT (view), "map-source");
 
-  /* this call will launch the tiles loading */
+  resize_viewport (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
 }
 
@@ -1061,8 +1061,6 @@ champlain_view_init (ChamplainView *view)
   clutter_actor_add_child (CLUTTER_ACTOR (view), priv->kinetic_scroll);
   priv->zoom_overlay_actor = clutter_actor_new ();
   clutter_actor_add_child (CLUTTER_ACTOR (view), priv->zoom_overlay_actor);
-
-  resize_viewport (view);
 
   /* Setup license */
   priv->license_actor = champlain_license_new ();
