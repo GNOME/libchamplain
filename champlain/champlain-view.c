@@ -975,6 +975,7 @@ champlain_view_init (ChamplainView *view)
   ChamplainMapSource *source;
   ClutterActor *viewport_container;
   ClutterLayoutManager *layout;
+  ClutterColor color = { 0xf1, 0xee, 0xe8, 0xff };
 
   champlain_debug_set_flags (g_getenv ("CHAMPLAIN_DEBUG"));
 
@@ -1008,6 +1009,8 @@ champlain_view_init (ChamplainView *view)
   priv->zoom_overlay_actor = NULL;
   priv->bg_offset_x = 0;
   priv->bg_offset_y = 0;
+
+  clutter_actor_set_background_color (CLUTTER_ACTOR (view), &color);
 
   priv->redraw_timeout = g_timeout_add (350, redraw_timeout_cb, view);
 

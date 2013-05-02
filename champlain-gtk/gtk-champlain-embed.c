@@ -217,9 +217,6 @@ set_view (GtkChamplainEmbed *embed,
 static void
 gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 {
-  ClutterColor stage_color = { 0x34, 0x39, 0x39, 0xff };
-  ClutterActor *stage;
-
   GtkChamplainEmbedPrivate *priv = GET_PRIVATE (embed);
 
   embed->priv = priv;
@@ -248,10 +245,6 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 
   priv->view = NULL;
   set_view (embed, CHAMPLAIN_VIEW (champlain_view_new ()));
-
-  /* Setup stage */
-  stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
-  clutter_actor_set_background_color (stage, &stage_color);
 
   gtk_container_add (GTK_CONTAINER (embed), priv->clutter_embed);
 }
