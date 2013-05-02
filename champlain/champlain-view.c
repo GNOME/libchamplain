@@ -1811,14 +1811,8 @@ view_load_visible_tiles (ChamplainView *view)
   max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
   max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
 
-  if (x_end > max_x_end)
-    x_end = max_x_end;
-  if (y_end > max_y_end)
-    y_end = max_y_end;
-  if (x_first > max_x_end)
-    x_first = max_x_end;
-  if (y_first > max_y_end)
-    y_first = max_y_end;
+  x_end = CLAMP (x_end, x_first, max_x_end);
+  y_end = CLAMP (y_end, y_first, max_y_end);
 
   x_count = x_end - x_first;
   y_count = y_end - y_first;
@@ -1839,11 +1833,9 @@ view_load_visible_tiles (ChamplainView *view)
 
       gint tile_x = champlain_tile_get_x (tile);
       gint tile_y = champlain_tile_get_y (tile);
-      guint zoom_level = champlain_tile_get_zoom_level (tile);
 
       if (tile_x < x_first || tile_x >= x_end ||
-          tile_y < y_first || tile_y >= y_end ||
-          zoom_level != priv->zoom_level)
+          tile_y < y_first || tile_y >= y_end)
         {
           /* inform map source to terminate loading the tile */
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
@@ -2393,7 +2385,7 @@ show_zoom_actor (ChamplainView *view,
       ClutterActorIter iter;
       ClutterActor *child;
       gint size;
-      gint x_first, y_first, max_x_end, max_y_end;
+      gint x_first, y_first;
       gdouble zoom_actor_width, zoom_actor_height;
 
       size = champlain_map_source_get_tile_size (priv->map_source);
@@ -2401,14 +2393,6 @@ show_zoom_actor (ChamplainView *view,
       x_first = priv->viewport_x / size;
       y_first = priv->viewport_y / size;
       
-      max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
-      max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
-
-      if (x_first > max_x_end)
-        x_first = max_x_end;
-      if (y_first > max_y_end)
-        y_first = max_y_end;
-
       priv->anim_start_zoom_level = priv->zoom_level;
       priv->zoom_actor_viewport_x = priv->viewport_x;
       priv->zoom_actor_viewport_y = priv->viewport_y;
