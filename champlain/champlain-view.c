@@ -353,15 +353,15 @@ resize_viewport (ChamplainView *view)
   champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->viewport), &hadjust,
       &vadjust);
 
-  gdouble map_width = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level) *
+  gint map_width = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level) *
     champlain_map_source_get_tile_size (priv->map_source);
-  gdouble map_height = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
+  gint map_height = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
     champlain_map_source_get_tile_size (priv->map_source);
   
-  lower_x = MIN (-priv->viewport_width / 2.0, -priv->viewport_width + map_width / 2.0);
-  lower_y = MIN (-priv->viewport_height / 2.0, -priv->viewport_height + map_height / 2.0);
-  upper_x = MAX (map_width - priv->viewport_width / 2.0, map_width / 2.0);
-  upper_y = MAX (map_height - priv->viewport_height / 2.0, map_height / 2.0);
+  lower_x = MIN (-priv->viewport_width / 2, -priv->viewport_width + map_width / 2);
+  lower_y = MIN (-priv->viewport_height / 2, -priv->viewport_height + map_height / 2);
+  upper_x = MAX (map_width - priv->viewport_width / 2, map_width / 2);
+  upper_y = MAX (map_height - priv->viewport_height / 2, map_height / 2);
 
   /*
    * block emmision of signal by priv->viewport with viewport_pos_changed_cb()

@@ -286,7 +286,7 @@ main (int argc,
   append_point (path_layer, 45.4151, -73.1218);
   champlain_view_add_layer (view, CHAMPLAIN_LAYER (path_layer));
 
-  gtk_widget_set_size_request (widget, 640, 480);
+  gtk_widget_set_size_request (widget, 640, 481);
 
   bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
   button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_IN);
