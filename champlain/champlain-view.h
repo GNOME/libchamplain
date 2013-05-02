@@ -125,12 +125,6 @@ void champlain_view_add_layer (ChamplainView *view,
 void champlain_view_remove_layer (ChamplainView *view,
     ChamplainLayer *layer);
 
-void
-champlain_view_set_actor_position (ChamplainView *view,
-    ClutterActor *actor,
-    gdouble x,
-    gdouble y);
-
 guint champlain_view_get_zoom_level (ChamplainView *view);
 guint champlain_view_get_min_zoom_level (ChamplainView *view);
 guint champlain_view_get_max_zoom_level (ChamplainView *view);
