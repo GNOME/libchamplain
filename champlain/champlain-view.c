@@ -2400,17 +2400,17 @@ show_zoom_actor (ChamplainView *view,
       x_first = CLAMP (priv->viewport_x / size, 0, max_x_end);
       y_first = CLAMP (priv->viewport_y / size, 0, max_y_end);
 
-      priv->anim_start_zoom_level = priv->zoom_level;
-      priv->zoom_actor_viewport_x = priv->viewport_x;
-      priv->zoom_actor_viewport_y = priv->viewport_y;
-
       clutter_actor_destroy_all_children (priv->zoom_overlay_actor);
       zoom_actor = clutter_actor_new ();
       clutter_actor_add_child (priv->zoom_overlay_actor, zoom_actor);
-
-      gint deltax = x_first * size - priv->viewport_x;
-      gint deltay = y_first * size - priv->viewport_y;
       
+      gint deltax = priv->viewport_x - x_first * size;
+      gint deltay = priv->viewport_y - y_first * size;
+
+      priv->anim_start_zoom_level = priv->zoom_level;
+      priv->zoom_actor_viewport_x = priv->viewport_x - deltax;
+      priv->zoom_actor_viewport_y = priv->viewport_y - deltay;
+
       clutter_actor_iter_init (&iter, priv->map_layer);
       while (clutter_actor_iter_next (&iter, &child))
         {
@@ -2419,19 +2419,20 @@ show_zoom_actor (ChamplainView *view,
           gint tile_y = champlain_tile_get_y (tile);
 
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+          
           g_object_ref (CLUTTER_ACTOR (tile));
           clutter_actor_iter_remove (&iter);
           clutter_actor_add_child (zoom_actor, CLUTTER_ACTOR (tile));
           g_object_unref (CLUTTER_ACTOR (tile));
-          clutter_actor_set_position (CLUTTER_ACTOR (tile), (tile_x - x_first) * size + deltax, (tile_y - y_first) * size + deltay);
+          
+          clutter_actor_set_position (CLUTTER_ACTOR (tile), (tile_x - x_first) * size, (tile_y - y_first) * size);
         }
-              
-      clutter_actor_set_size (zoom_actor, priv->viewport_width, priv->viewport_height);
       
       zoom_actor_width = clutter_actor_get_width (zoom_actor);
       zoom_actor_height = clutter_actor_get_height (zoom_actor);
 
-      clutter_actor_set_pivot_point (zoom_actor, x / zoom_actor_width, y / zoom_actor_height);
+      clutter_actor_set_pivot_point (zoom_actor, (x + deltax) / zoom_actor_width, (y + deltay) / zoom_actor_height);
+      clutter_actor_set_position (zoom_actor, -deltax, -deltay);
     }
   else
     zoom_actor = clutter_actor_get_first_child (priv->zoom_overlay_actor);
