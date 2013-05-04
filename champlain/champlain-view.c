@@ -922,11 +922,12 @@ champlain_view_realized_cb (ChamplainView *view,
 
   clutter_actor_grab_key_focus (priv->kinetic_scroll);
 
-  g_object_notify (G_OBJECT (view), "zoom-level");
-  g_object_notify (G_OBJECT (view), "map-source");
-
   resize_viewport (view);
   champlain_view_center_on (view, priv->latitude, priv->longitude);
+
+  g_object_notify (G_OBJECT (view), "zoom-level");
+  g_object_notify (G_OBJECT (view), "map-source");
+  g_signal_emit_by_name (view, "layer-relocated", NULL);
 }
 
 
@@ -2467,7 +2468,9 @@ view_set_zoom_level_at (ChamplainView *view,
       y = priv->viewport_height / 2.0;
     }
 
-  show_zoom_actor (view, zoom_level, x, y);
+  /* don't do anything when view not yet realized */
+  if (CLUTTER_ACTOR_IS_REALIZED (view))
+    show_zoom_actor (view, zoom_level, x, y);
 
   gdouble deltazoom = pow (2, -(gdouble)priv->zoom_level + (gdouble)zoom_level);
   new_x = (priv->viewport_x + x) * deltazoom - x;
@@ -2475,13 +2478,16 @@ view_set_zoom_level_at (ChamplainView *view,
 
   priv->zoom_level = zoom_level;
 
-  resize_viewport (view);
-  remove_all_tiles (view);  
-  position_viewport (view, new_x, new_y);
-  load_visible_tiles (view, FALSE);
+  if (CLUTTER_ACTOR_IS_REALIZED (view))
+    {
+      resize_viewport (view);
+      remove_all_tiles (view);
+      position_viewport (view, new_x, new_y);
+      load_visible_tiles (view, FALSE);
 
-  if (!priv->animate_zoom)
-    position_zoom_actor (view);
+      if (!priv->animate_zoom)
+        position_zoom_actor (view);
+    }
 
   g_object_notify (G_OBJECT (view), "zoom-level");
   return TRUE;
