@@ -415,32 +415,33 @@ champlain_viewport_set_origin (ChamplainViewport *viewport,
     clutter_actor_set_position (priv->child, -x + priv->anchor_x, -y + priv->anchor_y);
 
   g_object_freeze_notify (G_OBJECT (viewport));
-  g_object_freeze_notify (G_OBJECT (priv->hadjustment));
-  g_object_freeze_notify (G_OBJECT (priv->vadjustment));
-
-  if (x != priv->x)
+  
+  if (priv->hadjustment && priv->vadjustment)
     {
-      priv->x = x;
-      g_object_notify (G_OBJECT (viewport), "x-origin");
+      g_object_freeze_notify (G_OBJECT (priv->hadjustment));
+      g_object_freeze_notify (G_OBJECT (priv->vadjustment));
+      
+      if (x != priv->x)
+        {
+          priv->x = x;
+          g_object_notify (G_OBJECT (viewport), "x-origin");
 
-      if (priv->hadjustment)
-        champlain_adjustment_set_value (priv->hadjustment,
-            x);
+          champlain_adjustment_set_value (priv->hadjustment, x);
+        }
+
+      if (y != priv->y)
+        {
+          priv->y = y;
+          g_object_notify (G_OBJECT (viewport), "y-origin");
+
+          champlain_adjustment_set_value (priv->vadjustment, y);
+        }
+        
+      g_object_thaw_notify (G_OBJECT (priv->hadjustment));
+      g_object_thaw_notify (G_OBJECT (priv->vadjustment));
     }
 
-  if (y != priv->y)
-    {
-      priv->y = y;
-      g_object_notify (G_OBJECT (viewport), "y-origin");
-
-      if (priv->vadjustment)
-        champlain_adjustment_set_value (priv->vadjustment,
-            y);
-    }
-    
   g_object_thaw_notify (G_OBJECT (viewport));
-  g_object_thaw_notify (G_OBJECT (priv->hadjustment));
-  g_object_thaw_notify (G_OBJECT (priv->vadjustment));
   
   if (relocated)
     g_signal_emit_by_name (viewport, "relocated", NULL);
