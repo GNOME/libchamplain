@@ -697,7 +697,7 @@ champlain_marker_layer_get_selection_mode (ChamplainMarkerLayer *layer)
 
 
 static void
-relocate (ChamplainMarkerLayer *layer)
+reposition (ChamplainMarkerLayer *layer)
 {
   ClutterActorIter iter;
   ClutterActor *child;
@@ -720,7 +720,18 @@ relocate_cb (G_GNUC_UNUSED GObject *gobject,
 {
   g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
 
-  relocate (layer);
+  reposition (layer);
+}
+
+
+static void
+zoom_reposition_cb (G_GNUC_UNUSED GObject *gobject,
+    G_GNUC_UNUSED GParamSpec *arg1,
+    ChamplainMarkerLayer *layer)
+{
+  g_return_if_fail (CHAMPLAIN_IS_MARKER_LAYER (layer));
+
+  reposition (layer);
 }
 
 
@@ -748,7 +759,10 @@ set_view (ChamplainLayer *layer,
       g_signal_connect (view, "layer-relocated",
           G_CALLBACK (relocate_cb), layer);
 
-      relocate (marker_layer);
+      g_signal_connect (view, "notify::zoom-level",
+          G_CALLBACK (zoom_reposition_cb), layer);
+
+      reposition (marker_layer);
     }
 }
 

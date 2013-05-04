@@ -216,9 +216,8 @@ static void viewport_pos_changed_cb (GObject *gobject,
 static gboolean kinetic_scroll_button_press_cb (ClutterActor *actor,
     ClutterButtonEvent *event,
     ChamplainView *view);
-static void view_load_visible_tiles (ChamplainView *view);
-static void view_position_tile (ChamplainView *view,
-    ChamplainTile *tile);
+static void load_visible_tiles (ChamplainView *view,
+    gboolean relocate);
 static gboolean view_set_zoom_level_at (ChamplainView *view,
     guint zoom_level,
     gboolean use_event_coord,
@@ -239,25 +238,15 @@ static gboolean redraw_timeout_cb(gpointer view);
 static void remove_all_tiles (ChamplainView *view);
 
 
-/* Updates the internals after the viewport changed */
 static void
-update_viewport (ChamplainView *view,
+update_coords (ChamplainView *view,
     gint x,
-    gint y,
-    gboolean relocate)
+    gint y)
 {
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
 
-  /* remember the relative offset of the background tile */
-  gfloat bg_width = 1.0;
-  gfloat bg_height = 1.0;
-  if (priv->background_content)
-      clutter_content_get_preferred_size (priv->background_content, &bg_width, &bg_height);
-  gint old_bg_offset_x = (priv->viewport_x + priv->bg_offset_x) % (gint)bg_width;
-  gint old_bg_offset_y = (priv->viewport_y + priv->bg_offset_y) % (gint)bg_height;
-    
   priv->viewport_x = x;
   priv->viewport_y = y;
   priv->longitude = champlain_map_source_get_longitude (priv->map_source,
@@ -266,10 +255,39 @@ update_viewport (ChamplainView *view,
   priv->latitude = champlain_map_source_get_latitude (priv->map_source,
         priv->zoom_level,
         y + priv->viewport_height / 2.0);
+  
+  g_object_notify (G_OBJECT (view), "longitude");
+  g_object_notify (G_OBJECT (view), "latitude");
+}
 
-  if (relocate)
+
+static void
+position_viewport (ChamplainView *view,
+    gint x,
+    gint y)
+{
+  DEBUG_LOG ()
+
+  ChamplainViewPrivate *priv = view->priv;
+  gint old_bg_offset_x = 0, old_bg_offset_y = 0;
+  gfloat bg_width, bg_height;
+
+  /* remember the relative offset of the background tile */
+  if (priv->background_content)
     {
-      /* compute the new relative offset of the background tile */
+      clutter_content_get_preferred_size (priv->background_content, &bg_width, &bg_height);
+      old_bg_offset_x = (priv->viewport_x + priv->bg_offset_x) % (gint)bg_width;
+      old_bg_offset_y = (priv->viewport_y + priv->bg_offset_y) % (gint)bg_height;
+    }
+    
+  /* notify about latitude and longitude change only after the viewport position is set */
+  g_object_freeze_notify (G_OBJECT (view));
+  
+  update_coords (view, x, y);
+
+  /* compute the new relative offset of the background tile */
+  if (priv->background_content)
+    {
       gint new_bg_offset_x = priv->viewport_x % (gint)bg_width;
       gint new_bg_offset_y = priv->viewport_y % (gint)bg_height;
       priv->bg_offset_x = (old_bg_offset_x - new_bg_offset_x) % (gint)bg_width;
@@ -278,18 +296,13 @@ update_viewport (ChamplainView *view,
         priv->bg_offset_x += bg_width;
       if (priv->bg_offset_y < 0)
         priv->bg_offset_y += bg_height;
-
-      champlain_viewport_set_origin (CHAMPLAIN_VIEWPORT (priv->viewport),
-          priv->viewport_x,
-          priv->viewport_y);
-          
-      g_signal_emit_by_name (view, "layer-relocated", NULL);
     }
+    
+  champlain_viewport_set_origin (CHAMPLAIN_VIEWPORT (priv->viewport),
+      priv->viewport_x,
+      priv->viewport_y);
 
-  view_load_visible_tiles (view);
-  
-  g_object_notify (G_OBJECT (view), "longitude");
-  g_object_notify (G_OBJECT (view), "latitude");
+  g_object_thaw_notify (G_OBJECT (view));
 }
 
 
@@ -297,7 +310,10 @@ static void
 view_relocated_cb (G_GNUC_UNUSED ChamplainViewport *viewport,
     ChamplainView *view)
 {
-  view_load_visible_tiles (view);
+  ChamplainViewPrivate *priv = view->priv;
+  
+  clutter_actor_destroy_all_children (priv->zoom_layer);
+  load_visible_tiles (view, TRUE);
   g_signal_emit_by_name (view, "layer-relocated", NULL);
 }
 
@@ -313,7 +329,8 @@ panning_completed (G_GNUC_UNUSED ChamplainKineticScrollView *scroll,
 
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
-  update_viewport (view, x, y, FALSE);
+  update_coords (view, x, y);
+  load_visible_tiles (view, FALSE);
 }
 
 
@@ -363,17 +380,10 @@ resize_viewport (ChamplainView *view)
   upper_x = MAX (map_width - priv->viewport_width / 2, map_width / 2);
   upper_y = MAX (map_height - priv->viewport_height / 2, map_height / 2);
 
-  /*
-   * block emmision of signal by priv->viewport with viewport_pos_changed_cb()
-   * callback - the signal can be emitted by updating ChamplainAdjustment, but
-   * calling the callback now would be a disaster since we don't have updated
-   * anchor yet
-   */
+  /* we don't want to get notified about the position change now */
   g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
-
   champlain_adjustment_set_values (hadjust, champlain_adjustment_get_value (hadjust), lower_x, upper_x, 1.0);
   champlain_adjustment_set_values (vadjust, champlain_adjustment_get_value (vadjust), lower_y, upper_y, 1.0);
-
   g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 }
 
@@ -939,7 +949,7 @@ _update_idle_cb (ChamplainView *view)
   if (priv->keep_center_on_resize)
     champlain_view_center_on (view, priv->latitude, priv->longitude);
   else
-    view_load_visible_tiles (view);
+    load_visible_tiles (view, FALSE);
 
   return FALSE;
 }
@@ -1093,7 +1103,8 @@ redraw_timeout_cb (gpointer data)
   if ((ABS (x - priv->viewport_x) > 0 || ABS (y - priv->viewport_y) > 0) && 
       g_timer_elapsed (priv->update_viewport_timer, NULL) > 0.30)
     {
-      update_viewport (view, x, y, FALSE);
+      update_coords (view, x, y);
+      load_visible_tiles (view, FALSE);
       g_timer_start (priv->update_viewport_timer);
     }
     
@@ -1115,7 +1126,8 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
 
   if (ABS (x - priv->viewport_x) > 100 || ABS (y - priv->viewport_y) > 100)
     {
-      update_viewport (view, x, y, FALSE);
+      update_coords (view, x, y);
+      load_visible_tiles (view, FALSE);
       g_timer_start (priv->update_viewport_timer);
     }
 }
@@ -1253,7 +1265,8 @@ champlain_view_center_on (ChamplainView *view,
 
   DEBUG ("Centering on %f, %f (%d, %d)", latitude, longitude, x, y);
 
-  update_viewport (view, x, y, TRUE);
+  position_viewport (view, x, y);
+  load_visible_tiles (view, FALSE);
 }
 
 
@@ -1718,23 +1731,6 @@ champlain_view_get_viewport_origin (ChamplainView *view,
 
 
 static void
-champlain_view_set_actor_position (ChamplainView *view,
-    ClutterActor *actor,
-    gdouble x,
-    gdouble y)
-{
-  DEBUG_LOG ()
-
-  ChamplainViewPrivate *priv = view->priv;
-  gint anchor_x, anchor_y;
-  
-  champlain_viewport_get_anchor (CHAMPLAIN_VIEWPORT (priv->viewport), &anchor_x, &anchor_y);
-  
-  clutter_actor_set_position (actor, x - anchor_x, y - anchor_y);
-}
-
-
-static void
 fill_background_tiles (ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -1769,7 +1765,7 @@ fill_background_tiles (ChamplainView *view)
               clutter_actor_set_content (child, priv->background_content);
               clutter_actor_add_child (priv->background_layer, child);
             }
-          champlain_view_set_actor_position (view,
+          champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport),
               child,
               (x * width) - priv->bg_offset_x,
               (y * height) - priv->bg_offset_y);
@@ -1786,7 +1782,8 @@ fill_background_tiles (ChamplainView *view)
 
 
 static void
-view_load_visible_tiles (ChamplainView *view)
+load_visible_tiles (ChamplainView *view,
+    gboolean relocate)
 {
   DEBUG_LOG ()
 
@@ -1847,7 +1844,8 @@ view_load_visible_tiles (ChamplainView *view)
       else
         {
           tile_map[(tile_y - y_first) * x_count + (tile_x - x_first)] = TRUE;
-          view_position_tile (view, tile);
+          if (relocate)
+            champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport), CLUTTER_ACTOR (tile), tile_x * size, tile_y * size);
         }
     }
   
@@ -1876,7 +1874,7 @@ view_load_visible_tiles (ChamplainView *view)
                   
               g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
               clutter_actor_add_child (priv->map_layer, CLUTTER_ACTOR (tile));
-              view_position_tile (view, tile);
+              champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport), CLUTTER_ACTOR (tile), x * size, y * size);
 
               /* updates champlain_view state automatically as
                  notify::state signal is connected  */
@@ -1923,27 +1921,6 @@ fill_tile_cb (FillTileCallbackData *data)
 
 
 static void
-view_position_tile (ChamplainView *view,
-    ChamplainTile *tile)
-{
-  DEBUG_LOG ()
-
-  ClutterActor *actor;
-  gint x;
-  gint y;
-  gint size;
-
-  actor = CLUTTER_ACTOR (tile);
-
-  x = champlain_tile_get_x (tile);
-  y = champlain_tile_get_y (tile);
-  size = champlain_tile_get_size (tile);
-
-  champlain_view_set_actor_position (view, actor, x * size, y * size);
-}
-
-
-static void
 remove_all_tiles (ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -1977,7 +1954,7 @@ champlain_view_reload_tiles (ChamplainView *view)
 
   remove_all_tiles (view);
 
-  view_load_visible_tiles (view);
+  load_visible_tiles (view, FALSE);
 }
 
 
@@ -2054,10 +2031,8 @@ champlain_view_set_map_source (ChamplainView *view,
       priv->zoom_level = priv->min_zoom_level;
       g_object_notify (G_OBJECT (view), "zoom-level");
     }
-
-  remove_all_tiles (view);
-
-  champlain_view_center_on (view, priv->latitude, priv->longitude);
+    
+  champlain_view_reload_tiles (view);
 
   g_object_notify (G_OBJECT (view), "map-source");
 }
@@ -2349,9 +2324,7 @@ position_zoom_actor (ChamplainView *view)
   x = priv->zoom_actor_viewport_x * deltazoom;
   y = priv->zoom_actor_viewport_y * deltazoom;
 
-  champlain_view_set_actor_position (view, zoom_actor, x, y);
-
-  //clutter_actor_hide (priv->map_layer);
+  champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport), zoom_actor, x, y);
 }
 
 
@@ -2504,7 +2477,8 @@ view_set_zoom_level_at (ChamplainView *view,
 
   resize_viewport (view);
   remove_all_tiles (view);  
-  update_viewport (view, new_x, new_y, TRUE);
+  position_viewport (view, new_x, new_y);
+  load_visible_tiles (view, FALSE);
 
   if (!priv->animate_zoom)
     position_zoom_actor (view);

@@ -691,6 +691,9 @@ set_view (ChamplainLayer *layer,
       g_signal_connect (view, "notify::latitude",
           G_CALLBACK (redraw_path_cb), layer);
 
+      g_signal_connect (view, "notify::zoom-level",
+          G_CALLBACK (redraw_path_cb), layer);
+
       invalidate_canvas (path_layer);
     }
 }

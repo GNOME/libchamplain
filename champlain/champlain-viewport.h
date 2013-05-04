@@ -91,6 +91,11 @@ void champlain_viewport_get_anchor (ChamplainViewport *viewport,
     gint *x,
     gint *y);
 
+void champlain_viewport_set_actor_position (ChamplainViewport *viewport,
+    ClutterActor *actor,
+    gdouble x,
+    gdouble y);
+
 G_END_DECLS
 
 #endif /* __CHAMPLAIN_VIEWPORT_H__ */

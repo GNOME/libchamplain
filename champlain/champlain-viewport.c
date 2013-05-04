@@ -492,3 +492,15 @@ champlain_viewport_set_child (ChamplainViewport *viewport, ClutterActor *child)
   clutter_actor_add_child (CLUTTER_ACTOR (viewport), child);
   priv->child = child;
 }
+
+
+void
+champlain_viewport_set_actor_position (ChamplainViewport *viewport,
+    ClutterActor *actor,
+    gdouble x,
+    gdouble y)
+{
+  ChamplainViewportPrivate *priv = viewport->priv;
+  
+  clutter_actor_set_position (actor, x - priv->anchor_x, y - priv->anchor_y);
+}
