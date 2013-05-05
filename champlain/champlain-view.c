@@ -164,9 +164,7 @@ struct _ChamplainViewPrivate
   /* Represents the (lat, lon) at the center of the viewport */
   gdouble longitude;
   gdouble latitude;
-
-  /* Timer to track time between viewport updates */
-  GTimer *update_viewport_timer;
+  gboolean location_updated;
 
   gint bg_offset_x;
   gint bg_offset_y;
@@ -241,7 +239,8 @@ static void remove_all_tiles (ChamplainView *view);
 static void
 update_coords (ChamplainView *view,
     gint x,
-    gint y)
+    gint y,
+    gboolean notify)
 {
   DEBUG_LOG ()
 
@@ -256,8 +255,11 @@ update_coords (ChamplainView *view,
         priv->zoom_level,
         y + priv->viewport_height / 2.0);
   
-  g_object_notify (G_OBJECT (view), "longitude");
-  g_object_notify (G_OBJECT (view), "latitude");
+  if (notify)
+    {
+      g_object_notify (G_OBJECT (view), "longitude");
+      g_object_notify (G_OBJECT (view), "latitude");
+    }
 }
 
 
@@ -283,7 +285,7 @@ position_viewport (ChamplainView *view,
   /* notify about latitude and longitude change only after the viewport position is set */
   g_object_freeze_notify (G_OBJECT (view));
   
-  update_coords (view, x, y);
+  update_coords (view, x, y, TRUE);
 
   /* compute the new relative offset of the background tile */
   if (priv->background_content)
@@ -297,10 +299,13 @@ position_viewport (ChamplainView *view,
       if (priv->bg_offset_y < 0)
         priv->bg_offset_y += bg_height;
     }
-    
+
+  /* we know about the change already - don't send the notifications again */
+  g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
   champlain_viewport_set_origin (CHAMPLAIN_VIEWPORT (priv->viewport),
       priv->viewport_x,
       priv->viewport_y);
+  g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 
   g_object_thaw_notify (G_OBJECT (view));
 }
@@ -327,9 +332,12 @@ panning_completed (G_GNUC_UNUSED ChamplainKineticScrollView *scroll,
   ChamplainViewPrivate *priv = view->priv;
   gdouble x, y;
 
+  g_source_remove (priv->redraw_timeout);
+  priv->redraw_timeout = 0;
+
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
-  update_coords (view, x, y);
+  update_coords (view, x, y, TRUE);
   load_visible_tiles (view, FALSE);
 }
 
@@ -544,12 +552,6 @@ champlain_view_dispose (GObject *object)
 
   if (priv->goto_context != NULL)
     champlain_view_stop_go_to (view);
-
-  if (priv->update_viewport_timer != NULL)
-    {
-      g_timer_destroy (priv->update_viewport_timer);
-      priv->update_viewport_timer = NULL;
-    }
 
   if (priv->kinetic_scroll != NULL)
     {
@@ -1017,16 +1019,14 @@ champlain_view_init (ChamplainView *view)
   priv->longitude = 0.0;
   priv->goto_context = NULL;
   priv->tiles_loading = 0;
-  priv->update_viewport_timer = g_timer_new ();
   priv->animating_zoom = FALSE;
   priv->background_content = NULL;
   priv->zoom_overlay_actor = NULL;
   priv->bg_offset_x = 0;
   priv->bg_offset_y = 0;
+  priv->location_updated = FALSE;
 
   clutter_actor_set_background_color (CLUTTER_ACTOR (view), &color);
-
-  priv->redraw_timeout = g_timeout_add (350, redraw_timeout_cb, view);
 
   g_signal_connect (view, "notify::width", G_CALLBACK (view_size_changed_cb), NULL);
   g_signal_connect (view, "notify::height", G_CALLBACK (view_size_changed_cb), NULL);
@@ -1101,14 +1101,13 @@ redraw_timeout_cb (gpointer data)
 
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
-  if ((ABS (x - priv->viewport_x) > 0 || ABS (y - priv->viewport_y) > 0) && 
-      g_timer_elapsed (priv->update_viewport_timer, NULL) > 0.30)
+  if (priv->location_updated || ABS ((gint)x - priv->viewport_x) > 0 || ABS ((gint)y - priv->viewport_y) > 0)
     {
-      update_coords (view, x, y);
+      update_coords (view, x, y, TRUE);
       load_visible_tiles (view, FALSE);
-      g_timer_start (priv->update_viewport_timer);
+      priv->location_updated = FALSE;
     }
-    
+
   return TRUE;
 }
 
@@ -1123,13 +1122,16 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
   ChamplainViewPrivate *priv = view->priv;
   gdouble x, y;
 
+  if (priv->redraw_timeout == 0)
+    priv->redraw_timeout = g_timeout_add (350, redraw_timeout_cb, view);
+
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
   if (ABS (x - priv->viewport_x) > 100 || ABS (y - priv->viewport_y) > 100)
     {
-      update_coords (view, x, y);
+      update_coords (view, x, y, FALSE);
       load_visible_tiles (view, FALSE);
-      g_timer_start (priv->update_viewport_timer);
+      priv->location_updated = TRUE;
     }
 }
 
