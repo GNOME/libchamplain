@@ -105,10 +105,6 @@ void champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
     guint n_frames,
     guint fps);
 
-gboolean champlain_adjustment_get_elastic (ChamplainAdjustment *adjustment);
-void champlain_adjustment_set_elastic (ChamplainAdjustment *adjustment,
-    gboolean elastic);
-
 gboolean champlain_adjustment_clamp (ChamplainAdjustment *adjustment,
     gboolean interpolate,
     guint n_frames,

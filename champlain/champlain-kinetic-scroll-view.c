@@ -225,48 +225,26 @@ clamp_adjustments (ChamplainKineticScrollView *scroll)
 
   if (priv->viewport)
     {
-      guint fps, n_frames;
       ChamplainAdjustment *hadj, *vadj;
-      gboolean snap;
+      gdouble d, value, lower, step_increment;
 
       champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->viewport),
           &hadj, &vadj);
 
-      /* FIXME: Hard-coded value here */
-      fps = clutter_get_default_frame_rate ();
-      n_frames = fps / 6;
-
-      snap = TRUE;
-      if (champlain_adjustment_get_elastic (hadj))
-        snap = !champlain_adjustment_clamp (hadj, TRUE, n_frames, fps);
-
       /* Snap to the nearest step increment on hadjustment */
-      if (snap)
-        {
-          gdouble d, value, lower, step_increment;
 
-          champlain_adjustment_get_values (hadj, &value, &lower, NULL,
-              &step_increment);
-          d = (rint ((value - lower) / step_increment) *
-               step_increment) + lower;
-          champlain_adjustment_set_value (hadj, d);
-        }
-
-      snap = TRUE;
-      if (champlain_adjustment_get_elastic (vadj))
-        snap = !champlain_adjustment_clamp (vadj, TRUE, n_frames, fps);
+      champlain_adjustment_get_values (hadj, &value, &lower, NULL,
+          &step_increment);
+      d = (rint ((value - lower) / step_increment) *
+           step_increment) + lower;
+      champlain_adjustment_set_value (hadj, d);
 
       /* Snap to the nearest step increment on vadjustment */
-      if (snap)
-        {
-          gdouble d, value, lower, step_increment;
-
-          champlain_adjustment_get_values (vadj, &value, &lower, NULL,
-              &step_increment);
-          d = (rint ((value - lower) / step_increment) *
-               step_increment) + lower;
-          champlain_adjustment_set_value (vadj, d);
-        }
+      champlain_adjustment_get_values (vadj, &value, &lower, NULL,
+          &step_increment);
+      d = (rint ((value - lower) / step_increment) *
+           step_increment) + lower;
+      champlain_adjustment_set_value (vadj, d);
     }
 }
 
@@ -280,24 +258,9 @@ motion_event_cb (ClutterActor *stage,
   ClutterActor *actor = CLUTTER_ACTOR (scroll);
   gfloat x, y;
 
-  if (event->type != CLUTTER_MOTION)
+  if (event->type != CLUTTER_MOTION || !(event->modifier_state & CLUTTER_BUTTON1_MASK))
     return FALSE;
-    
-  if (!(event->modifier_state & CLUTTER_BUTTON1_MASK))
-  {
-    /* It sometimes -very rarely - happens that we miss the release event for some
-     * reason. This is a sanity check to disconnect the event handlers when the 
-     * button is not pressed. */
-    g_signal_handlers_disconnect_by_func (stage,
-        motion_event_cb,
-        scroll);
-    g_signal_handlers_disconnect_by_func (stage,
-        button_release_event_cb,
-        scroll);
-    clamp_adjustments (scroll);
-    g_signal_emit_by_name (scroll, "panning-completed", NULL);
-  }
-  
+      
   if (clutter_actor_transform_stage_point (actor,
           event->x,
           event->y,
@@ -426,8 +389,8 @@ button_release_event_cb (ClutterActor *stage,
   ClutterActor *actor = CLUTTER_ACTOR (scroll);
   gboolean decelerating = FALSE;
 
-  if ((event->type != CLUTTER_BUTTON_RELEASE) ||
-      (event->button != 1))
+  if ((event->type != CLUTTER_MOTION || event->modifier_state & CLUTTER_BUTTON1_MASK) &&
+      (event->type != CLUTTER_BUTTON_RELEASE || event->button != 1))
     return FALSE;
 
   g_signal_handlers_disconnect_by_func (stage,

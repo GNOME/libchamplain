@@ -46,9 +46,6 @@ struct _ChamplainAdjustmentPrivate
   gdouble dx;
   gdouble old_position;
   gdouble new_position;
-
-  /* For elasticity */
-  gboolean elastic;
 };
 
 enum
@@ -59,8 +56,6 @@ enum
   PROP_UPPER,
   PROP_VALUE,
   PROP_STEP_INC,
-
-  PROP_ELASTIC,
 };
 
 enum
@@ -105,10 +100,6 @@ champlain_adjustment_get_property (GObject *object,
       g_value_set_double (value, priv->step_increment);
       break;
 
-    case PROP_ELASTIC:
-      g_value_set_boolean (value, priv->elastic);
-      break;
-
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -140,10 +131,6 @@ champlain_adjustment_set_property (GObject *object,
 
     case PROP_STEP_INC:
       champlain_adjustment_set_step_increment (adj, g_value_get_double (value));
-      break;
-
-    case PROP_ELASTIC:
-      champlain_adjustment_set_elastic (adj, g_value_get_boolean (value));
       break;
 
     default:
@@ -230,16 +217,6 @@ champlain_adjustment_class_init (ChamplainAdjustmentClass *klass)
           G_MAXDOUBLE,
           0.0,
           CHAMPLAIN_PARAM_READWRITE));
-  g_object_class_install_property (object_class,
-      PROP_ELASTIC,
-      g_param_spec_boolean ("elastic",
-          "Elastic",
-          "Make interpolation "
-          "behave in an "
-          "'elastic' way and "
-          "stop clamping value.",
-          FALSE,
-          CHAMPLAIN_PARAM_READWRITE));
 
   signals[CHANGED] =
     g_signal_new ("changed",
@@ -295,9 +272,7 @@ champlain_adjustment_set_value (ChamplainAdjustment *adjustment,
 
   stop_interpolation (adjustment);
 
-  if (!priv->elastic)
-    value = CLAMP (value, MIN (priv->lower, priv->upper), 
-              MAX (priv->lower, priv->upper));
+  value = CLAMP (value, priv->lower, priv->upper);
 
   if (priv->value != value)
     {
@@ -484,18 +459,9 @@ interpolation_new_frame_cb (ClutterTimeline *timeline,
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
   priv->interpolation = NULL;
-  if (priv->elastic)
-    {
-      gdouble progress = clutter_timeline_get_progress (timeline);
-      gdouble dx = priv->old_position +
-        (priv->new_position - priv->old_position) *
-        progress;
-      champlain_adjustment_set_value (adjustment, dx);
-    }
-  else
-    champlain_adjustment_set_value (adjustment,
-        priv->old_position +
-        frame_num * priv->dx);
+  champlain_adjustment_set_value (adjustment,
+      priv->old_position +
+      frame_num * priv->dx);
   priv->interpolation = timeline;
 }
 
@@ -507,8 +473,7 @@ interpolation_completed_cb (ClutterTimeline *timeline,
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
 
   stop_interpolation (adjustment);
-  champlain_adjustment_set_value (adjustment,
-      priv->new_position);
+  champlain_adjustment_set_value (adjustment, priv->new_position);
 }
 
 
@@ -534,9 +499,6 @@ champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
   priv->dx = (priv->new_position - priv->old_position) * n_frames;
   priv->interpolation = clutter_timeline_new (((gdouble) n_frames / fps) * 1000);
 
-  if (priv->elastic)
-    clutter_timeline_set_progress_mode (priv->interpolation, CLUTTER_EASE_OUT_SINE);
-
   g_signal_connect (priv->interpolation,
       "new-frame",
       G_CALLBACK (interpolation_new_frame_cb),
@@ -551,21 +513,6 @@ champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
 
 
 gboolean
-champlain_adjustment_get_elastic (ChamplainAdjustment *adjustment)
-{
-  return adjustment->priv->elastic;
-}
-
-
-void
-champlain_adjustment_set_elastic (ChamplainAdjustment *adjustment,
-    gboolean elastic)
-{
-  adjustment->priv->elastic = elastic;
-}
-
-
-gboolean
 champlain_adjustment_clamp (ChamplainAdjustment *adjustment,
     gboolean interpolate,
     guint n_frames,
@@ -573,11 +520,8 @@ champlain_adjustment_clamp (ChamplainAdjustment *adjustment,
 {
   ChamplainAdjustmentPrivate *priv = adjustment->priv;
   gdouble dest = priv->value;
-
-  if (priv->value < priv->lower)
-    dest = priv->lower;
-  if (priv->value > priv->upper)
-    dest = priv->upper;
+  
+  dest = CLAMP (dest, priv->lower, priv->upper);
 
   if (dest != priv->value)
     {
