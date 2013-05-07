@@ -86,6 +86,7 @@ struct _ChamplainPathLayerPrivate
   ClutterContent *canvas;
   ClutterActor *path_actor;
   GList *nodes;
+  gboolean redraw_scheduled;
 };
 
 
@@ -372,6 +373,7 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   priv->nodes = NULL;
   priv->dash = NULL;
   priv->num_dashes = 0;
+  priv->redraw_scheduled = FALSE;
 
   priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
@@ -417,6 +419,21 @@ invalidate_canvas (ChamplainPathLayer *layer)
   clutter_canvas_set_size (CLUTTER_CANVAS (priv->canvas), width, height);
   clutter_actor_set_size (priv->path_actor, width, height);
   clutter_content_invalidate (priv->canvas);
+  priv->redraw_scheduled = FALSE;
+}
+
+
+static void
+schedule_redraw (ChamplainPathLayer *layer)
+{
+  if (!layer->priv->redraw_scheduled)
+    {
+      layer->priv->redraw_scheduled = TRUE;
+      g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
+          (GSourceFunc) invalidate_canvas,
+          g_object_ref (layer),
+          (GDestroyNotify) g_object_unref);
+    }
 }
 
 
@@ -425,7 +442,7 @@ position_notify (ChamplainLocation *location,
     G_GNUC_UNUSED GParamSpec *pspec,
     ChamplainPathLayer *layer)
 {
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -446,7 +463,7 @@ add_node (ChamplainPathLayer *layer,
     priv->nodes = g_list_prepend (priv->nodes, location);
   else
     priv->nodes = g_list_insert (priv->nodes, location, position);
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -499,7 +516,7 @@ champlain_path_layer_remove_all (ChamplainPathLayer *layer)
 
   g_list_free (priv->nodes);
   priv->nodes = NULL;
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -547,7 +564,7 @@ champlain_path_layer_remove_node (ChamplainPathLayer *layer,
 
   priv->nodes = g_list_remove (priv->nodes, location);
   g_object_unref (location);
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -579,7 +596,7 @@ relocate_cb (G_GNUC_UNUSED GObject *gobject,
 {
   g_return_if_fail (CHAMPLAIN_IS_PATH_LAYER (layer));
 
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -656,7 +673,7 @@ redraw_path_cb (G_GNUC_UNUSED GObject *gobject,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainPathLayer *layer)
 {
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -694,7 +711,7 @@ set_view (ChamplainLayer *layer,
       g_signal_connect (view, "notify::zoom-level",
           G_CALLBACK (redraw_path_cb), layer);
 
-      invalidate_canvas (path_layer);
+      schedule_redraw (path_layer);
     }
 }
 
@@ -762,7 +779,7 @@ champlain_path_layer_set_fill_color (ChamplainPathLayer *layer,
   priv->fill_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (layer), "fill-color");
 
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -812,7 +829,7 @@ champlain_path_layer_set_stroke_color (ChamplainPathLayer *layer,
   priv->stroke_color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (layer), "stroke-color");
 
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -853,7 +870,7 @@ champlain_path_layer_set_stroke (ChamplainPathLayer *layer,
   layer->priv->stroke = value;
   g_object_notify (G_OBJECT (layer), "stroke");
 
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -894,7 +911,7 @@ champlain_path_layer_set_fill (ChamplainPathLayer *layer,
   layer->priv->fill = value;
   g_object_notify (G_OBJECT (layer), "fill");
 
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -935,7 +952,7 @@ champlain_path_layer_set_stroke_width (ChamplainPathLayer *layer,
   layer->priv->stroke_width = value;
   g_object_notify (G_OBJECT (layer), "stroke-width");
 
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 
@@ -1019,7 +1036,7 @@ champlain_path_layer_set_closed (ChamplainPathLayer *layer,
   layer->priv->closed_path = value;
   g_object_notify (G_OBJECT (layer), "closed");
 
-  invalidate_canvas (layer);
+  schedule_redraw (layer);
 }
 
 

@@ -63,6 +63,7 @@ struct _ChamplainScalePrivate
   ClutterContent *canvas;
 
   ChamplainView *view;
+  gboolean redraw_scheduled;
 };
 
 G_DEFINE_TYPE (ChamplainScale, champlain_scale, CLUTTER_TYPE_ACTOR);
@@ -337,6 +338,30 @@ redraw_scale (ClutterCanvas *canvas,
 
 
 static void
+invalidate_canvas (ChamplainScale *layer)
+{
+  ChamplainScalePrivate *priv = layer->priv;
+
+  clutter_content_invalidate (priv->canvas);
+  priv->redraw_scheduled = FALSE;
+}
+
+
+static void
+schedule_redraw (ChamplainScale *layer)
+{
+  if (!layer->priv->redraw_scheduled)
+    {
+      layer->priv->redraw_scheduled = TRUE;
+      g_idle_add_full (CLUTTER_PRIORITY_REDRAW,
+          (GSourceFunc) invalidate_canvas,
+          g_object_ref (layer),
+          (GDestroyNotify) g_object_unref);
+    }
+}
+
+
+static void
 create_scale (ChamplainScale *scale)
 {
   ClutterActor *text, *scale_actor;
@@ -372,7 +397,7 @@ create_scale (ChamplainScale *scale)
 
   clutter_actor_set_opacity (CLUTTER_ACTOR (scale), 200);
 
-  clutter_content_invalidate (priv->canvas);
+  schedule_redraw (scale);
 }
 
 
@@ -386,6 +411,7 @@ champlain_scale_init (ChamplainScale *scale)
   priv->scale_unit = CHAMPLAIN_UNIT_KM;
   priv->max_scale_width = 100;
   priv->view = NULL;
+  priv->redraw_scheduled = FALSE;
 
   create_scale (scale);
 }
@@ -445,7 +471,7 @@ champlain_scale_set_unit (ChamplainScale *scale,
 
   scale->priv->scale_unit = unit;
   g_object_notify (G_OBJECT (scale), "unit");
-  clutter_content_invalidate (scale->priv->canvas);
+  schedule_redraw (scale);
 }
 
 
@@ -492,7 +518,7 @@ redraw_scale_cb (G_GNUC_UNUSED GObject *gobject,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainScale *scale)
 {
-  clutter_content_invalidate (scale->priv->canvas);
+  schedule_redraw (scale);
 }
 
 
@@ -515,7 +541,7 @@ champlain_scale_connect_view (ChamplainScale *scale,
   scale->priv->view = g_object_ref (view);
   g_signal_connect (view, "notify::latitude",
       G_CALLBACK (redraw_scale_cb), scale);
-  clutter_content_invalidate (scale->priv->canvas);
+  schedule_redraw (scale);
 }
 
 
