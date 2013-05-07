@@ -188,6 +188,7 @@ struct _ChamplainViewPrivate
   guint anim_start_zoom_level;
   gint zoom_actor_viewport_x;
   gint zoom_actor_viewport_y;
+  guint zoom_actor_timeout;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR);
@@ -584,6 +585,12 @@ champlain_view_dispose (GObject *object)
     {
       g_source_remove (priv->redraw_timeout);
       priv->redraw_timeout = 0;
+    }
+    
+  if (priv->redraw_timeout != 0)
+    {
+      g_source_remove (priv->zoom_actor_timeout);
+      priv->zoom_actor_timeout = 0;
     }
 
   priv->map_layer = NULL;
@@ -1029,6 +1036,7 @@ champlain_view_init (ChamplainView *view)
   priv->bg_offset_y = 0;
   priv->location_updated = FALSE;
   priv->redraw_timeout = 0;
+  priv->zoom_actor_timeout = 0;
 
   clutter_actor_set_background_color (CLUTTER_ACTOR (view), &color);
 
@@ -1965,6 +1973,17 @@ champlain_view_reload_tiles (ChamplainView *view)
 }
 
 
+static gboolean
+remove_zoom_actor_cb (ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  
+  clutter_actor_destroy_all_children (priv->zoom_layer);
+  priv->zoom_actor_timeout = 0;
+  return FALSE;
+}
+
+
 static void
 tile_state_notify (ChamplainTile *tile,
     G_GNUC_UNUSED GParamSpec *pspec,
@@ -1992,6 +2011,8 @@ tile_state_notify (ChamplainTile *tile,
         {
           priv->state = CHAMPLAIN_STATE_DONE;
           g_object_notify (G_OBJECT (view), "state");
+          if (clutter_actor_get_n_children (priv->zoom_layer) > 0)
+            priv->zoom_actor_timeout = g_timeout_add_seconds_full (CLUTTER_PRIORITY_REDRAW, 1, (GSourceFunc) remove_zoom_actor_cb, view, NULL);
         }
     }
 }
@@ -2318,6 +2339,11 @@ position_zoom_actor (ChamplainView *view)
   gdouble deltazoom;
   
   clutter_actor_destroy_all_children (priv->zoom_layer);
+  if (priv->zoom_actor_timeout != 0)
+    {
+      g_source_remove (priv->zoom_actor_timeout);
+      priv->zoom_actor_timeout = 0;
+    }
 
   ClutterActor *zoom_actor = clutter_actor_get_first_child (priv->zoom_overlay_actor);
   clutter_actor_set_pivot_point (zoom_actor, 0.0, 0.0);
