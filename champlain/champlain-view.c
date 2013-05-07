@@ -331,9 +331,12 @@ panning_completed (G_GNUC_UNUSED ChamplainKineticScrollView *scroll,
 
   ChamplainViewPrivate *priv = view->priv;
   gdouble x, y;
-
-  g_source_remove (priv->redraw_timeout);
-  priv->redraw_timeout = 0;
+  
+  if (priv->redraw_timeout != 0)
+    {
+      g_source_remove (priv->redraw_timeout);
+      priv->redraw_timeout = 0;
+    }
 
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
@@ -1025,6 +1028,7 @@ champlain_view_init (ChamplainView *view)
   priv->bg_offset_x = 0;
   priv->bg_offset_y = 0;
   priv->location_updated = FALSE;
+  priv->redraw_timeout = 0;
 
   clutter_actor_set_background_color (CLUTTER_ACTOR (view), &color);
 
