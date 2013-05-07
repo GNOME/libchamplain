@@ -2512,8 +2512,8 @@ view_set_zoom_level_at (ChamplainView *view,
 
   /* priv->viewport_x, priv->viewport_y are in int which isn't sufficient precision
    * when multiplied by deltazoom - recalculate them */
-  viewport_x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, priv->longitude);
-  viewport_y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->latitude);
+  viewport_x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, priv->longitude) - priv->viewport_width / 2.0;
+  viewport_y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->latitude) - priv->viewport_height / 2.0;
   new_x = (viewport_x + offset_x) * deltazoom - offset_x;
   new_y = (viewport_y + offset_y) * deltazoom - offset_y;
 
