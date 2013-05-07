@@ -2490,6 +2490,8 @@ view_set_zoom_level_at (ChamplainView *view,
   gdouble new_x, new_y;
   gdouble offset_x = x;
   gdouble offset_y = y;
+  gdouble viewport_x, viewport_y;
+  gdouble deltazoom;
 
   if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE (priv, zoom_level))
     return FALSE;
@@ -2506,9 +2508,14 @@ view_set_zoom_level_at (ChamplainView *view,
   if (CLUTTER_ACTOR_IS_REALIZED (view))
     show_zoom_actor (view, zoom_level, offset_x, offset_y);
 
-  gdouble deltazoom = pow (2, -(gdouble)priv->zoom_level + (gdouble)zoom_level);
-  new_x = (priv->viewport_x + offset_x) * deltazoom - offset_x;
-  new_y = (priv->viewport_y + offset_y) * deltazoom - offset_y;
+  deltazoom = pow (2, -(gdouble)priv->zoom_level + (gdouble)zoom_level);
+
+  /* priv->viewport_x, priv->viewport_y are in int which isn't sufficient precision
+   * when multiplied by deltazoom - recalculate them */
+  viewport_x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, priv->longitude);
+  viewport_y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->latitude);
+  new_x = (viewport_x + offset_x) * deltazoom - offset_x;
+  new_y = (viewport_y + offset_y) * deltazoom - offset_y;
 
   priv->zoom_level = zoom_level;
 
