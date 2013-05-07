@@ -287,9 +287,23 @@ view_realize_cb (GtkWidget *widget,
   style = gtk_widget_get_style (widget);
 
   gdk_to_clutter_color (&style->text[GTK_STATE_SELECTED], &color);
+  if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0)
+    {
+      color.red = 255;
+      color.green = 255;
+      color.blue = 255;
+    }
   champlain_marker_set_selection_text_color (&color);
 
   gdk_to_clutter_color (&style->bg[GTK_STATE_SELECTED], &color);
+  if (color.alpha == 0)
+    color.alpha = 255;
+  if (color.red == 0 && color.green == 0 && color.blue == 0)
+    {
+      color.red = 75;
+      color.green = 105;
+      color.blue = 131;
+    }
   champlain_marker_set_selection_color (&color);
 #else
   GtkStyleContext *style;
@@ -300,10 +314,24 @@ view_realize_cb (GtkWidget *widget,
   
   gtk_style_context_get_color (style, GTK_STATE_FLAG_SELECTED, &gdk_rgba_color);
   gdk_rgba_to_clutter_color (&gdk_rgba_color, &color);
+  if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0)
+    {
+      color.red = 255;
+      color.green = 255;
+      color.blue = 255;
+    }
   champlain_marker_set_selection_text_color (&color);
 
   gtk_style_context_get_background_color (style, GTK_STATE_FLAG_SELECTED, &gdk_rgba_color);
   gdk_rgba_to_clutter_color (&gdk_rgba_color, &color);
+  if (color.alpha == 0)
+    color.alpha = 255;
+  if (color.red == 0 && color.green == 0 && color.blue == 0)
+    {
+      color.red = 75;
+      color.green = 105;
+      color.blue = 131;
+    }
   champlain_marker_set_selection_color (&color);
 #endif
 
