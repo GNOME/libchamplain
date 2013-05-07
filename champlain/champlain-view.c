@@ -2488,6 +2488,8 @@ view_set_zoom_level_at (ChamplainView *view,
 
   ChamplainViewPrivate *priv = view->priv;
   gdouble new_x, new_y;
+  gdouble offset_x = x;
+  gdouble offset_y = y;
 
   if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE (priv, zoom_level))
     return FALSE;
@@ -2496,17 +2498,17 @@ view_set_zoom_level_at (ChamplainView *view,
     
   if (!use_event_coord)
     {
-      x = priv->viewport_width / 2.0;
-      y = priv->viewport_height / 2.0;
+      offset_x = priv->viewport_width / 2.0;
+      offset_y = priv->viewport_height / 2.0;
     }
 
   /* don't do anything when view not yet realized */
   if (CLUTTER_ACTOR_IS_REALIZED (view))
-    show_zoom_actor (view, zoom_level, x, y);
+    show_zoom_actor (view, zoom_level, offset_x, offset_y);
 
   gdouble deltazoom = pow (2, -(gdouble)priv->zoom_level + (gdouble)zoom_level);
-  new_x = (priv->viewport_x + x) * deltazoom - x;
-  new_y = (priv->viewport_y + y) * deltazoom - y;
+  new_x = (priv->viewport_x + offset_x) * deltazoom - offset_x;
+  new_y = (priv->viewport_y + offset_y) * deltazoom - offset_y;
 
   priv->zoom_level = zoom_level;
 
