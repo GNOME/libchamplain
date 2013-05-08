@@ -150,8 +150,8 @@ struct _ChamplainViewPrivate
 
   ClutterContent *background_content; 
 
-  gint viewport_x;
-  gint viewport_y;
+  gdouble viewport_x;
+  gdouble viewport_y;
   gint viewport_width;
   gint viewport_height;
 
@@ -186,8 +186,8 @@ struct _ChamplainViewPrivate
   
   gboolean animating_zoom;
   guint anim_start_zoom_level;
-  gint zoom_actor_viewport_x;
-  gint zoom_actor_viewport_y;
+  gdouble zoom_actor_viewport_x;
+  gdouble zoom_actor_viewport_y;
   guint zoom_actor_timeout;
 };
 
@@ -239,8 +239,8 @@ static void remove_all_tiles (ChamplainView *view);
 
 static void
 update_coords (ChamplainView *view,
-    gint x,
-    gint y,
+    gdouble x,
+    gdouble y,
     gboolean notify)
 {
   DEBUG_LOG ()
@@ -266,8 +266,8 @@ update_coords (ChamplainView *view,
 
 static void
 position_viewport (ChamplainView *view,
-    gint x,
-    gint y)
+    gdouble x,
+    gdouble y)
 {
   DEBUG_LOG ()
 
@@ -279,8 +279,8 @@ position_viewport (ChamplainView *view,
   if (priv->background_content)
     {
       clutter_content_get_preferred_size (priv->background_content, &bg_width, &bg_height);
-      old_bg_offset_x = (priv->viewport_x + priv->bg_offset_x) % (gint)bg_width;
-      old_bg_offset_y = (priv->viewport_y + priv->bg_offset_y) % (gint)bg_height;
+      old_bg_offset_x = ((gint)priv->viewport_x + priv->bg_offset_x) % (gint)bg_width;
+      old_bg_offset_y = ((gint)priv->viewport_y + priv->bg_offset_y) % (gint)bg_height;
     }
     
   /* notify about latitude and longitude change only after the viewport position is set */
@@ -291,8 +291,8 @@ position_viewport (ChamplainView *view,
   /* compute the new relative offset of the background tile */
   if (priv->background_content)
     {
-      gint new_bg_offset_x = priv->viewport_x % (gint)bg_width;
-      gint new_bg_offset_y = priv->viewport_y % (gint)bg_height;
+      gint new_bg_offset_x = (gint)priv->viewport_x % (gint)bg_width;
+      gint new_bg_offset_y = (gint)priv->viewport_y % (gint)bg_height;
       priv->bg_offset_x = (old_bg_offset_x - new_bg_offset_x) % (gint)bg_width;
       priv->bg_offset_y = (old_bg_offset_y - new_bg_offset_y) % (gint)bg_height;
       if (priv->bg_offset_x < 0)
@@ -304,8 +304,8 @@ position_viewport (ChamplainView *view,
   /* we know about the change already - don't send the notifications again */
   g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
   champlain_viewport_set_origin (CHAMPLAIN_VIEWPORT (priv->viewport),
-      priv->viewport_x,
-      priv->viewport_y);
+      (gint)priv->viewport_x,
+      (gint)priv->viewport_y);
   g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 
   g_object_thaw_notify (G_OBJECT (view));
@@ -361,7 +361,7 @@ scroll_event (G_GNUC_UNUSED ClutterActor *actor,
     zoom_level = priv->zoom_level + 1;
   else if (event->direction == CLUTTER_SCROLL_DOWN)
     zoom_level = priv->zoom_level - 1;
-
+    
   return view_set_zoom_level_at (view, zoom_level, TRUE, event->x, event->y);
 }
 
@@ -1113,7 +1113,7 @@ redraw_timeout_cb (gpointer data)
 
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
-  if (priv->location_updated || ABS ((gint)x - priv->viewport_x) > 0 || ABS ((gint)y - priv->viewport_y) > 0)
+  if (priv->location_updated || (gint)ABS (x - priv->viewport_x) > 0 || (gint)ABS (y - priv->viewport_y) > 0)
     {
       update_coords (view, x, y, TRUE);
       load_visible_tiles (view, FALSE);
@@ -1269,7 +1269,7 @@ champlain_view_center_on (ChamplainView *view,
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
-  gint x, y;
+  gdouble x, y;
   ChamplainViewPrivate *priv = view->priv;
 
   longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
@@ -1278,7 +1278,7 @@ champlain_view_center_on (ChamplainView *view,
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude) - priv->viewport_width / 2.0;
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude) - priv->viewport_height / 2.0;
 
-  DEBUG ("Centering on %f, %f (%d, %d)", latitude, longitude, x, y);
+  DEBUG ("Centering on %f, %f (%g, %g)", latitude, longitude, x, y);
 
   position_viewport (view, x, y);
   load_visible_tiles (view, FALSE);
@@ -1763,8 +1763,8 @@ fill_background_tiles (ChamplainView *view)
   x_count = ceil ((gfloat) priv->viewport_width / width) + 3;
   y_count = ceil ((gfloat) priv->viewport_height / height) + 3;
 
-  x_first = priv->viewport_x / width - 1;
-  y_first = priv->viewport_y / height - 1;
+  x_first = (gint)priv->viewport_x / width - 1;
+  y_first = (gint)priv->viewport_y / height - 1;
   
   clutter_actor_iter_init (&iter, priv->background_layer);
 
@@ -2353,7 +2353,7 @@ position_zoom_actor (ChamplainView *view)
   clutter_actor_add_child (priv->zoom_layer, zoom_actor);
   g_object_unref (zoom_actor);
 
-  deltazoom = pow (2, -(gdouble)priv->anim_start_zoom_level + (gdouble)priv->zoom_level);
+  deltazoom = pow (2, (gdouble)priv->zoom_level - (gdouble)priv->anim_start_zoom_level);
   x = priv->zoom_actor_viewport_x * deltazoom;
   y = priv->zoom_actor_viewport_y * deltazoom;
 
@@ -2380,8 +2380,8 @@ zoom_animation_completed (ClutterActor *actor,
 static void
 show_zoom_actor (ChamplainView *view, 
     guint zoom_level, 
-    gint x, 
-    gint y)
+    gdouble x, 
+    gdouble y)
 {
   DEBUG_LOG ()
 
@@ -2397,6 +2397,7 @@ show_zoom_actor (ChamplainView *view,
       gint x_first, y_first;
       gdouble zoom_actor_width, zoom_actor_height;
       gdouble max_x_end, max_y_end;
+      gdouble deltax, deltay;
 
       size = champlain_map_source_get_tile_size (priv->map_source);
 
@@ -2410,8 +2411,8 @@ show_zoom_actor (ChamplainView *view,
       zoom_actor = clutter_actor_new ();
       clutter_actor_add_child (priv->zoom_overlay_actor, zoom_actor);
       
-      gint deltax = priv->viewport_x - x_first * size;
-      gint deltay = priv->viewport_y - y_first * size;
+      deltax = priv->viewport_x - x_first * size;
+      deltay = priv->viewport_y - y_first * size;
 
       priv->anim_start_zoom_level = priv->zoom_level;
       priv->zoom_actor_viewport_x = priv->viewport_x - deltax;
@@ -2490,7 +2491,6 @@ view_set_zoom_level_at (ChamplainView *view,
   gdouble new_x, new_y;
   gdouble offset_x = x;
   gdouble offset_y = y;
-  gdouble viewport_x, viewport_y;
   gdouble deltazoom;
 
   if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE (priv, zoom_level))
@@ -2508,15 +2508,11 @@ view_set_zoom_level_at (ChamplainView *view,
   if (CLUTTER_ACTOR_IS_REALIZED (view))
     show_zoom_actor (view, zoom_level, offset_x, offset_y);
 
-  deltazoom = pow (2, -(gdouble)priv->zoom_level + (gdouble)zoom_level);
+  deltazoom = pow (2, (gdouble)zoom_level - (gdouble)priv->zoom_level);
 
-  /* priv->viewport_x, priv->viewport_y are in int which isn't sufficient precision
-   * when multiplied by deltazoom - recalculate them */
-  viewport_x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, priv->longitude) - priv->viewport_width / 2.0;
-  viewport_y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, priv->latitude) - priv->viewport_height / 2.0;
-  new_x = (viewport_x + offset_x) * deltazoom - offset_x;
-  new_y = (viewport_y + offset_y) * deltazoom - offset_y;
-
+  new_x = (priv->viewport_x + offset_x) * deltazoom - offset_x;
+  new_y = (priv->viewport_y + offset_y) * deltazoom - offset_y;
+  
   priv->zoom_level = zoom_level;
 
   if (CLUTTER_ACTOR_IS_REALIZED (view))
