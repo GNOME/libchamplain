@@ -161,6 +161,8 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         NULL);
   champlain_map_source_factory_register (factory, desc);
 
+/* Not available any more - remove completely in the next release */
+#if 0
   desc = champlain_map_source_desc_new_full (
         CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
         "OpenStreetMap Osmarender",
@@ -174,6 +176,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         champlain_map_source_new_generic,
         NULL);
   champlain_map_source_factory_register (factory, desc);
+#endif
 
   desc = champlain_map_source_desc_new_full (
         CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST,
