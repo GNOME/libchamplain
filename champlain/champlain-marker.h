@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
- * Copyright (C) 2011-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2011-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -77,6 +77,8 @@ struct _ChamplainMarkerClass
 
 GType champlain_marker_get_type (void);
 
+
+ClutterActor *champlain_marker_new (void);
 
 void champlain_marker_set_selectable (ChamplainMarker *marker,
     gboolean value);

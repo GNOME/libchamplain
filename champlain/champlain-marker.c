@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
- * Copyright (C) 2011-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2011-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,11 @@
  * #champlainview for the markers to show on the map.
  *
  * A marker is nothing more than a regular #clutteractor. You can draw on
- * it what ever you want.  Set the markers position
- * on the map using #champlain_location_set_location.
+ * it what ever you want.  Set the marker's position
+ * on the map using #champlain_location_set_location. Don't forget to set the 
+ * marker's pointer position using #clutter_actor_set_translation.
  *
- * This is a base abstract class of all markers. libchamplain has a more evoluted
+ * This is a base class of all markers. libchamplain has a more evoluted
  * type of markers with text and image support. See #ChamplainLabel for more details.
  */
 
@@ -84,7 +85,7 @@ static gdouble get_longitude (ChamplainLocation *location);
 
 static void location_interface_init (ChamplainLocationIface *iface);
 
-G_DEFINE_ABSTRACT_TYPE_WITH_CODE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_ACTOR,
+G_DEFINE_TYPE_WITH_CODE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_ACTOR,
     G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION, location_interface_init));
 
 #define GET_PRIVATE(obj) \
@@ -465,6 +466,22 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
 }
 
 
+/**
+ * champlain_marker_new:
+ *
+ * Creates an instance of #ChamplainMarker.
+ *
+ * Returns: a new #ChamplainMarker.
+ *
+ * Since: 0.12.4
+ */
+ClutterActor *
+champlain_marker_new (void)
+{
+  return CLUTTER_ACTOR (g_object_new (CHAMPLAIN_TYPE_MARKER, NULL));
+}
+
+
 static gboolean
 motion_event_cb (ClutterActor *stage,
     ClutterMotionEvent *event,
@@ -581,7 +598,12 @@ button_press_event_cb (ClutterActor *actor,
     champlain_marker_set_selected (marker, TRUE);
 
   if (priv->selectable || priv->draggable)
-    clutter_actor_raise (CLUTTER_ACTOR (marker), NULL);
+    {
+      ClutterActor *parent;
+      
+      parent = clutter_actor_get_parent (CLUTTER_ACTOR (marker));
+      clutter_actor_set_child_above_sibling (parent, CLUTTER_ACTOR (marker), NULL);
+    }
 
   g_signal_emit_by_name (marker, "button-press", event);
 
@@ -761,7 +783,6 @@ void
 champlain_marker_animate_in_with_delay (ChamplainMarker *marker,
     guint delay)
 {
-  ClutterTimeline *timeline;
   gfloat y;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
@@ -771,17 +792,15 @@ champlain_marker_animate_in_with_delay (ChamplainMarker *marker,
   clutter_actor_set_scale (CLUTTER_ACTOR (marker), 1.5, 1.5);
   clutter_actor_get_position (CLUTTER_ACTOR (marker), NULL, &y);
   clutter_actor_move_by (CLUTTER_ACTOR (marker), 0, -100);
-
-  timeline = clutter_timeline_new (1000);
-  clutter_timeline_set_delay (timeline, delay);
-  clutter_actor_animate_with_timeline (CLUTTER_ACTOR (marker),
-      CLUTTER_EASE_OUT_BOUNCE, 
-      timeline, 
-      "opacity", 255, 
-      "y", y,
-      "scale-x", 1.0, 
-      "scale-y", 1.0, 
-      NULL);
+      
+  clutter_actor_save_easing_state (CLUTTER_ACTOR (marker));
+  clutter_actor_set_easing_delay (CLUTTER_ACTOR (marker), delay);
+  clutter_actor_set_easing_mode (CLUTTER_ACTOR (marker), CLUTTER_EASE_OUT_BOUNCE);
+  clutter_actor_set_easing_duration (CLUTTER_ACTOR (marker), 1000);
+  clutter_actor_set_opacity (CLUTTER_ACTOR (marker), 255);
+  clutter_actor_set_scale (CLUTTER_ACTOR (marker), 1.0, 1.0);
+  clutter_actor_set_y (CLUTTER_ACTOR (marker), y);
+  clutter_actor_restore_easing_state (CLUTTER_ACTOR (marker));
 }
 
 
@@ -801,12 +820,14 @@ champlain_marker_animate_out (ChamplainMarker *marker)
 
 
 static void
-on_animation_completed (G_GNUC_UNUSED ClutterAnimation *animation,
-    ChamplainMarker *marker)
+on_transition_stopped (ClutterActor *marker,
+    const gchar *transition_name,
+    gboolean is_finished)
 {
-  clutter_actor_hide (CLUTTER_ACTOR (marker));
+  clutter_actor_hide (marker);
 
-  clutter_actor_move_by (CLUTTER_ACTOR (marker), 0, 100);
+  clutter_actor_move_by (marker, 0, 100);
+  g_signal_handlers_disconnect_by_func (marker, on_transition_stopped, NULL);
 }
 
 
@@ -824,8 +845,6 @@ void
 champlain_marker_animate_out_with_delay (ChamplainMarker *marker,
     guint delay)
 {
-  ClutterAnimation *animation;
-  ClutterTimeline *timeline;
   gfloat y;
 
   g_return_if_fail (CHAMPLAIN_IS_MARKER (marker));
@@ -833,16 +852,17 @@ champlain_marker_animate_out_with_delay (ChamplainMarker *marker,
   clutter_actor_get_position (CLUTTER_ACTOR (marker), NULL, &y);
   clutter_actor_set_opacity (CLUTTER_ACTOR (marker), 200);
 
-  timeline = clutter_timeline_new (750);
-  clutter_timeline_set_delay (timeline, delay);
-  animation = clutter_actor_animate_with_timeline (CLUTTER_ACTOR (marker),
-        CLUTTER_EASE_IN_BACK, 
-        timeline, 
-        "opacity", 0, 
-        "y", y - 100,
-        "scale-x", 2.0, 
-        "scale-y", 2.0, 
-        NULL);
-  g_signal_connect_after (animation, "completed",
-      G_CALLBACK (on_animation_completed), marker);
+  clutter_actor_save_easing_state (CLUTTER_ACTOR (marker));
+  clutter_actor_set_easing_delay (CLUTTER_ACTOR (marker), delay);
+  clutter_actor_set_easing_mode (CLUTTER_ACTOR (marker), CLUTTER_EASE_IN_BACK);
+  clutter_actor_set_easing_duration (CLUTTER_ACTOR (marker), 750);
+  clutter_actor_set_opacity (CLUTTER_ACTOR (marker), 0);
+  clutter_actor_set_scale (CLUTTER_ACTOR (marker), 2.0, 2.0);
+  clutter_actor_set_y (CLUTTER_ACTOR (marker), y - 100);
+  clutter_actor_restore_easing_state (CLUTTER_ACTOR (marker));
+      
+  g_signal_connect (CLUTTER_ACTOR (marker),
+      "transition-stopped::opacity",
+      G_CALLBACK (on_transition_stopped),
+      NULL);      
 }

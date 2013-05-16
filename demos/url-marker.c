@@ -50,7 +50,7 @@ pixbuf_new_from_message (SoupMessage *message,
   /*  Use a pixbuf loader that can load images of the same mime-type as the
       message.
    */
-  mime_type = soup_message_headers_get (message->response_headers,
+  mime_type = soup_message_headers_get_one (message->response_headers,
         "Content-Type");
   loader = gdk_pixbuf_loader_new_with_mime_type (mime_type, error);
   if (loader != NULL)
@@ -88,49 +88,30 @@ cleanup:
 }
 
 
-/**
- * Transforms a GdkPixbuf into a ClutterTexture.
- * If there's an error building the ClutterActor (the texture) the function
- * will return NULL and set error accordingly.
- *
- * If you are using ClutterGtk, you can also use gtk_clutter_texture_set_from_pixbuf
- * instead of cluter_texture_set_from_rgb_data.
- *
- * The ClutterActor has to be freed with clutter_actor_destroy.
- */
 static ClutterActor *
 texture_new_from_pixbuf (GdkPixbuf *pixbuf, GError **error)
 {
   ClutterActor *texture = NULL;
-  const guchar *data;
-  gboolean has_alpha, success;
-  int width, height, rowstride;
-  ClutterTextureFlags flags = 0;
+  gfloat width, height;
+  ClutterContent *content;
+  
+  content = clutter_image_new ();
+  clutter_image_set_data (CLUTTER_IMAGE (content),
+                          gdk_pixbuf_get_pixels (pixbuf),
+                          gdk_pixbuf_get_has_alpha (pixbuf)
+                            ? COGL_PIXEL_FORMAT_RGBA_8888
+                            : COGL_PIXEL_FORMAT_RGB_888,
+                          gdk_pixbuf_get_width (pixbuf),
+                          gdk_pixbuf_get_height (pixbuf),
+                          gdk_pixbuf_get_rowstride (pixbuf),
+                          NULL);
 
-  *error = NULL;
-
-  data = gdk_pixbuf_get_pixels (pixbuf);
-  width = gdk_pixbuf_get_width (pixbuf);
-  height = gdk_pixbuf_get_height (pixbuf);
-  has_alpha = gdk_pixbuf_get_has_alpha (pixbuf);
-  rowstride = gdk_pixbuf_get_rowstride (pixbuf);
-
-  texture = clutter_texture_new ();
-  success = clutter_texture_set_from_rgb_data (CLUTTER_TEXTURE (texture),
-        data,
-        has_alpha,
-        width,
-        height,
-        rowstride,
-        (has_alpha ? 4 : 3),
-        flags,
-        error);
-
-  if (!success)
-    {
-      clutter_actor_destroy (CLUTTER_ACTOR (texture));
-      texture = NULL;
-    }
+  texture = clutter_actor_new ();
+  clutter_content_get_preferred_size (content, &width, &height);
+  clutter_actor_set_size (texture, width, height);
+  clutter_actor_set_content (texture, content);
+  clutter_content_invalidate (content);
+  g_object_unref (content);
 
   return texture;
 }
@@ -253,7 +234,7 @@ main (int argc, char *argv[])
   /* Create the map view */
   view = champlain_view_new ();
   clutter_actor_set_size (CLUTTER_ACTOR (view), 800, 600);
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), view);
+  clutter_actor_add_child (stage, view);
 
   /* Create the markers and marker layer */
   layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
@@ -271,7 +252,7 @@ main (int argc, char *argv[])
       "kinetic-mode", TRUE, NULL);
   champlain_view_center_on (CHAMPLAIN_VIEW (view), 48.22, 16.8);
 
-  clutter_actor_show_all (stage);
+  clutter_actor_show (stage);
   clutter_main ();
 
   g_object_unref (session);

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2009 Simon Wenner <simon@wenner.ch>
- * Copyright (C) 2010-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2010-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -106,8 +106,15 @@ struct _WorkerThreadData
 };
 
 /* lock to protect the renderer state while rendering */
-GStaticRWLock MemphisLock = G_STATIC_RW_LOCK_INIT;
-
+#if GLIB_CHECK_VERSION(2,32,0)
+  static GRWLock MemphisLock;
+#else
+  GStaticRWLock MemphisLock = G_STATIC_RW_LOCK_INIT;
+  #define g_rw_lock_reader_lock(l)   g_static_rw_lock_reader_lock (l)
+  #define g_rw_lock_reader_unlock(l) g_static_rw_lock_reader_unlock (l)
+  #define g_rw_lock_writer_lock(l)   g_static_rw_lock_writer_lock (l)
+  #define g_rw_lock_writer_unlock(l) g_static_rw_lock_writer_unlock (l)
+#endif
 
 static void memphis_worker_thread (gpointer data,
     gpointer user_data);
@@ -305,12 +312,12 @@ tile_loaded_cb (gpointer worker_data)
   gpointer ret_data = NULL;
   guint ret_size = 0;
   gboolean ret_error = TRUE;
-  cairo_t *cr_clutter;
   ClutterActor *actor;
   guint size = data->size;
   GdkPixbuf *pixbuf = NULL;
   gchar *buffer = NULL;
   gsize buffer_size;
+  ClutterContent *content;
 
   g_slice_free (WorkerThreadData, data);
 
@@ -323,14 +330,6 @@ tile_loaded_cb (gpointer worker_data)
   if (!cst)
     goto finish;
 
-  /* draw the clutter texture */
-  actor = clutter_cairo_texture_new (size, size);
-
-  cr_clutter = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (actor));
-  cairo_set_source_surface (cr_clutter, cst, 0, 0);
-  cairo_paint (cr_clutter);
-  cairo_destroy (cr_clutter);
-
   /* modify directly the buffer of cairo surface - we don't use it any more
      and we close the surface anyway */
   argb_to_rgba (cairo_image_surface_get_data (cst),
@@ -342,6 +341,26 @@ tile_loaded_cb (gpointer worker_data)
 
   if (!gdk_pixbuf_save_to_buffer (pixbuf, &buffer, &buffer_size, "png", NULL, NULL))
     goto finish;
+    
+  content = clutter_image_new ();
+  if (!clutter_image_set_data (CLUTTER_IMAGE (content),
+          gdk_pixbuf_get_pixels (pixbuf),
+          gdk_pixbuf_get_has_alpha (pixbuf)
+            ? COGL_PIXEL_FORMAT_RGBA_8888
+            : COGL_PIXEL_FORMAT_RGB_888,
+          gdk_pixbuf_get_width (pixbuf),
+          gdk_pixbuf_get_height (pixbuf),
+          gdk_pixbuf_get_rowstride (pixbuf),
+          NULL))
+    {
+      g_object_unref (content);
+      goto finish;
+    }
+
+  actor = clutter_actor_new ();
+  clutter_actor_set_size (actor, size, size);
+  clutter_actor_set_content (actor, content);
+  g_object_unref (content);
 
   champlain_tile_set_content (tile, actor);
 
@@ -375,9 +394,9 @@ memphis_worker_thread (gpointer worker_data,
 
   data->cst = NULL;
 
-  g_static_rw_lock_reader_lock (&MemphisLock);
+  g_rw_lock_reader_lock (&MemphisLock);
   has_data = memphis_renderer_tile_has_data (renderer->priv->renderer, data->x, data->y, data->z);
-  g_static_rw_lock_reader_unlock (&MemphisLock);
+  g_rw_lock_reader_unlock (&MemphisLock);
 
   if (has_data)
     {
@@ -389,9 +408,9 @@ memphis_worker_thread (gpointer worker_data,
 
       DEBUG ("Draw Tile (%d, %d, %d)", data->x, data->y, data->z);
 
-      g_static_rw_lock_reader_lock (&MemphisLock);
+      g_rw_lock_reader_lock (&MemphisLock);
       memphis_renderer_draw_tile (renderer->priv->renderer, cr, data->x, data->y, data->z);
-      g_static_rw_lock_reader_unlock (&MemphisLock);
+      g_rw_lock_reader_unlock (&MemphisLock);
 
       cairo_destroy (cr);
     }
@@ -460,9 +479,9 @@ set_data (ChamplainRenderer *renderer,
       return;
     }
 
-  g_static_rw_lock_writer_lock (&MemphisLock);
+  g_rw_lock_writer_lock (&MemphisLock);
   memphis_renderer_set_map (priv->renderer, map);
-  g_static_rw_lock_writer_unlock (&MemphisLock);
+  g_rw_lock_writer_unlock (&MemphisLock);
 
   bbox = champlain_bounding_box_new ();
 
@@ -499,7 +518,7 @@ champlain_memphis_renderer_load_rules (
       return;
     }
 
-  g_static_rw_lock_writer_lock (&MemphisLock);
+  g_rw_lock_writer_lock (&MemphisLock);
   if (rules_path)
     {
       memphis_rule_set_load_from_file (priv->rules, rules_path, &err);
@@ -508,7 +527,7 @@ champlain_memphis_renderer_load_rules (
           g_critical ("Can't load rules file: \"%s\"", err->message);
           memphis_rule_set_load_from_data (priv->rules, default_rules,
               strlen (default_rules), NULL);
-          g_static_rw_lock_writer_unlock (&MemphisLock);
+          g_rw_lock_writer_unlock (&MemphisLock);
           g_error_free (err);
           return;
         }
@@ -517,7 +536,7 @@ champlain_memphis_renderer_load_rules (
     memphis_rule_set_load_from_data (priv->rules, default_rules,
         strlen (default_rules), NULL);
 
-  g_static_rw_lock_writer_unlock (&MemphisLock);
+  g_rw_lock_writer_unlock (&MemphisLock);
 }
 
 
@@ -541,9 +560,9 @@ champlain_memphis_renderer_get_background_color (
   ClutterColor color;
   guint8 r, b, g, a;
 
-  g_static_rw_lock_reader_lock (&MemphisLock);
+  g_rw_lock_reader_lock (&MemphisLock);
   memphis_rule_set_get_bg_color (renderer->priv->rules, &r, &g, &b, &a);
-  g_static_rw_lock_reader_unlock (&MemphisLock);
+  g_rw_lock_reader_unlock (&MemphisLock);
 
   color.red = r;
   color.green = g;
@@ -569,10 +588,10 @@ champlain_memphis_renderer_set_background_color (
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_RENDERER (renderer));
 
-  g_static_rw_lock_writer_lock (&MemphisLock);
+  g_rw_lock_writer_lock (&MemphisLock);
   memphis_rule_set_set_bg_color (renderer->priv->rules, color->red,
       color->green, color->blue, color->alpha);
-  g_static_rw_lock_writer_unlock (&MemphisLock);
+  g_rw_lock_writer_unlock (&MemphisLock);
 }
 
 
@@ -593,9 +612,9 @@ champlain_memphis_renderer_set_rule (ChamplainMemphisRenderer *renderer,
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_RENDERER (renderer) &&
       MEMPHIS_RULE (rule));
 
-  g_static_rw_lock_writer_lock (&MemphisLock);
+  g_rw_lock_writer_lock (&MemphisLock);
   memphis_rule_set_set_rule (renderer->priv->rules, (MemphisRule *) rule);
-  g_static_rw_lock_writer_unlock (&MemphisLock);
+  g_rw_lock_writer_unlock (&MemphisLock);
 }
 
 
@@ -619,9 +638,9 @@ champlain_memphis_renderer_get_rule (ChamplainMemphisRenderer *renderer,
 
   MemphisRule *rule;
 
-  g_static_rw_lock_reader_lock (&MemphisLock);
+  g_rw_lock_reader_lock (&MemphisLock);
   rule = memphis_rule_set_get_rule (renderer->priv->rules, id);
-  g_static_rw_lock_reader_unlock (&MemphisLock);
+  g_rw_lock_reader_unlock (&MemphisLock);
 
   return (ChamplainMemphisRule *) rule;
 }
@@ -647,9 +666,9 @@ champlain_memphis_renderer_get_rule_ids (ChamplainMemphisRenderer *renderer)
 
   GList *list;
 
-  g_static_rw_lock_reader_lock (&MemphisLock);
+  g_rw_lock_reader_lock (&MemphisLock);
   list = memphis_rule_set_get_rule_ids (renderer->priv->rules);
-  g_static_rw_lock_reader_unlock (&MemphisLock);
+  g_rw_lock_reader_unlock (&MemphisLock);
 
   return list;
 }
@@ -671,9 +690,9 @@ champlain_memphis_renderer_remove_rule (
 {
   g_return_if_fail (CHAMPLAIN_IS_MEMPHIS_RENDERER (renderer));
 
-  g_static_rw_lock_writer_lock (&MemphisLock);
+  g_rw_lock_writer_lock (&MemphisLock);
   memphis_rule_set_remove_rule (renderer->priv->rules, id);
-  g_static_rw_lock_writer_unlock (&MemphisLock);
+  g_rw_lock_writer_unlock (&MemphisLock);
 }
 
 
@@ -696,9 +715,9 @@ champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *renderer,
 
   renderer->priv->tile_size = size;
 
-  g_static_rw_lock_writer_lock (&MemphisLock);
+  g_rw_lock_writer_lock (&MemphisLock);
   memphis_renderer_set_resolution (priv->renderer, size);
-  g_static_rw_lock_writer_unlock (&MemphisLock);
+  g_rw_lock_writer_unlock (&MemphisLock);
 
   g_object_notify (G_OBJECT (renderer), "tile-size");
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2010-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ G_DEFINE_TYPE (ChamplainErrorTileRenderer, champlain_error_tile_renderer, CHAMPL
 
 struct _ChamplainErrorTileRendererPrivate
 {
-  CoglHandle error_tex;
+  ClutterContent *error_canvas;
   guint tile_size;
 };
 
@@ -97,10 +97,10 @@ champlain_error_tile_renderer_dispose (GObject *object)
 {
   ChamplainErrorTileRendererPrivate *priv = CHAMPLAIN_ERROR_TILE_RENDERER (object)->priv;
 
-  if (priv->error_tex)
+  if (priv->error_canvas)
     {
-      cogl_handle_unref (priv->error_tex);
-      priv->error_tex = NULL;
+      g_object_unref (priv->error_canvas);
+      priv->error_canvas = NULL;
     }
 
   G_OBJECT_CLASS (champlain_error_tile_renderer_parent_class)->dispose (object);
@@ -156,7 +156,7 @@ champlain_error_tile_renderer_init (ChamplainErrorTileRenderer *self)
 
   self->priv = priv;
 
-  priv->error_tex = NULL;
+  priv->error_canvas = NULL;
 }
 
 
@@ -186,6 +186,39 @@ set_data (ChamplainRenderer *renderer, const gchar *data, guint size)
 }
 
 
+static gboolean
+redraw_tile (ClutterCanvas *canvas,
+    cairo_t *cr,
+    gint w,
+    gint h)
+{
+  cairo_pattern_t *pat;
+  gint size = w;
+  
+  /* draw a linear gray to white pattern */
+  pat = cairo_pattern_create_linear (size / 2.0, 0.0, size, size / 2.0);
+  cairo_pattern_add_color_stop_rgb (pat, 0, 0.686, 0.686, 0.686);
+  cairo_pattern_add_color_stop_rgb (pat, 1, 0.925, 0.925, 0.925);
+  cairo_set_source (cr, pat);
+  cairo_rectangle (cr, 0, 0, size, size);
+  cairo_fill (cr);
+
+  cairo_pattern_destroy (pat);
+
+  /* draw the red cross */
+  cairo_set_source_rgb (cr, 0.424, 0.078, 0.078);
+  cairo_set_line_width (cr, 14.0);
+  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+  cairo_move_to (cr, 24, 24);
+  cairo_line_to (cr, 50, 50);
+  cairo_move_to (cr, 50, 24);
+  cairo_line_to (cr, 24, 50);
+  cairo_stroke (cr);
+
+  return TRUE;
+}
+
+
 static void
 render (ChamplainRenderer *renderer, ChamplainTile *tile)
 {
@@ -194,7 +227,7 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
 
   ChamplainErrorTileRenderer *error_renderer = CHAMPLAIN_ERROR_TILE_RENDERER (renderer);
   ChamplainErrorTileRendererPrivate *priv = error_renderer->priv;
-  ClutterActor *clone;
+  ClutterActor *actor;
   gpointer data = NULL;
   guint size = 0;
   gboolean error = FALSE;
@@ -208,47 +241,19 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
 
   size = champlain_error_tile_renderer_get_tile_size (error_renderer);
 
-  if (!priv->error_tex)
+  if (!priv->error_canvas)
     {
-      cairo_t *cr;
-      cairo_pattern_t *pat;
-      ClutterActor *tmp_actor;
-
-      tmp_actor = clutter_cairo_texture_new (size, size);
-      cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (tmp_actor));
-
-      /* draw a linear gray to white pattern */
-      pat = cairo_pattern_create_linear (size / 2.0, 0.0, size, size / 2.0);
-      cairo_pattern_add_color_stop_rgb (pat, 0, 0.686, 0.686, 0.686);
-      cairo_pattern_add_color_stop_rgb (pat, 1, 0.925, 0.925, 0.925);
-      cairo_set_source (cr, pat);
-      cairo_rectangle (cr, 0, 0, size, size);
-      cairo_fill (cr);
-
-      cairo_pattern_destroy (pat);
-
-      /* draw the red cross */
-      cairo_set_source_rgb (cr, 0.424, 0.078, 0.078);
-      cairo_set_line_width (cr, 14.0);
-      cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
-      cairo_move_to (cr, 24, 24);
-      cairo_line_to (cr, 50, 50);
-      cairo_move_to (cr, 50, 24);
-      cairo_line_to (cr, 24, 50);
-      cairo_stroke (cr);
-
-      cairo_destroy (cr);
-
-      priv->error_tex = clutter_texture_get_cogl_texture (CLUTTER_TEXTURE (tmp_actor));
-      cogl_handle_ref (priv->error_tex);
-
-      g_object_ref_sink (tmp_actor);
-      g_object_unref (tmp_actor);
+      priv->error_canvas = clutter_canvas_new ();
+      clutter_canvas_set_size (CLUTTER_CANVAS (priv->error_canvas), size, size);
+      g_signal_connect (priv->error_canvas, "draw", G_CALLBACK (redraw_tile), NULL);
+      clutter_content_invalidate (priv->error_canvas);
     }
 
-  clone = clutter_texture_new ();
-  clutter_texture_set_cogl_texture (CLUTTER_TEXTURE (clone), priv->error_tex);
-  champlain_tile_set_content (tile, clone);
+  actor = clutter_actor_new ();
+  clutter_actor_set_size (actor, size, size);
+  clutter_actor_set_content (actor, priv->error_canvas);
+  
+  champlain_tile_set_content (tile, actor);
   g_signal_emit_by_name (tile, "render-complete", data, size, error);
 }
 

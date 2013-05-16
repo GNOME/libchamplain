@@ -1,6 +1,7 @@
 /* champlain-kinetic-scroll-view.h: Finger scrolling container actor
  *
  * Copyright (C) 2008 OpenedHand
+ * Copyright (C) 2011-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +26,7 @@
 
 #include <glib-object.h>
 #include <clutter/clutter.h>
+#include <champlain/champlain-viewport.h>
 
 G_BEGIN_DECLS
 
@@ -64,9 +66,10 @@ struct _ChamplainKineticScrollViewClass
 
 GType champlain_kinetic_scroll_view_get_type (void) G_GNUC_CONST;
 
-ClutterActor *champlain_kinetic_scroll_view_new (gboolean kinetic);
+ClutterActor *champlain_kinetic_scroll_view_new (gboolean kinetic,
+    ChamplainViewport *viewport);
 
-void champlain_kinetic_scroll_view_stop (ChamplainKineticScrollView *scroll);
+void champlain_kinetic_scroll_view_stop (ChamplainKineticScrollView *self);
 
 G_END_DECLS
 

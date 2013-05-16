@@ -216,3 +216,26 @@ champlain_bounding_box_is_valid (ChamplainBoundingBox *bbox)
          (bbox->bottom > CHAMPLAIN_MIN_LATITUDE) && (bbox->bottom < CHAMPLAIN_MAX_LATITUDE) &&
          (bbox->top > CHAMPLAIN_MIN_LATITUDE) && (bbox->top < CHAMPLAIN_MAX_LATITUDE);
 }
+
+/**
+ * champlain_bounding_box_covers:
+ * @bbox: a #ChamplainBoundingBox
+ * @latitude: the latitude of the point
+ * @longitude: the longitude of the point
+ *
+ * Checks whether @bbox covers the given coordinates.
+ *
+ * Returns: TRUE when the bounding box covers given coordinates, FALSE otherwise.
+ *
+ * Since: 0.12.4
+ */
+gboolean
+champlain_bounding_box_covers(ChamplainBoundingBox *bbox,
+    gdouble latitude,
+    gdouble longitude)
+{
+  g_return_val_if_fail (CHAMPLAIN_BOUNDING_BOX (bbox), FALSE);
+
+  return ((latitude >= bbox->bottom && latitude <= bbox->top) &&
+          (longitude >= bbox->left && longitude <= bbox->right));
+}

@@ -1,6 +1,7 @@
 /* champlain-viewport.h: Viewport actor
  *
  * Copyright (C) 2008 OpenedHand
+ * Copyright (C) 2011-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -67,12 +68,12 @@ GType champlain_viewport_get_type (void) G_GNUC_CONST;
 ClutterActor *champlain_viewport_new (void);
 
 void champlain_viewport_set_origin (ChamplainViewport *viewport,
-    float x,
-    float y);
+    gdouble x,
+    gdouble y);
 
 void champlain_viewport_get_origin (ChamplainViewport *viewport,
-    gfloat *x,
-    gfloat *y);
+    gdouble *x,
+    gdouble *y);
 void champlain_viewport_stop (ChamplainViewport *viewport);
 
 void champlain_viewport_get_adjustments (ChamplainViewport *viewport,
@@ -85,6 +86,15 @@ void champlain_viewport_set_adjustments (ChamplainViewport *viewport,
 
 void champlain_viewport_set_child (ChamplainViewport *viewport,
     ClutterActor *child);
+
+void champlain_viewport_get_anchor (ChamplainViewport *viewport,
+    gint *x,
+    gint *y);
+
+void champlain_viewport_set_actor_position (ChamplainViewport *viewport,
+    ClutterActor *actor,
+    gdouble x,
+    gdouble y);
 
 G_END_DECLS
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2011-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,8 @@
 
 G_BEGIN_DECLS
 
+#ifndef GTK_DISABLE_DEPRECATED
+
 #define CHAMPLAIN_TYPE_CUSTOM_MARKER champlain_custom_marker_get_type ()
 
 #define CHAMPLAIN_CUSTOM_MARKER(obj) \
@@ -59,6 +61,9 @@ typedef struct _ChamplainCustomMarkerClass ChamplainCustomMarkerClass;
  * and should be accessed using the provided API
  *
  * Since: 0.10
+ * 
+ * Deprecated: 0.12.4: #ChamplainMarker is a concrete class now and can be used
+ * instead.
  */
 struct _ChamplainCustomMarker
 {
@@ -75,6 +80,8 @@ struct _ChamplainCustomMarkerClass
 GType champlain_custom_marker_get_type (void);
 
 ClutterActor *champlain_custom_marker_new (void);
+
+#endif
 
 G_END_DECLS
 

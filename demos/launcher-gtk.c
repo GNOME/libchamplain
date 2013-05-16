@@ -62,7 +62,7 @@ toggle_layer (GtkToggleButton *widget,
 }
 
 
-gboolean
+static gboolean
 mouse_click_cb (ClutterActor *actor, ClutterButtonEvent *event, ChamplainView *view)
 {
   gdouble lat, lon;
@@ -164,7 +164,6 @@ build_combo_box (GtkComboBox *box)
 {
   ChamplainMapSourceFactory *factory;
   GSList *sources, *iter;
-  gint i = 0;
   GtkTreeStore *store;
   GtkTreeIter parent;
   GtkCellRenderer *cell;
@@ -259,9 +258,11 @@ main (int argc,
   champlain_scale_connect_view (CHAMPLAIN_SCALE (scale), view);
   
   /* align to the bottom left */
-  champlain_view_bin_layout_add (view, scale,
-                                 CLUTTER_BIN_ALIGNMENT_START,
-                                 CLUTTER_BIN_ALIGNMENT_END);
+  clutter_actor_set_x_expand (scale, TRUE);
+  clutter_actor_set_y_expand (scale, TRUE);
+  clutter_actor_set_x_align (scale, CLUTTER_ACTOR_ALIGN_START);
+  clutter_actor_set_y_align (scale, CLUTTER_ACTOR_ALIGN_END);
+  clutter_actor_add_child (CLUTTER_ACTOR (view), scale);
   
   license_actor = champlain_view_get_license_actor (view);
   champlain_license_set_extra_text (license_actor, "Don't eat cereals with orange juice\nIt tastes bad");
@@ -271,7 +272,7 @@ main (int argc,
   layer = create_marker_layer (view, &path);
   champlain_view_add_layer (view, CHAMPLAIN_LAYER (path));
   champlain_view_add_layer (view, CHAMPLAIN_LAYER (layer));
-
+  
   path_layer = champlain_path_layer_new ();
   /* Cheap approx of Highway 10 */
   append_point (path_layer, 45.4095, -73.3197);
@@ -285,7 +286,7 @@ main (int argc,
   append_point (path_layer, 45.4151, -73.1218);
   champlain_view_add_layer (view, CHAMPLAIN_LAYER (path_layer));
 
-  gtk_widget_set_size_request (widget, 640, 480);
+  gtk_widget_set_size_request (widget, 640, 481);
 
   bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
   button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_IN);

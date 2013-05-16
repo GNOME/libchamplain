@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
- * Copyright (C) 2010-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2010-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -349,7 +349,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_TILE_SIZE, pspec);
 
   /**
-   * ChamplainTileSource:projection
+   * ChamplainTileSource:projection:
    *
    * The map projection of the tile source
    *
@@ -364,7 +364,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   g_object_class_install_property (object_class, PROP_MAP_PROJECTION, pspec);
 
   /**
-   * ChamplainTileSource:cache
+   * ChamplainTileSource:cache:
    *
    * The cache used for tile storage
    *

@@ -31,14 +31,15 @@ def make_button(text):
 	black = Clutter.Color.new(0x00, 0x00, 0x00, 0xff)
 	white = Clutter.Color.new(0xff, 0xff, 0xff, 0xff)
   
-	button = Clutter.Group()
+	button = Clutter.Actor()
 	
-	button_bg = Clutter.Rectangle.new_with_color(white)
+	button_bg = Clutter.Actor()
+	button_bg.set_background_color(white)
 	button_bg.set_opacity(0xcc)
-	button.add_actor(button_bg)
+	button.add_child(button_bg)
 	
 	button_text = Clutter.Text.new_full("Sans 10", text, black)
-	button.add_actor(button_text)
+	button.add_child(button_text)
 	
 	(width, height) = button_text.get_size()
 	button_bg.set_size(width + PADDING * 2, height + PADDING * 2)
@@ -67,14 +68,14 @@ if __name__ == '__main__':
 	# Create the map view
 	view = Champlain.View()
 	view.set_size(800, 600)
-	stage.add_actor(view)
+	stage.add_child(view)
 
 	# Create the buttons
-	buttons = Clutter.Group()
+	buttons = Clutter.Actor()
 	buttons.set_position(PADDING, PADDING)
 
 	button = make_button('Zoom in')
-	buttons.add_actor(button)
+	buttons.add_child(button)
 	button.set_reactive(True)
 	(width, height) = button.get_size()
 	total_width += width + PADDING;
@@ -82,13 +83,13 @@ if __name__ == '__main__':
 	button.connect('button-release-event', zoom_in, view)
 	
 	button = make_button('Zoom out')
-	buttons.add_actor(button)
+	buttons.add_child(button)
 	button.set_reactive(True)
 	button.set_position(total_width, 0)
 	(width, height) = button.get_size()
 	button.connect('button-release-event', zoom_out, view)
 
-	stage.add_actor(buttons)
+	stage.add_child(buttons)
 
 	# Draw a line
 	layer = Champlain.PathLayer()

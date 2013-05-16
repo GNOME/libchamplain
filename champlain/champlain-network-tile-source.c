@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
- * Copyright (C) 2010-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2010-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -221,7 +221,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   map_source_class->fill_tile = fill_tile;
 
   /**
-   * ChamplainNetworkTileSource:uri-format
+   * ChamplainNetworkTileSource:uri-format:
    *
    * The uri format of the tile source, see #champlain_network_tile_source_set_uri_format
    *
@@ -235,7 +235,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   g_object_class_install_property (object_class, PROP_URI_FORMAT, pspec);
 
   /**
-   * ChamplainNetworkTileSource:offline
+   * ChamplainNetworkTileSource:offline:
    *
    * Specifies whether the network tile source can access network
    *
@@ -249,7 +249,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   g_object_class_install_property (object_class, PROP_OFFLINE, pspec);
 
   /**
-   * ChamplainNetworkTileSource:proxy-uri
+   * ChamplainNetworkTileSource:proxy-uri:
    *
    * The proxy uri used to access network
    *
@@ -623,7 +623,7 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
     }
 
   /* Verify if the server sent an etag and save it */
-  etag = soup_message_headers_get (msg->response_headers, "ETag");
+  etag = soup_message_headers_get_one (msg->response_headers, "ETag");
   DEBUG ("Received ETag %s", etag);
 
   renderer = champlain_map_source_get_renderer (map_source);

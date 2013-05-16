@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2011-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -63,7 +63,7 @@ struct _ChamplainPointPrivate
 {
   ClutterColor *color;
   gdouble size;
-  ClutterActor *point_actor;
+  ClutterContent *canvas;
 
   guint redraw_id;
 };
@@ -72,9 +72,6 @@ G_DEFINE_TYPE (ChamplainPoint, champlain_point, CHAMPLAIN_TYPE_MARKER);
 
 #define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_POINT, ChamplainPointPrivate))
-
-
-static void draw_point (ChamplainPoint *point);
 
 
 static void
@@ -126,15 +123,6 @@ champlain_point_set_property (GObject *object,
 
 
 static void
-paint (ClutterActor *self)
-{
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_paint (CLUTTER_ACTOR (priv->point_actor));
-}
-
-
-static void
 pick (ClutterActor *self,
     const ClutterColor *color)
 {
@@ -156,88 +144,8 @@ pick (ClutterActor *self,
 
 
 static void
-get_preferred_width (ClutterActor *self,
-    gfloat for_height,
-    gfloat *min_width_p,
-    gfloat *natural_width_p)
-{
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_get_preferred_width (CLUTTER_ACTOR (priv->point_actor),
-      for_height,
-      min_width_p,
-      natural_width_p);
-}
-
-
-static void
-get_preferred_height (ClutterActor *self,
-    gfloat for_width,
-    gfloat *min_height_p,
-    gfloat *natural_height_p)
-{
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
-
-  clutter_actor_get_preferred_height (CLUTTER_ACTOR (priv->point_actor),
-      for_width,
-      min_height_p,
-      natural_height_p);
-}
-
-
-static void
-allocate (ClutterActor *self,
-    const ClutterActorBox *box,
-    ClutterAllocationFlags flags)
-{
-  ClutterActorBox child_box;
-
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_point_parent_class)->allocate (self, box, flags);
-
-  child_box.x1 = 0;
-  child_box.x2 = box->x2 - box->x1;
-  child_box.y1 = 0;
-  child_box.y2 = box->y2 - box->y1;
-
-  clutter_actor_allocate (CLUTTER_ACTOR (priv->point_actor), &child_box, flags);
-}
-
-
-static void
-map (ClutterActor *self)
-{
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_point_parent_class)->map (self);
-
-  clutter_actor_map (CLUTTER_ACTOR (priv->point_actor));
-}
-
-
-static void
-unmap (ClutterActor *self)
-{
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
-
-  CLUTTER_ACTOR_CLASS (champlain_point_parent_class)->unmap (self);
-
-  clutter_actor_unmap (CLUTTER_ACTOR (priv->point_actor));
-}
-
-
-static void
 champlain_point_dispose (GObject *object)
 {
-  ChamplainPointPrivate *priv = CHAMPLAIN_POINT (object)->priv;
-
-  if (priv->point_actor)
-    {
-      clutter_actor_unparent (CLUTTER_ACTOR (priv->point_actor));
-      priv->point_actor = NULL;
-    }
-
   G_OBJECT_CLASS (champlain_point_parent_class)->dispose (object);
 }
 
@@ -251,6 +159,12 @@ champlain_point_finalize (GObject *object)
     {
       clutter_color_free (priv->color);
       priv->color = NULL;
+    }
+
+  if (priv->canvas)
+    {
+      g_object_unref (priv->canvas);
+      priv->canvas = NULL;
     }
 
   G_OBJECT_CLASS (champlain_point_parent_class)->finalize (object);
@@ -270,13 +184,7 @@ champlain_point_class_init (ChamplainPointClass *klass)
   object_class->get_property = champlain_point_get_property;
   object_class->set_property = champlain_point_set_property;
 
-  actor_class->get_preferred_width = get_preferred_width;
-  actor_class->get_preferred_height = get_preferred_height;
-  actor_class->allocate = allocate;
-  actor_class->paint = paint;
   actor_class->pick = pick;
-  actor_class->map = map;
-  actor_class->unmap = unmap;
 
   g_object_class_install_property (object_class, PROP_COLOR,
       clutter_param_spec_color ("color", 
@@ -297,18 +205,16 @@ champlain_point_class_init (ChamplainPointClass *klass)
 
 
 static void
-draw_point (ChamplainPoint *point)
+draw (ClutterCanvas *canvas,
+      cairo_t       *cr,
+      gint           width,
+      gint           height,
+      ChamplainPoint *point)
 {
   ChamplainPointPrivate *priv = point->priv;
-  cairo_t *cr;
   gdouble size = priv->size;
   gdouble radius = size / 2.0;
   const ClutterColor *color;
-
-  clutter_cairo_texture_set_surface_size (CLUTTER_CAIRO_TEXTURE (priv->point_actor), size, size);
-  clutter_actor_set_anchor_point (CLUTTER_ACTOR (point), radius, radius);
-
-  cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (priv->point_actor));
 
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
   cairo_paint (cr);
@@ -331,8 +237,6 @@ draw_point (ChamplainPoint *point)
   cairo_fill_preserve (cr);
   cairo_set_line_width (cr, 1.0);
   cairo_stroke (cr);
-
-  cairo_destroy (cr);
 }
 
 
@@ -341,7 +245,7 @@ notify_selected (GObject *gobject,
     G_GNUC_UNUSED GParamSpec *pspec,
     G_GNUC_UNUSED gpointer user_data)
 {
-  draw_point (CHAMPLAIN_POINT (gobject));
+  clutter_content_invalidate (CHAMPLAIN_POINT (gobject)->priv->canvas);
 }
 
 
@@ -354,12 +258,15 @@ champlain_point_init (ChamplainPoint *point)
 
   priv->color = clutter_color_copy (&DEFAULT_COLOR);
   priv->size = 12;
-  priv->point_actor = clutter_cairo_texture_new (priv->size, priv->size);
-  clutter_actor_set_parent (CLUTTER_ACTOR (priv->point_actor), CLUTTER_ACTOR (point));
-  g_signal_connect (point, "notify::selected", G_CALLBACK (notify_selected), NULL);
-  clutter_actor_queue_relayout (CLUTTER_ACTOR (point));
+  priv->canvas = clutter_canvas_new ();
+  g_signal_connect (priv->canvas, "draw", G_CALLBACK (draw), point);
+  clutter_canvas_set_size (CLUTTER_CANVAS (priv->canvas), priv->size, priv->size);
+  clutter_actor_set_size (CLUTTER_ACTOR (point), priv->size, priv->size);
+  clutter_actor_set_content (CLUTTER_ACTOR (point), priv->canvas);
+  clutter_actor_set_translation (CLUTTER_ACTOR (point), -priv->size/2, -priv->size/2, 0.0);
+  clutter_content_invalidate (priv->canvas);
 
-  draw_point (point);
+  g_signal_connect (point, "notify::selected", G_CALLBACK (notify_selected), NULL);
 }
 
 
@@ -420,14 +327,12 @@ champlain_point_set_size (ChamplainPoint *point,
 
   ChamplainPointPrivate *priv = point->priv;
 
-  if (priv->point_actor)
-    clutter_actor_unparent (CLUTTER_ACTOR (priv->point_actor));
-
   point->priv->size = size;
-  priv->point_actor = clutter_cairo_texture_new (size, size);
-  clutter_actor_set_parent (CLUTTER_ACTOR (priv->point_actor), CLUTTER_ACTOR (point));
+  clutter_canvas_set_size (CLUTTER_CANVAS (priv->canvas), size, size);
+  clutter_actor_set_size (CLUTTER_ACTOR (point), priv->size, priv->size);
+  clutter_actor_set_translation (CLUTTER_ACTOR (point), -priv->size/2, -priv->size/2, 0.0);
   g_object_notify (G_OBJECT (point), "size");
-  draw_point (point);
+  clutter_content_invalidate (priv->canvas);
 }
 
 
@@ -476,7 +381,7 @@ champlain_point_set_color (ChamplainPoint *point,
 
   priv->color = clutter_color_copy (color);
   g_object_notify (G_OBJECT (point), "color");
-  draw_point (point);
+  clutter_content_invalidate (priv->canvas);
 }
 
 

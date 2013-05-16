@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
- * Copyright (C) 2010-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2010-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -96,18 +96,40 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  * OpenStreetMap Mapnik
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm-mapnik"
+#ifndef GTK_DISABLE_DEPRECATED
 /**
  * CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER:
  *
  * OpenStreetMap Osmarender
+ *
+ * Deprecated: Osmarender isn't available any more and will be removed in the next release.
+ * As it doens't exist, it isn't registered to the factory and the 'create' method won't
+ * return any source.
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "osm-osmarender"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OAM:
+ *
+ * OpenAerialMap
+ *
+ * Deprecated: OpenAerialMap isn't available any more and will be removed in the next release.
+ * As it doens't exist, it isn't registered to the factory and the 'create' method won't
+ * return any source.
+ */
+#define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
+#endif
 /**
  * CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST:
  *
  * Mapquest OpenStreetMap
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST "osm-mapquest"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP:
+ *
+ * Mapquest Open Aerial
+ */
+#define CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP "osm-aerialmap"
 /**
  * CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP:
  *
@@ -121,12 +143,6 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "osm-transportmap"
 /**
- * CHAMPLAIN_MAP_SOURCE_OAM:
- *
- * OpenAerialMap
- */
-#define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
-/**
  * CHAMPLAIN_MAP_SOURCE_MFF_RELIEF:
  *
  * Maps for Free Relief
@@ -136,6 +152,7 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap I"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap II"
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST "Mapquest OSM"
+#define CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP "Open Aerial Map"
 #define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "OpenCycleMap"
 #define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "Public Transport"
 #define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"

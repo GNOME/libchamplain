@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#ifndef __CHAMPLAIN_VERSION_H__
+#define __CHAMPLAIN_VERSION_H__
+
 /**
  * SECTION:champlain-version
  * @short_description: Versioning utility macros
@@ -26,9 +29,6 @@
  * Champlain offers a set of macros for checking the version of the library
  * an application was linked to.
  */
-
-#ifndef __CHAMPLAIN_VERSION_H__
-#define __CHAMPLAIN_VERSION_H__
 
 /**
  * CHAMPLAIN_MAJOR_VERSION:

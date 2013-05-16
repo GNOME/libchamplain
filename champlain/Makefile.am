@@ -49,7 +49,6 @@ libchamplain_headers_public = 				\
 
 libchamplain_headers_private =	\
 	$(srcdir)/champlain-debug.h	\
-	$(srcdir)/champlain-group.h	\
 	$(srcdir)/champlain-private.h
 
 
@@ -89,7 +88,6 @@ libchamplain_sources =					\
 	$(srcdir)/champlain-file-tile-source.c		\
 	$(srcdir)/champlain-null-tile-source.c		\
 	$(srcdir)/champlain-network-bbox-tile-source.c	\
-	$(srcdir)/champlain-group.c			\
 	$(srcdir)/champlain-adjustment.c \
 	$(srcdir)/champlain-kinetic-scroll-view.c \
 	$(srcdir)/champlain-viewport.c	\
@@ -145,7 +143,6 @@ AM_CPPFLAGS = 				\
 	-DDATADIR=\""$(datadir)"\"	\
 	-I$(top_srcdir)			\
 	-DCHAMPLAIN_COMPILATION 	\
-	-DCLUTTER_DISABLE_DEPRECATION_WARNINGS 	\
 	$(WARN_CFLAGS)
 
 

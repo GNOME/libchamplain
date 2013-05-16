@@ -1,6 +1,7 @@
 /* champlain-adjustment.h: Adjustment object
  *
  * Copyright (C) 2008 OpenedHand
+ * Copyright (C) 2011-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -65,7 +66,7 @@ struct _ChamplainAdjustment
 };
 
 /**
- * ChamplainAdjustmentClass
+ * ChamplainAdjustmentClass:
  * @changed: Class handler for the ::changed signal.
  *
  * Base class for #ChamplainAdjustment.
@@ -84,9 +85,7 @@ GType champlain_adjustment_get_type (void) G_GNUC_CONST;
 ChamplainAdjustment *champlain_adjustment_new (gdouble value,
     gdouble lower,
     gdouble upper,
-    gdouble step_increment,
-    gdouble page_increment,
-    gdouble page_size);
+    gdouble step_increment);
 gdouble champlain_adjustment_get_value (ChamplainAdjustment *adjustment);
 void champlain_adjustment_set_value (ChamplainAdjustment *adjustment,
     gdouble value);
@@ -94,25 +93,17 @@ void champlain_adjustment_set_values (ChamplainAdjustment *adjustment,
     gdouble value,
     gdouble lower,
     gdouble upper,
-    gdouble step_increment,
-    gdouble page_increment,
-    gdouble page_size);
+    gdouble step_increment);
 void champlain_adjustment_get_values (ChamplainAdjustment *adjustment,
     gdouble *value,
     gdouble *lower,
     gdouble *upper,
-    gdouble *step_increment,
-    gdouble *page_increment,
-    gdouble *page_size);
+    gdouble *step_increment);
 
 void champlain_adjustment_interpolate (ChamplainAdjustment *adjustment,
     gdouble value,
     guint n_frames,
     guint fps);
-
-gboolean champlain_adjustment_get_elastic (ChamplainAdjustment *adjustment);
-void champlain_adjustment_set_elastic (ChamplainAdjustment *adjustment,
-    gboolean elastic);
 
 gboolean champlain_adjustment_clamp (ChamplainAdjustment *adjustment,
     gboolean interpolate,

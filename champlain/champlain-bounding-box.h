@@ -73,6 +73,10 @@ void champlain_bounding_box_extend (ChamplainBoundingBox *bbox,
 
 gboolean champlain_bounding_box_is_valid (ChamplainBoundingBox *bbox);
 
+gboolean champlain_bounding_box_covers(ChamplainBoundingBox *bbox,
+    gdouble latitude,
+    gdouble longitude);
+
 G_END_DECLS
 
 #endif

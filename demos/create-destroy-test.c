@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2010-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ create_actor ()
   /* Create the map view */
   actor = champlain_view_new ();
   clutter_actor_set_size (CLUTTER_ACTOR (actor), 800, 600);
-  clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
+  clutter_actor_add_child (stage, actor);
 
   champlain_view_set_zoom_level (CHAMPLAIN_VIEW (actor), 12);
   champlain_view_center_on (CHAMPLAIN_VIEW (actor), 45.466, -73.75);

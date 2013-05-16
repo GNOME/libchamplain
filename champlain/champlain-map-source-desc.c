@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
- * Copyright (C) 2011-2012 Jiri Techet <techet@gmail.com>
+ * Copyright (C) 2011-2013 Jiri Techet <techet@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -354,7 +354,7 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
           G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
   /**
-   * ChamplainMapSourceDesc:projection
+   * ChamplainMapSourceDesc:projection:
    *
    * The map projection of the map source
    *

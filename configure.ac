@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 m4_define([champlain_major_version], [0])
 m4_define([champlain_minor_version], [12])
-m4_define([champlain_micro_version], [3])
+m4_define([champlain_micro_version], [4])
 m4_define([champlain_version],
           [champlain_major_version.champlain_minor_version.champlain_micro_version])
 m4_define([champlain_minor_api_version], [m4_eval(champlain_minor_version + champlain_minor_version%2)])
@@ -63,7 +63,7 @@ PKG_CHECK_MODULES(DEPS,
   [   glib-2.0 >= 2.16
       gobject-2.0 >= 2.10
       gdk-3.0 >= 2.90
-      clutter-1.0 >= 1.2
+      clutter-1.0 >= 1.12
       cairo >= 1.4
       gio-2.0 >= 2.16
       sqlite3 >= 3.0

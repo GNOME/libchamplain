@@ -33,7 +33,7 @@ const Lang = imports.lang;
 const Clutter = imports.gi.Clutter;
 const Champlain = imports.gi.Champlain;
 
-Clutter.init (0, null);
+Clutter.init (null);
 
 const PADDING = 10;
 
@@ -42,14 +42,15 @@ function make_button (text)
   let white = new Clutter.Color ({red:0xff, blue:0xff, green:0xff, alpha:0xff});
   let black = new Clutter.Color ({red:0x00, blue:0x00, green:0x00, alpha:0xff});
 
-  let button = new Clutter.Group ();
+  let button = new Clutter.Actor ();
 
-  let button_bg = new Clutter.Rectangle ({color:white});
-  button.add_actor (button_bg);
+  let button_bg = new Clutter.Actor ();
+  button_bg.set_background_color (white)
+  button.add_child (button_bg);
   button.set_opacity (0xcc);
 
   let button_text = new Clutter.Text ({font_name:"Sans 10", text:text, color:black});
-  button.add_actor (button_text);
+  button.add_child (button_text);
 
   let [width, height] = button_text.get_size();
   button_bg.set_size (width + PADDING * 2, height + PADDING * 2);
@@ -73,7 +74,7 @@ function map_view_button_release_cb (actor, event)
   return true;
 }
 
-let stage = Clutter.Stage.get_default ();
+let stage = new Clutter.Stage ();
 stage.title = "Champlain Javascript Example";
 stage.set_size (800, 600);
 
@@ -83,12 +84,12 @@ view.set_size (800, 600);
 stage.add_actor (view);
 
 /* Create the buttons */
-let buttons = new Clutter.Group ();
+let buttons = new Clutter.Actor ();
 let total_width = 0;
 buttons.set_position (PADDING, PADDING);
 
 let button = make_button ("Zoom in");
-buttons.add_actor (button);
+buttons.add_child (button);
 button.set_reactive (true);
 
 let width = button.width;
@@ -101,7 +102,7 @@ button.connect ("button-release-event", Lang.bind (view,
       }));
 
 let button = make_button ("Zoom out");
-buttons.add_actor (button);
+buttons.add_child (button);
 button.set_reactive (true);
 button.set_position (total_width, 0);
 
@@ -114,7 +115,7 @@ button.connect ("button-release-event", Lang.bind (view,
         return true;
       }));
 
-stage.add_actor (buttons);
+stage.add_child (buttons);
 
 /* Create the markers and marker layer */
 // TODO
@@ -129,6 +130,7 @@ view.zoom_level = 12;
 view.kinetic_mode = true;
 view.center_on (45.466, -73.75);
 
+stage.connect ("destroy", Clutter.main_quit);
+
 stage.show ();
 Clutter.main ();
-stage.destroy ();
