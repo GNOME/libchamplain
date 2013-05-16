@@ -1071,7 +1071,7 @@ champlain_path_layer_get_closed (ChamplainPathLayer *layer)
  * 
  * Pass NULL to use solid line.
  * 
- * Since: 0.14
+ * Since: 0.12.4
  */
 void
 champlain_path_layer_set_dash (ChamplainPathLayer *layer,
@@ -1106,7 +1106,7 @@ champlain_path_layer_set_dash (ChamplainPathLayer *layer,
  * 
  * Returns: (transfer container) (element-type guint): the list
  *
- * Since: 0.14
+ * Since: 0.12.4
  */
 GList *
 champlain_path_layer_get_dash (ChamplainPathLayer *layer)
