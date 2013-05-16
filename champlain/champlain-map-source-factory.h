@@ -131,6 +131,12 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "osm-transportmap"
 /**
+ * CHAMPLAIN_MAP_SOURCE_OAM:
+ *
+ * OpenAerialMap
+ */
+#define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
+/**
  * CHAMPLAIN_MAP_SOURCE_MFF_RELIEF:
  *
  * Maps for Free Relief
@@ -143,6 +149,7 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
 #define CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP "Open Aerial Map"
 #define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "OpenCycleMap"
 #define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "Public Transport"
+#define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
 #define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "MapsForFree Relief"
 #endif
 

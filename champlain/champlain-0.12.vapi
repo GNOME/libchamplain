@@ -7,15 +7,12 @@ namespace Champlain {
 		[CCode (has_construct_function = false)]
 		public Adjustment (double value, double lower, double upper, double step_increment);
 		public bool clamp (bool interpolate, uint n_frames, uint fps);
-		public bool get_elastic ();
 		public double get_value ();
 		public void get_values (double value, double lower, double upper, double step_increment);
 		public void interpolate (double value, uint n_frames, uint fps);
 		public void interpolate_stop ();
-		public void set_elastic (bool elastic);
 		public void set_value (double value);
 		public void set_values (double value, double lower, double upper, double step_increment);
-		public bool elastic { get; set; }
 		[NoAccessorMethod]
 		public double lower { get; set; }
 		[NoAccessorMethod]
@@ -567,6 +564,7 @@ namespace Champlain {
 		public void get_adjustments (Champlain.Adjustment hadjustment, Champlain.Adjustment vadjustment);
 		public void get_anchor (int x, int y);
 		public void get_origin (double x, double y);
+		public void set_actor_position (Clutter.Actor actor, double x, double y);
 		public void set_adjustments (Champlain.Adjustment hadjustment, Champlain.Adjustment vadjustment);
 		public void set_child (Clutter.Actor child);
 		public void set_origin (double x, double y);
@@ -650,6 +648,8 @@ namespace Champlain {
 	public const string MAP_SOURCE_MEMPHIS_NETWORK;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_MFF_RELIEF")]
 	public const string MAP_SOURCE_MFF_RELIEF;
+	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OAM")]
+	public const string MAP_SOURCE_OAM;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP")]
 	public const string MAP_SOURCE_OSM_AERIAL_MAP;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP")]
