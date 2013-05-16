@@ -161,23 +161,6 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         NULL);
   champlain_map_source_factory_register (factory, desc);
 
-/* Not available any more - remove completely in the next release */
-#if 0
-  desc = champlain_map_source_desc_new_full (
-        CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
-        "OpenStreetMap Osmarender",
-        "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
-        "http://creativecommons.org/licenses/by-sa/2.0/",
-        0,
-        17,
-        256,
-        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "http://a.tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png",
-        champlain_map_source_new_generic,
-        NULL);
-  champlain_map_source_factory_register (factory, desc);
-#endif
-
   desc = champlain_map_source_desc_new_full (
         CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST,
         "MapQuest OSM",
@@ -234,8 +217,8 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         NULL);
   champlain_map_source_factory_register (factory, desc);
 
+/* Not available any more - remove completely in the next release */
 #if 0
-/* Disabling until OpenArealMap works again */
   desc = champlain_map_source_desc_new_full (
         CHAMPLAIN_MAP_SOURCE_OAM,
         "OpenAerialMap",
@@ -246,6 +229,20 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         256,
         CHAMPLAIN_MAP_PROJECTION_MERCATOR,
         "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
+        "OpenStreetMap Osmarender",
+        "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
+        "http://creativecommons.org/licenses/by-sa/2.0/",
+        0,
+        17,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "http://a.tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png",
         champlain_map_source_new_generic,
         NULL);
   champlain_map_source_factory_register (factory, desc);

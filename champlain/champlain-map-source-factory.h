@@ -96,6 +96,7 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  * OpenStreetMap Mapnik
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm-mapnik"
+#ifndef GTK_DISABLE_DEPRECATED
 /**
  * CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER:
  *
@@ -106,6 +107,17 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  * return any source.
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "osm-osmarender"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OAM:
+ *
+ * OpenAerialMap
+ *
+ * Deprecated: OpenAerialMap isn't available any more and will be removed in the next release.
+ * As it doens't exist, it isn't registered to the factory and the 'create' method won't
+ * return any source.
+ */
+#define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
+#endif
 /**
  * CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST:
  *
@@ -130,12 +142,6 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  * OpenStreetMap Transport Map
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "osm-transportmap"
-/**
- * CHAMPLAIN_MAP_SOURCE_OAM:
- *
- * OpenAerialMap
- */
-#define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
 /**
  * CHAMPLAIN_MAP_SOURCE_MFF_RELIEF:
  *
