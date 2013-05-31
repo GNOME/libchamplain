@@ -150,7 +150,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
   desc = champlain_map_source_desc_new_full (
         CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK,
         "OpenStreetMap Mapnik",
-        "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
+        "Map Data ODBL OpenStreetMap Contributors, Map Imagery CC-BY-SA 2.0 OpenStreetMap",
         "http://creativecommons.org/licenses/by-sa/2.0/",
         0,
         18,
