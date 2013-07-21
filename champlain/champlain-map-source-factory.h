@@ -82,6 +82,8 @@ ChamplainMapSource *champlain_map_source_factory_create (ChamplainMapSourceFacto
     const gchar *id);
 ChamplainMapSource *champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *factory,
     const gchar *id);
+ChamplainMapSource *champlain_map_source_factory_create_memcached_source (ChamplainMapSourceFactory *factory,
+    const gchar *id);
 ChamplainMapSource *champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *factory,
     guint tile_size);
 

@@ -133,7 +133,6 @@ typedef struct
 typedef struct
 {
   ChamplainView *view;
-  ChamplainMapSource *map_source;
   gint x;
   gint y;
   gint zoom_level;
@@ -162,6 +161,7 @@ struct _ChamplainViewPrivate
   gint viewport_height;
 
   ChamplainMapSource *map_source; /* Current map tile source */
+  GList *all_sources;
 
   guint zoom_level; /* Holds the current zoom level number */
   guint min_zoom_level; /* Lowest allowed zoom level */
@@ -605,6 +605,9 @@ champlain_view_dispose (GObject *object)
       g_object_unref (priv->map_source);
       priv->map_source = NULL;
     }
+
+  g_list_free_full (priv->all_sources, g_object_unref);
+  priv->all_sources = NULL;
 
   if (priv->background_content)
     {
@@ -1875,7 +1878,6 @@ fill_background_tiles (ChamplainView *view)
     }
 }
 
-
 static void 
 tile_map_set (ChamplainView *view, gint tile_x, gint tile_y, gboolean value)
 {
@@ -1899,6 +1901,38 @@ tile_in_tile_map (ChamplainView *view, gint tile_x, gint tile_y)
   return GPOINTER_TO_INT (g_hash_table_lookup (priv->tile_map, &key));
 }
 
+static void
+load_tile_for_source (ChamplainView      *view,
+                      ChamplainMapSource *source,
+                      int                 opacity,
+                      int                 size,
+                      int                 x,
+                      int                 y)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  ChamplainTile *tile = champlain_tile_new ();
+
+  DEBUG ("Loading tile %d, %d, %d", priv->zoom_level, x, y);
+
+  champlain_tile_set_x (tile, x);
+  champlain_tile_set_y (tile, y);
+  champlain_tile_set_zoom_level (tile, priv->zoom_level);
+  champlain_tile_set_size (tile, size);
+  clutter_actor_set_opacity (CLUTTER_ACTOR (tile), opacity);
+
+  g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
+  clutter_actor_add_child (priv->map_layer, CLUTTER_ACTOR (tile));
+  champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport), CLUTTER_ACTOR (tile), x * size, y * size);
+
+  /* updates champlain_view state automatically as
+     notify::state signal is connected  */
+  champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
+
+  champlain_map_source_fill_tile (source, tile);
+
+  if (source != priv->map_source)
+    g_object_set_data (G_OBJECT (tile), "overlay", GINT_TO_POINTER (TRUE));
+}
 
 static gboolean
 fill_tile_cb (FillTileCallbackData *data)
@@ -1907,31 +1941,23 @@ fill_tile_cb (FillTileCallbackData *data)
   
   ChamplainView *view = data->view;
   ChamplainViewPrivate *priv = view->priv;
-  ChamplainMapSource *map_source = data->map_source;
   gint x = data->x;
   gint y = data->y;
   gint size = data->size;
   gint zoom_level = data->zoom_level;
 
-  if (!tile_in_tile_map (view, x, y) && zoom_level == priv->zoom_level && map_source == priv->map_source &&
+  if (!tile_in_tile_map (view, x, y) && zoom_level == priv->zoom_level &&
       y >= priv->tile_y_first && y < priv->tile_y_last && x >= priv->tile_x_first && x < priv->tile_x_last)
     {
-      ChamplainTile *tile = champlain_tile_new ();
+      GList *iter;
 
-      champlain_tile_set_x (tile, x);
-      champlain_tile_set_y (tile, y);
-      champlain_tile_set_zoom_level (tile, zoom_level);
-      champlain_tile_set_size (tile, size);
+      load_tile_for_source (view, priv->map_source, 255, size, x, y);
+      for (iter = priv->all_sources; iter; iter = iter->next)
+        load_tile_for_source (view, iter->data,
+                              GPOINTER_TO_INT (g_object_get_data (G_OBJECT (iter->data),
+                                                                  "opacity")),
+                              size, x, y);
 
-      g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
-      clutter_actor_add_child (priv->map_layer, CLUTTER_ACTOR (tile));
-      champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport), CLUTTER_ACTOR (tile), x * size, y * size);
-
-      /* updates champlain_view state automatically as
-         notify::state signal is connected  */
-      champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
-
-      champlain_map_source_fill_tile (priv->map_source, tile);
       tile_map_set (view, x, y, TRUE);
     }
 
@@ -1940,7 +1966,6 @@ fill_tile_cb (FillTileCallbackData *data)
 
   return FALSE;
 }
-
 
 static void
 load_visible_tiles (ChamplainView *view,
@@ -2024,7 +2049,6 @@ load_visible_tiles (ChamplainView *view,
               data->y = y;
               data->size = size;
               data->zoom_level = priv->zoom_level;
-              data->map_source = priv->map_source;
               data->view = g_object_ref (view);
 
               g_idle_add_full (CLUTTER_PRIORITY_REDRAW, (GSourceFunc) fill_tile_cb, data, NULL);
@@ -2133,6 +2157,9 @@ tile_state_notify (ChamplainTile *tile,
  * Changes the currently used map source. #g_object_unref() will be called on
  * the previous one.
  *
+ * As a side effect, changing the primary map source will also clear all
+ * secondary map sources.
+ *
  * Since: 0.4
  */
 void
@@ -2151,6 +2178,9 @@ champlain_view_set_map_source (ChamplainView *view,
 
   g_object_unref (priv->map_source);
   priv->map_source = g_object_ref_sink (source);
+
+  g_list_free_full (priv->all_sources, g_object_unref);
+  priv->all_sources = NULL;
 
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
@@ -2531,17 +2561,23 @@ show_zoom_actor (ChamplainView *view,
           ChamplainTile *tile = CHAMPLAIN_TILE (child);
           gint tile_x = champlain_tile_get_x (tile);
           gint tile_y = champlain_tile_get_y (tile);
+          gboolean overlay = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (tile), "overlay"));
 
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
-          
+
           g_object_ref (CLUTTER_ACTOR (tile));
           clutter_actor_iter_remove (&iter);
           clutter_actor_add_child (zoom_actor, CLUTTER_ACTOR (tile));
           g_object_unref (CLUTTER_ACTOR (tile));
-          
+
+          /* We move overlay tiles to the zoom actor so they get properly reparented
+             and destroyed as needed, but we hide them for performance reasons */
+          if (overlay)
+            clutter_actor_hide (CLUTTER_ACTOR (tile));
+
           clutter_actor_set_position (CLUTTER_ACTOR (tile), (tile_x - x_first) * size, (tile_y - y_first) * size);
         }
-      
+
       zoom_actor_width = clutter_actor_get_width (zoom_actor);
       zoom_actor_height = clutter_actor_get_height (zoom_actor);
 
@@ -3005,4 +3041,41 @@ champlain_view_get_bounding_box (ChamplainView *view)
     priv->viewport_x + priv->viewport_width);
 
   return bbox;
+}
+
+void
+champlain_view_add_overlay_source (ChamplainView      *view,
+                                   ChamplainMapSource *source,
+                                   guint8              opacity)
+{
+  DEBUG_LOG ()
+
+  ChamplainViewPrivate *priv;
+
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (source));
+
+  priv = view->priv;
+  priv->all_sources = g_list_append (priv->all_sources, g_object_ref (source));
+  g_object_set_data (G_OBJECT (source), "opacity", GINT_TO_POINTER (opacity));
+
+  champlain_view_reload_tiles (view);
+}
+
+void
+champlain_view_remove_overlay_source (ChamplainView      *view,
+                                      ChamplainMapSource *source)
+{
+  DEBUG_LOG ()
+
+  ChamplainViewPrivate *priv;
+
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (source));
+
+  priv = view->priv;
+  priv->all_sources = g_list_remove (priv->all_sources, source);
+  g_object_unref (source);
+
+  champlain_view_reload_tiles (view);
 }

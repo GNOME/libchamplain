@@ -482,6 +482,38 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
   return CHAMPLAIN_MAP_SOURCE (source_chain);
 }
 
+/**
+ * champlain_map_source_factory_create_memcached_source:
+ * @factory: the Factory
+ * @id: the wanted map source id
+ *
+ * Creates a memory cached map source.
+ *
+ * Returns: (transfer none): a ready to use #ChamplainMapSourceChain consisting of
+ * #ChamplainMemoryCache and #ChamplainMapSource matching the given name
+ *
+ * Since: 0.6
+ */
+ChamplainMapSource *
+champlain_map_source_factory_create_memcached_source (ChamplainMapSourceFactory *factory,
+    const gchar *id)
+{
+  ChamplainMapSourceChain *source_chain;
+  ChamplainMapSource *tile_source;
+  ChamplainMapSource *memory_cache;
+  ChamplainRenderer *renderer;
+
+  tile_source = champlain_map_source_factory_create (factory, id);
+
+  renderer = CHAMPLAIN_RENDERER (champlain_image_renderer_new ());
+  memory_cache = CHAMPLAIN_MAP_SOURCE (champlain_memory_cache_new_full (100, renderer));
+
+  source_chain = champlain_map_source_chain_new ();
+  champlain_map_source_chain_push (source_chain, tile_source);
+  champlain_map_source_chain_push (source_chain, memory_cache);
+
+  return CHAMPLAIN_MAP_SOURCE (source_chain);
+}
 
 /**
  * champlain_map_source_factory_create_error_source:
