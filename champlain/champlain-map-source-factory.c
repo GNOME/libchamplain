@@ -262,6 +262,76 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         NULL);
   champlain_map_source_factory_register (factory, desc);
 
+  desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OWM_CLOUDS,
+        "OpenWeatherMap cloud layer",
+        "Map data is CC-BY-SA 2.0 OpenWeatherMap contributors",
+        "http://creativecommons.org/licenses/by-sa/2.0/",
+        0,
+        18,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "http://tile.openweathermap.org/map/clouds/#Z#/#X#/#Y#.png",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OWM_WIND,
+        "OpenWeatherMap wind layer",
+        "Map data is CC-BY-SA 2.0 OpenWeatherMap contributors",
+        "http://creativecommons.org/licenses/by-sa/2.0/",
+        0,
+        18,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "http://tile.openweathermap.org/map/wind/#Z#/#X#/#Y#.png",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OWM_TEMPERATURE,
+        "OpenWeatherMap temperature layer",
+        "Map data is CC-BY-SA 2.0 OpenWeatherMap contributors",
+        "http://creativecommons.org/licenses/by-sa/2.0/",
+        0,
+        18,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "http://tile.openweathermap.org/map/temp/#Z#/#X#/#Y#.png",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OWM_PRECIPITATION,
+        "OpenWeatherMap precipitation layer",
+        "Map data is CC-BY-SA 2.0 OpenWeatherMap contributors",
+        "http://creativecommons.org/licenses/by-sa/2.0/",
+        0,
+        18,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "http://tile.openweathermap.org/map/precipitation/#Z#/#X#/#Y#.png",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OWM_PRESSURE,
+        "OpenWeatherMap sea level pressure layer",
+        "Map data is CC-BY-SA 2.0 OpenWeatherMap contributors",
+        "http://creativecommons.org/licenses/by-sa/2.0/",
+        0,
+        18,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "http://tile.openweathermap.org/map/pressure/#Z#/#X#/#Y#.png",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+
 #ifdef CHAMPLAIN_HAS_MEMPHIS
   desc = champlain_map_source_desc_new_full (
         CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL,
