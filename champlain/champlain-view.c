@@ -130,8 +130,12 @@ typedef struct
 
 typedef struct
 {
-  ChamplainTile *tile;
+  ChamplainView *view;
   ChamplainMapSource *map_source;
+  gint x;
+  gint y;
+  gint zoom_level;
+  gint size;
 } FillTileCallbackData;
 
 
@@ -189,6 +193,13 @@ struct _ChamplainViewPrivate
   gdouble zoom_actor_viewport_x;
   gdouble zoom_actor_viewport_y;
   guint zoom_actor_timeout;
+  
+  GHashTable *tile_map;
+
+  gint tile_x_first;
+  gint tile_y_first;
+  gint tile_x_last;
+  gint tile_y_last;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR);
@@ -232,7 +243,6 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble latitude,
     gdouble longitude,
     guint duration);
-static gboolean fill_tile_cb (FillTileCallbackData *data);
 static gboolean redraw_timeout_cb(gpointer view);
 static void remove_all_tiles (ChamplainView *view);
 
@@ -591,6 +601,12 @@ champlain_view_dispose (GObject *object)
     {
       g_source_remove (priv->zoom_actor_timeout);
       priv->zoom_actor_timeout = 0;
+    }
+
+  if (priv->tile_map != NULL)
+    {
+      g_hash_table_destroy (priv->tile_map);
+      priv->tile_map = NULL;
     }
 
   priv->map_layer = NULL;
@@ -991,6 +1007,13 @@ view_size_changed_cb (ChamplainView *view,
 }
 
 
+static void 
+slice_free_gint64 (gpointer data)
+{
+  g_slice_free (gint64, data);
+}
+
+
 static void
 champlain_view_init (ChamplainView *view)
 {
@@ -1037,6 +1060,7 @@ champlain_view_init (ChamplainView *view)
   priv->location_updated = FALSE;
   priv->redraw_timeout = 0;
   priv->zoom_actor_timeout = 0;
+  priv->tile_map = g_hash_table_new_full (g_int64_hash, g_int64_equal, slice_free_gint64, NULL);
 
   clutter_actor_set_background_color (CLUTTER_ACTOR (view), &color);
 
@@ -1796,6 +1820,72 @@ fill_background_tiles (ChamplainView *view)
 }
 
 
+static void 
+tile_map_set (ChamplainView *view, gint tile_x, gint tile_y, gboolean value)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  gint64 count = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+  gint64 *key = g_slice_alloc (sizeof(gint64));
+  *key = (gint64)tile_y * count + tile_x;
+  if (value)
+    g_hash_table_insert (priv->tile_map, key, GINT_TO_POINTER (TRUE));
+  else
+    g_hash_table_remove (priv->tile_map, key);
+}
+
+
+static gboolean 
+tile_in_tile_map (ChamplainView *view, gint tile_x, gint tile_y)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  gint64 count = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+  gint64 key = (gint64)tile_y * count + tile_x;
+  return GPOINTER_TO_INT (g_hash_table_lookup (priv->tile_map, &key));
+}
+
+
+static gboolean
+fill_tile_cb (FillTileCallbackData *data)
+{
+  DEBUG_LOG ()
+  
+  ChamplainView *view = data->view;
+  ChamplainViewPrivate *priv = view->priv;
+  ChamplainMapSource *map_source = data->map_source;
+  gint x = data->x;
+  gint y = data->y;
+  gint size = data->size;
+  gint zoom_level = data->zoom_level;
+
+  if (!tile_in_tile_map (view, x, y) && zoom_level == priv->zoom_level && map_source == priv->map_source &&
+      y >= priv->tile_y_first && y < priv->tile_y_last && x >= priv->tile_x_first && x < priv->tile_x_last)
+    {
+      ChamplainTile *tile = champlain_tile_new ();
+
+      champlain_tile_set_x (tile, x);
+      champlain_tile_set_y (tile, y);
+      champlain_tile_set_zoom_level (tile, zoom_level);
+      champlain_tile_set_size (tile, size);
+
+      g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
+      clutter_actor_add_child (priv->map_layer, CLUTTER_ACTOR (tile));
+      champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport), CLUTTER_ACTOR (tile), x * size, y * size);
+
+      /* updates champlain_view state automatically as
+         notify::state signal is connected  */
+      champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
+
+      champlain_map_source_fill_tile (priv->map_source, tile);
+      tile_map_set (view, x, y, TRUE);
+    }
+
+  g_object_unref (view);
+  g_slice_free (FillTileCallbackData, data);
+
+  return FALSE;
+}
+
+
 static void
 load_visible_tiles (ChamplainView *view,
     gboolean relocate)
@@ -1806,11 +1896,10 @@ load_visible_tiles (ChamplainView *view,
   ClutterActorIter iter;
   gint size;
   ClutterActor *child;
-  gint x_count, y_count, x_first, y_first, x_end, y_end, max_x_end, max_y_end;
-  gboolean *tile_map;
+  gint x_count, y_count, max_x_end, max_y_end;
   gint arm_size, arm_max, turn;
   gint dirs[5] = { 0, 1, 0, -1, 0 };
-  int i, x, y;
+  gint i, x, y;
 
   size = champlain_map_source_get_tile_size (priv->map_source);
 
@@ -1820,21 +1909,19 @@ load_visible_tiles (ChamplainView *view,
   x_count = ceil ((gfloat) priv->viewport_width / size) + 1;
   y_count = ceil ((gfloat) priv->viewport_height / size) + 1;
 
-  x_first = CLAMP (priv->viewport_x / size, 0, max_x_end);
-  y_first = CLAMP (priv->viewport_y / size, 0, max_y_end);
+  priv->tile_x_first = CLAMP (priv->viewport_x / size, 0, max_x_end);
+  priv->tile_y_first = CLAMP (priv->viewport_y / size, 0, max_y_end);
 
-  x_end = x_first + x_count;
-  y_end = y_first + y_count;
+  priv->tile_x_last = priv->tile_x_first + x_count;
+  priv->tile_y_last = priv->tile_y_first + y_count;
 
-  x_end = CLAMP (x_end, x_first, max_x_end);
-  y_end = CLAMP (y_end, y_first, max_y_end);
+  priv->tile_x_last = CLAMP (priv->tile_x_last, priv->tile_x_first, max_x_end);
+  priv->tile_y_last = CLAMP (priv->tile_y_last, priv->tile_y_first, max_y_end);
 
-  x_count = x_end - x_first;
-  y_count = y_end - y_first;
+  x_count = priv->tile_x_last - priv->tile_x_first;
+  y_count = priv->tile_y_last - priv->tile_y_first;
 
-  DEBUG ("Range %d, %d to %d, %d", x_first, y_first, x_end, y_end);
-
-  tile_map = g_slice_alloc0 (sizeof (gboolean) * x_count * y_count);
+  DEBUG ("Range %d, %d to %d, %d", priv->tile_x_first, priv->tile_y_first, priv->tile_x_last, priv->tile_y_last);
 
   /* fill background tiles */
   if (priv->background_content != NULL)
@@ -1849,24 +1936,20 @@ load_visible_tiles (ChamplainView *view,
       gint tile_x = champlain_tile_get_x (tile);
       gint tile_y = champlain_tile_get_y (tile);
 
-      if (tile_x < x_first || tile_x >= x_end ||
-          tile_y < y_first || tile_y >= y_end)
+      if (tile_x < priv->tile_x_first || tile_x >= priv->tile_x_last || 
+          tile_y < priv->tile_y_first || tile_y >= priv->tile_y_last)
         {
-          /* inform map source to terminate loading the tile */
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
           clutter_actor_iter_destroy (&iter);
+          tile_map_set (view, tile_x, tile_y, FALSE);
         }
-      else
-        {
-          tile_map[(tile_y - y_first) * x_count + (tile_x - x_first)] = TRUE;
-          if (relocate)
-            champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport), CLUTTER_ACTOR (tile), tile_x * size, tile_y * size);
-        }
+      else if (relocate)
+        champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport), CLUTTER_ACTOR (tile), tile_x * size, tile_y * size);
     }
-  
+
   /* Load new tiles if needed */
-  x = x_first + x_count / 2 - 1;
-  y = y_first + y_count / 2 - 1;
+  x = priv->tile_x_first + x_count / 2 - 1;
+  y = priv->tile_y_first + y_count / 2 - 1;
   arm_max = MAX (x_count, y_count) + 2;
   arm_size = 1;
 
@@ -1874,33 +1957,19 @@ load_visible_tiles (ChamplainView *view,
     {
       for (i = 0; i < arm_size; i++)
         {
-          if (y >= y_first && y < y_end && x >= x_first && x < x_end &&
-              !tile_map[(y - y_first) * x_count + (x - x_first)])
+          if (!tile_in_tile_map (view, x, y) && y >= priv->tile_y_first && y < priv->tile_y_last && x >= priv->tile_x_first && x < priv->tile_x_last)
             {
-              ChamplainTile *tile;
               FillTileCallbackData *data;
 
               DEBUG ("Loading tile %d, %d, %d", priv->zoom_level, x, y);
-              tile = champlain_tile_new ();
-              champlain_tile_set_x (tile, x);
-              champlain_tile_set_y (tile, y);
-              champlain_tile_set_zoom_level (tile, priv->zoom_level);
-              champlain_tile_set_size (tile, size);
-                  
-              g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), view);
-              clutter_actor_add_child (priv->map_layer, CLUTTER_ACTOR (tile));
-              champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport), CLUTTER_ACTOR (tile), x * size, y * size);
-
-              /* updates champlain_view state automatically as
-                 notify::state signal is connected  */
-              champlain_tile_set_state (tile, CHAMPLAIN_STATE_LOADING);
 
               data = g_slice_new (FillTileCallbackData);
-              data->tile = tile;
+              data->x = x;
+              data->y = y;
+              data->size = size;
+              data->zoom_level = priv->zoom_level;
               data->map_source = priv->map_source;
-
-              g_object_ref (tile);
-              g_object_ref (priv->map_source);
+              data->view = g_object_ref (view);
 
               g_idle_add_full (CLUTTER_PRIORITY_REDRAW, (GSourceFunc) fill_tile_cb, data, NULL);
             }
@@ -1912,26 +1981,6 @@ load_visible_tiles (ChamplainView *view,
       if (turn % 2 == 1)
         arm_size++;
     }
-
-  g_slice_free1 (sizeof (gboolean) * x_count * y_count, tile_map);
-}
-
-
-static gboolean
-fill_tile_cb (FillTileCallbackData *data)
-{
-  DEBUG_LOG ()
-
-  ChamplainTile *tile = data->tile;
-  ChamplainMapSource *map_source = data->map_source;
-
-  champlain_map_source_fill_tile (map_source, tile);
-
-  g_slice_free (FillTileCallbackData, data);
-  g_object_unref (map_source);
-  g_object_unref (tile);
-
-  return FALSE;
 }
 
 
@@ -1949,6 +1998,8 @@ remove_all_tiles (ChamplainView *view)
   clutter_actor_iter_init (&iter, priv->map_layer);
   while (clutter_actor_iter_next (&iter, &child))
     champlain_tile_set_state (CHAMPLAIN_TILE (child), CHAMPLAIN_STATE_DONE);
+
+  g_hash_table_remove_all (priv->tile_map);
 
   clutter_actor_destroy_all_children (priv->map_layer);
 }
