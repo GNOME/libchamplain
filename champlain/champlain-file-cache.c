@@ -223,7 +223,7 @@ init_cache (ChamplainFileCache *file_cache)
 
   sqlite3_exec (priv->db,
       "PRAGMA synchronous=OFF;"
-      "PRAGMA count_changes=OFF;",
+      "PRAGMA auto_vacuum=INCREMENTAL;",
       NULL, NULL, &error_msg);
   if (error_msg != NULL)
     {
@@ -1014,4 +1014,6 @@ champlain_file_cache_purge (ChamplainFileCache *file_cache)
       sqlite3_free (error);
     }
   sqlite3_free (query);
+  
+  sqlite3_exec (priv->db, "PRAGMA incremental_vacuum;", NULL, NULL, &error);
 }
