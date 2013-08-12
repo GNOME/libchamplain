@@ -102,6 +102,8 @@ enum
   PROP_ANIMATE_ZOOM,
   PROP_STATE,
   PROP_BACKGROUND_PATTERN,
+  PROP_GOTO_ANIMATION_MODE,
+  PROP_GOTO_ANIMATION_DURATION
 };
 
 #define PADDING 10
@@ -188,6 +190,9 @@ struct _ChamplainViewPrivate
   
   guint redraw_timeout;
   
+  ClutterAnimationMode goto_mode;
+  guint goto_duration;
+
   gboolean animating_zoom;
   guint anim_start_zoom_level;
   gdouble zoom_actor_viewport_x;
@@ -481,6 +486,14 @@ champlain_view_get_property (GObject *object,
       g_value_set_object (value, priv->background_content);
       break;
 
+    case PROP_GOTO_ANIMATION_MODE:
+      g_value_set_enum (value, priv->goto_mode);
+      break;
+
+    case PROP_GOTO_ANIMATION_DURATION:
+      g_value_set_uint (value, priv->goto_duration);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -548,6 +561,14 @@ champlain_view_set_property (GObject *object,
       
     case PROP_BACKGROUND_PATTERN:
       champlain_view_set_background_pattern (view, g_value_get_object (value));
+      break;
+
+    case PROP_GOTO_ANIMATION_MODE:
+      priv->goto_mode = g_value_get_enum (value);
+      break;
+
+    case PROP_GOTO_ANIMATION_DURATION:
+      priv->goto_duration = g_value_get_uint (value);
       break;
 
     default:
@@ -898,6 +919,38 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
           G_PARAM_READWRITE));
 
   /**
+   * ChamplainView:goto-animation-mode:
+   *
+   * The mode of animation when going to a location.
+   *
+   */
+  g_object_class_install_property (object_class,
+      PROP_GOTO_ANIMATION_MODE,
+      g_param_spec_enum ("goto-animation-mode",
+          "Go to animation mode",
+          "The mode of animation when going to a location",
+          CLUTTER_TYPE_ANIMATION_MODE,
+          CLUTTER_EASE_IN_OUT_CIRC,
+          G_PARAM_READWRITE));
+
+  /**
+   * ChamplainView:goto-animation-duration:
+   *
+   * The duration of an animation when going to a location.
+   * A value of 0 means that the duration is calculated automatically for you.
+   *
+   */
+  g_object_class_install_property (object_class,
+      PROP_GOTO_ANIMATION_DURATION,
+      g_param_spec_uint ("goto-animation-duration",
+          "Go to animation duration",
+          "The duration of an animation when going to a location",
+          0,
+          G_MAXINT,
+          0,
+          G_PARAM_READWRITE));
+
+  /**
    * ChamplainView::animation-completed:
    *
    * The #ChamplainView::animation-completed signal is emitted when any animation in the view
@@ -1061,6 +1114,8 @@ champlain_view_init (ChamplainView *view)
   priv->redraw_timeout = 0;
   priv->zoom_actor_timeout = 0;
   priv->tile_map = g_hash_table_new_full (g_int64_hash, g_int64_equal, slice_free_gint64, NULL);
+  priv->goto_duration = 0;
+  priv->goto_mode = CLUTTER_EASE_IN_OUT_CIRC;
 
   clutter_actor_set_background_color (CLUTTER_ACTOR (view), &color);
 
@@ -1390,14 +1445,15 @@ champlain_view_go_to (ChamplainView *view,
 {
   DEBUG_LOG ()
 
-  guint duration;
+  guint duration = view->priv->goto_duration;
 
-  duration = 500 * view->priv->zoom_level / 2.0;
+  if (duration == 0) /* calculate duration from zoom level */
+      duration = 500 * view->priv->zoom_level / 2.0;
+
   champlain_view_go_to_with_duration (view, latitude, longitude, duration);
 }
 
 
-/* FIXME: make public after API freeze */
 static void
 champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble latitude,
@@ -1440,7 +1496,7 @@ champlain_view_go_to_with_duration (ChamplainView *view,
    * is higher and if the points are far away
    */
   ctx->timeline = clutter_timeline_new (duration);
-  clutter_timeline_set_progress_mode (ctx->timeline, CLUTTER_EASE_IN_OUT_CIRC);
+  clutter_timeline_set_progress_mode (ctx->timeline, priv->goto_mode);
 
   g_signal_connect (ctx->timeline, "new-frame", G_CALLBACK (timeline_new_frame),
       ctx);
