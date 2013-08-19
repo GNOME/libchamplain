@@ -926,7 +926,10 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
    * ChamplainView:goto-animation-mode:
    *
    * The mode of animation when going to a location.
-   *
+   * 
+   * Please note that animation of #champlain_view_ensure_visible also
+   * involves a 'goto' animation.
+   * 
    */
   g_object_class_install_property (object_class,
       PROP_GOTO_ANIMATION_MODE,
@@ -940,8 +943,11 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   /**
    * ChamplainView:goto-animation-duration:
    *
-   * The duration of an animation when going to a location.
+   * The durati0n of an animation when going to a location.
    * A value of 0 means that the duration is calculated automatically for you.
+   *
+   * Please note that animation of #champlain_view_ensure_visible also
+   * involves a 'goto' animation.
    *
    */
   g_object_class_install_property (object_class,
