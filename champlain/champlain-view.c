@@ -3078,6 +3078,7 @@ champlain_view_add_overlay_source (ChamplainView *view,
   g_object_ref (source);
   priv->overlay_sources = g_list_append (priv->overlay_sources, source);
   g_object_set_data (G_OBJECT (source), "opacity", GINT_TO_POINTER (opacity));
+  g_object_notify (G_OBJECT (view), "map-source");
 
   champlain_view_reload_tiles (view);
 }
@@ -3106,6 +3107,32 @@ champlain_view_remove_overlay_source (ChamplainView *view,
   priv = view->priv;
   priv->overlay_sources = g_list_remove (priv->overlay_sources, source);
   g_object_unref (source);
+  g_object_notify (G_OBJECT (view), "map-source");
 
   champlain_view_reload_tiles (view);
+}
+
+
+/**
+ * champlain_view_get_overlay_sources:
+ * @view: a #ChamplainView
+ *
+ * Gets a list of overlay sources.
+ *
+ * Returns: (transfer container) (element-type ChamplainMapSource): the list
+ *
+ * Since: 0.12.5
+ */
+GList *
+champlain_view_get_overlay_sources (ChamplainView *view)
+{
+  DEBUG_LOG ()
+
+  ChamplainViewPrivate *priv;
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
+  
+  priv = view->priv;
+
+  return g_list_copy (priv->overlay_sources);
 }

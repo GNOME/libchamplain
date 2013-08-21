@@ -112,6 +112,7 @@ void champlain_view_add_overlay_source (ChamplainView *view,
     guint8 opacity);
 void champlain_view_remove_overlay_source (ChamplainView *view,
     ChamplainMapSource *map_source);
+GList *champlain_view_get_overlay_sources (ChamplainView *view);
 
 void champlain_view_set_deceleration (ChamplainView *view,
     gdouble rate);

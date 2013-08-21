@@ -128,6 +128,7 @@ redraw_license (ChamplainLicense *license)
   gchar *text;
   gfloat width, height;
   ChamplainMapSource *map_source;
+  GList *overlay_sources, *iter;
 
   if (!priv->view)
     return;
@@ -144,6 +145,24 @@ redraw_license (ChamplainLicense *license)
           NULL);
   else
     text = g_strdup (champlain_map_source_get_license (map_source));
+    
+  overlay_sources = champlain_view_get_overlay_sources (priv->view);
+  for (iter = overlay_sources; iter; iter = iter->next)
+    {
+      ChamplainMapSource *map_source = iter->data;
+      const gchar *overlay_license = champlain_map_source_get_license (map_source);
+      
+      if (g_strrstr (text, overlay_license) == NULL)
+        {
+          gchar *old_text = text;
+          text = g_strjoin ("\n",
+                text,
+                champlain_map_source_get_license (map_source),
+                NULL);
+          g_free (old_text);
+        }
+    }
+  g_list_free (overlay_sources);
 
   clutter_text_set_text (CLUTTER_TEXT (priv->license_actor), text);
   clutter_actor_get_size (priv->license_actor, &width, &height);
