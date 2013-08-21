@@ -133,6 +133,7 @@ typedef struct
 typedef struct
 {
   ChamplainView *view;
+  ChamplainMapSource *map_source;
   gint x;
   gint y;
   gint zoom_level;
@@ -1946,7 +1947,7 @@ fill_tile_cb (FillTileCallbackData *data)
   gint size = data->size;
   gint zoom_level = data->zoom_level;
 
-  if (!tile_in_tile_map (view, x, y) && zoom_level == priv->zoom_level &&
+  if (!tile_in_tile_map (view, x, y) && zoom_level == priv->zoom_level && data->map_source == priv->map_source &&
       y >= priv->tile_y_first && y < priv->tile_y_last && x >= priv->tile_x_first && x < priv->tile_x_last)
     {
       GList *iter;
@@ -2049,6 +2050,9 @@ load_visible_tiles (ChamplainView *view,
               data->y = y;
               data->size = size;
               data->zoom_level = priv->zoom_level;
+              /* used only to check that the map source didn't change before the
+               * idle function is called */
+              data->map_source = priv->map_source;
               data->view = g_object_ref (view);
 
               g_idle_add_full (CLUTTER_PRIORITY_REDRAW, (GSourceFunc) fill_tile_cb, data, NULL);
