@@ -109,7 +109,7 @@ void champlain_view_set_map_source (ChamplainView *view,
     ChamplainMapSource *map_source);
 void champlain_view_add_overlay_source (ChamplainView *view,
     ChamplainMapSource *map_source,
-    guint8              opacity);
+    guint8 opacity);
 void champlain_view_remove_overlay_source (ChamplainView *view,
     ChamplainMapSource *map_source);
 

@@ -162,7 +162,7 @@ struct _ChamplainViewPrivate
   gint viewport_height;
 
   ChamplainMapSource *map_source; /* Current map tile source */
-  GList *all_sources;
+  GList *overlay_sources;
 
   guint zoom_level; /* Holds the current zoom level number */
   guint min_zoom_level; /* Lowest allowed zoom level */
@@ -607,8 +607,8 @@ champlain_view_dispose (GObject *object)
       priv->map_source = NULL;
     }
 
-  g_list_free_full (priv->all_sources, g_object_unref);
-  priv->all_sources = NULL;
+  g_list_free_full (priv->overlay_sources, g_object_unref);
+  priv->overlay_sources = NULL;
 
   if (priv->background_content)
     {
@@ -1902,13 +1902,14 @@ tile_in_tile_map (ChamplainView *view, gint tile_x, gint tile_y)
   return GPOINTER_TO_INT (g_hash_table_lookup (priv->tile_map, &key));
 }
 
+
 static void
-load_tile_for_source (ChamplainView      *view,
-                      ChamplainMapSource *source,
-                      int                 opacity,
-                      int                 size,
-                      int                 x,
-                      int                 y)
+load_tile_for_source (ChamplainView *view,
+    ChamplainMapSource *source,
+    gint opacity,
+    gint size,
+    gint x,
+    gint y)
 {
   ChamplainViewPrivate *priv = view->priv;
   ChamplainTile *tile = champlain_tile_new ();
@@ -1935,6 +1936,7 @@ load_tile_for_source (ChamplainView      *view,
     g_object_set_data (G_OBJECT (tile), "overlay", GINT_TO_POINTER (TRUE));
 }
 
+
 static gboolean
 fill_tile_cb (FillTileCallbackData *data)
 {
@@ -1953,11 +1955,11 @@ fill_tile_cb (FillTileCallbackData *data)
       GList *iter;
 
       load_tile_for_source (view, priv->map_source, 255, size, x, y);
-      for (iter = priv->all_sources; iter; iter = iter->next)
-        load_tile_for_source (view, iter->data,
-                              GPOINTER_TO_INT (g_object_get_data (G_OBJECT (iter->data),
-                                                                  "opacity")),
-                              size, x, y);
+      for (iter = priv->overlay_sources; iter; iter = iter->next)
+        {
+          gint opacity = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (iter->data), "opacity"));
+          load_tile_for_source (view, iter->data, opacity, size, x, y);
+        }
 
       tile_map_set (view, x, y, TRUE);
     }
@@ -1967,6 +1969,7 @@ fill_tile_cb (FillTileCallbackData *data)
 
   return FALSE;
 }
+
 
 static void
 load_visible_tiles (ChamplainView *view,
@@ -2183,8 +2186,8 @@ champlain_view_set_map_source (ChamplainView *view,
   g_object_unref (priv->map_source);
   priv->map_source = g_object_ref_sink (source);
 
-  g_list_free_full (priv->all_sources, g_object_unref);
-  priv->all_sources = NULL;
+  g_list_free_full (priv->overlay_sources, g_object_unref);
+  priv->overlay_sources = NULL;
 
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
   priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
@@ -3047,10 +3050,22 @@ champlain_view_get_bounding_box (ChamplainView *view)
   return bbox;
 }
 
+
+/**
+ * champlain_view_add_overlay_source:
+ * @view: a #ChamplainView
+ * @source: a #ChamplainMapSource
+ * @opacity: opacity to use
+ *
+ * Adds a new overlay map source to render tiles with the supplied opacity on top 
+ * of the ordinary map source. Multiple overlay sources can be added.
+ *
+ * Since: 0.12.5
+ */
 void
-champlain_view_add_overlay_source (ChamplainView      *view,
-                                   ChamplainMapSource *source,
-                                   guint8              opacity)
+champlain_view_add_overlay_source (ChamplainView *view,
+    ChamplainMapSource *source,
+    guint8 opacity)
 {
   DEBUG_LOG ()
 
@@ -3060,15 +3075,26 @@ champlain_view_add_overlay_source (ChamplainView      *view,
   g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (source));
 
   priv = view->priv;
-  priv->all_sources = g_list_append (priv->all_sources, g_object_ref (source));
+  g_object_ref (source);
+  priv->overlay_sources = g_list_append (priv->overlay_sources, source);
   g_object_set_data (G_OBJECT (source), "opacity", GINT_TO_POINTER (opacity));
 
   champlain_view_reload_tiles (view);
 }
 
+
+/**
+ * champlain_view_remove_overlay_source:
+ * @view: a #ChamplainView
+ * @source: a #ChamplainMapSource
+ *
+ * Removes an overlay source from #ChamplainView.
+ *
+ * Since: 0.12.5
+ */
 void
-champlain_view_remove_overlay_source (ChamplainView      *view,
-                                      ChamplainMapSource *source)
+champlain_view_remove_overlay_source (ChamplainView *view,
+    ChamplainMapSource *source)
 {
   DEBUG_LOG ()
 
@@ -3078,7 +3104,7 @@ champlain_view_remove_overlay_source (ChamplainView      *view,
   g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (source));
 
   priv = view->priv;
-  priv->all_sources = g_list_remove (priv->all_sources, source);
+  priv->overlay_sources = g_list_remove (priv->overlay_sources, source);
   g_object_unref (source);
 
   champlain_view_reload_tiles (view);

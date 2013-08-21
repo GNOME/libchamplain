@@ -482,6 +482,7 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
   return CHAMPLAIN_MAP_SOURCE (source_chain);
 }
 
+
 /**
  * champlain_map_source_factory_create_memcached_source:
  * @factory: the Factory
@@ -492,7 +493,7 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
  * Returns: (transfer none): a ready to use #ChamplainMapSourceChain consisting of
  * #ChamplainMemoryCache and #ChamplainMapSource matching the given name
  *
- * Since: 0.6
+ * Since: 0.12.5
  */
 ChamplainMapSource *
 champlain_map_source_factory_create_memcached_source (ChamplainMapSourceFactory *factory,
@@ -514,6 +515,7 @@ champlain_map_source_factory_create_memcached_source (ChamplainMapSourceFactory 
 
   return CHAMPLAIN_MAP_SOURCE (source_chain);
 }
+
 
 /**
  * champlain_map_source_factory_create_error_source:
