@@ -943,7 +943,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
   /**
    * ChamplainView:goto-animation-duration:
    *
-   * The durati0n of an animation when going to a location.
+   * The duration of an animation when going to a location.
    * A value of 0 means that the duration is calculated automatically for you.
    *
    * Please note that animation of #champlain_view_ensure_visible also
