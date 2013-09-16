@@ -214,7 +214,7 @@ redraw_tile (ClutterCanvas *canvas,
   cairo_move_to (cr, 50, 24);
   cairo_line_to (cr, 24, 50);
   cairo_stroke (cr);
-
+  
   return TRUE;
 }
 
@@ -252,7 +252,9 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
   actor = clutter_actor_new ();
   clutter_actor_set_size (actor, size, size);
   clutter_actor_set_content (actor, priv->error_canvas);
-  
+  /* has to be set for proper opacity */
+  clutter_actor_set_offscreen_redirect (actor, CLUTTER_OFFSCREEN_REDIRECT_AUTOMATIC_FOR_OPACITY);
+
   champlain_tile_set_content (tile, actor);
   g_signal_emit_by_name (tile, "render-complete", data, size, error);
 }

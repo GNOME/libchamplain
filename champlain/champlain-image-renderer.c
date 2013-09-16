@@ -39,6 +39,16 @@ struct _ChamplainImageRendererPrivate
   guint size;
 };
 
+typedef struct _RendererData RendererData;
+
+struct _RendererData
+{
+  ChamplainRenderer *renderer;
+  ChamplainTile *tile;
+  gchar *data;
+  guint size;
+};
+
 static void set_data (ChamplainRenderer *renderer,
     const gchar *data,
     guint size);
@@ -120,51 +130,25 @@ set_data (ChamplainRenderer *renderer, const gchar *data, guint size)
 }
 
 
-static void
-render (ChamplainRenderer *renderer, ChamplainTile *tile)
+static void 
+image_rendered_cb (GInputStream *stream, GAsyncResult *res, RendererData *data)
 {
-  ChamplainImageRendererPrivate *priv = GET_PRIVATE (renderer);
+  ChamplainTile *tile = data->tile;
   gboolean error = TRUE;
-  GdkPixbufLoader *loader = NULL;
   GError *gerror = NULL;
   ClutterActor *actor = NULL;
   GdkPixbuf *pixbuf;
   ClutterContent *content;
   gfloat width, height;
-
-  if (!priv->data || priv->size == 0)
-    goto finish;
-
-  loader = gdk_pixbuf_loader_new ();
-  if (!gdk_pixbuf_loader_write (loader,
-          (const guchar *) priv->data,
-          priv->size,
-          &gerror))
-    {
-      if (gerror)
-        {
-          g_warning ("Unable to load the pixbuf: %s", gerror->message);
-          g_error_free (gerror);
-        }
-      goto finish;
-    }
-
-  gdk_pixbuf_loader_close (loader, &gerror);
-  if (gerror)
-    {
-      g_warning ("Unable to close the pixbuf loader: %s", gerror->message);
-      g_error_free (gerror);
-      goto finish;
-    }
-
-  /* Load the image into clutter */
-  pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+  
+  pixbuf = gdk_pixbuf_new_from_stream_finish (res, NULL);
   if (!pixbuf)
     {
       g_warning ("NULL pixbuf");
       goto finish;
     }
   
+  /* Load the image into clutter */
   content = clutter_image_new ();
   if (!clutter_image_set_data (CLUTTER_IMAGE (content),
           gdk_pixbuf_get_pixels (pixbuf),
@@ -190,7 +174,6 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
   actor = clutter_actor_new ();
   clutter_actor_set_size (actor, width, height);
   clutter_actor_set_content (actor, content);
-  clutter_content_invalidate (content);
   g_object_unref (content);
   /* has to be set for proper opacity */
   clutter_actor_set_offscreen_redirect (actor, CLUTTER_OFFSCREEN_REDIRECT_AUTOMATIC_FOR_OPACITY);
@@ -202,8 +185,41 @@ finish:
   if (actor)
     champlain_tile_set_content (tile, actor);
 
-  g_signal_emit_by_name (tile, "render-complete", priv->data, priv->size, error);
+  g_signal_emit_by_name (tile, "render-complete", data->data, data->size, error);
 
-  if (loader)
-    g_object_unref (loader);
+  if (pixbuf)
+    g_object_unref (pixbuf);
+
+  g_object_unref (data->renderer);
+  g_object_unref (tile);
+  g_object_unref (stream);
+  g_free (data->data);
+  g_slice_free (RendererData, data);
+}
+
+
+
+static void
+render (ChamplainRenderer *renderer, ChamplainTile *tile)
+{
+  ChamplainImageRendererPrivate *priv = GET_PRIVATE (renderer);
+  GInputStream *stream;
+
+  if (!priv->data || priv->size == 0)
+    {
+      g_signal_emit_by_name (tile, "render-complete", priv->data, priv->size, TRUE);
+      return;
+    }
+    
+  RendererData *data;
+
+  data = g_slice_new (RendererData);
+  data->tile = g_object_ref (tile);
+  data->renderer = g_object_ref (renderer);
+  data->data = priv->data;
+  data->size = priv->size;
+    
+  stream = g_memory_input_stream_new_from_data (priv->data, priv->size, NULL);
+  gdk_pixbuf_new_from_stream_async (stream, NULL, (GAsyncReadyCallback)image_rendered_cb, data);
+  priv->data = NULL;
 }

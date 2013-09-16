@@ -82,6 +82,8 @@ ChamplainMapSource *champlain_map_source_factory_create (ChamplainMapSourceFacto
     const gchar *id);
 ChamplainMapSource *champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *factory,
     const gchar *id);
+ChamplainMapSource *champlain_map_source_factory_create_memcached_source (ChamplainMapSourceFactory *factory,
+    const gchar *id);
 ChamplainMapSource *champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *factory,
     guint tile_size);
 
@@ -148,6 +150,36 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  * Maps for Free Relief
  */
 #define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "mff-relief"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OWM_CLOUDS:
+ *
+ * OpenWeatherMap clouds layer
+ */
+#define CHAMPLAIN_MAP_SOURCE_OWM_CLOUDS "owm-clouds"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OWM_PRECIPITATION:
+ *
+ * OpenWeatherMap precipitation
+ */
+#define CHAMPLAIN_MAP_SOURCE_OWM_PRECIPITATION "owm-precipitation"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OWM_PRESSURE:
+ *
+ * OpenWeatherMap sea level pressure
+ */
+#define CHAMPLAIN_MAP_SOURCE_OWM_PRESSURE "owm-pressure"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OWM_WIND:
+ *
+ * OpenWeatherMap wind
+ */
+#define CHAMPLAIN_MAP_SOURCE_OWM_WIND "owm-wind"
+/**
+ * CHAMPLAIN_MAP_SOURCE_OWM_TEMPERATURE:
+ *
+ * OpenWeatherMap temperature
+ */
+#define CHAMPLAIN_MAP_SOURCE_OWM_TEMPERATURE "owm-temperature"
 #else
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap I"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap II"
