@@ -125,7 +125,7 @@ fi
 
 AC_ARG_ENABLE(maemo,
   AS_HELP_STRING([--enable-maemo],[compile with maemo optimizations]),
-    [enable_maemo=yes])
+    enable_maemo=$enableval, enable_maemo=no)
 
 # -----------------------------------------------------------
 # Enable gtk
