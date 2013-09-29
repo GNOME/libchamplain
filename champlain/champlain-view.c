@@ -3060,7 +3060,7 @@ champlain_view_get_bounding_box (ChamplainView *view)
 /**
  * champlain_view_add_overlay_source:
  * @view: a #ChamplainView
- * @source: a #ChamplainMapSource
+ * @map_source: a #ChamplainMapSource
  * @opacity: opacity to use
  *
  * Adds a new overlay map source to render tiles with the supplied opacity on top 
@@ -3070,7 +3070,7 @@ champlain_view_get_bounding_box (ChamplainView *view)
  */
 void
 champlain_view_add_overlay_source (ChamplainView *view,
-    ChamplainMapSource *source,
+    ChamplainMapSource *map_source,
     guint8 opacity)
 {
   DEBUG_LOG ()
@@ -3078,12 +3078,12 @@ champlain_view_add_overlay_source (ChamplainView *view,
   ChamplainViewPrivate *priv;
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (source));
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
 
   priv = view->priv;
-  g_object_ref (source);
-  priv->overlay_sources = g_list_append (priv->overlay_sources, source);
-  g_object_set_data (G_OBJECT (source), "opacity", GINT_TO_POINTER (opacity));
+  g_object_ref (map_source);
+  priv->overlay_sources = g_list_append (priv->overlay_sources, map_source);
+  g_object_set_data (G_OBJECT (map_source), "opacity", GINT_TO_POINTER (opacity));
   g_object_notify (G_OBJECT (view), "map-source");
 
   champlain_view_reload_tiles (view);
@@ -3093,7 +3093,7 @@ champlain_view_add_overlay_source (ChamplainView *view,
 /**
  * champlain_view_remove_overlay_source:
  * @view: a #ChamplainView
- * @source: a #ChamplainMapSource
+ * @map_source: a #ChamplainMapSource
  *
  * Removes an overlay source from #ChamplainView.
  *
@@ -3101,18 +3101,18 @@ champlain_view_add_overlay_source (ChamplainView *view,
  */
 void
 champlain_view_remove_overlay_source (ChamplainView *view,
-    ChamplainMapSource *source)
+    ChamplainMapSource *map_source)
 {
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv;
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
-  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (source));
+  g_return_if_fail (CHAMPLAIN_IS_MAP_SOURCE (map_source));
 
   priv = view->priv;
-  priv->overlay_sources = g_list_remove (priv->overlay_sources, source);
-  g_object_unref (source);
+  priv->overlay_sources = g_list_remove (priv->overlay_sources, map_source);
+  g_object_unref (map_source);
   g_object_notify (G_OBJECT (view), "map-source");
 
   champlain_view_reload_tiles (view);
