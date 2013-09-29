@@ -11,21 +11,14 @@ pcfiles += champlain-gtk-@CHAMPLAIN_API_VERSION@.pc
 other_pcfiles += champlain-gtk-@CHAMPLAIN_API_VERSION@-uninstalled.pc
 endif
 
-if ENABLE_MEMPHIS
-pcfiles += champlain-memphis-@CHAMPLAIN_API_VERSION@.pc
-other_pcfiles += champlain-memphis-@CHAMPLAIN_API_VERSION@-uninstalled.pc
-endif
-
 pkgconfig_DATA = $(pcfiles)
 pkgconfigdir = $(libdir)/pkgconfig
 
-DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc --enable-gtk --enable-introspection --enable-vala-demos --enable-memphis
+DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc --enable-gtk --enable-introspection --enable-vala-demos --disable-memphis
 
 EXTRA_DIST = \
 	champlain-gtk.pc.in \
 	champlain-gtk-uninstalled.pc.in \
-	champlain-memphis.pc.in \
-	champlain-memphis-uninstalled.pc.in \
 	champlain.pc.in \
 	champlain-uninstalled.pc.in
 

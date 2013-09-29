@@ -303,25 +303,6 @@ namespace Champlain {
 		public void set_size_limit (uint size_limit);
 		public uint size_limit { get; set construct; }
 	}
-	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_memphis_renderer_get_type ()")]
-	public class MemphisRenderer : Champlain.Renderer {
-		[CCode (has_construct_function = false)]
-		protected MemphisRenderer ();
-		[CCode (has_construct_function = false)]
-		public MemphisRenderer.full (uint tile_size);
-		public Clutter.Color get_background_color ();
-		public Champlain.BoundingBox get_bounding_box ();
-		public GLib.List<string> get_rule_ids ();
-		public uint get_tile_size ();
-		public void load_rules (string rules_path);
-		public void remove_rule (string id);
-		public void set_background_color (Clutter.Color color);
-		public void set_rule (Champlain.MemphisRule rule);
-		public void set_tile_size (uint size);
-		[NoAccessorMethod]
-		public Champlain.BoundingBox bounding_box { owned get; set; }
-		public uint tile_size { get; set; }
-	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_network_bbox_tile_source_get_type ()")]
 	public class NetworkBboxTileSource : Champlain.TileSource {
 		[CCode (has_construct_function = false)]
@@ -597,38 +578,10 @@ namespace Champlain {
 		[NoAccessorMethod]
 		public abstract double longitude { get; set; }
 	}
-	[CCode (cheader_filename = "champlain/champlain.h", has_type_id = false)]
-	public struct MemphisRule {
-		public weak string keys;
-		public weak string values;
-		public Champlain.MemphisRuleType type;
-		public Champlain.MemphisRuleAttr polygon;
-		public Champlain.MemphisRuleAttr line;
-		public Champlain.MemphisRuleAttr border;
-		public Champlain.MemphisRuleAttr text;
-	}
-	[CCode (cheader_filename = "champlain/champlain.h", has_type_id = false)]
-	public struct MemphisRuleAttr {
-		public uint8 z_min;
-		public uint8 z_max;
-		public uint8 color_red;
-		public uint8 color_green;
-		public uint8 color_blue;
-		public uint8 color_alpha;
-		public weak string style;
-		public double size;
-	}
 	[CCode (cheader_filename = "champlain/champlain.h", cprefix = "CHAMPLAIN_MAP_PROJECTION_", has_type_id = false)]
 	public enum MapProjection {
 		[CCode (cname = "CHAMPLAIN_MAP_PROJECTION_MERCATOR")]
 		MAP_PROJECTION_MERCATOR
-	}
-	[CCode (cheader_filename = "champlain/champlain.h", cprefix = "CHAMPLAIN_MEMPHIS_RULE_TYPE_", has_type_id = false)]
-	public enum MemphisRuleType {
-		UNKNOWN,
-		NODE,
-		WAY,
-		RELATION
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", cprefix = "CHAMPLAIN_SELECTION_", has_type_id = false)]
 	public enum SelectionMode {

@@ -98,7 +98,6 @@
     <title>Renderer API</title>
     <xi:include href="xml/champlain-renderer.xml"/>
     <xi:include href="xml/champlain-image-renderer.xml"/>
-    <xi:include href="xml/champlain-memphis-renderer.xml"/>
     <xi:include href="xml/champlain-error-tile-renderer.xml"/>
   </part>
   <part>

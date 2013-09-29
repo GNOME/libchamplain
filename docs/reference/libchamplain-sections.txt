@@ -456,8 +456,6 @@ CHAMPLAIN_MAP_SOURCE_OWM_PRECIPITATION
 CHAMPLAIN_MAP_SOURCE_OWM_PRESSURE
 CHAMPLAIN_MAP_SOURCE_OWM_TEMPERATURE
 CHAMPLAIN_MAP_SOURCE_OWM_WIND
-CHAMPLAIN_MAP_SOURCE_MEMPHIS_LOCAL
-CHAMPLAIN_MAP_SOURCE_MEMPHIS_NETWORK
 <SUBSECTION Standard>
 CHAMPLAIN_MAP_SOURCE_FACTORY
 CHAMPLAIN_IS_MAP_SOURCE_FACTORY
@@ -690,38 +688,6 @@ CHAMPLAIN_MAP_SOURCE_DESC_GET_CLASS
 ChamplainMapSourceDescClass
 ChamplainMapSourceDescPrivate
 </SECTION>
-
-<SECTION>
-<FILE>champlain-memphis-renderer</FILE>
-<TITLE>ChamplainMemphisRenderer</TITLE>
-ChamplainMemphisRenderer
-ChamplainMemphisRule
-ChamplainMemphisRuleAttr
-ChamplainMemphisRuleType
-champlain_memphis_renderer_new_full
-champlain_memphis_renderer_load_rules
-champlain_memphis_renderer_get_background_color
-champlain_memphis_renderer_set_background_color
-champlain_memphis_renderer_get_rule_ids
-champlain_memphis_renderer_set_rule
-champlain_memphis_renderer_get_rule
-champlain_memphis_renderer_remove_rule
-champlain_memphis_renderer_get_bounding_box
-champlain_memphis_renderer_set_tile_size
-champlain_memphis_renderer_get_tile_size
-<SUBSECTION Standard>
-CHAMPLAIN_MEMPHIS_RENDERER
-CHAMPLAIN_IS_MEMPHIS_RENDERER
-CHAMPLAIN_TYPE_MEMPHIS_RENDERER
-champlain_memphis_renderer_get_type
-CHAMPLAIN_MEMPHIS_RENDERER_CLASS
-CHAMPLAIN_IS_MEMPHIS_RENDERER_CLASS
-CHAMPLAIN_MEMPHIS_RENDERER_GET_CLASS
-<SUBSECTION Private>
-ChamplainMemphisRendererClass
-ChamplainMemphisRendererPrivate
-</SECTION>
-
 
 <SECTION>
 <FILE>champlain-custom-marker</FILE>

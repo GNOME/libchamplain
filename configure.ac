@@ -153,11 +153,9 @@ AM_CONDITIONAL(ENABLE_GTK, test "x$enable_gtk" = "xyes")
 
 AC_ARG_ENABLE(memphis,
   AS_HELP_STRING([--disable-memphis],[Disable support of local rendering using libmemphis]),
-    enable_memphis=$enableval, enable_memphis="auto")
+    enable_memphis=$enableval, enable_memphis=no)
 
-if test "x$enable_memphis" = "xauto"; then
-  PKG_CHECK_MODULES(MEMPHIS, [memphis-0.2 >= 0.2.1], enable_memphis="yes", enable_memphis="no")
-elif test "x$enable_memphis" = "xyes"; then
+if test "x$enable_memphis" = "xyes"; then
   PKG_CHECK_MODULES(MEMPHIS, [memphis-0.2 >= 0.2.1])
 fi
 
@@ -244,9 +242,7 @@ AC_CONFIG_FILES([Makefile
                  champlain-$CHAMPLAIN_API_VERSION-uninstalled.pc:champlain-uninstalled.pc.in
                  champlain-gtk-$CHAMPLAIN_API_VERSION.pc:champlain-gtk.pc.in
                  champlain-gtk-$CHAMPLAIN_API_VERSION-uninstalled.pc:champlain-gtk-uninstalled.pc.in
-                 champlain-gtk/Makefile
-                 champlain-memphis-$CHAMPLAIN_API_VERSION.pc:champlain-memphis.pc.in
-                 champlain-memphis-$CHAMPLAIN_API_VERSION-uninstalled.pc:champlain-memphis-uninstalled.pc.in])
+                 champlain-gtk/Makefile])
 AC_OUTPUT
 
 echo ""
