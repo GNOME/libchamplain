@@ -180,6 +180,7 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  * OpenWeatherMap temperature
  */
 #define CHAMPLAIN_MAP_SOURCE_OWM_TEMPERATURE "owm-temperature"
+
 #else
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap I"
 #define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap II"
@@ -189,6 +190,11 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
 #define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "Public Transport"
 #define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
 #define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "MapsForFree Relief"
+#define CHAMPLAIN_MAP_SOURCE_OWM_CLOUDS "OpenWeatherMap Clouds"
+#define CHAMPLAIN_MAP_SOURCE_OWM_PRECIPITATION "OpenWeatherMap Precipitation"
+#define CHAMPLAIN_MAP_SOURCE_OWM_PRESSURE "OpenWeatherMap Pressure"
+#define CHAMPLAIN_MAP_SOURCE_OWM_WIND "OpenWeatherMap Wind"
+#define CHAMPLAIN_MAP_SOURCE_OWM_TEMPERATURE "OpenWeatherMap Temperature"
 #endif
 
 #ifdef CHAMPLAIN_HAS_MEMPHIS
