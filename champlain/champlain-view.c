@@ -2185,6 +2185,8 @@ champlain_view_set_map_source (ChamplainView *view,
       CHAMPLAIN_IS_MAP_SOURCE (source));
 
   ChamplainViewPrivate *priv = view->priv;
+  guint source_min_zoom;
+  guint source_max_zoom;
 
   if (priv->map_source == source)
     return;
@@ -2195,8 +2197,10 @@ champlain_view_set_map_source (ChamplainView *view,
   g_list_free_full (priv->overlay_sources, g_object_unref);
   priv->overlay_sources = NULL;
 
-  priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
-  priv->max_zoom_level = champlain_map_source_get_max_zoom_level (priv->map_source);
+  source_min_zoom = champlain_map_source_get_min_zoom_level (priv->map_source);
+  champlain_view_set_min_zoom_level (view, source_min_zoom);
+  source_max_zoom = champlain_map_source_get_max_zoom_level (priv->map_source);
+  champlain_view_set_max_zoom_level (view, source_max_zoom);
 
   /* Keep same zoom level if the new map supports it */
   if (priv->zoom_level > priv->max_zoom_level)
