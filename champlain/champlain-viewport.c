@@ -151,8 +151,11 @@ champlain_viewport_stop (ChamplainViewport *viewport)
 {
   ChamplainViewportPrivate *priv = CHAMPLAIN_VIEWPORT (viewport)->priv;
 
-  champlain_adjustment_interpolate_stop (priv->hadjustment);
-  champlain_adjustment_interpolate_stop (priv->vadjustment);
+  if (priv->hadjustment)
+    champlain_adjustment_interpolate_stop (priv->hadjustment);
+    
+  if (priv->vadjustment)
+    champlain_adjustment_interpolate_stop (priv->vadjustment);
 }
 
 
