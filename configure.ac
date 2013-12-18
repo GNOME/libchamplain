@@ -13,7 +13,7 @@ AC_INIT([libchamplain],
         [champlain_version],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=libchamplain],
         [libchamplain],
-        [http://projects.gnome.org/libchamplain/])
+        [https://wiki.gnome.org/Projects/libchamplain])
 AC_CONFIG_SRCDIR([champlain/champlain.h])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
