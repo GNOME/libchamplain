@@ -251,6 +251,16 @@ static void champlain_view_go_to_with_duration (ChamplainView *view,
     guint duration);
 static gboolean redraw_timeout_cb(gpointer view);
 static void remove_all_tiles (ChamplainView *view);
+static void get_x_y_for_zoom_level (ChamplainView *view,
+    guint zoom_level,
+    gint offset_x,
+    gint offset_y,
+    gdouble *new_x,
+    gdouble *new_y);
+static ChamplainBoundingBox *get_bounding_box (ChamplainView *view,
+    guint zoom_level,
+    gdouble x,
+    gdouble y);
 
 
 static void
@@ -2636,6 +2646,22 @@ show_zoom_actor (ChamplainView *view,
     clutter_actor_set_scale (zoom_actor, deltazoom, deltazoom);
 }
 
+static void
+get_x_y_for_zoom_level (ChamplainView *view,
+                        guint zoom_level,
+                        gint offset_x,
+                        gint offset_y,
+                        gdouble *new_x,
+                        gdouble *new_y)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble deltazoom;
+
+  deltazoom = pow (2, (gdouble) zoom_level - (gdouble) priv->zoom_level);
+
+  *new_x = (priv->viewport_x + offset_x) * deltazoom - offset_x;
+  *new_y = (priv->viewport_y + offset_y) * deltazoom - offset_y;
+}
 
 /* Sets the zoom level, leaving the (x, y) at the exact same point in the view */
 static gboolean
@@ -2651,7 +2677,6 @@ view_set_zoom_level_at (ChamplainView *view,
   gdouble new_x, new_y;
   gdouble offset_x = x;
   gdouble offset_y = y;
-  gdouble deltazoom;
 
   if (zoom_level == priv->zoom_level || ZOOM_LEVEL_OUT_OF_RANGE (priv, zoom_level))
     return FALSE;
@@ -2668,11 +2693,8 @@ view_set_zoom_level_at (ChamplainView *view,
   if (CLUTTER_ACTOR_IS_REALIZED (view))
     show_zoom_actor (view, zoom_level, offset_x, offset_y);
 
-  deltazoom = pow (2, (gdouble)zoom_level - (gdouble)priv->zoom_level);
+  get_x_y_for_zoom_level (view, zoom_level, offset_x, offset_y, &new_x, &new_y);
 
-  new_x = (priv->viewport_x + offset_x) * deltazoom - offset_x;
-  new_y = (priv->viewport_y + offset_y) * deltazoom - offset_y;
-  
   priv->zoom_level = zoom_level;
 
   if (CLUTTER_ACTOR_IS_REALIZED (view))
@@ -3021,6 +3043,61 @@ champlain_view_get_state (ChamplainView *view)
   return view->priv->state;
 }
 
+static ChamplainBoundingBox *
+get_bounding_box (ChamplainView *view,
+                  guint zoom_level,
+                  gdouble x,
+                  gdouble y)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  ChamplainBoundingBox *bbox;
+
+  bbox = champlain_bounding_box_new ();
+
+  bbox->top = champlain_map_source_get_latitude (priv->map_source,
+                                                 zoom_level,
+                                                 y);
+  bbox->bottom = champlain_map_source_get_latitude (priv->map_source,
+                                                    zoom_level,
+                                                    y + priv->viewport_height);
+  bbox->left = champlain_map_source_get_longitude (priv->map_source,
+                                                   zoom_level,
+                                                   x);
+  bbox->right = champlain_map_source_get_longitude (priv->map_source,
+                                                    zoom_level,
+                                                    x + priv->viewport_width);
+  return bbox;
+}
+
+/**
+ * champlain_view_get_bounding_box_for_zoom_level:
+ * @view: a #ChamplainView
+ * @zoom_level: the level of zoom, a guint between 1 and 20
+ *
+ * Gets the bounding box for view @view at @zoom_level.
+ *
+ * Returns: (transfer full): the bounding box for the view at @zoom_level.
+ *
+ * Since: 0.12.7
+ */
+ChamplainBoundingBox *
+champlain_view_get_bounding_box_for_zoom_level (ChamplainView *view,
+                                                guint zoom_level)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble x, y;
+  gdouble offset_x, offset_y;
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
+
+  offset_x = priv->viewport_width / 2.0;
+  offset_y = priv->viewport_height / 2.0;
+
+  get_x_y_for_zoom_level (view, zoom_level, offset_x, offset_y, &x, &y);
+
+  return get_bounding_box (view, zoom_level, x, y);
+}
+
 /**
  * champlain_view_get_bounding_box:
  * @view: a #ChamplainView
@@ -3037,27 +3114,10 @@ champlain_view_get_bounding_box (ChamplainView *view)
   DEBUG_LOG ()
 
   ChamplainViewPrivate *priv = view->priv;
-  ChamplainBoundingBox *bbox;
 
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
 
-  bbox = champlain_bounding_box_new ();
-
-  bbox->top = champlain_map_source_get_latitude (priv->map_source,
-    priv->zoom_level,
-    priv->viewport_y);
-  bbox->bottom = champlain_map_source_get_latitude (priv->map_source,
-    priv->zoom_level,
-    priv->viewport_y + priv->viewport_height);
-
-  bbox->left = champlain_map_source_get_longitude (priv->map_source,
-    priv->zoom_level,
-    priv->viewport_x);
-  bbox->right = champlain_map_source_get_longitude (priv->map_source,
-    priv->zoom_level,
-    priv->viewport_x + priv->viewport_width);
-
-  return bbox;
+  return get_bounding_box (view, priv->zoom_level, priv->viewport_x, priv->viewport_y);
 }
 
 
