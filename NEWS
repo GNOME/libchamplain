@@ -1,3 +1,62 @@
+libchamplain 0.12.5 (2013-09-16)
+===============================
+
+Stable release
+
+Changes:
+
+* Add properties for animation mode & duration (Jonas Danielsson)
+* Add support for OpenWeatherMap overlays (Giovanni Campagna)
+* Performance improvements (Jiří Techet)
+* Minor fixes and improvements (Marvin Schmidt, Colin Walters, Jiří Techet)
+
+libchamplain 0.12.4 (2013-05-16)
+===============================
+
+Stable release
+
+Changes:
+
+* Add dependency on clutter 1.12 and fix all the depreciation warnings 
+  (Jiří Techet, Zeeshan Ali)
+* Many internal cleanups and minor improvements (Jiří Techet)
+* Fix gtk and libsoup depreciation warnings (Jiří Techet)
+* Deprecate CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER and CHAMPLAIN_MAP_SOURCE_OAM 
+  which don't exist any more and remove them from the factory (Jiří Techet)
+* Deprecate ChamplainCustomMarker (Jiří Techet)
+* Deprecate champlain_view_bin_layout_add() (Zeeshan Ali)
+* Fix blurry map when view resized (Jiří Techet)
+* Use more neutral map background color (Jiří Techet)
+* Add champlain_view_get_bounding_box() and champlain_bounding_box_covers() (Zeeshan Ali)
+* Add a possibility to set a background texture (Nirbheek Chauhan)
+* Add Mapquest Open Aerial map source (Zeeshan Ali)
+* Added the possibility to use TMS correct y-axis (Samuel Gyger)
+* Minor fixes and improvements (Zeeshan Ali, Evan Nemerson, Jiří Techet)
+
+libchamplain 0.12.3 (2012-07-14)
+===============================
+
+Stable release
+
+Changes:
+* Fix OpenCycleMap source URL (Thomas Bechtold)
+* Fix ChmplainPoint resizing issue (Jiří Techet)
+* Many minor documentation improvements (Pablo Castellano)
+* New polygons.py Python demo
+* Other minor fixes and improvements (Pablo Castellano, Jiří Techet)
+
+libchamplain 0.12.2 (2012-03-12)
+===============================
+
+Stable release
+
+Changes:
+* Call vapigen with --pkg cogl-pango-1.0 (Alexandre Rostovtsev) 
+* Don't call vapigen during distcheck and use pre-generated vapi
+  instead to become independent of vala version during distcheck 
+  (Jiří Techet)
+* Minor changes here and there (Jiří Techet)
+
 libchamplain 0.12.1 (2011-12-20)
 ===============================
 
