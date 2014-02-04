@@ -1,3 +1,19 @@
+libchamplain 0.12.6 (2014-02-04)
+================================
+
+Stable release
+
+Changes:
+
+- Make sure Maemo is disabled when --disable-maemo is used.
+- Add the new weather map sources for Maemo builds as well.
+- ChamplainView
+  - More reliable notifications for max/min-zoom-level properties.
+  - Add API to determine appropriate zoom-level for a particular
+    bounding box.
+- Update project homepage link.
+- Fixes to build.
+
 libchamplain 0.12.5 (2013-09-16)
 ===============================
 
