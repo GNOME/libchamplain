@@ -164,6 +164,7 @@ champlain_view_get_license_actor
 champlain_view_get_center_latitude
 champlain_view_get_center_longitude
 champlain_view_get_bounding_box
+champlain_view_get_bounding_box_for_zoom_level
 champlain_view_get_state
 <SUBSECTION Standard>
 CHAMPLAIN_VIEW

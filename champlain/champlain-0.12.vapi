@@ -490,6 +490,7 @@ namespace Champlain {
 		public bool get_animate_zoom ();
 		public unowned Clutter.Content get_background_pattern ();
 		public Champlain.BoundingBox get_bounding_box ();
+		public Champlain.BoundingBox get_bounding_box_for_zoom_level (uint zoom_level);
 		public double get_center_latitude ();
 		public double get_center_longitude ();
 		public double get_deceleration ();

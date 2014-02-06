@@ -1,3 +1,12 @@
+libchamplain 0.12.7 (2014-02-06)
+================================
+
+Stable release
+
+Changes:
+
+* Use correct LIBRARY_VERSION string
+
 libchamplain 0.12.6 (2014-02-04)
 ================================
 
