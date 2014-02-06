@@ -3078,7 +3078,7 @@ get_bounding_box (ChamplainView *view,
  *
  * Returns: (transfer full): the bounding box for the view at @zoom_level.
  *
- * Since: 0.12.7
+ * Since: 0.12.6
  */
 ChamplainBoundingBox *
 champlain_view_get_bounding_box_for_zoom_level (ChamplainView *view,
