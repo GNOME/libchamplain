@@ -88,7 +88,7 @@ GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_SCANNERFLAGS = \
 	--c-include="champlain-gtk/champlain-gtk.h" \
 	--include-uninstalled=$(top_builddir)/champlain/Champlain-@CHAMPLAIN_API_VERSION@.gir
 GtkChamplain_@CHAMPLAIN_API_VERSION_NORM@_gir_CFLAGS = \
-	$(SOUP_CFLAGS) $(GTK_CFLAGS) $(DEPS_CFLAGS) \
+	$(GTK_CFLAGS) $(DEPS_CFLAGS) \
 	-I$(top_srcdir) -I$(top_builddir)\
 	-DCHAMPLAIN_COMPILATION -DCHAMPLAIN_GTK_COMPILATION
 

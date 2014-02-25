@@ -20,8 +20,8 @@ polygons_SOURCES = polygons.c
 polygons_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 
 url_marker_SOURCES = url-marker.c
-url_marker_CPPFLAGS = $(DEPS_CFLAGS) $(SOUP_CFLAGS) $(WARN_CFLAGS)
-url_marker_LDADD = $(SOUP_LIBS) $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
+url_marker_CPPFLAGS = $(DEPS_CFLAGS) $(WARN_CFLAGS)
+url_marker_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 
 create_destroy_test_SOURCES = create-destroy-test.c
 create_destroy_test_LDADD = $(DEPS_LIBS) ../champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la

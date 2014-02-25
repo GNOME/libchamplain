@@ -38,11 +38,7 @@
 #include "champlain-version.h"
 #include "champlain-tile.h"
 
-#ifdef HAVE_LIBSOUP_GNOME
-#include <libsoup/soup-gnome.h>
-#else
 #include <libsoup/soup.h>
-#endif
 
 G_DEFINE_TYPE (ChamplainNetworkBboxTileSource, champlain_network_bbox_tile_source, CHAMPLAIN_TYPE_TILE_SOURCE)
 

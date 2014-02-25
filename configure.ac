@@ -67,6 +67,7 @@ PKG_CHECK_MODULES(DEPS,
       cairo >= 1.4
       gio-2.0 >= 2.16
       sqlite3 >= 3.0
+      libsoup-2.4 >= 2.42
   ]
 )
 AC_SUBST(DEPS_CFLAGS)
@@ -82,31 +83,6 @@ GNOME_MAINTAINER_MODE_DEFINES
 
 GOBJECT_INTROSPECTION_CHECK([0.6.3])
 
-# -----------------------------------------------------------
-# Check for libsoup, use libsoup-gnome if available
-# -----------------------------------------------------------
-PKG_CHECK_MODULES(SOUP_GNOME, libsoup-gnome-2.4 >= 2.42, [
-    have_soup_gnome="yes"
-    SOUP_CFLAGS=$SOUP_GNOME_CFLAGS
-    SOUP_LIBS=$SOUP_GNOME_LIBS
-    SOUP_DEP="libsoup-gnome-2.4"
-    AC_DEFINE(HAVE_LIBSOUP_GNOME,1,[libsoup gnome integration])
-    ], have_soup_gnome="no")
-
-
-if test "x$have_soup_gnome" = "xno"; then
-  PKG_CHECK_MODULES(SOUP, libsoup-2.4 >= 2.42,
-     have_soup="yes", have_soup="no")
-  SOUP_DEP="libsoup-2.4"
-fi
-
-if test "x$have_soup" = "xno" && test "x$have_soup_gnome" = "xno"; then
-   AC_MSG_ERROR([Could not find libsoup or libsoup-gnome.])
-fi
-
-AC_SUBST(SOUP_CFLAGS)
-AC_SUBST(SOUP_LIBS)
-AC_SUBST(SOUP_DEP)
 # -----------------------------------------------------------
 # Enable debug
 # -----------------------------------------------------------
@@ -252,7 +228,6 @@ echo "                 Prefix: ${prefix}"
 echo "         Compiler flags: ${CFLAGS} ${CPPFLAGS}"
 echo "          Documentation: ${enable_gtk_doc}"
 echo "                  Debug: ${enable_debug}"
-echo "          libsoup-gnome: ${have_soup_gnome}"
 echo "              Gtk+ View: ${enable_gtk}"
 echo ""
 echo "Extra renderers:"

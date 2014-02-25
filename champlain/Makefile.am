@@ -129,7 +129,7 @@ nodist_libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	$(libchamplain_headers_built)	\
 	$(libchamplain_sources_built)
 
-libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(SOUP_LIBS) $(MEMPHIS_LIBS) $(LIBM)
+libchamplain_@CHAMPLAIN_API_VERSION@_la_LIBADD = $(DEPS_LIBS) $(MEMPHIS_LIBS) $(LIBM)
 
 libchamplain_@CHAMPLAIN_API_VERSION@_la_LDFLAGS = \
 	-version-info $(LIBRARY_VERSION)\
@@ -138,7 +138,6 @@ libchamplain_@CHAMPLAIN_API_VERSION@_la_LDFLAGS = \
 
 AM_CPPFLAGS = 				\
 	$(DEPS_CFLAGS)			\
-	$(SOUP_CFLAGS)			\
 	$(MEMPHIS_CFLAGS)		\
 	-DDATADIR=\""$(datadir)"\"	\
 	-I$(top_srcdir)			\
@@ -179,7 +178,7 @@ Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_INCLUDES = Clutter-1.0 $(memphis_gir_
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_EXPORT_PACKAGES = champlain-@CHAMPLAIN_API_VERSION@ $(memphis_package)
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_SCANNERFLAGS = --identifier-prefix=Champlain --symbol-prefix=champlain --c-include="champlain/champlain.h"
 Champlain_@CHAMPLAIN_API_VERSION_NORM@_gir_CFLAGS = \
-	$(DEPS_CFLAGS) $(SOUP_CFLAGS) $(MEMPHIS_CFLAGS) \
+	$(DEPS_CFLAGS) $(MEMPHIS_CFLAGS) \
 	-I$(top_srcdir) -I$(top_builddir) \
 	-DCHAMPLAIN_COMPILATION
 

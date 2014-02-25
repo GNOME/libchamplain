@@ -51,11 +51,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib-object.h>
-#ifdef HAVE_LIBSOUP_GNOME
-#include <libsoup/soup-gnome.h>
-#else
 #include <libsoup/soup.h>
-#endif
 #include <math.h>
 #include <sys/stat.h>
 #include <string.h>
