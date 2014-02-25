@@ -201,7 +201,7 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
   /**
    * ChamplainNetworkBboxTileSource:proxy-uri:
    *
-   * The proxy URI to use to access network
+   * Used to override the default proxy for accessing the network.
    *
    * Since: 0.8
    */

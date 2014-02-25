@@ -251,7 +251,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   /**
    * ChamplainNetworkTileSource:proxy-uri:
    *
-   * The proxy uri used to access network
+   * Used to override the default proxy for accessing the network.
    *
    * Since: 0.4
    */
@@ -414,7 +414,7 @@ champlain_network_tile_source_get_proxy_uri (ChamplainNetworkTileSource *tile_so
  * @tile_source: the #ChamplainNetworkTileSource
  * @proxy_uri: the proxy uri used to access network
  *
- * Sets the proxy uri used to access network.
+ * Override the default proxy for accessing the network.
  *
  * Since: 0.6
  */
