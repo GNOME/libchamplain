@@ -85,7 +85,7 @@ GOBJECT_INTROSPECTION_CHECK([0.6.3])
 # -----------------------------------------------------------
 # Check for libsoup, use libsoup-gnome if available
 # -----------------------------------------------------------
-PKG_CHECK_MODULES(SOUP_GNOME, libsoup-gnome-2.4 >= 2.26, [
+PKG_CHECK_MODULES(SOUP_GNOME, libsoup-gnome-2.4 >= 2.42, [
     have_soup_gnome="yes"
     SOUP_CFLAGS=$SOUP_GNOME_CFLAGS
     SOUP_LIBS=$SOUP_GNOME_LIBS
@@ -95,7 +95,7 @@ PKG_CHECK_MODULES(SOUP_GNOME, libsoup-gnome-2.4 >= 2.26, [
 
 
 if test "x$have_soup_gnome" = "xno"; then
-  PKG_CHECK_MODULES(SOUP, libsoup-2.4 >= 2.4.1,
+  PKG_CHECK_MODULES(SOUP, libsoup-2.4 >= 2.42,
      have_soup="yes", have_soup="no")
   SOUP_DEP="libsoup-2.4"
 fi
