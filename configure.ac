@@ -67,7 +67,7 @@ PKG_CHECK_MODULES(DEPS,
       cairo >= 1.4
       gio-2.0 >= 2.16
       sqlite3 >= 3.0
-      libsoup-2.4 >= 2.42
+      libsoup-2.4 >= 2.34
   ]
 )
 AC_SUBST(DEPS_CFLAGS)

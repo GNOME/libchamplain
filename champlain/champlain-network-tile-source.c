@@ -273,10 +273,8 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
 
   priv->soup_session = soup_session_async_new_with_options (
         "proxy-uri", NULL,
-#ifdef HAVE_LIBSOUP_GNOME
         SOUP_SESSION_ADD_FEATURE_BY_TYPE, 
-        SOUP_TYPE_PROXY_RESOLVER_GNOME,
-#endif
+        SOUP_TYPE_PROXY_RESOLVER_DEFAULT,
         NULL);
   g_object_set (G_OBJECT (priv->soup_session),
       "user-agent", 
