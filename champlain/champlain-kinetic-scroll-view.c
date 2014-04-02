@@ -258,9 +258,10 @@ motion_event_cb (ClutterActor *stage,
   ClutterActor *actor = CLUTTER_ACTOR (scroll);
   gfloat x, y;
 
-  if (event->type != CLUTTER_MOTION || !(event->modifier_state & CLUTTER_BUTTON1_MASK))
+  if ((event->type != CLUTTER_MOTION || !(event->modifier_state & CLUTTER_BUTTON1_MASK)) &&
+      event->type != CLUTTER_TOUCH_UPDATE)
     return FALSE;
-      
+
   if (clutter_actor_transform_stage_point (actor,
           event->x,
           event->y,
@@ -389,8 +390,10 @@ button_release_event_cb (ClutterActor *stage,
   ClutterActor *actor = CLUTTER_ACTOR (scroll);
   gboolean decelerating = FALSE;
 
+
   if ((event->type != CLUTTER_MOTION || event->modifier_state & CLUTTER_BUTTON1_MASK) &&
-      (event->type != CLUTTER_BUTTON_RELEASE || event->button != 1))
+      (event->type != CLUTTER_BUTTON_RELEASE || event->button != 1) && 
+      event->type != CLUTTER_TOUCH_END)
     return FALSE;
 
   g_signal_handlers_disconnect_by_func (stage,
@@ -586,8 +589,8 @@ button_press_event_cb (ClutterActor *actor,
   ClutterButtonEvent *bevent = (ClutterButtonEvent *) event;
   ClutterActor *stage = clutter_actor_get_stage (actor);
 
-  if ((event->type == CLUTTER_BUTTON_PRESS) &&
-      (bevent->button == 1) &&
+  if ((((event->type == CLUTTER_BUTTON_PRESS) && (bevent->button == 1)) ||
+      event->type == CLUTTER_TOUCH_BEGIN) &&
       stage)
     {
       ChamplainKineticScrollViewMotion *motion;
@@ -636,6 +639,8 @@ champlain_kinetic_scroll_view_init (ChamplainKineticScrollView *self)
 
   clutter_actor_set_reactive (CLUTTER_ACTOR (self), TRUE);
   g_signal_connect (self, "button-press-event",
+      G_CALLBACK (button_press_event_cb), self);
+  g_signal_connect (self, "touch-event",
       G_CALLBACK (button_press_event_cb), self);
 }
 
