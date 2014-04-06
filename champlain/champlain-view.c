@@ -1896,26 +1896,33 @@ fill_background_tiles (ChamplainView *view)
 }
 
 static void 
-tile_map_set (ChamplainView *view, gint tile_x, gint tile_y, gboolean value)
+tile_table_set (ChamplainView *view,
+    GHashTable *table,
+    gint tile_x,
+    gint tile_y,
+    gboolean value)
 {
   ChamplainViewPrivate *priv = view->priv;
   gint64 count = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
   gint64 *key = g_slice_alloc (sizeof(gint64));
   *key = (gint64)tile_y * count + tile_x;
   if (value)
-    g_hash_table_insert (priv->tile_map, key, GINT_TO_POINTER (TRUE));
+    g_hash_table_insert (table, key, GINT_TO_POINTER (TRUE));
   else
-    g_hash_table_remove (priv->tile_map, key);
+    g_hash_table_remove (table, key);
 }
 
 
 static gboolean 
-tile_in_tile_map (ChamplainView *view, gint tile_x, gint tile_y)
+tile_in_tile_table (ChamplainView *view,
+    GHashTable *table,
+    gint tile_x,
+    gint tile_y)
 {
   ChamplainViewPrivate *priv = view->priv;
   gint64 count = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
   gint64 key = (gint64)tile_y * count + tile_x;
-  return GPOINTER_TO_INT (g_hash_table_lookup (priv->tile_map, &key));
+  return GPOINTER_TO_INT (g_hash_table_lookup (table, &key));
 }
 
 
@@ -1965,7 +1972,7 @@ fill_tile_cb (FillTileCallbackData *data)
   gint size = data->size;
   gint zoom_level = data->zoom_level;
 
-  if (!tile_in_tile_map (view, x, y) && zoom_level == priv->zoom_level && data->map_source == priv->map_source &&
+  if (!tile_in_tile_table (view, priv->tile_map, x, y) && zoom_level == priv->zoom_level && data->map_source == priv->map_source &&
       y >= priv->tile_y_first && y < priv->tile_y_last && x >= priv->tile_x_first && x < priv->tile_x_last)
     {
       GList *iter;
@@ -1977,7 +1984,7 @@ fill_tile_cb (FillTileCallbackData *data)
           load_tile_for_source (view, iter->data, opacity, size, x, y);
         }
 
-      tile_map_set (view, x, y, TRUE);
+      tile_table_set (view, priv->tile_map, x, y, TRUE);
     }
 
   g_object_unref (view);
@@ -2042,7 +2049,7 @@ load_visible_tiles (ChamplainView *view,
         {
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
           clutter_actor_iter_destroy (&iter);
-          tile_map_set (view, tile_x, tile_y, FALSE);
+          tile_table_set (view, priv->tile_map, tile_x, tile_y, FALSE);
         }
       else if (relocate)
         champlain_viewport_set_actor_position (CHAMPLAIN_VIEWPORT (priv->viewport), CLUTTER_ACTOR (tile), tile_x * size, tile_y * size);
@@ -2058,7 +2065,7 @@ load_visible_tiles (ChamplainView *view,
     {
       for (i = 0; i < arm_size; i++)
         {
-          if (!tile_in_tile_map (view, x, y) && y >= priv->tile_y_first && y < priv->tile_y_last && x >= priv->tile_x_first && x < priv->tile_x_last)
+            if (!tile_in_tile_table (view, priv->tile_map, x, y) && y >= priv->tile_y_first && y < priv->tile_y_last && x >= priv->tile_x_first && x < priv->tile_x_last)
             {
               FillTileCallbackData *data;
 
