@@ -201,11 +201,7 @@ struct _ChamplainViewPrivate
   guint zoom_actor_timeout;
   
   GHashTable *tile_map;
-
-  gint tile_x_first;
-  gint tile_y_first;
-  gint tile_x_last;
-  gint tile_y_last;
+  GHashTable *visible_tiles;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR);
@@ -642,6 +638,12 @@ champlain_view_dispose (GObject *object)
     {
       g_hash_table_destroy (priv->tile_map);
       priv->tile_map = NULL;
+    }
+
+  if (priv->visible_tiles != NULL)
+    {
+      g_hash_table_destroy (priv->visible_tiles);
+      priv->visible_tiles = NULL;
     }
 
   priv->map_layer = NULL;
@@ -1134,6 +1136,7 @@ champlain_view_init (ChamplainView *view)
   priv->redraw_timeout = 0;
   priv->zoom_actor_timeout = 0;
   priv->tile_map = g_hash_table_new_full (g_int64_hash, g_int64_equal, slice_free_gint64, NULL);
+  priv->visible_tiles = g_hash_table_new_full (g_int64_hash, g_int64_equal, slice_free_gint64, NULL);
   priv->goto_duration = 0;
   priv->goto_mode = CLUTTER_EASE_IN_OUT_CIRC;
 
@@ -1972,8 +1975,10 @@ fill_tile_cb (FillTileCallbackData *data)
   gint size = data->size;
   gint zoom_level = data->zoom_level;
 
-  if (!tile_in_tile_table (view, priv->tile_map, x, y) && zoom_level == priv->zoom_level && data->map_source == priv->map_source &&
-      y >= priv->tile_y_first && y < priv->tile_y_last && x >= priv->tile_x_first && x < priv->tile_x_last)
+  if (!tile_in_tile_table (view, priv->tile_map, x, y) &&
+      zoom_level == priv->zoom_level &&
+      data->map_source == priv->map_source &&
+      tile_in_tile_table (view, priv->visible_tiles, x, y))
     {
       GList *iter;
 
@@ -2005,6 +2010,7 @@ load_visible_tiles (ChamplainView *view,
   gint size;
   ClutterActor *child;
   gint x_count, y_count, max_x_end, max_y_end;
+  gint x_start, y_start, x_end, y_end;
   gint arm_size, arm_max, turn;
   gint dirs[5] = { 0, 1, 0, -1, 0 };
   gint i, x, y;
@@ -2014,22 +2020,20 @@ load_visible_tiles (ChamplainView *view,
   max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
   max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
 
-  x_count = ceil ((gfloat) priv->viewport_width / size) + 1;
+  x_start = CLAMP (priv->viewport_x / size, 0, max_x_end);
+  x_count = ceil ((gfloat) (priv->viewport_width) / size) + 1;
+  x_end = MIN (x_start + x_count, max_x_end);
+  x_count = x_end - x_start;
+
+  y_start = CLAMP (priv->viewport_y / size, 0, max_y_end);
   y_count = ceil ((gfloat) priv->viewport_height / size) + 1;
+  y_end = MIN (y_start + y_count, max_y_end);
+  y_count = y_end - y_start;
 
-  priv->tile_x_first = CLAMP (priv->viewport_x / size, 0, max_x_end);
-  priv->tile_y_first = CLAMP (priv->viewport_y / size, 0, max_y_end);
-
-  priv->tile_x_last = priv->tile_x_first + x_count;
-  priv->tile_y_last = priv->tile_y_first + y_count;
-
-  priv->tile_x_last = CLAMP (priv->tile_x_last, priv->tile_x_first, max_x_end);
-  priv->tile_y_last = CLAMP (priv->tile_y_last, priv->tile_y_first, max_y_end);
-
-  x_count = priv->tile_x_last - priv->tile_x_first;
-  y_count = priv->tile_y_last - priv->tile_y_first;
-
-  DEBUG ("Range %d, %d to %d, %d", priv->tile_x_first, priv->tile_y_first, priv->tile_x_last, priv->tile_y_last);
+  g_hash_table_remove_all (priv->visible_tiles);
+  for (x = x_start; x < x_end; x++)
+    for (y = y_start; y < y_end; y++)
+      tile_table_set (view, priv->visible_tiles, x, y, TRUE);
 
   /* fill background tiles */
   if (priv->background_content != NULL)
@@ -2044,8 +2048,7 @@ load_visible_tiles (ChamplainView *view,
       gint tile_x = champlain_tile_get_x (tile);
       gint tile_y = champlain_tile_get_y (tile);
 
-      if (tile_x < priv->tile_x_first || tile_x >= priv->tile_x_last || 
-          tile_y < priv->tile_y_first || tile_y >= priv->tile_y_last)
+      if (!tile_in_tile_table (view, priv->visible_tiles, tile_x, tile_y))
         {
           champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
           clutter_actor_iter_destroy (&iter);
@@ -2056,8 +2059,8 @@ load_visible_tiles (ChamplainView *view,
     }
 
   /* Load new tiles if needed */
-  x = priv->tile_x_first + x_count / 2 - 1;
-  y = priv->tile_y_first + y_count / 2 - 1;
+  x = x_start + x_count / 2 - 1;
+  y = y_start + y_count / 2 - 1;
   arm_max = MAX (x_count, y_count) + 2;
   arm_size = 1;
 
@@ -2065,7 +2068,9 @@ load_visible_tiles (ChamplainView *view,
     {
       for (i = 0; i < arm_size; i++)
         {
-            if (!tile_in_tile_table (view, priv->tile_map, x, y) && y >= priv->tile_y_first && y < priv->tile_y_last && x >= priv->tile_x_first && x < priv->tile_x_last)
+          if (!tile_in_tile_table (view, priv->tile_map, x, y) &&
+              tile_in_tile_table (view, priv->visible_tiles, x, y) &&
+              y >= y_start && y < y_end)
             {
               FillTileCallbackData *data;
 
