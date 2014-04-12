@@ -1344,7 +1344,7 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
 
   champlain_viewport_get_origin (CHAMPLAIN_VIEWPORT (priv->viewport), &x, &y);
 
-  if (ABS (x - priv->viewport_x) > 100 || ABS (y - priv->viewport_y) > 100)
+  if (priv->hwrap)
     {
       gint size, cols, map_width;
 
@@ -1352,12 +1352,15 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
       cols = champlain_map_source_get_column_count (priv->map_source,
                                                     priv->zoom_level);
       map_width = size * cols;
-
+      
       /* Faux wrapping, by positioning viewport to correct wrap point */
-      if (priv->hwrap && (x < 0 || x >= map_width))
+      if (x < 0 || x >= map_width)
         position_viewport (view, x_to_wrap_x (x, map_width), y);
-      else
-        update_coords (view, x, y, FALSE);
+    }
+
+  if (ABS (x - priv->viewport_x) > 100 || ABS (y - priv->viewport_y) > 100)
+    {
+      update_coords (view, x, y, FALSE);
 
       load_visible_tiles (view, FALSE);
       priv->location_updated = TRUE;
