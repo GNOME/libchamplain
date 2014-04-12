@@ -2712,7 +2712,7 @@ champlain_view_get_horizontal_wrap (ChamplainView *view)
 {
   DEBUG_LOG ()
 
-  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), FALSE);
 
   ChamplainViewPrivate *priv = view->priv;
 
