@@ -152,11 +152,9 @@ struct _ChamplainViewPrivate
   ClutterActor *background_layer;               /* background_layer */
   ClutterActor *zoom_layer;                     /* zoom_layer */
   ClutterActor *map_layer;                      /* map_layer */
-                                                /* map_layer clones left */
-                                                /* map_layer clones right */
+                                                /* map_layer clones */
   ClutterActor *user_layers;                    /* user_layers */
-                                                /* user_layers clones left */
-                                                /* user_layers clones right */
+                                                /* user_layers clones */
   ClutterActor *zoom_overlay_actor; /* zoom_overlay_actor */
   ClutterActor *license_actor;      /* license_actor */
 
@@ -1140,22 +1138,18 @@ update_clones_of (ChamplainView *view, ClutterActor *actor, gint map_size)
   ChamplainViewPrivate *priv = view->priv;
   gint i;
 
-  for (i = 0; i < priv->num_clones; i++) {
-    ClutterActor *clone_right = clutter_clone_new (actor);
-    ClutterActor *clone_left  = clutter_clone_new (actor);
+  for (i = 0; i < priv->num_clones; i++) 
+    {
+      ClutterActor *clone_right = clutter_clone_new (actor);
 
-    clutter_actor_set_x (clone_left, -(i + 1) * map_size);
-    clutter_actor_set_x (clone_right, (i + 1) * map_size);
+      clutter_actor_set_x (clone_right, (i + 1) * map_size);
 
-    /* user layers can wrap the map_width, make sure they remain visible */
-    clutter_actor_insert_child_below (priv->viewport_container, clone_left,
-                                      priv->user_layers);
-    clutter_actor_insert_child_below (priv->viewport_container, clone_right,
+      /* user layers can wrap the map_width, make sure they remain visible */
+      clutter_actor_insert_child_below (priv->viewport_container, clone_right,
                                       priv->user_layers);
 
-    priv->clones = g_list_prepend (priv->clones, clone_right);
-    priv->clones = g_list_prepend (priv->clones, clone_left);
-  }
+      priv->clones = g_list_prepend (priv->clones, clone_right);
+    }
 }
 
 static void
@@ -1173,7 +1167,7 @@ update_clones (ChamplainView *view)
   map_size = tile_size * cols;
   clutter_actor_get_size (CLUTTER_ACTOR (view), &view_width, NULL);
 
-  priv->num_clones = ceil ((view_width / (2 * map_size))) + 1;
+  priv->num_clones = ceil (view_width / map_size);
 
   if (priv->clones != NULL) {
     g_list_free_full (priv->clones, (GDestroyNotify) clutter_actor_destroy);
@@ -1353,7 +1347,9 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
                                                     priv->zoom_level);
       map_width = size * cols;
       
-      /* Faux wrapping, by positioning viewport to correct wrap point */
+      /* Faux wrapping, by positioning viewport to correct wrap point
+       * so the master map view is on the left edge of ChamplainView 
+       * (possibly partially invisible) */
       if (x < 0 || x >= map_width)
         position_viewport (view, x_to_wrap_x (x, map_width), y);
     }
@@ -2823,15 +2819,12 @@ show_zoom_actor (ChamplainView *view,
 
       if (priv->hwrap) {
         for (i = 0; i < priv->num_clones; i++) {
-          ClutterActor *clone_left = clutter_clone_new (tile_container);
           ClutterActor *clone_right = clutter_clone_new (tile_container);
           gfloat tiles_x;
 
           clutter_actor_get_position (tile_container, &tiles_x, NULL);
-          clutter_actor_set_x (clone_left, tiles_x - (i * max_x_end * size));
           clutter_actor_set_x (clone_right, tiles_x + (i * max_x_end * size));
 
-          clutter_actor_add_child (zoom_actor, clone_left);
           clutter_actor_add_child (zoom_actor, clone_right);
         }
       }
