@@ -2667,17 +2667,31 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
 
   priv->hwrap = wrap;
 
-  if (priv->hwrap) {
-    g_signal_connect (view, "notify::zoom-level",
+  if (priv->hwrap) 
+    {
+      g_signal_connect (view, "notify::zoom-level",
                       G_CALLBACK (update_clones), NULL);
-    update_clones (view);
-  } else {
-    g_signal_handlers_disconnect_by_func (view,
-                                          G_CALLBACK (update_clones), NULL);
-    g_list_free_full (priv->clones, (GDestroyNotify) clutter_actor_destroy);
-    priv->clones = NULL;
-  }
+      update_clones (view);
+    } 
+  else 
+    {
+      g_signal_handlers_disconnect_by_func (view,
+                                            G_CALLBACK (update_clones), NULL);
+      g_list_free_full (priv->clones, (GDestroyNotify) clutter_actor_destroy);
+      priv->clones = NULL;
+    }
   resize_viewport (view);
+
+  gint size, cols, map_width;
+  size = champlain_map_source_get_tile_size (priv->map_source);
+  cols = champlain_map_source_get_column_count (priv->map_source,
+                                                priv->zoom_level);
+  map_width = size * cols;
+  if (priv->hwrap) 
+    position_viewport (view, x_to_wrap_x (priv->viewport_x, map_width), priv->viewport_y);
+  else
+    position_viewport (view, priv->viewport_x - (priv->num_clones / 2) * map_width, priv->viewport_y);
+    
   load_visible_tiles (view, FALSE);
 }
 
