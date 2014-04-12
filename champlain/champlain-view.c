@@ -276,6 +276,19 @@ x_to_wrap_x (gint x, gint width) {
 }
 
 
+static gint 
+get_map_width (ChamplainView *view) 
+{
+  gint size, cols;
+  ChamplainViewPrivate *priv = view->priv;
+  
+  size = champlain_map_source_get_tile_size (priv->map_source);
+  cols = champlain_map_source_get_column_count (priv->map_source,
+                                                priv->zoom_level);
+  return size * cols;
+}
+
+
 static void
 update_coords (ChamplainView *view,
     gdouble x,
@@ -421,8 +434,7 @@ resize_viewport (ChamplainView *view)
   champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->viewport), &hadjust,
       &vadjust);
 
-  gint map_width = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level) *
-    champlain_map_source_get_tile_size (priv->map_source);
+  gint map_width = get_map_width (view);
   gint map_height = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
     champlain_map_source_get_tile_size (priv->map_source);
   
@@ -1338,12 +1350,8 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
 
   if (priv->hwrap)
     {
-      gint size, cols, map_width;
-
-      size = champlain_map_source_get_tile_size (priv->map_source);
-      cols = champlain_map_source_get_column_count (priv->map_source,
-                                                    priv->zoom_level);
-      map_width = size * cols;
+      gint map_width;
+      map_width = get_map_width (view);
       
       /* Faux wrapping, by positioning viewport to correct wrap point
        * so the master map view is on the left edge of ChamplainView 
@@ -2680,11 +2688,7 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
     }
   resize_viewport (view);
 
-  gint size, cols, map_width;
-  size = champlain_map_source_get_tile_size (priv->map_source);
-  cols = champlain_map_source_get_column_count (priv->map_source,
-                                                priv->zoom_level);
-  map_width = size * cols;
+  gint map_width = get_map_width (view);
   if (priv->hwrap) 
     position_viewport (view, x_to_wrap_x (priv->viewport_x, map_width), priv->viewport_y);
   else
