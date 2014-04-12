@@ -266,15 +266,13 @@ static ChamplainBoundingBox *get_bounding_box (ChamplainView *view,
     gdouble x,
     gdouble y);
 
-static inline gint
+
+static gint
 x_to_wrap_x (gint x, gint width) {
-  while (x < 0)
-    x += width;
-
-  while (x >= width)
-    x -= width;
-
-  return x;
+  if (x < 0)
+    x += (-x / width + 1) * width;
+  
+  return x % width;
 }
 
 
