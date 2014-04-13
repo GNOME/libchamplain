@@ -2665,15 +2665,9 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
   priv->hwrap = wrap;
 
   if (priv->hwrap) 
-    {
-      g_signal_connect (view, "notify::zoom-level",
-                      G_CALLBACK (update_clones), NULL);
-      update_clones (view);
-    } 
+    update_clones (view);
   else 
     {
-      g_signal_handlers_disconnect_by_func (view,
-                                            G_CALLBACK (update_clones), NULL);
       g_list_free_full (priv->clones, (GDestroyNotify) clutter_actor_destroy);
       priv->clones = NULL;
     }
@@ -2752,6 +2746,8 @@ zoom_animation_completed (ClutterActor *actor,
   priv->animating_zoom = FALSE;
   position_zoom_actor (view);  
   clutter_actor_show (priv->user_layers);
+  if (priv->hwrap)
+    update_clones (view);
 
   g_signal_handlers_disconnect_by_func (actor, zoom_animation_completed, view);
 }
@@ -2876,7 +2872,11 @@ show_zoom_actor (ChamplainView *view,
       priv->animating_zoom = TRUE;
     }
   else
-    clutter_actor_set_scale (zoom_actor, deltazoom, deltazoom);
+    {
+      clutter_actor_set_scale (zoom_actor, deltazoom, deltazoom);
+      if (priv->hwrap)
+        update_clones (view);
+    }
 }
 
 static void
