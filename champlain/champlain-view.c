@@ -1142,29 +1142,6 @@ view_size_changed_cb (ChamplainView *view,
 
 
 static void
-update_clones_of (ChamplainView *view, ClutterActor *actor, gint map_size)
-{
-  DEBUG_LOG ()
-
-  ChamplainViewPrivate *priv = view->priv;
-  gint i;
-
-  for (i = 0; i < priv->num_clones; i++) 
-    {
-      ClutterActor *clone_right = clutter_clone_new (actor);
-
-      clutter_actor_set_x (clone_right, (i + 1) * map_size);
-
-      /* user layers can wrap the map_width, make sure they remain visible */
-      clutter_actor_insert_child_below (priv->viewport_container, clone_right,
-                                        priv->user_layers);
-
-      priv->clones = g_list_prepend (priv->clones, clone_right);
-    }
-}
-
-
-static void
 update_clones (ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -1172,6 +1149,7 @@ update_clones (ChamplainView *view)
   ChamplainViewPrivate *priv = view->priv;
   gint map_size;
   gfloat view_width;
+  gint i;
 
   map_size = get_map_width (view);
   clutter_actor_get_size (CLUTTER_ACTOR (view), &view_width, NULL);
@@ -1183,8 +1161,21 @@ update_clones (ChamplainView *view)
       g_list_free_full (priv->clones, (GDestroyNotify) clutter_actor_destroy);
       priv->clones = NULL;
     }
-  update_clones_of (view, priv->map_layer, map_size);
-  update_clones_of (view, priv->user_layers, map_size);
+    
+  for (i = 0; i < priv->num_clones; i++) 
+    {
+      ClutterActor *clone_right = clutter_clone_new (priv->map_layer);
+
+      clutter_actor_set_x (clone_right, (i + 1) * map_size);
+
+      /* user layers can wrap the map_width, make sure they remain visible */
+      clutter_actor_insert_child_below (priv->viewport_container, clone_right,
+                                        priv->user_layers);
+
+      priv->clones = g_list_prepend (priv->clones, clone_right);
+    }
+    
+  // TODO: position user_layers into the center of the map
 }
 
 
