@@ -1106,13 +1106,16 @@ _update_idle_cb (ChamplainView *view)
 
   resize_viewport (view);
 
-  if (priv->hwrap)
-    update_clones (view);
-
   if (priv->keep_center_on_resize)
     champlain_view_center_on (view, priv->latitude, priv->longitude);
   else
     load_visible_tiles (view, FALSE);
+
+  if (priv->hwrap)
+    {
+      update_clones (view);
+      position_viewport (view, x_to_wrap_x (priv->viewport_x, get_map_width (view)), priv->viewport_y);
+    }
 
   return FALSE;
 }
@@ -2677,7 +2680,7 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
   if (priv->hwrap) 
     position_viewport (view, x_to_wrap_x (priv->viewport_x, map_width), priv->viewport_y);
   else
-    position_viewport (view, priv->viewport_x - (priv->num_clones / 2) * map_width, priv->viewport_y);
+    position_viewport (view, priv->viewport_x - ((gint)priv->viewport_width / map_width / 2) * map_width, priv->viewport_y);
     
   load_visible_tiles (view, FALSE);
 }
@@ -2934,7 +2937,10 @@ view_set_zoom_level_at (ChamplainView *view,
     {
       resize_viewport (view);
       remove_all_tiles (view);
-      position_viewport (view, new_x, new_y);
+      if (priv->hwrap)
+        position_viewport (view, x_to_wrap_x (new_x, get_map_width (view)), new_y);
+      else
+        position_viewport (view, new_x, new_y);
       load_visible_tiles (view, FALSE);
 
       if (!priv->animate_zoom)
