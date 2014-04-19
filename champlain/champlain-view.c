@@ -1106,7 +1106,7 @@ champlain_view_init (ChamplainView *view)
   factory = champlain_map_source_factory_dup_default ();
   source = champlain_map_source_factory_create_cached_source (factory, CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK);
 
-  priv->map_source = CHAMPLAIN_MAP_SOURCE (source);
+  priv->map_source = CHAMPLAIN_MAP_SOURCE (g_object_ref_sink (source));
 
   priv->zoom_level = 0;
   priv->min_zoom_level = champlain_map_source_get_min_zoom_level (priv->map_source);
