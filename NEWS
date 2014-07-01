@@ -1,3 +1,15 @@
+libchamplain 0.12.8 (2014-07-01)
+================================
+
+Stable release
+
+Changes:
+
+* Fix crash when changing a map source (Jonas Danielsson)
+* Drop the dependency on libsoup-gnome by using libsoup 2.34 or newer 
+  (Jonas Danielsson)
+* Add basic touchscreen support (Reyad Attiyat)
+
 libchamplain 0.12.7 (2014-02-06)
 ================================
 
