@@ -247,7 +247,7 @@ marker_selected_cb (ChamplainMarker *marker,
     G_GNUC_UNUSED GParamSpec *arg1,
     ChamplainMarkerLayer *layer)
 {
-  if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE)
+  if (layer->priv->mode == CHAMPLAIN_SELECTION_SINGLE && champlain_marker_get_selected (marker))
     set_selected_all_but_one (layer, marker, FALSE);
 }
 
