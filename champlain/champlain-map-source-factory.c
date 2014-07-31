@@ -156,7 +156,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         18,
         256,
         CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "http://tile.openstreetmap.org/#Z#/#X#/#Y#.png",
+        "https://tile.openstreetmap.org/#Z#/#X#/#Y#.png",
         champlain_map_source_new_generic,
         NULL);
   champlain_map_source_factory_register (factory, desc);
@@ -170,7 +170,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         17,
         256,
         CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "http://otile1.mqcdn.com/tiles/1.0.0/osm/#Z#/#X#/#Y#.png",
+        "https://otile1.mqcdn.com/tiles/1.0.0/osm/#Z#/#X#/#Y#.png",
         champlain_map_source_new_generic,
         NULL);
   champlain_map_source_factory_register (factory, desc);
@@ -184,7 +184,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         18,
         256,
         CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "http://otile1.mqcdn.com/tiles/1.0.0/sat/#Z#/#X#/#Y#.jpg",
+        "https://otile1.mqcdn.com/tiles/1.0.0/sat/#Z#/#X#/#Y#.jpg",
         champlain_map_source_new_generic,
         NULL);
   champlain_map_source_factory_register (factory, desc);
