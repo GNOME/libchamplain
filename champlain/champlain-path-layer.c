@@ -405,7 +405,7 @@ champlain_path_layer_new ()
 }
 
 
-static void
+static gboolean
 invalidate_canvas (ChamplainPathLayer *layer)
 {
   ChamplainPathLayerPrivate *priv = layer->priv;
@@ -420,6 +420,8 @@ invalidate_canvas (ChamplainPathLayer *layer)
   clutter_actor_set_size (priv->path_actor, width, height);
   clutter_content_invalidate (priv->canvas);
   priv->redraw_scheduled = FALSE;
+
+  return FALSE;
 }
 
 
