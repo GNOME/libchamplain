@@ -835,7 +835,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
       g_param_spec_boolean ("kinetic-mode",
           "Kinetic Mode",
           "Determines whether the view should use kinetic mode.",
-          TRUE, 
+          FALSE, 
           CHAMPLAIN_PARAM_READWRITE));
 
   /**
@@ -1115,7 +1115,7 @@ champlain_view_init (ChamplainView *view)
   priv->zoom_on_double_click = TRUE;
   priv->animate_zoom = TRUE;
   priv->license_actor = NULL;
-  priv->kinetic_mode = TRUE;
+  priv->kinetic_mode = FALSE;
   priv->viewport_x = 0;
   priv->viewport_y = 0;
   priv->viewport_width = 0;
