@@ -272,9 +272,9 @@ set_location (ChamplainLocation *location,
   g_return_if_fail (CHAMPLAIN_IS_MARKER (location));
 
   ChamplainMarkerPrivate *priv = CHAMPLAIN_MARKER (location)->priv;
-
-  priv->lon = longitude;
-  priv->lat = latitude;
+  
+  priv->lon = CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
+  priv->lat = CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
 
   g_object_notify (G_OBJECT (location), "latitude");
   g_object_notify (G_OBJECT (location), "longitude");

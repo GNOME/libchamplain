@@ -123,8 +123,8 @@ set_location (ChamplainLocation *location,
 
   ChamplainCoordinatePrivate *priv = CHAMPLAIN_COORDINATE (location)->priv;
 
-  priv->longitude = longitude;
-  priv->latitude = latitude;
+  priv->longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
+  priv->latitude = CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
 
   g_object_notify (G_OBJECT (location), "latitude");
   g_object_notify (G_OBJECT (location), "longitude");
