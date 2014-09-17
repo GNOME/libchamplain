@@ -9,7 +9,7 @@ libchamplain_gtk_headers_public =	\
 	$(srcdir)/champlain-gtk.h
 
 libchamplain_gtk_sources = \
-	$(srcdir)/gtk-champlain-embed.c
+	gtk-champlain-embed.c
 
 
 # glib-genmarshal rules

@@ -54,44 +54,44 @@ libchamplain_headers_private =	\
 
 if ENABLE_MEMPHIS
 memphis_sources =		\
-	$(srcdir)/champlain-memphis-renderer.c
+	champlain-memphis-renderer.c
 endif
 
 libchamplain_sources =					\
 	$(memphis_sources)				\
-	$(srcdir)/champlain-debug.c 			\
-	$(srcdir)/champlain-view.c 			\
-	$(srcdir)/champlain-layer.c 			\
-	$(srcdir)/champlain-marker-layer.c		\
-	$(srcdir)/champlain-path-layer.c		\
-	$(srcdir)/champlain-location.c		\
-	$(srcdir)/champlain-coordinate.c		\
-	$(srcdir)/champlain-marker.c	 		\
-	$(srcdir)/champlain-label.c 			\
-	$(srcdir)/champlain-scale.c			\
-	$(srcdir)/champlain-license.c			\
-	$(srcdir)/champlain-tile.c			\
-	$(srcdir)/champlain-map-source.c		\
-	$(srcdir)/champlain-map-source-chain.c		\
-	$(srcdir)/champlain-tile-source.c		\
-	$(srcdir)/champlain-tile-cache.c		\
-	$(srcdir)/champlain-memory-cache.c		\
-	$(srcdir)/champlain-network-tile-source.c	\
-	$(srcdir)/champlain-file-cache.c		\
-	$(srcdir)/champlain-map-source-factory.c	\
-	$(srcdir)/champlain-map-source-desc.c		\
-	$(srcdir)/champlain-point.c			\
-	$(srcdir)/champlain-custom-marker.c		\
-	$(srcdir)/champlain-renderer.c			\
-	$(srcdir)/champlain-image-renderer.c		\
-	$(srcdir)/champlain-error-tile-renderer.c	\
-	$(srcdir)/champlain-file-tile-source.c		\
-	$(srcdir)/champlain-null-tile-source.c		\
-	$(srcdir)/champlain-network-bbox-tile-source.c	\
-	$(srcdir)/champlain-adjustment.c \
-	$(srcdir)/champlain-kinetic-scroll-view.c \
-	$(srcdir)/champlain-viewport.c	\
-	$(srcdir)/champlain-bounding-box.c
+	champlain-debug.c 			\
+	champlain-view.c 			\
+	champlain-layer.c 			\
+	champlain-marker-layer.c		\
+	champlain-path-layer.c		\
+	champlain-location.c		\
+	champlain-coordinate.c		\
+	champlain-marker.c	 		\
+	champlain-label.c 			\
+	champlain-scale.c			\
+	champlain-license.c			\
+	champlain-tile.c			\
+	champlain-map-source.c		\
+	champlain-map-source-chain.c		\
+	champlain-tile-source.c		\
+	champlain-tile-cache.c		\
+	champlain-memory-cache.c		\
+	champlain-network-tile-source.c	\
+	champlain-file-cache.c		\
+	champlain-map-source-factory.c	\
+	champlain-map-source-desc.c		\
+	champlain-point.c			\
+	champlain-custom-marker.c		\
+	champlain-renderer.c			\
+	champlain-image-renderer.c		\
+	champlain-error-tile-renderer.c	\
+	champlain-file-tile-source.c		\
+	champlain-null-tile-source.c		\
+	champlain-network-bbox-tile-source.c	\
+	champlain-adjustment.c \
+	champlain-kinetic-scroll-view.c \
+	champlain-viewport.c	\
+	champlain-bounding-box.c
 
 champlain-features.h: $(top_builddir)/config.status
 	$(AM_V_GEN) ( cd $(top_builddir) && ./config.status champlain/$@ )
