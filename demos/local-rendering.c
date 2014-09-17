@@ -110,7 +110,7 @@ data_source_state_changed (ChamplainNetworkBboxTileSource *source,
   g_object_get (G_OBJECT (source), "state", &state, NULL);
   if (state == CHAMPLAIN_STATE_LOADING)
     {
-      gtk_image_set_from_stock (image, GTK_STOCK_NETWORK, GTK_ICON_SIZE_BUTTON);
+      gtk_image_set_from_icon_name (image, "edit-find", GTK_ICON_SIZE_BUTTON);
       g_print ("NET DATA SOURCE STATE: loading\n");
     }
   else
@@ -302,7 +302,7 @@ static void
 create_rule_edit_window (ChamplainMemphisRule *rule, gchar *id,
     ChamplainMemphisRenderer *renderer)
 {
-  GtkWidget *label, *grid, *props, *button;
+  GtkWidget *label, *grid, *props, *button, *image;
 
   current_rule = rule;
 
@@ -363,11 +363,14 @@ create_rule_edit_window (ChamplainMemphisRule *rule, gchar *id,
 
   GtkWidget *vbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 
-  button = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+  button = gtk_button_new ();
+  image = gtk_image_new_from_icon_name ("zoom-in", GTK_ICON_SIZE_BUTTON);
+  gtk_button_set_image (GTK_BUTTON (button), image);
+  gtk_button_set_label (GTK_BUTTON (button), "Close");
   gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (button), "clicked",
       G_CALLBACK (rule_window_close_cb), NULL);
-  button = gtk_button_new_from_stock (GTK_STOCK_APPLY);
+  button = gtk_button_new_with_mnemonic ("_Apply");
   g_signal_connect (G_OBJECT (button), "clicked",
       G_CALLBACK (rule_apply_cb), renderer);
   gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
@@ -735,7 +738,7 @@ int
 main (int argc,
     char *argv[])
 {
-  GtkWidget *widget, *hbox, *bbox, *menubox, *button, *viewport, *label;
+  GtkWidget *widget, *hbox, *bbox, *menubox, *button, *viewport, *label, *image;
 
   if (gtk_clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
     return 1;
@@ -775,11 +778,17 @@ main (int argc,
 
   /* first line of buttons */
   bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
-  button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_IN);
+  button = gtk_button_new ();
+  image = gtk_image_new_from_icon_name ("zoom-in", GTK_ICON_SIZE_BUTTON);
+  gtk_button_set_image (GTK_BUTTON (button), image);
+  gtk_button_set_label (GTK_BUTTON (button), "Zoom In");
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_in), champlain_view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
-  button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_OUT);
+  button = gtk_button_new ();
+  image = gtk_image_new_from_icon_name ("zoom-out", GTK_ICON_SIZE_BUTTON);
+  gtk_button_set_image (GTK_BUTTON (button), image);
+  gtk_button_set_label (GTK_BUTTON (button), "Zoom Out");
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_out), champlain_view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
@@ -812,7 +821,9 @@ main (int argc,
   g_signal_connect (button, "changed", G_CALLBACK (map_data_changed), champlain_view);
   gtk_box_pack_start (GTK_BOX (memphis_local_box), button, FALSE, FALSE, 0);
 
-  button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_FIT);
+  button = gtk_button_new ();
+  image = gtk_image_new_from_icon_name ("zoom-fit-best", GTK_ICON_SIZE_BUTTON);
+  gtk_button_set_image (GTK_BUTTON (button), image);
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_to_map_data), champlain_view);
   gtk_container_add (GTK_CONTAINER (memphis_local_box), button);
 
@@ -877,7 +888,7 @@ main (int argc,
   scrolled = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled),
       GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-  gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (scrolled), tree_view);
+  gtk_container_add (GTK_CONTAINER (scrolled), tree_view);
 
   gtk_box_pack_start (GTK_BOX (memphis_box), scrolled, TRUE, TRUE, 0);
   gtk_box_pack_start (GTK_BOX (menubox), memphis_box, TRUE, TRUE, 0);

@@ -134,7 +134,7 @@ view_state_changed (ChamplainView *view,
   g_object_get (G_OBJECT (view), "state", &state, NULL);
   if (state == CHAMPLAIN_STATE_LOADING)
     {
-      gtk_image_set_from_stock (image, GTK_STOCK_NETWORK, GTK_ICON_SIZE_BUTTON);
+      gtk_image_set_from_icon_name (image, "edit-find", GTK_ICON_SIZE_BUTTON);
     }
   else
     {
@@ -268,7 +268,7 @@ main (int argc,
     char *argv[])
 {
   GtkWidget *window;
-  GtkWidget *widget, *vbox, *bbox, *button, *image, *viewport;
+  GtkWidget *widget, *vbox, *bbox, *button, *viewport, *image;
   ChamplainView *view;
   ChamplainMarkerLayer *layer;
   ClutterActor *scale;
@@ -343,11 +343,17 @@ main (int argc,
   gtk_widget_set_size_request (widget, 640, 481);
 
   bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
-  button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_IN);
+  button = gtk_button_new ();
+  image = gtk_image_new_from_icon_name ("zoom-in", GTK_ICON_SIZE_BUTTON);
+  gtk_button_set_image (GTK_BUTTON (button), image);
+  gtk_button_set_label (GTK_BUTTON (button), "Zoom In");
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_in), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
-  button = gtk_button_new_from_stock (GTK_STOCK_ZOOM_OUT);
+  button = gtk_button_new ();
+  image = gtk_image_new_from_icon_name ("zoom-out", GTK_ICON_SIZE_BUTTON);
+  gtk_button_set_image (GTK_BUTTON (button), image);
+  gtk_button_set_label (GTK_BUTTON (button), "Zoom Out");
   g_signal_connect (button, "clicked", G_CALLBACK (zoom_out), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
@@ -371,8 +377,8 @@ main (int argc,
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
   button = gtk_button_new ();
-  image = gtk_image_new_from_icon_name ("list-add-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
-  gtk_container_add (GTK_CONTAINER (button), image);
+  image = gtk_image_new_from_icon_name ("list-add", GTK_ICON_SIZE_BUTTON);
+  gtk_button_set_image (GTK_BUTTON (button), image);
   g_signal_connect (button, "clicked", G_CALLBACK (add_clicked), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
