@@ -1,3 +1,17 @@
+libchamplain 0.12.9 (2014-09-18)
+================================
+
+Stable release
+
+Changes:
+
+* For privacy reasons use https instead of http in map sources 
+  that support it (Jiří Techet)
+* Fixed leaked idle function in ChamplainPathLayer and ChamplainScale 
+  (Damián Nohales, Jiří Techet)
+* Don't deselect all markers when a marker got deselected (Damián Nohales)
+* Various minor fixes and compilation warning removal (Jiří Techet)
+
 libchamplain 0.12.8 (2014-07-01)
 ================================
 
