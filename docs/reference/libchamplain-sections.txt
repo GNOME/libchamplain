@@ -58,6 +58,7 @@ champlain_label_set_attributes
 champlain_label_set_single_line_mode
 champlain_label_set_ellipsize
 champlain_label_set_draw_background
+champlain_label_set_draw_shadow
 champlain_label_get_use_markup
 champlain_label_get_text
 champlain_label_get_image
@@ -71,6 +72,7 @@ champlain_label_get_ellipsize
 champlain_label_get_single_line_mode
 champlain_label_get_draw_background
 champlain_label_get_attributes
+champlain_label_get_draw_shadow
 <SUBSECTION Standard>
 CHAMPLAIN_LABEL
 CHAMPLAIN_IS_LABEL
