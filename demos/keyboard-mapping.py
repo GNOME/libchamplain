@@ -25,15 +25,16 @@ class KeyboardMapping:
         window.show_all()
 
     def on_key_press(self, widget, ev):
-        delta = self.widget.get_allocation().width / 4
+        deltax = self.widget.get_allocation().width / 4
+        deltay = self.widget.get_allocation().height / 4
         if ev.keyval == Gdk.KEY_Left: 
-            self.scroll(-delta, 0)
+            self.scroll(-deltax, 0)
         elif ev.keyval == Gdk.KEY_Right: 
-            self.scroll(delta, 0)
+            self.scroll(deltax, 0)
         elif ev.keyval == Gdk.KEY_Up: 
-            self.scroll(0, -delta)
+            self.scroll(0, -deltay)
         elif ev.keyval == Gdk.KEY_Down: 
-            self.scroll(0, delta)
+            self.scroll(0, deltay)
         elif ev.keyval == Gdk.KEY_plus or ev.keyval == Gdk.KEY_KP_Add:
             self.view.zoom_in()
         elif ev.keyval == Gdk.KEY_minus or ev.keyval == Gdk.KEY_KP_Subtract: 
