@@ -92,6 +92,13 @@ static void view_size_allocated_cb (GtkWidget *widget,
     GtkChamplainEmbed *view);
 static void view_realize_cb (GtkWidget *widget,
     GtkChamplainEmbed *view);
+static gboolean
+embed_focus_cb (GtkChamplainEmbed *embed,
+    GdkEvent *event);
+static gboolean
+stage_key_press_cb (ClutterActor *actor,
+    ClutterEvent *event,
+    GtkChamplainEmbed *embed);
 
 G_DEFINE_TYPE (GtkChamplainEmbed, gtk_champlain_embed, GTK_TYPE_ALIGNMENT);
 
@@ -218,6 +225,7 @@ static void
 gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 {
   GtkChamplainEmbedPrivate *priv = GET_PRIVATE (embed);
+  ClutterActor *stage;
 
   embed->priv = priv;
 
@@ -245,6 +253,16 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 
   priv->view = NULL;
   set_view (embed, CHAMPLAIN_VIEW (champlain_view_new ()));
+
+  /* Setup focus/key-press events */
+  g_signal_connect (embed, "focus-in-event",
+                    G_CALLBACK (embed_focus_cb),
+                    NULL);
+  stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (priv->clutter_embed));
+  g_signal_connect (stage, "key-press-event",
+                    G_CALLBACK (stage_key_press_cb),
+                    embed);
+  gtk_widget_set_can_focus (GTK_WIDGET (embed), TRUE);
 
   gtk_container_add (GTK_CONTAINER (embed), priv->clutter_embed);
 }
@@ -372,6 +390,26 @@ mouse_button_cb (GtkWidget *widget,
   return FALSE;
 }
 
+static gboolean
+embed_focus_cb (GtkChamplainEmbed *embed,
+    GdkEvent *event)
+{
+  GtkChamplainEmbedPrivate *priv = embed->priv;
+
+  gtk_widget_grab_focus (priv->clutter_embed);
+  return TRUE;
+}
+
+static gboolean
+stage_key_press_cb (ClutterActor *actor,
+    ClutterEvent *event,
+    GtkChamplainEmbed *embed)
+{
+  ChamplainView *view = gtk_champlain_embed_get_view (embed);
+
+  clutter_actor_event (CLUTTER_ACTOR (view), event, FALSE);
+  return TRUE;
+}
 
 /**
  * gtk_champlain_embed_new:
