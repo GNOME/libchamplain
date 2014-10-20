@@ -242,9 +242,8 @@ static gboolean view_set_zoom_level_at (ChamplainView *view,
 static void tile_state_notify (ChamplainTile *tile,
     G_GNUC_UNUSED GParamSpec *pspec,
     ChamplainView *view);
-static gboolean kinetic_scroll_key_press_cb (ClutterActor *actor,
-    ClutterKeyEvent *event,
-    ChamplainView *view);
+static gboolean kinetic_scroll_key_press_cb (ChamplainView *view,
+    ClutterKeyEvent *event);
 static void champlain_view_go_to_with_duration (ChamplainView *view,
     gdouble latitude,
     gdouble longitude,
@@ -1179,13 +1178,13 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (panning_completed), view);
   g_signal_connect (priv->kinetic_scroll, "button-press-event",
       G_CALLBACK (kinetic_scroll_button_press_cb), view);
-  g_signal_connect (priv->kinetic_scroll, "key-press-event",
-      G_CALLBACK (kinetic_scroll_key_press_cb), view);
 
   /* Setup stage */
   clutter_actor_add_child (CLUTTER_ACTOR (view), priv->kinetic_scroll);
   priv->zoom_overlay_actor = clutter_actor_new ();
   clutter_actor_add_child (CLUTTER_ACTOR (view), priv->zoom_overlay_actor);
+  g_signal_connect (view, "key-press-event",
+                    G_CALLBACK (kinetic_scroll_key_press_cb), NULL);
 
   /* Setup license */
   priv->license_actor = champlain_license_new ();
@@ -1288,9 +1287,8 @@ champlain_view_scroll (ChamplainView *view,
 
 
 static gboolean
-kinetic_scroll_key_press_cb (G_GNUC_UNUSED ClutterActor *actor,
-    ClutterKeyEvent *event,
-    ChamplainView *view)
+kinetic_scroll_key_press_cb (ChamplainView *view,
+    ClutterKeyEvent *event)
 {
   DEBUG_LOG ()
 
