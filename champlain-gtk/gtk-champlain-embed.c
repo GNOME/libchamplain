@@ -92,11 +92,9 @@ static void view_size_allocated_cb (GtkWidget *widget,
     GtkChamplainEmbed *view);
 static void view_realize_cb (GtkWidget *widget,
     GtkChamplainEmbed *view);
-static gboolean
-embed_focus_cb (GtkChamplainEmbed *embed,
+static gboolean embed_focus_cb (GtkChamplainEmbed *embed,
     GdkEvent *event);
-static gboolean
-stage_key_press_cb (ClutterActor *actor,
+static gboolean stage_key_press_cb (ClutterActor *actor,
     ClutterEvent *event,
     GtkChamplainEmbed *embed);
 
