@@ -975,7 +975,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
    * The #ChamplainView::animation-completed signal is emitted when any animation in the view
    * ends.  This is a detailed signal.  For example, if you want to be signaled
    * only for go-to animation, you should connect to
-   * "animation-completed::go-to".
+   * "animation-completed::go-to". And for zoom, connect to "animation-completed::zoom".
    *
    * Since: 0.4
    */
@@ -2536,6 +2536,7 @@ zoom_animation_completed (ClutterActor *actor,
   clutter_actor_show (priv->user_layers);
 
   g_signal_handlers_disconnect_by_func (actor, zoom_animation_completed, view);
+  g_signal_emit_by_name (view, "animation-completed::zoom", NULL);
 }
 
 
