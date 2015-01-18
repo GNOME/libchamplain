@@ -167,7 +167,7 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         "Data, imagery and map information provided by MapQuest, Open Street Map and contributors",
         "http://creativecommons.org/licenses/by-sa/2.0/",
         0,
-        19,
+        17,
         256,
         CHAMPLAIN_MAP_PROJECTION_MERCATOR,
         "https://otile1.mqcdn.com/tiles/1.0.0/osm/#Z#/#X#/#Y#.png",
