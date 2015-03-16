@@ -386,7 +386,22 @@ scroll_event (G_GNUC_UNUSED ClutterActor *actor,
     zoom_level = priv->zoom_level + 1;
   else if (event->direction == CLUTTER_SCROLL_DOWN)
     zoom_level = priv->zoom_level - 1;
-    
+  else if (event->direction == CLUTTER_SCROLL_SMOOTH)
+    {
+      gdouble dx, dy;
+
+      clutter_event_get_scroll_delta (event, &dx, &dy);
+
+      /* Use a threshhold value to avoid jitter */
+      if (fabs(dy) < 0.75)
+        return FALSE;
+
+      if (dy > 0)
+        zoom_level = priv->zoom_level - 1;
+      else
+        zoom_level = priv->zoom_level + 1;
+  }
+
   return view_set_zoom_level_at (view, zoom_level, TRUE, event->x, event->y);
 }
 
