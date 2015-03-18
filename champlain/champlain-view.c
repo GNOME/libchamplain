@@ -390,7 +390,7 @@ scroll_event (G_GNUC_UNUSED ClutterActor *actor,
     {
       gdouble dx, dy;
 
-      clutter_event_get_scroll_delta (event, &dx, &dy);
+      clutter_event_get_scroll_delta ((ClutterEvent *)event, &dx, &dy);
 
       /* Use a threshhold value to avoid jitter */
       if (fabs(dy) < 0.75)
