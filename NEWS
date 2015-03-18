@@ -1,3 +1,18 @@
+libchamplain 0.12.10 (2015-03-18)
+=================================
+
+Stable release
+
+Changes:
+
+* Improve key-press event handling to better support custom keybindings
+  (Jonas Danielsson)
+* Add a simple demo demonstrating custom keybindings (Jiří Techet)
+* Handle CLUTTER_SCROLL_SMOOTH to fix moouse-wheel zooming with newer clutter
+  versions (Jonas Danielsson)
+* Make ChamplainLabel shadow optional (Chris Mayo)
+* Emit animation-completed::zoom signal when zoom ends (Jonas Danielsson)
+
 libchamplain 0.12.9 (2014-09-18)
 ================================
 
