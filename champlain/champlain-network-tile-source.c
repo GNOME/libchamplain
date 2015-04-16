@@ -275,6 +275,8 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
         "proxy-uri", NULL,
         SOUP_SESSION_ADD_FEATURE_BY_TYPE, 
         SOUP_TYPE_PROXY_RESOLVER_DEFAULT,
+        SOUP_SESSION_ADD_FEATURE_BY_TYPE,
+        SOUP_TYPE_CONTENT_DECODER,
         NULL);
   g_object_set (G_OBJECT (priv->soup_session),
       "user-agent", 
