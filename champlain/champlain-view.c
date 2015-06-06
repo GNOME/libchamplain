@@ -206,6 +206,13 @@ struct _ChamplainViewPrivate
   gint tile_y_first;
   gint tile_x_last;
   gint tile_y_last;
+
+  /* Zoom gesture */
+  ClutterGestureAction *zoom_gesture;
+  guint initial_gesture_zoom;
+  gdouble focus_lat;
+  gdouble focus_lon;
+  gboolean zoom_started;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR);
@@ -658,6 +665,14 @@ champlain_view_dispose (GObject *object)
       priv->tile_map = NULL;
     }
 
+  if (priv->zoom_gesture)
+    {
+      clutter_actor_remove_action (CLUTTER_ACTOR (view),
+                                   CLUTTER_ACTION (priv->zoom_gesture));
+      priv->zoom_gesture = NULL;
+    }
+
+
   priv->map_layer = NULL;
   priv->license_actor = NULL;
   priv->user_layers = NULL;
@@ -1101,6 +1116,93 @@ slice_free_gint64 (gpointer data)
 }
 
 
+static guint
+view_find_suitable_zoom (ChamplainView *view,
+    gdouble factor)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  guint zoom_level = priv->initial_gesture_zoom;
+
+  while (factor > 2)
+    {
+      factor /= 2;
+      zoom_level++;
+    }
+
+  while (factor < 0.5)
+    {
+      factor *= 2;
+      zoom_level--;
+    }
+
+  return zoom_level;
+}
+
+
+static gboolean
+zoom_gesture_zoom_cb (ClutterZoomAction *gesture,
+    G_GNUC_UNUSED ClutterActor *actor,
+    ClutterPoint *focal_point,
+    gdouble factor,
+    gpointer user_data)
+{
+  ChamplainView *view = user_data;
+  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  gdouble dx, dy, lat, lon;
+  ClutterPoint focus;
+
+  if (!priv->zoom_started)
+    {
+      priv->zoom_started = TRUE;
+      priv->focus_lat = champlain_view_y_to_latitude (user_data, focal_point->y);
+      priv->focus_lon = champlain_view_x_to_longitude (user_data, focal_point->x);
+      priv->initial_gesture_zoom = priv->zoom_level;
+    }
+  else
+    {
+      guint zoom_level;
+
+      zoom_level = view_find_suitable_zoom (view, factor);
+
+      focus.x = champlain_map_source_get_x (priv->map_source,
+                                            zoom_level, priv->focus_lon);
+      focus.y = champlain_map_source_get_y (priv->map_source,
+                                            zoom_level, priv->focus_lat);
+
+      dx = (priv->viewport_width / 2.0) - focal_point->x;
+      dy = (priv->viewport_height / 2.0) - focal_point->y;
+
+      lon = champlain_map_source_get_longitude (priv->map_source, zoom_level, focus.x + dx);
+      lat = champlain_map_source_get_latitude (priv->map_source, zoom_level, focus.y + dy);
+
+      champlain_view_center_on (view, lat, lon);
+      champlain_view_set_zoom_level (view, zoom_level);
+    }
+
+  return FALSE;
+}
+
+static gboolean
+zoom_gesture_begin_cb (ClutterGestureAction *gesture,
+    G_GNUC_UNUSED ClutterActor *actor,
+    G_GNUC_UNUSED gpointer user_data)
+{
+  /* Give up on >2 finger input */
+  return clutter_gesture_action_get_n_current_points (gesture) == 2;
+}
+
+
+static void
+zoom_gesture_finish_cb (ClutterGestureAction *gesture,
+    G_GNUC_UNUSED ClutterActor *actor,
+    gpointer user_data)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (user_data);
+
+  priv->zoom_started = FALSE;
+}
+
+
 static void
 champlain_view_init (ChamplainView *view)
 {
@@ -1193,6 +1295,19 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (panning_completed), view);
   g_signal_connect (priv->kinetic_scroll, "button-press-event",
       G_CALLBACK (kinetic_scroll_button_press_cb), view);
+
+  /* Setup zoom gesture */
+  priv->zoom_gesture = CLUTTER_GESTURE_ACTION (clutter_zoom_action_new ());
+  g_signal_connect (priv->zoom_gesture, "zoom",
+                    G_CALLBACK (zoom_gesture_zoom_cb), view);
+  g_signal_connect (priv->zoom_gesture, "gesture-begin",
+                    G_CALLBACK (zoom_gesture_begin_cb), view);
+  g_signal_connect (priv->zoom_gesture, "gesture-end",
+                    G_CALLBACK (zoom_gesture_finish_cb), view);
+  g_signal_connect (priv->zoom_gesture, "gesture-cancel",
+                    G_CALLBACK (zoom_gesture_finish_cb), view);
+  clutter_actor_add_action (CLUTTER_ACTOR (view),
+                            CLUTTER_ACTION (priv->zoom_gesture));
 
   /* Setup stage */
   clutter_actor_add_child (CLUTTER_ACTOR (view), priv->kinetic_scroll);
