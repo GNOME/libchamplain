@@ -57,6 +57,7 @@ struct _ChamplainKineticScrollViewPrivate
   gdouble decel_rate;
 
   ClutterActor *viewport;
+  ClutterEventSequence *sequence;
 };
 
 enum
@@ -259,7 +260,7 @@ motion_event_cb (ClutterActor *stage,
   gfloat x, y;
 
   if ((event->type != CLUTTER_MOTION || !(event->modifier_state & CLUTTER_BUTTON1_MASK)) &&
-      event->type != CLUTTER_TOUCH_UPDATE)
+      (event->type != CLUTTER_TOUCH_UPDATE || priv->sequence != clutter_event_get_event_sequence ((ClutterEvent *) event)))
     return FALSE;
 
   if (clutter_actor_transform_stage_point (actor,
@@ -310,7 +311,7 @@ motion_event_cb (ClutterActor *stage,
       g_get_current_time (&motion->time);
     }
 
-  return TRUE;
+  return FALSE;
 }
 
 
@@ -390,10 +391,9 @@ button_release_event_cb (ClutterActor *stage,
   ClutterActor *actor = CLUTTER_ACTOR (scroll);
   gboolean decelerating = FALSE;
 
-
   if ((event->type != CLUTTER_MOTION || event->modifier_state & CLUTTER_BUTTON1_MASK) &&
       (event->type != CLUTTER_BUTTON_RELEASE || event->button != 1) && 
-      event->type != CLUTTER_TOUCH_END)
+      (event->type != CLUTTER_TOUCH_END || priv->sequence != clutter_event_get_event_sequence ((ClutterEvent *) event)))
     return FALSE;
 
   g_signal_handlers_disconnect_by_func (stage,
@@ -567,6 +567,8 @@ button_release_event_cb (ClutterActor *stage,
         }
     }
 
+  priv->sequence = NULL;
+
   /* Reset motion event buffer */
   priv->last_motion = 0;
 
@@ -576,7 +578,12 @@ button_release_event_cb (ClutterActor *stage,
       g_signal_emit_by_name (scroll, "panning-completed", NULL);
     }
 
-  return TRUE;
+  /* Due to the way gestures in progress connect to the stage in order to
+   * receive events, we must let these events go through, as they could be
+   * essential for the management of the ClutterZoomGesture in the
+   * ChamplainView.
+   */
+  return FALSE;
 }
 
 
@@ -589,8 +596,27 @@ button_press_event_cb (ClutterActor *actor,
   ClutterButtonEvent *bevent = (ClutterButtonEvent *) event;
   ClutterActor *stage = clutter_actor_get_stage (actor);
 
+  if (event->type == CLUTTER_TOUCH_BEGIN && priv->sequence)
+    {
+      /* On multi touch input, shy away an cancel everything */
+      priv->sequence = NULL;
+
+      g_signal_handlers_disconnect_by_func (stage,
+          motion_event_cb,
+          scroll);
+      g_signal_handlers_disconnect_by_func (stage,
+          button_release_event_cb,
+          scroll);
+
+      champlain_kinetic_scroll_view_stop (scroll);
+      clamp_adjustments (scroll);
+      g_signal_emit_by_name (scroll, "panning-completed", NULL);
+
+      return FALSE;
+    }
+
   if ((((event->type == CLUTTER_BUTTON_PRESS) && (bevent->button == 1)) ||
-      event->type == CLUTTER_TOUCH_BEGIN) &&
+      (event->type == CLUTTER_TOUCH_BEGIN && !priv->sequence)) &&
       stage)
     {
       ChamplainKineticScrollViewMotion *motion;
@@ -611,6 +637,8 @@ button_press_event_cb (ClutterActor *actor,
               priv->deceleration_timeline = NULL;
             }
 
+          priv->sequence = clutter_event_get_event_sequence (event);
+
           g_signal_connect (stage,
               "captured-event",
               G_CALLBACK (motion_event_cb),
@@ -622,6 +650,11 @@ button_press_event_cb (ClutterActor *actor,
         }
     }
 
+  /* Due to the way gestures in progress connect to the stage in order to
+   * receive events, we must let these events go through, as they could be
+   * essential for the management of the ClutterZoomGesture in the
+   * ChamplainView.
+   */
   return FALSE;
 }
 
