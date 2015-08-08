@@ -103,7 +103,8 @@ enum
   PROP_STATE,
   PROP_BACKGROUND_PATTERN,
   PROP_GOTO_ANIMATION_MODE,
-  PROP_GOTO_ANIMATION_DURATION
+  PROP_GOTO_ANIMATION_DURATION,
+  PROP_WORLD
 };
 
 #define PADDING 10
@@ -213,6 +214,8 @@ struct _ChamplainViewPrivate
   gdouble focus_lat;
   gdouble focus_lon;
   gboolean zoom_started;
+
+  ChamplainBoundingBox *world_bbox;
 };
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR);
@@ -267,7 +270,11 @@ static ChamplainBoundingBox *get_bounding_box (ChamplainView *view,
     guint zoom_level,
     gdouble x,
     gdouble y);
-
+static void get_tile_bounds (ChamplainView *view,
+    guint *min_x,
+    guint *min_y,
+    guint *max_x,
+    guint *max_y);
 
 static void
 update_coords (ChamplainView *view,
@@ -423,21 +430,27 @@ resize_viewport (ChamplainView *view)
   gdouble upper_x = G_MAXINT16;
   gdouble upper_y = G_MAXINT16;
   ChamplainAdjustment *hadjust, *vadjust;
+  guint min_x, min_y, max_x, max_y;
 
   ChamplainViewPrivate *priv = view->priv;
 
   champlain_viewport_get_adjustments (CHAMPLAIN_VIEWPORT (priv->viewport), &hadjust,
       &vadjust);
 
-  gint map_width = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level) *
-    champlain_map_source_get_tile_size (priv->map_source);
-  gint map_height = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level) *
-    champlain_map_source_get_tile_size (priv->map_source);
-  
-  lower_x = MIN (-priv->viewport_width / 2, -priv->viewport_width + map_width / 2);
-  lower_y = MIN (-priv->viewport_height / 2, -priv->viewport_height + map_height / 2);
-  upper_x = MAX (map_width - priv->viewport_width / 2, map_width / 2);
-  upper_y = MAX (map_height - priv->viewport_height / 2, map_height / 2);
+  get_tile_bounds (view, &min_x, &min_y, &max_x, &max_y);
+  gint x_last = max_x * champlain_map_source_get_tile_size (priv->map_source);
+  gint y_last = max_y * champlain_map_source_get_tile_size (priv->map_source);
+  gint x_first = min_x * champlain_map_source_get_tile_size (priv->map_source);
+  gint y_first = min_y * champlain_map_source_get_tile_size (priv->map_source);
+
+  lower_x = MIN (x_first - priv->viewport_width / 2,
+                 (x_first - priv->viewport_width) + (x_last - x_first) / 2);
+
+  lower_y = MIN (y_first - priv->viewport_height / 2,
+                 (y_first - priv->viewport_height) + (y_last - y_first) / 2);
+
+  upper_x = MAX (x_last - priv->viewport_width / 2, (x_last - x_first) / 2);
+  upper_y = MAX (y_last - priv->viewport_height / 2, (y_last - y_first)/ 2);
 
   /* we don't want to get notified about the position change now */
   g_signal_handlers_block_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
@@ -445,7 +458,6 @@ resize_viewport (ChamplainView *view)
   champlain_adjustment_set_values (vadjust, champlain_adjustment_get_value (vadjust), lower_y, upper_y, 1.0);
   g_signal_handlers_unblock_by_func (priv->viewport, G_CALLBACK (viewport_pos_changed_cb), view);
 }
-
 
 static void
 champlain_view_get_property (GObject *object,
@@ -462,12 +474,12 @@ champlain_view_get_property (GObject *object,
     {
     case PROP_LONGITUDE:
       g_value_set_double (value,
-          CLAMP (priv->longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE));
+          CLAMP (priv->longitude, priv->world_bbox->left, priv->world_bbox->right));
       break;
 
     case PROP_LATITUDE:
       g_value_set_double (value,
-          CLAMP (priv->latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE));
+          CLAMP (priv->latitude, priv->world_bbox->bottom, priv->world_bbox->top));
       break;
 
     case PROP_ZOOM_LEVEL:
@@ -524,6 +536,10 @@ champlain_view_get_property (GObject *object,
 
     case PROP_GOTO_ANIMATION_DURATION:
       g_value_set_uint (value, priv->goto_duration);
+      break;
+
+    case PROP_WORLD:
+      g_value_set_boxed (value, priv->world_bbox);
       break;
 
     default:
@@ -603,6 +619,10 @@ champlain_view_set_property (GObject *object,
       priv->goto_duration = g_value_get_uint (value);
       break;
 
+    case PROP_WORLD:
+      champlain_view_set_world (view, g_value_get_boxed (value));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -677,6 +697,9 @@ champlain_view_dispose (GObject *object)
   priv->license_actor = NULL;
   priv->user_layers = NULL;
   priv->zoom_layer = NULL;
+
+  if (priv->world_bbox)
+    champlain_bounding_box_free (priv->world_bbox);
 
   G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
 }
@@ -1000,6 +1023,25 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
           G_PARAM_READWRITE));
 
   /**
+   * ChamplainView:world:
+   *
+   * Set a bounding box to limit the world to. No tiles will be loaded
+   * outside of this bounding box. It will not be possible to scroll outside
+   * of this bounding box.
+   *
+   * Default world is the actual world.
+   *
+   * Since: 0.12.11
+   */
+  g_object_class_install_property (object_class,
+      PROP_WORLD,
+      g_param_spec_boxed ("world",
+          "The world",
+          "The bounding box to limit the #ChamplainView to",
+          CHAMPLAIN_TYPE_BOUNDING_BOX,
+          G_PARAM_READWRITE));
+
+  /**
    * ChamplainView::animation-completed:
    *
    * The #ChamplainView::animation-completed signal is emitted when any animation in the view
@@ -1252,6 +1294,11 @@ champlain_view_init (ChamplainView *view)
   priv->tile_map = g_hash_table_new_full (g_int64_hash, g_int64_equal, slice_free_gint64, NULL);
   priv->goto_duration = 0;
   priv->goto_mode = CLUTTER_EASE_IN_OUT_CIRC;
+  priv->world_bbox = champlain_bounding_box_new ();
+  priv->world_bbox->left = CHAMPLAIN_MIN_LONGITUDE;
+  priv->world_bbox->bottom = CHAMPLAIN_MIN_LATITUDE;
+  priv->world_bbox->right = CHAMPLAIN_MAX_LONGITUDE;
+  priv->world_bbox->top = CHAMPLAIN_MAX_LATITUDE;
 
   clutter_actor_set_background_color (CLUTTER_ACTOR (view), &color);
 
@@ -1499,8 +1546,8 @@ champlain_view_center_on (ChamplainView *view,
   gdouble x, y;
   ChamplainViewPrivate *priv = view->priv;
 
-  longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
-  latitude = CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
+  longitude = CLAMP (longitude, priv->world_bbox->left, priv->world_bbox->right);
+  latitude = CLAMP (latitude, priv->world_bbox->bottom, priv->world_bbox->top);
 
   x = champlain_map_source_get_x (priv->map_source, priv->zoom_level, longitude) - priv->viewport_width / 2.0;
   y = champlain_map_source_get_y (priv->map_source, priv->zoom_level, latitude) - priv->viewport_height / 2.0;
@@ -1627,8 +1674,8 @@ champlain_view_go_to_with_duration (ChamplainView *view,
   ctx = g_slice_new (GoToContext);
   ctx->from_latitude = priv->latitude;
   ctx->from_longitude = priv->longitude;
-  ctx->to_latitude = CLAMP (latitude, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);;
-  ctx->to_longitude = CLAMP (longitude, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
+  ctx->to_latitude = CLAMP (latitude, priv->world_bbox->bottom, priv->world_bbox->top);
+  ctx->to_longitude = CLAMP (longitude, priv->world_bbox->left, priv->world_bbox->right);
 
   ctx->view = view;
 
@@ -1777,6 +1824,64 @@ champlain_view_set_max_zoom_level (ChamplainView *view,
     champlain_view_set_zoom_level (view, max_zoom_level);
 }
 
+/**
+ * champlain_view_get_world:
+ * @view: a #ChamplainView
+ *
+ * Get the bounding box that represents the extent of the world.
+ *
+ * Returns: a #ChamplainBoundingBox that represents the current world
+ *
+ * Since: 0.12.11
+ */
+ChamplainBoundingBox *
+champlain_view_get_world (ChamplainView *view)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+
+  ChamplainViewPrivate *priv = view->priv;
+
+  return priv->world_bbox;
+}
+
+
+/**
+ * champlain_view_set_world:
+ * @view: a #ChamplainView
+ * @bbox: (transfer full): the #ChamplainBoundingBox of the world
+ *
+ * Set a bounding box to limit the world to. No tiles will be loaded
+ * outside of this bounding box. It will not be possible to scroll outside
+ * of this bounding box.
+ *
+ * Since: 0.12.11
+ */
+void
+champlain_view_set_world (ChamplainView *view,
+    ChamplainBoundingBox *bbox)
+{
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+  g_return_if_fail (bbox != NULL);
+
+  ChamplainViewPrivate *priv = view->priv;
+  gdouble latitude, longitude;
+
+  bbox->left = CLAMP (bbox->left, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
+  bbox->bottom = CLAMP (bbox->bottom, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
+  bbox->right = CLAMP (bbox->right, CHAMPLAIN_MIN_LONGITUDE, CHAMPLAIN_MAX_LONGITUDE);
+  bbox->top = CLAMP (bbox->top, CHAMPLAIN_MIN_LATITUDE, CHAMPLAIN_MAX_LATITUDE);
+
+  if (priv->world_bbox)
+    champlain_bounding_box_free (priv->world_bbox);
+
+  priv->world_bbox = champlain_bounding_box_copy (bbox);
+
+  if (!champlain_bounding_box_covers (priv->world_bbox, priv->latitude, priv->longitude))
+    {
+      champlain_bounding_box_get_center (priv->world_bbox, &latitude, &longitude);
+      champlain_view_center_on (view, latitude, longitude);
+    }
+}
 
 /**
  * champlain_view_add_layer:
@@ -2125,27 +2230,26 @@ load_visible_tiles (ChamplainView *view,
   ClutterActorIter iter;
   gint size;
   ClutterActor *child;
-  gint x_count, y_count, max_x_end, max_y_end;
+  gint x_count, y_count;
+  guint min_x, min_y, max_x, max_y;
   gint arm_size, arm_max, turn;
   gint dirs[5] = { 0, 1, 0, -1, 0 };
   gint i, x, y;
 
   size = champlain_map_source_get_tile_size (priv->map_source);
-
-  max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
-  max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
+  get_tile_bounds (view, &min_x, &min_y, &max_x, &max_y);
 
   x_count = ceil ((gfloat) priv->viewport_width / size) + 1;
   y_count = ceil ((gfloat) priv->viewport_height / size) + 1;
 
-  priv->tile_x_first = CLAMP (priv->viewport_x / size, 0, max_x_end);
-  priv->tile_y_first = CLAMP (priv->viewport_y / size, 0, max_y_end);
+  priv->tile_x_first = CLAMP (priv->viewport_x / size, min_x, max_x);
+  priv->tile_y_first = CLAMP (priv->viewport_y / size, min_y, max_y);
 
   priv->tile_x_last = priv->tile_x_first + x_count;
   priv->tile_y_last = priv->tile_y_first + y_count;
 
-  priv->tile_x_last = CLAMP (priv->tile_x_last, priv->tile_x_first, max_x_end);
-  priv->tile_y_last = CLAMP (priv->tile_y_last, priv->tile_y_first, max_y_end);
+  priv->tile_x_last = CLAMP (priv->tile_x_last, priv->tile_x_first, max_x);
+  priv->tile_y_last = CLAMP (priv->tile_y_last, priv->tile_y_first, max_y);
 
   x_count = priv->tile_x_last - priv->tile_x_first;
   y_count = priv->tile_y_last - priv->tile_y_first;
@@ -2689,16 +2793,14 @@ show_zoom_actor (ChamplainView *view,
       gint size;
       gint x_first, y_first;
       gdouble zoom_actor_width, zoom_actor_height;
-      gdouble max_x_end, max_y_end;
       gdouble deltax, deltay;
+      guint min_x, min_y, max_x, max_y;
 
+      get_tile_bounds (view, &min_x, &min_y, &max_x, &max_y);
       size = champlain_map_source_get_tile_size (priv->map_source);
 
-      max_x_end = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
-      max_y_end = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
-
-      x_first = CLAMP (priv->viewport_x / size, 0, max_x_end);
-      y_first = CLAMP (priv->viewport_y / size, 0, max_y_end);
+      x_first = CLAMP (priv->viewport_x / size, min_x, max_x);
+      y_first = CLAMP (priv->viewport_y / size, min_y, max_y);
 
       clutter_actor_destroy_all_children (priv->zoom_overlay_actor);
       zoom_actor = clutter_actor_new ();
@@ -3170,6 +3272,38 @@ champlain_view_get_state (ChamplainView *view)
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), CHAMPLAIN_STATE_NONE);
 
   return view->priv->state;
+}
+
+static void
+get_tile_bounds (ChamplainView *view,
+                 guint *min_x,
+                 guint *min_y,
+                 guint *max_x,
+                 guint *max_y)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  guint size = champlain_map_source_get_tile_size (priv->map_source);
+  gint coord;
+
+  coord = champlain_map_source_get_x (priv->map_source,
+                                      priv->zoom_level,
+                                      priv->world_bbox->left);
+  *min_x = coord / size;
+
+  coord = champlain_map_source_get_y (priv->map_source,
+                                      priv->zoom_level,
+                                      priv->world_bbox->top);
+  *min_y = coord/size;
+
+  coord = champlain_map_source_get_x (priv->map_source,
+                                      priv->zoom_level,
+                                      priv->world_bbox->right);
+  *max_x = ceil ((double) coord / (double) size);
+
+  coord  = champlain_map_source_get_y (priv->map_source,
+                                       priv->zoom_level,
+                                       priv->world_bbox->bottom);
+  *max_y = ceil ((double) coord / (double) size);
 }
 
 static ChamplainBoundingBox *

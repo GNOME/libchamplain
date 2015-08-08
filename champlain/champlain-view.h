@@ -126,6 +126,8 @@ void champlain_view_set_animate_zoom (ChamplainView *view,
     gboolean value);
 void champlain_view_set_background_pattern (ChamplainView *view,
     ClutterContent *background);
+void champlain_view_set_world (ChamplainView *view,
+    ChamplainBoundingBox *bbox);
 
 void champlain_view_add_layer (ChamplainView *view,
     ChamplainLayer *layer);
@@ -143,6 +145,7 @@ gboolean champlain_view_get_zoom_on_double_click (ChamplainView *view);
 gboolean champlain_view_get_animate_zoom (ChamplainView *view);
 ChamplainState champlain_view_get_state (ChamplainView *view);
 ClutterContent *champlain_view_get_background_pattern (ChamplainView *view);
+ChamplainBoundingBox *champlain_view_get_world (ChamplainView *view);
 
 void champlain_view_reload_tiles (ChamplainView *view);
 
