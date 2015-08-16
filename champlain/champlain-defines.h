@@ -25,8 +25,15 @@
 
 #define CHAMPLAIN_API __attribute__((visibility ("default")))
 
-#define CHAMPLAIN_MIN_LATITUDE   -90.0
-#define CHAMPLAIN_MAX_LATITUDE    90.0
+/*
+ * The ordinate y of the Mercator projection becomes infinite at the poles
+ * and the map must be truncated at some latitude less than ninety degrees.
+ *
+ * Using a square aspect ratio for the map, the maximum latitude shown is
+ * approximately 85.05113 degrees.
+ */
+#define CHAMPLAIN_MIN_LATITUDE   -85.05113
+#define CHAMPLAIN_MAX_LATITUDE    85.05113
 #define CHAMPLAIN_MIN_LONGITUDE -180.0
 #define CHAMPLAIN_MAX_LONGITUDE  180.0
 
