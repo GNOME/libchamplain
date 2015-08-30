@@ -669,6 +669,7 @@ champlain_kinetic_scroll_view_init (ChamplainKineticScrollView *self)
   g_array_set_size (priv->motion_buffer, 3);
   priv->decel_rate = 1.1f;
   priv->viewport = NULL;
+  priv->sequence = NULL;
 
   clutter_actor_set_reactive (CLUTTER_ACTOR (self), TRUE);
   g_signal_connect (self, "button-press-event",
