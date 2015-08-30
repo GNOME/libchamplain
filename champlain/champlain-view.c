@@ -1830,7 +1830,7 @@ champlain_view_set_max_zoom_level (ChamplainView *view,
  *
  * Get the bounding box that represents the extent of the world.
  *
- * Returns: a #ChamplainBoundingBox that represents the current world
+ * Returns: (transfer none): a #ChamplainBoundingBox that represents the current world
  *
  * Since: 0.12.11
  */
@@ -1848,7 +1848,7 @@ champlain_view_get_world (ChamplainView *view)
 /**
  * champlain_view_set_world:
  * @view: a #ChamplainView
- * @bbox: (transfer full): the #ChamplainBoundingBox of the world
+ * @bbox: (transfer none): the #ChamplainBoundingBox of the world
  *
  * Set a bounding box to limit the world to. No tiles will be loaded
  * outside of this bounding box. It will not be possible to scroll outside
