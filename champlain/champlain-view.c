@@ -699,7 +699,10 @@ champlain_view_dispose (GObject *object)
   priv->zoom_layer = NULL;
 
   if (priv->world_bbox)
-    champlain_bounding_box_free (priv->world_bbox);
+    {
+      champlain_bounding_box_free (priv->world_bbox);
+      priv->world_bbox = NULL;
+    }
 
   G_OBJECT_CLASS (champlain_view_parent_class)->dispose (object);
 }
