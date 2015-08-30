@@ -311,6 +311,11 @@ motion_event_cb (ClutterActor *stage,
       g_get_current_time (&motion->time);
     }
 
+  /* Due to the way gestures in progress connect to the stage in order to
+   * receive events, we must let these events go through, as they could be
+   * essential for the management of the ClutterZoomGesture in the
+   * ChamplainView.
+   */
   return FALSE;
 }
 
@@ -598,7 +603,7 @@ button_press_event_cb (ClutterActor *actor,
 
   if (event->type == CLUTTER_TOUCH_BEGIN && priv->sequence)
     {
-      /* On multi touch input, shy away an cancel everything */
+      /* On multi touch input, shy away and cancel everything */
       priv->sequence = NULL;
 
       g_signal_handlers_disconnect_by_func (stage,
@@ -650,11 +655,6 @@ button_press_event_cb (ClutterActor *actor,
         }
     }
 
-  /* Due to the way gestures in progress connect to the stage in order to
-   * receive events, we must let these events go through, as they could be
-   * essential for the management of the ClutterZoomGesture in the
-   * ChamplainView.
-   */
   return FALSE;
 }
 
