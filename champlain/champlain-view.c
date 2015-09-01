@@ -1840,7 +1840,7 @@ champlain_view_set_max_zoom_level (ChamplainView *view,
 ChamplainBoundingBox *
 champlain_view_get_world (ChamplainView *view)
 {
-  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
 
   ChamplainViewPrivate *priv = view->priv;
 
