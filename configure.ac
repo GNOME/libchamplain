@@ -36,7 +36,7 @@ AM_PROG_CC_C_O
 # - If binary compatibility has been broken (eg removed or changed interfaces)
 #   change to C+1:0:0
 # - If the interface is the same as the previous version, change to C:R+1:A
-LIBRARY_VERSION=5:4:5
+LIBRARY_VERSION=6:4:6
 CHAMPLAIN_API_VERSION=champlain_api_version
 CHAMPLAIN_API_VERSION_NORM=champlain_major_version[_]champlain_minor_api_version
 CHAMPLAIN_MAJOR_VERSION=champlain_major_version

@@ -1,3 +1,15 @@
+libchamplain 0.12.11 (2015-09-18)
+=================================
+
+Stable release
+
+Changes:
+
+* Improved touch-screen support, pinch-to-zoom (Carlos Garnacho)
+* Add champlain_view_set_world() to limit the world to the specified bounding
+  box (Jonas Danielsson)
+* Various minor fixes (Jonas Danielsson, Ting-Wei Lan, Jiří Techet)
+
 libchamplain 0.12.10 (2015-03-18)
 =================================
 
