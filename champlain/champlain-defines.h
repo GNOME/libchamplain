@@ -32,8 +32,8 @@
  * Using a square aspect ratio for the map, the maximum latitude shown is
  * approximately 85.05113 degrees.
  */
-#define CHAMPLAIN_MIN_LATITUDE   -85.05113
-#define CHAMPLAIN_MAX_LATITUDE    85.05113
+#define CHAMPLAIN_MIN_LATITUDE   -85.0511287798
+#define CHAMPLAIN_MAX_LATITUDE    85.0511287798
 #define CHAMPLAIN_MIN_LONGITUDE -180.0
 #define CHAMPLAIN_MAX_LONGITUDE  180.0
 
