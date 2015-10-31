@@ -1252,6 +1252,18 @@ zoom_gesture_finish_cb (ClutterGestureAction *gesture,
 
 
 static void
+zoom_gesture_cancel_cb (ClutterGestureAction *gesture,
+    G_GNUC_UNUSED ClutterActor *actor,
+    gpointer user_data)
+{
+  ChamplainViewPrivate *priv = GET_PRIVATE (user_data);
+
+  priv->zoom_started = FALSE;
+  g_signal_stop_emission_by_name (gesture, "gesture-cancel");
+}
+
+
+static void
 champlain_view_init (ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -1358,7 +1370,7 @@ champlain_view_init (ChamplainView *view)
   g_signal_connect (priv->zoom_gesture, "gesture-end",
                     G_CALLBACK (zoom_gesture_finish_cb), view);
   g_signal_connect (priv->zoom_gesture, "gesture-cancel",
-                    G_CALLBACK (zoom_gesture_finish_cb), view);
+                    G_CALLBACK (zoom_gesture_cancel_cb), view);
   clutter_actor_add_action (CLUTTER_ACTOR (view),
                             CLUTTER_ACTION (priv->zoom_gesture));
 
