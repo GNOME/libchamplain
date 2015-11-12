@@ -158,6 +158,7 @@ champlain_view_get_zoom_on_double_click
 champlain_view_get_animate_zoom
 champlain_view_get_background_pattern
 champlain_view_reload_tiles
+champlain_view_to_surface
 champlain_view_x_to_longitude
 champlain_view_y_to_latitude
 champlain_view_longitude_to_x
@@ -784,4 +785,19 @@ CHAMPLAIN_IS_LOCATION
 CHAMPLAIN_TYPE_LOCATION
 champlain_location_get_type
 CHAMPLAIN_LOCATION_GET_IFACE
+</SECTION>
+
+<SECTION>
+<FILE>champlain-exportable</FILE>
+<TITLE>ChamplainExportable</TITLE>
+ChamplainExportable
+ChamplainExportableIface
+champlain_exportable_set_surface
+champlain_location_get_surface
+<SUBSECTION Standard>
+CHAMPLAIN_EXPORTABLE
+CHAMPLAIN_IS_EXPORTABLE
+CHAMPLAIN_TYPE_EXPORTABLE
+champlain_exportable_get_type
+CHAMPLAIN_EXPORTABLE_GET_IFACE
 </SECTION>

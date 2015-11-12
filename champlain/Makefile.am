@@ -45,7 +45,9 @@ libchamplain_headers_public = 				\
 	$(srcdir)/champlain-adjustment.h		\
 	$(srcdir)/champlain-kinetic-scroll-view.h		\
 	$(srcdir)/champlain-viewport.h		\
-	$(srcdir)/champlain-bounding-box.h
+	$(srcdir)/champlain-bounding-box.h		\
+	$(srcdir)/champlain-exportable.h
+
 
 libchamplain_headers_private =	\
 	$(srcdir)/champlain-debug.h	\
@@ -91,7 +93,8 @@ libchamplain_sources =					\
 	champlain-adjustment.c \
 	champlain-kinetic-scroll-view.c \
 	champlain-viewport.c	\
-	champlain-bounding-box.c
+	champlain-bounding-box.c		\
+	$(srcdir)/champlain-exportable.c
 
 champlain-features.h: $(top_builddir)/config.status
 	$(AM_V_GEN) ( cd $(top_builddir) && ./config.status champlain/$@ )
