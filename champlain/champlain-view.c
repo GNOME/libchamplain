@@ -275,6 +275,9 @@ static void get_tile_bounds (ChamplainView *view,
     guint *min_y,
     guint *max_x,
     guint *max_y);
+static gboolean tile_in_tile_map (ChamplainView *view,
+    gint tile_x,
+    gint tile_y);
 
 static void
 update_coords (ChamplainView *view,
@@ -1740,6 +1743,106 @@ champlain_view_zoom_out (ChamplainView *view)
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
 
   champlain_view_set_zoom_level (view, view->priv->zoom_level - 1);
+}
+
+
+
+static void
+layers_to_surface (ChamplainView *view,
+    cairo_t *cr)
+{
+  ClutterActorIter iter;
+  ClutterActor *child;
+
+  clutter_actor_iter_init (&iter, view->priv->user_layers);
+  while (clutter_actor_iter_next (&iter, &child))
+    {
+      ChamplainLayer *layer = CHAMPLAIN_LAYER (child);
+      cairo_surface_t *surface;
+
+      if (!CHAMPLAIN_IS_EXPORTABLE (layer))
+        continue;
+
+      surface = champlain_exportable_get_surface (CHAMPLAIN_EXPORTABLE (layer));
+      cairo_set_source_surface (cr, surface, 0, 0);
+      cairo_paint(cr);
+    }
+}
+
+/**
+ * champlain_view_to_surface:
+ * @view: a #ChamplainView
+ * @include_layers: Set to %TRUE if you want to include layers
+ *
+ * Will generate a #cairo_surface_t that represents the current view
+ * of the map. Without any markers or layers. If the current #ChamplainRenderer
+ * used does not support this, this function will return %NULL.
+ *
+ * If @include_layers is set to %TRUE all layers that implement
+ * #ChamplainExportable will be included in the surface.
+ *
+ * The #ChamplainView also need to be in #CHAMPLAIN_STATE_DONE state.
+ *
+ * Returns: (transfer full): a #cairo_surface_t or %NULL on failure. Free with
+ *          cairo_surface_destroy() when done.
+ */
+cairo_surface_t *
+champlain_view_to_surface (ChamplainView *view,
+    gboolean include_layers)
+{
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), NULL);
+
+  ChamplainViewPrivate *priv = view->priv;
+  cairo_surface_t *surface;
+  cairo_t *cr;
+  ClutterActorIter iter;
+  ClutterActor *child;
+  gdouble width, height;
+
+  if (priv->state != CHAMPLAIN_STATE_DONE)
+    return NULL;
+
+  width = clutter_actor_get_width (CLUTTER_ACTOR (view));
+  height = clutter_actor_get_height (CLUTTER_ACTOR (view));
+  surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
+  cr = cairo_create (surface);
+
+  clutter_actor_iter_init (&iter, priv->map_layer);
+  while (clutter_actor_iter_next (&iter, &child))
+    {
+      ChamplainTile *tile = CHAMPLAIN_TILE (child);
+      guint tile_x = champlain_tile_get_x (tile);
+      guint tile_y = champlain_tile_get_y (tile);
+      guint tile_size = champlain_tile_get_size (tile);
+
+      if (tile_in_tile_map (view, tile_x, tile_y))
+        {
+          cairo_surface_t *tile_surface;
+          double x, y;
+
+          tile_surface = champlain_exportable_get_surface (CHAMPLAIN_EXPORTABLE (tile));
+          if (!tile_surface)
+            {
+          cairo_destroy (cr);
+                cairo_surface_destroy (surface);
+                return NULL;
+            }
+          x = ((double) tile_x * tile_size) - priv->viewport_x;
+          y = ((double) tile_y * tile_size) - priv->viewport_y;
+          cairo_set_source_surface (cr,
+                                    tile_surface,
+                                    x, y);
+          cairo_paint(cr);
+        }
+    }
+
+    if (include_layers)
+      layers_to_surface (view, cr);
+
+    cairo_destroy (cr);
+    return surface;
 }
 
 

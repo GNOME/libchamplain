@@ -133,6 +133,8 @@ void champlain_view_add_layer (ChamplainView *view,
     ChamplainLayer *layer);
 void champlain_view_remove_layer (ChamplainView *view,
     ChamplainLayer *layer);
+cairo_surface_t * champlain_view_to_surface (ChamplainView *view,
+    gboolean include_layers);
 
 guint champlain_view_get_zoom_level (ChamplainView *view);
 guint champlain_view_get_min_zoom_level (ChamplainView *view);
