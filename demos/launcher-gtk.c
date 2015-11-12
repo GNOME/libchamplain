@@ -51,6 +51,7 @@ toggle_layer (GtkToggleButton *widget,
     {
       champlain_path_layer_set_visible (path_layer, TRUE);
       champlain_path_layer_set_visible (path, TRUE);
+
       champlain_marker_layer_animate_in_all_markers (CHAMPLAIN_MARKER_LAYER (layer));
     }
   else
@@ -208,6 +209,51 @@ append_point (ChamplainPathLayer *layer, gdouble lon, gdouble lat)
   
   coord = champlain_coordinate_new_full (lon, lat);
   champlain_path_layer_add_node (layer, CHAMPLAIN_LOCATION (coord));
+}
+
+static void
+export_to_png_cb (GdkPixbuf    *pixbuf,
+    GAsyncResult *res)
+{
+  gdk_pixbuf_save_to_stream_finish (res, NULL);
+}
+
+static void
+export_png (GtkButton     *button,
+    ChamplainView *view)
+{
+  cairo_surface_t *surface;
+  GdkPixbuf *pixbuf;
+  GFileOutputStream *os;
+  GFile *file;
+  gint width, height;
+
+  if (champlain_view_get_state (view) != CHAMPLAIN_STATE_DONE)
+    return;
+
+  surface = champlain_view_to_surface (view, TRUE);
+  if (!surface)
+    return;
+
+  width = cairo_image_surface_get_width (surface);
+  height = cairo_image_surface_get_height (surface);
+  pixbuf = gdk_pixbuf_get_from_surface (surface, 0, 0, width, height);
+  if (!pixbuf)
+    return;
+
+  file = g_file_new_for_path ("champlain-map.png");
+  os = g_file_create (file, G_FILE_CREATE_NONE, NULL, NULL);
+  if (!os)
+    {
+      g_object_unref (pixbuf);
+      return;
+    }
+
+  gdk_pixbuf_save_to_stream_async (pixbuf,
+                                   G_OUTPUT_STREAM (os), "png",
+                                   NULL,
+                                   (GAsyncReadyCallback) export_to_png_cb,
+                                   NULL);
 }
 
 static void
@@ -380,6 +426,12 @@ main (int argc,
   image = gtk_image_new_from_icon_name ("list-add", GTK_ICON_SIZE_BUTTON);
   gtk_button_set_image (GTK_BUTTON (button), image);
   g_signal_connect (button, "clicked", G_CALLBACK (add_clicked), view);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+
+  button = gtk_button_new ();
+  image = gtk_image_new_from_icon_name ("camera-photo-symbolic", GTK_ICON_SIZE_BUTTON);
+  gtk_button_set_image (GTK_BUTTON (button), image);
+  g_signal_connect (button, "clicked", G_CALLBACK (export_png), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
   button = gtk_image_new ();
