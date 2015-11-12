@@ -41,7 +41,10 @@
 #include <clutter/clutter.h>
 #include <glib.h>
 
-G_DEFINE_TYPE (ChamplainPathLayer, champlain_path_layer, CHAMPLAIN_TYPE_LAYER)
+static void exportable_interface_init (ChamplainExportableIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (ChamplainPathLayer, champlain_path_layer, CHAMPLAIN_TYPE_LAYER,
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_EXPORTABLE, exportable_interface_init));
 
 #define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_PATH_LAYER, ChamplainPathLayerPrivate))
@@ -62,6 +65,7 @@ enum
   PROP_FILL_COLOR,
   PROP_STROKE,
   PROP_VISIBLE,
+  PROP_SURFACE,
 };
 
 static ClutterColor DEFAULT_FILL_COLOR = { 0xcc, 0x00, 0x00, 0xaa };
@@ -84,11 +88,16 @@ struct _ChamplainPathLayerPrivate
   guint num_dashes;
   
   ClutterContent *canvas;
+  cairo_surface_t *surface;
   ClutterActor *path_actor;
   GList *nodes;
   gboolean redraw_scheduled;
 };
 
+
+static void set_surface (ChamplainExportable *exportable,
+    cairo_surface_t *surface);
+static cairo_surface_t *get_surface (ChamplainExportable *exportable);
 
 static gboolean redraw_path (ClutterCanvas *canvas,
     cairo_t *cr,
@@ -141,6 +150,10 @@ champlain_path_layer_get_property (GObject *object,
       g_value_set_boolean (value, priv->visible);
       break;
 
+    case PROP_SURFACE:
+      g_value_set_boxed (value, get_surface (CHAMPLAIN_EXPORTABLE (self)));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -190,6 +203,10 @@ champlain_path_layer_set_property (GObject *object,
           g_value_get_boolean (value));
       break;
 
+   case PROP_SURFACE:
+      set_surface (CHAMPLAIN_EXPORTABLE (object), g_value_get_boxed (value));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -213,6 +230,8 @@ champlain_path_layer_dispose (GObject *object)
       g_object_unref (priv->canvas);
       priv->canvas = NULL;
     }
+
+  g_clear_pointer (&priv->surface, cairo_surface_destroy);
 
   G_OBJECT_CLASS (champlain_path_layer_parent_class)->dispose (object);
 }
@@ -354,6 +373,10 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
           "The path's visibility",
           TRUE,
           CHAMPLAIN_PARAM_READWRITE));
+
+  g_object_class_override_property (object_class,
+      PROP_SURFACE,
+      "surface");
 }
 
 
@@ -386,6 +409,39 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   clutter_actor_set_size (priv->path_actor, 255, 255);
   clutter_actor_set_content (priv->path_actor, priv->canvas);
   clutter_actor_add_child (CLUTTER_ACTOR (self), priv->path_actor);
+}
+
+static void
+set_surface (ChamplainExportable *exportable,
+     cairo_surface_t *surface)
+{
+  g_return_if_fail (CHAMPLAIN_PATH_LAYER (exportable));
+  g_return_if_fail (surface != NULL);
+
+  ChamplainPathLayer *self = CHAMPLAIN_PATH_LAYER (exportable);
+
+  if (self->priv->surface == surface)
+    return;
+
+  cairo_surface_destroy (self->priv->surface);
+  self->priv->surface = cairo_surface_reference (surface);
+  g_object_notify (G_OBJECT (self), "surface");
+}
+
+static cairo_surface_t *
+get_surface (ChamplainExportable *exportable)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_PATH_LAYER (exportable), NULL);
+
+  return CHAMPLAIN_PATH_LAYER (exportable)->priv->surface;
+}
+
+
+static void
+exportable_interface_init (ChamplainExportableIface *iface)
+{
+  iface->get_surface = get_surface;
+  iface->set_surface = set_surface;
 }
 
 
@@ -665,6 +721,8 @@ redraw_path (ClutterCanvas *canvas,
 
   if (priv->stroke)
     cairo_stroke (cr);
+
+  set_surface (CHAMPLAIN_EXPORTABLE (layer), cairo_get_target (cr));
 
   return FALSE;
 }
