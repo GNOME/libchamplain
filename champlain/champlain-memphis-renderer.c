@@ -334,6 +334,7 @@ tile_loaded_cb (gpointer worker_data)
      and we close the surface anyway */
   argb_to_rgba (cairo_image_surface_get_data (cst),
       cairo_image_surface_get_stride (cst) * cairo_image_surface_get_height (cst));
+  champlain_exportable_set_surface (CHAMPLAIN_EXPORTABLE (tile), cst);
 
   pixbuf = gdk_pixbuf_new_from_data (cairo_image_surface_get_data (cst),
         GDK_COLORSPACE_RGB, TRUE, 8, size, size,

@@ -190,11 +190,14 @@ static gboolean
 redraw_tile (ClutterCanvas *canvas,
     cairo_t *cr,
     gint w,
-    gint h)
+    gint h,
+    ChamplainTile *tile)
 {
   cairo_pattern_t *pat;
   gint size = w;
   
+  champlain_exportable_set_surface (CHAMPLAIN_EXPORTABLE (tile), cairo_get_target (cr));
+
   /* draw a linear gray to white pattern */
   pat = cairo_pattern_create_linear (size / 2.0, 0.0, size, size / 2.0);
   cairo_pattern_add_color_stop_rgb (pat, 0, 0.686, 0.686, 0.686);
@@ -245,7 +248,7 @@ render (ChamplainRenderer *renderer, ChamplainTile *tile)
     {
       priv->error_canvas = clutter_canvas_new ();
       clutter_canvas_set_size (CLUTTER_CANVAS (priv->error_canvas), size, size);
-      g_signal_connect (priv->error_canvas, "draw", G_CALLBACK (redraw_tile), NULL);
+      g_signal_connect (priv->error_canvas, "draw", G_CALLBACK (redraw_tile), tile);
       clutter_content_invalidate (priv->error_canvas);
     }
 

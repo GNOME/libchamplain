@@ -130,16 +130,40 @@ set_data (ChamplainRenderer *renderer, const gchar *data, guint size)
 }
 
 
-static void 
+static gboolean
+image_tile_draw_cb (ClutterCanvas   *canvas,
+    cairo_t *cr,
+    gint width,
+    gint height,
+    ChamplainTile *tile)
+{
+  cairo_surface_t *surface;
+
+  surface = champlain_exportable_get_surface (CHAMPLAIN_EXPORTABLE (tile));
+
+  /* Clear the drawing area */
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_paint (cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+
+  cairo_set_source_surface (cr, surface, 0, 0);
+  cairo_paint(cr);
+
+  return FALSE;
+}
+
+static void
 image_rendered_cb (GInputStream *stream, GAsyncResult *res, RendererData *data)
 {
   ChamplainTile *tile = data->tile;
   gboolean error = TRUE;
-  GError *gerror = NULL;
   ClutterActor *actor = NULL;
   GdkPixbuf *pixbuf;
   ClutterContent *content;
   gfloat width, height;
+  cairo_surface_t *image_surface = NULL;
+  cairo_format_t format;
+  cairo_t *cr;
   
   pixbuf = gdk_pixbuf_new_from_stream_finish (res, NULL);
   if (!pixbuf)
@@ -148,29 +172,28 @@ image_rendered_cb (GInputStream *stream, GAsyncResult *res, RendererData *data)
       goto finish;
     }
   
-  /* Load the image into clutter */
-  content = clutter_image_new ();
-  if (!clutter_image_set_data (CLUTTER_IMAGE (content),
-          gdk_pixbuf_get_pixels (pixbuf),
-          gdk_pixbuf_get_has_alpha (pixbuf)
-            ? COGL_PIXEL_FORMAT_RGBA_8888
-            : COGL_PIXEL_FORMAT_RGB_888,
-          gdk_pixbuf_get_width (pixbuf),
-          gdk_pixbuf_get_height (pixbuf),
-          gdk_pixbuf_get_rowstride (pixbuf),
-          &gerror))
+  width = gdk_pixbuf_get_width (pixbuf);
+  height = gdk_pixbuf_get_height (pixbuf);
+  format = (gdk_pixbuf_get_has_alpha (pixbuf) ? CAIRO_FORMAT_ARGB32 : CAIRO_FORMAT_RGB24);
+  image_surface = cairo_image_surface_create (format, width, height);
+  if (cairo_surface_status (image_surface) != CAIRO_STATUS_SUCCESS)
     {
-      if (gerror)
-        {
-          g_warning ("Unable to transfer to clutter: %s", gerror->message);
-          g_error_free (gerror);
-        }
-
-      g_object_unref (content);
+      g_warning ("Bad surface");
       goto finish;
     }
+  cr = cairo_create (image_surface);
+  gdk_cairo_set_source_pixbuf (cr, pixbuf, 0, 0);
+  cairo_paint (cr);
+  champlain_exportable_set_surface (CHAMPLAIN_EXPORTABLE (tile), image_surface);
+  cairo_destroy (cr);
 
-  clutter_content_get_preferred_size (content, &width, &height);
+  /* Load the image into clutter */
+  width = height = champlain_tile_get_size (tile);
+  content = clutter_canvas_new ();
+  clutter_canvas_set_size (CLUTTER_CANVAS (content), width, height);
+  g_signal_connect (content, "draw", G_CALLBACK (image_tile_draw_cb), tile);
+  clutter_content_invalidate (content);
+
   actor = clutter_actor_new ();
   clutter_actor_set_size (actor, width, height);
   clutter_actor_set_content (actor, content);
@@ -189,6 +212,9 @@ finish:
 
   if (pixbuf)
     g_object_unref (pixbuf);
+
+  if (image_surface)
+    cairo_surface_destroy (image_surface);
 
   g_object_unref (data->renderer);
   g_object_unref (tile);
