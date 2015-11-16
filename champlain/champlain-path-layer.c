@@ -411,6 +411,7 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   clutter_actor_add_child (CLUTTER_ACTOR (self), priv->path_actor);
 }
 
+
 static void
 set_surface (ChamplainExportable *exportable,
      cairo_surface_t *surface)
@@ -427,6 +428,7 @@ set_surface (ChamplainExportable *exportable,
   self->priv->surface = cairo_surface_reference (surface);
   g_object_notify (G_OBJECT (self), "surface");
 }
+
 
 static cairo_surface_t *
 get_surface (ChamplainExportable *exportable)

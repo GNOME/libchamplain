@@ -152,6 +152,7 @@ image_tile_draw_cb (ClutterCanvas   *canvas,
   return FALSE;
 }
 
+
 static void
 image_rendered_cb (GInputStream *stream, GAsyncResult *res, RendererData *data)
 {
@@ -222,7 +223,6 @@ finish:
   g_free (data->data);
   g_slice_free (RendererData, data);
 }
-
 
 
 static void

@@ -1746,7 +1746,6 @@ champlain_view_zoom_out (ChamplainView *view)
 }
 
 
-
 static void
 layers_to_surface (ChamplainView *view,
     cairo_t *cr)
@@ -1768,6 +1767,7 @@ layers_to_surface (ChamplainView *view,
       cairo_paint(cr);
     }
 }
+
 
 /**
  * champlain_view_to_surface:
@@ -1825,9 +1825,9 @@ champlain_view_to_surface (ChamplainView *view,
           tile_surface = champlain_exportable_get_surface (CHAMPLAIN_EXPORTABLE (tile));
           if (!tile_surface)
             {
-          cairo_destroy (cr);
-                cairo_surface_destroy (surface);
-                return NULL;
+              cairo_destroy (cr);
+              cairo_surface_destroy (surface);
+              return NULL;
             }
           x = ((double) tile_x * tile_size) - priv->viewport_x;
           y = ((double) tile_y * tile_size) - priv->viewport_y;

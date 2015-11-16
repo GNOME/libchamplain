@@ -366,7 +366,7 @@ champlain_tile_class_init (ChamplainTileClass *klass)
           FALSE,
           G_PARAM_READWRITE));
 
-    g_object_class_override_property (object_class,
+  g_object_class_override_property (object_class,
       PROP_SURFACE,
       "surface");
 
@@ -450,6 +450,7 @@ exportable_interface_init (ChamplainExportableIface *iface)
   iface->get_surface = get_surface;
   iface->set_surface = set_surface;
 }
+
 
 /**
  * champlain_tile_new:

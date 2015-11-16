@@ -94,7 +94,7 @@ libchamplain_sources =					\
 	champlain-kinetic-scroll-view.c \
 	champlain-viewport.c	\
 	champlain-bounding-box.c		\
-	$(srcdir)/champlain-exportable.c
+	champlain-exportable.c
 
 champlain-features.h: $(top_builddir)/config.status
 	$(AM_V_GEN) ( cd $(top_builddir) && ./config.status champlain/$@ )

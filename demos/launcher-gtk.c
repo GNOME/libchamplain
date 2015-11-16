@@ -51,7 +51,6 @@ toggle_layer (GtkToggleButton *widget,
     {
       champlain_path_layer_set_visible (path_layer, TRUE);
       champlain_path_layer_set_visible (path, TRUE);
-
       champlain_marker_layer_animate_in_all_markers (CHAMPLAIN_MARKER_LAYER (layer));
     }
   else
@@ -211,12 +210,14 @@ append_point (ChamplainPathLayer *layer, gdouble lon, gdouble lat)
   champlain_path_layer_add_node (layer, CHAMPLAIN_LOCATION (coord));
 }
 
+
 static void
 export_to_png_cb (GdkPixbuf    *pixbuf,
     GAsyncResult *res)
 {
   gdk_pixbuf_save_to_stream_finish (res, NULL);
 }
+
 
 static void
 export_png (GtkButton     *button,
@@ -256,6 +257,7 @@ export_png (GtkButton     *button,
                                    NULL);
 }
 
+
 static void
 add_clicked (GtkButton     *button,
              ChamplainView *view)
@@ -284,30 +286,32 @@ add_clicked (GtkButton     *button,
 
   response = gtk_dialog_run (GTK_DIALOG (dialog));
 
-  if (response == GTK_RESPONSE_OK) {
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    ChamplainMapSource *source;
-    ChamplainMapSourceFactory *factory;
-    char *id;
+  if (response == GTK_RESPONSE_OK)
+    {
+      GtkTreeModel *model;
+      GtkTreeIter iter;
+      ChamplainMapSource *source;
+      ChamplainMapSourceFactory *factory;
+      char *id;
 
-    if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (combo), &iter))
-      return;
+      if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (combo), &iter))
+        return;
 
-    model = gtk_combo_box_get_model (GTK_COMBO_BOX (combo));
+      model = gtk_combo_box_get_model (GTK_COMBO_BOX (combo));
 
-    gtk_tree_model_get (model, &iter, COL_ID, &id, -1);
+      gtk_tree_model_get (model, &iter, COL_ID, &id, -1);
 
-    factory = champlain_map_source_factory_dup_default ();
-    source = champlain_map_source_factory_create_memcached_source (factory, id);
+      factory = champlain_map_source_factory_dup_default ();
+      source = champlain_map_source_factory_create_memcached_source (factory, id);
 
-    champlain_view_add_overlay_source (view, source, 0.6 * 255);
-    g_object_unref (factory);
-    g_free (id);
-  }
+      champlain_view_add_overlay_source (view, source, 0.6 * 255);
+      g_object_unref (factory);
+      g_free (id);
+    }
 
   gtk_widget_destroy (dialog);
 }
+
 
 int
 main (int argc,
