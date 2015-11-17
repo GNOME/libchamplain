@@ -1775,6 +1775,8 @@ layers_to_surface (ChamplainView *view,
         continue;
 
       surface = champlain_exportable_get_surface (CHAMPLAIN_EXPORTABLE (layer));
+      if (!surface)
+        continue;
       cairo_set_source_surface (cr, surface, 0, 0);
       cairo_paint(cr);
     }
@@ -1832,7 +1834,7 @@ champlain_view_to_surface (ChamplainView *view,
       if (tile_in_tile_map (view, tile_x, tile_y))
         {
           cairo_surface_t *tile_surface;
-          double x, y;
+          double x, y, opacity;
 
           tile_surface = champlain_exportable_get_surface (CHAMPLAIN_EXPORTABLE (tile));
           if (!tile_surface)
@@ -1841,12 +1843,13 @@ champlain_view_to_surface (ChamplainView *view,
               cairo_surface_destroy (surface);
               return NULL;
             }
+          opacity = ((double) clutter_actor_get_opacity (CLUTTER_ACTOR (tile))) / 255.0;
           x = ((double) tile_x * tile_size) - priv->viewport_x;
           y = ((double) tile_y * tile_size) - priv->viewport_y;
           cairo_set_source_surface (cr,
                                     tile_surface,
                                     x, y);
-          cairo_paint(cr);
+          cairo_paint_with_alpha(cr, opacity);
         }
     }
 

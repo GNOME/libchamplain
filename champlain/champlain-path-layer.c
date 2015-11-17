@@ -435,7 +435,12 @@ get_surface (ChamplainExportable *exportable)
 {
   g_return_val_if_fail (CHAMPLAIN_IS_PATH_LAYER (exportable), NULL);
 
-  return CHAMPLAIN_PATH_LAYER (exportable)->priv->surface;
+  ChamplainPathLayer *self = CHAMPLAIN_PATH_LAYER (exportable);
+
+  if (self->priv->visible)
+    return CHAMPLAIN_PATH_LAYER (exportable)->priv->surface;
+  else
+    return NULL;
 }
 
 
