@@ -676,7 +676,7 @@ champlain_view_dispose (GObject *object)
       priv->redraw_timeout = 0;
     }
     
-  if (priv->redraw_timeout != 0)
+  if (priv->zoom_actor_timeout != 0)
     {
       g_source_remove (priv->zoom_actor_timeout);
       priv->zoom_actor_timeout = 0;
