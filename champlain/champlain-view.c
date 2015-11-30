@@ -191,6 +191,7 @@ struct _ChamplainViewPrivate
   gint tiles_loading;
   
   guint redraw_timeout;
+  guint zoom_timeout;
   
   ClutterAnimationMode goto_mode;
   guint goto_duration;
@@ -214,6 +215,7 @@ struct _ChamplainViewPrivate
   gdouble focus_lat;
   gdouble focus_lon;
   gboolean zoom_started;
+  gdouble accumulated_scroll_dy;
 
   ChamplainBoundingBox *world_bbox;
 };
@@ -389,6 +391,21 @@ panning_completed (G_GNUC_UNUSED ChamplainKineticScrollView *scroll,
 
 
 static gboolean
+zoom_timeout_cb (gpointer data)
+{
+  DEBUG_LOG ()
+
+  ChamplainView *view = data;
+  ChamplainViewPrivate *priv = view->priv;
+
+  priv->accumulated_scroll_dy = 0;
+  priv->zoom_timeout = 0;
+
+  return FALSE;
+}
+
+
+static gboolean
 scroll_event (G_GNUC_UNUSED ClutterActor *actor,
     ClutterScrollEvent *event,
     ChamplainView *view)
@@ -406,18 +423,23 @@ scroll_event (G_GNUC_UNUSED ClutterActor *actor,
   else if (event->direction == CLUTTER_SCROLL_SMOOTH)
     {
       gdouble dx, dy;
+      gint steps;
 
       clutter_event_get_scroll_delta ((ClutterEvent *)event, &dx, &dy);
 
-      /* Use a threshhold value to avoid jitter */
-      if (fabs(dy) < 0.75)
-        return FALSE;
-
+      priv->accumulated_scroll_dy += dy;
+      /* add some small value to avoid missing step for values like 0.999999 */
       if (dy > 0)
-        zoom_level = priv->zoom_level - 1;
+        steps = (int) (priv->accumulated_scroll_dy + 0.01);
       else
-        zoom_level = priv->zoom_level + 1;
-  }
+        steps = (int) (priv->accumulated_scroll_dy - 0.01);
+      zoom_level = priv->zoom_level - steps;
+      priv->accumulated_scroll_dy -= steps;
+
+      if (priv->zoom_timeout != 0)
+        g_source_remove (priv->zoom_timeout);
+      priv->zoom_timeout = g_timeout_add (1000, zoom_timeout_cb, view);
+    }
 
   return view_set_zoom_level_at (view, zoom_level, TRUE, event->x, event->y);
 }
@@ -680,6 +702,12 @@ champlain_view_dispose (GObject *object)
     {
       g_source_remove (priv->zoom_actor_timeout);
       priv->zoom_actor_timeout = 0;
+    }
+
+  if (priv->zoom_timeout != 0)
+    {
+      g_source_remove (priv->zoom_timeout);
+      priv->zoom_timeout = 0;
     }
 
   if (priv->tile_map != NULL)
