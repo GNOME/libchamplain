@@ -793,7 +793,7 @@ CHAMPLAIN_LOCATION_GET_IFACE
 ChamplainExportable
 ChamplainExportableIface
 champlain_exportable_set_surface
-champlain_location_get_surface
+champlain_exportable_get_surface
 <SUBSECTION Standard>
 CHAMPLAIN_EXPORTABLE
 CHAMPLAIN_IS_EXPORTABLE

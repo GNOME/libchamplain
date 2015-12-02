@@ -104,6 +104,7 @@
     <title>Others</title>
     <xi:include href="xml/champlain-tile.xml"/>
     <xi:include href="xml/champlain-bounding-box.xml"/>
+    <xi:include href="xml/champlain-exportable.xml"/>
     <xi:include href="xml/champlain-version.xml"/>
   </part>
   <part>
