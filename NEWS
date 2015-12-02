@@ -1,3 +1,15 @@
+libchamplain 0.12.12 (2015-12-02)
+=================================
+
+Stable release
+
+Changes:
+
+* Add possibility to export maps (Jonas Danielsson)
+* Fix map getting blank after some mouse actions (Carlos Garnacho)
+* Fix tile loading at higher zoom levels (Rémy Oudompheng)
+* Improve mouse wheel zoom handling (Carlos Garnacho, Jiri Techet)
+
 libchamplain 0.12.11 (2015-09-18)
 =================================
 
