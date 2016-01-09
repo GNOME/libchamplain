@@ -37,7 +37,10 @@
 #include <clutter/clutter.h>
 #include <glib.h>
 
-G_DEFINE_TYPE (ChamplainMarkerLayer, champlain_marker_layer, CHAMPLAIN_TYPE_LAYER)
+static void exportable_interface_init (ChamplainExportableIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (ChamplainMarkerLayer, champlain_marker_layer, CHAMPLAIN_TYPE_LAYER,
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_EXPORTABLE, exportable_interface_init));
 
 #define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MARKER_LAYER, ChamplainMarkerLayerPrivate))
@@ -52,6 +55,7 @@ enum
 {
   PROP_0,
   PROP_SELECTION_MODE,
+  PROP_SURFACE,
 };
 
 
@@ -61,6 +65,9 @@ struct _ChamplainMarkerLayerPrivate
   ChamplainView *view;
 };
 
+static void set_surface (ChamplainExportable *exportable,
+    cairo_surface_t *surface);
+static cairo_surface_t *get_surface (ChamplainExportable *exportable);
 
 static void marker_selected_cb (ChamplainMarker *marker,
     G_GNUC_UNUSED GParamSpec *arg1,
@@ -87,6 +94,10 @@ champlain_marker_layer_get_property (GObject *object,
       g_value_set_enum (value, priv->mode);
       break;
 
+    case PROP_SURFACE:
+      g_value_set_boxed (value, get_surface (CHAMPLAIN_EXPORTABLE (self)));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
     }
@@ -105,6 +116,10 @@ champlain_marker_layer_set_property (GObject *object,
     {
     case PROP_SELECTION_MODE:
       champlain_marker_layer_set_selection_mode (self, g_value_get_enum (value));
+      break;
+
+    case PROP_SURFACE:
+      set_surface (CHAMPLAIN_EXPORTABLE (object), g_value_get_boxed (value));
       break;
 
     default:
@@ -164,6 +179,10 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
           CHAMPLAIN_TYPE_SELECTION_MODE,
           CHAMPLAIN_SELECTION_NONE,
           CHAMPLAIN_PARAM_READWRITE));
+
+    g_object_class_override_property (object_class,
+      PROP_SURFACE,
+      "surface");
 }
 
 
@@ -176,6 +195,77 @@ champlain_marker_layer_init (ChamplainMarkerLayer *self)
   priv = self->priv;
   priv->mode = CHAMPLAIN_SELECTION_NONE;
   priv->view = NULL;
+}
+
+
+static void
+set_surface (ChamplainExportable *exportable,
+     cairo_surface_t *surface)
+{
+  /* no need */
+}
+
+static cairo_surface_t *
+get_surface (ChamplainExportable *exportable)
+{
+  g_return_val_if_fail (CHAMPLAIN_IS_MARKER_LAYER (exportable), NULL);
+
+  ClutterActorIter iter;
+  ClutterActor *child;
+  ChamplainMarkerLayer *layer = CHAMPLAIN_MARKER_LAYER (exportable);
+  ChamplainMarkerLayerPrivate *priv = layer->priv;
+  cairo_surface_t *surface = NULL;
+  cairo_t *cr;
+  gboolean has_marker = FALSE;
+
+  clutter_actor_iter_init (&iter, CLUTTER_ACTOR (layer));
+  while (clutter_actor_iter_next (&iter, &child))
+    {
+      ChamplainMarker *marker = CHAMPLAIN_MARKER (child);
+
+      if (CHAMPLAIN_IS_EXPORTABLE (marker))
+        {
+          gfloat x, y, tx, ty;
+          gint origin_x, origin_y;
+          cairo_surface_t *marker_surface;
+          ChamplainExportable *exportable;
+
+          if (!has_marker)
+            {
+              gfloat width, height;
+
+              width = 256;
+              height = 256;
+              if (priv->view != NULL)
+                clutter_actor_get_size (CLUTTER_ACTOR (priv->view),&width, &height);
+              surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
+              has_marker = TRUE;
+            }
+
+          exportable = CHAMPLAIN_EXPORTABLE (marker);
+          marker_surface = champlain_exportable_get_surface (exportable);
+
+          champlain_view_get_viewport_origin (priv->view, &origin_x, &origin_y);
+          clutter_actor_get_translation (CLUTTER_ACTOR (marker), &tx, &ty, NULL);
+          clutter_actor_get_position (CLUTTER_ACTOR (marker), &x, &y);
+
+          cr = cairo_create (surface);
+          cairo_set_source_surface (cr, marker_surface,
+                                    (x + tx) - origin_x,
+                                    (y + ty) - origin_y);
+          cairo_paint (cr);
+          cairo_destroy (cr);
+        }
+    }
+
+  return surface;
+}
+
+static void
+exportable_interface_init (ChamplainExportableIface *iface)
+{
+  iface->get_surface = get_surface;
+  iface->set_surface = set_surface;
 }
 
 
