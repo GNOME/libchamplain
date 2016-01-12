@@ -165,6 +165,7 @@ INTROSPECTION_SCANNER_ARGS = --warn-all
 INTROSPECTION_COMPILER_ARGS =
 introspection_sources = \
 	$(filter-out $(srcdir)/champlain-version.h,$(libchamplain_headers_public))	\
+	$(srcdir)/champlain-enum-types.h						\
 	$(libchamplain_sources)
 if ENABLE_MEMPHIS
 memphis_gir_include = Memphis-0.2
