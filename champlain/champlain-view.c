@@ -1417,9 +1417,6 @@ champlain_view_init (ChamplainView *view)
   clutter_actor_set_x_align (priv->license_actor, CLUTTER_ACTOR_ALIGN_END);
   clutter_actor_set_y_align (priv->license_actor, CLUTTER_ACTOR_ALIGN_END);
   clutter_actor_add_child (CLUTTER_ACTOR (view), priv->license_actor);
-  
-  priv->state = CHAMPLAIN_STATE_DONE;
-  g_object_notify (G_OBJECT (view), "state");
 }
 
 
