@@ -110,7 +110,7 @@ include $(top_srcdir)/build/Makefile.am.marshal
 # glib-mkenums rules
 glib_enum_h = champlain-enum-types.h
 glib_enum_c = champlain-enum-types.c
-glib_enum_headers = $(filter-out $(srcdir)/champlain-version.h,$(libchamplain_headers_public))
+glib_enum_headers = $(filter-out champlain-version.h,$(libchamplain_headers_public))
 include $(top_srcdir)/build/Makefile.am.enums
 
 libchamplain_headers_built = 	\
@@ -165,7 +165,7 @@ INTROSPECTION_SCANNER_ARGS = --warn-all
 INTROSPECTION_COMPILER_ARGS =
 introspection_sources = \
 	$(filter-out $(srcdir)/champlain-version.h,$(libchamplain_headers_public))	\
-	$(srcdir)/champlain-enum-types.h						\
+	champlain-enum-types.h						\
 	$(libchamplain_sources)
 if ENABLE_MEMPHIS
 memphis_gir_include = Memphis-0.2
