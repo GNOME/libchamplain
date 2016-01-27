@@ -327,8 +327,11 @@ view_realize_cb (GtkWidget *widget,
 
   /* Set selection color */
   style = gtk_widget_get_style_context (widget);
-  
-  gtk_style_context_get_color (style, GTK_STATE_FLAG_SELECTED, &gdk_rgba_color);
+  gtk_style_context_save (style);
+  gtk_style_context_set_state (style, GTK_STATE_FLAG_SELECTED);
+
+  gtk_style_context_get_color (style, gtk_style_context_get_state (style),
+                               &gdk_rgba_color);
   gdk_rgba_to_clutter_color (&gdk_rgba_color, &color);
   if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0)
     {
@@ -338,7 +341,8 @@ view_realize_cb (GtkWidget *widget,
     }
   champlain_marker_set_selection_text_color (&color);
 
-  gtk_style_context_get_background_color (style, GTK_STATE_FLAG_SELECTED, &gdk_rgba_color);
+  gtk_style_context_get_background_color (style, gtk_style_context_get_state (style),
+                                          &gdk_rgba_color);
   gdk_rgba_to_clutter_color (&gdk_rgba_color, &color);
   if (color.alpha == 0)
     color.alpha = 255;
@@ -349,6 +353,8 @@ view_realize_cb (GtkWidget *widget,
       color.blue = 131;
     }
   champlain_marker_set_selection_color (&color);
+
+  gtk_style_context_restore (style);
 #endif
 
   /* Setup mouse cursor to a hand */
