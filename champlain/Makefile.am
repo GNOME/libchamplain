@@ -139,12 +139,13 @@ libchamplain_@CHAMPLAIN_API_VERSION@_la_LDFLAGS = \
 	-no-undefined 			\
 	-export-symbols-regex ^champlain_.*
 
-AM_CPPFLAGS = 				\
-	$(DEPS_CFLAGS)			\
-	$(MEMPHIS_CFLAGS)		\
-	-DDATADIR=\""$(datadir)"\"	\
-	-I$(top_srcdir)			\
-	-DCHAMPLAIN_COMPILATION 	\
+AM_CPPFLAGS = 					\
+	$(DEPS_CFLAGS)				\
+	$(MEMPHIS_CFLAGS)			\
+	-DDATADIR=\""$(datadir)"\"		\
+	-I$(top_srcdir)				\
+	-DCHAMPLAIN_COMPILATION 		\
+	-DG_LOG_DOMAIN=\"$(PACKAGE_NAME)\"	\
 	$(WARN_CFLAGS)
 
 
