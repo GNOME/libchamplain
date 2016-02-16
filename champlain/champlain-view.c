@@ -726,6 +726,10 @@ champlain_view_dispose (GObject *object)
 
   priv->map_layer = NULL;
   priv->license_actor = NULL;
+
+  /* This is needed to prevent race condition see bug #760012 */
+  if (priv->user_layers)
+      clutter_actor_remove_all_children (priv->user_layers);
   priv->user_layers = NULL;
   priv->zoom_layer = NULL;
 
