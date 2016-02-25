@@ -1,3 +1,18 @@
+libchamplain 0.12.13 (2016-02-25)
+=================================
+
+Stable release
+
+Changes:
+
+* Implement ChamplainExportable in MarkerLayer and ChamplainPoint
+  (Jonas Danielsson)
+* Avoid runtime warnings due to the use of deprecated API (Cosimo Cecchi)
+* Make sure enums are introspectable (Jonas Danielsson)
+* Fix occasional crash when closing map with layers (Jonas Danielsson)
+* Various minor fixes and improvements (Emmanuele Bassi, Hashem Nasarat,
+  Pavel Machek, Jiří Techet)
+
 libchamplain 0.12.12 (2015-12-02)
 =================================
 
