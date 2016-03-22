@@ -271,8 +271,9 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
   priv->uri_format = NULL;
   priv->offline = FALSE;
 
-  priv->soup_session = soup_session_async_new_with_options (
+  priv->soup_session = soup_session_new_with_options (
         "proxy-uri", NULL,
+        "ssl-strict",FALSE,
         SOUP_SESSION_ADD_FEATURE_BY_TYPE, 
         SOUP_TYPE_PROXY_RESOLVER_DEFAULT,
         SOUP_SESSION_ADD_FEATURE_BY_TYPE,
