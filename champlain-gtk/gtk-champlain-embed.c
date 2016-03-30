@@ -224,6 +224,7 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 {
   GtkChamplainEmbedPrivate *priv = GET_PRIVATE (embed);
   ClutterActor *stage;
+  GdkDisplay *display;
 
   embed->priv = priv;
 
@@ -246,8 +247,9 @@ gtk_champlain_embed_init (GtkChamplainEmbed *embed)
       G_CALLBACK (mouse_button_cb),
       embed);
   /* Setup cursors */
-  priv->cursor_hand_open = gdk_cursor_new (GDK_HAND1);
-  priv->cursor_hand_closed = gdk_cursor_new (GDK_FLEUR);
+  display = gdk_display_get_default ();
+  priv->cursor_hand_open = gdk_cursor_new_for_display (display, GDK_HAND1);
+  priv->cursor_hand_closed = gdk_cursor_new_for_display (display, GDK_FLEUR);
 
   priv->view = NULL;
   set_view (embed, CHAMPLAIN_VIEW (champlain_view_new ()));
