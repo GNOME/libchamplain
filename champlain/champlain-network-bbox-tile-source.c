@@ -240,7 +240,7 @@ champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
   priv->proxy_uri = g_strdup ("");
   priv->soup_session = soup_session_new_with_options (
         "proxy-uri", soup_uri_new (priv->proxy_uri),
-        "ssl-strict",FALSE,
+        "ssl-strict", FALSE,
         SOUP_SESSION_ADD_FEATURE_BY_TYPE, 
         SOUP_TYPE_PROXY_RESOLVER_DEFAULT,
         NULL);
