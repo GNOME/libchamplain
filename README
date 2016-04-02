@@ -12,7 +12,7 @@ libchamplain requires:
   * clutter >= 1.12
   * cairo >= 1.4
   * sqlite >= 3.0
-  * libsoup >= 2.33.5
+  * libsoup >= 2.42
 
 If you are building libchamplain-gtk, you will also need:
 
