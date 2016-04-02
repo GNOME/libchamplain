@@ -2013,6 +2013,9 @@ champlain_view_set_world (ChamplainView *view,
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   g_return_if_fail (bbox != NULL);
 
+  if (!champlain_bounding_box_is_valid (bbox))
+    return;
+
   ChamplainViewPrivate *priv = view->priv;
   gdouble latitude, longitude;
 
