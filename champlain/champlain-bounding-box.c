@@ -211,10 +211,10 @@ champlain_bounding_box_is_valid (ChamplainBoundingBox *bbox)
   g_return_val_if_fail (CHAMPLAIN_BOUNDING_BOX (bbox), FALSE);
 
   return (bbox->left < bbox->right) && (bbox->bottom < bbox->top) &&
-         (bbox->left > CHAMPLAIN_MIN_LONGITUDE) && (bbox->left < CHAMPLAIN_MAX_LONGITUDE) &&
-         (bbox->right > CHAMPLAIN_MIN_LONGITUDE) && (bbox->right < CHAMPLAIN_MAX_LONGITUDE) &&
-         (bbox->bottom > CHAMPLAIN_MIN_LATITUDE) && (bbox->bottom < CHAMPLAIN_MAX_LATITUDE) &&
-         (bbox->top > CHAMPLAIN_MIN_LATITUDE) && (bbox->top < CHAMPLAIN_MAX_LATITUDE);
+         (bbox->left >= CHAMPLAIN_MIN_LONGITUDE) && (bbox->left <= CHAMPLAIN_MAX_LONGITUDE) &&
+         (bbox->right >= CHAMPLAIN_MIN_LONGITUDE) && (bbox->right <= CHAMPLAIN_MAX_LONGITUDE) &&
+         (bbox->bottom >= CHAMPLAIN_MIN_LATITUDE) && (bbox->bottom <= CHAMPLAIN_MAX_LATITUDE) &&
+         (bbox->top >= CHAMPLAIN_MIN_LATITUDE) && (bbox->top <= CHAMPLAIN_MAX_LATITUDE);
 }
 
 /**
