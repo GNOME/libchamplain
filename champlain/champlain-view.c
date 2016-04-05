@@ -1203,13 +1203,13 @@ view_find_suitable_zoom (ChamplainView *view,
   ChamplainViewPrivate *priv = GET_PRIVATE (view);
   guint zoom_level = priv->initial_gesture_zoom;
 
-  while (factor > 2)
+  while (factor > 2 && zoom_level <= priv->max_zoom_level)
     {
       factor /= 2;
       zoom_level++;
     }
 
-  while (factor < 0.5)
+  while (factor < 0.5 && zoom_level >= priv->min_zoom_level)
     {
       factor *= 2;
       zoom_level--;
