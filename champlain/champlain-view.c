@@ -2294,7 +2294,10 @@ tile_map_set (ChamplainView *view, gint tile_x, gint tile_y, gboolean value)
   if (value)
     g_hash_table_insert (priv->tile_map, key, GINT_TO_POINTER (TRUE));
   else
-    g_hash_table_remove (priv->tile_map, key);
+    {
+      g_hash_table_remove (priv->tile_map, key);
+      g_slice_free (gint64, key);
+    }
 }
 
 
