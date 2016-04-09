@@ -571,21 +571,19 @@ champlain_map_source_new_generic (ChamplainMapSourceDesc *desc)
 {
   ChamplainMapSource *map_source;
   ChamplainRenderer *renderer;
-  gchar *id, *name, *license, *license_uri, *uri_format;
+  const gchar *id, *name, *license, *license_uri, *uri_format;
   guint min_zoom, max_zoom, tile_size;
   ChamplainMapProjection projection;
 
-  g_object_get (G_OBJECT (desc),
-      "id", &id,
-      "name", &name,
-      "license", &license,
-      "license-uri", &license_uri,
-      "min-zoom-level", &min_zoom,
-      "max-zoom-level", &max_zoom,
-      "tile-size", &tile_size,
-      "projection", &projection,
-      "uri-format", &uri_format,
-      NULL);
+  id = champlain_map_source_desc_get_id (desc);
+  name = champlain_map_source_desc_get_name (desc);
+  license = champlain_map_source_desc_get_license (desc);
+  license_uri = champlain_map_source_desc_get_license_uri (desc);
+  min_zoom = champlain_map_source_desc_get_min_zoom_level (desc);
+  max_zoom = champlain_map_source_desc_get_max_zoom_level (desc);
+  tile_size = champlain_map_source_desc_get_tile_size (desc);
+  projection = champlain_map_source_desc_get_projection (desc);
+  uri_format = champlain_map_source_desc_get_uri_format (desc);
 
   renderer = CHAMPLAIN_RENDERER (champlain_image_renderer_new ());
 
@@ -611,20 +609,19 @@ champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc)
 {
   ChamplainMapSource *map_source;
   ChamplainRenderer *renderer;
-  gchar *id, *name, *license, *license_uri;
+  const gchar *id, *name, *license, *license_uri;
   guint min_zoom, max_zoom, tile_size;
   ChamplainMapProjection projection;
 
-  g_object_get (G_OBJECT (desc),
-      "id", &id,
-      "name", &name,
-      "license", &license,
-      "license-uri", &license_uri,
-      "min-zoom-level", &min_zoom,
-      "max-zoom-level", &max_zoom,
-      "tile-size", &tile_size,
-      "projection", &projection,
-      NULL);
+  id = champlain_map_source_desc_get_id (desc);
+  name = champlain_map_source_desc_get_name (desc);
+  license = champlain_map_source_desc_get_license (desc);
+  license_uri = champlain_map_source_desc_get_license_uri (desc);
+  min_zoom = champlain_map_source_desc_get_min_zoom_level (desc);
+  max_zoom = champlain_map_source_desc_get_max_zoom_level (desc);
+  tile_size = champlain_map_source_desc_get_tile_size (desc);
+  projection = champlain_map_source_desc_get_projection (desc);
+  uri_format = champlain_map_source_desc_get_uri_format (desc);
 
   renderer = CHAMPLAIN_RENDERER (champlain_memphis_renderer_new_full (tile_size));
 
