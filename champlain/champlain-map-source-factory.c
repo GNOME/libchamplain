@@ -621,7 +621,6 @@ champlain_map_source_new_memphis (ChamplainMapSourceDesc *desc)
   max_zoom = champlain_map_source_desc_get_max_zoom_level (desc);
   tile_size = champlain_map_source_desc_get_tile_size (desc);
   projection = champlain_map_source_desc_get_projection (desc);
-  uri_format = champlain_map_source_desc_get_uri_format (desc);
 
   renderer = CHAMPLAIN_RENDERER (champlain_memphis_renderer_new_full (tile_size));
 
