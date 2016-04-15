@@ -542,6 +542,18 @@ champlain_map_source_factory_create_error_source (ChamplainMapSourceFactory *fac
 }
 
 
+static gint
+compare_id (ChamplainMapSourceDesc *a, ChamplainMapSourceDesc *b)
+{
+  const gchar *id_a, *id_b;
+
+  id_a = champlain_map_source_desc_get_id (a);
+  id_b = champlain_map_source_desc_get_id (b);
+
+  return g_strcmp0 (id_a, id_b);
+}
+
+
 /**
  * champlain_map_source_factory_register:
  * @factory: A #ChamplainMapSourceFactory
@@ -560,9 +572,12 @@ gboolean
 champlain_map_source_factory_register (ChamplainMapSourceFactory *factory,
     ChamplainMapSourceDesc *desc)
 {
-  /* FIXME: check for existing factory with that name? */
-  factory->priv->registered_sources = g_slist_append (factory->priv->registered_sources, desc);
-  return TRUE;
+  if(!g_slist_find_custom (factory->priv->registered_sources, desc, (GCompareFunc) compare_id))
+    {
+      factory->priv->registered_sources = g_slist_append (factory->priv->registered_sources, desc);
+      return TRUE;
+    }
+  return FALSE;
 }
 
 
