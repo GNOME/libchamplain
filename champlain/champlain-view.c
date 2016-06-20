@@ -1157,7 +1157,7 @@ update_clones (ChamplainView *view)
   map_size = get_map_width (view);
   clutter_actor_get_size (CLUTTER_ACTOR (view), &view_width, NULL);
 
-  priv->num_clones = ceil (view_width / map_size);
+  priv->num_clones = ceil (view_width / map_size) + 1;
 
   if (priv->clones != NULL)
     {
@@ -2831,14 +2831,17 @@ show_zoom_actor (ChamplainView *view,
 
       if (priv->hwrap) 
         {
+          GList *old_clone = priv->clones;
           for (i = 0; i < priv->num_clones; i++) 
             {
               ClutterActor *clone_right = clutter_clone_new (tile_container);
+              clutter_actor_hide (CLUTTER_ACTOR (old_clone->data));
               gfloat tiles_x;
 
               clutter_actor_get_position (tile_container, &tiles_x, NULL);
               clutter_actor_set_x (clone_right, tiles_x + (i * max_x_end * size));
 
+              old_clone = old_clone->next;
               clutter_actor_add_child (zoom_actor, clone_right);
             }
         }
