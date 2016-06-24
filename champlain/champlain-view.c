@@ -153,15 +153,21 @@ struct _ChamplainViewPrivate
   ClutterActor *zoom_layer;                     /* zoom_layer */
   ClutterActor *map_layer;                      /* map_layer */
                                                 /* map_layer clones */
-  ClutterActor *user_layers;                    /* user_layers */
+  ClutterActor *user_layers;                    /* user_layers and clones */
   ClutterActor *zoom_overlay_actor; /* zoom_overlay_actor */
   ClutterActor *license_actor;      /* license_actor */
 
   ClutterContent *background_content; 
 
   gboolean hwrap;
-  GList *clones;
   gint num_clones;
+  GList *map_clones;
+  /* There are num_clones user layer slots, overlayed on the map clones.
+   * The first slot initially contains the real user_layers actor, and the
+   * rest contain clones. Whenever the cursor enters a clone slot, its content
+   * is swapped with the real one so as to ensure reactiveness to events.
+   */
+  GList *user_layer_slots;
 
   gdouble viewport_x;
   gdouble viewport_y;
@@ -213,6 +219,7 @@ struct _ChamplainViewPrivate
 
 G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR);
 
+static void exclusive_destroy_clone(ClutterActor *clone);
 static void update_clones (ChamplainView *view);
 static gboolean scroll_event (ClutterActor *actor,
     ClutterScrollEvent *event,
@@ -234,6 +241,12 @@ static void viewport_pos_changed_cb (GObject *gobject,
     ChamplainView *view);
 static gboolean kinetic_scroll_button_press_cb (ClutterActor *actor,
     ClutterButtonEvent *event,
+    ChamplainView *view);
+static void swap_user_layer_slots (ChamplainView *view,
+    gint original_index,
+    gint clone_index);
+static gboolean clone_enter_cb (ClutterActor *actor,
+    ClutterCrossingEvent *event,
     ChamplainView *view);
 static void load_visible_tiles (ChamplainView *view,
     gboolean relocate);
@@ -1143,6 +1156,14 @@ view_size_changed_cb (ChamplainView *view,
   priv->viewport_height = height;
 }
 
+static void
+exclusive_destroy_clone (ClutterActor *clone)
+{
+  if (!CLUTTER_IS_CLONE (clone))
+    return;
+
+  clutter_actor_destroy (clone);
+}
 
 static void
 update_clones (ChamplainView *view)
@@ -1159,26 +1180,47 @@ update_clones (ChamplainView *view)
 
   priv->num_clones = ceil (view_width / map_size) + 1;
 
-  if (priv->clones != NULL)
+  if (priv->map_clones != NULL)
     {
-      g_list_free_full (priv->clones, (GDestroyNotify) clutter_actor_destroy);
-      priv->clones = NULL;
+      /* Only destroy clones, skip the real user_layers actor */
+      g_list_free_full (priv->user_layer_slots, (GDestroyNotify) exclusive_destroy_clone);
+      g_list_free_full (priv->map_clones, (GDestroyNotify) clutter_actor_destroy);
+
+      priv->map_clones = NULL;
+      priv->user_layer_slots = NULL;
     }
+
+  /* Inserting the real user layer in the first slot */
+  priv->user_layer_slots = g_list_append (priv->user_layer_slots, priv->user_layers);
+  clutter_actor_set_x (priv->user_layers, 0);
+
+  /* A fixed width is needed to ensure actors don't get resized when moved */
+  clutter_actor_set_width (priv->user_layers, map_size);
     
   for (i = 0; i < priv->num_clones; i++) 
     {
-      ClutterActor *clone_right = clutter_clone_new (priv->map_layer);
+      /* Map layer clones */
+      ClutterActor *map_clone = clutter_clone_new (priv->map_layer);
+      clutter_actor_set_x (map_clone, (i + 1) * map_size);
+      clutter_actor_insert_child_below (priv->viewport_container, map_clone,
+                                        NULL);
 
-      clutter_actor_set_x (clone_right, (i + 1) * map_size);
+      priv->map_clones = g_list_prepend (priv->map_clones, map_clone);
 
-      /* user layers can wrap the map_width, make sure they remain visible */
-      clutter_actor_insert_child_below (priv->viewport_container, clone_right,
+      /* User layer clones */
+      ClutterActor *clone_user = clutter_clone_new (priv->user_layers);
+      clutter_actor_set_x (clone_user, (i + 1) * map_size);
+      clutter_actor_insert_child_below (priv->viewport_container, clone_user,
                                         priv->user_layers);
 
-      priv->clones = g_list_prepend (priv->clones, clone_right);
+      clutter_actor_set_reactive (clone_user, TRUE);
+      clutter_actor_set_width (priv->user_layers, map_size);
+      g_signal_connect (clone_user, "enter-event",
+          G_CALLBACK (clone_enter_cb), view);
+
+      /* Inserting the user layer clones in the following slots */
+      priv->user_layer_slots = g_list_append (priv->user_layer_slots, clone_user);
     }
-    
-  // TODO: position user_layers into the center of the map
 }
 
 
@@ -1239,7 +1281,8 @@ champlain_view_init (ChamplainView *view)
   priv->goto_duration = 0;
   priv->goto_mode = CLUTTER_EASE_IN_OUT_CIRC;
   priv->num_clones = 0;
-  priv->clones = NULL;
+  priv->map_clones = NULL;
+  priv->user_layer_slots = NULL;
   priv->hwrap = FALSE;
 
   clutter_actor_set_background_color (CLUTTER_ACTOR (view), &color);
@@ -1363,6 +1406,43 @@ viewport_pos_changed_cb (G_GNUC_UNUSED GObject *gobject,
       priv->location_updated = TRUE;
     }
 }
+
+
+static void
+swap_user_layer_slots (ChamplainView *view,
+    gint original_index,
+    gint clone_index)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  gint map_width = get_map_width (view);
+
+  GList *original_slot = g_list_nth (priv->user_layer_slots, original_index);
+  GList *clone_slot = g_list_nth (priv->user_layer_slots, clone_index);
+
+  ClutterActor *clone = clone_slot->data;
+
+  original_slot->data = clone;
+  clone_slot->data = priv->user_layers;
+
+  clutter_actor_set_x (clone, original_index * map_width);
+  clutter_actor_set_x (priv->user_layers, clone_index * map_width);
+}
+
+
+static gboolean
+clone_enter_cb (ClutterActor *clone,
+    G_GNUC_UNUSED ClutterCrossingEvent *event,
+    ChamplainView *view)
+{
+   ChamplainViewPrivate *priv = view->priv;
+
+   gint original_index = g_list_index (priv->user_layer_slots, priv->user_layers);
+   gint clone_index = g_list_index (priv->user_layer_slots, clone);
+
+   swap_user_layer_slots (view, original_index, clone_index);
+
+   return TRUE;
+ }
 
 static gboolean
 kinetic_scroll_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
@@ -2677,8 +2757,10 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
     update_clones (view);
   else 
     {
-      g_list_free_full (priv->clones, (GDestroyNotify) clutter_actor_destroy);
-      priv->clones = NULL;
+      g_list_free_full (priv->map_clones, (GDestroyNotify) clutter_actor_destroy);
+      g_list_free_full (priv->user_layer_slots, (GDestroyNotify) exclusive_destroy_clone);
+      priv->map_clones = NULL;
+      priv->user_layer_slots = NULL;
     }
   resize_viewport (view);
 
@@ -2831,11 +2913,12 @@ show_zoom_actor (ChamplainView *view,
 
       if (priv->hwrap) 
         {
-          GList *old_clone = priv->clones;
+          GList *old_clone = priv->map_clones;
           for (i = 0; i < priv->num_clones; i++) 
             {
               ClutterActor *clone_right = clutter_clone_new (tile_container);
               clutter_actor_hide (CLUTTER_ACTOR (old_clone->data));
+              clutter_actor_set_reactive (CLUTTER_ACTOR (old_clone->data), FALSE);
               gfloat tiles_x;
 
               clutter_actor_get_position (tile_container, &tiles_x, NULL);
