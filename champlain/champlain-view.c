@@ -242,6 +242,12 @@ static void viewport_pos_changed_cb (GObject *gobject,
 static gboolean kinetic_scroll_button_press_cb (ClutterActor *actor,
     ClutterButtonEvent *event,
     ChamplainView *view);
+static gboolean user_layer_button_press_cb (ClutterActor *actor,
+    ClutterButtonEvent *event,
+    ChamplainView *view);
+static ClutterActor *sample_user_layer_at_pos (ChamplainView *view,
+    gfloat x,
+    gfloat y);
 static void swap_user_layer_slots (ChamplainView *view,
     gint original_index,
     gint clone_index);
@@ -1174,7 +1180,7 @@ update_clones (ChamplainView *view)
   gint map_size;
   gfloat view_width;
   gint i;
-
+  
   map_size = get_map_width (view);
   clutter_actor_get_size (CLUTTER_ACTOR (view), &view_width, NULL);
 
@@ -1307,6 +1313,10 @@ champlain_view_init (ChamplainView *view)
   clutter_actor_add_child (priv->viewport_container, priv->zoom_layer);
   clutter_actor_add_child (priv->viewport_container, priv->map_layer);
   clutter_actor_add_child (priv->viewport_container, priv->user_layers);
+
+  clutter_actor_set_reactive (priv->user_layers, TRUE);
+  g_signal_connect (priv->user_layers, "button-press-event",
+      G_CALLBACK (user_layer_button_press_cb), view);
 
   /* Setup viewport */
   priv->viewport = champlain_viewport_new ();
@@ -1443,6 +1453,83 @@ clone_enter_cb (ClutterActor *clone,
 
    return TRUE;
  }
+
+
+static ClutterActor *
+sample_user_layer_at_pos (ChamplainView *view,
+    gfloat x,
+    gfloat y)
+{
+    ClutterStage *stage = CLUTTER_STAGE (clutter_actor_get_stage (CLUTTER_ACTOR (view)));
+    ClutterActor *retval = clutter_stage_get_actor_at_pos (stage,
+        CLUTTER_PICK_REACTIVE, x, y);
+
+    /* If no reactive actor is found on top of the clone, return NULL */
+    if (CLUTTER_IS_CLONE (retval))
+      return NULL;
+
+    return retval;
+}
+
+
+static gboolean
+user_layer_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
+    ClutterButtonEvent *event,
+    ChamplainView *view)
+{
+  ChamplainViewPrivate *priv = view->priv;
+
+  if (!priv->hwrap)
+    return FALSE;
+
+  gint original_index = g_list_index (priv->user_layer_slots, priv->user_layers);
+  gint initial_original_index = original_index;
+  ClutterActor *sampled_actor = NULL;
+
+  /* Sampling neighbouring slots for children that are split by the slot border.
+   * (e.g. a marker that has one half in a slot #n and the other half in #n-1)
+   * Whenever a user clicks on the real user layer, it is swapped succesively with
+   * the right and left neighbors (if they exist) and the area at the event
+   * coordinates is inspected for a reactive child actor. If a child is found,
+   * a button press is synthesized over it.
+   */
+  gint right_neighbor_index = original_index + 1;
+  gint left_neighbor_index = original_index - 1;
+
+  /* Swapping and testing right neighbor */
+  if (right_neighbor_index < priv->num_clones)
+    {
+      swap_user_layer_slots (view, original_index, right_neighbor_index);
+      original_index = right_neighbor_index;
+      sampled_actor = sample_user_layer_at_pos (view, event->x, event->y);
+    }
+
+  /* Swapping and testing left neighbor */
+  if (left_neighbor_index >= 0 && sampled_actor == NULL)
+    {
+      swap_user_layer_slots (view, original_index, left_neighbor_index);
+      original_index = left_neighbor_index;
+      sampled_actor = sample_user_layer_at_pos (view, event->x, event->y);
+    }
+
+  /* If found, redirecting event to the sampled actor */
+  if (sampled_actor != NULL)
+    {
+      ClutterEvent *cloned_event = (ClutterEvent *)event;
+      clutter_event_set_source (cloned_event, sampled_actor);
+      clutter_event_put (cloned_event);
+    }
+  else
+    {
+      /* Swaping the real layer back to its initial slot */
+      if (original_index != initial_original_index)
+        swap_user_layer_slots (view, original_index, initial_original_index);
+
+      return FALSE;
+    }
+
+  return TRUE;
+}
 
 static gboolean
 kinetic_scroll_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
