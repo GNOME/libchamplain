@@ -87,9 +87,16 @@ struct _ChamplainPathLayerPrivate
   gdouble *dash;
   guint num_dashes;
   
-  ClutterContent *canvas;
   cairo_surface_t *surface;
+
+  ClutterContent *right_canvas;
+  ClutterContent *left_canvas;
+
+  ClutterActor *right_actor;
+  ClutterActor *left_actor;
+
   ClutterActor *path_actor;
+
   GList *nodes;
   gboolean redraw_scheduled;
 };
@@ -225,10 +232,12 @@ champlain_path_layer_dispose (GObject *object)
   if (priv->view != NULL)
     set_view (CHAMPLAIN_LAYER (self), NULL);
 
-  if (priv->canvas)
+  if (priv->right_canvas)
     {
-      g_object_unref (priv->canvas);
-      priv->canvas = NULL;
+      g_object_unref (priv->right_canvas);
+      g_object_unref (priv->left_canvas);
+      priv->right_canvas = NULL;
+      priv->left_canvas = NULL;
     }
 
   g_clear_pointer (&priv->surface, cairo_surface_destroy);
@@ -401,14 +410,28 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
 
-  priv->canvas = clutter_canvas_new ();
-  clutter_canvas_set_size (CLUTTER_CANVAS (priv->canvas), 255, 255);
-  g_signal_connect (priv->canvas, "draw", G_CALLBACK (redraw_path), self);
+  priv->right_canvas = clutter_canvas_new ();
+  priv->left_canvas = clutter_canvas_new ();
+
+  clutter_canvas_set_size (CLUTTER_CANVAS (priv->right_canvas), 255, 255);
+  clutter_canvas_set_size (CLUTTER_CANVAS (priv->left_canvas), 0, 0);
+
+  g_signal_connect (priv->right_canvas, "draw", G_CALLBACK (redraw_path), self);
+  g_signal_connect (priv->left_canvas, "draw", G_CALLBACK (redraw_path), self);
 
   priv->path_actor = clutter_actor_new ();
-  clutter_actor_set_size (priv->path_actor, 255, 255);
-  clutter_actor_set_content (priv->path_actor, priv->canvas);
   clutter_actor_add_child (CLUTTER_ACTOR (self), priv->path_actor);
+  clutter_actor_set_size (priv->path_actor, 255, 255);
+
+  priv->right_actor = clutter_actor_new ();
+  clutter_actor_set_size (priv->right_actor, 255, 255);
+  clutter_actor_set_content (priv->right_actor, priv->right_canvas);
+  clutter_actor_add_child (priv->path_actor, priv->right_actor);
+
+  priv->left_actor = clutter_actor_new ();
+  clutter_actor_set_size (priv->left_actor, 255, 255);
+  clutter_actor_set_content (priv->left_actor, priv->left_canvas);
+  clutter_actor_add_child (priv->path_actor, priv->left_actor);
 }
 
 
@@ -468,20 +491,64 @@ champlain_path_layer_new ()
 }
 
 
+static void
+get_map_size (ChamplainView *view, gint *width, gint *height)
+{
+  gint size, rows, cols;
+  ChamplainMapSource *map_source = champlain_view_get_map_source (view);
+  gint zoom_level = champlain_view_get_zoom_level (view);
+  size = champlain_map_source_get_tile_size (map_source);
+  rows = champlain_map_source_get_row_count (map_source,
+                                                zoom_level);
+  cols = champlain_map_source_get_column_count (map_source,
+                                                zoom_level);
+  *width = size * rows;
+  *height = size * cols;
+
+}
+
+
 static gboolean
 invalidate_canvas (ChamplainPathLayer *layer)
 {
   ChamplainPathLayerPrivate *priv = layer->priv;
-  gfloat width, height;
-  
-  width = 256;
-  height = 256;
-  if (priv->view != NULL)
-    clutter_actor_get_size (CLUTTER_ACTOR (priv->view), &width, &height);
+  gfloat view_width, view_height;
+  gint map_width, map_height;
+  gint viewport_x, viewport_y;
+  gfloat right_actor_width, right_actor_height;
+  gfloat left_actor_width, left_actor_height;
 
-  clutter_canvas_set_size (CLUTTER_CANVAS (priv->canvas), width, height);
-  clutter_actor_set_size (priv->path_actor, width, height);
-  clutter_content_invalidate (priv->canvas);
+  right_actor_width = 256;
+  right_actor_height = 256;
+  left_actor_width = 0;
+  left_actor_height = 0;
+  map_width = 256;
+  map_height = 256;
+
+  if (priv->view != NULL)
+    {
+      get_map_size (priv->view, &map_width, &map_height);
+      clutter_actor_get_size (CLUTTER_ACTOR (priv->view), &view_width, &view_height);
+      champlain_view_get_viewport_origin (priv->view, &viewport_x, &viewport_y);
+      right_actor_width = MIN (map_width - viewport_x, view_width);
+      right_actor_height = MIN (map_height - viewport_y, view_height);
+      left_actor_width = view_width - right_actor_width;
+      left_actor_height = right_actor_height;
+    }
+
+  clutter_actor_set_size (priv->path_actor, map_width, map_height);
+
+  clutter_actor_set_size (priv->right_actor, right_actor_width, right_actor_height);
+  clutter_canvas_set_size (CLUTTER_CANVAS (priv->right_canvas), right_actor_width, right_actor_height);
+  clutter_content_invalidate (priv->right_canvas);
+
+  if (left_actor_width != 0)
+    {
+      clutter_actor_set_size (priv->left_actor, left_actor_width, left_actor_height);
+      clutter_canvas_set_size (CLUTTER_CANVAS (priv->left_canvas), left_actor_width, left_actor_height);
+      clutter_content_invalidate (priv->left_canvas);
+    }
+
   priv->redraw_scheduled = FALSE;
 
   return FALSE;
@@ -675,17 +742,21 @@ redraw_path (ClutterCanvas *canvas,
   ChamplainPathLayerPrivate *priv = layer->priv;
   GList *elem;
   ChamplainView *view = priv->view;
-  gint x, y;
+  gint  viewport_x, viewport_y;
   
   /* layer not yet added to the view */
   if (view == NULL)
     return FALSE;
 
-  if (!priv->visible || width == 0.0 || height == 0.0)
+  if (!priv->visible || width == 0.0 || height ==  0.0)
     return FALSE;
 
-  champlain_view_get_viewport_origin (priv->view, &x, &y);
-  clutter_actor_set_position (priv->path_actor, x, y);
+  champlain_view_get_viewport_origin (priv->view, &viewport_x, &viewport_y);
+
+  if (canvas == CLUTTER_CANVAS (priv->right_canvas))
+      clutter_actor_set_position (priv->right_actor, viewport_x, viewport_y);
+  else
+      clutter_actor_set_position (priv->left_actor, 0, viewport_y);
 
   /* Clear the drawing area */
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
@@ -702,7 +773,10 @@ redraw_path (ClutterCanvas *canvas,
       x = champlain_view_longitude_to_x (view, champlain_location_get_longitude (location));
       y = champlain_view_latitude_to_y (view, champlain_location_get_latitude (location));
 
-      cairo_line_to (cr, x, y);
+      if (canvas == CLUTTER_CANVAS (priv->right_canvas))
+        cairo_line_to (cr, x, y);
+      else
+        cairo_line_to (cr, x + viewport_x, y);
     }
 
   if (priv->closed_path)
