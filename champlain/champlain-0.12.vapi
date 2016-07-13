@@ -641,6 +641,7 @@ namespace Champlain {
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK")]
 	public const string MAP_SOURCE_OSM_MAPNIK;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST")]
+	[Deprecated]
 	public const string MAP_SOURCE_OSM_MAPQUEST;
 	[CCode (cheader_filename = "champlain/champlain.h", cname = "CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER")]
 	[Deprecated]

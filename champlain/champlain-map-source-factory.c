@@ -162,34 +162,6 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
   champlain_map_source_factory_register (factory, desc);
 
   desc = champlain_map_source_desc_new_full (
-        CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST,
-        "MapQuest OSM",
-        "Data, imagery and map information provided by MapQuest, Open Street Map and contributors",
-        "http://creativecommons.org/licenses/by-sa/2.0/",
-        0,
-        17,
-        256,
-        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "https://otile1.mqcdn.com/tiles/1.0.0/osm/#Z#/#X#/#Y#.png",
-        champlain_map_source_new_generic,
-        NULL);
-  champlain_map_source_factory_register (factory, desc);
-
-  desc = champlain_map_source_desc_new_full (
-        CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP,
-        "MapQuest Open Aerial",
-        "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
-        "http://creativecommons.org/licenses/by-sa/2.0/",
-        0,
-        18,
-        256,
-        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "https://otile1.mqcdn.com/tiles/1.0.0/sat/#Z#/#X#/#Y#.jpg",
-        champlain_map_source_new_generic,
-        NULL);
-  champlain_map_source_factory_register (factory, desc);
-
-  desc = champlain_map_source_desc_new_full (
         CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP,
         "OpenStreetMap Cycle Map",
         "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
@@ -216,37 +188,6 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         champlain_map_source_new_generic,
         NULL);
   champlain_map_source_factory_register (factory, desc);
-
-/* Not available any more - remove completely in the next release */
-#if 0
-  desc = champlain_map_source_desc_new_full (
-        CHAMPLAIN_MAP_SOURCE_OAM,
-        "OpenAerialMap",
-        "(CC) BY 3.0 OpenAerialMap contributors",
-        "http://creativecommons.org/licenses/by/3.0/",
-        0,
-        17,
-        256,
-        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg",
-        champlain_map_source_new_generic,
-        NULL);
-  champlain_map_source_factory_register (factory, desc);
-
-  desc = champlain_map_source_desc_new_full (
-        CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
-        "OpenStreetMap Osmarender",
-        "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
-        "http://creativecommons.org/licenses/by-sa/2.0/",
-        0,
-        17,
-        256,
-        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
-        "http://a.tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png",
-        champlain_map_source_new_generic,
-        NULL);
-  champlain_map_source_factory_register (factory, desc);
-#endif
 
   desc = champlain_map_source_desc_new_full (
         CHAMPLAIN_MAP_SOURCE_MFF_RELIEF,
@@ -361,6 +302,66 @@ champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
         NULL);
   champlain_map_source_factory_register (factory, desc);
 #endif
+
+/* Not available any more - remove completely in the next release */
+#if 0
+  desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP,
+        "MapQuest Open Aerial",
+        "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
+        "http://creativecommons.org/licenses/by-sa/2.0/",
+        0,
+        18,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "https://otile1.mqcdn.com/tiles/1.0.0/sat/#Z#/#X#/#Y#.jpg",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST,
+        "MapQuest OSM",
+        "Data, imagery and map information provided by MapQuest, Open Street Map and contributors",
+        "http://creativecommons.org/licenses/by-sa/2.0/",
+        0,
+        17,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "https://otile1.mqcdn.com/tiles/1.0.0/osm/#Z#/#X#/#Y#.png",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OAM,
+        "OpenAerialMap",
+        "(CC) BY 3.0 OpenAerialMap contributors",
+        "http://creativecommons.org/licenses/by/3.0/",
+        0,
+        17,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "http://tile.openaerialmap.org/tiles/1.0.0/openaerialmap-900913/#Z#/#X#/#Y#.jpg",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+
+  desc = champlain_map_source_desc_new_full (
+        CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER,
+        "OpenStreetMap Osmarender",
+        "Map data is CC-BY-SA 2.0 OpenStreetMap contributors",
+        "http://creativecommons.org/licenses/by-sa/2.0/",
+        0,
+        17,
+        256,
+        CHAMPLAIN_MAP_PROJECTION_MERCATOR,
+        "http://a.tah.openstreetmap.org/Tiles/tile/#Z#/#X#/#Y#.png",
+        champlain_map_source_new_generic,
+        NULL);
+  champlain_map_source_factory_register (factory, desc);
+#endif
+
 }
 
 

@@ -91,12 +91,6 @@ gboolean champlain_map_source_factory_register (ChamplainMapSourceFactory *facto
     ChamplainMapSourceDesc *desc);
 GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *factory);
 
-/**
- * CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK:
- *
- * OpenStreetMap Mapnik
- */
-#define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm-mapnik"
 #ifndef GTK_DISABLE_DEPRECATED
 /**
  * CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER:
@@ -118,11 +112,12 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  * return any source.
  */
 #define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
-#endif
 /**
  * CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST:
  *
- * Mapquest OpenStreetMap
+ * Deprecated: Mapquest isn't available any more and will be removed in the next release.
+ * As it doens't exist, it isn't registered to the factory and the 'create' method won't
+ * return any source.
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST "osm-mapquest"
 /**
@@ -131,6 +126,14 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  * Mapquest Open Aerial
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP "osm-aerialmap"
+#endif
+
+/**
+ * CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK:
+ *
+ * OpenStreetMap Mapnik
+ */
+#define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "osm-mapnik"
 /**
  * CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP:
  *
