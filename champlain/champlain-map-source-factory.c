@@ -408,8 +408,8 @@ champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *factory)
  * Note: The id should not contain any character that can't be in a filename as it
  * will be used as the cache directory name for that map source.
  *
- * Returns: (transfer none): a ready to use #ChamplainMapSource matching the given name, returns
- * NULL is none match.
+ * Returns: (transfer none): a ready to use #ChamplainMapSource matching the given name;
+ * returns NULL if the source with the given name doesn't exist.
  *
  * Since: 0.4
  */
@@ -448,6 +448,7 @@ champlain_map_source_factory_create (ChamplainMapSourceFactory *factory,
  * Returns: (transfer none): a ready to use #ChamplainMapSourceChain consisting of
  * #ChamplainMemoryCache, #ChamplainFileCache, #ChamplainMapSource matching the given name, and
  * an error tile source created with champlain_map_source_factory_create_error_source ().
+ * Returns NULL if the source with the given name doesn't exist.
  *
  * Since: 0.6
  */
@@ -464,6 +465,8 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
   ChamplainRenderer *renderer;
 
   tile_source = champlain_map_source_factory_create (factory, id);
+  if (!tile_source)
+    return NULL;
 
   tile_size = champlain_map_source_get_tile_size (tile_source);
   error_source = champlain_map_source_factory_create_error_source (factory, tile_size);
@@ -492,7 +495,8 @@ champlain_map_source_factory_create_cached_source (ChamplainMapSourceFactory *fa
  * Creates a memory cached map source.
  *
  * Returns: (transfer none): a ready to use #ChamplainMapSourceChain consisting of
- * #ChamplainMemoryCache and #ChamplainMapSource matching the given name
+ * #ChamplainMemoryCache and #ChamplainMapSource matching the given name.
+ * Returns NULL if the source with the given name doesn't exist.
  *
  * Since: 0.12.5
  */
@@ -506,6 +510,8 @@ champlain_map_source_factory_create_memcached_source (ChamplainMapSourceFactory 
   ChamplainRenderer *renderer;
 
   tile_source = champlain_map_source_factory_create (factory, id);
+  if (!tile_source)
+    return NULL;
 
   renderer = CHAMPLAIN_RENDERER (champlain_image_renderer_new ());
   memory_cache = CHAMPLAIN_MAP_SOURCE (champlain_memory_cache_new_full (100, renderer));
