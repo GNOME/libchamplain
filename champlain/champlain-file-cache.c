@@ -280,13 +280,9 @@ champlain_file_cache_constructed (GObject *object)
 
   if (!priv->cache_dir)
     {
-#ifdef CHAMPLAIN_HAS_MAEMO
-      priv->cache_dir = g_strdup ("/home/user/MyDocs/.Maps/");
-#else
       priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S,
             g_get_user_cache_dir (),
             "champlain", NULL);
-#endif
     }
 
   init_cache (file_cache);

@@ -91,7 +91,6 @@ gboolean champlain_map_source_factory_register (ChamplainMapSourceFactory *facto
     ChamplainMapSourceDesc *desc);
 GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *factory);
 
-#ifndef CHAMPLAIN_HAS_MAEMO
 /**
  * CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK:
  *
@@ -181,21 +180,6 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  */
 #define CHAMPLAIN_MAP_SOURCE_OWM_TEMPERATURE "owm-temperature"
 
-#else
-#define CHAMPLAIN_MAP_SOURCE_OSM_MAPNIK "OpenStreetMap I"
-#define CHAMPLAIN_MAP_SOURCE_OSM_OSMARENDER "OpenStreetMap II"
-#define CHAMPLAIN_MAP_SOURCE_OSM_MAPQUEST "Mapquest OSM"
-#define CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP "Open Aerial Map"
-#define CHAMPLAIN_MAP_SOURCE_OSM_CYCLE_MAP "OpenCycleMap"
-#define CHAMPLAIN_MAP_SOURCE_OSM_TRANSPORT_MAP "Public Transport"
-#define CHAMPLAIN_MAP_SOURCE_OAM "OpenAerialMap"
-#define CHAMPLAIN_MAP_SOURCE_MFF_RELIEF "MapsForFree Relief"
-#define CHAMPLAIN_MAP_SOURCE_OWM_CLOUDS "OpenWeatherMap Clouds"
-#define CHAMPLAIN_MAP_SOURCE_OWM_PRECIPITATION "OpenWeatherMap Precipitation"
-#define CHAMPLAIN_MAP_SOURCE_OWM_PRESSURE "OpenWeatherMap Pressure"
-#define CHAMPLAIN_MAP_SOURCE_OWM_WIND "OpenWeatherMap Wind"
-#define CHAMPLAIN_MAP_SOURCE_OWM_TEMPERATURE "OpenWeatherMap Temperature"
-#endif
 
 #ifdef CHAMPLAIN_HAS_MEMPHIS
 /**

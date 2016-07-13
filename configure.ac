@@ -96,14 +96,6 @@ if test x$enable_debug = xyes; then
 fi
 
 # -----------------------------------------------------------
-# Enable Maemo optimizations
-# -----------------------------------------------------------
-
-AC_ARG_ENABLE(maemo,
-  AS_HELP_STRING([--enable-maemo],[compile with maemo optimizations]),
-    enable_maemo=$enableval, enable_maemo=no)
-
-# -----------------------------------------------------------
 # Enable gtk
 # -----------------------------------------------------------
 
@@ -191,14 +183,9 @@ CHAMPLAIN_CONFIG_COMMANDS([champlain/champlain-features.h],
     echo '#define CHAMPLAIN_HAS_MEMPHIS 1'
     echo ''
   fi
-  if test "x$enable_maemo" = "xyes"; then
-    echo '#define CHAMPLAIN_HAS_MAEMO 1'
-    echo ''
-  fi
   echo '#endif'
 ],[
   enable_memphis="$enable_memphis"
-  enable_maemo="$enable_maemo"
 ])
 
 # ----------------------------------------------------------
