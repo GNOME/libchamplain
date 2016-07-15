@@ -416,6 +416,18 @@ view_relocated_cb (G_GNUC_UNUSED ChamplainViewport *viewport,
   clutter_actor_destroy_all_children (priv->zoom_layer);
   load_visible_tiles (view, TRUE);
   g_signal_emit_by_name (view, "layer-relocated", NULL);
+
+  /* Clutter clones need their source actor to have an explicitly set size to display properly */
+  gint anchor_x, anchor_y, new_width, new_height;
+  gint tile_size = champlain_map_source_get_tile_size (priv->map_source);
+  gint column_count = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+  gint row_count = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
+  champlain_viewport_get_anchor (CHAMPLAIN_VIEWPORT (priv->viewport), &anchor_x, &anchor_y);
+
+  new_width = column_count * tile_size + anchor_x;
+  new_height = row_count * tile_size + anchor_y;
+
+  clutter_actor_set_size (priv->map_layer, new_width, new_height);
 }
 
 
