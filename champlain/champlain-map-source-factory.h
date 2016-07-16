@@ -124,6 +124,10 @@ GSList *champlain_map_source_factory_get_registered (ChamplainMapSourceFactory *
  * CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP:
  *
  * Mapquest Open Aerial
+ *
+ * Deprecated: Mapquest isn't available any more and will be removed in the next release.
+ * As it doens't exist, it isn't registered to the factory and the 'create' method won't
+ * return any source.
  */
 #define CHAMPLAIN_MAP_SOURCE_OSM_AERIAL_MAP "osm-aerialmap"
 #endif
