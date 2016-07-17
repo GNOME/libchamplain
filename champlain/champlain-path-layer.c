@@ -537,6 +537,12 @@ invalidate_canvas (ChamplainPathLayer *layer)
       right_actor_height = MIN (map_height - (viewport_y + anchor_y), (gint)view_height);
       left_actor_width = MIN (view_width - right_actor_width, map_width - right_actor_width);
       left_actor_height = right_actor_height;
+
+      /* Ensure sizes are positive  */
+      right_actor_width = MAX (0, right_actor_width);
+      right_actor_height = MAX (0, right_actor_height);
+      left_actor_width = MAX (0, left_actor_width);
+      left_actor_height = MAX (0, left_actor_height);
     }
 
   clutter_actor_set_size (priv->path_actor, map_width, map_height);
