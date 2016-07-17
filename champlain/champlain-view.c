@@ -268,8 +268,8 @@ static ClutterActor *sample_user_layer_at_pos (ChamplainView *view,
 static void swap_user_layer_slots (ChamplainView *view,
     gint original_index,
     gint clone_index);
-static gboolean clone_enter_cb (ClutterActor *actor,
-    ClutterCrossingEvent *event,
+static gboolean pointer_motion_cb (ClutterActor *actor,
+    ClutterMotionEvent *event,
     ChamplainView *view);
 static void load_visible_tiles (ChamplainView *view,
     gboolean relocate);
@@ -1343,11 +1343,7 @@ update_clones (ChamplainView *view)
       clutter_actor_set_x (clone_user, (i + 1) * map_size);
       clutter_actor_insert_child_below (priv->viewport_container, clone_user,
                                         priv->user_layers);
-
-      clutter_actor_set_reactive (clone_user, TRUE);
       clutter_actor_set_width (priv->user_layers, map_size);
-      g_signal_connect (clone_user, "enter-event",
-          G_CALLBACK (clone_enter_cb), view);
 
       /* Inserting the user layer clones in the following slots */
       priv->user_layer_slots = g_list_append (priv->user_layer_slots, clone_user);
@@ -1682,16 +1678,19 @@ swap_user_layer_slots (ChamplainView *view,
 
 
 static gboolean
-clone_enter_cb (ClutterActor *clone,
-    G_GNUC_UNUSED ClutterCrossingEvent *event,
+pointer_motion_cb (G_GNUC_UNUSED ClutterActor *actor,
+    ClutterMotionEvent *event,
     ChamplainView *view)
 {
    ChamplainViewPrivate *priv = view->priv;
 
-   gint original_index = g_list_index (priv->user_layer_slots, priv->user_layers);
-   gint clone_index = g_list_index (priv->user_layer_slots, clone);
+   gint map_width = get_map_width (view);
 
-   swap_user_layer_slots (view, original_index, clone_index);
+   gint original_index = g_list_index (priv->user_layer_slots, priv->user_layers);
+   gint clone_index = (event->x + priv->viewport_x) / map_width;
+
+   if (clone_index != original_index && clone_index <= priv->num_clones + 1)
+    swap_user_layer_slots (view, original_index, clone_index);
 
    return TRUE;
  }
@@ -1755,7 +1754,7 @@ user_layer_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
     }
 
   /* If found, redirecting event to the sampled actor */
-  if (sampled_actor != NULL)
+  if (sampled_actor != NULL && sampled_actor != priv->kinetic_scroll)
     {
       ClutterEvent *cloned_event = (ClutterEvent *)event;
       clutter_event_set_source (cloned_event, sampled_actor);
@@ -3254,14 +3253,19 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
 
   priv->hwrap = wrap;
 
-  if (priv->hwrap) 
-    update_clones (view);
+  if (priv->hwrap)
+    {
+      g_signal_connect (priv->kinetic_scroll, "motion-event",
+        G_CALLBACK (pointer_motion_cb), view);
+      update_clones (view);
+    }
   else 
     {
       g_list_free_full (priv->map_clones, (GDestroyNotify) clutter_actor_destroy);
       g_list_free_full (priv->user_layer_slots, (GDestroyNotify) exclusive_destroy_clone);
       priv->map_clones = NULL;
       priv->user_layer_slots = NULL;
+      g_signal_handlers_disconnect_by_func (priv->kinetic_scroll, pointer_motion_cb, view);
     }
   resize_viewport (view);
 
