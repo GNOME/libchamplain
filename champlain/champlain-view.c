@@ -259,17 +259,17 @@ static void viewport_pos_changed_cb (GObject *gobject,
 static gboolean kinetic_scroll_button_press_cb (ClutterActor *actor,
     ClutterButtonEvent *event,
     ChamplainView *view);
-static gboolean user_layer_button_press_cb (ClutterActor *actor,
-    ClutterButtonEvent *event,
-    ChamplainView *view);
 static ClutterActor *sample_user_layer_at_pos (ChamplainView *view,
     gfloat x,
     gfloat y);
 static void swap_user_layer_slots (ChamplainView *view,
     gint original_index,
     gint clone_index);
-static gboolean pointer_motion_cb (ClutterActor *actor,
+static gboolean viewport_motion_cb (ClutterActor *actor,
     ClutterMotionEvent *event,
+    ChamplainView *view);
+static gboolean viewport_press_cb (ClutterActor *actor,
+    ClutterButtonEvent *event,
     ChamplainView *view);
 static void load_visible_tiles (ChamplainView *view,
     gboolean relocate);
@@ -1542,10 +1542,6 @@ champlain_view_init (ChamplainView *view)
   clutter_actor_add_child (priv->viewport_container, priv->map_layer);
   clutter_actor_add_child (priv->viewport_container, priv->user_layers);
 
-  clutter_actor_set_reactive (priv->user_layers, TRUE);
-  g_signal_connect (priv->user_layers, "button-press-event",
-      G_CALLBACK (user_layer_button_press_cb), view);
-
   /* Setup viewport */
   priv->viewport = champlain_viewport_new ();
   champlain_viewport_set_child (CHAMPLAIN_VIEWPORT (priv->viewport), priv->viewport_container);
@@ -1555,6 +1551,7 @@ champlain_view_init (ChamplainView *view)
       G_CALLBACK (viewport_pos_changed_cb), view);
   g_signal_connect (priv->viewport, "notify::y-origin",
       G_CALLBACK (viewport_pos_changed_cb), view);
+  clutter_actor_set_reactive (priv->viewport, TRUE);
 
   /* Setup kinetic scroll */
   priv->kinetic_scroll = champlain_kinetic_scroll_view_new (FALSE, CHAMPLAIN_VIEWPORT (priv->viewport));
@@ -1678,7 +1675,7 @@ swap_user_layer_slots (ChamplainView *view,
 
 
 static gboolean
-pointer_motion_cb (G_GNUC_UNUSED ClutterActor *actor,
+viewport_motion_cb (G_GNUC_UNUSED ClutterActor *actor,
     ClutterMotionEvent *event,
     ChamplainView *view)
 {
@@ -1701,12 +1698,14 @@ sample_user_layer_at_pos (ChamplainView *view,
     gfloat x,
     gfloat y)
 {
+    ChamplainViewPrivate *priv = view->priv;
+
     ClutterStage *stage = CLUTTER_STAGE (clutter_actor_get_stage (CLUTTER_ACTOR (view)));
     ClutterActor *retval = clutter_stage_get_actor_at_pos (stage,
         CLUTTER_PICK_REACTIVE, x, y);
 
     /* If no reactive actor is found on top of the clone, return NULL */
-    if (CLUTTER_IS_CLONE (retval))
+    if (retval == priv->viewport || retval == priv->kinetic_scroll)
       return NULL;
 
     return retval;
@@ -1714,10 +1713,12 @@ sample_user_layer_at_pos (ChamplainView *view,
 
 
 static gboolean
-user_layer_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
+viewport_press_cb (G_GNUC_UNUSED ClutterActor *actor,
     ClutterButtonEvent *event,
     ChamplainView *view)
 {
+  DEBUG_LOG ()
+
   ChamplainViewPrivate *priv = view->priv;
 
   if (!priv->hwrap)
@@ -1754,7 +1755,7 @@ user_layer_button_press_cb (G_GNUC_UNUSED ClutterActor *actor,
     }
 
   /* If found, redirecting event to the sampled actor */
-  if (sampled_actor != NULL && sampled_actor != priv->kinetic_scroll)
+  if (sampled_actor != NULL)
     {
       ClutterEvent *cloned_event = (ClutterEvent *)event;
       clutter_event_set_source (cloned_event, sampled_actor);
@@ -3277,8 +3278,10 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
 
   if (priv->hwrap)
     {
-      g_signal_connect (priv->kinetic_scroll, "motion-event",
-        G_CALLBACK (pointer_motion_cb), view);
+      g_signal_connect (priv->viewport, "motion-event",
+        G_CALLBACK (viewport_motion_cb), view);
+      g_signal_connect (priv->viewport, "button-press-event",
+        G_CALLBACK (viewport_press_cb), view);
       update_clones (view);
     }
   else 
@@ -3287,7 +3290,8 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
       g_list_free_full (priv->user_layer_slots, (GDestroyNotify) exclusive_destroy_clone);
       priv->map_clones = NULL;
       priv->user_layer_slots = NULL;
-      g_signal_handlers_disconnect_by_func (priv->kinetic_scroll, pointer_motion_cb, view);
+      g_signal_handlers_disconnect_by_func (priv->viewport, viewport_motion_cb, view);
+      g_signal_handlers_disconnect_by_func (priv->viewport, viewport_press_cb, view);
     }
   resize_viewport (view);
 
