@@ -2510,6 +2510,28 @@ champlain_view_latitude_to_y (ChamplainView *view,
   return y - priv->viewport_y;
 }
 
+/**
+ * champlain_view_get_viewport_anchor:
+ * @view: a #ChamplainView
+ * @anchor_x: (out): the x coordinate of the viewport anchor
+ * @anchor_y: (out): the y coordinate of the viewport anchor
+ *
+ * Gets the x and y coordinate of the viewport anchor in respect to the layer origin.
+ *
+ * Since: 0.12.14
+ */
+void
+champlain_view_get_viewport_anchor (ChamplainView *view,
+    gint *anchor_x,
+    gint *anchor_y)
+{
+    DEBUG_LOG ()
+
+  g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
+  ChamplainViewPrivate *priv = view->priv;
+
+  champlain_viewport_get_anchor (CHAMPLAIN_VIEWPORT (priv->viewport), anchor_x, anchor_y);
+}
 
 /**
  * champlain_view_get_viewport_origin:

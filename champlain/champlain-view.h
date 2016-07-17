@@ -162,6 +162,9 @@ gdouble champlain_view_longitude_to_x (ChamplainView *view,
 gdouble champlain_view_latitude_to_y (ChamplainView *view,
     gdouble latitude);
 
+void champlain_view_get_viewport_anchor (ChamplainView *view,
+    gint *anchor_x,
+    gint *anchor_y);
 void champlain_view_get_viewport_origin (ChamplainView *view,
     gint *x,
     gint *y);

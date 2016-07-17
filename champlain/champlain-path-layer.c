@@ -515,6 +515,7 @@ invalidate_canvas (ChamplainPathLayer *layer)
   gfloat view_width, view_height;
   gint map_width, map_height;
   gint viewport_x, viewport_y;
+  gint anchor_x, anchor_y;
   gfloat right_actor_width, right_actor_height;
   gfloat left_actor_width, left_actor_height;
 
@@ -530,9 +531,11 @@ invalidate_canvas (ChamplainPathLayer *layer)
       get_map_size (priv->view, &map_width, &map_height);
       clutter_actor_get_size (CLUTTER_ACTOR (priv->view), &view_width, &view_height);
       champlain_view_get_viewport_origin (priv->view, &viewport_x, &viewport_y);
-      right_actor_width = MIN (map_width - viewport_x, view_width);
-      right_actor_height = MIN (map_height - viewport_y, view_height);
-      left_actor_width = view_width - right_actor_width;
+      champlain_view_get_viewport_anchor (priv->view, &anchor_x, &anchor_y);
+
+      right_actor_width = MIN (map_width - (viewport_x + anchor_x), (gint)view_width);
+      right_actor_height = MIN (map_height - (viewport_y + anchor_y), (gint)view_height);
+      left_actor_width = MIN (view_width - right_actor_width, map_width - right_actor_width);
       left_actor_height = right_actor_height;
     }
 
@@ -743,6 +746,7 @@ redraw_path (ClutterCanvas *canvas,
   GList *elem;
   ChamplainView *view = priv->view;
   gint  viewport_x, viewport_y;
+  gint anchor_x, anchor_y;
   
   /* layer not yet added to the view */
   if (view == NULL)
@@ -752,11 +756,12 @@ redraw_path (ClutterCanvas *canvas,
     return FALSE;
 
   champlain_view_get_viewport_origin (priv->view, &viewport_x, &viewport_y);
+  champlain_view_get_viewport_anchor (priv->view, &anchor_x, &anchor_y);
 
   if (canvas == CLUTTER_CANVAS (priv->right_canvas))
       clutter_actor_set_position (priv->right_actor, viewport_x, viewport_y);
   else
-      clutter_actor_set_position (priv->left_actor, 0, viewport_y);
+      clutter_actor_set_position (priv->left_actor, -anchor_x, viewport_y);
 
   /* Clear the drawing area */
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
@@ -776,7 +781,7 @@ redraw_path (ClutterCanvas *canvas,
       if (canvas == CLUTTER_CANVAS (priv->right_canvas))
         cairo_line_to (cr, x, y);
       else
-        cairo_line_to (cr, x + viewport_x, y);
+        cairo_line_to (cr, x + (viewport_x + anchor_x), y);
     }
 
   if (priv->closed_path)
