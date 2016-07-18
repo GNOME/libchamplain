@@ -3292,6 +3292,7 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
       priv->user_layer_slots = NULL;
       g_signal_handlers_disconnect_by_func (priv->viewport, viewport_motion_cb, view);
       g_signal_handlers_disconnect_by_func (priv->viewport, viewport_press_cb, view);
+      clutter_actor_set_x (priv->user_layers, 0);
     }
   resize_viewport (view);
 
