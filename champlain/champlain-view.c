@@ -1324,9 +1324,6 @@ update_clones (ChamplainView *view)
   /* Inserting the real user layer in the first slot */
   priv->user_layer_slots = g_list_append (priv->user_layer_slots, priv->user_layers);
   clutter_actor_set_x (priv->user_layers, 0);
-
-  /* A fixed width is needed to ensure actors don't get resized when moved */
-  clutter_actor_set_width (priv->user_layers, map_size);
     
   for (i = 0; i < priv->num_clones; i++) 
     {
@@ -1343,7 +1340,6 @@ update_clones (ChamplainView *view)
       clutter_actor_set_x (clone_user, (i + 1) * map_size);
       clutter_actor_insert_child_below (priv->viewport_container, clone_user,
                                         priv->user_layers);
-      clutter_actor_set_width (priv->user_layers, map_size);
 
       /* Inserting the user layer clones in the following slots */
       priv->user_layer_slots = g_list_append (priv->user_layer_slots, clone_user);
