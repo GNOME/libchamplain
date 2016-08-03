@@ -96,6 +96,11 @@ const gchar *champlain_network_tile_source_get_proxy_uri (ChamplainNetworkTileSo
 void champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_source,
     const gchar *proxy_uri);
 
+gint champlain_network_tile_source_get_max_conns (ChamplainNetworkTileSource *tile_source);
+void champlain_network_tile_source_set_max_conns (ChamplainNetworkTileSource *tile_source,
+    gint max_conns);
+
+
 G_END_DECLS
 
 #endif /* _CHAMPLAIN_NETWORK_TILE_SOURCE_H_ */
