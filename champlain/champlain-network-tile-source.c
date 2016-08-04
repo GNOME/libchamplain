@@ -70,6 +70,11 @@ G_DEFINE_TYPE (ChamplainNetworkTileSource, champlain_network_tile_source, CHAMPL
 #define GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE, ChamplainNetworkTileSourcePrivate))
 
+/* The osm.org tile set require us to use no more than 2 simultaneous
+ * connections so let that be the default.
+ */
+#define MAX_CONNS_DEFAULT 2
+
 struct _ChamplainNetworkTileSourcePrivate
 {
   gboolean offline;
@@ -285,7 +290,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
         "for this tile source.",
         1,
         G_MAXINT,
-        2,
+        MAX_CONNS_DEFAULT,
         G_PARAM_READWRITE);
 
   g_object_class_install_property (object_class, PROP_MAX_CONNS, pspec);
@@ -303,7 +308,7 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
   priv->proxy_uri = NULL;
   priv->uri_format = NULL;
   priv->offline = FALSE;
-  priv->max_conns = 2;
+  priv->max_conns = MAX_CONNS_DEFAULT;
 
   priv->soup_session = soup_session_new_with_options (
         "proxy-uri", NULL,
@@ -316,8 +321,8 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
   g_object_set (G_OBJECT (priv->soup_session),
       "user-agent", 
       "libchamplain/" CHAMPLAIN_VERSION_S,
-      "max-conns-per-host", 2,    /* This is as required by OSM */
-      "max-conns", 2,
+      "max-conns-per-host", MAX_CONNS_DEFAULT,
+      "max-conns", MAX_CONNS_DEFAULT,
       NULL);
 }
 
