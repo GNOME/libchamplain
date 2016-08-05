@@ -160,6 +160,17 @@ zoom_out (GtkWidget *widget,
 
 
 static void
+toggle_wrap (GtkWidget *widget,
+    ChamplainView *view)
+{
+ gboolean wrap;
+
+  wrap = champlain_view_get_horizontal_wrap (view);
+  champlain_view_set_horizontal_wrap (view, !wrap);
+}
+
+
+static void
 build_combo_box (GtkComboBox *box)
 {
   ChamplainMapSourceFactory *factory;
@@ -410,6 +421,12 @@ main (int argc,
   button = gtk_toggle_button_new_with_label ("Markers");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (button), TRUE);
   g_signal_connect (button, "toggled", G_CALLBACK (toggle_layer), layer);
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+
+  button = gtk_toggle_button_new_with_label ("Toggle wrap");
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (button),
+                                champlain_view_get_horizontal_wrap (view));
+  g_signal_connect (button, "toggled", G_CALLBACK (toggle_wrap), view);
   gtk_container_add (GTK_CONTAINER (bbox), button);
 
   button = gtk_combo_box_new ();
