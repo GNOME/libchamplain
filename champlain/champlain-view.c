@@ -1703,7 +1703,7 @@ sample_user_layer_at_pos (ChamplainView *view,
         CLUTTER_PICK_REACTIVE, x, y);
 
     /* If no reactive actor is found on top of the clone, return NULL */
-    if (retval == priv->viewport || retval == priv->kinetic_scroll)
+    if (!clutter_actor_contains (priv->user_layers, retval))
       return NULL;
 
     return retval;
