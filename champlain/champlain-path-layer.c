@@ -504,7 +504,6 @@ get_map_size (ChamplainView *view, gint *width, gint *height)
                                                 zoom_level);
   *width = size * rows;
   *height = size * cols;
-
 }
 
 
@@ -758,16 +757,16 @@ redraw_path (ClutterCanvas *canvas,
   if (view == NULL)
     return FALSE;
 
-  if (!priv->visible || width == 0.0 || height ==  0.0)
+  if (!priv->visible || width == 0.0 || height == 0.0)
     return FALSE;
 
   champlain_view_get_viewport_origin (priv->view, &viewport_x, &viewport_y);
   champlain_view_get_viewport_anchor (priv->view, &anchor_x, &anchor_y);
 
   if (canvas == CLUTTER_CANVAS (priv->right_canvas))
-      clutter_actor_set_position (priv->right_actor, viewport_x, viewport_y);
+    clutter_actor_set_position (priv->right_actor, viewport_x, viewport_y);
   else
-      clutter_actor_set_position (priv->left_actor, -anchor_x, viewport_y);
+    clutter_actor_set_position (priv->left_actor, -anchor_x, viewport_y);
 
   /* Clear the drawing area */
   cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
