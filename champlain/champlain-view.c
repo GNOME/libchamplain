@@ -3445,13 +3445,13 @@ show_zoom_actor (ChamplainView *view,
         {
           GList *old_clone = priv->map_clones;
           gint i;
+
           for (i = 0; i < priv->num_clones; i++) 
             {
               gfloat tiles_x;
               ClutterActor *clone_right = clutter_clone_new (tile_container);
 
               clutter_actor_hide (CLUTTER_ACTOR (old_clone->data));
-              clutter_actor_set_reactive (CLUTTER_ACTOR (old_clone->data), FALSE);
 
               clutter_actor_get_position (tile_container, &tiles_x, NULL);
               clutter_actor_set_x (clone_right, tiles_x + (i * column_count * size));
