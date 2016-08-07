@@ -89,13 +89,26 @@ struct _ChamplainPathLayerPrivate
   
   cairo_surface_t *surface;
 
-  ClutterContent *right_canvas;
-  ClutterContent *left_canvas;
+  /* In order to correctly render paths in the horizontal wrap,
+   * the path_actor (a map-wide actor) contains two children that
+   * split the visible paths.
+   *
+   * The right_actor renders paths visible on the original map layer.
+   * (from viewport's x coordinate to the rightmost point on the map)
+
+   * The left_actor renders paths visible on the first cloned map layer.
+   * (a fixed size, from the leftmost point on the map)
+   *
+   * If horizontal wrap is disabled, the left_actor won't render
+   * anything.
+   */
+  ClutterActor *path_actor;
 
   ClutterActor *right_actor;
   ClutterActor *left_actor;
 
-  ClutterActor *path_actor;
+  ClutterContent *right_canvas;
+  ClutterContent *left_canvas;
 
   GList *nodes;
   gboolean redraw_scheduled;
