@@ -1684,7 +1684,7 @@ viewport_motion_cb (G_GNUC_UNUSED ClutterActor *actor,
    gint original_index = g_list_index (priv->user_layer_slots, priv->user_layers);
    gint clone_index = (event->x + priv->viewport_x) / map_width;
 
-   if (clone_index != original_index && clone_index <= priv->num_clones + 1)
+   if (clone_index != original_index && clone_index < priv->num_clones + 1)
      swap_user_layer_slots (view, original_index, clone_index);
 
    return TRUE;
