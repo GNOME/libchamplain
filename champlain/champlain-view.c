@@ -412,16 +412,17 @@ view_relocated_cb (G_GNUC_UNUSED ChamplainViewport *viewport,
     ChamplainView *view)
 {
   ChamplainViewPrivate *priv = view->priv;
-  
+  gint anchor_x, anchor_y, new_width, new_height;
+  gint tile_size, column_count, row_count;
+
   clutter_actor_destroy_all_children (priv->zoom_layer);
   load_visible_tiles (view, TRUE);
   g_signal_emit_by_name (view, "layer-relocated", NULL);
 
   /* Clutter clones need their source actor to have an explicitly set size to display properly */
-  gint anchor_x, anchor_y, new_width, new_height;
-  gint tile_size = champlain_map_source_get_tile_size (priv->map_source);
-  gint column_count = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
-  gint row_count = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
+  tile_size = champlain_map_source_get_tile_size (priv->map_source);
+  column_count = champlain_map_source_get_column_count (priv->map_source, priv->zoom_level);
+  row_count = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
   champlain_viewport_get_anchor (CHAMPLAIN_VIEWPORT (priv->viewport), &anchor_x, &anchor_y);
 
   new_width = column_count * tile_size + anchor_x;
@@ -1327,8 +1328,10 @@ update_clones (ChamplainView *view)
     
   for (i = 0; i < priv->num_clones; i++) 
     {
+      ClutterActor *map_clone, *user_clone;
+
       /* Map layer clones */
-      ClutterActor *map_clone = clutter_clone_new (priv->map_layer);
+      map_clone = clutter_clone_new (priv->map_layer);
       clutter_actor_set_x (map_clone, (i + 1) * map_size);
       clutter_actor_insert_child_below (priv->viewport_container, map_clone,
                                         NULL);
@@ -1336,13 +1339,13 @@ update_clones (ChamplainView *view)
       priv->map_clones = g_list_prepend (priv->map_clones, map_clone);
 
       /* User layer clones */
-      ClutterActor *clone_user = clutter_clone_new (priv->user_layers);
-      clutter_actor_set_x (clone_user, (i + 1) * map_size);
-      clutter_actor_insert_child_below (priv->viewport_container, clone_user,
+      user_clone = clutter_clone_new (priv->user_layers);
+      clutter_actor_set_x (user_clone, (i + 1) * map_size);
+      clutter_actor_insert_child_below (priv->viewport_container, user_clone,
                                         priv->user_layers);
 
       /* Inserting the user layer clones in the following slots */
-      priv->user_layer_slots = g_list_append (priv->user_layer_slots, clone_user);
+      priv->user_layer_slots = g_list_append (priv->user_layer_slots, user_clone);
     }
 }
 
@@ -3389,7 +3392,7 @@ show_zoom_actor (ChamplainView *view,
       ClutterActorIter iter;
       ClutterActor *child;
       ClutterActor *tile_container;
-      gint size, i;
+      gint size;
       gint x_first, y_first;
       gdouble zoom_actor_width, zoom_actor_height;
       gint column_count;
@@ -3443,12 +3446,14 @@ show_zoom_actor (ChamplainView *view,
       if (priv->hwrap) 
         {
           GList *old_clone = priv->map_clones;
+          gint i;
           for (i = 0; i < priv->num_clones; i++) 
             {
+              gfloat tiles_x;
               ClutterActor *clone_right = clutter_clone_new (tile_container);
+
               clutter_actor_hide (CLUTTER_ACTOR (old_clone->data));
               clutter_actor_set_reactive (CLUTTER_ACTOR (old_clone->data), FALSE);
-              gfloat tiles_x;
 
               clutter_actor_get_position (tile_container, &tiles_x, NULL);
               clutter_actor_set_x (clone_right, tiles_x + (i * column_count * size));
