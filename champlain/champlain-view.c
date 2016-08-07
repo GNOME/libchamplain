@@ -2810,9 +2810,7 @@ load_visible_tiles (ChamplainView *view,
             tile_x = x_to_wrap_x (tile_x, column_count);
 
           if (!tile_in_tile_table (view, priv->tile_map, tile_x, y) &&
-              tile_in_tile_table (view, priv->visible_tiles, tile_x, y) &&
-              y >= priv->tile_y_first &&
-              y < priv->tile_y_last)
+              tile_in_tile_table (view, priv->visible_tiles, tile_x, y))
             {
               FillTileCallbackData *data;
 
