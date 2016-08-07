@@ -3441,6 +3441,10 @@ show_zoom_actor (ChamplainView *view,
         }
       clutter_actor_add_child (zoom_actor, tile_container);
 
+      /* The tile_container is cloned and its clones are also added to the zoom_actor
+       * in order to horizontally wrap. Moreover, the old clones are hidden while the zooming
+       * animation is runnning.
+       */
       if (priv->hwrap) 
         {
           GList *old_clone = priv->map_clones;
