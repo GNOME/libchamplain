@@ -388,6 +388,18 @@ champlain_path_layer_class_init (ChamplainPathLayerClass *klass)
       "surface");
 }
 
+static void
+initialize_child_actor (ChamplainPathLayer *self,
+    ClutterActor *child_actor,
+    ClutterContent *canvas)
+{
+  ChamplainPathLayerPrivate *priv = self->priv;;
+
+  clutter_actor_set_content (child_actor, canvas);
+  g_signal_connect (canvas, "draw", G_CALLBACK (redraw_path), self);
+  clutter_actor_set_size (child_actor, 255, 255);
+  clutter_actor_add_child (priv->path_actor, child_actor);
+}
 
 static void
 champlain_path_layer_init (ChamplainPathLayer *self)
@@ -410,28 +422,21 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   priv->fill_color = clutter_color_copy (&DEFAULT_FILL_COLOR);
   priv->stroke_color = clutter_color_copy (&DEFAULT_STROKE_COLOR);
 
+  priv->path_actor = clutter_actor_new ();
+  clutter_actor_add_child (CLUTTER_ACTOR (self), priv->path_actor);
+  clutter_actor_set_size (priv->path_actor, 255, 255);
+
+  priv->right_actor = clutter_actor_new ();
+  priv->left_actor = clutter_actor_new ();
+
   priv->right_canvas = clutter_canvas_new ();
   priv->left_canvas = clutter_canvas_new ();
 
   clutter_canvas_set_size (CLUTTER_CANVAS (priv->right_canvas), 255, 255);
   clutter_canvas_set_size (CLUTTER_CANVAS (priv->left_canvas), 0, 0);
 
-  g_signal_connect (priv->right_canvas, "draw", G_CALLBACK (redraw_path), self);
-  g_signal_connect (priv->left_canvas, "draw", G_CALLBACK (redraw_path), self);
-
-  priv->path_actor = clutter_actor_new ();
-  clutter_actor_add_child (CLUTTER_ACTOR (self), priv->path_actor);
-  clutter_actor_set_size (priv->path_actor, 255, 255);
-
-  priv->right_actor = clutter_actor_new ();
-  clutter_actor_set_size (priv->right_actor, 255, 255);
-  clutter_actor_set_content (priv->right_actor, priv->right_canvas);
-  clutter_actor_add_child (priv->path_actor, priv->right_actor);
-
-  priv->left_actor = clutter_actor_new ();
-  clutter_actor_set_size (priv->left_actor, 255, 255);
-  clutter_actor_set_content (priv->left_actor, priv->left_canvas);
-  clutter_actor_add_child (priv->path_actor, priv->left_actor);
+  initialize_child_actor (self, priv->right_actor, priv->right_canvas);
+  initialize_child_actor (self, priv->left_actor, priv->left_canvas);
 }
 
 
