@@ -520,8 +520,11 @@ get_map_size (ChamplainView *view, gint *width, gint *height)
                                                 zoom_level);
   cols = champlain_map_source_get_column_count (map_source,
                                                 zoom_level);
-  *width = size * rows;
-  *height = size * cols;
+  if (width)
+    *width = size * rows;
+
+  if (height)
+    *height = size * cols;
 }
 
 
