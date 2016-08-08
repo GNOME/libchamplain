@@ -2087,6 +2087,39 @@ champlain_view_zoom_out (ChamplainView *view)
   champlain_view_set_zoom_level (view, view->priv->zoom_level - 1);
 }
 
+static void
+paint_surface (ChamplainView *view,
+    cairo_t *cr,
+    cairo_surface_t *surface,
+    double x,
+    double y,
+    double opacity)
+{
+  ChamplainViewPrivate *priv = view->priv;
+
+  gint map_width = get_map_width (view);
+
+  cairo_set_source_surface (cr,
+                            surface,
+                            x, y);
+  cairo_paint_with_alpha (cr, opacity);
+
+  /* Paint each surface num_clones - 1 extra times (last clone is not
+   * actually visible) in order to horizontally wrap.
+   */
+  if (priv->hwrap)
+    {
+      gint i;
+
+      for (i = 1; i <= priv->num_clones - 1; i++)
+        {
+          cairo_set_source_surface (cr,
+                            surface,
+                            x + i * map_width, y);
+          cairo_paint_with_alpha (cr, opacity);
+        }
+    }
+}
 
 static void
 layers_to_surface (ChamplainView *view,
@@ -2107,8 +2140,8 @@ layers_to_surface (ChamplainView *view,
       surface = champlain_exportable_get_surface (CHAMPLAIN_EXPORTABLE (layer));
       if (!surface)
         continue;
-      cairo_set_source_surface (cr, surface, 0, 0);
-      cairo_paint(cr);
+
+      paint_surface (view, cr, surface, 0, 0, 255);
     }
 }
 
@@ -2176,10 +2209,8 @@ champlain_view_to_surface (ChamplainView *view,
           opacity = ((double) clutter_actor_get_opacity (CLUTTER_ACTOR (tile))) / 255.0;
           x = ((double) tile_x * tile_size) - priv->viewport_x;
           y = ((double) tile_y * tile_size) - priv->viewport_y;
-          cairo_set_source_surface (cr,
-                                    tile_surface,
-                                    x, y);
-          cairo_paint_with_alpha(cr, opacity);
+
+          paint_surface (view, cr, tile_surface, x, y, opacity);
         }
     }
 
