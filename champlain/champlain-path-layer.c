@@ -110,6 +110,12 @@ struct _ChamplainPathLayerPrivate
   ClutterContent *right_canvas;
   ClutterContent *left_canvas;
 
+  cairo_surface_t *right_surface;
+  cairo_surface_t *left_surface;
+
+  gboolean right_surface_updated;
+  gboolean left_surface_updated;
+
   GList *nodes;
   gboolean redraw_scheduled;
 };
@@ -445,6 +451,9 @@ champlain_path_layer_init (ChamplainPathLayer *self)
   priv->right_canvas = clutter_canvas_new ();
   priv->left_canvas = clutter_canvas_new ();
 
+  priv->right_surface_updated = FALSE;
+  priv->left_surface_updated = FALSE;
+
   clutter_canvas_set_size (CLUTTER_CANVAS (priv->right_canvas), 255, 255);
   clutter_canvas_set_size (CLUTTER_CANVAS (priv->left_canvas), 0, 0);
 
@@ -569,12 +578,14 @@ invalidate_canvas (ChamplainPathLayer *layer)
 
   clutter_actor_set_size (priv->right_actor, right_actor_width, right_actor_height);
   clutter_canvas_set_size (CLUTTER_CANVAS (priv->right_canvas), right_actor_width, right_actor_height);
+  priv->right_surface_updated = FALSE;
   clutter_content_invalidate (priv->right_canvas);
 
   if (left_actor_width != 0)
     {
       clutter_actor_set_size (priv->left_actor, left_actor_width, left_actor_height);
       clutter_canvas_set_size (CLUTTER_CANVAS (priv->left_canvas), left_actor_width, left_actor_height);
+      priv->left_surface_updated = FALSE;
       clutter_content_invalidate (priv->left_canvas);
     }
 
@@ -760,6 +771,57 @@ relocate_cb (G_GNUC_UNUSED GObject *gobject,
   schedule_redraw (layer);
 }
 
+static void
+update_surface (ChamplainPathLayer *layer,
+    ClutterCanvas *canvas,
+    cairo_surface_t *surface)
+{
+  ChamplainPathLayerPrivate *priv = layer->priv;
+
+  if (canvas == CLUTTER_CANVAS (priv->right_canvas))
+    {
+      cairo_surface_destroy (priv->right_surface);
+      priv->right_surface = cairo_surface_reference (surface);
+      priv->right_surface_updated = TRUE;
+    }
+  else if (canvas == CLUTTER_CANVAS (priv->left_canvas))
+    {
+      cairo_surface_destroy (priv->left_surface);
+      priv->left_surface = cairo_surface_reference (surface);
+      priv->left_surface_updated = TRUE;
+    }
+
+ /* Updating the exportable surface. Path layer has two surfaces (one for each canvas)
+  * which have to be merged into a single new one.
+  */
+  if (priv->left_surface_updated && priv->right_surface_updated)
+    {
+      gfloat view_width, view_height;
+      gint map_width, viewport_x, anchor_x;
+      cairo_surface_t *new_surface;
+      cairo_t *cr;
+
+      get_map_size (priv->view, &map_width, NULL);
+      clutter_actor_get_size (CLUTTER_ACTOR (priv->view), &view_width, &view_height);
+      champlain_view_get_viewport_origin (priv->view, &viewport_x, NULL);
+      champlain_view_get_viewport_anchor (priv->view, &anchor_x, NULL);
+
+      new_surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, view_width, view_height);
+      cr = cairo_create (new_surface);
+
+      cairo_set_source_surface (cr,
+                                priv->right_surface,
+                                0, 0);
+      cairo_paint (cr);
+
+      cairo_set_source_surface (cr,
+                                priv->left_surface,
+                                map_width - viewport_x - anchor_x, 0);
+      cairo_paint (cr);
+
+      set_surface (CHAMPLAIN_EXPORTABLE (layer), new_surface);
+    }
+}
 
 static gboolean
 redraw_path (ClutterCanvas *canvas,
@@ -834,7 +896,7 @@ redraw_path (ClutterCanvas *canvas,
   if (priv->stroke)
     cairo_stroke (cr);
 
-  set_surface (CHAMPLAIN_EXPORTABLE (layer), cairo_get_target (cr));
+  update_surface (layer, canvas, cairo_get_target (cr));
 
   return FALSE;
 }
