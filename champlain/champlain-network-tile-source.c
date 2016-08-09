@@ -282,7 +282,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
    * Before changing this remember to verify how many simultaneous connections
    * your tile provider allows you to make.
    *
-   * Since: 0.12.15
+   * Since: 0.12.14
    */
   pspec = g_param_spec_int ("max-conns",
         "Max Connection Count",
@@ -532,7 +532,7 @@ champlain_network_tile_source_set_offline (ChamplainNetworkTileSource *tile_sour
  * Returns: the max number of allowed simultaneous connections for this tile
  * source.
  *
- * Since: 0.12.15
+ * Since: 0.12.14
  */
 gint
 champlain_network_tile_source_get_max_conns (ChamplainNetworkTileSource *tile_source)
@@ -553,7 +553,7 @@ champlain_network_tile_source_get_max_conns (ChamplainNetworkTileSource *tile_so
  * Before changing this remember to verify how many simultaneous connections
  * your tile provider allows you to make.
  *
- * Since: 0.12.15
+ * Since: 0.12.14
  */
 void
 champlain_network_tile_source_set_max_conns (ChamplainNetworkTileSource *tile_source,
