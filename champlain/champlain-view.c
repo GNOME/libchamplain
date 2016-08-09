@@ -425,6 +425,10 @@ view_relocated_cb (G_GNUC_UNUSED ChamplainViewport *viewport,
   row_count = champlain_map_source_get_row_count (priv->map_source, priv->zoom_level);
   champlain_viewport_get_anchor (CHAMPLAIN_VIEWPORT (priv->viewport), &anchor_x, &anchor_y);
 
+  /* The area containing tiles in the map layer is actually column_count * tile_size wide (same
+   * for height), but the viewport anchor acts as an offset for the tile actors, causing the map
+   * layer to contain some empty space as well.
+   */
   new_width = column_count * tile_size + anchor_x;
   new_height = row_count * tile_size + anchor_y;
 

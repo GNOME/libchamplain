@@ -568,6 +568,12 @@ invalidate_canvas (ChamplainPathLayer *layer)
       champlain_view_get_viewport_origin (priv->view, &viewport_x, &viewport_y);
       champlain_view_get_viewport_anchor (priv->view, &anchor_x, &anchor_y);
 
+      /* For efficiency in terms of clipping, the path actors must have a minimal size.
+       * The right_actor renders the paths on the visible side of the original map layer
+       * (from viewport offset to end of the map).
+       * The left_actor renders the paths on the visible side of the first cloned map layer
+       * (from the leftmost point on the map, clamped by the viewport width).
+       */
       right_actor_width = MIN (map_width - (viewport_x + anchor_x), (gint)view_width);
       right_actor_height = MIN (map_height - (viewport_y + anchor_y), (gint)view_height);
       left_actor_width = MIN (view_width - right_actor_width, map_width - right_actor_width);
