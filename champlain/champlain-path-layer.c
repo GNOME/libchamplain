@@ -260,6 +260,8 @@ champlain_path_layer_dispose (GObject *object)
     }
 
   g_clear_pointer (&priv->surface, cairo_surface_destroy);
+  g_clear_pointer (&priv->right_surface, cairo_surface_destroy);
+  g_clear_pointer (&priv->left_surface, cairo_surface_destroy);
 
   G_OBJECT_CLASS (champlain_path_layer_parent_class)->dispose (object);
 }
@@ -450,6 +452,10 @@ champlain_path_layer_init (ChamplainPathLayer *self)
 
   priv->right_canvas = clutter_canvas_new ();
   priv->left_canvas = clutter_canvas_new ();
+
+  priv->surface = NULL;
+  priv->right_surface = NULL;
+  priv->left_surface = NULL;
 
   priv->right_surface_updated = FALSE;
   priv->left_surface_updated = FALSE;
@@ -820,6 +826,9 @@ update_surface (ChamplainPathLayer *layer,
       cairo_paint (cr);
 
       set_surface (CHAMPLAIN_EXPORTABLE (layer), new_surface);
+
+      cairo_surface_destroy (new_surface);
+      cairo_destroy (cr);
     }
 }
 
