@@ -593,13 +593,19 @@ invalidate_canvas (ChamplainPathLayer *layer)
   priv->right_surface_updated = FALSE;
   clutter_content_invalidate (priv->right_canvas);
 
+  /* Since the left actor only renders paths visible on the clone, it should be hidden
+   * when no clone is visible.
+   */
   if (left_actor_width != 0)
     {
       clutter_actor_set_size (priv->left_actor, left_actor_width, left_actor_height);
       clutter_canvas_set_size (CLUTTER_CANVAS (priv->left_canvas), left_actor_width, left_actor_height);
       priv->left_surface_updated = FALSE;
       clutter_content_invalidate (priv->left_canvas);
+      clutter_actor_show (priv->left_actor);
     }
+  else
+    clutter_actor_hide (priv->left_actor);
 
   priv->redraw_scheduled = FALSE;
 
