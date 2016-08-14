@@ -128,7 +128,8 @@ void champlain_view_set_background_pattern (ChamplainView *view,
     ClutterContent *background);
 void champlain_view_set_world (ChamplainView *view,
     ChamplainBoundingBox *bbox);
-
+void champlain_view_set_horizontal_wrap (ChamplainView *view,
+    gboolean wrap);
 void champlain_view_add_layer (ChamplainView *view,
     ChamplainLayer *layer);
 void champlain_view_remove_layer (ChamplainView *view,
@@ -148,6 +149,7 @@ gboolean champlain_view_get_animate_zoom (ChamplainView *view);
 ChamplainState champlain_view_get_state (ChamplainView *view);
 ClutterContent *champlain_view_get_background_pattern (ChamplainView *view);
 ChamplainBoundingBox *champlain_view_get_world (ChamplainView *view);
+gboolean champlain_view_get_horizontal_wrap (ChamplainView *view);
 
 void champlain_view_reload_tiles (ChamplainView *view);
 
@@ -160,6 +162,9 @@ gdouble champlain_view_longitude_to_x (ChamplainView *view,
 gdouble champlain_view_latitude_to_y (ChamplainView *view,
     gdouble latitude);
 
+void champlain_view_get_viewport_anchor (ChamplainView *view,
+    gint *anchor_x,
+    gint *anchor_y);
 void champlain_view_get_viewport_origin (ChamplainView *view,
     gint *x,
     gint *y);
