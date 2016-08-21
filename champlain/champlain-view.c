@@ -536,6 +536,17 @@ resize_viewport (ChamplainView *view)
   gint x_first = min_x * champlain_map_source_get_tile_size (priv->map_source);
   gint y_first = min_y * champlain_map_source_get_tile_size (priv->map_source);
 
+  /* Location of viewport with respect to the first tile:
+   *
+   * - for large maps (higher zoom levels) we allow the map to end in the middle
+   *   of the viewport; that is, one half of the viewport is positioned before
+   *   the first tile
+   * - for small maps (e.g. zoom level 0) we allow half of the map to go outside
+   *   the viewport; that is, whole viewport except one half of the map is
+   *   positioned before the first tile
+   *
+   * The first and the second element of the MIN() below corresponds to the
+   * first and the second case above. */
   lower_x = MIN (x_first - priv->viewport_width / 2,
                  (x_first - priv->viewport_width) + (x_last - x_first) / 2);
 
@@ -2559,7 +2570,7 @@ champlain_view_get_viewport_anchor (ChamplainView *view,
     gint *anchor_x,
     gint *anchor_y)
 {
-    DEBUG_LOG ()
+  DEBUG_LOG ()
 
   g_return_if_fail (CHAMPLAIN_IS_VIEW (view));
   ChamplainViewPrivate *priv = view->priv;
