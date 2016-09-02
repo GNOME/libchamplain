@@ -160,11 +160,13 @@ struct _ChamplainViewPrivate
   ClutterContent *background_content; 
 
   gboolean hwrap;
-  gint num_clones;
+  /* There are num_right_clones clones on the right, and one extra on the left */
+  gint num_right_clones;
   GList *map_clones;
-  /* There are num_clones user layer slots, overlayed on the map clones.
-   * The first slot initially contains the real user_layers actor, and the
-   * rest contain clones. Whenever the cursor enters a clone slot, its content
+  /* There are num_right_clones + 2 user layer slots, overlayed on the map clones.
+   * Initially, the first slot contains the left clone, the second slot
+   * contains the real user layer, and the rest contain the right clones.
+   * Whenever the cursor enters a clone slot, its content
    * is swapped with the real one so as to ensure reactiveness to events.
    */
   GList *user_layer_slots;
@@ -1313,6 +1315,32 @@ exclusive_destroy_clone (ClutterActor *clone)
 }
 
 static void
+add_clone (ChamplainView *view,
+    gint x)
+{
+  ChamplainViewPrivate *priv = view->priv;
+  ClutterActor *map_clone, *user_clone;
+
+  /* Map layer clones */
+  map_clone = clutter_clone_new (priv->map_layer);
+  clutter_actor_set_x (map_clone, x);
+  clutter_actor_insert_child_below (priv->viewport_container, map_clone,
+                                    NULL);
+
+  priv->map_clones = g_list_prepend (priv->map_clones, map_clone);
+
+  /* User layer clones */
+  user_clone = clutter_clone_new (priv->user_layers);
+  clutter_actor_set_x (user_clone, x);
+  clutter_actor_insert_child_below (priv->viewport_container, user_clone,
+                                    priv->user_layers);
+
+  /* Inserting clones in the slots following the real user layer (order must be kept)*/
+  priv->user_layer_slots = g_list_append (priv->user_layer_slots, user_clone);
+}
+
+
+static void
 update_clones (ChamplainView *view)
 {
   DEBUG_LOG ()
@@ -1325,7 +1353,7 @@ update_clones (ChamplainView *view)
   map_size = get_map_width (view);
   clutter_actor_get_size (CLUTTER_ACTOR (view), &view_width, NULL);
 
-  priv->num_clones = ceil (view_width / map_size) + 1;
+  priv->num_right_clones = ceil (view_width / map_size) + 1;
 
   if (priv->map_clones != NULL)
     {
@@ -1337,31 +1365,15 @@ update_clones (ChamplainView *view)
       priv->user_layer_slots = NULL;
     }
 
-  /* Inserting the real user layer in the first slot */
+  /* An extra clone is added to the left for smoother panning */
+  add_clone (view, -map_size);
+
+  /* Inserting the real user layer in the second slot (after the left clone) */
   priv->user_layer_slots = g_list_append (priv->user_layer_slots, priv->user_layers);
   clutter_actor_set_x (priv->user_layers, 0);
     
-  for (i = 0; i < priv->num_clones; i++) 
-    {
-      ClutterActor *map_clone, *user_clone;
-
-      /* Map layer clones */
-      map_clone = clutter_clone_new (priv->map_layer);
-      clutter_actor_set_x (map_clone, (i + 1) * map_size);
-      clutter_actor_insert_child_below (priv->viewport_container, map_clone,
-                                        NULL);
-
-      priv->map_clones = g_list_prepend (priv->map_clones, map_clone);
-
-      /* User layer clones */
-      user_clone = clutter_clone_new (priv->user_layers);
-      clutter_actor_set_x (user_clone, (i + 1) * map_size);
-      clutter_actor_insert_child_below (priv->viewport_container, user_clone,
-                                        priv->user_layers);
-
-      /* Inserting the user layer clones in the following slots */
-      priv->user_layer_slots = g_list_append (priv->user_layer_slots, user_clone);
-    }
+  for (i = 0; i < priv->num_right_clones; i++)
+    add_clone (view, (i + 1) * map_size);
 }
 
 
@@ -1528,7 +1540,7 @@ champlain_view_init (ChamplainView *view)
   priv->world_bbox->bottom = CHAMPLAIN_MIN_LATITUDE;
   priv->world_bbox->right = CHAMPLAIN_MAX_LONGITUDE;
   priv->world_bbox->top = CHAMPLAIN_MAX_LATITUDE;
-  priv->num_clones = 0;
+  priv->num_right_clones = 0;
   priv->map_clones = NULL;
   priv->user_layer_slots = NULL;
   priv->hwrap = FALSE;
@@ -1682,8 +1694,8 @@ swap_user_layer_slots (ChamplainView *view,
   original_slot->data = clone;
   clone_slot->data = priv->user_layers;
 
-  clutter_actor_set_x (clone, original_index * map_width);
-  clutter_actor_set_x (priv->user_layers, clone_index * map_width);
+  clutter_actor_set_x (clone, (original_index - 1) * map_width);
+  clutter_actor_set_x (priv->user_layers, (clone_index - 1) * map_width);
 }
 
 
@@ -1697,9 +1709,9 @@ viewport_motion_cb (G_GNUC_UNUSED ClutterActor *actor,
    gint map_width = get_map_width (view);
 
    gint original_index = g_list_index (priv->user_layer_slots, priv->user_layers);
-   gint clone_index = (event->x + priv->viewport_x) / map_width;
+   gint clone_index = (event->x + priv->viewport_x) / map_width + 1;
 
-   if (clone_index != original_index && clone_index < priv->num_clones + 1)
+   if (clone_index != original_index && clone_index < priv->num_right_clones + 2)
      swap_user_layer_slots (view, original_index, clone_index);
 
    return TRUE;
@@ -1752,7 +1764,7 @@ viewport_press_cb (G_GNUC_UNUSED ClutterActor *actor,
   gint left_neighbor_index = original_index - 1;
 
   /* Swapping and testing right neighbor */
-  if (right_neighbor_index < priv->num_clones)
+  if (right_neighbor_index < priv->num_right_clones + 2)
     {
       swap_user_layer_slots (view, original_index, right_neighbor_index);
       original_index = right_neighbor_index;
@@ -2119,18 +2131,23 @@ paint_surface (ChamplainView *view,
                             x, y);
   cairo_paint_with_alpha (cr, opacity);
 
-  /* Paint each surface num_clones - 1 extra times (last clone is not
-   * actually visible) in order to horizontally wrap.
+  /* Paint each surface num_right_clones - 1 extra times on the right
+   * (last clone is not actually visible) and once in the left
+   * in order to horizontally wrap.
    */
   if (priv->hwrap)
     {
       gint i;
 
-      for (i = 1; i <= priv->num_clones - 1; i++)
+      for (i = 0; i < priv->num_right_clones + 1; i++)
         {
+          /* Don't repaint original layer */
+          if (i == 1)
+            continue;
+
           cairo_set_source_surface (cr,
                             surface,
-                            x + i * map_width, y);
+                            x + (i - 1) * map_width, y);
           cairo_paint_with_alpha (cr, opacity);
         }
     }
@@ -3496,17 +3513,22 @@ show_zoom_actor (ChamplainView *view,
           GList *old_clone = priv->map_clones;
           gint i;
 
-          for (i = 0; i < priv->num_clones; i++) 
+          for (i = 0; i < priv->num_right_clones + 2; i++)
             {
               gfloat tiles_x;
-              ClutterActor *clone_right = clutter_clone_new (tile_container);
+              ClutterActor *clone;
+
+              if (i == 1)
+                continue;
+
+              clone = clutter_clone_new (tile_container);
 
               clutter_actor_hide (CLUTTER_ACTOR (old_clone->data));
 
               clutter_actor_get_position (tile_container, &tiles_x, NULL);
-              clutter_actor_set_x (clone_right, tiles_x + (i * column_count * size));
+              clutter_actor_set_x (clone, tiles_x + ((i - 1) * column_count * size));
 
-              clutter_actor_add_child (zoom_actor, clone_right);
+              clutter_actor_add_child (zoom_actor, clone);
 
               old_clone = old_clone->next;
             }
