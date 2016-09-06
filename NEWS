@@ -1,3 +1,23 @@
+libchamplain 0.12.14 (2016-07-06)
+=================================
+
+Stable release
+
+Changes:
+
+* Add support for horizontal map wrapping (Marius Stanciu, Jonas Danielsson,
+  Jiří Techet)
+* Make the number of parallel connections of network tile source configurable
+  (Mattias Bengtsson)
+* Remove Mapquest map source as the tile server is not accessible any more
+  (Nayan Deshmukh, Jiří Techet)
+* Remove Maemo-related code (Jiří Techet)
+* Fix small memory leaks (Marius Stanciu)
+* Bump libsoup dependency requirement to 2.42 and drop deprecated function
+  calls (Nayan Deshmukh)
+* Various minor improvements, fixes, depreciaton warning removals and cleanups
+  (Nayan Deshmukh, Marius Stanciu, Mattias Bengtsson, Jiří Techet)
+
 libchamplain 0.12.13 (2016-02-25)
 =================================
 

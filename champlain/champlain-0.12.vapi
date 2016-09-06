@@ -508,6 +508,7 @@ namespace Champlain {
 		public double get_center_latitude ();
 		public double get_center_longitude ();
 		public double get_deceleration ();
+		public bool get_horizontal_wrap ();
 		public bool get_keep_center_on_resize ();
 		public bool get_kinetic_mode ();
 		public unowned Champlain.License get_license_actor ();
@@ -516,6 +517,7 @@ namespace Champlain {
 		public uint get_min_zoom_level ();
 		public GLib.List<weak Champlain.MapSource> get_overlay_sources ();
 		public Champlain.State get_state ();
+		public void get_viewport_anchor (out int anchor_x, out int anchor_y);
 		public void get_viewport_origin (out int x, out int y);
 		public unowned Champlain.BoundingBox get_world ();
 		public uint get_zoom_level ();
@@ -529,6 +531,7 @@ namespace Champlain {
 		public void set_animate_zoom (bool value);
 		public void set_background_pattern (Clutter.Content background);
 		public void set_deceleration (double rate);
+		public void set_horizontal_wrap (bool wrap);
 		public void set_keep_center_on_resize (bool value);
 		public void set_kinetic_mode (bool kinetic);
 		public void set_map_source (Champlain.MapSource map_source);
@@ -550,6 +553,7 @@ namespace Champlain {
 		public uint goto_animation_duration { get; set; }
 		[NoAccessorMethod]
 		public Clutter.AnimationMode goto_animation_mode { get; set; }
+		public bool horizontal_wrap { get; set; }
 		public bool keep_center_on_resize { get; set; }
 		public bool kinetic_mode { get; set; }
 		[NoAccessorMethod]

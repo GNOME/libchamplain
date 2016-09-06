@@ -173,6 +173,7 @@ champlain_view_get_center_longitude
 champlain_view_get_bounding_box
 champlain_view_get_bounding_box_for_zoom_level
 champlain_view_get_state
+champlain_view_get_viewport_anchor
 <SUBSECTION Standard>
 CHAMPLAIN_VIEW
 CHAMPLAIN_IS_VIEW
