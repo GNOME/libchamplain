@@ -223,14 +223,6 @@ append_point (ChamplainPathLayer *layer, gdouble lon, gdouble lat)
 
 
 static void
-export_to_png_cb (GdkPixbuf    *pixbuf,
-    GAsyncResult *res)
-{
-  gdk_pixbuf_save_to_stream_finish (res, NULL);
-}
-
-
-static void
 export_png (GtkButton     *button,
     ChamplainView *view)
 {
@@ -254,18 +246,15 @@ export_png (GtkButton     *button,
     return;
 
   file = g_file_new_for_path ("champlain-map.png");
-  os = g_file_create (file, G_FILE_CREATE_NONE, NULL, NULL);
+  os = g_file_replace (file, NULL, FALSE, G_FILE_CREATE_NONE, NULL, NULL);
   if (!os)
     {
       g_object_unref (pixbuf);
       return;
     }
 
-  gdk_pixbuf_save_to_stream_async (pixbuf,
-                                   G_OUTPUT_STREAM (os), "png",
-                                   NULL,
-                                   (GAsyncReadyCallback) export_to_png_cb,
-                                   NULL);
+  gdk_pixbuf_save_to_stream (pixbuf, G_OUTPUT_STREAM (os), "png", NULL, NULL);
+  g_output_stream_close (G_OUTPUT_STREAM (os), NULL, NULL);
 }
 
 
