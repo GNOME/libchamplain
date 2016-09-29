@@ -253,7 +253,7 @@ export_png (GtkButton     *button,
       return;
     }
 
-  gdk_pixbuf_save_to_stream (pixbuf, G_OUTPUT_STREAM (os), "png", NULL, NULL);
+  gdk_pixbuf_save_to_stream (pixbuf, G_OUTPUT_STREAM (os), "png", NULL, NULL, NULL);
   g_output_stream_close (G_OUTPUT_STREAM (os), NULL, NULL);
 }
 
