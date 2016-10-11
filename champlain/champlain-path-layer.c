@@ -485,6 +485,53 @@ set_surface (ChamplainExportable *exportable,
   g_object_notify (G_OBJECT (self), "surface");
 }
 
+static void
+get_map_size (ChamplainView *view, gint *width, gint *height)
+{
+  gint size, rows, cols;
+  ChamplainMapSource *map_source = champlain_view_get_map_source (view);
+  gint zoom_level = champlain_view_get_zoom_level (view);
+  size = champlain_map_source_get_tile_size (map_source);
+  rows = champlain_map_source_get_row_count (map_source,
+                                                zoom_level);
+  cols = champlain_map_source_get_column_count (map_source,
+                                                zoom_level);
+  if (width)
+    *width = size * rows;
+
+  if (height)
+    *height = size * cols;
+}
+
+static cairo_surface_t *
+create_merged_surface (ChamplainPathLayer *layer)
+{
+  ChamplainPathLayerPrivate *priv = layer->priv;
+  gfloat view_width, view_height;
+  gint map_width, viewport_x, anchor_x;
+  cairo_surface_t *new_surface;
+  cairo_t *cr;
+
+  get_map_size (priv->view, &map_width, NULL);
+  clutter_actor_get_size (CLUTTER_ACTOR (priv->view), &view_width, &view_height);
+  champlain_view_get_viewport_origin (priv->view, &viewport_x, NULL);
+  champlain_view_get_viewport_anchor (priv->view, &anchor_x, NULL);
+  new_surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, view_width, view_height);
+  cr = cairo_create (new_surface);
+
+  cairo_set_source_surface (cr,
+                            priv->right_surface,
+                            0, 0);
+  cairo_paint (cr);
+
+  cairo_set_source_surface (cr,
+                            priv->left_surface,
+                            map_width - viewport_x - anchor_x, 0);
+  cairo_paint (cr);
+  cairo_destroy (cr);
+
+  return new_surface;
+}
 
 static cairo_surface_t *
 get_surface (ChamplainExportable *exportable)
@@ -494,7 +541,16 @@ get_surface (ChamplainExportable *exportable)
   ChamplainPathLayer *self = CHAMPLAIN_PATH_LAYER (exportable);
 
   if (self->priv->visible)
-    return CHAMPLAIN_PATH_LAYER (exportable)->priv->surface;
+    {
+      /* if the surface hasn't yet been rendered, update it */
+      if (!self->priv->surface)
+        {
+          cairo_surface_t *new_surface = create_merged_surface (self);
+
+          set_surface (exportable, new_surface);
+        }
+      return CHAMPLAIN_PATH_LAYER (exportable)->priv->surface;
+    }
   else
     return NULL;
 }
@@ -522,26 +578,6 @@ champlain_path_layer_new ()
 {
   return g_object_new (CHAMPLAIN_TYPE_PATH_LAYER, NULL);
 }
-
-
-static void
-get_map_size (ChamplainView *view, gint *width, gint *height)
-{
-  gint size, rows, cols;
-  ChamplainMapSource *map_source = champlain_view_get_map_source (view);
-  gint zoom_level = champlain_view_get_zoom_level (view);
-  size = champlain_map_source_get_tile_size (map_source);
-  rows = champlain_map_source_get_row_count (map_source,
-                                                zoom_level);
-  cols = champlain_map_source_get_column_count (map_source,
-                                                zoom_level);
-  if (width)
-    *width = size * rows;
-
-  if (height)
-    *height = size * cols;
-}
-
 
 static gboolean
 invalidate_canvas (ChamplainPathLayer *layer)
@@ -814,33 +850,12 @@ update_surface (ChamplainPathLayer *layer,
   */
   if (priv->left_surface_updated && priv->right_surface_updated)
     {
-      gfloat view_width, view_height;
-      gint map_width, viewport_x, anchor_x;
       cairo_surface_t *new_surface;
-      cairo_t *cr;
-
-      get_map_size (priv->view, &map_width, NULL);
-      clutter_actor_get_size (CLUTTER_ACTOR (priv->view), &view_width, &view_height);
-      champlain_view_get_viewport_origin (priv->view, &viewport_x, NULL);
-      champlain_view_get_viewport_anchor (priv->view, &anchor_x, NULL);
-
-      new_surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, view_width, view_height);
-      cr = cairo_create (new_surface);
-
-      cairo_set_source_surface (cr,
-                                priv->right_surface,
-                                0, 0);
-      cairo_paint (cr);
-
-      cairo_set_source_surface (cr,
-                                priv->left_surface,
-                                map_width - viewport_x - anchor_x, 0);
-      cairo_paint (cr);
+      new_surface = create_merged_surface (layer);
 
       set_surface (CHAMPLAIN_EXPORTABLE (layer), new_surface);
 
       cairo_surface_destroy (new_surface);
-      cairo_destroy (cr);
     }
   /* When only the right actor is visible, no merging is required */
   else if (!CLUTTER_ACTOR_IS_VISIBLE (priv->left_actor))
