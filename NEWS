@@ -1,4 +1,16 @@
-libchamplain 0.12.14 (2016-07-06)
+libchamplain 0.12.15 (2016-03-08)
+=================================
+
+Stable release
+
+Changes:
+
+* Fix path layer surface exporting when no clone is visible (Marius Stanciu)
+* Fix printing in gnome-maps (Marcus Lundblad)
+* Fix build on RHEL 7.3 (Matthias Clasen)
+* Minor example updates (Jiří Techet)
+
+libchamplain 0.12.14 (2016-09-06)
 =================================
 
 Stable release
