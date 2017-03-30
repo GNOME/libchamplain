@@ -1455,7 +1455,8 @@ zoom_gesture_begin_cb (ClutterGestureAction *gesture,
     G_GNUC_UNUSED ClutterActor *actor,
     G_GNUC_UNUSED gpointer user_data)
 {
-  ClutterInputDevice *device = clutter_gesture_action_get_device (gesture, 0);
+  ClutterEvent *event = clutter_gesture_action_get_last_event (gesture, 0);
+  ClutterInputDevice *device = clutter_event_get_source_device (event);
 
   /* Give up on >2 finger input and when using mouse */
   return clutter_gesture_action_get_n_current_points (gesture) == 2 &&
