@@ -62,7 +62,8 @@ enum
   PROP_URI_FORMAT,
   PROP_OFFLINE,
   PROP_PROXY_URI,
-  PROP_MAX_CONNS
+  PROP_MAX_CONNS,
+  PROP_USER_AGENT
 };
 
 G_DEFINE_TYPE (ChamplainNetworkTileSource, champlain_network_tile_source, CHAMPLAIN_TYPE_TILE_SOURCE);
@@ -171,6 +172,10 @@ champlain_network_tile_source_set_property (GObject *object,
 
     case PROP_MAX_CONNS:
       champlain_network_tile_source_set_max_conns (tile_source, g_value_get_int (value));
+      break;
+
+    case PROP_USER_AGENT:
+      champlain_network_tile_source_set_user_agent (tile_source, g_value_get_string (value));
       break;
 
     default:
@@ -295,6 +300,20 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
 
   g_object_class_install_property (object_class, PROP_MAX_CONNS, pspec);
 
+  /**
+   * ChamplainNetworkTileSource:user-agent:
+   *
+   * The HTTP user agent used for requests
+   *
+   * Since: 0.12.16
+   */
+  pspec = g_param_spec_string ("user-agent",
+        "HTTP User Agent",
+        "The HTTP user agent used for network requests",
+        "libchamplain/" CHAMPLAIN_VERSION_S,
+        G_PARAM_WRITABLE);
+
+  g_object_class_install_property (object_class, PROP_USER_AGENT, pspec);
 }
 
 
@@ -572,6 +591,28 @@ champlain_network_tile_source_set_max_conns (ChamplainNetworkTileSource *tile_so
   g_object_notify (G_OBJECT (tile_source), "max_conns");
 }
 
+/**
+ * champlain_network_tile_source_set_user_agent:
+ * @map_data_source: a #ChamplainNetworkTileSource
+ * @user_agent: A User-Agent string
+ *
+ * Sets the User-Agent header used communicating with the server.
+ * Since: 0.12.16
+ */
+void
+champlain_network_tile_source_set_user_agent (
+    ChamplainNetworkTileSource *tile_source,
+    const gchar *user_agent)
+{
+  g_return_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source)
+      && user_agent != NULL);
+
+  ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
+
+  if (priv->soup_session)
+    g_object_set (G_OBJECT (priv->soup_session), "user-agent",
+        user_agent, NULL);
+}
 
 #define SIZE 8
 static gchar *

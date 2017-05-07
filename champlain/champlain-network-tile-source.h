@@ -100,6 +100,7 @@ gint champlain_network_tile_source_get_max_conns (ChamplainNetworkTileSource *ti
 void champlain_network_tile_source_set_max_conns (ChamplainNetworkTileSource *tile_source,
     gint max_conns);
 
+void champlain_network_tile_source_set_user_agent (ChamplainNetworkTileSource *self, const gchar *user_agent);
 
 G_END_DECLS
 

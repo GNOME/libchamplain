@@ -50,7 +50,8 @@ enum
   PROP_0,
   PROP_API_URI,
   PROP_PROXY_URI,
-  PROP_STATE
+  PROP_STATE,
+  PROP_USER_AGENT
 };
 
 struct _ChamplainNetworkBboxTileSourcePrivate
@@ -126,6 +127,11 @@ champlain_network_bbox_tile_source_set_property (GObject *object,
       priv->state = g_value_get_enum (value);
       g_object_notify (G_OBJECT (self), "state");
       break;
+
+    case PROP_USER_AGENT:
+      champlain_network_bbox_tile_source_set_user_agent (self,
+          g_value_get_string (value));
+     break;
 
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -225,6 +231,21 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
           CHAMPLAIN_TYPE_STATE,
           CHAMPLAIN_STATE_NONE,
           G_PARAM_READWRITE));
+
+  /**
+   * ChamplainNetworkBboxTileSource:user-agent:
+   *
+   * The HTTP user agent used for requests
+   *
+   * Since: 0.12.16
+   */
+  g_object_class_install_property (object_class,
+      PROP_USER_AGENT,
+      g_param_spec_string ("user-agent",
+        "HTTP User Agent",
+        "The HTTP user agent used for network requests",
+        "libchamplain/" CHAMPLAIN_VERSION_S,
+        G_PARAM_WRITABLE));
 }
 
 
@@ -479,4 +500,27 @@ champlain_network_bbox_tile_source_set_api_uri (
   g_free (priv->api_uri);
   priv->api_uri = g_strdup (api_uri);
   g_object_notify (G_OBJECT (self), "api-uri");
+}
+
+/**
+ * champlain_network_bbox_tile_source_set_user_agent:
+ * @map_data_source: a #ChamplainNetworkBboxTileSource
+ * @user_agent: A User-Agent string
+ *
+ * Sets the User-Agent header used communicating with the server.
+ * Since: 0.12.16
+ */
+void
+champlain_network_bbox_tile_source_set_user_agent (
+    ChamplainNetworkBboxTileSource *self,
+    const gchar *user_agent)
+{
+  g_return_if_fail (CHAMPLAIN_IS_NETWORK_BBOX_TILE_SOURCE (self)
+      && user_agent != NULL);
+
+  ChamplainNetworkBboxTileSourcePrivate *priv = self->priv;
+
+  if (priv->soup_session)
+    g_object_set (G_OBJECT (priv->soup_session), "user-agent",
+        user_agent, NULL);
 }

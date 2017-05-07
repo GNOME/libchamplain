@@ -92,6 +92,10 @@ void champlain_network_bbox_tile_source_set_api_uri (
     ChamplainNetworkBboxTileSource *map_data_source,
     const gchar *api_uri);
 
+void champlain_network_bbox_tile_source_set_user_agent (
+    ChamplainNetworkBboxTileSource *map_data_source,
+    const gchar *user_agent);
+
 G_END_DECLS
 
 #endif /* _CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE */
