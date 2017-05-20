@@ -593,7 +593,7 @@ champlain_network_tile_source_set_max_conns (ChamplainNetworkTileSource *tile_so
 
 /**
  * champlain_network_tile_source_set_user_agent:
- * @map_data_source: a #ChamplainNetworkTileSource
+ * @tile_source: a #ChamplainNetworkTileSource
  * @user_agent: A User-Agent string
  *
  * Sets the User-Agent header used communicating with the server.
@@ -613,6 +613,7 @@ champlain_network_tile_source_set_user_agent (
     g_object_set (G_OBJECT (priv->soup_session), "user-agent",
         user_agent, NULL);
 }
+
 
 #define SIZE 8
 static gchar *

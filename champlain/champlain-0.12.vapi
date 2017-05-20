@@ -50,7 +50,6 @@ namespace Champlain {
 	[Deprecated (since = "0.12.4")]
 	public class CustomMarker : Champlain.Marker, Atk.Implementor, Champlain.Location, Clutter.Animatable, Clutter.Container, Clutter.Scriptable {
 		[CCode (has_construct_function = false, type = "ClutterActor*")]
-		[Deprecated (since = "0.12.4")]
 		public CustomMarker ();
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_error_tile_renderer_get_type ()")]
@@ -317,11 +316,13 @@ namespace Champlain {
 		public unowned string get_api_uri ();
 		public void load_map_data (Champlain.BoundingBox bbox);
 		public void set_api_uri (string api_uri);
+		public void set_user_agent (string user_agent);
 		public string api_uri { get; set; }
 		[NoAccessorMethod]
 		public string proxy_uri { owned get; set; }
 		[NoAccessorMethod]
 		public Champlain.State state { get; set; }
+		public string user_agent { set; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_network_tile_source_get_type ()")]
 	public class NetworkTileSource : Champlain.TileSource {
@@ -337,10 +338,12 @@ namespace Champlain {
 		public void set_offline (bool offline);
 		public void set_proxy_uri (string proxy_uri);
 		public void set_uri_format (string uri_format);
+		public void set_user_agent (string user_agent);
 		public int max_conns { get; set; }
 		public bool offline { get; set; }
 		public string proxy_uri { get; set; }
 		public string uri_format { get; set construct; }
+		public string user_agent { set; }
 	}
 	[CCode (cheader_filename = "champlain/champlain.h", type_id = "champlain_null_tile_source_get_type ()")]
 	public class NullTileSource : Champlain.TileSource {

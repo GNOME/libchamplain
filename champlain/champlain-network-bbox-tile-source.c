@@ -502,6 +502,7 @@ champlain_network_bbox_tile_source_set_api_uri (
   g_object_notify (G_OBJECT (self), "api-uri");
 }
 
+
 /**
  * champlain_network_bbox_tile_source_set_user_agent:
  * @map_data_source: a #ChamplainNetworkBboxTileSource
