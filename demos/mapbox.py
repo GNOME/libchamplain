@@ -34,7 +34,7 @@ def create_cached_source():
         MIN_ZOOM,
         MAX_ZOOM,
         TILE_SIZE,
-        Champlain.MapProjection.MAP_PROJECTION_MERCATOR,
+        Champlain.MapProjection.MERCATOR,
         "https://a.tiles.mapbox.com/v4/mapbox.streets/#Z#/#X#/#Y#.png?access_token=" + ACCESS_TOKEN,
         Champlain.ImageRenderer())
 
