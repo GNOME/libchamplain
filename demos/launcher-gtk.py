@@ -122,7 +122,7 @@ class LauncherGTK:
     def mouse_click_cb(self, actor, event, view):
         x, y = event.x, event.y
         lon, lat = view.x_to_longitude(x), view.y_to_latitude(y)
-        print "Mouse click at: %f %f" % (lat, lon)
+        print("Mouse click at: %f %f" % (lat, lon))
         return True
 
     def zoom_changed(self, widget):
@@ -150,7 +150,7 @@ class LauncherGTK:
         if event.button != 1 and event.click_count > 1:
             return False
 
-        print "Montreal was clicked\n"
+        print("Montreal was clicked\n")
         return True
 
 
