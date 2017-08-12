@@ -5,6 +5,10 @@
 #
 # export GI_TYPELIB_PATH=$GI_TYPELIB_PATH:/usr/local/lib/girepository-1.0/
 
+import gi
+gi.require_version('Champlain', '0.12')
+gi.require_version('GtkChamplain', '0.12')
+gi.require_version('GtkClutter', '1.0')
 from gi.repository import GtkClutter
 from gi.repository import GObject, Gtk, Champlain, GtkChamplain
 

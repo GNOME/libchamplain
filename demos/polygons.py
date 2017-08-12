@@ -16,6 +16,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
+import gi
+gi.require_version('Champlain', '0.12')
+gi.require_version('Clutter', '1.0')
 from gi.repository import Clutter, Champlain
 Clutter.init([])
 
