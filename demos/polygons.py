@@ -33,7 +33,7 @@ def zoom_out(widget, event, view):
 def make_button(text):
 	black = Clutter.Color.new(0x00, 0x00, 0x00, 0xff)
 	white = Clutter.Color.new(0xff, 0xff, 0xff, 0xff)
-  
+
 	button = Clutter.Actor()
 	
 	button_bg = Clutter.Actor()
@@ -81,7 +81,7 @@ if __name__ == '__main__':
 	buttons.add_child(button)
 	button.set_reactive(True)
 	(width, height) = button.get_size()
-	total_width += width + PADDING;
+	total_width += width + PADDING
 	#button.connect('button-release-event', zoom_in, view)
 	button.connect('button-release-event', zoom_in, view)
 	
@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
 	dash = [6, 2]
 	layer.set_dash(dash)
-  
+
 	# Draw a path
 	layer = Champlain.PathLayer()
 	append_point(layer, 45.1386, -73.9196)

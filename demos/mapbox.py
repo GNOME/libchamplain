@@ -10,7 +10,7 @@ gi.require_version('Champlain', '0.12')
 gi.require_version('GtkChamplain', '0.12')
 gi.require_version('GtkClutter', '1.0')
 from gi.repository import GtkClutter
-from gi.repository import GObject, Gtk, Champlain, GtkChamplain
+from gi.repository import Gtk, Champlain, GtkChamplain
 
 ACCESS_TOKEN = "PUT YOUR ACCESS TOKEN HERE!!!"
 
@@ -72,5 +72,3 @@ window.add(widget)
 window.show_all()
 
 Gtk.main()
-
-

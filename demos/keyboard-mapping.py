@@ -9,7 +9,7 @@ import gi
 gi.require_version('GtkChamplain', '0.12')
 gi.require_version('GtkClutter', '1.0')
 from gi.repository import GtkClutter
-from gi.repository import GObject, Gtk, Gdk, GtkChamplain 
+from gi.repository import Gtk, Gdk, GtkChamplain
 
 class KeyboardMapping:
 
@@ -30,17 +30,17 @@ class KeyboardMapping:
     def on_key_press(self, widget, ev):
         deltax = self.widget.get_allocation().width / 4
         deltay = self.widget.get_allocation().height / 4
-        if ev.keyval == Gdk.KEY_Left: 
+        if ev.keyval == Gdk.KEY_Left:
             self.scroll(-deltax, 0)
-        elif ev.keyval == Gdk.KEY_Right: 
+        elif ev.keyval == Gdk.KEY_Right:
             self.scroll(deltax, 0)
-        elif ev.keyval == Gdk.KEY_Up: 
+        elif ev.keyval == Gdk.KEY_Up:
             self.scroll(0, -deltay)
-        elif ev.keyval == Gdk.KEY_Down: 
+        elif ev.keyval == Gdk.KEY_Down:
             self.scroll(0, deltay)
         elif ev.keyval == Gdk.KEY_plus or ev.keyval == Gdk.KEY_KP_Add:
             self.view.zoom_in()
-        elif ev.keyval == Gdk.KEY_minus or ev.keyval == Gdk.KEY_KP_Subtract: 
+        elif ev.keyval == Gdk.KEY_minus or ev.keyval == Gdk.KEY_KP_Subtract:
             self.view.zoom_out()
         else:
             return False
@@ -58,6 +58,7 @@ class KeyboardMapping:
       
         self.view.center_on(lat, lon)
         #self.view.go_to(lat, lon)
+
 
 if __name__ == "__main__":
     KeyboardMapping()

@@ -9,7 +9,7 @@ import gi
 gi.require_version('GtkChamplain', '0.12')
 gi.require_version('GtkClutter', '1.0')
 from gi.repository import GtkClutter
-from gi.repository import GObject, Gtk, GtkChamplain 
+from gi.repository import Gtk, GtkChamplain
 
 GtkClutter.init([])
 
@@ -23,4 +23,3 @@ window.add(widget)
 window.show_all()
 
 Gtk.main()
-
