@@ -1,3 +1,14 @@
+libchamplain 0.12.16 (2017-09-06)
+=================================
+
+Stable release
+
+Changes:
+
+* Add possibility to set User-Agent for requests (Jens Georg)
+* Fix touch gesture zoom (Jan-Michael Brummer)
+* Python demo fixes and cleanups (Chris Mayo)
+
 libchamplain 0.12.15 (2017-03-08)
 =================================
 
