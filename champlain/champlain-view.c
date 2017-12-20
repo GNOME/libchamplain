@@ -2471,18 +2471,17 @@ champlain_view_x_to_longitude (ChamplainView *view,
 
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
 
+  x += priv->viewport_x;
+
   if (priv->hwrap)
     {
       gdouble width = get_map_width (view);
       x = x_to_wrap_x (x, width);
-
-      if (x >= width - priv->viewport_x)
-        x -= width;
     }
 
   longitude = champlain_map_source_get_longitude (priv->map_source,
         priv->zoom_level,
-        x + priv->viewport_x);
+        x);
 
   return longitude;
 }
