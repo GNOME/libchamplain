@@ -334,6 +334,26 @@ get_map_width (ChamplainView *view)
 }
 
 
+static gdouble
+get_longitude (ChamplainView *view,
+    guint zoom_level,
+    gdouble x)
+{
+  ChamplainViewPrivate *priv = view->priv;
+
+  DEBUG_LOG ()
+
+  g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
+
+  if (priv->hwrap)
+    x = x_to_wrap_x (x, get_map_width (view));
+
+  return champlain_map_source_get_longitude (priv->map_source,
+        zoom_level,
+        x);
+}
+
+
 static void
 update_coords (ChamplainView *view,
     gdouble x,
@@ -346,7 +366,7 @@ update_coords (ChamplainView *view,
 
   priv->viewport_x = x;
   priv->viewport_y = y;
-  priv->longitude = champlain_map_source_get_longitude (priv->map_source,
+  priv->longitude = get_longitude (view,
         priv->zoom_level,
         x + priv->viewport_width / 2.0);
   priv->latitude = champlain_map_source_get_latitude (priv->map_source,
@@ -1440,7 +1460,7 @@ zoom_gesture_zoom_cb (ClutterZoomAction *gesture,
       dx = (priv->viewport_width / 2.0) - focal_point->x;
       dy = (priv->viewport_height / 2.0) - focal_point->y;
 
-      lon = champlain_map_source_get_longitude (priv->map_source, zoom_level, focus.x + dx);
+      lon = get_longitude (view, zoom_level, focus.x + dx);
       lat = champlain_map_source_get_latitude (priv->map_source, zoom_level, focus.y + dy);
 
       champlain_view_center_on (view, lat, lon);
@@ -1830,7 +1850,7 @@ champlain_view_scroll (ChamplainView *view,
   y = priv->viewport_y + priv->viewport_height / 2.0 + deltay;
 
   lat = champlain_map_source_get_latitude (priv->map_source, priv->zoom_level, y);
-  lon = champlain_map_source_get_longitude (priv->map_source, priv->zoom_level, x);
+  lon = get_longitude (view, priv->zoom_level, x);
 
   if (priv->kinetic_mode)
     champlain_view_go_to_with_duration (view, lat, lon, 300);
@@ -2465,25 +2485,12 @@ champlain_view_x_to_longitude (ChamplainView *view,
     gdouble x)
 {
   ChamplainViewPrivate *priv = view->priv;
-  gdouble longitude;
 
   DEBUG_LOG ()
 
   g_return_val_if_fail (CHAMPLAIN_IS_VIEW (view), 0.0);
 
-  x += priv->viewport_x;
-
-  if (priv->hwrap)
-    {
-      gdouble width = get_map_width (view);
-      x = x_to_wrap_x (x, width);
-    }
-
-  longitude = champlain_map_source_get_longitude (priv->map_source,
-        priv->zoom_level,
-        x);
-
-  return longitude;
+  return get_longitude (view, priv->zoom_level, x + priv->viewport_x);
 }
 
 
@@ -4036,12 +4043,12 @@ get_bounding_box (ChamplainView *view,
   bbox->bottom = champlain_map_source_get_latitude (priv->map_source,
                                                     zoom_level,
                                                     y + priv->viewport_height);
-  bbox->left = champlain_map_source_get_longitude (priv->map_source,
-                                                   zoom_level,
-                                                   x);
-  bbox->right = champlain_map_source_get_longitude (priv->map_source,
-                                                    zoom_level,
-                                                    x + priv->viewport_width);
+  bbox->left = get_longitude (view,
+                              zoom_level,
+                              x);
+  bbox->right = get_longitude (view,
+                               zoom_level,
+                               x + priv->viewport_width);
   return bbox;
 }
 
