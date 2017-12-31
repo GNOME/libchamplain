@@ -1950,7 +1950,10 @@ champlain_view_center_on (ChamplainView *view,
 
   DEBUG ("Centering on %f, %f (%g, %g)", latitude, longitude, x, y);
 
-  position_viewport (view, x, y);
+  if (priv->hwrap)
+    position_viewport (view, x_to_wrap_x (x, get_map_width (view)), y);
+  else
+    position_viewport (view, x, y);
   load_visible_tiles (view, FALSE);
 }
 
