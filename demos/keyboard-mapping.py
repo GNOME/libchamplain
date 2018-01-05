@@ -23,6 +23,7 @@ class KeyboardMapping:
         self.widget = GtkChamplain.Embed()
         self.widget.set_size_request(640, 480)
         self.view = self.widget.get_view()
+        self.view.set_horizontal_wrap(True)
 
         window.add(self.widget)
         window.show_all()
