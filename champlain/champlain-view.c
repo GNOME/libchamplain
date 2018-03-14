@@ -3378,7 +3378,7 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
  *
  * Returns the value of the #ChamplainView:horizontal-wrap property.
  *
- * Returns: (transfer none): %TRUE if #ChamplainView:horizontal-wrap is set.
+ * Returns: %TRUE if #ChamplainView:horizontal-wrap is set.
  *
  */
 gboolean
