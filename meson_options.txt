@@ -1,4 +1,0 @@
-option('memphis', type : 'boolean', description : 'Support of local rendering using libmemphis')
-option('gtk', type : 'boolean', description : 'Compile Gtk+ embedded view')
-option('vala-support', type : 'boolean', description : 'Build Vala bindings')
-option('debug', type : 'boolean', value : false, description : 'Enable debug code')
