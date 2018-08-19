@@ -61,7 +61,7 @@ libchamplain_reference_fixxref_args = [
 ]
 
 gnome.gtkdoc(
-  package_string,
+  package_name,
   main_sgml: 'libchamplain-docs.sgml',
   gobject_typesfile: files('libchamplain.types'),
   src_dir: libchamplain_reference_source_folders,
