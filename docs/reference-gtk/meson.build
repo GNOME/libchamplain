@@ -34,7 +34,7 @@ libchamplain_gtk_reference_fixxref_args = [
 ]
 
 gnome.gtkdoc(
-  package_gtk_string,
+  package_gtk_name,
   main_sgml: 'libchamplain-gtk-docs.sgml',
   gobject_typesfile: files('libchamplain-gtk.types'),
   src_dir: libchamplain_gtk_srcdir,
