@@ -14,7 +14,7 @@ languages are provided using GObject Introspection.</description>
   <programming-language>C</programming-language>
   <homepage rdf:resource="https://wiki.gnome.org/Projects/libchamplain" />
   <download-page rdf:resource="http://download.gnome.org/sources/libchamplain/" />
-  <bug-database rdf:resource="https://bugzilla.gnome.org/browse.cgi?product=libchamplain" />
+  <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/libchamplain/issues/" />
   <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/libchamplain-list" />
 
   <maintainer>
