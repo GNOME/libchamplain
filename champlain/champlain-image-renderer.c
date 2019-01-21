@@ -50,7 +50,7 @@ struct _RendererData
 };
 
 static void set_data (ChamplainRenderer *renderer,
-    const gchar *data,
+    const guint8 *data,
     guint size);
 static void render (ChamplainRenderer *renderer,
     ChamplainTile *tile);
@@ -118,7 +118,7 @@ champlain_image_renderer_new (void)
 
 
 static void
-set_data (ChamplainRenderer *renderer, const gchar *data, guint size)
+set_data (ChamplainRenderer *renderer, const guint8 *data, guint size)
 {
   ChamplainImageRendererPrivate *priv = GET_PRIVATE (renderer);
 

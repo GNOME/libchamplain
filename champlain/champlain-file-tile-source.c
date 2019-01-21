@@ -144,7 +144,7 @@ champlain_file_tile_source_load_map_data (ChamplainFileTileSource *self,
     }
 
   renderer = champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (self));
-  champlain_renderer_set_data (renderer, data, length);
+  champlain_renderer_set_data (renderer, (guint8*) data, length);
   g_free (data);
 }
 

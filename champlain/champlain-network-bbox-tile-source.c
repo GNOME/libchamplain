@@ -339,7 +339,7 @@ load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
   g_object_set (G_OBJECT (self), "state", CHAMPLAIN_STATE_DONE, NULL);
 
   renderer = champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (self));
-  champlain_renderer_set_data (renderer, msg->response_body->data, msg->response_body->length);
+  champlain_renderer_set_data (renderer, (guint8*) msg->response_body->data, msg->response_body->length);
 }
 
 

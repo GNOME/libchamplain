@@ -58,7 +58,7 @@ champlain_renderer_class_init (ChamplainRendererClass *klass)
 /**
  * champlain_renderer_set_data:
  * @renderer: a #ChamplainRenderer
- * @data: data used for tile rendering
+ * @data: (array length=size): data used for tile rendering
  * @size: size of the data in bytes
  *
  * Sets the data which is used to render tiles by the renderer.
@@ -67,7 +67,7 @@ champlain_renderer_class_init (ChamplainRendererClass *klass)
  */
 void
 champlain_renderer_set_data (ChamplainRenderer *renderer,
-    const gchar *data,
+    const guint8 *data,
     guint size)
 {
   g_return_if_fail (CHAMPLAIN_IS_RENDERER (renderer));
