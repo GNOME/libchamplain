@@ -765,7 +765,7 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
 
   g_signal_connect (tile, "render-complete", G_CALLBACK (tile_rendered_cb), data);
 
-  champlain_renderer_set_data (renderer, msg->response_body->data, msg->response_body->length);
+  champlain_renderer_set_data (renderer, (guint8*) msg->response_body->data, msg->response_body->length);
   champlain_renderer_render (renderer, tile);
 
   return;

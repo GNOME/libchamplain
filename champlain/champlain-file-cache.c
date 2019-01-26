@@ -656,7 +656,7 @@ file_loaded_cb (GFile *file,
 
   g_signal_connect (tile, "render-complete", G_CALLBACK (tile_rendered_cb), user_data);
 
-  champlain_renderer_set_data (renderer, contents, length);
+  champlain_renderer_set_data (renderer, (guint8*) contents, length);
   g_free (contents);
   champlain_renderer_render (renderer, tile);
 }

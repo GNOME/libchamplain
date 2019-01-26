@@ -66,7 +66,7 @@ struct _ChamplainRendererClass
   GInitiallyUnownedClass parent_class;
 
   void (*set_data)(ChamplainRenderer *renderer,
-      const gchar *data,
+      const guint8 *data,
       guint size);
   void (*render)(ChamplainRenderer *renderer,
       ChamplainTile *tile);
@@ -75,7 +75,7 @@ struct _ChamplainRendererClass
 GType champlain_renderer_get_type (void);
 
 void champlain_renderer_set_data (ChamplainRenderer *renderer,
-    const gchar *data,
+    const guint8 *data,
     guint size);
 void champlain_renderer_render (ChamplainRenderer *renderer,
     ChamplainTile *tile);
