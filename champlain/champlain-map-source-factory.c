@@ -119,7 +119,7 @@ champlain_map_source_factory_constructor (GType type,
     }
   else
     {
-      retval = g_object_ref (instance);
+      retval = G_OBJECT( g_object_ref (instance));
     }
 
   return retval;

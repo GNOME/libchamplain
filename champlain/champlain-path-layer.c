@@ -858,7 +858,7 @@ update_surface (ChamplainPathLayer *layer,
       cairo_surface_destroy (new_surface);
     }
   /* When only the right actor is visible, no merging is required */
-  else if (!CLUTTER_ACTOR_IS_VISIBLE (priv->left_actor))
+  else if (!clutter_actor_is_visible (priv->left_actor))
     set_surface (CHAMPLAIN_EXPORTABLE (layer), priv->right_surface);
 }
 

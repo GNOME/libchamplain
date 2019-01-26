@@ -1258,7 +1258,7 @@ champlain_view_realized_cb (ChamplainView *view,
 
   ChamplainViewPrivate *priv = view->priv;
   
-  if (!CLUTTER_ACTOR_IS_REALIZED (view))
+  if (!clutter_actor_is_realized (CLUTTER_ACTOR (view)))
     return;
 
   clutter_actor_grab_key_focus (priv->kinetic_scroll);
@@ -1475,7 +1475,7 @@ zoom_gesture_begin_cb (ClutterGestureAction *gesture,
     G_GNUC_UNUSED ClutterActor *actor,
     G_GNUC_UNUSED gpointer user_data)
 {
-  ClutterEvent *event = clutter_gesture_action_get_last_event (gesture, 0);
+  const ClutterEvent *event = clutter_gesture_action_get_last_event (gesture, 0);
   ClutterInputDevice *device = clutter_event_get_source_device (event);
 
   /* Give up on >2 finger input and when using mouse */
@@ -3378,7 +3378,7 @@ champlain_view_set_horizontal_wrap (ChamplainView *view,
  *
  * Returns the value of the #ChamplainView:horizontal-wrap property.
  *
- * Returns: (transfer none): %TRUE if #ChamplainView:horizontal-wrap is set.
+ * Returns: %TRUE if #ChamplainView:horizontal-wrap is set.
  *
  */
 gboolean
@@ -3641,14 +3641,14 @@ view_set_zoom_level_at (ChamplainView *view,
     }
 
   /* don't do anything when view not yet realized */
-  if (CLUTTER_ACTOR_IS_REALIZED (view))
+  if (clutter_actor_is_realized (CLUTTER_ACTOR (view)))
     show_zoom_actor (view, zoom_level, offset_x, offset_y);
 
   get_x_y_for_zoom_level (view, zoom_level, offset_x, offset_y, &new_x, &new_y);
 
   priv->zoom_level = zoom_level;
 
-  if (CLUTTER_ACTOR_IS_REALIZED (view))
+  if (clutter_actor_is_realized (CLUTTER_ACTOR (view)))
     {
       resize_viewport (view);
       remove_all_tiles (view);

@@ -63,7 +63,7 @@ PKG_CHECK_MODULES(DEPS,
   [   glib-2.0 >= 2.16
       gobject-2.0 >= 2.10
       gdk-3.0 >= 2.90
-      clutter-1.0 >= 1.12
+      clutter-1.0 >= 1.24
       cairo >= 1.4
       gio-2.0 >= 2.16
       sqlite3 >= 3.0

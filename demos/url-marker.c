@@ -239,7 +239,7 @@ main (int argc, char *argv[])
   /* Create the markers and marker layer */
   layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
   champlain_view_add_layer (CHAMPLAIN_VIEW (view), CHAMPLAIN_LAYER (layer));
-  session = soup_session_async_new ();
+  session = soup_session_new ();
   create_marker_from_url (layer, session, 48.218611, 17.146397,
       "http://hexten.net/cpan-faces/potyl.jpg");
   create_marker_from_url (layer, session, 48.21066, 16.31476,
