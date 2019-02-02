@@ -2766,9 +2766,9 @@ fill_tile_cb (FillTileCallbackData *data)
   gint size = data->size;
   gint zoom_level = data->zoom_level;
 
-  if (!tile_in_tile_table (view, priv->tile_map, x, y) &&
-      zoom_level == priv->zoom_level &&
+  if (zoom_level == priv->zoom_level &&
       data->map_source == priv->map_source &&
+      !tile_in_tile_table (view, priv->tile_map, x, y) &&
       tile_in_tile_table (view, priv->visible_tiles, x, y))
     {
       GList *iter;
