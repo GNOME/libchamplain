@@ -33,6 +33,7 @@ public class Launcher : GLib.Object
     stage = new Clutter.Stage ();
     stage.title = "Champlain Vala Example";
     stage.set_size (800, 600);
+    stage.destroy.connect(Clutter.main_quit);
 
     /* Create the map view */
     view = new Champlain.View ();
