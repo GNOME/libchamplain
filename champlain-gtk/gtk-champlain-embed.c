@@ -288,6 +288,18 @@ gdk_rgba_to_clutter_color (GdkRGBA *gdk_rgba_color,
   color->blue = CLAMP (gdk_rgba_color->blue * 255, 0, 255);
   color->alpha = CLAMP (gdk_rgba_color->alpha * 255, 0, 255);
 }
+
+static void
+get_background_color (GtkStyleContext *context,
+    GtkStateFlags state,
+    GdkRGBA *color)
+{
+  GdkRGBA *c;
+
+  gtk_style_context_get (context, state, "background-color", &c, NULL);
+  *color = *c;
+  gdk_rgba_free (c);
+}
 #endif
 
 
@@ -343,8 +355,8 @@ view_realize_cb (GtkWidget *widget,
     }
   champlain_marker_set_selection_text_color (&color);
 
-  gtk_style_context_get_background_color (style, gtk_style_context_get_state (style),
-                                          &gdk_rgba_color);
+  get_background_color (style, gtk_style_context_get_state (style),
+                        &gdk_rgba_color);
   gdk_rgba_to_clutter_color (&gdk_rgba_color, &color);
   if (color.alpha == 0)
     color.alpha = 255;
