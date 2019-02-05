@@ -53,9 +53,6 @@ enum
 
 /* static guint gtk_champlain_embed_embed_signals[LAST_SIGNAL] = { 0, }; */
 
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), GTK_CHAMPLAIN_TYPE_EMBED, GtkChamplainEmbedPrivate))
-
 struct _GtkChamplainEmbedPrivate
 {
   GtkWidget *clutter_embed;
@@ -98,7 +95,7 @@ static gboolean stage_key_press_cb (ClutterActor *actor,
     ClutterEvent *event,
     GtkChamplainEmbed *embed);
 
-G_DEFINE_TYPE (GtkChamplainEmbed, gtk_champlain_embed, GTK_TYPE_ALIGNMENT);
+G_DEFINE_TYPE_WITH_PRIVATE (GtkChamplainEmbed, gtk_champlain_embed, GTK_TYPE_ALIGNMENT)
 
 static void
 gtk_champlain_embed_get_property (GObject *object,
@@ -175,8 +172,6 @@ gtk_champlain_embed_finalize (GObject *object)
 static void
 gtk_champlain_embed_class_init (GtkChamplainEmbedClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (GtkChamplainEmbedPrivate));
-
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   object_class->finalize = gtk_champlain_embed_finalize;
   object_class->dispose = gtk_champlain_embed_dispose;
@@ -222,7 +217,7 @@ set_view (GtkChamplainEmbed *embed,
 static void
 gtk_champlain_embed_init (GtkChamplainEmbed *embed)
 {
-  GtkChamplainEmbedPrivate *priv = GET_PRIVATE (embed);
+  GtkChamplainEmbedPrivate *priv = gtk_champlain_embed_get_instance_private (embed);
   ClutterActor *stage;
   GdkDisplay *display;
 

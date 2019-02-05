@@ -28,11 +28,6 @@
 #include "champlain-viewport.h"
 #include "champlain-private.h"
 
-G_DEFINE_TYPE (ChamplainViewport, champlain_viewport, CLUTTER_TYPE_ACTOR)
-
-#define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_VIEWPORT, ChamplainViewportPrivate))
-
 struct _ChamplainViewportPrivate
 {
   gdouble x;
@@ -46,6 +41,8 @@ struct _ChamplainViewportPrivate
   
   ClutterActor *child;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainViewport, champlain_viewport, CLUTTER_TYPE_ACTOR)
 
 enum
 {
@@ -186,8 +183,6 @@ static void
 champlain_viewport_class_init (ChamplainViewportClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
-
-  g_type_class_add_private (klass, sizeof (ChamplainViewportPrivate));
 
   gobject_class->get_property = champlain_viewport_get_property;
   gobject_class->set_property = champlain_viewport_set_property;
@@ -378,7 +373,7 @@ champlain_viewport_get_adjustments (ChamplainViewport *viewport,
 static void
 champlain_viewport_init (ChamplainViewport *self)
 {
-  self->priv = GET_PRIVATE (self);
+  self->priv = champlain_viewport_get_instance_private (self);
   
   self->priv->anchor_x = 0;
   self->priv->anchor_y = 0;

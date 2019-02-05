@@ -72,15 +72,13 @@ enum
 /* static guint champlain_map_source_factory_signals[LAST_SIGNAL] = { 0, }; */
 static ChamplainMapSourceFactory *instance = NULL;
 
-G_DEFINE_TYPE (ChamplainMapSourceFactory, champlain_map_source_factory, G_TYPE_OBJECT);
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_FACTORY, ChamplainMapSourceFactoryPrivate))
-
 struct _ChamplainMapSourceFactoryPrivate
 {
   GSList *registered_sources;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainMapSourceFactory, champlain_map_source_factory, G_TYPE_OBJECT)
+
 
 static ChamplainMapSource *champlain_map_source_new_generic (
     ChamplainMapSourceDesc *desc);
@@ -129,8 +127,6 @@ champlain_map_source_factory_constructor (GType type,
 static void
 champlain_map_source_factory_class_init (ChamplainMapSourceFactoryClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (ChamplainMapSourceFactoryPrivate));
-
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->constructor = champlain_map_source_factory_constructor;
@@ -141,7 +137,7 @@ champlain_map_source_factory_class_init (ChamplainMapSourceFactoryClass *klass)
 static void
 champlain_map_source_factory_init (ChamplainMapSourceFactory *factory)
 {
-  ChamplainMapSourceFactoryPrivate *priv = GET_PRIVATE (factory);
+  ChamplainMapSourceFactoryPrivate *priv = champlain_map_source_factory_get_instance_private (factory);
   ChamplainMapSourceDesc *desc;
 
   factory->priv = priv;

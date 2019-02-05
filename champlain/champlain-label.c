@@ -108,10 +108,7 @@ struct _ChamplainLabelPrivate
   gint point;
 };
 
-G_DEFINE_TYPE (ChamplainLabel, champlain_label, CHAMPLAIN_TYPE_MARKER);
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_LABEL, ChamplainLabelPrivate))
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainLabel, champlain_label, CHAMPLAIN_TYPE_MARKER)
 
 static void draw_label (ChamplainLabel *label);
 
@@ -259,7 +256,7 @@ static void
 pick (ClutterActor *self,
     const ClutterColor *color)
 {
-  ChamplainLabelPrivate *priv = GET_PRIVATE (self);
+  ChamplainLabelPrivate *priv = CHAMPLAIN_LABEL (self)->priv;
   gfloat width, height;
 
   if (!clutter_actor_should_pick_paint (self))
@@ -354,8 +351,6 @@ champlain_label_class_init (ChamplainLabelClass *klass)
 {
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  g_type_class_add_private (klass, sizeof (ChamplainLabelPrivate));
 
   object_class->finalize = champlain_label_finalize;
   object_class->dispose = champlain_label_dispose;
@@ -847,7 +842,7 @@ notify_selected (GObject *gobject,
 static void
 champlain_label_init (ChamplainLabel *label)
 {
-  ChamplainLabelPrivate *priv = GET_PRIVATE (label);
+  ChamplainLabelPrivate *priv = champlain_label_get_instance_private (label);
 
   label->priv = priv;
 

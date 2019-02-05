@@ -66,16 +66,6 @@ enum
   PROP_USER_AGENT
 };
 
-G_DEFINE_TYPE (ChamplainNetworkTileSource, champlain_network_tile_source, CHAMPLAIN_TYPE_TILE_SOURCE);
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_NETWORK_TILE_SOURCE, ChamplainNetworkTileSourcePrivate))
-
-/* The osm.org tile set require us to use no more than 2 simultaneous
- * connections so let that be the default.
- */
-#define MAX_CONNS_DEFAULT 2
-
 struct _ChamplainNetworkTileSourcePrivate
 {
   gboolean offline;
@@ -84,6 +74,13 @@ struct _ChamplainNetworkTileSourcePrivate
   SoupSession *soup_session;
   gint max_conns;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainNetworkTileSource, champlain_network_tile_source, CHAMPLAIN_TYPE_TILE_SOURCE)
+
+/* The osm.org tile set require us to use no more than 2 simultaneous
+ * connections so let that be the default.
+ */
+#define MAX_CONNS_DEFAULT 2
 
 typedef struct
 {
@@ -226,8 +223,6 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GParamSpec *pspec;
 
-  g_type_class_add_private (klass, sizeof (ChamplainNetworkTileSourcePrivate));
-
   object_class->finalize = champlain_network_tile_source_finalize;
   object_class->dispose = champlain_network_tile_source_dispose;
   object_class->get_property = champlain_network_tile_source_get_property;
@@ -320,7 +315,7 @@ champlain_network_tile_source_class_init (ChamplainNetworkTileSourceClass *klass
 static void
 champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
 {
-  ChamplainNetworkTileSourcePrivate *priv = GET_PRIVATE (tile_source);
+  ChamplainNetworkTileSourcePrivate *priv = champlain_network_tile_source_get_instance_private (tile_source);
 
   tile_source->priv = priv;
 

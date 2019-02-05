@@ -34,22 +34,19 @@
 #include <glib.h>
 #include <string.h>
 
-G_DEFINE_TYPE (ChamplainMemoryCache, champlain_memory_cache, CHAMPLAIN_TYPE_TILE_CACHE);
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MEMORY_CACHE, ChamplainMemoryCachePrivate))
-
-enum
-{
-  PROP_0,
-  PROP_SIZE_LIMIT
-};
-
 struct _ChamplainMemoryCachePrivate
 {
   guint size_limit;
   GQueue *queue;
   GHashTable *hash_table;
+};
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainMemoryCache, champlain_memory_cache, CHAMPLAIN_TYPE_TILE_CACHE)
+
+enum
+{
+  PROP_0,
+  PROP_SIZE_LIMIT
 };
 
 typedef struct
@@ -141,8 +138,6 @@ champlain_memory_cache_class_init (ChamplainMemoryCacheClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GParamSpec *pspec;
 
-  g_type_class_add_private (klass, sizeof (ChamplainMemoryCachePrivate));
-
   object_class->finalize = champlain_memory_cache_finalize;
   object_class->dispose = champlain_memory_cache_dispose;
   object_class->get_property = champlain_memory_cache_get_property;
@@ -201,7 +196,7 @@ champlain_memory_cache_new_full (guint size_limit,
 static void
 champlain_memory_cache_init (ChamplainMemoryCache *memory_cache)
 {
-  ChamplainMemoryCachePrivate *priv = GET_PRIVATE (memory_cache);
+  ChamplainMemoryCachePrivate *priv = champlain_memory_cache_get_instance_private (memory_cache);
 
   memory_cache->priv = priv;
 

@@ -27,16 +27,13 @@
 #include "champlain-error-tile-renderer.h"
 #include <gdk/gdk.h>
 
-G_DEFINE_TYPE (ChamplainErrorTileRenderer, champlain_error_tile_renderer, CHAMPLAIN_TYPE_RENDERER)
-
-#define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_ERROR_TILE_RENDERER, ChamplainErrorTileRendererPrivate))
-
 struct _ChamplainErrorTileRendererPrivate
 {
   ClutterContent *error_canvas;
   guint tile_size;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainErrorTileRenderer, champlain_error_tile_renderer, CHAMPLAIN_TYPE_RENDERER)
 
 enum
 {
@@ -120,8 +117,6 @@ champlain_error_tile_renderer_class_init (ChamplainErrorTileRendererClass *klass
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ChamplainRendererClass *renderer_class = CHAMPLAIN_RENDERER_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainErrorTileRendererPrivate));
-
   object_class->get_property = champlain_error_tile_renderer_get_property;
   object_class->set_property = champlain_error_tile_renderer_set_property;
   object_class->finalize = champlain_error_tile_renderer_finalize;
@@ -152,7 +147,7 @@ champlain_error_tile_renderer_class_init (ChamplainErrorTileRendererClass *klass
 static void
 champlain_error_tile_renderer_init (ChamplainErrorTileRenderer *self)
 {
-  ChamplainErrorTileRendererPrivate *priv = GET_PRIVATE (self);
+  ChamplainErrorTileRendererPrivate *priv = champlain_error_tile_renderer_get_instance_private (self);
 
   self->priv = priv;
 

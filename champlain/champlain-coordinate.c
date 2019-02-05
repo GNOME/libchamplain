@@ -46,17 +46,15 @@ static gdouble get_longitude (ChamplainLocation *location);
 
 static void location_interface_init (ChamplainLocationIface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (ChamplainCoordinate, champlain_coordinate, G_TYPE_INITIALLY_UNOWNED,
-    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION, location_interface_init));
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_COORDINATE, ChamplainCoordinatePrivate))
-
 struct _ChamplainCoordinatePrivate
 {
   gdouble longitude;
   gdouble latitude;
 };
+
+G_DEFINE_TYPE_WITH_CODE (ChamplainCoordinate, champlain_coordinate, G_TYPE_INITIALLY_UNOWNED,
+    G_ADD_PRIVATE (ChamplainCoordinate)
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION, location_interface_init))
 
 static void
 champlain_coordinate_get_property (GObject *object,
@@ -179,8 +177,6 @@ champlain_coordinate_finalize (GObject *object)
 static void
 champlain_coordinate_class_init (ChamplainCoordinateClass *coordinate_class)
 {
-  g_type_class_add_private (coordinate_class, sizeof (ChamplainCoordinatePrivate));
-
   GObjectClass *object_class = G_OBJECT_CLASS (coordinate_class);
   object_class->finalize = champlain_coordinate_finalize;
   object_class->dispose = champlain_coordinate_dispose;
@@ -200,7 +196,7 @@ champlain_coordinate_class_init (ChamplainCoordinateClass *coordinate_class)
 static void
 champlain_coordinate_init (ChamplainCoordinate *coordinate)
 {
-  ChamplainCoordinatePrivate *priv = GET_PRIVATE (coordinate);
+  ChamplainCoordinatePrivate *priv = champlain_coordinate_get_instance_private (coordinate);
 
   coordinate->priv = priv;
 

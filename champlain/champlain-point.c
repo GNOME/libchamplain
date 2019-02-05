@@ -77,10 +77,8 @@ static cairo_surface_t *get_surface (ChamplainExportable *exportable);
 static void exportable_interface_init (ChamplainExportableIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (ChamplainPoint, champlain_point, CHAMPLAIN_TYPE_MARKER,
-    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_EXPORTABLE, exportable_interface_init));
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_POINT, ChamplainPointPrivate))
+    G_ADD_PRIVATE (ChamplainPoint)
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_EXPORTABLE, exportable_interface_init))
 
 
 static void
@@ -143,7 +141,7 @@ static void
 pick (ClutterActor *self,
     const ClutterColor *color)
 {
-  ChamplainPointPrivate *priv = GET_PRIVATE (self);
+  ChamplainPointPrivate *priv = CHAMPLAIN_POINT (self)->priv;
   gdouble radius = priv->size / 2.0;
 
   cogl_path_new ();
@@ -197,8 +195,6 @@ champlain_point_class_init (ChamplainPointClass *klass)
 {
   ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  g_type_class_add_private (klass, sizeof (ChamplainPointPrivate));
 
   object_class->finalize = champlain_point_finalize;
   object_class->dispose = champlain_point_dispose;
@@ -280,7 +276,7 @@ notify_selected (GObject *gobject,
 static void
 champlain_point_init (ChamplainPoint *point)
 {
-  ChamplainPointPrivate *priv = GET_PRIVATE (point);
+  ChamplainPointPrivate *priv = champlain_point_get_instance_private (point);
 
   point->priv = priv;
 

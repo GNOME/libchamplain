@@ -40,10 +40,15 @@
 
 #include <libsoup/soup.h>
 
-G_DEFINE_TYPE (ChamplainNetworkBboxTileSource, champlain_network_bbox_tile_source, CHAMPLAIN_TYPE_TILE_SOURCE)
+struct _ChamplainNetworkBboxTileSourcePrivate
+{
+  gchar *api_uri;
+  gchar *proxy_uri;
+  SoupSession *soup_session;
+  ChamplainState state;
+};
 
-#define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_NETWORK_BBOX_TILE_SOURCE, ChamplainNetworkBboxTileSourcePrivate))
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainNetworkBboxTileSource, champlain_network_bbox_tile_source, CHAMPLAIN_TYPE_TILE_SOURCE)
 
 enum
 {
@@ -52,14 +57,6 @@ enum
   PROP_PROXY_URI,
   PROP_STATE,
   PROP_USER_AGENT
-};
-
-struct _ChamplainNetworkBboxTileSourcePrivate
-{
-  gchar *api_uri;
-  gchar *proxy_uri;
-  SoupSession *soup_session;
-  ChamplainState state;
 };
 
 static void fill_tile (ChamplainMapSource *map_source,
@@ -175,8 +172,6 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainNetworkBboxTileSourcePrivate));
-
   object_class->get_property = champlain_network_bbox_tile_source_get_property;
   object_class->set_property = champlain_network_bbox_tile_source_set_property;
   object_class->dispose = champlain_network_bbox_tile_source_dispose;
@@ -252,7 +247,7 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
 static void
 champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
 {
-  ChamplainNetworkBboxTileSourcePrivate *priv = GET_PRIVATE (self);
+  ChamplainNetworkBboxTileSourcePrivate *priv = champlain_network_bbox_tile_source_get_instance_private (self);
 
   self->priv = priv;
 

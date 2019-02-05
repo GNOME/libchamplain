@@ -59,10 +59,7 @@ struct _ChamplainMapSourceDescPrivate
   gpointer data;
 };
 
-G_DEFINE_TYPE (ChamplainMapSourceDesc, champlain_map_source_desc, G_TYPE_OBJECT);
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_DESC, ChamplainMapSourceDescPrivate))
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainMapSourceDesc, champlain_map_source_desc, G_TYPE_OBJECT)
 
 
 static void set_id (ChamplainMapSourceDesc *desc,
@@ -236,8 +233,6 @@ static void
 champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  g_type_class_add_private (klass, sizeof (ChamplainMapSourceDescPrivate));
 
   object_class->finalize = champlain_map_source_desc_finalize;
   object_class->dispose = champlain_map_source_desc_dispose;
@@ -419,7 +414,7 @@ champlain_map_source_desc_class_init (ChamplainMapSourceDescClass *klass)
 static void
 champlain_map_source_desc_init (ChamplainMapSourceDesc *desc)
 {
-  ChamplainMapSourceDescPrivate *priv = GET_PRIVATE (desc);
+  ChamplainMapSourceDescPrivate *priv = champlain_map_source_desc_get_instance_private (desc);
 
   desc->priv = priv;
 

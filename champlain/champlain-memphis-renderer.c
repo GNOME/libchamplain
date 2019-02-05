@@ -77,11 +77,6 @@ static void set_bounding_box (ChamplainMemphisRenderer *renderer,
     ChamplainBoundingBox *bbox);
 
 
-G_DEFINE_TYPE (ChamplainMemphisRenderer, champlain_memphis_renderer, CHAMPLAIN_TYPE_RENDERER)
-
-#define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_MEMPHIS_RENDERER, ChamplainMemphisRendererPrivate))
-
 struct _ChamplainMemphisRendererPrivate
 {
   MemphisRuleSet *rules;
@@ -90,6 +85,8 @@ struct _ChamplainMemphisRendererPrivate
   guint tile_size;
   ChamplainBoundingBox *bbox;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainMemphisRenderer, champlain_memphis_renderer, CHAMPLAIN_TYPE_RENDERER)
 
 typedef struct _WorkerThreadData WorkerThreadData;
 
@@ -212,8 +209,6 @@ champlain_memphis_renderer_class_init (ChamplainMemphisRendererClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ChamplainRendererClass *renderer_class = CHAMPLAIN_RENDERER_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainMemphisRendererPrivate));
-
   object_class->get_property = champlain_memphis_renderer_get_property;
   object_class->set_property = champlain_memphis_renderer_set_property;
   object_class->dispose = champlain_memphis_renderer_dispose;
@@ -252,7 +247,7 @@ champlain_memphis_renderer_class_init (ChamplainMemphisRendererClass *klass)
 static void
 champlain_memphis_renderer_init (ChamplainMemphisRenderer *renderer)
 {
-  ChamplainMemphisRendererPrivate *priv = GET_PRIVATE (renderer);
+  ChamplainMemphisRendererPrivate *priv = champlain_memphis_renderer_get_instance_private (renderer);
 
   renderer->priv = priv;
 
@@ -462,7 +457,7 @@ set_data (ChamplainRenderer *renderer,
     const guint8 *data,
     guint size)
 {
-  ChamplainMemphisRendererPrivate *priv = GET_PRIVATE (renderer);
+  ChamplainMemphisRendererPrivate *priv = CHAMPLAIN_MEMPHIS_RENDERER (renderer)->priv;
   ChamplainBoundingBox *bbox;
   GError *err = NULL;
 

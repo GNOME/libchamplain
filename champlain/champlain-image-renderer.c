@@ -28,16 +28,13 @@
 #include "champlain-image-renderer.h"
 #include <gdk/gdk.h>
 
-G_DEFINE_TYPE (ChamplainImageRenderer, champlain_image_renderer, CHAMPLAIN_TYPE_RENDERER)
-
-#define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_IMAGE_RENDERER, ChamplainImageRendererPrivate))
-
 struct _ChamplainImageRendererPrivate
 {
   gchar *data;
   guint size;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainImageRenderer, champlain_image_renderer, CHAMPLAIN_TYPE_RENDERER)
 
 typedef struct _RendererData RendererData;
 
@@ -66,7 +63,7 @@ champlain_image_renderer_dispose (GObject *object)
 static void
 champlain_image_renderer_finalize (GObject *object)
 {
-  ChamplainImageRendererPrivate *priv = GET_PRIVATE (object);
+  ChamplainImageRendererPrivate *priv = CHAMPLAIN_IMAGE_RENDERER (object)->priv;
 
   g_free (priv->data);
 
@@ -80,8 +77,6 @@ champlain_image_renderer_class_init (ChamplainImageRendererClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ChamplainRendererClass *renderer_class = CHAMPLAIN_RENDERER_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainImageRendererPrivate));
-
   object_class->finalize = champlain_image_renderer_finalize;
   object_class->dispose = champlain_image_renderer_dispose;
 
@@ -93,7 +88,7 @@ champlain_image_renderer_class_init (ChamplainImageRendererClass *klass)
 static void
 champlain_image_renderer_init (ChamplainImageRenderer *self)
 {
-  ChamplainImageRendererPrivate *priv = GET_PRIVATE (self);
+  ChamplainImageRendererPrivate *priv = champlain_image_renderer_get_instance_private (self);
 
   self->priv = priv;
 
@@ -120,7 +115,7 @@ champlain_image_renderer_new (void)
 static void
 set_data (ChamplainRenderer *renderer, const guint8 *data, guint size)
 {
-  ChamplainImageRendererPrivate *priv = GET_PRIVATE (renderer);
+  ChamplainImageRendererPrivate *priv = CHAMPLAIN_IMAGE_RENDERER (renderer)->priv;
 
   if (priv->data)
     g_free (priv->data);
@@ -228,7 +223,7 @@ finish:
 static void
 render (ChamplainRenderer *renderer, ChamplainTile *tile)
 {
-  ChamplainImageRendererPrivate *priv = GET_PRIVATE (renderer);
+  ChamplainImageRendererPrivate *priv = CHAMPLAIN_IMAGE_RENDERER (renderer)->priv;
   GInputStream *stream;
 
   if (!priv->data || priv->size == 0)

@@ -34,16 +34,13 @@
 #include "champlain-tile-cache.h"
 #include "champlain-tile-source.h"
 
-G_DEFINE_TYPE (ChamplainMapSourceChain, champlain_map_source_chain, CHAMPLAIN_TYPE_MAP_SOURCE);
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MAP_SOURCE_CHAIN, ChamplainMapSourceChainPrivate))
-
 struct _ChamplainMapSourceChainPrivate
 {
   ChamplainMapSource *stack_top;
   ChamplainMapSource *stack_bottom;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainMapSourceChain, champlain_map_source_chain, CHAMPLAIN_TYPE_MAP_SOURCE)
 
 static const gchar *get_id (ChamplainMapSource *map_source);
 static const gchar *get_name (ChamplainMapSource *map_source);
@@ -83,8 +80,6 @@ champlain_map_source_chain_class_init (ChamplainMapSourceChainClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainMapSourceChainPrivate));
-
   object_class->finalize = champlain_map_source_chain_finalize;
   object_class->dispose = champlain_map_source_chain_dispose;
 
@@ -105,7 +100,7 @@ champlain_map_source_chain_class_init (ChamplainMapSourceChainClass *klass)
 static void
 champlain_map_source_chain_init (ChamplainMapSourceChain *source_chain)
 {
-  ChamplainMapSourceChainPrivate *priv = GET_PRIVATE (source_chain);
+  ChamplainMapSourceChainPrivate *priv = champlain_map_source_chain_get_instance_private (source_chain);
 
   source_chain->priv = priv;
 

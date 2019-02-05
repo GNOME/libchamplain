@@ -28,10 +28,20 @@
 #include "champlain-tile-source.h"
 #include "champlain-enum-types.h"
 
-G_DEFINE_ABSTRACT_TYPE (ChamplainTileSource, champlain_tile_source, CHAMPLAIN_TYPE_MAP_SOURCE);
+struct _ChamplainTileSourcePrivate
+{
+  gchar *id;
+  gchar *name;
+  gchar *license;
+  gchar *license_uri;
+  guint min_zoom_level;
+  guint max_zoom_level;
+  guint tile_size;
+  ChamplainMapProjection map_projection;
+  ChamplainTileCache *cache;
+};
 
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_TILE_SOURCE, ChamplainTileSourcePrivate))
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (ChamplainTileSource, champlain_tile_source, CHAMPLAIN_TYPE_MAP_SOURCE);
 
 enum
 {
@@ -45,19 +55,6 @@ enum
   PROP_TILE_SIZE,
   PROP_MAP_PROJECTION,
   PROP_CACHE
-};
-
-struct _ChamplainTileSourcePrivate
-{
-  gchar *id;
-  gchar *name;
-  gchar *license;
-  gchar *license_uri;
-  guint min_zoom_level;
-  guint max_zoom_level;
-  guint tile_size;
-  ChamplainMapProjection map_projection;
-  ChamplainTileCache *cache;
 };
 
 static const gchar *get_id (ChamplainMapSource *map_source);
@@ -225,8 +222,6 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GParamSpec *pspec;
 
-  g_type_class_add_private (klass, sizeof (ChamplainTileSourcePrivate));
-
   object_class->finalize = champlain_tile_source_finalize;
   object_class->dispose = champlain_tile_source_dispose;
   object_class->get_property = champlain_tile_source_get_property;
@@ -382,7 +377,7 @@ champlain_tile_source_class_init (ChamplainTileSourceClass *klass)
 static void
 champlain_tile_source_init (ChamplainTileSource *tile_source)
 {
-  ChamplainTileSourcePrivate *priv = GET_PRIVATE (tile_source);
+  ChamplainTileSourcePrivate *priv = champlain_tile_source_get_instance_private (tile_source);
 
   tile_source->priv = priv;
 

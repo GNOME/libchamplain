@@ -85,12 +85,6 @@ static gdouble get_longitude (ChamplainLocation *location);
 
 static void location_interface_init (ChamplainLocationIface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_ACTOR,
-    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION, location_interface_init));
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MARKER, ChamplainMarkerPrivate))
-
 struct _ChamplainMarkerPrivate
 {
   gdouble lon;
@@ -103,6 +97,10 @@ struct _ChamplainMarkerPrivate
   gfloat click_y;
   gboolean moved;
 };
+
+G_DEFINE_TYPE_WITH_CODE (ChamplainMarker, champlain_marker, CLUTTER_TYPE_ACTOR,
+    G_ADD_PRIVATE (ChamplainMarker)
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_LOCATION, location_interface_init))
 
 
 /**
@@ -329,8 +327,6 @@ champlain_marker_finalize (GObject *object)
 static void
 champlain_marker_class_init (ChamplainMarkerClass *marker_class)
 {
-  g_type_class_add_private (marker_class, sizeof (ChamplainMarkerPrivate));
-
   GObjectClass *object_class = G_OBJECT_CLASS (marker_class);
   object_class->finalize = champlain_marker_finalize;
   object_class->dispose = champlain_marker_dispose;
@@ -618,7 +614,7 @@ button_press_event_cb (ClutterActor *actor,
 static void
 champlain_marker_init (ChamplainMarker *marker)
 {
-  ChamplainMarkerPrivate *priv = GET_PRIVATE (marker);
+  ChamplainMarkerPrivate *priv = champlain_marker_get_instance_private (marker);
 
   marker->priv = priv;
 

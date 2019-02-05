@@ -66,10 +66,7 @@ struct _ChamplainScalePrivate
   gboolean redraw_scheduled;
 };
 
-G_DEFINE_TYPE (ChamplainScale, champlain_scale, CLUTTER_TYPE_ACTOR);
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_SCALE, ChamplainScalePrivate))
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainScale, champlain_scale, CLUTTER_TYPE_ACTOR)
 
 
 #define SCALE_HEIGHT  5
@@ -150,8 +147,6 @@ champlain_scale_dispose (GObject *object)
 static void
 champlain_scale_finalize (GObject *object)
 {
-/*  ChamplainScalePrivate *priv = CHAMPLAIN_SCALE (object)->priv; */
-
   G_OBJECT_CLASS (champlain_scale_parent_class)->finalize (object);
 }
 
@@ -160,8 +155,6 @@ static void
 champlain_scale_class_init (ChamplainScaleClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  g_type_class_add_private (klass, sizeof (ChamplainScalePrivate));
 
   object_class->finalize = champlain_scale_finalize;
   object_class->dispose = champlain_scale_dispose;
@@ -406,7 +399,7 @@ create_scale (ChamplainScale *scale)
 static void
 champlain_scale_init (ChamplainScale *scale)
 {
-  ChamplainScalePrivate *priv = GET_PRIVATE (scale);
+  ChamplainScalePrivate *priv = champlain_scale_get_instance_private (scale);
 
   scale->priv = priv;
 

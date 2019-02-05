@@ -110,9 +110,6 @@ enum
 
 #define PADDING 10
 static guint signals[LAST_SIGNAL] = { 0, };
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_VIEW, ChamplainViewPrivate))
   
 #define ZOOM_LEVEL_OUT_OF_RANGE(priv, level) \
   (level < priv->min_zoom_level || \
@@ -236,7 +233,7 @@ struct _ChamplainViewPrivate
   GHashTable *visible_tiles;
 };
 
-G_DEFINE_TYPE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR);
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainView, champlain_view, CLUTTER_TYPE_ACTOR)
 
 static void exclusive_destroy_clone (ClutterActor *clone);
 static void update_clones (ChamplainView *view);
@@ -865,8 +862,6 @@ champlain_view_finalize (GObject *object)
 {
   DEBUG_LOG ()
 
-/*  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW (object)->priv; */
-
   G_OBJECT_CLASS (champlain_view_parent_class)->finalize (object);
 }
 
@@ -917,8 +912,6 @@ static void
 champlain_view_class_init (ChamplainViewClass *champlainViewClass)
 {
   DEBUG_LOG ()
-
-  g_type_class_add_private (champlainViewClass, sizeof (ChamplainViewPrivate));
 
   GObjectClass *object_class = G_OBJECT_CLASS (champlainViewClass);
   object_class->dispose = champlain_view_dispose;
@@ -1307,7 +1300,7 @@ static void
 view_size_changed_cb (ChamplainView *view,
     G_GNUC_UNUSED GParamSpec *pspec)
 {
-  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  ChamplainViewPrivate *priv = view->priv;
   gint width, height;
   
   width = clutter_actor_get_width (CLUTTER_ACTOR (view));
@@ -1408,7 +1401,7 @@ static guint
 view_find_suitable_zoom (ChamplainView *view,
     gdouble factor)
 {
-  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  ChamplainViewPrivate *priv = view->priv;
   guint zoom_level = priv->initial_gesture_zoom;
 
   while (factor > 2 && zoom_level <= priv->max_zoom_level)
@@ -1435,7 +1428,7 @@ zoom_gesture_zoom_cb (ClutterZoomAction *gesture,
     gpointer user_data)
 {
   ChamplainView *view = user_data;
-  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  ChamplainViewPrivate *priv = view->priv;
   gdouble dx, dy, lat, lon;
   ClutterPoint focus;
 
@@ -1489,7 +1482,7 @@ zoom_gesture_finish_cb (ClutterGestureAction *gesture,
     G_GNUC_UNUSED ClutterActor *actor,
     gpointer user_data)
 {
-  ChamplainViewPrivate *priv = GET_PRIVATE (user_data);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW (user_data)->priv;
 
   priv->zoom_started = FALSE;
 }
@@ -1500,7 +1493,7 @@ zoom_gesture_cancel_cb (ClutterGestureAction *gesture,
     G_GNUC_UNUSED ClutterActor *actor,
     gpointer user_data)
 {
-  ChamplainViewPrivate *priv = GET_PRIVATE (user_data);
+  ChamplainViewPrivate *priv = CHAMPLAIN_VIEW (user_data)->priv;
 
   priv->zoom_started = FALSE;
   g_signal_stop_emission_by_name (gesture, "gesture-cancel");
@@ -1512,7 +1505,7 @@ champlain_view_init (ChamplainView *view)
 {
   DEBUG_LOG ()
 
-  ChamplainViewPrivate *priv = GET_PRIVATE (view);
+  ChamplainViewPrivate *priv = champlain_view_get_instance_private (view);
   ChamplainMapSourceFactory *factory;
   ChamplainMapSource *source;
   ClutterLayoutManager *layout;

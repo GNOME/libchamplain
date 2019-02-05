@@ -39,11 +39,15 @@
 
 static void exportable_interface_init (ChamplainExportableIface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (ChamplainMarkerLayer, champlain_marker_layer, CHAMPLAIN_TYPE_LAYER,
-    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_EXPORTABLE, exportable_interface_init));
+struct _ChamplainMarkerLayerPrivate
+{
+  ChamplainSelectionMode mode;
+  ChamplainView *view;
+};
 
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MARKER_LAYER, ChamplainMarkerLayerPrivate))
+G_DEFINE_TYPE_WITH_CODE (ChamplainMarkerLayer, champlain_marker_layer, CHAMPLAIN_TYPE_LAYER,
+    G_ADD_PRIVATE (ChamplainMarkerLayer)
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_EXPORTABLE, exportable_interface_init))
 
 enum
 {
@@ -58,12 +62,6 @@ enum
   PROP_SURFACE,
 };
 
-
-struct _ChamplainMarkerLayerPrivate
-{
-  ChamplainSelectionMode mode;
-  ChamplainView *view;
-};
 
 static void set_surface (ChamplainExportable *exportable,
     cairo_surface_t *surface);
@@ -154,8 +152,6 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   ChamplainLayerClass *layer_class = CHAMPLAIN_LAYER_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainMarkerLayerPrivate));
-
   object_class->finalize = champlain_marker_layer_finalize;
   object_class->dispose = champlain_marker_layer_dispose;
   object_class->get_property = champlain_marker_layer_get_property;
@@ -189,10 +185,9 @@ champlain_marker_layer_class_init (ChamplainMarkerLayerClass *klass)
 static void
 champlain_marker_layer_init (ChamplainMarkerLayer *self)
 {
-  ChamplainMarkerLayerPrivate *priv;
+  ChamplainMarkerLayerPrivate *priv = champlain_marker_layer_get_instance_private (self);
 
-  self->priv = GET_PRIVATE (self);
-  priv = self->priv;
+  self->priv = priv;
   priv->mode = CHAMPLAIN_SELECTION_NONE;
   priv->view = NULL;
 }

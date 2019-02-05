@@ -29,19 +29,6 @@
 #include <clutter/clutter.h>
 #include <math.h>
 
-G_DEFINE_TYPE (ChamplainKineticScrollView, champlain_kinetic_scroll_view, CLUTTER_TYPE_ACTOR)
-
-#define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_KINETIC_SCROLL_VIEW, ChamplainKineticScrollViewPrivate))
-
-typedef struct
-{
-  /* Units to store the origin of a click when scrolling */
-  gfloat x;
-  gfloat y;
-  GTimeVal time;
-} ChamplainKineticScrollViewMotion;
-
 struct _ChamplainKineticScrollViewPrivate
 {
   /* Scroll mode */
@@ -59,6 +46,16 @@ struct _ChamplainKineticScrollViewPrivate
   ClutterActor *viewport;
   ClutterEventSequence *sequence;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainKineticScrollView, champlain_kinetic_scroll_view, CLUTTER_TYPE_ACTOR)
+
+typedef struct
+{
+  /* Units to store the origin of a click when scrolling */
+  gfloat x;
+  gfloat y;
+  GTimeVal time;
+} ChamplainKineticScrollViewMotion;
 
 enum
 {
@@ -173,8 +170,6 @@ static void
 champlain_kinetic_scroll_view_class_init (ChamplainKineticScrollViewClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  g_type_class_add_private (klass, sizeof (ChamplainKineticScrollViewPrivate));
 
   object_class->get_property = champlain_kinetic_scroll_view_get_property;
   object_class->set_property = champlain_kinetic_scroll_view_set_property;
@@ -662,8 +657,9 @@ button_press_event_cb (ClutterActor *actor,
 static void
 champlain_kinetic_scroll_view_init (ChamplainKineticScrollView *self)
 {
-  ChamplainKineticScrollViewPrivate *priv = self->priv = GET_PRIVATE (self);
+  ChamplainKineticScrollViewPrivate *priv = champlain_kinetic_scroll_view_get_instance_private (self);
 
+  self->priv = priv;
   priv->motion_buffer = g_array_sized_new (FALSE, TRUE,
         sizeof (ChamplainKineticScrollViewMotion), 3);
   g_array_set_size (priv->motion_buffer, 3);

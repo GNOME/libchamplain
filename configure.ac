@@ -60,7 +60,7 @@ AC_CHECK_LIBM
 AC_SUBST(LIBM)
 
 PKG_CHECK_MODULES(DEPS,
-  [   glib-2.0 >= 2.16
+  [   glib-2.0 >= 2.38
       gobject-2.0 >= 2.10
       gdk-3.0 >= 2.90
       clutter-1.0 >= 1.24

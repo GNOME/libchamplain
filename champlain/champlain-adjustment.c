@@ -29,11 +29,6 @@
 #include "champlain-marshal.h"
 #include "champlain-private.h"
 
-G_DEFINE_TYPE (ChamplainAdjustment, champlain_adjustment, G_TYPE_OBJECT)
-
-#define ADJUSTMENT_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_ADJUSTMENT, ChamplainAdjustmentPrivate))
-
 struct _ChamplainAdjustmentPrivate
 {
   gdouble lower;
@@ -47,6 +42,8 @@ struct _ChamplainAdjustmentPrivate
   gdouble old_position;
   gdouble new_position;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainAdjustment, champlain_adjustment, G_TYPE_OBJECT)
 
 enum
 {
@@ -175,8 +172,6 @@ champlain_adjustment_class_init (ChamplainAdjustmentClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainAdjustmentPrivate));
-
   object_class->get_property = champlain_adjustment_get_property;
   object_class->set_property = champlain_adjustment_set_property;
   object_class->dispose = champlain_adjustment_dispose;
@@ -232,7 +227,7 @@ champlain_adjustment_class_init (ChamplainAdjustmentClass *klass)
 static void
 champlain_adjustment_init (ChamplainAdjustment *self)
 {
-  self->priv = ADJUSTMENT_PRIVATE (self);
+  self->priv = champlain_adjustment_get_instance_private (self);
 }
 
 

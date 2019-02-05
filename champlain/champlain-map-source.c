@@ -55,22 +55,19 @@
 
 #include <math.h>
 
-G_DEFINE_ABSTRACT_TYPE (ChamplainMapSource, champlain_map_source, G_TYPE_INITIALLY_UNOWNED);
+struct _ChamplainMapSourcePrivate
+{
+  ChamplainMapSource *next_source;
+  ChamplainRenderer *renderer;
+};
 
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_MAP_SOURCE, ChamplainMapSourcePrivate))
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (ChamplainMapSource, champlain_map_source, G_TYPE_INITIALLY_UNOWNED)
 
 enum
 {
   PROP_0,
   PROP_NEXT_SOURCE,
   PROP_RENDERER,
-};
-
-struct _ChamplainMapSourcePrivate
-{
-  ChamplainMapSource *next_source;
-  ChamplainRenderer *renderer;
 };
 
 static void
@@ -167,8 +164,6 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GParamSpec *pspec;
 
-  g_type_class_add_private (klass, sizeof (ChamplainMapSourcePrivate));
-
   object_class->finalize = champlain_map_source_finalize;
   object_class->dispose = champlain_map_source_dispose;
   object_class->get_property = champlain_map_source_get_property;
@@ -219,7 +214,7 @@ champlain_map_source_class_init (ChamplainMapSourceClass *klass)
 static void
 champlain_map_source_init (ChamplainMapSource *map_source)
 {
-  ChamplainMapSourcePrivate *priv = GET_PRIVATE (map_source);
+  ChamplainMapSourcePrivate *priv = champlain_map_source_get_instance_private (map_source);
 
   map_source->priv = priv;
 

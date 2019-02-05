@@ -38,18 +38,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-G_DEFINE_TYPE (ChamplainFileCache, champlain_file_cache, CHAMPLAIN_TYPE_TILE_CACHE);
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_FILE_CACHE, ChamplainFileCachePrivate))
-
-enum
-{
-  PROP_0,
-  PROP_SIZE_LIMIT,
-  PROP_CACHE_DIR
-};
-
 struct _ChamplainFileCachePrivate
 {
   guint size_limit;
@@ -59,6 +47,16 @@ struct _ChamplainFileCachePrivate
   sqlite3_stmt *stmt_select;
   sqlite3_stmt *stmt_update;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainFileCache, champlain_file_cache, CHAMPLAIN_TYPE_TILE_CACHE)
+
+enum
+{
+  PROP_0,
+  PROP_SIZE_LIMIT,
+  PROP_CACHE_DIR
+};
+
 
 static void finalize_sql (ChamplainFileCache *file_cache);
 static void init_cache (ChamplainFileCache *file_cache);
@@ -300,8 +298,6 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
   GParamSpec *pspec;
   gchar *cache_dir = NULL;
 
-  g_type_class_add_private (klass, sizeof (ChamplainFileCachePrivate));
-
   object_class->finalize = champlain_file_cache_finalize;
   object_class->dispose = champlain_file_cache_dispose;
   object_class->get_property = champlain_file_cache_get_property;
@@ -351,7 +347,7 @@ champlain_file_cache_class_init (ChamplainFileCacheClass *klass)
 static void
 champlain_file_cache_init (ChamplainFileCache *file_cache)
 {
-  ChamplainFileCachePrivate *priv = GET_PRIVATE (file_cache);
+  ChamplainFileCachePrivate *priv = champlain_file_cache_get_instance_private (file_cache);
 
   file_cache->priv = priv;
 

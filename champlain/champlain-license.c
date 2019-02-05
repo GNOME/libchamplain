@@ -64,10 +64,7 @@ struct _ChamplainLicensePrivate
   ChamplainView *view;
 };
 
-G_DEFINE_TYPE (ChamplainLicense, champlain_license, CLUTTER_TYPE_ACTOR);
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_LICENSE, ChamplainLicensePrivate))
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainLicense, champlain_license, CLUTTER_TYPE_ACTOR)
 
 #define WIDTH_PADDING 10
 #define HEIGHT_PADDING 7
@@ -215,8 +212,6 @@ champlain_license_class_init (ChamplainLicenseClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  g_type_class_add_private (klass, sizeof (ChamplainLicensePrivate));
-
   object_class->finalize = champlain_license_finalize;
   object_class->dispose = champlain_license_dispose;
   object_class->get_property = champlain_license_get_property;
@@ -260,7 +255,7 @@ champlain_license_class_init (ChamplainLicenseClass *klass)
 static void
 champlain_license_init (ChamplainLicense *license)
 {
-  ChamplainLicensePrivate *priv = GET_PRIVATE (license);
+  ChamplainLicensePrivate *priv = champlain_license_get_instance_private (license);
 
   license->priv = priv;
   priv->extra_text = NULL;

@@ -37,33 +37,17 @@
 #include <glib.h>
 #include <glib-object.h>
 
-
-enum
-{
-  /* normal signals */
-  LAST_SIGNAL
-};
-
-enum
-{
-  PROP_0,
-};
-
 struct _ChamplainCustomMarkerPrivate
 {
   ClutterContainer *dummy;
 };
 
-G_DEFINE_TYPE (ChamplainCustomMarker, champlain_custom_marker, CHAMPLAIN_TYPE_MARKER)
-
-#define GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), CHAMPLAIN_TYPE_CUSTOM_MARKER, ChamplainCustomMarkerPrivate))
+G_DEFINE_TYPE_WITH_PRIVATE (ChamplainCustomMarker, champlain_custom_marker, CHAMPLAIN_TYPE_MARKER)
 
 
 static void
 champlain_custom_marker_class_init (ChamplainCustomMarkerClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (ChamplainCustomMarkerPrivate));
 }
 
 

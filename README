@@ -6,8 +6,7 @@ interactive maps.
 
 libchamplain requires:
 
-  * glib >= 2.10
-  * gio >= 2.16
+  * glib >= 2.38
   * gdk >= 3.0
   * clutter >= 1.24
   * cairo >= 1.4

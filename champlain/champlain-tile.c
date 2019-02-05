@@ -42,12 +42,27 @@ static void set_surface (ChamplainExportable *exportable,
 static cairo_surface_t *get_surface (ChamplainExportable *exportable);
 static void exportable_interface_init (ChamplainExportableIface *iface);
 
+struct _ChamplainTilePrivate
+{
+  guint x; /* The x position on the map (in pixels) */
+  guint y; /* The y position on the map (in pixels) */
+  guint size; /* The tile's width and height (only support square tiles */
+  guint zoom_level; /* The tile's zoom level */
+
+  ChamplainState state; /* The tile state: loading, validation, done */
+  /* The tile actor that will be displayed after champlain_tile_display_content () */
+  ClutterActor *content_actor;
+  gboolean fade_in;
+
+  GTimeVal *modified_time; /* The last modified time of the cache */
+  gchar *etag; /* The HTTP ETag sent by the server */
+  gboolean content_displayed;
+  cairo_surface_t *surface;
+};
+
 G_DEFINE_TYPE_WITH_CODE (ChamplainTile, champlain_tile, CLUTTER_TYPE_ACTOR,
-    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_EXPORTABLE, exportable_interface_init));
-
-#define GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), CHAMPLAIN_TYPE_TILE, ChamplainTilePrivate))
-
+    G_ADD_PRIVATE (ChamplainTile)
+    G_IMPLEMENT_INTERFACE (CHAMPLAIN_TYPE_EXPORTABLE, exportable_interface_init))
 
 enum
 {
@@ -72,23 +87,6 @@ enum
 
 static guint champlain_tile_signals[LAST_SIGNAL] = { 0, };
 
-struct _ChamplainTilePrivate
-{
-  guint x; /* The x position on the map (in pixels) */
-  guint y; /* The y position on the map (in pixels) */
-  guint size; /* The tile's width and height (only support square tiles */
-  guint zoom_level; /* The tile's zoom level */
-
-  ChamplainState state; /* The tile state: loading, validation, done */
-  /* The tile actor that will be displayed after champlain_tile_display_content () */
-  ClutterActor *content_actor;
-  gboolean fade_in;
-
-  GTimeVal *modified_time; /* The last modified time of the cache */
-  gchar *etag; /* The HTTP ETag sent by the server */
-  gboolean content_displayed;
-  cairo_surface_t *surface;
-};
 
 static void
 champlain_tile_get_property (GObject *object,
@@ -226,8 +224,6 @@ static void
 champlain_tile_class_init (ChamplainTileClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  g_type_class_add_private (klass, sizeof (ChamplainTilePrivate));
 
   object_class->get_property = champlain_tile_get_property;
   object_class->set_property = champlain_tile_set_property;
@@ -399,7 +395,7 @@ champlain_tile_class_init (ChamplainTileClass *klass)
 static void
 champlain_tile_init (ChamplainTile *self)
 {
-  ChamplainTilePrivate *priv = GET_PRIVATE (self);
+  ChamplainTilePrivate *priv = champlain_tile_get_instance_private (self);
 
   self->priv = priv;
 
