@@ -71,7 +71,7 @@ enum
 static void render (ChamplainRenderer *renderer,
     ChamplainTile *tile);
 static void set_data (ChamplainRenderer *renderer,
-    const gchar *data,
+    const guint8 *data,
     guint size);
 static void set_bounding_box (ChamplainMemphisRenderer *renderer,
     ChamplainBoundingBox *bbox);
@@ -459,7 +459,7 @@ render (ChamplainRenderer *renderer,
 
 static void
 set_data (ChamplainRenderer *renderer,
-    const gchar *data,
+    const guint8 *data,
     guint size)
 {
   ChamplainMemphisRendererPrivate *priv = GET_PRIVATE (renderer);
@@ -468,7 +468,7 @@ set_data (ChamplainRenderer *renderer,
 
   MemphisMap *map = memphis_map_new ();
 
-  memphis_map_load_from_data (map, data, size, &err);
+  memphis_map_load_from_data (map, (gchar *)data, size, &err);
 
   DEBUG ("BBox data received");
 
