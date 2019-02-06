@@ -45,7 +45,7 @@ if build_gtk_widgetry == true
   endforeach
 endif
 
-if generate_vapi == true
+if generate_vapi == true and build_gtk_widgetry == true
   libchamplain_vala_demos = [
     ['launcher-vala', ['launcher-vala.vala', 'markers-vala.vala']],
   ]
