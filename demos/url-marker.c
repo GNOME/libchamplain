@@ -241,11 +241,11 @@ main (int argc, char *argv[])
   champlain_view_add_layer (CHAMPLAIN_VIEW (view), CHAMPLAIN_LAYER (layer));
   session = soup_session_new ();
   create_marker_from_url (layer, session, 48.218611, 17.146397,
-      "http://hexten.net/cpan-faces/potyl.jpg");
+      "https://gitlab.gnome.org/GNOME/libchamplain/raw/master/demos/icons/emblem-favorite.png");
   create_marker_from_url (layer, session, 48.21066, 16.31476,
-      "http://hexten.net/cpan-faces/jkutej.jpg");
+      "https://gitlab.gnome.org/GNOME/libchamplain/raw/master/demos/icons/emblem-generic.png");
   create_marker_from_url (layer, session, 48.14838, 17.10791,
-      "http://bratislava.pm.org/images/whoiswho/jnthn.jpg");
+      "https://gitlab.gnome.org/GNOME/libchamplain/raw/master/demos/icons/emblem-important.png");
 
   /* Finish initialising the map view */
   g_object_set (G_OBJECT (view), "zoom-level", 10,

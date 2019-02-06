@@ -422,7 +422,7 @@ champlain_network_tile_source_get_uri_format (ChamplainNetworkTileSource *tile_s
  * Y in TMS coordinates.
  *
  * For example, this is the OpenStreetMap URI format:
- * "http://tile.openstreetmap.org/\#Z\#/\#X\#/\#Y\#.png"
+ * "https://tile.openstreetmap.org/\#Z\#/\#X\#/\#Y\#.png"
  *
  * Since: 0.4
  */

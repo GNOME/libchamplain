@@ -11,7 +11,7 @@ m4_define([champlain_api_version],
 AC_PREREQ([2.64])
 AC_INIT([libchamplain],
         [champlain_version],
-        [http://bugzilla.gnome.org/enter_bug.cgi?product=libchamplain],
+        [https://gitlab.gnome.org/GNOME/libchamplain/issues],
         [libchamplain],
         [https://wiki.gnome.org/Projects/libchamplain])
 AC_CONFIG_SRCDIR([champlain/champlain.h])

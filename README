@@ -28,16 +28,18 @@ The usual rules for building apply -
 configure; make; sudo make install; sudo ldconfig
 
 should do the right thing. For more details consult the INSTALL file in this 
-directory.
+directory. Alternatively, using the meson build system, run
+
+meson _builddir; cd _builddir; ninja; sudo ninja install
 
 The official website is:
    https://wiki.gnome.org/Projects/libchamplain
 
 The official mailing list archive is:
-   http://mail.gnome.org/mailman/listinfo/libchamplain-list
+   https://mail.gnome.org/mailman/listinfo/libchamplain-list
 
-New bug page on Bugzilla:
-   http://bugzilla.gnome.org/simple-bug-guide.cgi?product=libchamplain
+New bug page on GitLab:
+   https://gitlab.gnome.org/GNOME/libchamplain/issues
 
 libchamplain is licensed under the terms of the GNU Lesser General Public
 License, version 2.1 or (at your option) later.

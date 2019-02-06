@@ -23,7 +23,7 @@
  *
  * The #ChamplainMemphisRenderer uses the rendering library
  * <ulink role="online-location" url="https://trac.openstreetmap.ch/trac/memphis/">
- * LibMemphis</ulink> to render tiles based on <ulink role="online-location" url="http://www.openstreetmap.org/">
+ * LibMemphis</ulink> to render tiles based on <ulink role="online-location" url="https://www.openstreetmap.org/">
  * OpenStreetMap</ulink> data. Tiles are rendered in separate threads.
  * It supports zoom levels 12 to 18.
  *

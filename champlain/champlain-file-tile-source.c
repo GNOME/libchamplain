@@ -22,7 +22,7 @@
  * @short_description: A map source that loads tile data from a file
  *
  * This tile source loads local <ulink role="online-location"
- * url="http://wiki.openstreetmap.org/wiki/.osm">
+ * url="https://wiki.openstreetmap.org/wiki/OSM_XML">
  * OpenStreetMap XML data files</ulink> (*.osm).
  */
 

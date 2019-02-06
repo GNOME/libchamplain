@@ -37,7 +37,7 @@
  *
  * The maps are downloaded from Internet from open maps sources (like
  * <ulink role="online-location"
- * url="http://www.openstreetmap.org">OpenStreetMap</ulink>).  Maps are divided
+ * url="https://www.openstreetmap.org">OpenStreetMap</ulink>).  Maps are divided
  * in tiles for each zoom level.  When a tile is requested, #ChamplainView will
  * first check if it is in cache (in the user's cache dir under champlain). If
  * an error occurs during download, an error tile will be displayed.

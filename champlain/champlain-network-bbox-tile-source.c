@@ -25,8 +25,8 @@
  * This map source source downloads the map data from an OpenStreetMap API
  * server. It supports protocol version 0.5 and 0.6.
  *
- * <ulink role="online-location" url="http://wiki.openstreetmap.org/wiki/API">
- * http://wiki.openstreetmap.org/wiki/API</ulink>
+ * <ulink role="online-location" url="https://wiki.openstreetmap.org/wiki/API">
+ * https://wiki.openstreetmap.org/wiki/API</ulink>
  */
 
 #include "champlain-network-bbox-tile-source.h"
@@ -192,7 +192,7 @@ champlain_network_bbox_tile_source_class_init (ChamplainNetworkBboxTileSourceCla
       g_param_spec_string ("api-uri",
           "API URI",
           "The API URI of an OpenStreetMap server",
-          "http://www.informationfreeway.org/api/0.6",
+          "https://www.informationfreeway.org/api/0.6",
           G_PARAM_READWRITE));
 
   /**
@@ -251,7 +251,7 @@ champlain_network_bbox_tile_source_init (ChamplainNetworkBboxTileSource *self)
 
   self->priv = priv;
 
-  priv->api_uri = g_strdup ("http://www.informationfreeway.org/api/0.6");
+  priv->api_uri = g_strdup ("https://www.informationfreeway.org/api/0.6");
   /* informationfreeway.org is a load-balancer for different api servers */
   priv->proxy_uri = g_strdup ("");
   priv->soup_session = soup_session_new_with_options (
@@ -348,8 +348,8 @@ load_map_data_cb (G_GNUC_UNUSED SoupSession *session, SoupMessage *msg,
  * limitations on the maximum number of nodes that can be requested.
  *
  * For details, see: <ulink role="online-location"
- * url="http://api.openstreetmap.org/api/capabilities">
- * http://api.openstreetmap.org/api/capabilities</ulink>
+ * url="https://api.openstreetmap.org/api/capabilities">
+ * https://api.openstreetmap.org/api/capabilities</ulink>
  *
  * Since: 0.10
  */
@@ -368,7 +368,7 @@ champlain_network_bbox_tile_source_load_map_data (
   gchar *url;
 
   url = g_strdup_printf (
-        "http://api.openstreetmap.org/api/0.6/map?bbox=%f,%f,%f,%f",
+        "https://api.openstreetmap.org/api/0.6/map?bbox=%f,%f,%f,%f",
         bbox->left, bbox->bottom, bbox->right, bbox->top);
   msg = soup_message_new ("GET", url);
 
