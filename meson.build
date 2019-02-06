@@ -55,10 +55,10 @@ cc = meson.get_compiler('c')
 
 libm_dep = cc.find_library('m', required: true)
 
-glib_req = '>= 2.38.0'
-gtk_req = '>= 2.90.0'
+glib_req = '>= 2.38'
+gtk_req = '>= 3.0'
 clutter_req = '>= 1.24'
-clutter_gtk_req = '>= 0.90'
+clutter_gtk_req = '>= 1.0'
 cairo_req = '>= 1.4'
 sqlite_req = '>= 3.0'
 libsoup_req = '>= 2.42'

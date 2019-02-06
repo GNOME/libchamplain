@@ -61,11 +61,11 @@ AC_SUBST(LIBM)
 
 PKG_CHECK_MODULES(DEPS,
   [   glib-2.0 >= 2.38
-      gobject-2.0 >= 2.10
-      gdk-3.0 >= 2.90
+      gobject-2.0 >= 2.38
+      gio-2.0 >= 2.38
+      gdk-3.0 >= 3.0
       clutter-1.0 >= 1.24
       cairo >= 1.4
-      gio-2.0 >= 2.16
       sqlite3 >= 3.0
       libsoup-2.4 >= 2.42
   ]
@@ -73,7 +73,7 @@ PKG_CHECK_MODULES(DEPS,
 AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 
-AM_PATH_GLIB_2_0(2.16.0,,gobject gthread gio)
+AM_PATH_GLIB_2_0(2.38.0,,gobject gthread gio)
 
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
@@ -105,8 +105,8 @@ AC_ARG_ENABLE(gtk,
 
 if test x$enable_gtk = xyes; then
   PKG_CHECK_MODULES(GTK,
-    [   gtk+-3.0 >= 2.90
-        clutter-gtk-1.0 >= 0.90
+    [   gtk+-3.0 >= 3.0
+        clutter-gtk-1.0 >= 1.0
     ]
   )
   AC_SUBST(GTK_CFLAGS)
