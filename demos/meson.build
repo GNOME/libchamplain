@@ -22,6 +22,7 @@ foreach demo: libchamplain_demos
 endforeach
 
 subdir('icons')
+subdir('memphis')
 
 if build_gtk_widgetry == true
   libchamplain_gtk_demos = [
@@ -64,6 +65,27 @@ if generate_vapi == true and build_gtk_widgetry == true
         libchamplain_dep,
         libchamplain_gtk_dep,
         libchamplain_vapi,
+      ]
+    )
+  endforeach
+endif
+
+if build_with_memphis == true and build_gtk_widgetry == true
+  libchamplain_memphis_demos = [
+    ['local-rendering', 'local-rendering.c'],
+  ]
+
+  foreach demo: libchamplain_memphis_demos
+    demo_name = demo.get(0)
+    demo_sources = demo.get(1)
+
+    executable(
+      demo_name,
+      demo_sources,
+      install: false,
+      dependencies: [
+        libchamplain_dep,
+        libchamplain_gtk_dep,
       ]
     )
   endforeach

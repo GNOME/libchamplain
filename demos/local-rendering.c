@@ -462,11 +462,15 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
       ChamplainMapSource *src;
       ChamplainRenderer *image_renderer;
       guint tile_size;
+      gchar *rules_path, *map_path;
+
+      rules_path = g_build_path(G_DIR_SEPARATOR_S, "memphis", rules[rules_index], NULL);
+      map_path = g_build_path(G_DIR_SEPARATOR_S, "memphis", maps[map_index], NULL);
 
       if (g_strcmp0 (id, "memphis-local") == 0)
         {
-          champlain_memphis_renderer_load_rules (CHAMPLAIN_MEMPHIS_RENDERER (renderer), rules[rules_index]);
-          champlain_file_tile_source_load_map_data (CHAMPLAIN_FILE_TILE_SOURCE (source), maps[map_index]);
+          champlain_memphis_renderer_load_rules (CHAMPLAIN_MEMPHIS_RENDERER (renderer), rules_path);
+          champlain_file_tile_source_load_map_data (CHAMPLAIN_FILE_TILE_SOURCE (source), map_path);
           gtk_widget_hide (memphis_box);
           gtk_widget_set_no_show_all (memphis_box, FALSE);
           gtk_widget_set_no_show_all (memphis_local_box, FALSE);
@@ -475,7 +479,7 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
         }
       else if (g_strcmp0 (id, "memphis-network") == 0)
         {
-          champlain_memphis_renderer_load_rules (CHAMPLAIN_MEMPHIS_RENDERER (renderer), rules[rules_index]);
+          champlain_memphis_renderer_load_rules (CHAMPLAIN_MEMPHIS_RENDERER (renderer), rules_path);
           load_network_map_data (CHAMPLAIN_NETWORK_BBOX_TILE_SOURCE (source), view);
           gtk_widget_hide (memphis_box);
           gtk_widget_set_no_show_all (memphis_box, FALSE);
@@ -488,6 +492,9 @@ map_source_changed (GtkWidget *widget, ChamplainView *view)
           gtk_widget_hide (memphis_box);
           gtk_widget_set_no_show_all (memphis_box, TRUE);
         }
+
+      g_free (rules_path);
+      g_free (map_path);
 
       tile_source = CHAMPLAIN_MAP_SOURCE (source);
 
@@ -540,8 +547,11 @@ map_data_changed (GtkWidget *widget, ChamplainView *view)
 
   if (g_strcmp0 (champlain_map_source_get_id (tile_source), "memphis-local") == 0)
     {
-      champlain_file_tile_source_load_map_data (CHAMPLAIN_FILE_TILE_SOURCE (tile_source), maps[map_index]);
+      gchar *map_path = g_build_path(G_DIR_SEPARATOR_S, "memphis", maps[map_index], NULL);
+
+      champlain_file_tile_source_load_map_data (CHAMPLAIN_FILE_TILE_SOURCE (tile_source), map_path);
       reload_tiles ();
+      g_free (map_path);
     }
 }
 
@@ -562,11 +572,13 @@ rules_changed (GtkWidget *widget, ChamplainView *view)
   if (strncmp (champlain_map_source_get_id (tile_source), "memphis", 7) == 0)
     {
       ChamplainMemphisRenderer *renderer;
+      gchar *rules_path = g_build_path(G_DIR_SEPARATOR_S, "memphis", file, NULL);
 
       renderer = CHAMPLAIN_MEMPHIS_RENDERER (champlain_map_source_get_renderer (CHAMPLAIN_MAP_SOURCE (tile_source)));
-      champlain_memphis_renderer_load_rules (renderer, file);
+      champlain_memphis_renderer_load_rules (renderer, rules_path);
       load_rules_into_gui (view);
       reload_tiles ();
+      g_free (rules_path);
     }
 }
 

@@ -196,6 +196,7 @@ AC_CONFIG_FILES([Makefile
                  champlain/champlain-version.h
                  demos/Makefile
                  demos/icons/Makefile
+                 demos/memphis/Makefile
                  docs/Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
