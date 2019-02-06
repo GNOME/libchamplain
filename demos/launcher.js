@@ -23,7 +23,7 @@
  * Dependencies:
  *  * gobject-introspection
  *  * Build Champlain with '--enable-introspection'
- *  * Gjs: http://live.gnome.org/Gjs
+ *  * Gjs: https://gitlab.gnome.org/GNOME/gjs/wikis/Home
  *
  * If you installed Champlain in /usr/local you have to run:
  * export GI_TYPELIB_PATH=$GI_TYPELIB_PATH:/usr/local/lib/girepository-1.0/
