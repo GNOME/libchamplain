@@ -108,7 +108,7 @@ if build_gtk_doc and not gtk_doc_dep.found()
 endif
 
 build_gtk_widgetry = get_option('widgetry')
-if build_gtk_widgetry and not gtk_doc_dep.found()
+if build_gtk_widgetry and not gtk_dep.found()
   build_gtk_widgetry = false
 elif build_gtk_widgetry and not clutter_gtk_dep.found()
   build_gtk_widgetry = false
