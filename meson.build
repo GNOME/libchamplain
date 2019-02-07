@@ -130,13 +130,13 @@ if generate_vapi and not vapigen_dep.found()
 endif
 
 subdir('champlain')
-if build_gtk_widgetry == true
+if build_gtk_widgetry
   subdir('champlain-gtk')
 endif
 
 subdir('docs')
 
-if build_demos == true
+if build_demos
   subdir('demos')
 endif
 

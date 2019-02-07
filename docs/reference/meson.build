@@ -20,7 +20,7 @@ libchamplain_reference_ignored_h = [
   'champlain.h',
 ]
 
-if build_with_memphis == false
+if not build_with_memphis
   libchamplain_reference_ignored_h += [
     'champlain-memphis-renderer.h',
   ]

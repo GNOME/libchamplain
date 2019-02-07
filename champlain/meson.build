@@ -36,7 +36,7 @@ libchamplain_public_h = [
   'champlain.h',
 ]
 
-if build_with_memphis == true
+if build_with_memphis
   libchamplain_public_h += [
     'champlain-memphis-renderer.h',
   ]
@@ -79,7 +79,7 @@ libchamplain_sources = [
   'champlain-viewport.c',
 ]
 
-if build_with_memphis == true
+if build_with_memphis
   libchamplain_sources += [
     'champlain-memphis-renderer.c',
   ]
@@ -96,7 +96,7 @@ libchamplain_deps = [
   libsoup_dep,
 ]
 
-if build_with_memphis == true
+if build_with_memphis
   libchamplain_deps += memphis_dep
 endif
 
@@ -112,7 +112,7 @@ libchamplain_link_args = [
 ]
 
 features_h = configuration_data()
-if build_with_memphis == true
+if build_with_memphis
   features_h.set('CHAMPLAIN_HAS_MEMPHIS', '1')
 endif
 
@@ -206,13 +206,13 @@ libchamplain_dep_sources = [
   libchamplain_version_h,
 ]
 
-if generate_gir == true
+if generate_gir
   libchamplain_gir_includes = [
     'GObject-2.0',
     'Clutter-1.0',
   ]
 
-  if build_with_memphis == true
+  if build_with_memphis
     libchamplain_gir_includes += 'Memphis-0.2'
   endif
 
@@ -239,7 +239,7 @@ if generate_gir == true
     libchamplain_gir,
   ]
 
-  if generate_vapi == true
+  if generate_vapi
     libchamplain_vapi_packages = [
       'clutter-1.0',
       'cogl-pango-1.0',

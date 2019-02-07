@@ -82,7 +82,7 @@ libchamplain_gtk_dep_sources = [
   libchamplain_gtk_marshals_h,
 ]
 
-if generate_gir == true
+if generate_gir
   libchamplain_gtk_gir_includes = [
     'GObject-2.0',
     'Clutter-1.0',
@@ -113,7 +113,7 @@ if generate_gir == true
     libchamplain_gtk_gir,
   ]
 
-  if generate_vapi == true
+  if generate_vapi
     libchamplain_gtk_vapi_packages = [
       'clutter-gtk-1.0',
       'cogl-pango-1.0',

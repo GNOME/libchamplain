@@ -24,7 +24,7 @@ endforeach
 subdir('icons')
 subdir('memphis')
 
-if build_gtk_widgetry == true
+if build_gtk_widgetry
   libchamplain_gtk_demos = [
     ['minimal-gtk', 'minimal-gtk.c'],
     ['launcher-gtk', ['launcher-gtk.c', 'markers.c']],
@@ -46,7 +46,7 @@ if build_gtk_widgetry == true
   endforeach
 endif
 
-if generate_vapi == true and build_gtk_widgetry == true
+if generate_vapi and build_gtk_widgetry
   libchamplain_vala_demos = [
     ['launcher-vala', ['launcher-vala.vala', 'markers-vala.vala']],
   ]
@@ -70,7 +70,7 @@ if generate_vapi == true and build_gtk_widgetry == true
   endforeach
 endif
 
-if build_with_memphis == true and build_gtk_widgetry == true
+if build_with_memphis and build_gtk_widgetry
   libchamplain_memphis_demos = [
     ['local-rendering', 'local-rendering.c'],
   ]
