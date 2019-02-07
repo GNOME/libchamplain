@@ -23,9 +23,9 @@ also need:
 
   *  libmemphis >= 0.2.1
 
-The usual rules for building apply -
+The usual rules for building apply:
 
-configure; make; sudo make install; sudo ldconfig
+./autogen.sh; make; sudo make install; sudo ldconfig
 
 should do the right thing. For more details consult the INSTALL file in this 
 directory. Alternatively, using the meson build system, run
