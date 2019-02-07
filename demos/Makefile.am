@@ -58,5 +58,5 @@ launcher_vala_LDADD = \
        $(top_builddir)/champlain/libchamplain-@CHAMPLAIN_API_VERSION@.la
 endif
 
-EXTRA_DIST = markers.h launcher.js minimal.py launcher-gtk.py polygons.py keyboard-mapping.py
+EXTRA_DIST = markers.h launcher.js minimal.py launcher-gtk.py polygons.py keyboard-mapping.py mapbox.py
 
