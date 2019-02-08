@@ -6,7 +6,7 @@ stages:
 
 before_script:
   - dnf install -y gcc ccache gettext gtk-doc meson ninja-build redhat-rpm-config
-  - dnf install -y glib2-devel glib2-doc clutter-devel clutter-doc gtk3-devel gtk3-doc clutter-gtk-devel clutter-gtk-doc cairo-devel cairo-doc sqlite-devel libsoup-devel gobject-introspection-devel
+  - dnf install -y glib2-devel glib2-doc clutter-devel clutter-doc gtk3-devel gtk3-devel-docs clutter-gtk-devel cairo-devel sqlite-devel libsoup-devel gobject-introspection-devel
 
 .ccache-setup: &ccache-setup
   variables:
