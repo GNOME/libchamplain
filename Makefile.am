@@ -17,6 +17,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc --enable-gtk --enable-introspection --enable-vala-demos --disable-memphis
 
 EXTRA_DIST = \
+	README.md \
 	champlain-gtk.pc.in \
 	champlain-gtk-uninstalled.pc.in \
 	champlain.pc.in \
