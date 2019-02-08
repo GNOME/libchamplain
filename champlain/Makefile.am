@@ -199,13 +199,13 @@ CLEANFILES += $(gir_DATA) $(typelib_DATA)
 
 endif
 
-vapidir = $(datadir)/vala/vapi
-dist_vapi_DATA = champlain-@CHAMPLAIN_API_VERSION@.vapi
-EXTRA_DIST += champlain-@CHAMPLAIN_API_VERSION@.vapi
 
 if ENABLE_VALA
 
-CLEANFILES += $(dist_vapi_DATA)
+vapidir = $(datadir)/vala/vapi
+vapi_DATA = champlain-@CHAMPLAIN_API_VERSION@.vapi
+
+CLEANFILES += $(vapi_DATA)
 
 champlain-@CHAMPLAIN_API_VERSION@.vapi:	Champlain-@CHAMPLAIN_API_VERSION@.gir
 	$(AM_V_GEN) ( $(VAPIGEN) --library champlain-@CHAMPLAIN_API_VERSION@ --pkg clutter-1.0 --pkg cogl-pango-1.0 --pkg atk --pkg pangocairo $(builddir)/Champlain-@CHAMPLAIN_API_VERSION@.gir )

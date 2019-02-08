@@ -4,9 +4,9 @@ libchamplain - a map widget
 libchamplain is a Gtk widget displaying zoomable and pannable maps that can be
 loaded from various network sources. It supports overlay layers, markers, and
 custom elements displayed on top of the maps. The library is written in C but
-other language mappings are also available thanks to GObject-introspection.
+other language mappings are also available thanks to GObject-Introspection.
 
-libchamplain requires:
+libchamplain depends on the following libraries:
 * [glib](https://gitlab.gnome.org/GNOME/glib)
 * [gtk](https://gitlab.gnome.org/GNOME/gtk)
 * [clutter](https://gitlab.gnome.org/GNOME/clutter)
