@@ -1,17 +1,16 @@
 libchamplain 0.12 README
 ========================
 
-libchamplain is a Clutter based Gtk widget to display rich, eye-candy and
-interactive maps.
+libchamplain is a Gtk widget to display rich, eye-candy and interactive maps.
 
 libchamplain requires:
-  * glib >= 2.38
-  * gtk >= 3.0
-  * clutter >= 1.24
-  * clutter-gtk >= 1.0
-  * cairo >= 1.4
-  * sqlite >= 3.0
-  * libsoup >= 2.42
+  * [glib](https://gitlab.gnome.org/GNOME/glib)
+  * [gtk](https://gitlab.gnome.org/GNOME/gtk)
+  * [clutter](https://gitlab.gnome.org/GNOME/clutter)
+  * [clutter-gtk](https://gitlab.gnome.org/GNOME/clutter-gtk)
+  * [libsoup](https://gitlab.gnome.org/GNOME/libsoup)
+  * [cairo](https://www.cairographics.org)
+  * [sqlite](https://www.sqlite.org)
 
 To build using autotools, run:
 ```
@@ -23,24 +22,24 @@ Alternatively, when using the meson build system, run:
 meson _builddir; cd _builddir; ninja; sudo ninja install
 ```
 
-The repository and bug report page is at:
+The **repository** and **bug report** page is at:
 * https://gitlab.gnome.org/GNOME/libchamplain
 
-Release tarballs can be downloaded from:
+Release **tarballs** can be downloaded from:
 * https://download.gnome.org/sources/libchamplain/
 
-For a simple examples how to use the library, check the `demos` directory;
+For simple examples how to use the library, check the `demos` directory;
 in particular, the `minimal-gtk.c` and `minimal.py` demos are good starting
 points to see how to get the most basic map application running.
 
-Full documentation can be found at:
+Full **documentation** can be found at:
 * https://gnome.pages.gitlab.gnome.org/libchamplain/champlain
 * https://gnome.pages.gitlab.gnome.org/libchamplain/champlain-gtk
 
-The official mailing list is at:
+The official **mailing list** is at:
 * https://mail.gnome.org/mailman/listinfo/libchamplain-list
 
-The official IRC channel is at:
+The official **IRC channel** is at:
 * irc://irc.freenode.org/#champlain
 
 ---
