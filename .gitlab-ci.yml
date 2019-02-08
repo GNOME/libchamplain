@@ -6,7 +6,7 @@ stages:
 
 before_script:
   - dnf install -y gcc ccache gettext gtk-doc meson ninja-build redhat-rpm-config
-  - dnf install -y glib2-devel clutter-devel gtk3-devel clutter-gtk-devel cairo-devel sqlite-devel libsoup-devel gobject-introspection-devel
+  - dnf install -y glib2-devel glib2-doc clutter-devel clutter-doc gtk3-devel gtk3-doc clutter-gtk-devel clutter-gtk-doc cairo-devel cairo-doc sqlite-devel libsoup-devel gobject-introspection-devel
 
 .ccache-setup: &ccache-setup
   variables:
@@ -19,35 +19,16 @@ build-champlain:
     - mkdir -p _ccache
     - ccache --zero-stats
     - ccache --show-stats
-    - meson -Dwidgetry=false -Dgtk_doc=true _build .
+    - meson -Dwidgetry=true -Ddemos=true -Dgtk_doc=true _build .
     - ninja -C _build
     - ninja -C _build test
     - ninja -C _build champlain-doc
-    - ccache --show-stats
-  artifacts:
-    name: "champlain-gtk"
-    paths:
-      - _build/docs/reference/html
-  cache:
-    key: "$CI_JOB_NAME"
-    paths:
-      - _ccache/
-  <<: *ccache-setup
-
-build-champlain-gtk:
-  stage: build
-  script:
-    - mkdir -p _ccache
-    - ccache --zero-stats
-    - ccache --show-stats
-    - meson -Dwidgetry=true -Dgtk_doc=true _build .
-    - ninja -C _build
-    - ninja -C _build test
     - ninja -C _build champlain-gtk-doc
     - ccache --show-stats
   artifacts:
-    name: "champlain-gtk-doc"
+    name: "champlain-doc"
     paths:
+      - _build/docs/reference/html
       - _build/docs/reference-gtk/html
   cache:
     key: "$CI_JOB_NAME"
@@ -59,7 +40,6 @@ pages:
   stage: deploy
   dependencies:
     - build-champlain
-    - build-champlain-gtk
   script:
     - mkdir -p public/
     - mv _build/docs/reference/html/ public/champlain/
