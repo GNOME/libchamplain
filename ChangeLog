@@ -1,4 +1,1 @@
-2009-05-18  Jiří Techet <techet@gmail.com>
-
-	* *: The ChangeLog is auto-generated when releasing. If you
-	are seeing this, use 'git log' for a detailed list of changes.
+Use 'git log' on the repo cloned from https://gitlab.gnome.org/GNOME/libchamplain
