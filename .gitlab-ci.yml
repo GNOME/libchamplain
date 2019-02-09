@@ -6,7 +6,7 @@ stages:
 
 before_script:
   - dnf install -y gcc ccache gettext gtk-doc meson ninja-build redhat-rpm-config
-  - dnf install -y glib2-devel clutter-devel gtk3-devel clutter-gtk-devel cairo-devel sqlite-devel libsoup-devel gobject-introspection-devel
+  - dnf install -y glib2-devel clutter-devel gtk3-devel clutter-gtk-devel cairo-devel sqlite-devel libsoup-devel gobject-introspection-devel vala-devel
 
 .ccache-setup: &ccache-setup
   variables:
@@ -19,7 +19,7 @@ build-champlain:
     - mkdir -p _ccache
     - ccache --zero-stats
     - ccache --show-stats
-    - meson -Dwidgetry=true -Ddemos=true -Dgtk_doc=true -Dintrospection=true _build .
+    - meson -Dwidgetry=true -Ddemos=true -Dgtk_doc=true -Dintrospection=true -Dvapi=true _build .
     - ninja -C _build
     - ninja -C _build test
     - ninja -C _build champlain-doc
