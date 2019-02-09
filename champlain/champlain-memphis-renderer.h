@@ -17,17 +17,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#if !defined (__CHAMPLAIN_CHAMPLAIN_H_INSIDE__) && !defined (CHAMPLAIN_COMPILATION)
+#error "Only <champlain/champlain.h> can be included directly."
+#endif
+
 #ifndef _CHAMPLAIN_MEMPHIS_RENDERER
 #define _CHAMPLAIN_MEMPHIS_RENDERER
 
-#define __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
-
-#include "champlain/champlain-features.h"
-
-#include <champlain/champlain-tile-source.h>
+#include <champlain/champlain-renderer.h>
 #include <champlain/champlain-bounding-box.h>
-
-#include <glib-object.h>
 
 G_BEGIN_DECLS
 
@@ -186,8 +184,6 @@ void champlain_memphis_renderer_set_tile_size (ChamplainMemphisRenderer *rendere
     guint size);
 
 guint champlain_memphis_renderer_get_tile_size (ChamplainMemphisRenderer *renderer);
-
-#undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 
 G_END_DECLS
 

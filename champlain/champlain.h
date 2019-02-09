@@ -62,6 +62,10 @@
 #include "champlain/champlain-image-renderer.h"
 #include "champlain/champlain-error-tile-renderer.h"
 
+#ifdef CHAMPLAIN_HAS_MEMPHIS
+# include "champlain/champlain-memphis-renderer.h"
+#endif
+
 #undef __CHAMPLAIN_CHAMPLAIN_H_INSIDE__
 
 #endif
