@@ -20,11 +20,6 @@ To build libchamplain from sources using meson, run:
 meson _builddir; cd _builddir; ninja; sudo ninja install
 ```
 
-Alternatively, when using autotools, run:
-```
-./autogen.sh; make; sudo make install
-```
-
 The **repository and bug report** page is at:
 * https://gitlab.gnome.org/GNOME/libchamplain
 
