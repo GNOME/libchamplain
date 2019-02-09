@@ -1,4 +1,23 @@
 <SECTION>
+<FILE>gtk-champlain-embed</FILE>
+<TITLE>GtkChamplainEmbed</TITLE>
+GtkChamplainEmbed
+gtk_champlain_embed_new
+gtk_champlain_embed_get_view
+<SUBSECTION Standard>
+GTK_CHAMPLAIN_TYPE_EMBED
+GTK_CHAMPLAIN_EMBED
+GTK_CHAMPLAIN_IS_EMBED
+gtk_champlain_embed_get_type
+GTK_CHAMPLAIN_EMBED_CLASS
+GTK_CHAMPLAIN_IS_EMBED_CLASS
+GTK_CHAMPLAIN_EMBED_GET_CLASS
+<SUBSECTION Private>
+GtkChamplainEmbedClass
+GtkChamplainEmbedPrivate
+</SECTION>
+
+<SECTION>
 <FILE>champlain-map-source</FILE>
 <TITLE>ChamplainMapSource</TITLE>
 ChamplainMapSource

@@ -7,7 +7,13 @@ gobject_docpath = join_paths(gobject_prefix, 'share', 'gtk-doc', 'html', 'gobjec
 clutter_prefix = clutter_dep.get_pkgconfig_variable('prefix')
 clutter_docpath = join_paths(clutter_prefix, 'share', 'gtk-doc', 'html', 'clutter')
 
+gtk_prefix = gtk_dep.get_pkgconfig_variable('prefix')
+gtk_docpath = join_paths(gtk_prefix, 'share', 'gtk-doc', 'html', 'gtk3')
+
 libchamplain_reference_ignored_h = [
+  'champlain-gtk-enum-types.h',
+  'champlain-gtk-marshal.h',
+  'champlain-gtk.h',
   'champlain-adjustment.h',
   'champlain-debug.h',
   'champlain-defines.h',
@@ -45,6 +51,7 @@ libchamplain_reference_scan_args = [
 libchamplain_reference_mkdb_args = [
   '--output-format=xml',
   '--name-space=champlain',
+  '--name-space=gtk_champlain',
 ]
 
 libchamplain_reference_fixxref_args = [
@@ -59,8 +66,8 @@ gnome.gtkdoc(
   main_xml: 'champlain-docs.xml',
   mode: 'xml',
   gobject_typesfile: files('champlain.types'),
-  src_dir: libchamplain_srcdir,
-  dependencies: libchamplain_dep,
+  src_dir: [libchamplain_srcdir, libchamplain_gtk_srcdir],
+  dependencies: [libchamplain_dep, libchamplain_gtk_dep],
   scan_args: libchamplain_reference_scan_args,
   mkdb_args: libchamplain_reference_mkdb_args,
   fixxref_args: libchamplain_reference_fixxref_args,

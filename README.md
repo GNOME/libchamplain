@@ -37,7 +37,6 @@ points to see how to get the most basic map application running.
 
 Full **documentation** can be found at:
 * https://gnome.pages.gitlab.gnome.org/libchamplain/champlain
-* https://gnome.pages.gitlab.gnome.org/libchamplain/champlain-gtk
 
 The official **mailing list** is at:
 * https://mail.gnome.org/mailman/listinfo/libchamplain-list

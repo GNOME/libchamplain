@@ -23,13 +23,11 @@ build-champlain:
     - ninja -C _build
     - ninja -C _build test
     - ninja -C _build champlain-doc
-    - ninja -C _build champlain-gtk-doc
     - ccache --show-stats
   artifacts:
     name: "champlain-doc"
     paths:
       - _build/docs/reference/html
-      - _build/docs/reference-gtk/html
   cache:
     key: "$CI_JOB_NAME"
     paths:
@@ -43,7 +41,6 @@ pages:
   script:
     - mkdir -p public/
     - mv _build/docs/reference/html/ public/champlain/
-    - mv _build/docs/reference-gtk/html/ public/champlain-gtk/
   artifacts:
     paths:
       - public

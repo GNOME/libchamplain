@@ -72,7 +72,7 @@ libsoup_req = '>= 2.42'
 memphis_req = '>= 0.2.1'
 introspection_req = '>= 0.6.3'
 vala_req = '>= 0.11.0'
-gtk_doc_req = '>= 1.9'
+gtk_doc_req = '>= 1.15'
 
 glib_dep = dependency('glib-2.0', version: glib_req)
 gobject_dep = dependency('gobject-2.0', version: glib_req)
@@ -102,14 +102,14 @@ configure_file(
 # Options
 build_demos = get_option('demos')
 
-build_gtk_doc = get_option('gtk_doc')
-if build_gtk_doc and not gtk_doc_dep.found()
-  build_gtk_doc = false
-endif
-
 build_gtk_widgetry = get_option('widgetry')
 if build_gtk_widgetry and not (gtk_dep.found() and clutter_gtk_dep.found())
   build_gtk_widgetry = false
+endif
+
+build_gtk_doc = get_option('gtk_doc')
+if build_gtk_doc and not (gtk_doc_dep.found() and build_gtk_widgetry)
+  build_gtk_doc = false
 endif
 
 generate_gir = get_option('introspection')

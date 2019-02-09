@@ -76,7 +76,7 @@ AC_SUBST(DEPS_LIBS)
 AM_PATH_GLIB_2_0(2.38.0,,gobject gthread gio)
 
 # check for gtk-doc
-GTK_DOC_CHECK(1.9)
+GTK_DOC_CHECK(1.15)
 
 GNOME_COMPILE_WARNINGS([maximum])
 GNOME_MAINTAINER_MODE_DEFINES
@@ -200,8 +200,6 @@ AC_CONFIG_FILES([Makefile
                  docs/Makefile
                  docs/reference/Makefile
                  docs/reference/version.xml
-                 docs/reference-gtk/Makefile
-                 docs/reference-gtk/version.xml
                  champlain-$CHAMPLAIN_API_VERSION.pc:champlain.pc.in
                  champlain-$CHAMPLAIN_API_VERSION-uninstalled.pc:champlain-uninstalled.pc.in
                  champlain-gtk-$CHAMPLAIN_API_VERSION.pc:champlain-gtk.pc.in

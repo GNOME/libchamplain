@@ -1,6 +1,3 @@
-SUBDIRS=reference
-
 if ENABLE_GTK
-  SUBDIRS+=reference-gtk
+  SUBDIRS=reference
 endif
-

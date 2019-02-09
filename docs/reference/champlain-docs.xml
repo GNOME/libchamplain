@@ -41,7 +41,8 @@
   </bookinfo>
 
   <part>
-    <title>Basic API</title>
+    <title>Core API</title>
+    <xi:include href="xml/gtk-champlain-embed.xml"/>
     <xi:include href="xml/champlain-view.xml"/>
   </part>
   <part>
@@ -113,38 +114,37 @@
   </part>
 
   <index>
-    <title>Index</title>
+    <title>Index of all symbols</title>
+    <xi:include href="xml/api-index-full.xml"><xi:fallback /></xi:include>
   </index>
 
   <index role="deprecated">
     <title>Index of deprecated symbols</title>
+    <xi:include href="xml/api-index-deprecated.xml"><xi:fallback /></xi:include>
   </index>
 
-  <index role="0.1">
-    <title>Index of new symbols in 0.1</title>
+  <index role="0.12.10">
+    <title>Index of new symbols in 0.12.10</title>
+    <xi:include href="xml/api-index-0.12.10.xml"><xi:fallback /></xi:include>
   </index>
 
-  <index role="0.2">
-    <title>Index of new symbols in 0.2</title>
+  <index role="0.12.12">
+    <title>Index of new symbols in 0.12.12</title>
+    <xi:include href="xml/api-index-0.12.12.xml"><xi:fallback /></xi:include>
   </index>
 
-  <index role="0.4">
-    <title>Index of new symbols in 0.4</title>
+  <index role="0.12.14">
+    <title>Index of new symbols in 0.12.14</title>
+    <xi:include href="xml/api-index-0.12.14.xml"><xi:fallback /></xi:include>
   </index>
 
-  <index role="0.6">
-    <title>Index of new symbols in 0.6</title>
+  <index role="0.12.16">
+    <title>Index of new symbols in 0.12.16</title>
+    <xi:include href="xml/api-index-0.12.16.xml"><xi:fallback /></xi:include>
   </index>
 
-  <index role="0.8">
-    <title>Index of new symbols in 0.8</title>
-  </index>
-
-  <index role="0.10">
-    <title>Index of new symbols in 0.10</title>
-  </index>
-
-  <index role="0.12">
-    <title>Index of new symbols in 0.12</title>
+  <index role="0.12.18">
+    <title>Index of new symbols in 0.12.18</title>
+    <xi:include href="xml/api-index-0.12.18.xml"><xi:fallback /></xi:include>
   </index>
 </book>

@@ -28,3 +28,4 @@ champlain_tile_cache_get_type
 champlain_tile_get_type
 champlain_tile_source_get_type
 champlain_view_get_type
+gtk_champlain_embed_get_type
