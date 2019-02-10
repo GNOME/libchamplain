@@ -15,9 +15,15 @@ libchamplain depends on the following libraries:
 * [cairo](https://www.cairographics.org)
 * [sqlite](https://www.sqlite.org)
 
-To build libchamplain from sources using meson, run:
+To build libchamplain from sources using [meson](https://mesonbuild.com), run:
 ```
 meson _builddir; cd _builddir; ninja; sudo ninja install
+```
+
+It is possible to specify compilation options defined in `meson_options.txt`
+by using the `-D` flag, e.g.:
+```
+meson _builddir -Dgtk_doc=true -Ddemos=true
 ```
 
 The **repository and bug report** page is at:
