@@ -1,3 +1,6 @@
+# prefix the meson build directory with _ to get it ignored
+_*
+
 Makefile
 Makefile.in
 aclocal.m4
@@ -17,7 +20,6 @@ autom4te.cache
 *#*
 *.sw?
 *.pyc
-_*
 champlain-gtk/champlain-gtk-marshal.c
 champlain-gtk/champlain-gtk-marshal.h
 champlain-gtk/stamp-marshal
