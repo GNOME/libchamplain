@@ -1,3 +1,24 @@
+libchamplain 0.12.17 (2019-02-20)
+=================================
+
+Stable release
+
+Changes:
+
+* Use of meson build system, CI tests and automatized generation of
+  documentation (Martin Blanchard)
+* Various map wrapping fixes (Tomasz Miąsko, Jiří Techet)
+* Pass data as uint8 pointer in champlain_renderer_set_data() and make this
+  function introspectable (James Westman)
+* Bump versions of some dependencies - clutter (1.24), glib (2.38) - and fix
+  depreciation warnings (Jiří Techet)
+* Use https for all map sources that support it (Jiří Techet)
+* Don't version-control generated vapi files (Jiří Techet)
+* Combine champlain and champlain-gtk documentations into one (Jiří Techet)
+* More helpful README.md with links to pages related to libchamplain
+  (Jiří Techet)
+* Various housekeeping and cleanups (Jiří Techet, Andre Klapper)
+
 libchamplain 0.12.16 (2017-09-06)
 =================================
 
