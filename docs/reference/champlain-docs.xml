@@ -108,6 +108,7 @@
     <xi:include href="xml/champlain-exportable.xml"/>
     <xi:include href="xml/champlain-version.xml"/>
   </part>
+
   <part>
     <title>Annotation Glossary</title>
     <xi:include href="xml/annotation-glossary.xml"><xi:fallback /></xi:include>
@@ -128,6 +129,11 @@
     <xi:include href="xml/api-index-0.12.10.xml"><xi:fallback /></xi:include>
   </index>
 
+  <index role="0.12.11">
+    <title>Index of new symbols in 0.12.11</title>
+    <xi:include href="xml/api-index-0.12.11.xml"><xi:fallback /></xi:include>
+  </index>
+
   <index role="0.12.12">
     <title>Index of new symbols in 0.12.12</title>
     <xi:include href="xml/api-index-0.12.12.xml"><xi:fallback /></xi:include>
@@ -143,8 +149,4 @@
     <xi:include href="xml/api-index-0.12.16.xml"><xi:fallback /></xi:include>
   </index>
 
-  <index role="0.12.18">
-    <title>Index of new symbols in 0.12.18</title>
-    <xi:include href="xml/api-index-0.12.18.xml"><xi:fallback /></xi:include>
-  </index>
 </book>
