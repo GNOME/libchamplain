@@ -14,15 +14,14 @@ pkg = import('pkgconfig')
 # Versioning
 version = meson.project_version()
 version_arr = version.split('.')
-version_major = version_arr[0]
-version_minor = version_arr[1]
-version_micro = version_arr[2]
+version_major = version_arr[0].to_int()
+version_minor = version_arr[1].to_int()
+version_micro = version_arr[2].to_int()
 
-if version_minor.to_int().is_odd()
-  api_version = '.'.join([version_major, version_minor + 1])
-else
-  api_version = '.'.join([version_major, version_minor])
-endif
+api_version = '@0@.@1@'.format(
+  version_major,
+  version_minor.is_odd() ? version_minor + 1 : version_minor,
+)
 
 # Before making a release, the LT_VERSION string should be modified.
 # The string is of the form C.A.R
