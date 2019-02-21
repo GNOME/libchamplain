@@ -24,14 +24,17 @@ else
   api_version = '.'.join([version_major, version_minor])
 endif
 
-# Before making a release, the LT_VERSION string should be modified.
-# The string is of the form C.A.R
-# - If the interface is the same as the previous version, change to C.A.R+1
+# Before making a release, the lt_version string should be modified.
+# The string is of the form C:R:A.
 # - If interfaces have been changed or added, but binary compatibility has
-#   been preserved, change to C.A+1.R
+#   been preserved, change to C+1:0:A+1
 # - If binary compatibility has been broken (eg removed or changed interfaces)
-#   change to C+1.0.0
-lib_version = '0.11.8'
+#   change to C+1:0:0
+# - If the interface is the same as the previous version, change to C:R+1:A
+lt_version = '11:8:11'
+
+lt_arr = lt_version.split(':')
+lib_version = '@0@.@1@.@2@'.format(lt_arr[0].to_int() - lt_arr[2].to_int(), lt_arr[2], lt_arr[1])
 
 package_name = meson.project_name().strip('lib')
 package_string = '@0@-@1@'.format(package_name, api_version)
