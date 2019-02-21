@@ -31,7 +31,7 @@ endif
 #   been preserved, change to C.A+1.R
 # - If binary compatibility has been broken (eg removed or changed interfaces)
 #   change to C+1.0.0
-lib_version = '0.11.7'
+lib_version = '0.11.8'
 
 package_name = meson.project_name().strip('lib')
 package_string = '@0@-@1@'.format(package_name, api_version)

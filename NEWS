@@ -1,3 +1,15 @@
+libchamplain 0.12.18 (2019-02-21)
+=================================
+
+Stable release
+
+Changes:
+
+* Fix incorrect so version when using meson (Jiří Techet)
+* Avoid exporting marshaler functions by dropping the use of glib-genmarshal and
+  using the generic marshaler instead (Jiří Techet)
+* Don't use glib-mkenums for champlain-gtk where it's not needed (Jiří Techet)
+
 libchamplain 0.12.17 (2019-02-20)
 =================================
 
