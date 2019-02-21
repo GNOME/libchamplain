@@ -7,6 +7,11 @@ libchamplain_gtk_sources = [
   'gtk-champlain-embed.c',
 ]
 
+libchamplain_gtk_requires = [
+  gtk_dep,
+  libchamplain_sha,
+]
+
 libchamplain_gtk_deps = [
   glib_dep,
   gobject_dep,
@@ -112,4 +117,5 @@ libchamplain_gtk_pc = pkg.generate(
   description: 'Gtk+ Widget wrapper for libchamplain',
   subdirs: package_string,
   install_dir: pkgconfigdir,
+  requires: libchamplain_gtk_requires,
 )
