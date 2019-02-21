@@ -40,20 +40,11 @@ package_gtk_string = '@0@-@1@'.format(package_gtk_name, api_version)
 # Paths
 rootdir = include_directories('.')
 
-srcdir = meson.current_source_dir()
-builddir = meson.current_build_dir()
-
 prefix = get_option('prefix')
-
 includedir = join_paths(prefix, get_option('includedir'))
 libdir = join_paths(prefix, get_option('libdir'))
 datadir = join_paths(prefix, get_option('datadir'))
 pkgincludedir = join_paths(includedir, package_string)
-typelibdir = join_paths(libdir, 'girepository-1.0')
-pkgconfigdir = join_paths(libdir, 'pkgconfig')
-
-girdir = join_paths(datadir, 'gir-1.0')
-vapidir = join_paths(datadir, 'vala', 'vapi')
 
 # Dependencies
 cc = meson.get_compiler('c')
