@@ -26,7 +26,7 @@ libchamplain_gtk_srcdir = include_directories('.')
 libchamplain_gtk_c_args = [
   '-DHAVE_CONFIG_H',
   '-DCHAMPLAIN_GTK_COMPILATION',
-  '-DG_LOG_DOMAIN="@0@"'.format(package_gtk_name),
+  '-DG_LOG_DOMAIN="@0@"'.format(meson.project_name()),
 ]
 
 libchamplain_gtk_link_args = [
