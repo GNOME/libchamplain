@@ -11,27 +11,9 @@ libchamplain_gtk_headers_public =	\
 libchamplain_gtk_sources = \
 	gtk-champlain-embed.c
 
-
-# glib-mkenums rules
-glib_enum_h = champlain-gtk-enum-types.h
-glib_enum_c = champlain-gtk-enum-types.c
-glib_enum_headers = $(libchamplain_gtk_headers_public)
-include $(top_srcdir)/build/Makefile.am.enums
-
-libchamplain_gtk_headers_built =	\
-	champlain-gtk-enum-types.h
-
-libchamplain_gtk_sources_built =	\
-	champlain-gtk-enum-types.c
-
-
 libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
 	$(libchamplain_gtk_headers_public)	\
 	$(libchamplain_gtk_sources)
-
-nodist_libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
-	$(libchamplain_gtk_headers_built)	\
-	$(libchamplain_gtk_sources_built)
 
 libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_LIBADD = \
 	$(GTK_LIBS) 	\
@@ -50,8 +32,6 @@ lib_LTLIBRARIES = libchamplain-gtk-@CHAMPLAIN_API_VERSION@.la
 libchamplain_gtkdir=$(includedir)/libchamplain-gtk-@CHAMPLAIN_API_VERSION@/champlain-gtk
 
 libchamplain_gtk_HEADERS = $(libchamplain_gtk_headers_public)
-
-nodist_libchamplain_gtk_HEADERS = $(libchamplain_gtk_headers_built)
 
 # Make the g-ir-scanner to find the not yet installed pkg-config files.
 PKG_CONFIG_PATH := $(top_builddir):$(PKG_CONFIG_PATH)

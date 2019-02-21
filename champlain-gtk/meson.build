@@ -26,24 +26,6 @@ libchamplain_gtk_c_args = [
 libchamplain_gtk_link_args = [
 ]
 
-libchamplain_gtk_enums = gnome.mkenums(
-  'champlain-gtk-enum-types',
-  sources: libchamplain_gtk_public_h,
-  h_template: 'champlain-gtk-enum-types.h.in',
-  c_template: 'champlain-gtk-enum-types.c.in',
-  install_header: true,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain-gtk',
-  )
-)
-
-libchamplain_gtk_enums_h = libchamplain_gtk_enums.get(1)
-
-libchamplain_gtk_sources += [
-  libchamplain_gtk_enums,
-]
-
 install_headers(
   libchamplain_gtk_public_h,
   install_dir: join_paths(
@@ -65,7 +47,6 @@ libchamplain_gtk_sha = library(
 )
 
 libchamplain_gtk_dep_sources = [
-  libchamplain_gtk_enums_h,
 ]
 
 if generate_gir
