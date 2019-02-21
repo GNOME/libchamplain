@@ -29,12 +29,14 @@ libchamplain_gtk_c_args = [
 libchamplain_gtk_link_args = [
 ]
 
+libchamplain_gtk_includedir = join_paths(
+  pkgincludedir,
+  'champlain-gtk',
+)
+
 install_headers(
   libchamplain_gtk_public_h,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain-gtk',
-  )
+  install_dir: libchamplain_gtk_includedir,
 )
 
 libchamplain_gtk_sha = library(

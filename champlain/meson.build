@@ -114,6 +114,11 @@ libchamplain_c_args = [
 libchamplain_link_args = [
 ]
 
+libchamplain_includedir = join_paths(
+  pkgincludedir,
+  'champlain',
+)
+
 features_h = configuration_data()
 if build_with_memphis
   features_h.set('CHAMPLAIN_HAS_MEMPHIS', '1')
@@ -123,10 +128,7 @@ libchamplain_features_h = configure_file(
   output: 'champlain-features.h',
   configuration: features_h,
   install: true,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain',
-  )
+  install_dir: libchamplain_includedir,
 )
 
 version_h = configuration_data()
@@ -140,10 +142,7 @@ libchamplain_version_h = configure_file(
   output: 'champlain-version.h',
   configuration: version_h,
   install: true,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain',
-  )
+  install_dir: libchamplain_includedir,
 )
 
 libchamplain_public_h += [
@@ -157,10 +156,7 @@ libchamplain_enums = gnome.mkenums(
   h_template: 'champlain-enum-types.h.in',
   c_template: 'champlain-enum-types.c.in',
   install_header: true,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain',
-  )
+  install_dir: libchamplain_includedir,
 )
 
 libchamplain_enums_h = libchamplain_enums.get(1)
@@ -171,10 +167,7 @@ libchamplain_sources += [
 
 install_headers(
   libchamplain_public_h,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain',
-  )
+  install_dir: libchamplain_includedir,
 )
 
 libchamplain_sha = library(
