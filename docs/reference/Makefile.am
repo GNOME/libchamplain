@@ -62,7 +62,6 @@ endif
 # Header files to ignore when scanning. Use base file name, no paths
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
 IGNORE_HFILES=\
-	champlain-gtk-enum-types.h \
 	champlain-gtk.h \
 	$(memphis_headers) \
 	champlain-debug.h \
