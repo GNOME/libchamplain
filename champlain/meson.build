@@ -108,7 +108,7 @@ libchamplain_srcdir = include_directories('.')
 libchamplain_c_args = [
   '-DHAVE_CONFIG_H',
   '-DCHAMPLAIN_COMPILATION',
-  '-DG_LOG_DOMAIN="@0@"'.format(package_name),
+  '-DG_LOG_DOMAIN="@0@"'.format(meson.project_name()),
 ]
 
 libchamplain_link_args = [
