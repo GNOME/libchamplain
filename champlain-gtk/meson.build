@@ -103,7 +103,7 @@ endif
 libchamplain_gtk_dep = declare_dependency(
   link_with: libchamplain_gtk_sha,
   include_directories: rootdir,
-  dependencies: libchamplain_gtk_deps,
+  dependencies: [gtk_dep, libchamplain_dep],
   sources: libchamplain_gtk_dep_sources,
 )
 
@@ -112,4 +112,5 @@ libchamplain_gtk_pc = pkg.generate(
   description: 'Gtk+ Widget wrapper for libchamplain',
   subdirs: package_string,
   install_dir: pkgconfigdir,
+  requires: [gtk_dep, libchamplain_sha],
 )
