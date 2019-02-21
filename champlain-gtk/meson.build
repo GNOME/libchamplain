@@ -51,7 +51,6 @@ libchamplain_gtk_sha = library(
   c_args: libchamplain_gtk_c_args,
   link_args: libchamplain_gtk_link_args,
   install: true,
-  install_dir: libdir,
 )
 
 libchamplain_gtk_dep_sources = [
@@ -77,8 +76,6 @@ if generate_gir
     includes: ['Clutter-1.0', 'Gtk-3.0', libchamplain_gir.get(0)],
     link_with: libchamplain_gtk_sha,
     install: true,
-    install_dir_gir: girdir,
-    install_dir_typelib: typelibdir,
     extra_args: [
       '-DCHAMPLAIN_GTK_COMPILATION',
     ]
@@ -103,7 +100,6 @@ if generate_gir
       sources: libchamplain_gtk_gir.get(0),
       packages: libchamplain_gtk_vapi_packages,
       install: true,
-      install_dir: vapidir,
     )
   endif
 endif
@@ -119,6 +115,5 @@ libchamplain_gtk_pc = pkg.generate(
   libchamplain_gtk_sha,
   description: 'Gtk+ Widget wrapper for libchamplain',
   subdirs: package_string,
-  install_dir: pkgconfigdir,
   requires: libchamplain_gtk_requires,
 )
