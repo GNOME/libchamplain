@@ -1,6 +1,6 @@
 project(
   'libchamplain', 'c',
-  version: '0.12.18',
+  version: '0.12.19',
   license: 'LGPLv2.1+',
   meson_version: '>= 0.49.0',
   default_options: [
