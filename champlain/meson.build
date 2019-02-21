@@ -1,3 +1,5 @@
+libchamplain_name = package_string.strip('lib')
+
 libchamplain_public_h = [
   'champlain-adjustment.h',
   'champlain-bounding-box.h',
@@ -108,14 +110,15 @@ libchamplain_srcdir = include_directories('.')
 libchamplain_c_args = [
   '-DHAVE_CONFIG_H',
   '-DCHAMPLAIN_COMPILATION',
-  '-DG_LOG_DOMAIN="@0@"'.format(package_name),
+  '-DG_LOG_DOMAIN="libchamplain"',
 ]
 
 libchamplain_link_args = [
 ]
 
 libchamplain_includedir = join_paths(
-  pkgincludedir,
+  includedir,
+  package_string,
   'champlain',
 )
 
@@ -171,7 +174,7 @@ install_headers(
 )
 
 libchamplain_sha = library(
-  package_string,
+  libchamplain_name,
   libchamplain_sources,
   version: lib_version,
   include_directories: rootdir,
@@ -206,7 +209,7 @@ if generate_gir
     symbol_prefix: 'champlain',
     identifier_prefix: 'Champlain',
     header: 'champlain/champlain.h',
-    export_packages: [package_string],
+    export_packages: [libchamplain_name],
     includes: libchamplain_gir_includes,
     link_with: libchamplain_sha,
     install: true,
@@ -230,7 +233,7 @@ if generate_gir
     ]
 
     libchamplain_vapi = gnome.generate_vapi(
-      package_string,
+      libchamplain_name,
       sources: libchamplain_gir.get(0),
       packages: libchamplain_vapi_packages,
       install: true,
@@ -248,7 +251,6 @@ libchamplain_dep = declare_dependency(
 
 libchamplain_pc = pkg.generate(
   libchamplain_sha,
-  name: package_string,
   description: 'Map View for Clutter',
   subdirs: package_string,
   install_dir: pkgconfigdir,

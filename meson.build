@@ -36,10 +36,8 @@ lt_version = '11:8:11'
 lt_arr = lt_version.split(':')
 lib_version = '@0@.@1@.@2@'.format(lt_arr[0].to_int() - lt_arr[2].to_int(), lt_arr[2], lt_arr[1])
 
-package_name = meson.project_name().strip('lib')
-package_string = '@0@-@1@'.format(package_name, api_version)
-package_gtk_name = '@0@-gtk'.format(package_name)
-package_gtk_string = '@0@-@1@'.format(package_gtk_name, api_version)
+package_string = '@0@-@1@'.format(meson.project_name(), api_version)
+package_gtk_string = '@0@-gtk-@1@'.format(meson.project_name(), api_version)
 
 # Paths
 rootdir = include_directories('.')
@@ -52,7 +50,6 @@ prefix = get_option('prefix')
 includedir = join_paths(prefix, get_option('includedir'))
 libdir = join_paths(prefix, get_option('libdir'))
 datadir = join_paths(prefix, get_option('datadir'))
-pkgincludedir = join_paths(includedir, package_string)
 typelibdir = join_paths(libdir, 'girepository-1.0')
 pkgconfigdir = join_paths(libdir, 'pkgconfig')
 
