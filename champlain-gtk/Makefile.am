@@ -12,11 +12,6 @@ libchamplain_gtk_sources = \
 	gtk-champlain-embed.c
 
 
-# glib-genmarshal rules
-glib_marshal_list = champlain-gtk-marshal.list
-glib_marshal_prefix = _champlain_gtk_marshal
-include $(top_srcdir)/build/Makefile.am.marshal
-
 # glib-mkenums rules
 glib_enum_h = champlain-gtk-enum-types.h
 glib_enum_c = champlain-gtk-enum-types.c
@@ -24,12 +19,10 @@ glib_enum_headers = $(libchamplain_gtk_headers_public)
 include $(top_srcdir)/build/Makefile.am.enums
 
 libchamplain_gtk_headers_built =	\
-	champlain-gtk-enum-types.h		\
-	champlain-gtk-marshal.h
+	champlain-gtk-enum-types.h
 
 libchamplain_gtk_sources_built =	\
-	champlain-gtk-enum-types.c		\
-	champlain-gtk-marshal.c
+	champlain-gtk-enum-types.c
 
 
 libchamplain_gtk_@CHAMPLAIN_API_VERSION@_la_SOURCES = \

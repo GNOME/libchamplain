@@ -47,7 +47,6 @@
 #include "champlain-defines.h"
 #include "champlain-enum-types.h"
 #include "champlain-map-source.h"
-#include "champlain-marshal.h"
 #include "champlain-private.h"
 #include "champlain-network-tile-source.h"
 #include "champlain-map-source-chain.h"

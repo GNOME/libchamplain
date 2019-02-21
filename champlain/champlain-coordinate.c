@@ -26,7 +26,6 @@
 #include "champlain-coordinate.h"
 
 #include "config.h"
-#include "champlain-marshal.h"
 #include "champlain-private.h"
 #include "champlain-location.h"
 

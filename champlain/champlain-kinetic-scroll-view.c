@@ -23,7 +23,6 @@
 
 #include "champlain-kinetic-scroll-view.h"
 #include "champlain-enum-types.h"
-#include "champlain-marshal.h"
 #include "champlain-adjustment.h"
 #include "champlain-viewport.h"
 #include <clutter/clutter.h>
@@ -210,7 +209,7 @@ champlain_kinetic_scroll_view_class_init (ChamplainKineticScrollViewClass *klass
         G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 
         0, NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+        NULL, G_TYPE_NONE, 0);
 }
 
 

@@ -148,17 +148,6 @@ libchamplain_public_h += [
   libchamplain_version_h,
 ]
 
-libchamplain_marshals = gnome.genmarshal(
-  'champlain-marshal',
-  sources: 'champlain-marshal.list',
-  prefix: '_champlain_marshal',
-  install_header: true,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain',
-  )
-)
-
 libchamplain_enums = gnome.mkenums(
   'champlain-enum-types',
   sources: libchamplain_public_h,
@@ -171,11 +160,9 @@ libchamplain_enums = gnome.mkenums(
   )
 )
 
-libchamplain_marshals_h = libchamplain_marshals.get(1)
 libchamplain_enums_h = libchamplain_enums.get(1)
 
 libchamplain_sources += [
-  libchamplain_marshals,
   libchamplain_enums,
 ]
 
@@ -202,7 +189,6 @@ libchamplain_sha = library(
 libchamplain_dep_sources = [
   libchamplain_enums_h,
   libchamplain_features_h,
-  libchamplain_marshals_h,
   libchamplain_version_h,
 ]
 

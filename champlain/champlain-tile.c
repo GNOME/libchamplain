@@ -27,7 +27,6 @@
 
 #include "champlain-enum-types.h"
 #include "champlain-private.h"
-#include "champlain-marshal.h"
 
 #include <math.h>
 #include <errno.h>
@@ -385,7 +384,7 @@ champlain_tile_class_init (ChamplainTileClass *klass)
         0, 
         NULL, 
         NULL,
-        _champlain_marshal_VOID__POINTER_UINT_BOOLEAN, 
+        NULL,
         G_TYPE_NONE,
         3, 
         G_TYPE_POINTER, G_TYPE_UINT, G_TYPE_BOOLEAN);

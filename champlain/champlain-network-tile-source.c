@@ -42,7 +42,6 @@
 #include "champlain-defines.h"
 #include "champlain-enum-types.h"
 #include "champlain-map-source.h"
-#include "champlain-marshal.h"
 #include "champlain-private.h"
 
 #include <errno.h>

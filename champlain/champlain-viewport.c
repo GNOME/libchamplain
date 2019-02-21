@@ -227,7 +227,7 @@ champlain_viewport_class_init (ChamplainViewportClass *klass)
         G_OBJECT_CLASS_TYPE (gobject_class),
         G_SIGNAL_RUN_LAST, 
         0, NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, 
+        NULL,
         G_TYPE_NONE, 
         0);
 }

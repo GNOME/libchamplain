@@ -39,7 +39,6 @@
 
 #include "champlain.h"
 #include "champlain-defines.h"
-#include "champlain-marshal.h"
 #include "champlain-private.h"
 #include "champlain-tile.h"
 

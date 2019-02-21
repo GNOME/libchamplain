@@ -26,7 +26,6 @@
 #include <clutter/clutter.h>
 
 #include "champlain-adjustment.h"
-#include "champlain-marshal.h"
 #include "champlain-private.h"
 
 struct _ChamplainAdjustmentPrivate
@@ -219,7 +218,7 @@ champlain_adjustment_class_init (ChamplainAdjustmentClass *klass)
         G_SIGNAL_RUN_LAST,
         G_STRUCT_OFFSET (ChamplainAdjustmentClass, changed),
         NULL, NULL,
-        g_cclosure_marshal_VOID__VOID,
+        NULL,
         G_TYPE_NONE, 0);
 }
 

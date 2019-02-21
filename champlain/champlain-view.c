@@ -56,7 +56,6 @@
 #include "champlain.h"
 #include "champlain-defines.h"
 #include "champlain-enum-types.h"
-#include "champlain-marshal.h"
 #include "champlain-map-source.h"
 #include "champlain-map-source-factory.h"
 #include "champlain-private.h"
@@ -1218,7 +1217,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
         G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED, 
         0, NULL, NULL,
-        g_cclosure_marshal_VOID__OBJECT, 
+        NULL,
         G_TYPE_NONE, 
         0);
 
@@ -1237,7 +1236,7 @@ champlain_view_class_init (ChamplainViewClass *champlainViewClass)
         G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 
         0, NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, 
+        NULL,
         G_TYPE_NONE, 
         0);
 }

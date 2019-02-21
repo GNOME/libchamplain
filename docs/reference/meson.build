@@ -12,7 +12,6 @@ gtk_docpath = join_paths(gtk_prefix, 'share', 'gtk-doc', 'html', 'gtk3')
 
 libchamplain_reference_ignored_h = [
   'champlain-gtk-enum-types.h',
-  'champlain-gtk-marshal.h',
   'champlain-gtk.h',
   'champlain-adjustment.h',
   'champlain-debug.h',
@@ -20,7 +19,6 @@ libchamplain_reference_ignored_h = [
   'champlain-enum-types.h',
   'champlain-features.h',
   'champlain-kinetic-scroll-view.h',
-  'champlain-marshal.h',
   'champlain-private.h',
   'champlain-viewport.h',
   'champlain.h',

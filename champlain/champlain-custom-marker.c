@@ -30,7 +30,6 @@
 
 #include "champlain.h"
 #include "champlain-defines.h"
-#include "champlain-marshal.h"
 #include "champlain-private.h"
 
 #include <clutter/clutter.h>

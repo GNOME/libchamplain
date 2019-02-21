@@ -40,7 +40,6 @@
 
 #include "champlain.h"
 #include "champlain-defines.h"
-#include "champlain-marshal.h"
 #include "champlain-private.h"
 #include "champlain-tile.h"
 
@@ -389,7 +388,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
         G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 
         0, NULL, NULL,
-        g_cclosure_marshal_VOID__BOXED, 
+        NULL,
         G_TYPE_NONE, 
         1, 
         CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
@@ -408,7 +407,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
         G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 
         0, NULL, NULL,
-        g_cclosure_marshal_VOID__BOXED, 
+        NULL,
         G_TYPE_NONE, 
         1, 
         CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
@@ -430,7 +429,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
         G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 
         0, NULL, NULL,
-        _champlain_marshal_VOID__DOUBLE_DOUBLE_BOXED, 
+        NULL,
         G_TYPE_NONE, 
         3, 
         G_TYPE_DOUBLE, G_TYPE_DOUBLE, CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);
@@ -450,7 +449,7 @@ champlain_marker_class_init (ChamplainMarkerClass *marker_class)
         G_OBJECT_CLASS_TYPE (object_class),
         G_SIGNAL_RUN_LAST, 
         0, NULL, NULL,
-        g_cclosure_marshal_VOID__BOXED, 
+        NULL,
         G_TYPE_NONE, 
         1, 
         CLUTTER_TYPE_EVENT | G_SIGNAL_TYPE_STATIC_SCOPE);

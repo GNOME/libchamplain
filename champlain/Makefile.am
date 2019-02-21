@@ -102,11 +102,6 @@ champlain-features.h: $(top_builddir)/config.status
 BUILT_SOURCES += champlain-features.h
 CLEANFILES += champlain-features.h
 
-# glib-genmarshal rules
-glib_marshal_list = champlain-marshal.list
-glib_marshal_prefix = _champlain_marshal
-include $(top_srcdir)/build/Makefile.am.marshal
-
 # glib-mkenums rules
 glib_enum_h = champlain-enum-types.h
 glib_enum_c = champlain-enum-types.c
@@ -115,12 +110,10 @@ include $(top_srcdir)/build/Makefile.am.enums
 
 libchamplain_headers_built = 	\
 	champlain-features.h	\
-	champlain-enum-types.h	\
-	champlain-marshal.h
+	champlain-enum-types.h
 
 libchamplain_sources_built = 	\
-	champlain-enum-types.c	\
-	champlain-marshal.c
+	champlain-enum-types.c
 
 
 libchamplain_@CHAMPLAIN_API_VERSION@_la_SOURCES = \
