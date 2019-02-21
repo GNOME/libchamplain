@@ -1,3 +1,5 @@
+libchamplain_gtk_name = package_gtk_string.strip('lib')
+
 libchamplain_gtk_public_h = [
   'champlain-gtk.h',
   'gtk-champlain-embed.h',
@@ -26,14 +28,15 @@ libchamplain_gtk_srcdir = include_directories('.')
 libchamplain_gtk_c_args = [
   '-DHAVE_CONFIG_H',
   '-DCHAMPLAIN_GTK_COMPILATION',
-  '-DG_LOG_DOMAIN="@0@"'.format(package_gtk_name),
+  '-DG_LOG_DOMAIN="libchamplain-gtk"',
 ]
 
 libchamplain_gtk_link_args = [
 ]
 
 libchamplain_gtk_includedir = join_paths(
-  pkgincludedir,
+  includedir,
+  package_gtk_string,
   'champlain-gtk',
 )
 
@@ -43,7 +46,7 @@ install_headers(
 )
 
 libchamplain_gtk_sha = library(
-  package_gtk_string,
+  libchamplain_gtk_name,
   libchamplain_gtk_sources,
   version: meson.project_version(),
   include_directories: rootdir,
@@ -73,7 +76,7 @@ if generate_gir
     symbol_prefix: 'gtk_champlain',
     identifier_prefix: 'GtkChamplain',
     header: 'champlain-gtk/champlain-gtk.h',
-    export_packages: [package_gtk_string],
+    export_packages: [libchamplain_gtk_name],
     includes: ['Clutter-1.0', 'Gtk-3.0', libchamplain_gir.get(0)],
     link_with: libchamplain_gtk_sha,
     install: true,
@@ -99,7 +102,7 @@ if generate_gir
     ]
 
     libchamplain_gtk_vapi = gnome.generate_vapi(
-      package_gtk_string,
+      libchamplain_gtk_name,
       sources: libchamplain_gtk_gir.get(0),
       packages: libchamplain_gtk_vapi_packages,
       install: true,
@@ -118,7 +121,7 @@ libchamplain_gtk_dep = declare_dependency(
 libchamplain_gtk_pc = pkg.generate(
   libchamplain_gtk_sha,
   description: 'Gtk+ Widget wrapper for libchamplain',
-  subdirs: package_string,
+  subdirs: package_gtk_string,
   install_dir: pkgconfigdir,
   requires: libchamplain_gtk_requires,
 )
