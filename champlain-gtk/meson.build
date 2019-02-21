@@ -37,7 +37,7 @@ install_headers(
 libchamplain_gtk_sha = library(
   package_gtk_string,
   libchamplain_gtk_sources,
-  version: lib_version,
+  version: meson.project_version(),
   include_directories: rootdir,
   dependencies: libchamplain_gtk_deps,
   c_args: libchamplain_gtk_c_args,

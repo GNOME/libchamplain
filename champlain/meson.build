@@ -177,7 +177,7 @@ install_headers(
 libchamplain_sha = library(
   package_string,
   libchamplain_sources,
-  version: lib_version,
+  version: meson.project_version(),
   include_directories: rootdir,
   dependencies: libchamplain_deps,
   c_args: libchamplain_c_args,
