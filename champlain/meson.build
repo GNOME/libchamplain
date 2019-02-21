@@ -85,13 +85,16 @@ if build_with_memphis
   ]
 endif
 
-libchamplain_deps = [
-  libm_dep,
+libchamplain_requires = [
   glib_dep,
   gobject_dep,
-  gio_dep,
-  clutter_dep,
   cairo_dep,
+  clutter_dep,
+]
+
+libchamplain_deps = libchamplain_requires + [
+  libm_dep,
+  gio_dep,
   sqlite_dep,
   libsoup_dep,
 ]
@@ -246,7 +249,7 @@ endif
 libchamplain_dep = declare_dependency(
   link_with: libchamplain_sha,
   include_directories: rootdir,
-  dependencies: libchamplain_deps,
+  dependencies: libchamplain_requires,
   sources: libchamplain_dep_sources,
 )
 
@@ -256,4 +259,5 @@ libchamplain_pc = pkg.generate(
   description: 'Map View for Clutter',
   subdirs: package_string,
   install_dir: pkgconfigdir,
+  requires: libchamplain_requires,
 )

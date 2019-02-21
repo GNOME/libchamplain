@@ -7,11 +7,14 @@ libchamplain_gtk_sources = [
   'gtk-champlain-embed.c',
 ]
 
-libchamplain_gtk_deps = [
-  glib_dep,
-  gobject_dep,
+libchamplain_gtk_requires = [
   gtk_dep,
   clutter_gtk_dep,
+]
+
+libchamplain_gtk_deps = libchamplain_gtk_requires + [
+  glib_dep,
+  gobject_dep,
   libchamplain_dep,
 ]
 
@@ -103,7 +106,7 @@ endif
 libchamplain_gtk_dep = declare_dependency(
   link_with: libchamplain_gtk_sha,
   include_directories: rootdir,
-  dependencies: libchamplain_gtk_deps,
+  dependencies: libchamplain_gtk_requires + [libchamplain_dep],
   sources: libchamplain_gtk_dep_sources,
 )
 
@@ -112,4 +115,5 @@ libchamplain_gtk_pc = pkg.generate(
   description: 'Gtk+ Widget wrapper for libchamplain',
   subdirs: package_string,
   install_dir: pkgconfigdir,
+  requires: libchamplain_gtk_requires + [libchamplain_sha],
 )
