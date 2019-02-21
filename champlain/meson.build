@@ -130,8 +130,6 @@ endif
 libchamplain_features_h = configure_file(
   output: 'champlain-features.h',
   configuration: features_h,
-  install: true,
-  install_dir: libchamplain_includedir,
 )
 
 version_h = configuration_data()
@@ -144,8 +142,6 @@ libchamplain_version_h = configure_file(
   input: 'champlain-version.h.in',
   output: 'champlain-version.h',
   configuration: version_h,
-  install: true,
-  install_dir: libchamplain_includedir,
 )
 
 libchamplain_public_h += [
@@ -182,7 +178,6 @@ libchamplain_sha = library(
   c_args: libchamplain_c_args,
   link_args: libchamplain_link_args,
   install: true,
-  install_dir: libdir,
 )
 
 libchamplain_dep_sources = [
@@ -213,8 +208,6 @@ if generate_gir
     includes: libchamplain_gir_includes,
     link_with: libchamplain_sha,
     install: true,
-    install_dir_gir: girdir,
-    install_dir_typelib: typelibdir,
     extra_args: [
       '-DCHAMPLAIN_COMPILATION',
     ]
@@ -237,7 +230,6 @@ if generate_gir
       sources: libchamplain_gir.get(0),
       packages: libchamplain_vapi_packages,
       install: true,
-      install_dir: vapidir,
     )
   endif
 endif
@@ -253,6 +245,5 @@ libchamplain_pc = pkg.generate(
   libchamplain_sha,
   description: 'Map View for Clutter',
   subdirs: package_string,
-  install_dir: pkgconfigdir,
   requires: libchamplain_requires,
 )

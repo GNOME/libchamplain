@@ -10,6 +10,8 @@ clutter_docpath = join_paths(clutter_prefix, 'share', 'gtk-doc', 'html', 'clutte
 gtk_prefix = gtk_dep.get_pkgconfig_variable('prefix')
 gtk_docpath = join_paths(gtk_prefix, 'share', 'gtk-doc', 'html', 'gtk3')
 
+gtkdocdir = join_paths(datadir, 'gtk-doc', 'html', package_string)
+
 libchamplain_reference_ignored_h = [
   'champlain-gtk.h',
   'champlain-adjustment.h',
@@ -52,7 +54,7 @@ libchamplain_reference_mkdb_args = [
 ]
 
 libchamplain_reference_fixxref_args = [
-  '--html-dir=@0@'.format(join_paths(gtkdocdir, 'html', package_string)),
+  '--html-dir=@0@'.format(gtkdocdir),
   '--extra-dir=@0@'.format(glib_docpath),
   '--extra-dir=@0@'.format(gobject_docpath),
   '--extra-dir=@0@'.format(clutter_docpath),
@@ -69,9 +71,5 @@ gnome.gtkdoc(
   mkdb_args: libchamplain_reference_mkdb_args,
   fixxref_args: libchamplain_reference_fixxref_args,
   install: true,
-  install_dir: join_paths(
-    gtkdocdir,
-    'html',
-    package_string,
-  )
+  install_dir: gtkdocdir,
 )
