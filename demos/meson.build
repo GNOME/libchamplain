@@ -1,23 +1,22 @@
 libchamplain_demos = [
-  ['minimal', 'minimal.c'],
-  ['launcher', ['launcher.c', 'markers.c']],
-  ['animated-marker', 'animated-marker.c'],
-  ['polygons', 'polygons.c'],
-  ['url-marker', 'url-marker.c'],
-  ['create_destroy_test', 'create-destroy-test.c'],
+  ['minimal', 'minimal.c', []],
+  ['launcher', ['launcher.c', 'markers.c'], []],
+  ['animated-marker', 'animated-marker.c', []],
+  ['polygons', 'polygons.c', []],
+  ['url-marker', 'url-marker.c', [libsoup_dep]],
+  ['create_destroy_test', 'create-destroy-test.c', []],
 ]
 
 foreach demo: libchamplain_demos
   demo_name = demo.get(0)
   demo_sources = demo.get(1)
+  demo_deps = demo.get(2)
 
   executable(
     demo_name,
     demo_sources,
     install: false,
-    dependencies: [
-      libchamplain_dep,
-    ]
+    dependencies: demo_deps + [libchamplain_dep],
   )
 endforeach
 

@@ -7,11 +7,14 @@ libchamplain_gtk_sources = [
   'gtk-champlain-embed.c',
 ]
 
-libchamplain_gtk_deps = [
-  glib_dep,
-  gobject_dep,
+libchamplain_gtk_requires = [
   gtk_dep,
   clutter_gtk_dep,
+]
+
+libchamplain_gtk_deps = libchamplain_gtk_requires + [
+  glib_dep,
+  gobject_dep,
   libchamplain_dep,
 ]
 
@@ -20,18 +23,20 @@ libchamplain_gtk_srcdir = include_directories('.')
 libchamplain_gtk_c_args = [
   '-DHAVE_CONFIG_H',
   '-DCHAMPLAIN_GTK_COMPILATION',
-  '-DG_LOG_DOMAIN="@0@"'.format(package_gtk_name),
+  '-DG_LOG_DOMAIN="@0@"'.format(meson.project_name()),
 ]
 
 libchamplain_gtk_link_args = [
 ]
 
+libchamplain_gtk_includedir = join_paths(
+  pkgincludedir,
+  'champlain-gtk',
+)
+
 install_headers(
   libchamplain_gtk_public_h,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain-gtk',
-  )
+  install_dir: libchamplain_gtk_includedir,
 )
 
 libchamplain_gtk_sha = library(
@@ -43,7 +48,6 @@ libchamplain_gtk_sha = library(
   c_args: libchamplain_gtk_c_args,
   link_args: libchamplain_gtk_link_args,
   install: true,
-  install_dir: libdir,
 )
 
 libchamplain_gtk_dep_sources = [
@@ -69,8 +73,6 @@ if generate_gir
     includes: ['Clutter-1.0', 'Gtk-3.0', libchamplain_gir.get(0)],
     link_with: libchamplain_gtk_sha,
     install: true,
-    install_dir_gir: girdir,
-    install_dir_typelib: typelibdir,
     extra_args: [
       '-DCHAMPLAIN_GTK_COMPILATION',
     ]
@@ -95,7 +97,6 @@ if generate_gir
       sources: libchamplain_gtk_gir.get(0),
       packages: libchamplain_gtk_vapi_packages,
       install: true,
-      install_dir: vapidir,
     )
   endif
 endif
@@ -103,7 +104,7 @@ endif
 libchamplain_gtk_dep = declare_dependency(
   link_with: libchamplain_gtk_sha,
   include_directories: rootdir,
-  dependencies: libchamplain_gtk_deps,
+  dependencies: libchamplain_gtk_requires + [libchamplain_dep],
   sources: libchamplain_gtk_dep_sources,
 )
 
@@ -111,5 +112,5 @@ libchamplain_gtk_pc = pkg.generate(
   libchamplain_gtk_sha,
   description: 'Gtk+ Widget wrapper for libchamplain',
   subdirs: package_string,
-  install_dir: pkgconfigdir,
+  requires: libchamplain_gtk_requires + [libchamplain_sha],
 )

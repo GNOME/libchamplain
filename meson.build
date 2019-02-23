@@ -14,23 +14,22 @@ pkg = import('pkgconfig')
 # Versioning
 version = meson.project_version()
 version_arr = version.split('.')
-version_major = version_arr[0]
-version_minor = version_arr[1]
-version_micro = version_arr[2]
+version_major = version_arr[0].to_int()
+version_minor = version_arr[1].to_int()
+version_micro = version_arr[2].to_int()
 
-if version_minor.to_int().is_odd()
-  api_version = '.'.join([version_major, version_minor + 1])
-else
-  api_version = '.'.join([version_major, version_minor])
-endif
+api_version = '@0@.@1@'.format(
+  version_major,
+  version_minor.is_odd() ? version_minor + 1 : version_minor,
+)
 
-# Before making a release, the LT_VERSION string should be modified.
-# The string is of the form C.A.R
-# - If the interface is the same as the previous version, change to C.A.R+1
+# Before making a release, the lib_version string should be modified.
+# The string is of the form X.Y.Z
+# - If the interface is the same as the previous version, change to X.Y.Z+1
 # - If interfaces have been changed or added, but binary compatibility has
-#   been preserved, change to C.A+1.R
+#   been preserved, change to X.Y+1.0
 # - If binary compatibility has been broken (eg removed or changed interfaces)
-#   change to C+1.0.0
+#   change to X+1.0.0
 lib_version = '0.11.8'
 
 package_name = meson.project_name().strip('lib')
@@ -41,21 +40,11 @@ package_gtk_string = '@0@-@1@'.format(package_gtk_name, api_version)
 # Paths
 rootdir = include_directories('.')
 
-srcdir = meson.current_source_dir()
-builddir = meson.current_build_dir()
-
 prefix = get_option('prefix')
-
 includedir = join_paths(prefix, get_option('includedir'))
 libdir = join_paths(prefix, get_option('libdir'))
 datadir = join_paths(prefix, get_option('datadir'))
 pkgincludedir = join_paths(includedir, package_string)
-typelibdir = join_paths(libdir, 'girepository-1.0')
-pkgconfigdir = join_paths(libdir, 'pkgconfig')
-
-girdir = join_paths(datadir, 'gir-1.0')
-gtkdocdir = join_paths(datadir, 'gtk-doc')
-vapidir = join_paths(datadir, 'vala', 'vapi')
 
 # Dependencies
 cc = meson.get_compiler('c')

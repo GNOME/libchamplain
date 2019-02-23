@@ -85,13 +85,16 @@ if build_with_memphis
   ]
 endif
 
-libchamplain_deps = [
-  libm_dep,
+libchamplain_requires = [
   glib_dep,
   gobject_dep,
-  gio_dep,
-  clutter_dep,
   cairo_dep,
+  clutter_dep,
+]
+
+libchamplain_deps = libchamplain_requires + [
+  libm_dep,
+  gio_dep,
   sqlite_dep,
   libsoup_dep,
 ]
@@ -105,11 +108,16 @@ libchamplain_srcdir = include_directories('.')
 libchamplain_c_args = [
   '-DHAVE_CONFIG_H',
   '-DCHAMPLAIN_COMPILATION',
-  '-DG_LOG_DOMAIN="@0@"'.format(package_name),
+  '-DG_LOG_DOMAIN="@0@"'.format(meson.project_name()),
 ]
 
 libchamplain_link_args = [
 ]
+
+libchamplain_includedir = join_paths(
+  pkgincludedir,
+  'champlain',
+)
 
 features_h = configuration_data()
 if build_with_memphis
@@ -119,11 +127,6 @@ endif
 libchamplain_features_h = configure_file(
   output: 'champlain-features.h',
   configuration: features_h,
-  install: true,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain',
-  )
 )
 
 version_h = configuration_data()
@@ -136,11 +139,6 @@ libchamplain_version_h = configure_file(
   input: 'champlain-version.h.in',
   output: 'champlain-version.h',
   configuration: version_h,
-  install: true,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain',
-  )
 )
 
 libchamplain_public_h += [
@@ -154,10 +152,7 @@ libchamplain_enums = gnome.mkenums(
   h_template: 'champlain-enum-types.h.in',
   c_template: 'champlain-enum-types.c.in',
   install_header: true,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain',
-  )
+  install_dir: libchamplain_includedir,
 )
 
 libchamplain_enums_h = libchamplain_enums.get(1)
@@ -168,10 +163,7 @@ libchamplain_sources += [
 
 install_headers(
   libchamplain_public_h,
-  install_dir: join_paths(
-    pkgincludedir,
-    'champlain',
-  )
+  install_dir: libchamplain_includedir,
 )
 
 libchamplain_sha = library(
@@ -183,7 +175,6 @@ libchamplain_sha = library(
   c_args: libchamplain_c_args,
   link_args: libchamplain_link_args,
   install: true,
-  install_dir: libdir,
 )
 
 libchamplain_dep_sources = [
@@ -214,8 +205,6 @@ if generate_gir
     includes: libchamplain_gir_includes,
     link_with: libchamplain_sha,
     install: true,
-    install_dir_gir: girdir,
-    install_dir_typelib: typelibdir,
     extra_args: [
       '-DCHAMPLAIN_COMPILATION',
     ]
@@ -238,7 +227,6 @@ if generate_gir
       sources: libchamplain_gir.get(0),
       packages: libchamplain_vapi_packages,
       install: true,
-      install_dir: vapidir,
     )
   endif
 endif
@@ -246,14 +234,13 @@ endif
 libchamplain_dep = declare_dependency(
   link_with: libchamplain_sha,
   include_directories: rootdir,
-  dependencies: libchamplain_deps,
+  dependencies: libchamplain_requires,
   sources: libchamplain_dep_sources,
 )
 
 libchamplain_pc = pkg.generate(
   libchamplain_sha,
-  name: package_string,
   description: 'Map View for Clutter',
   subdirs: package_string,
-  install_dir: pkgconfigdir,
+  requires: libchamplain_requires,
 )
