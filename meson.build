@@ -30,7 +30,7 @@ api_version = '@0@.@1@'.format(
 #   been preserved, change to X.Y+1.0
 # - If binary compatibility has been broken (eg removed or changed interfaces)
 #   change to X+1.0.0
-lib_version = '0.11.8'
+lib_version = '0.11.9'
 
 package_name = meson.project_name().strip('lib')
 package_string = '@0@-@1@'.format(package_name, api_version)
