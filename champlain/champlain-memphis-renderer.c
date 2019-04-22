@@ -44,7 +44,7 @@
 #include "champlain-memphis-renderer.h"
 #include "champlain-bounding-box.h"
 
-#include <gdk/gdk.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include <memphis/memphis.h>
 #include <errno.h>

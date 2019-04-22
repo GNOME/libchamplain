@@ -30,7 +30,6 @@
 
 #include <math.h>
 #include <errno.h>
-#include <gdk/gdk.h>
 #include <libsoup/soup.h>
 #include <gio/gio.h>
 #include <clutter/clutter.h>

@@ -25,7 +25,6 @@
  */
 
 #include "champlain-error-tile-renderer.h"
-#include <gdk/gdk.h>
 
 struct _ChamplainErrorTileRendererPrivate
 {

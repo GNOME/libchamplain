@@ -45,7 +45,6 @@
 #include "champlain-private.h"
 
 #include <errno.h>
-#include <gdk/gdk.h>
 #include <gio/gio.h>
 #include <glib.h>
 #include <glib/gstdio.h>
