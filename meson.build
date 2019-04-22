@@ -66,6 +66,7 @@ gtk_doc_req = '>= 1.15'
 glib_dep = dependency('glib-2.0', version: glib_req)
 gobject_dep = dependency('gobject-2.0', version: glib_req)
 gio_dep = dependency('gio-2.0', version: glib_req)
+gdk_dep = dependency('gdk-3.0', version: gtk_req)
 clutter_dep = dependency('clutter-1.0', version: clutter_req)
 cairo_dep = dependency('cairo', version: cairo_req)
 sqlite_dep = dependency('sqlite3', version: sqlite_req)
