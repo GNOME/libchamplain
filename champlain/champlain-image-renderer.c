@@ -26,6 +26,7 @@
  */
 
 #include "champlain-image-renderer.h"
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk/gdk.h>
 
 struct _ChamplainImageRendererPrivate

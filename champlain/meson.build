@@ -95,6 +95,7 @@ libchamplain_requires = [
 libchamplain_deps = libchamplain_requires + [
   libm_dep,
   gio_dep,
+  gdk_dep,
   sqlite_dep,
   libsoup_dep,
 ]
