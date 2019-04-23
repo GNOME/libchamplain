@@ -22,7 +22,7 @@ build-champlain:
     - meson -Dwidgetry=true -Ddemos=true -Dgtk_doc=true -Dintrospection=true -Dvapi=true _build .
     - ninja -C _build
     - ninja -C _build test
-    - ninja -C _build champlain-doc
+    - ninja -C _build champlain-0.12-doc
     - ccache --show-stats
   artifacts:
     name: "champlain-doc"
