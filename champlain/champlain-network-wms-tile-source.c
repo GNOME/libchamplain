@@ -562,8 +562,8 @@ champlain_network_wms_tile_source_set_user_agent (
 
 typedef struct
 {
-  double x;
-  double y;
+  gdouble x;
+  gdouble y;
 } ChamplainWmsPoint;
 
 typedef struct
@@ -595,10 +595,16 @@ get_tile_bbox (gint x,
   ChamplainWmsPoint mercator_lower = get_mercator_coords (x, y, z);
   ChamplainWmsPoint mercator_upper = get_mercator_coords (x+1, y+1, z);
 
+  /**
+   * While this assignment of points may seem counterintuitive, it is required
+   * to convert between the Google-style tile coordinates used by libchamplain
+   * to TMS coordinates (otherwise you end up with a flipped map).
+   */
+
   ret.lower.x = mercator_lower.x;
-  ret.lower.y = mercator_lower.y;
+  ret.lower.y = -mercator_upper.y;
   ret.upper.x = mercator_upper.x;
-  ret.upper.y = mercator_upper.y;
+  ret.upper.y = -mercator_lower.y;
 
   return ret;
 }
@@ -626,7 +632,7 @@ get_tile_uri (ChamplainNetworkWmsTileSource *tile_source,
 
   while (token != NULL)
     {
-      gint number = G_MAXINT;
+      gdouble number = G_MAXDOUBLE;
       gchar value[SIZE];
 
       if (strcmp (token, "L") == 0)
@@ -638,9 +644,9 @@ get_tile_uri (ChamplainNetworkWmsTileSource *tile_source,
       if (strcmp (token, "T") == 0)
         number = bbox.upper.y;
 
-      if (number != G_MAXINT)
+      if (number != G_MAXDOUBLE)
         {
-          g_snprintf(value, SIZE, "%d", number);
+          g_snprintf(value, SIZE, "%.0f", number);
           g_string_append (ret, value);
         }
       else
