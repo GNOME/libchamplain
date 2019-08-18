@@ -4,8 +4,10 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/champlain/**",
                 "/home/dnl/libchamplain/champlain/**",
-                "/usr/include/glib-2.0"
+                "/usr/include/**",
+                "/usr/lib/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
