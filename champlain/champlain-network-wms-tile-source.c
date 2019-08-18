@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2008-2009 Pierre-Luc Beaudoin <pierre-luc@pierlux.com>
+ * Copyright (C) 2010-2013 Jiri Techet <techet@gmail.com>
  * Copyright (C) 2019 Daniel Burgess <dnl@tuta.io>
  *
  * This library is free software; you can redistribute it and/or
