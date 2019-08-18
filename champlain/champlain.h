@@ -53,6 +53,7 @@
 
 #include "champlain/champlain-network-tile-source.h"
 #include "champlain/champlain-network-bbox-tile-source.h"
+#include "champlain/champlain-network-wms-tile-source.h"
 #include "champlain/champlain-file-tile-source.h"
 #include "champlain/champlain-null-tile-source.h"
 
