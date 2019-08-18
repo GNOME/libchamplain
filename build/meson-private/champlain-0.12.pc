@@ -1,0 +1,12 @@
+prefix=/usr/local
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: champlain-0.12
+Description: Map View for Clutter
+Version: 0.12.20
+Requires: glib-2.0 >=  2.38, gobject-2.0 >=  2.38, cairo >=  1.4, clutter-1.0 >=  1.24
+Requires.private: gio-2.0 >=  2.38, gdk-3.0 >=  3.0, sqlite3 >=  3.0, libsoup-2.4 >=  2.42
+Libs: -L${libdir} -lchamplain-0.12
+Libs.private: -lm
+Cflags: -I${includedir}/champlain-0.12

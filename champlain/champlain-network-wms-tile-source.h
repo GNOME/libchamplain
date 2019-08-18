@@ -72,10 +72,12 @@ GType champlain_network_wms_tile_source_get_type(void);
 
 ChamplainNetworkWmsTileSource *champlain_network_wms_tile_source_new_full(
     const gchar *id,
-    const gchar *name;
+    const gchar *name,
+    const gchar *license,
     const gchar *license_uri,
     guint min_zoom,
     guint max_zoom,
+    guint tile_size,
     ChamplainMapProjection projection,
     const gchar *uri_format,
     ChamplainRenderer *renderer);

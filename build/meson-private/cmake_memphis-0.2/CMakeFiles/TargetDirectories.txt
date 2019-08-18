@@ -1,0 +1,2 @@
+/home/dnl/libchamplain/build/meson-private/cmake_memphis-0.2/CMakeFiles/rebuild_cache.dir
+/home/dnl/libchamplain/build/meson-private/cmake_memphis-0.2/CMakeFiles/edit_cache.dir

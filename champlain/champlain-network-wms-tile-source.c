@@ -536,7 +536,7 @@ champlain_network_wms_tile_source_set_max_conns (ChamplainNetworkWmsTileSource *
       "max-conns", max_conns,
       NULL);
 
-  g_obejct_notify (G_OBJECT (tile_source), "max-conns");
+  g_object_notify (G_OBJECT (tile_source), "max-conns");
 }
 
 /**
@@ -590,7 +590,7 @@ get_tile_bbox (gint x,
     gint y,
     gint z)
 {
-  ChamplainWmsBbox ret = {0, 0, 0, 0};
+  ChamplainWmsBbox ret = {{0, 0}, {0, 0}};
 
   ChamplainWmsPoint mercator_lower = get_mercator_coords (x, y, z);
   ChamplainWmsPoint mercator_upper = get_mercator_coords (x+1, y+1, z);
@@ -604,6 +604,7 @@ get_tile_bbox (gint x,
 }
 
 #define SIZE 8
+
 static gchar *
 get_tile_uri (ChamplainNetworkWmsTileSource *tile_source,
   gint x,
