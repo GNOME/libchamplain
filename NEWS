@@ -1,3 +1,15 @@
+libchamplain 0.12.20 (2019-10-28)
+=================================
+
+Stable release
+
+Changes:
+
+* Remove autotools-based build and all the related files (Jiří Techet)
+* Fix gtk-doc module name (Mart Raudsepp)
+* Add missing gdk required dependency (Mart Raudsepp)
+* Make the build reproducible (Chris Lamb)
+
 libchamplain 0.12.19 (2019-03-03)
 =================================
 
