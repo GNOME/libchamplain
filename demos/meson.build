@@ -85,6 +85,7 @@ if build_with_memphis and build_gtk_widgetry
       dependencies: [
         libchamplain_dep,
         libchamplain_gtk_dep,
+        memphis_dep,
       ]
     )
   endforeach
