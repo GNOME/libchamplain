@@ -1,4 +1,4 @@
-image: fedora:29
+image: fedora:37
 
 stages:
   - build
@@ -19,7 +19,7 @@ build-champlain:
     - mkdir -p _ccache
     - ccache --zero-stats
     - ccache --show-stats
-    - meson -Dwidgetry=true -Ddemos=true -Dgtk_doc=true -Dintrospection=true -Dvapi=true _build .
+    - meson -Dwidgetry=true -Ddemos=true -Dgtk_doc=true -Dintrospection=true -Dvapi=true -Dlibsoup3=false _build .
     - ninja -C _build
     - ninja -C _build test
     - ninja -C _build champlain-0.12-doc

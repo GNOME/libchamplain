@@ -80,17 +80,24 @@ G_DEFINE_TYPE_WITH_PRIVATE (ChamplainNetworkTileSource, champlain_network_tile_s
  */
 #define MAX_CONNS_DEFAULT 2
 
+#ifndef CHAMPLAIN_LIBSOUP_3
 typedef struct
 {
   ChamplainMapSource *map_source;
   SoupMessage *msg;
 } TileCancelledData;
+#endif
 
 typedef struct
 {
   ChamplainMapSource *map_source;
   ChamplainTile *tile;
+#ifdef CHAMPLAIN_LIBSOUP_3
+  SoupMessage *msg;
+  GCancellable *cancellable;
+#else
   TileCancelledData *cancelled_data;
+#endif
 } TileLoadedData;
 
 typedef struct
@@ -102,9 +109,11 @@ typedef struct
 
 static void fill_tile (ChamplainMapSource *map_source,
     ChamplainTile *tile);
+#ifndef CHAMPLAIN_LIBSOUP_3
 static void tile_state_notify (ChamplainTile *tile,
     G_GNUC_UNUSED GParamSpec *pspec,
     TileCancelledData *data);
+#endif
 
 static gchar *get_tile_uri (ChamplainNetworkTileSource *source,
     gint x,
@@ -185,11 +194,9 @@ champlain_network_tile_source_dispose (GObject *object)
   ChamplainNetworkTileSourcePrivate *priv = CHAMPLAIN_NETWORK_TILE_SOURCE (object)->priv;
 
   if (priv->soup_session)
-    {
       soup_session_abort (priv->soup_session);
-      g_object_unref (priv->soup_session);
-      priv->soup_session = NULL;
-    }
+
+  g_clear_object (&priv->soup_session);
 
   G_OBJECT_CLASS (champlain_network_tile_source_parent_class)->dispose (object);
 }
@@ -322,6 +329,13 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
   priv->offline = FALSE;
   priv->max_conns = MAX_CONNS_DEFAULT;
 
+#ifdef CHAMPLAIN_LIBSOUP_3
+  priv->soup_session = soup_session_new_with_options (
+      "user-agent", "libchamplain/" CHAMPLAIN_VERSION_S,
+      "max-conns-per-host", MAX_CONNS_DEFAULT,
+      "max-conns", MAX_CONNS_DEFAULT,
+      NULL);
+#else
   priv->soup_session = soup_session_new_with_options (
         "proxy-uri", NULL,
         "ssl-strict", FALSE,
@@ -336,6 +350,7 @@ champlain_network_tile_source_init (ChamplainNetworkTileSource *tile_source)
       "max-conns-per-host", MAX_CONNS_DEFAULT,
       "max-conns", MAX_CONNS_DEFAULT,
       NULL);
+#endif
 }
 
 
@@ -474,11 +489,21 @@ champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_so
   g_return_if_fail (CHAMPLAIN_IS_NETWORK_TILE_SOURCE (tile_source));
 
   ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
+#ifndef CHAMPLAIN_LIBSOUP_3
   SoupURI *uri = NULL;
+#endif
 
   g_free (priv->proxy_uri);
   priv->proxy_uri = g_strdup (proxy_uri);
 
+#ifdef CHAMPLAIN_LIBSOUP_3
+  if (priv->soup_session)
+    {
+      GProxyResolver *resolver = soup_session_get_proxy_resolver (priv->soup_session);
+      if (!resolver && G_IS_SIMPLE_PROXY_RESOLVER (resolver))
+        g_simple_proxy_resolver_set_default_proxy (G_SIMPLE_PROXY_RESOLVER (resolver), priv->proxy_uri);
+    }
+#else
   if (priv->proxy_uri)
     uri = soup_uri_new (priv->proxy_uri);
 
@@ -489,6 +514,7 @@ champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_so
 
   if (uri)
     soup_uri_free (uri);
+#endif
 
   g_object_notify (G_OBJECT (tile_source), "proxy-uri");
 }
@@ -660,6 +686,25 @@ get_tile_uri (ChamplainNetworkTileSource *tile_source,
   return token;
 }
 
+static void
+tile_rendered_data_free (TileRenderedData *data)
+{
+  g_clear_pointer (&data->etag, g_free);
+  g_clear_object (&data->map_source);
+  g_slice_free (TileRenderedData, data);
+}
+
+static void
+tile_loaded_data_free (TileLoadedData *data)
+{
+  g_clear_object (&data->tile);
+  g_clear_object (&data->map_source);
+#ifdef CHAMPLAIN_LIBSOUP_3
+  g_clear_object (&data->cancellable);
+  g_clear_object (&data->msg);
+#endif
+  g_slice_free (TileLoadedData, data);
+}
 
 static void
 tile_rendered_cb (ChamplainTile *tile,
@@ -668,12 +713,11 @@ tile_rendered_cb (ChamplainTile *tile,
     gboolean error,
     TileRenderedData *user_data)
 {
-  ChamplainMapSource *map_source = user_data->map_source;
+  ChamplainMapSource *map_source = g_steal_pointer (&user_data->map_source);
   ChamplainMapSource *next_source;
-  gchar *etag = user_data->etag;
+  gchar *etag = g_steal_pointer (&user_data->etag);
 
   g_signal_handlers_disconnect_by_func (tile, tile_rendered_cb, user_data);
-  g_slice_free (TileRenderedData, user_data);
 
   next_source = champlain_map_source_get_next_source (map_source);
 
@@ -700,7 +744,117 @@ tile_rendered_cb (ChamplainTile *tile,
   g_object_unref (tile);
 }
 
+#ifdef CHAMPLAIN_LIBSOUP_3
+static void
+tile_bytes_loaded_cb (GObject *source_object,
+    GAsyncResult *res,
+    gpointer user_data)
+{
+  TileLoadedData *callback_data = user_data;
+  ChamplainTile *tile = callback_data->tile;
+  ChamplainMapSource *map_source = callback_data->map_source;
+  GError *error = NULL;
 
+  if (g_output_stream_splice_finish (G_OUTPUT_STREAM (source_object), res, &error) != -1) {
+    gsize size = g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (source_object));
+    gconstpointer data = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (source_object));
+    ChamplainRenderer *renderer = champlain_map_source_get_renderer (map_source);
+
+    champlain_renderer_set_data (renderer, data, size);
+    champlain_renderer_render (renderer, tile);
+  }
+
+  tile_loaded_data_free (callback_data);
+}
+
+static void
+tile_loaded_cb (GObject *source_object,
+    GAsyncResult *res,
+    gpointer user_data)
+{
+  TileLoadedData *callback_data = (TileLoadedData *) user_data;
+  GCancellable *cancellable = callback_data->cancellable;
+  SoupMessage *msg = callback_data->msg;
+  ChamplainTile *tile = callback_data->tile;
+  ChamplainMapSource *map_source = callback_data->map_source;
+  const gchar *etag;
+  TileRenderedData *data;
+  GInputStream *stream;
+	GOutputStream *ostream;
+  GError *error = NULL;
+  SoupStatus status;
+  SoupMessageHeaders *response_headers;
+
+  stream = soup_session_send_finish (SOUP_SESSION (source_object), res, &error);
+  status = soup_message_get_status (msg);
+  DEBUG ("Got reply %d", status);
+
+  if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+    {
+      DEBUG ("Download of tile %d, %d got cancelled",
+          champlain_tile_get_x (tile), champlain_tile_get_y (tile));
+      goto cleanup;
+    }
+
+  if (status == SOUP_STATUS_NOT_MODIFIED)
+    {
+      ChamplainTileSource *tile_source = CHAMPLAIN_TILE_SOURCE (map_source);
+      ChamplainTileCache *tile_cache = champlain_tile_source_get_cache (tile_source);
+
+      if (tile_cache)
+        champlain_tile_cache_refresh_tile_time (tile_cache, tile);
+
+      champlain_tile_set_fade_in (tile, TRUE);
+      champlain_tile_set_state (tile, CHAMPLAIN_STATE_DONE);
+      champlain_tile_display_content (tile);
+      goto cleanup;
+    }
+
+  if (!SOUP_STATUS_IS_SUCCESSFUL (status))
+    {
+      ChamplainMapSource *next_source = champlain_map_source_get_next_source (map_source);
+      DEBUG ("Unable to download tile %d, %d: %s : %s",
+          champlain_tile_get_x (tile),
+          champlain_tile_get_y (tile),
+          soup_status_get_phrase (status),
+          soup_message_get_reason_phrase (msg));
+
+      if (next_source)
+        champlain_map_source_fill_tile (next_source, tile);
+
+      goto cleanup;
+    }
+
+  /* Verify if the server sent an etag and save it */
+  response_headers = soup_message_get_response_headers (msg);
+  etag = soup_message_headers_get_one (response_headers, "ETag");
+  DEBUG ("Received ETag %s", etag);
+
+  data = g_slice_new (TileRenderedData);
+  data->map_source = g_object_ref (map_source);
+  data->etag = g_strdup (etag);
+
+  g_signal_connect_data (tile, "render-complete", G_CALLBACK (tile_rendered_cb), data, (GClosureNotify)tile_rendered_data_free, 0);
+
+  ostream = g_memory_output_stream_new_resizable ();
+  g_output_stream_splice_async (ostream,
+      stream,
+      G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE |
+      G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
+      G_PRIORITY_DEFAULT_IDLE,
+      cancellable,
+      tile_bytes_loaded_cb,
+      callback_data);
+  g_clear_object (&ostream);
+  g_clear_object (&stream);
+
+  return;
+cleanup:
+  tile_loaded_data_free (callback_data);
+  g_clear_error (&error);
+  g_clear_object (&stream);
+}
+#else
 static void
 tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
     SoupMessage *msg,
@@ -717,7 +871,6 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
   ChamplainRenderer *renderer;
 
   g_signal_handlers_disconnect_by_func (tile, tile_state_notify, callback_data->cancelled_data);
-  g_slice_free (TileLoadedData, callback_data);
 
   DEBUG ("Got reply %d", msg->status_code);
 
@@ -753,10 +906,10 @@ tile_loaded_cb (G_GNUC_UNUSED SoupSession *session,
   g_return_if_fail (CHAMPLAIN_IS_RENDERER (renderer));
 
   data = g_slice_new (TileRenderedData);
-  data->map_source = map_source;
+  data->map_source = g_object_ref (map_source);
   data->etag = g_strdup (etag);
 
-  g_signal_connect (tile, "render-complete", G_CALLBACK (tile_rendered_cb), data);
+  g_signal_connect_data (tile, "render-complete", G_CALLBACK (tile_rendered_cb), data, (GClosureNotify)tile_rendered_data_free, 0);
 
   champlain_renderer_set_data (renderer, (guint8*) msg->response_body->data, msg->response_body->length);
   champlain_renderer_render (renderer, tile);
@@ -775,10 +928,8 @@ finish:
   champlain_tile_display_content (tile);
 
 cleanup:
-  g_object_unref (tile);
-  g_object_unref (map_source);
+  tile_loaded_data_free (callback_data);
 }
-
 
 static void
 destroy_cancelled_data (TileCancelledData *data,
@@ -792,8 +943,24 @@ destroy_cancelled_data (TileCancelledData *data,
 
   g_slice_free (TileCancelledData, data);
 }
+#endif
 
 
+#ifdef CHAMPLAIN_LIBSOUP_3
+static void
+tile_state_notify (ChamplainTile *tile,
+    G_GNUC_UNUSED GParamSpec *pspec,
+    gpointer user_data)
+{
+  GCancellable *cancellable = user_data;
+
+  if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE && cancellable != NULL)
+    {
+      DEBUG ("Canceling tile download");
+      g_cancellable_cancel (cancellable);
+    }
+}
+#else
 static void
 tile_state_notify (ChamplainTile *tile,
     G_GNUC_UNUSED GParamSpec *pspec,
@@ -806,6 +973,7 @@ tile_state_notify (ChamplainTile *tile,
       soup_session_cancel_message (priv->soup_session, data->msg, SOUP_STATUS_CANCELLED);
     }
 }
+#endif
 
 
 static gchar *
@@ -842,6 +1010,9 @@ fill_tile (ChamplainMapSource *map_source,
 
   ChamplainNetworkTileSource *tile_source = CHAMPLAIN_NETWORK_TILE_SOURCE (map_source);
   ChamplainNetworkTileSourcePrivate *priv = tile_source->priv;
+#ifdef CHAMPLAIN_LIBSOUP_3
+  GCancellable *cancellable = NULL;
+#endif
 
   if (champlain_tile_get_state (tile) == CHAMPLAIN_STATE_DONE)
     return;
@@ -865,6 +1036,11 @@ fill_tile (ChamplainMapSource *map_source,
 
           const gchar *etag = champlain_tile_get_etag (tile);
           gchar *date = get_modified_time_string (tile);
+#ifdef CHAMPLAIN_LIBSOUP_3
+          SoupMessageHeaders *headers = soup_message_get_request_headers (msg);
+#else
+          SoupMessageHeaders *headers = msg->request_headers;
+#endif
 
           /* If an etag is available, only use it.
            * OSM servers seems to send now as the modified time for all tiles
@@ -873,19 +1049,23 @@ fill_tile (ChamplainMapSource *map_source,
           if (etag)
             {
               DEBUG ("If-None-Match: %s", etag);
-              soup_message_headers_append (msg->request_headers,
+              soup_message_headers_append (headers,
                   "If-None-Match", etag);
             }
           else if (date)
             {
               DEBUG ("If-Modified-Since %s", date);
-              soup_message_headers_append (msg->request_headers,
+              soup_message_headers_append (headers,
                   "If-Modified-Since", date);
             }
 
           g_free (date);
         }
 
+#ifdef CHAMPLAIN_LIBSOUP_3
+      cancellable = g_cancellable_new ();
+      g_signal_connect (tile, "notify::state", G_CALLBACK (tile_state_notify), cancellable);
+#else
       TileCancelledData *tile_cancelled_data = g_slice_new (TileCancelledData);
       tile_cancelled_data->map_source = map_source;
       tile_cancelled_data->msg = msg;
@@ -895,18 +1075,21 @@ fill_tile (ChamplainMapSource *map_source,
 
       g_signal_connect_data (tile, "notify::state", G_CALLBACK (tile_state_notify),
           tile_cancelled_data, (GClosureNotify) destroy_cancelled_data, 0);
+#endif
 
       callback_data = g_slice_new (TileLoadedData);
-      callback_data->tile = tile;
-      callback_data->map_source = map_source;
+      callback_data->tile = g_object_ref (tile);
+      callback_data->map_source = g_object_ref (map_source);
+#ifdef CHAMPLAIN_LIBSOUP_3
+      callback_data->cancellable = cancellable; // transfer ownership
+      callback_data->msg = msg; // transfer ownership
+      soup_session_send_async (priv->soup_session, msg, G_PRIORITY_DEFAULT_IDLE, cancellable, tile_loaded_cb, callback_data);
+#else
       callback_data->cancelled_data = tile_cancelled_data;
-
-      g_object_ref (map_source);
-      g_object_ref (tile);
-
       soup_session_queue_message (priv->soup_session, msg,
           tile_loaded_cb,
           callback_data);
+#endif
     }
   else
     {
