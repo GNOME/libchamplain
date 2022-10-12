@@ -498,7 +498,7 @@ champlain_network_tile_source_set_proxy_uri (ChamplainNetworkTileSource *tile_so
   if (priv->soup_session)
     {
       GProxyResolver *resolver = soup_session_get_proxy_resolver (priv->soup_session);
-      if (!resolver && G_IS_SIMPLE_PROXY_RESOLVER (resolver))
+      if (resolver && G_IS_SIMPLE_PROXY_RESOLVER (resolver))
         g_simple_proxy_resolver_set_default_proxy (G_SIMPLE_PROXY_RESOLVER (resolver), priv->proxy_uri);
     }
 #else

@@ -119,7 +119,7 @@ champlain_network_bbox_tile_source_set_property (GObject *object,
         {
 #ifdef CHAMPLAIN_LIBSOUP_3
           GProxyResolver *resolver = soup_session_get_proxy_resolver (priv->soup_session);
-          if (!resolver && G_IS_SIMPLE_PROXY_RESOLVER (resolver))
+          if (resolver && G_IS_SIMPLE_PROXY_RESOLVER (resolver))
             g_simple_proxy_resolver_set_default_proxy (G_SIMPLE_PROXY_RESOLVER (resolver), priv->proxy_uri);
 #else
           g_object_set (G_OBJECT (priv->soup_session), "proxy-uri",
