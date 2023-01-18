@@ -1,4 +1,4 @@
-image: fedora:29
+image: fedora:37
 
 stages:
   - build
@@ -6,7 +6,7 @@ stages:
 
 before_script:
   - dnf install -y gcc ccache gettext gtk-doc meson ninja-build redhat-rpm-config
-  - dnf install -y glib2-devel clutter-devel gtk3-devel clutter-gtk-devel cairo-devel sqlite-devel libsoup-devel gobject-introspection-devel vala-devel
+  - dnf install -y glib2-devel clutter-devel gtk3-devel clutter-gtk-devel cairo-devel sqlite-devel libsoup3-devel libsoup-devel gobject-introspection-devel vala-devel
 
 .ccache-setup: &ccache-setup
   variables:
@@ -19,7 +19,10 @@ build-champlain:
     - mkdir -p _ccache
     - ccache --zero-stats
     - ccache --show-stats
-    - meson -Dwidgetry=true -Ddemos=true -Dgtk_doc=true -Dintrospection=true -Dvapi=true _build .
+    - meson -Dwidgetry=true -Ddemos=true -Dgtk_doc=true -Dintrospection=true -Dvapi=true -Dlibsoup3=false _build .
+    - ninja -C _build
+    - ninja -C _build test
+    - meson configure _build -Dlibsoup3=true
     - ninja -C _build
     - ninja -C _build test
     - ninja -C _build champlain-0.12-doc
