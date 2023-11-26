@@ -15,7 +15,7 @@ other language mappings are also available thanks to GObject-introspection.</des
   <homepage rdf:resource="https://wiki.gnome.org/Projects/libchamplain" />
   <download-page rdf:resource="https://download.gnome.org/sources/libchamplain/" />
   <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/libchamplain/issues/" />
-  <mailing-list rdf:resource="https://mail.gnome.org/mailman/listinfo/libchamplain-list" />
+  <developer-forum rdf:resource="https://discourse.gnome.org/tags/c/platform/5/libchamplain" />
 
   <maintainer>
     <foaf:Person>
