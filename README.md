@@ -39,8 +39,8 @@ points to see how to get the most basic map application running.
 Full **documentation** can be found at:
 * https://gnome.pages.gitlab.gnome.org/libchamplain/champlain
 
-The official **mailing list** is at:
-* https://mail.gnome.org/mailman/listinfo/libchamplain-list
+The official **forum** is at:
+* https://discourse.gnome.org/tags/c/platform/5/libchamplain
 
 The official **IRC channel** is at:
 * irc://irc.freenode.org/#champlain
